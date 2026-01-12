@@ -1,0 +1,22 @@
+{
+  "name": "@viccoboard/plugins",
+  "version": "0.1.0",
+  "description": "Plugin registry and contracts for ViccoBoard extensibility",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": ["plugins", "registry", "extensibility"],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@viccoboard/core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

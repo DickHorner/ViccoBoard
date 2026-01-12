@@ -1,0 +1,23 @@
+{
+  "name": "viccoboard",
+  "version": "0.1.0",
+  "description": "Unified Teacher Suite - SportZens + KURT",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "modules/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "education",
+    "sports",
+    "assessment",
+    "grading",
+    "teacher-tools"
+  ],
+  "author": "",
+  "license": "UNLICENSED"
+}

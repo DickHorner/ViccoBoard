@@ -1,0 +1,19 @@
+{
+  "name": "@viccoboard/core",
+  "version": "0.1.0",
+  "description": "Core domain models, interfaces, and storage abstractions",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": ["core", "domain", "interfaces"],
+  "author": "",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
