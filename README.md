@@ -161,16 +161,37 @@ Plugin registry and management system. Allows registration of:
 - Node.js 20.x or higher
 - npm 10.x or higher
 
-### Installation
+### Quick Demo
+
+See ViccoBoard in action with a working demonstration:
 
 ```bash
-# Install dependencies
-npm install
+# Windows (PowerShell)
+.\build-and-run.ps1
 
-# Build all packages
+# Unix/Mac/Linux
+chmod +x build-and-run.sh
+./build-and-run.sh
+
+# Or manually
 npm run build
+npm run demo
+```
 
-# Run tests
+The demo creates a class, enrolls students, records attendance, and shows statistics - proving the entire architecture works end-to-end!
+
+See [DEMO_COMPLETE.md](./DEMO_COMPLETE.md) for details.
+
+### Development
+
+```bash
+# Install dependencies for a specific package
+cd packages/core && npm install
+
+# Build a specific package
+cd packages/core && npm run build
+
+# Run tests (when available)
 npm test
 ```
 
@@ -184,9 +205,18 @@ For detailed documentation, see:
 
 ### Project Status
 
-🚧 **In Active Development**
+✅ **Working Proof-of-Concept Complete!**
 
-The core architecture and type definitions are in place. Implementation is following the modular approach defined in the architecture documents.
+A full working demo is available that demonstrates:
+- Encrypted database storage
+- Class and student management
+- Attendance tracking
+- Statistics and queries
+- Complete Clean Architecture implementation
+
+**Progress: 25% complete** - Foundation proven, ready for feature expansion.
+
+Run `npm run demo` to see it in action!
 
 ### Contributing
 

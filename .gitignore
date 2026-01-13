@@ -39,6 +39,7 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+demo-data/
 
 # Logs
 logs/
