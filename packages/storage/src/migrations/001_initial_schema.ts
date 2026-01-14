@@ -13,10 +13,7 @@ export class InitialSchemaMigration implements Migration {
   constructor(private storage: SQLiteStorage) {}
 
   async up(): Promise<void> {
-    this.upSync();
-  }
-
-  upSync(): void {
+    // Synchronously execute all migrations
     const db = this.storage.getDatabase();
     
     // Teacher Account
@@ -103,6 +100,7 @@ export class InitialSchemaMigration implements Migration {
         student_id TEXT NOT NULL,
         status TEXT NOT NULL,
         reason TEXT,
+        timestamp TEXT,
         exported INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
