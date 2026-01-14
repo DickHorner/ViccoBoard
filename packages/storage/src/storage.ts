@@ -7,6 +7,8 @@ import Database from 'better-sqlite3';
 import { Storage, Migration } from '@viccoboard/core';
 import * as path from 'path';
 import * as fs from 'fs';
+import { SQLiteAdapter } from './adapters/sqlite.adapter';
+import { StorageAdapter } from './adapters/storage-adapter.interface';
 
 export interface StorageConfig {
   databasePath: string;
@@ -16,6 +18,7 @@ export interface StorageConfig {
 
 export class SQLiteStorage implements Storage {
   private db: Database.Database | null = null;
+  private adapter: SQLiteAdapter | null = null;
   private config: StorageConfig;
   private migrations: Migration[] = [];
   private initialized: boolean = false;
@@ -57,6 +60,9 @@ export class SQLiteStorage implements Storage {
     // Enable foreign keys
     this.db.pragma('foreign_keys = ON');
 
+    // Initialize adapter
+    this.adapter = new SQLiteAdapter(this.db);
+
     this.initialized = true;
   }
 
@@ -64,6 +70,7 @@ export class SQLiteStorage implements Storage {
     if (this.db) {
       this.db.close();
       this.db = null;
+      this.adapter = null;
       this.initialized = false;
     }
   }
@@ -77,6 +84,13 @@ export class SQLiteStorage implements Storage {
       throw new Error('Storage not initialized');
     }
     return this.db;
+  }
+
+  getAdapter(): StorageAdapter {
+    if (!this.adapter) {
+      throw new Error('Storage not initialized');
+    }
+    return this.adapter;
   }
 
   registerMigration(migration: Migration): void {

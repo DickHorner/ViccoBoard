@@ -56,14 +56,18 @@ async function main() {
     console.log('\n🏗️  Step 2: Initialize Repositories & Use Cases');
     console.log('─'.repeat(60));
     
-    const classGroupRepo = new ClassGroupRepository(storage);
-    const studentRepo = new StudentRepository(storage);
-    const attendanceRepo = new AttendanceRepository(storage);
+    // Get the adapter from storage
+    const adapter = storage.getAdapter();
+    
+    const classGroupRepo = new ClassGroupRepository(adapter);
+    const studentRepo = new StudentRepository(adapter);
+    const attendanceRepo = new AttendanceRepository(adapter);
 
     const createClassUseCase = new CreateClassUseCase(classGroupRepo);
     const addStudentUseCase = new AddStudentUseCase(studentRepo, classGroupRepo);
     const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo, studentRepo);
 
+    console.log('✓ Storage adapter initialized');
     console.log('✓ Repositories initialized');
     console.log('✓ Use cases ready');
 

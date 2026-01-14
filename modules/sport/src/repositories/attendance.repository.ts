@@ -3,13 +3,13 @@
  * Handles persistence of attendance records
  */
 
-import { BaseRepository } from '@viccoboard/storage';
+import { AdapterRepository } from '@viccoboard/storage';
 import { AttendanceRecord } from '@viccoboard/core';
-import type { SQLiteStorage } from '@viccoboard/storage';
+import type { StorageAdapter } from '@viccoboard/storage';
 
-export class AttendanceRepository extends BaseRepository<AttendanceRecord> {
-  constructor(storage: SQLiteStorage) {
-    super(storage, 'attendance_records');
+export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
+  constructor(adapter: StorageAdapter) {
+    super(adapter, 'attendance_records');
   }
 
   /**

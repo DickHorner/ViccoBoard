@@ -3,13 +3,13 @@
  * Handles persistence of student profiles
  */
 
-import { BaseRepository } from '@viccoboard/storage';
+import { AdapterRepository } from '@viccoboard/storage';
 import { Student } from '@viccoboard/core';
-import type { SQLiteStorage } from '@viccoboard/storage';
+import type { StorageAdapter } from '@viccoboard/storage';
 
-export class StudentRepository extends BaseRepository<Student> {
-  constructor(storage: SQLiteStorage) {
-    super(storage, 'students');
+export class StudentRepository extends AdapterRepository<Student> {
+  constructor(adapter: StorageAdapter) {
+    super(adapter, 'students');
   }
 
   /**
@@ -67,16 +67,14 @@ export class StudentRepository extends BaseRepository<Student> {
    * Find students by name (partial match)
    */
   async findByName(searchTerm: string): Promise<Student[]> {
-    const db = this.storage.getDatabase();
-    const stmt = db.prepare(`
-      SELECT * FROM ${this.tableName}
-      WHERE LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ?
-    `);
+    // Get all students and filter in-memory (works with both SQLite and IndexedDB)
+    const allStudents = await this.findAll();
+    const lowerSearch = searchTerm.toLowerCase();
     
-    const searchPattern = `%${searchTerm.toLowerCase()}%`;
-    const rows = stmt.all(searchPattern, searchPattern);
-    
-    return rows.map(row => this.mapToEntity(row));
+    return allStudents.filter(student => 
+      student.firstName.toLowerCase().includes(lowerSearch) ||
+      student.lastName.toLowerCase().includes(lowerSearch)
+    );
   }
 
   /**

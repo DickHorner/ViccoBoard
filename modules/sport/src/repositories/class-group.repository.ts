@@ -3,13 +3,13 @@
  * Handles persistence of class/course groups
  */
 
-import { BaseRepository } from '@viccoboard/storage';
+import { AdapterRepository } from '@viccoboard/storage';
 import { ClassGroup } from '@viccoboard/core';
-import type { SQLiteStorage } from '@viccoboard/storage';
+import type { StorageAdapter } from '@viccoboard/storage';
 
-export class ClassGroupRepository extends BaseRepository<ClassGroup> {
-  constructor(storage: SQLiteStorage) {
-    super(storage, 'class_groups');
+export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
+  constructor(adapter: StorageAdapter) {
+    super(adapter, 'class_groups');
   }
 
   /**
