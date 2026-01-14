@@ -3,14 +3,14 @@
  * Business logic for recording student attendance in a lesson
  */
 
-import { AttendanceRecord } from '@viccoboard/core';
+import { AttendanceRecord, AttendanceStatus } from '@viccoboard/core';
 import { AttendanceRepository } from '../repositories/attendance.repository';
 import { StudentRepository } from '../repositories/student.repository';
 
 export interface RecordAttendanceInput {
   studentId: string;
   lessonId: string;
-  status: 'present' | 'absent' | 'excused' | 'passive' | 'late';
+  status: AttendanceStatus;
   reason?: string;
   notes?: string;
 }
@@ -78,7 +78,7 @@ export class RecordAttendanceUseCase {
       throw new Error('Attendance status is required');
     }
 
-    const validStatuses = ['present', 'absent', 'excused', 'passive', 'late'];
+    const validStatuses = Object.values(AttendanceStatus);
     if (!validStatuses.includes(input.status)) {
       throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
     }

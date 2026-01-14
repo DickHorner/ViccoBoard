@@ -18,6 +18,7 @@ import {
   AddStudentUseCase,
   RecordAttendanceUseCase
 } from '@viccoboard/sport';
+import { AttendanceStatus } from '@viccoboard/core';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -38,7 +39,7 @@ async function main() {
     const dbPath = path.join(dataDir, 'viccoboard-demo.db');
     const storage = new SQLiteStorage({
       databasePath: dbPath,
-      verbose: false
+      verbose: true
     });
 
     const password = 'demo-password-2024';
@@ -142,21 +143,21 @@ async function main() {
     await recordAttendanceUseCase.execute({
       studentId: createdStudents[0].id,
       lessonId: lessonId,
-      status: 'present'
+      status: AttendanceStatus.Present
     });
     console.log(`✓ ${createdStudents[0].firstName} ${createdStudents[0].lastName}: Present`);
 
     await recordAttendanceUseCase.execute({
       studentId: createdStudents[1].id,
       lessonId: lessonId,
-      status: 'present'
+      status: AttendanceStatus.Present
     });
     console.log(`✓ ${createdStudents[1].firstName} ${createdStudents[1].lastName}: Present`);
 
     await recordAttendanceUseCase.execute({
       studentId: createdStudents[2].id,
       lessonId: lessonId,
-      status: 'absent',
+      status: AttendanceStatus.Absent,
       reason: 'Sick'
     });
     console.log(`✓ ${createdStudents[2].firstName} ${createdStudents[2].lastName}: Absent (Sick)`);
@@ -164,7 +165,7 @@ async function main() {
     await recordAttendanceUseCase.execute({
       studentId: createdStudents[3].id,
       lessonId: lessonId,
-      status: 'passive',
+      status: AttendanceStatus.Passive,
       reason: 'Injury'
     });
     console.log(`✓ ${createdStudents[3].firstName} ${createdStudents[3].lastName}: Passive (Injury)`);
@@ -229,6 +230,10 @@ async function main() {
 
   } catch (error) {
     console.error('\n❌ Error:', error instanceof Error ? error.message : error);
+    if (error instanceof Error && error.stack) {
+      console.error('Stack trace:');
+      console.error(error.stack);
+    }
     process.exit(1);
   }
 }

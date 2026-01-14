@@ -13,6 +13,10 @@ export class InitialSchemaMigration implements Migration {
   constructor(private storage: SQLiteStorage) {}
 
   async up(): Promise<void> {
+    this.upSync();
+  }
+
+  upSync(): void {
     const db = this.storage.getDatabase();
     
     // Teacher Account

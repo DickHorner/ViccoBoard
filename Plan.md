@@ -9,9 +9,11 @@ in einem konsistenten System vereint.
 
 **Harte Vorgaben:**
 1. **Keine Funktion und keine Option wird ausgelassen** (siehe Feature-Checkliste in Abschnitt 6).
-2. **Modularer Ansatz**: neue Domänen (z. B. weitere Fächer/Tests) müssen als Module/Plugins ergänzbar sein, ohne Core-Änderungen.
-3. **Local-first/Offline** als Default: Daten bleiben lokal; Internet nur, wenn eine Funktion es zwingend braucht (z. B. WOW-Webinterface, E-Mail-Versand).
-4. **Sicherheitsmodell**: verschlüsselte lokale Speicherung + App-Sperre (PIN/Passwort), plus Backup/Restore.
+2. **Modularer Ansatz:** neue Domänen/Fächer/Tools müssen als Module/Plugins ergänzbar sein, ohne Core-Änderungen (Core = Interfaces, Policies, Shared UI).
+3. **Ohne Installation & komplett lokal lauffähig (Default):** Die App läuft als **statische Web-App im Browser** (HTTP/HTTPS), ohne App-Store, ohne Electron, ohne Browser-Extension, ohne lokale Server-Installation. Alle Kernfunktionen funktionieren offline.
+4. **LocalDB = IndexedDB (Default):** verschlüsselte Speicherung im Browser (inkl. Migrationen), jederzeitiger Export/Backup/Restore.
+5. **Online/Integrationen nur optional:** iServ/Notion/Sync sind **Feature-Flags** und standardmäßig **aus**. Die App muss ohne diese Integrationen vollständig nutzbar sein.
+6. **Sicherheitsmodell:** App-Sperre (PIN/Passwort), Lock-Policy/Timeout, sichere Schlüsselableitung, saubere Backups/Restore (kein Datenverlust durch Updates).
 
 ---
 
@@ -20,7 +22,7 @@ in einem konsistenten System vereint.
 ### 2.1 Core-Plattform (für alles)
 - **Core-UI Shell**: Navigation, Deep-Links, globaler Such-/Filterlayer.
 - **Identity & Security**: App-Sperre (PIN/Passwort), Passwort ändern, Datenbank-Passwort, Session-Timeout, Biometrie (optional), Berechtigungen.
-- **Storage**: verschlüsselte lokale DB, Migrationen, Attachments (Fotos/Signaturen/Bilder).
+- **Storage**: verschlüsselte lokale DB (**IndexedDB**), versionierte Migrationen, Attachments (Fotos/Signaturen/Bilder) – ohne Backend-Pflicht.
 - **Backup/Restore**: Export/Import kompletter Datenbestand + selektive Exporte (z. B. nur Prüfungsentwürfe).
 - **Import/Export Hub**: CSV/PDF/„Share Packages“ (für Austausch ohne Cloud).
 - **Templates**: Tabellen-/CSV-Vorlagen, Druckpresets, E-Mail-Templates.
@@ -64,13 +66,17 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 
 **Regel:** Core kennt nur Interfaces, nie konkrete Implementierungen.
 
-### 3.3 Local-first, Sync nur als Modul
-- Standard: alles offline.
-- Sync/Online wird als **separates Modul** implementiert (WOW-Server + ggf. optionaler Lehrer-zu-Lehrer-Sharing-Service).
+### 3.4 Runtime/Deployment ohne Installation
+- Build erzeugt **statische Assets** (`dist/`), die auf jedem beliebigen Webserver laufen (Schulserver/iServ-Web/USB-Intranet/Hosting).
+- **Keine Runtime-Server-Komponente**: Im Betrieb darf kein Node/Python/Docker nötig sein.
+- Offline-First: App muss bei deaktiviertem Netzwerk weiterhin bedienbar bleiben (Ausnahmen nur bei explizit aktivierten Integrationen).
+- Optional: PWA/Service Worker **nur** als Komfort (Caching), niemals als Voraussetzung.
 
----
-
-## 4) Datenmodell (konzeptionell)
+### 3.5 Persistenz- & Exportstrategie (IndexedDB)
+- **IndexedDB** als Primärspeicher; jede Domäne nutzt Repositories (kein Direktzugriff aus UI).
+- **Migrations**: strikt versioniert; Upgrades dürfen keine Daten löschen.
+- **Backup/Restore**: vollständiger Export/Import (z. B. verschlüsseltes Archiv) + selektive Exporte (CSV/PDF/Share-Package).
+- **E-Mail-Versand lokal:** Generiere E-Mail-Inhalt/Anhänge und öffne Mail-Client (`mailto:`) oder exportiere als `.eml`/PDF – kein SMTP-Server erforderlich.
 
 ### 4.1 Kern-Entitäten
 - **TeacherAccount** (lokal): Security-Settings (PIN, Passwortänderung, DB-Passwort, Lock-Policy).

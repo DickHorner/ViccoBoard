@@ -110,17 +110,25 @@ export class SQLiteStorage implements Storage {
       if (migration.version > currentVersion) {
         console.log(`Applying migration ${migration.version}: ${migration.name}`);
         
-        await this.transaction(async () => {
-          await migration.up();
-          this.db!.prepare(
+        try {
+          // Execute migration - upSync is synchronous and doesn't need transaction
+          migration.upSync();
+          
+          // Record in migrations table
+          this.db.prepare(
             'INSERT INTO migrations (version, name) VALUES (?, ?)'
           ).run(migration.version, migration.name);
-        });
+          
+          console.log(`✓ Migration ${migration.version} completed`);
+        } catch (error) {
+          console.error(`✗ Migration ${migration.version} failed:`, error);
+          throw error;
+        }
       }
     }
   }
 
-  async transaction<T>(callback: () => Promise<T>): Promise<T> {
+  async transaction<T>(callback: () => T): Promise<T> {
     if (!this.db) {
       throw new Error('Storage not initialized');
     }

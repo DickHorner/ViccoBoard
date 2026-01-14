@@ -82,5 +82,6 @@ export interface Migration {
   version: number;
   name: string;
   up(): Promise<void>;
+  upSync(): void;
   down(): Promise<void>;
 }

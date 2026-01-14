@@ -4,43 +4,15 @@
 echo "🎓 ViccoBoard - Build and Demo"
 echo "============================================================"
 
-# Install dependencies
+# Install dependencies at root (handles all workspaces)
 echo ""
 echo "📦 Installing dependencies..."
+npm install
 
-echo "  - Installing packages/core..."
-cd packages/core && npm install && cd ../..
-
-echo "  - Installing packages/plugins..."
-cd packages/plugins && npm install && cd ../..
-
-echo "  - Installing packages/storage..."
-cd packages/storage && npm install && cd ../..
-
-echo "  - Installing modules/sport..."
-cd modules/sport && npm install && cd ../..
-
-echo "  - Installing apps/demo..."
-cd apps/demo && npm install && cd ../..
-
-# Build packages
+# Build all packages using workspace command
 echo ""
 echo "🔨 Building packages..."
-
-echo "  - Building packages/core..."
-cd packages/core && npm run build && cd ../..
-
-echo "  - Building packages/plugins..."
-cd packages/plugins && npm run build && cd ../..
-
-echo "  - Building packages/storage..."
-cd packages/storage && npm run build && cd ../..
-
-echo "  - Building modules/sport..."
-cd modules/sport && npm run build && cd ../..
-
-echo "  - Building apps/demo..."
-cd apps/demo && npm run build && cd ../..
+npm run build
 
 # Run demo
 echo ""
@@ -48,7 +20,7 @@ echo "🚀 Running demo..."
 echo "============================================================"
 echo ""
 
-cd apps/demo && npm start && cd ../..
+cd apps/demo && npm start
 
 echo ""
 echo "✨ Complete!"
