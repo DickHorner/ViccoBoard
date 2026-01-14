@@ -62,7 +62,7 @@ export abstract class AdapterRepository<T> implements Repository<T> {
 
   async create(entity: Omit<T, 'id' | 'createdAt' | 'lastModified'>): Promise<T> {
     const id = uuidv4();
-    const now = new Date().toISOString();
+    const now = new Date();
 
     const entityWithMeta = {
       ...entity,
@@ -71,7 +71,7 @@ export abstract class AdapterRepository<T> implements Repository<T> {
       lastModified: now
     };
 
-    const row = this.mapToRow(entityWithMeta);
+    const row = this.mapToRow(entityWithMeta as Partial<T>);
     await this.adapter.insert(this.tableName, row);
 
     return entityWithMeta as T;

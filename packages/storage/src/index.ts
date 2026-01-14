@@ -10,7 +10,7 @@ export * from './repositories/adapter.repository';
 export * from './adapters/storage-adapter.interface';
 export * from './adapters/sqlite.adapter';
 export * from './adapters/indexeddb.adapter';
-export * from './migrations/001_initial_schema';
+export * from './migrations/001_initial_schema_new';
 export * from './indexeddb.storage';
 
 // Version

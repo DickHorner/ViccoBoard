@@ -27,7 +27,7 @@ export interface Storage {
   /**
    * Transaction support (synchronous callback required by some backends like better-sqlite3)
    */
-  transaction<T>(callback: () => T): Promise<T>;
+  transaction<T>(callback: () => T | Promise<T>): Promise<T>;
 }
 
 export interface Repository<T> {
