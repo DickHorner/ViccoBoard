@@ -9,23 +9,26 @@
     "test": "jest",
     "lint": "eslint src --ext .ts"
   },
-  "keywords": ["storage", "sqlite", "encryption", "database"],
+  "keywords": [
+    "storage",
+    "sqlite",
+    "encryption",
+    "database"
+  ],
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
     "@viccoboard/core": "*",
-    "better-sqlite3": "^9.0.0",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "crypto-js": "^4.2.0",
-    "uuid": "^9.0.0"
+    "sql.js": "^1.13.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.0",
-    "@types/bcrypt": "^5.0.0",
-    "@types/crypto-js": "^4.2.0",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20.0.0",
-    "@types/uuid": "^9.0.0",
-    "fake-indexeddb": "^4.0.0",
+    "@types/uuid": "^9.0.8",
     "typescript": "^5.0.0"
   }
 }

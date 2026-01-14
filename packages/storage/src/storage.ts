@@ -5,10 +5,10 @@
 
 import Database from 'better-sqlite3';
 import { Storage, Migration } from '@viccoboard/core';
+import { StorageAdapter } from './adapters/storage-adapter.interface';
+import { SQLiteAdapter } from './adapters/sqlite.adapter';
 import * as path from 'path';
 import * as fs from 'fs';
-import { SQLiteAdapter } from './adapters/sqlite.adapter';
-import { StorageAdapter } from './adapters/storage-adapter.interface';
 
 export interface StorageConfig {
   databasePath: string;
@@ -46,6 +46,9 @@ export class SQLiteStorage implements Storage {
       { verbose: this.config.verbose ? console.log : undefined }
     );
 
+
+    // Initialize adapter
+    this.adapter = new SQLiteAdapter(this.db);
     // Enable encryption (using SQLCipher pragma if available)
     // Note: better-sqlite3 doesn't include SQLCipher by default
     // For production, use @journeyapps/sqlcipher or similar
@@ -60,17 +63,22 @@ export class SQLiteStorage implements Storage {
     // Enable foreign keys
     this.db.pragma('foreign_keys = ON');
 
-    // Initialize adapter
-    this.adapter = new SQLiteAdapter(this.db);
-
     this.initialized = true;
+  }
+
+
+  getAdapter(): StorageAdapter {
+    if (!this.adapter) {
+      throw new Error('Storage not initialized');
+    }
+    return this.adapter;
   }
 
   async close(): Promise<void> {
     if (this.db) {
       this.db.close();
       this.db = null;
-      this.adapter = null;
+    this.adapter = null;
       this.initialized = false;
     }
   }
@@ -84,13 +92,6 @@ export class SQLiteStorage implements Storage {
       throw new Error('Storage not initialized');
     }
     return this.db;
-  }
-
-  getAdapter(): StorageAdapter {
-    if (!this.adapter) {
-      throw new Error('Storage not initialized');
-    }
-    return this.adapter;
   }
 
   registerMigration(migration: Migration): void {
@@ -125,14 +126,14 @@ export class SQLiteStorage implements Storage {
         console.log(`Applying migration ${migration.version}: ${migration.name}`);
         
         try {
-          // Execute migration (implementation should execute SQL synchronously using db.exec())
+          // Call up() method - should be synchronous
           await migration.up();
-
-          // Record in migrations table
+          
+          // Record migration in migrations table
           this.db.prepare(
             'INSERT INTO migrations (version, name) VALUES (?, ?)'
           ).run(migration.version, migration.name);
-
+          
           console.log(`✓ Migration ${migration.version} completed`);
         } catch (error) {
           console.error(`✗ Migration ${migration.version} failed:`, error);
@@ -142,7 +143,7 @@ export class SQLiteStorage implements Storage {
     }
   }
 
-  async transaction<T>(callback: () => T): Promise<T> {
+  async transaction<T>(callback: () => Promise<T>): Promise<T> {
     if (!this.db) {
       throw new Error('Storage not initialized');
     }

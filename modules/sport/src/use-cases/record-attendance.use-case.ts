@@ -78,7 +78,13 @@ export class RecordAttendanceUseCase {
       throw new Error('Attendance status is required');
     }
 
-    const validStatuses = Object.values(AttendanceStatus);
+    const validStatuses: AttendanceStatus[] = [
+      AttendanceStatus.Present,
+      AttendanceStatus.Absent,
+      AttendanceStatus.Excused,
+      AttendanceStatus.Passive,
+      AttendanceStatus.Late
+    ];
     if (!validStatuses.includes(input.status)) {
       throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
     }

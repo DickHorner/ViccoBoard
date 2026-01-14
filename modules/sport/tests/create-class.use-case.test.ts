@@ -21,7 +21,7 @@ describe('CreateClassUseCase', () => {
     storage.registerMigration(new InitialSchemaMigration(storage));
     await storage.migrate();
 
-    repository = new ClassGroupRepository(storage);
+    repository = new ClassGroupRepository(storage.getAdapter());
     useCase = new CreateClassUseCase(repository);
   });
 

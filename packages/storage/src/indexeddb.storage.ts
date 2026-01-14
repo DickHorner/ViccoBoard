@@ -81,7 +81,7 @@ export class IndexedDBStorage implements Storage {
     }
   }
 
-  async transaction<T>(callback: () => T): Promise<T> {
+  async transaction<T>(callback: () => T | Promise<T>): Promise<T> {
     // IndexedDB transactions are event based; for now we simply run the callback and
     // return the result. Implementing true rollback semantics will be a follow-up.
     return Promise.resolve(callback());

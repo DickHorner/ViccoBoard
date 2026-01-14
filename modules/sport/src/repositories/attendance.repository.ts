@@ -4,7 +4,7 @@
  */
 
 import { AdapterRepository } from '@viccoboard/storage';
-import { AttendanceRecord } from '@viccoboard/core';
+import { AttendanceRecord, AttendanceStatus } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
@@ -70,7 +70,7 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
     
     if (records.length === 0) return 100;
     
-    const presentCount = records.filter(r => r.status === 'present').length;
+    const presentCount = records.filter(r => r.status === AttendanceStatus.Present).length;
     return (presentCount / records.length) * 100;
   }
 

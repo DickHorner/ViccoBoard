@@ -67,10 +67,8 @@ export class StudentRepository extends AdapterRepository<Student> {
    * Find students by name (partial match)
    */
   async findByName(searchTerm: string): Promise<Student[]> {
-    // Get all students and filter in-memory (works with both SQLite and IndexedDB)
     const allStudents = await this.findAll();
     const lowerSearch = searchTerm.toLowerCase();
-    
     return allStudents.filter(student => 
       student.firstName.toLowerCase().includes(lowerSearch) ||
       student.lastName.toLowerCase().includes(lowerSearch)

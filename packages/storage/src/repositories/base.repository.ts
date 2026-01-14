@@ -45,7 +45,7 @@ export abstract class BaseRepository<T> implements Repository<T> {
     }
     
     const rows = db.prepare(sql).all();
-    return rows.map(row => this.mapToEntity(row));
+    return rows.map((row: any) => this.mapToEntity(row));
   }
 
   async find(criteria: QueryCriteria): Promise<T[]> {
@@ -62,13 +62,13 @@ export abstract class BaseRepository<T> implements Repository<T> {
     const sql = `SELECT * FROM ${this.tableName} WHERE ${whereClause}`;
     const rows = db.prepare(sql).all(...values);
     
-    return rows.map(row => this.mapToEntity(row));
+    return rows.map((row: any) => this.mapToEntity(row));
   }
 
   async create(entity: Omit<T, 'id' | 'createdAt' | 'lastModified'>): Promise<T> {
     const db = this.storage.getDatabase();
     const id = uuidv4();
-    const now = new Date().toISOString();
+    const now = new Date();
     
     const entityWithMeta = {
       ...entity,
@@ -77,7 +77,7 @@ export abstract class BaseRepository<T> implements Repository<T> {
       lastModified: now
     };
     
-    const row = this.mapToRow(entityWithMeta);
+    const row = this.mapToRow(entityWithMeta as unknown as Partial<T>);
     const keys = Object.keys(row);
     const placeholders = keys.map(() => '?').join(', ');
     const values = keys.map(key => row[key]);
@@ -98,10 +98,10 @@ export abstract class BaseRepository<T> implements Repository<T> {
     
     const updatesWithMeta = {
       ...updates,
-      lastModified: new Date().toISOString()
+      lastModified: new Date()
     };
     
-    const row = this.mapToRow(updatesWithMeta);
+    const row = this.mapToRow(updatesWithMeta as unknown as Partial<T>);
     const keys = Object.keys(row);
     const setClause = keys.map(key => `${key} = ?`).join(', ');
     const values = [...keys.map(key => row[key]), id];

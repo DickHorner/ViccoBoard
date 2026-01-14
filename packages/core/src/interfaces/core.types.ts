@@ -98,10 +98,16 @@ export interface LessonPart {
 }
 
 export interface AttendanceRecord {
+  id: string;
   studentId: string;
+  lessonId: string;
   status: AttendanceStatus;
   reason?: string;
-  exported: boolean;
+  notes?: string;
+  timestamp: Date;
+  createdAt: Date;
+  lastModified: Date;
+  exported?: boolean;
 }
 
 export enum AttendanceStatus {
