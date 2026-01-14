@@ -66,7 +66,8 @@ A complete, production-ready type system covering:
 - Enable/disable plugin functionality
 
 ### 4. Storage Layer (@viccoboard/storage)
-- **SQLiteStorage implementation** with encryption support (SQLCipher-ready)
+- **IndexedDBStorage prototype** (browser-first adapter, Safari/WebKit focus) — migrations + basic object-store helpers (Plan.md: IndexedDB default)
+- **SQLiteStorage implementation** with encryption support (SQLCipher-ready) — Node/CLI/demo adapter
 - **CryptoService implementation**:
   - Password hashing with bcrypt
   - AES encryption/decryption
@@ -74,17 +75,8 @@ A complete, production-ready type system covering:
   - One-way hashing
 - **SecureStorage implementation** (in-memory for development)
 - **BaseRepository** with full CRUD operations
-- **Transaction support** for atomic operations
+- **Transaction support** for atomic operations (SQLite: sync callback; IndexedDB: async shim)
 - **Migration system** with version tracking
-- **Initial schema migration** creating core tables:
-  - teacher_accounts
-  - class_groups
-  - students
-  - lessons
-  - lesson_parts
-  - attendance_records
-  - backups
-  - templates
 - **Initial schema migration** creating core tables:
   - teacher_accounts
   - class_groups
@@ -98,6 +90,11 @@ A complete, production-ready type system covering:
 
 ### 5. Sport Module (@viccoboard/sport) - NEW! ✨
 Complete implementation of SportZens core functionality:
+
+### 5b. Exams Module (@viccoboard/exams) - SCAFFOLD
+- Module scaffolded with basic use-case (createExamPayload)
+- Tests added for simple payload creation
+- Next: wire repositories and integration with storage
 
 #### Repositories (Data Access Layer)
 - **ClassGroupRepository** - Class/course management with queries
@@ -253,7 +250,7 @@ Separate web application for student workout submissions:
 - 🚧 WOW Web Interface: 0%
 
 ### ✅ COMPLETED: Working Demo
-The foundation is now proven with a working end-to-end demo!
+The foundation is now proven with a working end-to-end demo! (Node/SQLite adapter; browser/iPad build will use IndexedDB)
 
 ### Next Sprint Options:
 

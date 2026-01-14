@@ -31,14 +31,14 @@ ViccoBoard/
 
 1. **No Features Left Behind**: Every feature from both SportZens and KURT is included
 2. **Modular Architecture**: New domains can be added as modules/plugins without core changes
-3. **Local-First/Offline**: Data remains local; internet only when required (WOW, email)
-4. **Security**: Encrypted local storage, app lock (PIN/password), backup/restore
+3. **Local-First/Offline, iPadOS Safari-first**: Runs as static web app; data stays local; network only when explicitly needed (WOW link/QR, email). No Electron/Node server at runtime.
+4. **Security & Backups**: Encrypted local storage, app lock (PIN/password), backup/restore with visible backup status/reminders (Safari may purge local storage after inactivity)
 
 ### Technology Stack
 
 - **Language**: TypeScript
 - **Mobile Framework**: React Native / Flutter (TBD based on environment)
-- **Storage**: Encrypted SQLite (SQLCipher)
+- **Storage**: Encrypted IndexedDB (browser-first, Safari/WebKit compatible) — SQLite adapter available for Node/dev and testing (SQLCipher ready); exports/imports via download/file-picker (no File System Access API)
 - **Architecture**: Clean Architecture + Domain-Driven Design
 - **Plugin System**: Interface-based extensibility
 

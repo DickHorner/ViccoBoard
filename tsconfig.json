@@ -13,6 +13,9 @@
   },
   "references": [
     { "path": "./packages/core" },
-    { "path": "./packages/plugins" }
+    { "path": "./packages/plugins" },
+    { "path": "./packages/storage" },
+    { "path": "./modules/sport" },
+    { "path": "./modules/exams" }
   ]
 }

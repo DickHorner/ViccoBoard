@@ -7,14 +7,20 @@ Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle F
 ---
 
 ## 1) Globale Arbeitsregeln (Guardrails)
-1. **Keine Features streichen, keine Optionen zusammenkürzen.** Wenn etwas unklar ist, als `TBD` in `Plan.md` Abschnitt 9 ergänzen – aber nicht still weglassen.
-2. **Modularität erzwingen:** Änderungen müssen in ein passendes Modul/Plugin; Änderungen am Core nur für neue Interfaces.
-3. **Local-first respektieren:** Offline ist Default; Online nur für WOW, E-Mail und explizite Integrationen.
-4. **Traceability:** Jede PR referenziert mindestens eine Checkbox-ID aus `Plan.md` Abschnitt 6.
-5. **Tests sind Teil der Feature-Definition:** Neue Logik ohne Unit-/Integrationstest gilt als „nicht fertig“.
-6. **Keine erfundenen Datenformate:** Import/Export-Formate werden nur umgesetzt, wenn Anforderungen vorliegen; sonst `TBD` + Parser, der fehlende Felder klar meldet.
+1. **Keine Features streichen, keine Optionen „vereinfachen“.** Wenn Spezifikation fehlt: in `Plan.md` Abschnitt 9 aufnehmen (TBD), aber nie still weglassen.
+2. **Modularität erzwingen:** Änderungen müssen in ein passendes Modul/Plugin; Core nur erweitern, wenn ein neues Interface/Policy nötig ist.
+3. **Ohne Installation / komplett lokal (Default) ist ein Hard-Constraint:** Im Betrieb dürfen keine Server-Prozesse nötig sein (kein Node-Server, kein Docker, kein Electron). Output muss als statische Assets deploybar sein. **Zielplattform ist iPadOS Safari (WebKit):** keine File System Access API; Export/Import via Download + Datei-Auswahl; Touch/Split-View berücksichtigen.
+4. **Local-first respektieren:** Offline ist Default. WOW muss ohne Backend via QR/Link+QR-Rückgabe funktionieren. E-Mail nur lokal (`mailto:`/Export), keine SMTP-Pflicht.
+5. **Integrationen sind optional:** iServ/Notion/Sync nur hinter Feature-Flags und standardmäßig aus.
+6. **Traceability:** Jede PR referenziert mindestens eine Checkbox-ID aus `Plan.md` Abschnitt 6.
+7. **Tests sind Teil der Feature-Definition:** Neue Logik ohne Unit-/Integrationstest gilt als „nicht fertig“.
+8. **Keine erfundenen Datenformate:** Import/Export-Formate nur aus Spezifikation ableiten; sonst `TBD` + Validator/Fehlermeldung für fehlende Felder.
+9. **Privacy by default:** Keine Telemetrie/Tracki
+10. **Safari-Kompatibilität ist Pflicht:** Keine Nutzung von nicht unterstützten APIs (z. B. `showOpenFilePicker`/`showSaveFilePicker`, File System Access API). Wenn eine neue Browser-API eingesetzt wird, muss die iPadOS-Unterstützung dokumentiert sein.
+ng ohne expliziten Plan-Abschnitt + Opt-in.
 
 ---
+
 
 ## 2) Empfohlene Repo-Struktur (stack-agnostisch)
 - `packages/core/` — Domain-Modelle, Use-Cases, Interfaces, Migrationen, Crypto-Abstraktionen
@@ -116,12 +122,19 @@ Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle F
 - Betroffene Checkboxen: `Plan.md §6.x …`
 - Was wurde umgesetzt:
 - Was ist bewusst nicht umgesetzt (nur erlaubt, wenn in `Plan.md §9 TBD` dokumentiert):
-- Testabdeckung:
+- Testabdeckung (Unit/Integration):
 - Migrationen / Breaking Changes:
+- **Manuelle Checks (Pflicht):**
+  - **Offline-Check:** App öffnen → Netzwerk im Browser deaktivieren → Kernflow durchklicken (keine Hard-Fails).
+  - **Cold-Start:** „Site Data“ löschen → Reload → Migration/Init ohne Fehler.
+  - **Export/Import:** mind. 1 Export erzeugen und wieder importieren (nur für PRs, die Persistenz berühren).
+  - **iPadOS Safari Pflicht-Check:** Auf iPad (oder Simulator) anlegen → Reload → offline testen → Export erzeugen → Import zurückspielen (mind. für PRs, die UI/Storage/Export berühren).
+  - **Split View:** ½ Bildschirm prüfen (Sidebar/Tabellen/Formulare bleiben bedienbar).
 
 **Commit-Stil:** klein, logisch getrennt (keine 2.000-Zeilen-Wundertüte).
 
 ---
+
 
 ## 5) Prompt-Vorlagen (Copy/Paste) für Codex/Copilot
 

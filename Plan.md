@@ -15,16 +15,32 @@ in einem konsistenten System vereint.
 5. **Online/Integrationen nur optional:** iServ/Notion/Sync sind **Feature-Flags** und standardmäßig **aus**. Die App muss ohne diese Integrationen vollständig nutzbar sein.
 6. **Sicherheitsmodell:** App-Sperre (PIN/Passwort), Lock-Policy/Timeout, sichere Schlüsselableitung, saubere Backups/Restore (kein Datenverlust durch Updates).
 
+
+### 1.1 Zielplattform: iPad (10. Gen) / iPadOS Safari (WebKit)
+Diese App wird **primär** für iPadOS (Safari/WebKit) gebaut. Das beeinflusst insbesondere lokale Persistenz, Datei-Flows und Bedienung.
+
+**Nicht verhandelbar (Design- & Implementationsregeln):**
+- **WebKit-first:** iPadOS-Browser sind WebKit. Keine Annahmen über „Chrome-only“-APIs.
+- **Lokale Persistenz ist nicht garantiert „für immer“:** Unter iPadOS kann lokaler script-basierter Speicher (u. a. IndexedDB/Cache) nach **mehrtägiger Inaktivität** der Website gelöscht werden. Deshalb sind **Export/Backup/Restore + Backup-Reminder + Daten-Gesundheitsstatus** Kern-UX, nicht Optional-Feature.
+- **Kein File-System-Write aus dem Browser:** Safari unterstützt die **File System Access API** nicht. Export/Import daher ausschließlich über:
+  - **Download** (ZIP/JSON/PDF/CSV) + Teilen über iPadOS (Files-App/Share-Sheet),
+  - **Import via Datei-Auswahl** (`<input type="file">`), ohne „Save As“-Dialoge aus JS.
+- **Touch & Split View:** Touch-Targets ≥ 44 px, keine Hover-only Interaktionen, Layouts für ½/⅓ Split View, Portrait/Landscape, optionale Keyboard-Shortcuts.
+- **Offline:** App-Shell darf gecacht werden (Service Worker), aber die App bleibt **ohne Installation** nutzbar; „Zum Home-Bildschirm“ ist optional und wird nicht vorausgesetzt.
+
+
 ---
+
 
 ## 2) Produktstruktur (Module / Bounded Contexts)
 
 ### 2.1 Core-Plattform (für alles)
 - **Core-UI Shell**: Navigation, Deep-Links, globaler Such-/Filterlayer.
+- **iPad UX Layer**: Touch-first Komponenten (Tabellen, Formulare), Split-View-taugliche Layouts, Keyboard-Shortcuts (optional), Performance durch Virtualisierung.
 - **Identity & Security**: App-Sperre (PIN/Passwort), Passwort ändern, Datenbank-Passwort, Session-Timeout, Biometrie (optional), Berechtigungen.
 - **Storage**: verschlüsselte lokale DB (**IndexedDB**), versionierte Migrationen, Attachments (Fotos/Signaturen/Bilder) – ohne Backend-Pflicht.
-- **Backup/Restore**: Export/Import kompletter Datenbestand + selektive Exporte (z. B. nur Prüfungsentwürfe).
-- **Import/Export Hub**: CSV/PDF/„Share Packages“ (für Austausch ohne Cloud).
+- **Backup/Restore**: Export/Import kompletter Datenbestand + selektive Exporte (z. B. nur Prüfungsentwürfe). **Pflicht:** sichtbarer Backup-Status + Reminder (iPadOS-Persistenz-Risiko).
+- **Import/Export Hub**: CSV/PDF/„Share Packages“ (für Austausch ohne Cloud). (iPadOS: Export immer als Download/Share, Import über Datei-Auswahl; keine File-System-Write APIs).
 - **Templates**: Tabellen-/CSV-Vorlagen, Druckpresets, E-Mail-Templates.
 - **Analytics Engine**: aggregierte Statistiken (SportZens-Statistik + KURT-Auswertung), ohne personenbezogene Daten nach außen.
 - **Plugin Registry**: Registrierung von Tools (Timer, Scoreboard…), Assessment-Typen, Exportern und Integrationen.
@@ -66,17 +82,27 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 
 **Regel:** Core kennt nur Interfaces, nie konkrete Implementierungen.
 
+### 3.3 Local-first, Sync nur als Modul
+- **Standardbetrieb:** alles offline, Daten bleiben lokal (IndexedDB).
+- **WOW ohne Server:** „Schüler-Webeingabe“ wird im Default-Modus über **QR/Link (URL-Hash) + Rückgabe per QR/Code** umgesetzt, sodass kein Backend nötig ist.
+- **Sync/Online (später, optional):** wird als **separates Integration-Plugin** implementiert (z. B. iServ/Notion). Default bleibt: keine Abhängigkeit.
+
 ### 3.4 Runtime/Deployment ohne Installation
 - Build erzeugt **statische Assets** (`dist/`), die auf jedem beliebigen Webserver laufen (Schulserver/iServ-Web/USB-Intranet/Hosting).
 - **Keine Runtime-Server-Komponente**: Im Betrieb darf kein Node/Python/Docker nötig sein.
 - Offline-First: App muss bei deaktiviertem Netzwerk weiterhin bedienbar bleiben (Ausnahmen nur bei explizit aktivierten Integrationen).
 - Optional: PWA/Service Worker **nur** als Komfort (Caching), niemals als Voraussetzung.
 
-### 3.5 Persistenz- & Exportstrategie (IndexedDB)
+### 3.5 Persistenz- & Exportstrategie (LocalDB)
 - **IndexedDB** als Primärspeicher; jede Domäne nutzt Repositories (kein Direktzugriff aus UI).
 - **Migrations**: strikt versioniert; Upgrades dürfen keine Daten löschen.
 - **Backup/Restore**: vollständiger Export/Import (z. B. verschlüsseltes Archiv) + selektive Exporte (CSV/PDF/Share-Package).
 - **E-Mail-Versand lokal:** Generiere E-Mail-Inhalt/Anhänge und öffne Mail-Client (`mailto:`) oder exportiere als `.eml`/PDF – kein SMTP-Server erforderlich.
+
+---
+
+
+## 4) Datenmodell (konzeptionell)
 
 ### 4.1 Kern-Entitäten
 - **TeacherAccount** (lokal): Security-Settings (PIN, Passwortänderung, DB-Passwort, Lock-Policy).

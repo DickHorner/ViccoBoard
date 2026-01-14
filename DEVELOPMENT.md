@@ -411,6 +411,10 @@ export { LocalType };
 
 ## Debugging
 
+### Storage Notes
+
+By default, ViccoBoard targets **IndexedDB** for browser/runtime storage (encrypted storage + migrations). For local CLI development and the demo runner we keep a SQLite adapter (Node-only). Add `IndexedDB` migrations and adapters under `packages/storage` and prefer them for web apps. iPadOS Safari can evict local storage after inactivity: always surface backup status/reminders and support export/import via download + file picker (no File System Access API).
+
 ### SQLite Database
 
 ```bash

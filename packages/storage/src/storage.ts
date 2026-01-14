@@ -111,14 +111,14 @@ export class SQLiteStorage implements Storage {
         console.log(`Applying migration ${migration.version}: ${migration.name}`);
         
         try {
-          // Execute migration - upSync is synchronous and doesn't need transaction
-          migration.upSync();
-          
+          // Execute migration (implementation should execute SQL synchronously using db.exec())
+          await migration.up();
+
           // Record in migrations table
           this.db.prepare(
             'INSERT INTO migrations (version, name) VALUES (?, ?)'
           ).run(migration.version, migration.name);
-          
+
           console.log(`✓ Migration ${migration.version} completed`);
         } catch (error) {
           console.error(`✗ Migration ${migration.version} failed:`, error);

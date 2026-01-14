@@ -25,9 +25,9 @@ export interface Storage {
   migrate(): Promise<void>;
   
   /**
-   * Transaction support
+   * Transaction support (synchronous callback required by some backends like better-sqlite3)
    */
-  transaction<T>(callback: () => Promise<T>): Promise<T>;
+  transaction<T>(callback: () => T): Promise<T>;
 }
 
 export interface Repository<T> {
@@ -82,6 +82,5 @@ export interface Migration {
   version: number;
   name: string;
   up(): Promise<void>;
-  upSync(): void;
   down(): Promise<void>;
 }
