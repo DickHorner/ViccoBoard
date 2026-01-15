@@ -156,8 +156,8 @@ async function main() {
     }
 
     // Step 5: Create a Lesson
-    console.log('\n📚 Step 5: Create a Lesson');
-    console.log('─'.repeat(60));
+    console.log('\n Step 5: Create a Lesson');
+    console.log(''.repeat(60));
     
     // Create a lesson (in real app, this would use LessonRepository)
     const lessonId = 'lesson-2024-01-13-001';
@@ -169,14 +169,14 @@ async function main() {
       created_at: new Date().toISOString(),
       last_modified: new Date().toISOString()
     });
-    console.log(`✓ Lesson created for ${lessonDate.toLocaleDateString()}`);
+    console.log(` Lesson created for ${lessonDate.toLocaleDateString()}`);
     console.log(`  ID: ${lessonId}`);
 
-    // Step 6: Record Attendance for Lesson
-    console.log('\n📝 Step 6: Record Attendance');
+    // Step 6: Record Attendance
+    console.log('\n Step 6: Record Attendance');
     console.log('─'.repeat(60));
-
-    // Record attendance for each student
+    
+    console.log(`Lesson ID: ${lessonId}`);
     await recordAttendanceUseCase.execute({
       studentId: createdStudents[0].id,
       lessonId: lessonId,
@@ -207,14 +207,13 @@ async function main() {
     });
     console.log(`✓ ${createdStudents[3].firstName} ${createdStudents[3].lastName}: Passive (Injury)`);
 
-    // Step 7: View Statistics
-    console.log('\n📊 Step 7: View Statistics');
+    // Step 6: View Statistics
+    console.log('\n📊 Step 6: View Statistics');
     console.log('─'.repeat(60));
     
     const classStudents = await studentRepo.findByClassGroup(classGroup.id);
     console.log(`\nClass: ${classGroup.name}`);
     console.log(`Total Students: ${classStudents.length}`);
-    console.log();
 
     for (const student of classStudents) {
       const summary = await attendanceRepo.getAttendanceSummary(student.id);
@@ -224,11 +223,10 @@ async function main() {
       console.log(`  Absent: ${summary.absent}`);
       console.log(`  Passive: ${summary.passive}`);
       console.log(`  Attendance Rate: ${summary.percentage.toFixed(1)}%`);
-      console.log();
     }
 
-    // Step 8: Query Examples
-    console.log('🔍 Step 8: Query Examples');
+    // Step 7: Query Examples
+    console.log('🔍 Step 7: Query Examples');
     console.log('─'.repeat(60));
     
     const searchResults = await studentRepo.findByName('schmidt');
