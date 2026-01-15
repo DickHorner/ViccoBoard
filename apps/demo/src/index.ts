@@ -155,14 +155,26 @@ async function main() {
       }
     }
 
-    // Step 5: Record Attendance (Simulated Lesson)
-    console.log('\n📝 Step 5: Record Attendance for Lesson');
+    // Step 5: Create a Lesson
+    console.log('\n📚 Step 5: Create a Lesson');
     console.log('─'.repeat(60));
     
-    // Create a dummy lesson ID (in real app, this would come from LessonRepository)
+    // Create a lesson (in real app, this would use LessonRepository)
     const lessonId = 'lesson-2024-01-13-001';
-    console.log(`Lesson ID: ${lessonId}`);
-    console.log();
+    const lessonDate = new Date('2024-01-13');
+    await adapter.insert('lessons', {
+      id: lessonId,
+      class_group_id: classGroup.id,
+      date: lessonDate.toISOString(),
+      created_at: new Date().toISOString(),
+      last_modified: new Date().toISOString()
+    });
+    console.log(`✓ Lesson created for ${lessonDate.toLocaleDateString()}`);
+    console.log(`  ID: ${lessonId}`);
+
+    // Step 6: Record Attendance for Lesson
+    console.log('\n📝 Step 6: Record Attendance');
+    console.log('─'.repeat(60));
 
     // Record attendance for each student
     await recordAttendanceUseCase.execute({
@@ -195,8 +207,8 @@ async function main() {
     });
     console.log(`✓ ${createdStudents[3].firstName} ${createdStudents[3].lastName}: Passive (Injury)`);
 
-    // Step 6: View Statistics
-    console.log('\n📊 Step 6: View Statistics');
+    // Step 7: View Statistics
+    console.log('\n📊 Step 7: View Statistics');
     console.log('─'.repeat(60));
     
     const classStudents = await studentRepo.findByClassGroup(classGroup.id);
@@ -215,8 +227,8 @@ async function main() {
       console.log();
     }
 
-    // Step 7: Query Examples
-    console.log('🔍 Step 7: Query Examples');
+    // Step 8: Query Examples
+    console.log('🔍 Step 8: Query Examples');
     console.log('─'.repeat(60));
     
     const searchResults = await studentRepo.findByName('schmidt');
