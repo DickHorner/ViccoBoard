@@ -69,12 +69,12 @@ export abstract class AdapterRepository<T> implements Repository<T> {
       id,
       createdAt: now,
       lastModified: now
-    };
+    } as T;
 
-    const row = this.mapToRow(entityWithMeta as T);
+    const row = this.mapToRow(entityWithMeta);
     await this.adapter.insert(this.tableName, row);
 
-    return entityWithMeta as T;
+    return entityWithMeta;
   }
 
   async update(id: string, updates: Partial<T>): Promise<T> {
