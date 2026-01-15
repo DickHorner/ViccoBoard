@@ -76,14 +76,25 @@ async function main() {
     console.log('─'.repeat(60));
     
     const schoolYear = '2023/2024';
-    const classGroup = await createClassUseCase.execute({
-      name: '10a Sport',
-      schoolYear: schoolYear,
-      state: 'Bayern',
-      gradingScheme: 'default'
-    });
+    let classGroup;
+    try {
+      classGroup = await createClassUseCase.execute({
+        name: '10a Sport',
+        schoolYear: schoolYear,
+        state: 'Bayern',
+        gradingScheme: 'default'
+      });
+      console.log('✓ Class created:');
+    } catch (error) {
+      // Class already exists, find it
+      const existingClasses = await classGroupRepo.findBySchoolYear(schoolYear);
+      classGroup = existingClasses.find(c => c.name === '10a Sport');
+      if (!classGroup) {
+        throw error; // Re-throw if it's not the "already exists" error
+      }
+      console.log('✓ Using existing class:');
+    }
 
-    console.log('✓ Class created:');
     console.log(`  Name: ${classGroup.name}`);
     console.log(`  School Year: ${classGroup.schoolYear}`);
     console.log(`  State: ${classGroup.state}`);
@@ -93,7 +104,7 @@ async function main() {
     console.log('\n👥 Step 4: Add Students to Class');
     console.log('─'.repeat(60));
     
-    const students = [
+    const studentsData = [
       {
         firstName: 'Max',
         lastName: 'Mustermann',
@@ -124,14 +135,24 @@ async function main() {
       }
     ];
 
-    const createdStudents = [];
-    for (const studentData of students) {
-      const student = await addStudentUseCase.execute({
-        ...studentData,
-        classGroupId: classGroup.id
-      });
-      createdStudents.push(student);
-      console.log(`✓ Added: ${student.firstName} ${student.lastName} (${student.birthYear})`);
+    // Check if students already exist
+    let createdStudents = await studentRepo.findByClassGroup(classGroup.id);
+    
+    if (createdStudents.length === 0) {
+      // No students exist, create them
+      for (const studentData of studentsData) {
+        const student = await addStudentUseCase.execute({
+          ...studentData,
+          classGroupId: classGroup.id
+        });
+        createdStudents.push(student);
+        console.log(`✓ Added: ${student.firstName} ${student.lastName} (${student.birthYear})`);
+      }
+    } else {
+      console.log(`✓ Using ${createdStudents.length} existing student(s):`);
+      for (const student of createdStudents) {
+        console.log(`  - ${student.firstName} ${student.lastName} (${student.birthYear})`);
+      }
     }
 
     // Step 5: Record Attendance (Simulated Lesson)
