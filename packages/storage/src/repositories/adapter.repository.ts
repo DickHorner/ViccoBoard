@@ -71,7 +71,7 @@ export abstract class AdapterRepository<T> implements Repository<T> {
       lastModified: now
     };
 
-    const row = this.mapToRow(entityWithMeta as Partial<T>);
+    const row = this.mapToRow(entityWithMeta as T);
     await this.adapter.insert(this.tableName, row);
 
     return entityWithMeta as T;
