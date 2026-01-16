@@ -9,11 +9,15 @@
     "test": "jest",
     "lint": "eslint src --ext .ts"
   },
-  "keywords": ["core", "domain", "interfaces"],
+  "keywords": [
+    "core",
+    "domain",
+    "interfaces"
+  ],
   "author": "",
   "license": "UNLICENSED",
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^20.19.30",
     "typescript": "^5.0.0"
   }
 }
