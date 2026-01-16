@@ -1,91 +1,77 @@
 <template>
-  <div class="class-detail-view">
+  <div class="student-list-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Back</button>
-      <h2>Class Detail</h2>
-      <p class="page-description">View and manage class information, students, and lessons.</p>
+      <h2>Students</h2>
+      <p class="page-description">View and manage all students across your classes.</p>
+    </div>
+    
+    <div class="controls-bar">
+      <!-- Search -->
+      <div class="search-bar">
+        <input 
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by name or ID..."
+          class="search-input"
+        />
+      </div>
+      
+      <!-- Add Student Button -->
+      <button class="btn-primary" @click="showAddModal = true">
+        + Add Student
+      </button>
     </div>
     
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading class...</p>
+      <p>Loading students...</p>
     </div>
     
     <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadClass">Retry</button>
+    <div v-else-if="loadError" class="error-state">
+      <p>{{ loadError }}</p>
+      <button class="btn-primary" @click="loadStudents">Retry</button>
     </div>
     
-    <!-- Class Content -->
-    <div v-else-if="classGroup" class="class-info">
-      <section class="card">
-        <h3>Class Information</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <label>Class Name:</label>
-            <span>{{ classGroup.name }}</span>
-          </div>
-          <div class="info-item">
-            <label>School Year:</label>
-            <span>{{ classGroup.schoolYear }}</span>
-          </div>
-          <div class="info-item">
-            <label>Students:</label>
-            <span>{{ students.length }}</span>
-          </div>
+    <!-- Empty State -->
+    <div v-else-if="students.length === 0" class="empty-state">
+      <p>No students yet. Add your first student to get started.</p>
+      <button class="btn-primary" @click="showAddModal = true">
+        + Add Student
+      </button>
+    </div>
+    
+    <!-- No Results State -->
+    <div v-else-if="filteredStudents.length === 0" class="empty-state">
+      <p>No students found matching "{{ searchQuery }}"</p>
+    </div>
+    
+    <!-- Students List -->
+    <div v-else class="student-grid">
+      <RouterLink
+        v-for="student in filteredStudents"
+        :key="student.id"
+        :to="`/students/${student.id}`"
+        class="student-card"
+      >
+        <div class="student-avatar">
+          {{ getInitials(student.firstName, student.lastName) }}
         </div>
-      </section>
-      
-      <section class="card">
-        <div class="card-header">
-          <h3>Students</h3>
-          <button class="btn-primary btn-small" @click="showAddModal = true">
-            + Add Student
-          </button>
+        <div class="student-info">
+          <h3>{{ student.firstName }} {{ student.lastName }}</h3>
+          <p class="student-class">{{ getClassName(student.classId) }}</p>
+          <p class="student-id">ID: {{ student.id.substring(0, 8) }}</p>
         </div>
-        <div class="card-content">
-          <div v-if="loadingStudents" class="loading-state-small">
-            <div class="spinner-small"></div>
-            <p>Loading students...</p>
-          </div>
-          <div v-else-if="students.length === 0" class="empty-state">
-            <p>No students in this class yet.</p>
-          </div>
-          <div v-else class="student-list">
-            <RouterLink
-              v-for="student in students"
-              :key="student.id"
-              :to="`/students/${student.id}`"
-              class="student-item"
-            >
-              <div class="student-avatar-small">
-                {{ getInitials(student.firstName, student.lastName) }}
-              </div>
-              <span>{{ student.firstName }} {{ student.lastName }}</span>
-              <span class="student-arrow">→</span>
-            </RouterLink>
-          </div>
-        </div>
-      </section>
-      
-      <section class="card">
-        <h3>Quick Actions</h3>
-        <div class="card-content">
-          <RouterLink to="/attendance" class="action-button">
-            <span class="action-icon">✓</span>
-            <span>Record Attendance</span>
-          </RouterLink>
-        </div>
-      </section>
+        <div class="student-arrow">→</div>
+      </RouterLink>
     </div>
     
     <!-- Add Student Modal -->
     <div v-if="showAddModal" class="modal-overlay" @click="closeAddModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Add Student to {{ classGroup?.name }}</h3>
+          <h3>Add Student</h3>
           <button class="modal-close" @click="closeAddModal">✕</button>
         </div>
         
@@ -115,6 +101,21 @@
           </div>
           
           <div class="form-group">
+            <label for="classId">Class *</label>
+            <select
+              id="classId"
+              v-model="newStudent.classId"
+              required
+              class="form-input"
+            >
+              <option value="">Select a class</option>
+              <option v-for="cls in classes" :key="cls.id" :value="cls.id">
+                {{ cls.name }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group">
             <label for="dateOfBirth">Date of Birth</label>
             <input
               id="dateOfBirth"
@@ -135,8 +136,8 @@
             />
           </div>
           
-          <div v-if="addError" class="error-message">
-            {{ addError }}
+          <div v-if="error" class="error-message">
+            {{ error }}
           </div>
           
           <div class="modal-actions">
@@ -154,100 +155,89 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
-import { useClassGroups, useStudents } from '../composables/useDatabase'
-import type { ClassGroup, Student } from '../db'
-
-// Router
-const route = useRoute()
+import { ref, computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useStudents, useClassGroups } from '../composables/useDatabase'
+import type { Student, ClassGroup } from '../db'
 
 // State
-const classGroup = ref<ClassGroup | null>(null)
 const students = ref<Student[]>([])
+const classes = ref<ClassGroup[]>([])
 const loading = ref(true)
-const loadingStudents = ref(true)
-const error = ref('')
+const loadError = ref('')
+const searchQuery = ref('')
 const showAddModal = ref(false)
 const creating = ref(false)
-const addError = ref('')
+const error = ref('')
 
 const newStudent = ref({
   firstName: '',
   lastName: '',
+  classId: '',
   dateOfBirth: '',
   email: ''
 })
 
 // Composables
-const classGroupsDb = useClassGroups()
 const studentsDb = useStudents()
+const classGroupsDb = useClassGroups()
+
+// Computed
+const filteredStudents = computed(() => {
+  if (!searchQuery.value) {
+    return students.value
+  }
+  const query = searchQuery.value.toLowerCase()
+  return students.value.filter(student => 
+    student.firstName.toLowerCase().includes(query) ||
+    student.lastName.toLowerCase().includes(query) ||
+    student.id.toLowerCase().includes(query)
+  )
+})
 
 // Methods
-const loadClass = async () => {
+const loadStudents = async () => {
   loading.value = true
-  error.value = ''
+  loadError.value = ''
   try {
-    const classId = route.params.id as string
-    const foundClass = await classGroupsDb.getById(classId)
-    
-    if (!foundClass) {
-      error.value = 'Class not found'
-      return
-    }
-    
-    classGroup.value = foundClass
-    
-    // Load students
-    loadStudents(classId)
+    students.value = await studentsDb.getAll()
+    classes.value = await classGroupsDb.getAll()
   } catch (err) {
-    console.error('Failed to load class:', err)
-    error.value = 'Failed to load class. Please try again.'
+    console.error('Failed to load students:', err)
+    loadError.value = 'Failed to load students. Please try again.'
   } finally {
     loading.value = false
   }
 }
 
-const loadStudents = async (classId: string) => {
-  loadingStudents.value = true
-  try {
-    students.value = await studentsDb.getByClassId(classId)
-  } catch (err) {
-    console.error('Failed to load students:', err)
-  } finally {
-    loadingStudents.value = false
-  }
-}
-
 const handleAddStudent = async () => {
-  if (!classGroup.value) return
-  
-  addError.value = ''
+  error.value = ''
   creating.value = true
   
   try {
     await studentsDb.create({
       firstName: newStudent.value.firstName.trim(),
       lastName: newStudent.value.lastName.trim(),
-      classId: classGroup.value.id,
+      classId: newStudent.value.classId,
       dateOfBirth: newStudent.value.dateOfBirth ? new Date(newStudent.value.dateOfBirth) : undefined,
       email: newStudent.value.email || undefined
     })
     
     // Reload students
-    await loadStudents(classGroup.value.id)
+    await loadStudents()
     
     // Reset form and close modal
     newStudent.value = {
       firstName: '',
       lastName: '',
+      classId: '',
       dateOfBirth: '',
       email: ''
     }
     showAddModal.value = false
   } catch (err) {
     console.error('Failed to add student:', err)
-    addError.value = err instanceof Error ? err.message : 'Failed to add student. Please try again.'
+    error.value = err instanceof Error ? err.message : 'Failed to add student. Please try again.'
   } finally {
     creating.value = false
   }
@@ -255,10 +245,11 @@ const handleAddStudent = async () => {
 
 const closeAddModal = () => {
   showAddModal.value = false
-  addError.value = ''
+  error.value = ''
   newStudent.value = {
     firstName: '',
     lastName: '',
+    classId: '',
     dateOfBirth: '',
     email: ''
   }
@@ -268,39 +259,25 @@ const getInitials = (firstName: string, lastName: string): string => {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 }
 
+const getClassName = (classId: string): string => {
+  const cls = classes.value.find(c => c.id === classId)
+  return cls ? cls.name : 'Unknown Class'
+}
+
 // Lifecycle
 onMounted(() => {
-  loadClass()
+  loadStudents()
 })
 </script>
 
 <style scoped>
-.class-detail-view {
+.student-list-view {
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .page-header {
   margin-bottom: 2rem;
-}
-
-.back-button {
-  background: transparent;
-  border: none;
-  color: #667eea;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  transition: all 0.2s ease;
-}
-
-.back-button:hover {
-  color: #5568d3;
-  transform: translateX(-4px);
 }
 
 .page-header h2 {
@@ -315,108 +292,30 @@ onMounted(() => {
   margin: 0;
 }
 
-.loading-state,
-.error-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #666;
-}
-
-.loading-state-small {
-  text-align: center;
-  padding: 2rem 1rem;
-  color: #666;
-}
-
-.spinner,
-.spinner-small {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-}
-
-.spinner-small {
-  width: 32px;
-  height: 32px;
-  border-width: 3px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.class-info {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-}
-
-.card-header {
+.controls-bar {
   display: flex;
-  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
   align-items: center;
-  margin-bottom: 1rem;
 }
 
-.card-header h3 {
-  margin: 0;
+.search-bar {
+  flex: 1;
 }
 
-.card h3 {
-  font-size: 1.25rem;
-  color: #333;
-  margin: 0 0 1rem 0;
-  border-bottom: 2px solid #667eea;
-  padding-bottom: 0.5rem;
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
 }
 
-.info-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.info-item {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-}
-
-.info-item label {
-  font-weight: 600;
-  color: #666;
-}
-
-.info-item span {
-  color: #333;
-}
-
-.card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.empty-state {
-  color: #999;
-  font-style: italic;
-  text-align: center;
-  padding: 2rem 1rem;
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .btn-primary {
@@ -430,6 +329,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
+  white-space: nowrap;
 }
 
 .btn-primary:hover {
@@ -444,78 +344,93 @@ onMounted(() => {
   transform: none;
 }
 
-.btn-small {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  min-height: 36px;
+.loading-state,
+.error-state,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
 }
 
-.student-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
 }
 
-.student-item {
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.student-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.student-card {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: #f8f9fa;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-decoration: none;
   color: #333;
   transition: all 0.2s ease;
-  min-height: 44px;
+  min-height: 80px;
 }
 
-.student-item:hover {
-  background: #e9ecef;
+.student-card:hover {
   transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.student-avatar-small {
-  width: 32px;
-  height: 32px;
+.student-avatar {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 1.25rem;
   font-weight: 600;
   flex-shrink: 0;
 }
 
-.student-arrow {
-  margin-left: auto;
-  color: #667eea;
-  font-size: 1.25rem;
+.student-info {
+  flex: 1;
 }
 
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  text-decoration: none;
+.student-info h3 {
+  font-size: 1.125rem;
+  margin: 0 0 0.25rem 0;
   color: #333;
-  transition: all 0.2s ease;
-  min-height: 44px;
-  font-weight: 500;
 }
 
-.action-button:hover {
-  background: #e9ecef;
-  transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.student-class {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0 0 0.25rem 0;
 }
 
-.action-icon {
+.student-id {
+  font-size: 0.75rem;
+  color: #999;
+  margin: 0;
+  font-family: monospace;
+}
+
+.student-arrow {
   font-size: 1.5rem;
+  color: #667eea;
   flex-shrink: 0;
 }
 
@@ -644,23 +559,21 @@ onMounted(() => {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .class-info {
-    grid-template-columns: 1fr;
-  }
-  
-  .info-item {
-    grid-template-columns: 1fr;
-  }
-  
-  .card-header {
+  .controls-bar {
     flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
   }
   
-  .btn-small {
+  .btn-primary {
     width: 100%;
+  }
+  
+  .student-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .student-arrow {
+    display: none;
   }
 }
 </style>
-

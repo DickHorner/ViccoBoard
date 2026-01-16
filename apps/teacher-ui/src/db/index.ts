@@ -16,6 +16,7 @@ export interface Student {
   lastName: string
   dateOfBirth?: Date
   email?: string
+  photo?: string // Base64 encoded image
   createdAt: Date
   updatedAt: Date
 }
