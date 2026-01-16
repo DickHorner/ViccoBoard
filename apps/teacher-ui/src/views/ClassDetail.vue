@@ -43,6 +43,10 @@
             <span>{{ students.length }}</span>
           </div>
           <div class="info-item">
+            <label>Grading Scheme:</label>
+            <span>{{ getGradingSchemeDisplay() }}</span>
+          </div>
+          <div class="info-item">
             <label>Created:</label>
             <span>{{ formatDate(classGroup.createdAt) }}</span>
           </div>
@@ -148,6 +152,22 @@
             <small class="form-hint">Format: YYYY/YYYY</small>
           </div>
           
+          <div class="form-group">
+            <label for="gradingScheme">Grading Scheme</label>
+            <select
+              id="gradingScheme"
+              v-model="editForm.gradingScheme"
+              class="form-input"
+            >
+              <option value="default">Default (1-6 German)</option>
+              <option value="numeric-1-15">Numeric (1-15 Points)</option>
+              <option value="letter-a-f">Letter Grades (A-F)</option>
+              <option value="percentage">Percentage (0-100%)</option>
+              <option value="custom">Custom</option>
+            </select>
+            <small class="form-hint">Select the grading system for this class</small>
+          </div>
+          
           <div v-if="editError" class="error-message">
             {{ editError }}
           </div>
@@ -226,7 +246,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { useClassGroups, useStudents, useAttendance } from '../composables/useDatabase'
+import { useClassGroups, useStudents } from '../composables/useDatabase'
 import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
@@ -240,7 +260,7 @@ const error = ref('')
 
 // Edit modal
 const showEditModal = ref(false)
-const editForm = ref({ name: '', schoolYear: '' })
+const editForm = ref({ name: '', schoolYear: '', gradingScheme: 'default' })
 const editError = ref('')
 const updating = ref(false)
 
@@ -253,7 +273,7 @@ const addingStudent = ref(false)
 // Composables
 const classGroups = useClassGroups()
 const studentsDb = useStudents()
-const attendance = useAttendance()
+// const attendance = useAttendance() // TODO: Use for real statistics calculation
 
 // Computed statistics
 const statistics = computed(() => {
@@ -286,7 +306,8 @@ const loadData = async () => {
     // Initialize edit form
     editForm.value = {
       name: cls.name,
-      schoolYear: cls.schoolYear
+      schoolYear: cls.schoolYear,
+      gradingScheme: 'default' // TODO: Get from class when available
     }
   } catch (err) {
     console.error('Failed to load class:', err)
@@ -349,7 +370,8 @@ const closeEditModal = () => {
   if (classGroup.value) {
     editForm.value = {
       name: classGroup.value.name,
-      schoolYear: classGroup.value.schoolYear
+      schoolYear: classGroup.value.schoolYear,
+      gradingScheme: 'default' // TODO: Get from class when available
     }
   }
 }
@@ -362,6 +384,18 @@ const closeAddStudentModal = () => {
 
 const formatDate = (date: Date): string => {
   return new Date(date).toLocaleDateString()
+}
+
+const getGradingSchemeDisplay = (): string => {
+  const schemes: Record<string, string> = {
+    'default': 'Default (1-6 German)',
+    'numeric-1-15': 'Numeric (1-15 Points)',
+    'letter-a-f': 'Letter Grades (A-F)',
+    'percentage': 'Percentage (0-100%)',
+    'custom': 'Custom'
+  }
+  // TODO: Get actual grading scheme from class when available
+  return schemes['default'] || 'Not set'
 }
 
 // Lifecycle
