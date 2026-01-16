@@ -25,9 +25,8 @@
           <div class="student-avatar">{{ getInitials(student) }}</div>
           <div class="student-info">
             <h3>{{ student.firstName }} {{ student.lastName }}</h3>
-            <p v-if="student.birthYear">Born: {{ student.birthYear }}</p>
-            <p v-if="student.gender">Gender: {{ capitalize(student.gender) }}</p>
-            <p v-if="student.contactInfo?.email">{{ student.contactInfo.email }}</p>
+            <p v-if="student.dateOfBirth">Born: {{ student.dateOfBirth.getFullYear() }}</p>
+            <p v-if="student.email">{{ student.email }}</p>
           </div>
         </div>
       </section>
@@ -72,13 +71,13 @@
               class="attendance-record"
             >
               <div class="record-date">
-                {{ formatDate(record.timestamp) }}
+                {{ formatDate(record.date) }}
               </div>
               <div :class="['record-status', `status-${record.status}`]">
                 {{ capitalize(record.status) }}
               </div>
-              <div v-if="record.reason" class="record-reason">
-                {{ record.reason }}
+              <div v-if="record.notes" class="record-reason">
+                {{ record.notes }}
               </div>
             </div>
           </div>
@@ -91,8 +90,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useStudents, useAttendance } from '../composables/useSportModule'
-import type { Student, AttendanceRecord } from '@viccoboard/core'
+import { useStudents, useAttendance } from '../composables/useSportBridge'
+import type { Student, AttendanceRecord } from '../db'
 
 const route = useRoute()
 const studentId = route.params.id as string

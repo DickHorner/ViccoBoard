@@ -119,9 +119,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useClassGroups, useStudents, useAttendance } from '../composables/useSportModule'
-import { AttendanceStatus } from '@viccoboard/core'
-import type { ClassGroup, Student } from '@viccoboard/core'
+import { useClassGroups, useStudents, useAttendance } from '../composables/useSportBridge'
+import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
 
@@ -217,7 +216,7 @@ const handleSaveAttendance = async () => {
     const records = Object.entries(attendance.value).map(([studentId, entry]) => ({
       studentId,
       lessonId,
-      status: entry.status as AttendanceStatus,
+      status: entry.status,
       reason: entry.reason,
       notes: undefined
     }))

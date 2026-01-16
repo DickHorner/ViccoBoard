@@ -108,7 +108,7 @@
               <span class="activity-icon">{{ getActivityIcon(activity.status) }}</span>
               <div class="activity-details">
                 <p class="activity-text">Attendance recorded</p>
-                <p class="activity-time">{{ formatDate(activity.timestamp) }}</p>
+                <p class="activity-time">{{ formatDate(activity.date) }}</p>
               </div>
             </div>
           </div>
@@ -172,8 +172,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useClassGroups, useAttendance } from '../composables/useSportModule'
-import type { ClassGroup, AttendanceRecord } from '@viccoboard/core'
+import { useClassGroups, useAttendance } from '../composables/useSportBridge'
+import type { ClassGroup, AttendanceRecord } from '../db'
 
 // State
 const classes = ref<ClassGroup[]>([])

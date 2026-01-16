@@ -32,10 +32,6 @@
             <span>{{ classGroup.schoolYear }}</span>
           </div>
           <div class="info-item">
-            <label>State:</label>
-            <span>{{ classGroup.state || '-' }}</span>
-          </div>
-          <div class="info-item">
             <label>Students:</label>
             <span>{{ students.length }}</span>
           </div>
@@ -66,7 +62,7 @@
               <div class="student-avatar">{{ getInitials(student) }}</div>
               <div class="student-info">
                 <h4>{{ student.firstName }} {{ student.lastName }}</h4>
-                <p v-if="student.birthYear">Birth Year: {{ student.birthYear }}</p>
+                <p v-if="student.dateOfBirth">Birth: {{ student.dateOfBirth.getFullYear() }}</p>
               </div>
               <div class="student-arrow">→</div>
             </RouterLink>
@@ -176,8 +172,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { useClassGroups, useStudents } from '../composables/useSportModule'
-import type { ClassGroup, Student } from '@viccoboard/core'
+import { useClassGroups, useStudents } from '../composables/useSportBridge'
+import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
 const classId = route.params.id as string
