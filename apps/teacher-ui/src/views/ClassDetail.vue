@@ -165,7 +165,7 @@
               <option value="letter-a-f">Letter Grades (A-F)</option>
               <option value="percentage">Percentage (0-100%)</option>
             </select>
-            <small class="form-hint">Select the grading system for this class</small>
+            <small class="form-hint">Note: Grading scheme selection will be saved once backend support is added</small>
           </div>
           
           <div v-if="editError" class="error-message">
@@ -282,7 +282,7 @@ const studentsDb = useStudents()
 const statistics = computed(() => {
   const totalLessons = 0 // TODO: Implement lesson counting
   const assessmentCount = 0 // TODO: Implement assessment counting
-  const attendanceRate = students.value.length > 0 ? 95 : 0 // TODO: Calculate real attendance rate
+  const attendanceRate = 0 // TODO: Calculate real attendance rate from attendance records
   
   return {
     totalLessons,
