@@ -9,7 +9,7 @@
     
     <aside class="app-sidebar" :class="{ collapsed: sidebarCollapsed }">
       <nav class="nav-menu">
-        <RouterLink to="/" class="nav-item" exact-active-class="active">
+        <RouterLink to="/" class="nav-item" active-class="active">
           <span class="nav-icon">📊</span>
           <span class="nav-label">Dashboard</span>
         </RouterLink>
