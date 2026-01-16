@@ -71,6 +71,7 @@
                   @click.stop="editClass(cls)" 
                   class="action-btn"
                   title="Edit class"
+                  aria-label="Edit class"
                 >
                   ✏️
                 </button>
@@ -78,6 +79,7 @@
                   @click.stop="confirmDeleteClass(cls)" 
                   class="action-btn action-btn-danger"
                   title="Delete class"
+                  aria-label="Delete class"
                 >
                   🗑️
                 </button>

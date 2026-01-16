@@ -87,6 +87,7 @@
       <section class="card">
         <h3>Statistics</h3>
         <div class="card-content">
+          <p class="info-note">📊 Statistics will be calculated from actual attendance and assessment data.</p>
           <div class="stats-grid">
             <div class="stat-item">
               <div class="stat-value">{{ statistics.attendanceRate }}%</div>
@@ -163,7 +164,6 @@
               <option value="numeric-1-15">Numeric (1-15 Points)</option>
               <option value="letter-a-f">Letter Grades (A-F)</option>
               <option value="percentage">Percentage (0-100%)</option>
-              <option value="custom">Custom</option>
             </select>
             <small class="form-hint">Select the grading system for this class</small>
           </div>
@@ -252,6 +252,9 @@ import type { ClassGroup, Student } from '../db'
 const route = useRoute()
 const classId = route.params.id as string
 
+// Constants
+const DEFAULT_GRADING_SCHEME = 'default'
+
 // State
 const classGroup = ref<ClassGroup | null>(null)
 const students = ref<Student[]>([])
@@ -260,7 +263,7 @@ const error = ref('')
 
 // Edit modal
 const showEditModal = ref(false)
-const editForm = ref({ name: '', schoolYear: '', gradingScheme: 'default' })
+const editForm = ref({ name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME })
 const editError = ref('')
 const updating = ref(false)
 
@@ -307,7 +310,7 @@ const loadData = async () => {
     editForm.value = {
       name: cls.name,
       schoolYear: cls.schoolYear,
-      gradingScheme: 'default' // TODO: Get from class when available
+      gradingScheme: DEFAULT_GRADING_SCHEME // TODO: Get from class when gradingScheme field is added to ClassGroup
     }
   } catch (err) {
     console.error('Failed to load class:', err)
@@ -371,7 +374,7 @@ const closeEditModal = () => {
     editForm.value = {
       name: classGroup.value.name,
       schoolYear: classGroup.value.schoolYear,
-      gradingScheme: 'default' // TODO: Get from class when available
+      gradingScheme: DEFAULT_GRADING_SCHEME // TODO: Get from class when gradingScheme field is added to ClassGroup
     }
   }
 }
@@ -391,11 +394,10 @@ const getGradingSchemeDisplay = (): string => {
     'default': 'Default (1-6 German)',
     'numeric-1-15': 'Numeric (1-15 Points)',
     'letter-a-f': 'Letter Grades (A-F)',
-    'percentage': 'Percentage (0-100%)',
-    'custom': 'Custom'
+    'percentage': 'Percentage (0-100%)'
   }
-  // TODO: Get actual grading scheme from class when available
-  return schemes['default'] || 'Not set'
+  // TODO: Get actual grading scheme from class when gradingScheme field is added to ClassGroup
+  return schemes[DEFAULT_GRADING_SCHEME] || 'Not set'
 }
 
 // Lifecycle
@@ -484,6 +486,16 @@ onMounted(() => {
   color: #c33;
   margin: 0 0 1rem 0;
   font-weight: 500;
+}
+
+.info-note {
+  background: #e7f3ff;
+  border-left: 4px solid #667eea;
+  padding: 0.75rem 1rem;
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 0.9rem;
+  border-radius: 4px;
 }
 
 .class-info {
