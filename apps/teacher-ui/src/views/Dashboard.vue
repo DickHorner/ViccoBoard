@@ -41,7 +41,8 @@ import { RouterLink } from 'vue-router'
 
 const createClass = () => {
   // Placeholder for create class functionality
-  alert('Create class functionality will be implemented in future phases')
+  // TODO: Implement proper modal or navigation to class creation form in Phase 2-3
+  console.log('Create class functionality will be implemented in future phases')
 }
 </script>
 

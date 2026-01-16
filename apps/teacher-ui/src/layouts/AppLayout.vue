@@ -23,6 +23,7 @@
         class="sidebar-toggle"
         @click="toggleSidebar"
         aria-label="Toggle sidebar"
+        :aria-expanded="!sidebarCollapsed"
       >
         <span v-if="sidebarCollapsed">☰</span>
         <span v-else>✕</span>
@@ -121,6 +122,8 @@ onUnmounted(() => {
   transform: translateX(-100%);
   position: absolute;
   z-index: 100;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .nav-menu {
