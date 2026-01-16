@@ -209,8 +209,8 @@ const handleSaveAttendance = async () => {
   saving.value = true
   
   try {
-    // Generate a lesson ID for this attendance session
-    const lessonId = `lesson-${selectedClassId.value}-${Date.now()}`
+    // Generate a unique lesson ID for this attendance session
+    const lessonId = `lesson-${crypto.randomUUID()}`
     
     // Prepare attendance records
     const records = Object.entries(attendance.value).map(([studentId, entry]) => ({
@@ -226,10 +226,12 @@ const handleSaveAttendance = async () => {
     
     saveSuccess.value = `Attendance recorded successfully for ${records.length} student${records.length > 1 ? 's' : ''}!`
     
-    // Reset attendance after 2 seconds
+    // Reset attendance after brief display
     setTimeout(() => {
-      attendance.value = {}
-      saveSuccess.value = ''
+      if (saveSuccess.value) { // Only clear if still showing this success message
+        attendance.value = {}
+        saveSuccess.value = ''
+      }
     }, 2000)
   } catch (err) {
     console.error('Failed to save attendance:', err)

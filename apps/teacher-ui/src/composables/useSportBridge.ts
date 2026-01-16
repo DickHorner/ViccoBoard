@@ -284,7 +284,7 @@ export function useAttendance() {
     if (existingRecord) {
       // Update existing record
       await db.attendanceRecords.update(existingRecord.id, {
-        status: input.status as any,
+        status: input.status as 'present' | 'absent' | 'excused' | 'late',
         notes: input.notes || input.reason,
         updatedAt: new Date()
       })
@@ -300,7 +300,7 @@ export function useAttendance() {
       studentId: input.studentId,
       lessonId: input.lessonId,
       date: now,
-      status: input.status as any,
+      status: input.status as 'present' | 'absent' | 'excused' | 'late',
       notes: input.notes || input.reason,
       createdAt: now,
       updatedAt: now
@@ -329,7 +329,7 @@ export function useAttendance() {
       present: records.filter(r => r.status === 'present').length,
       absent: records.filter(r => r.status === 'absent').length,
       excused: records.filter(r => r.status === 'excused').length,
-      passive: 0, // Not in Dexie schema
+      passive: 0, // Passive status not in Dexie schema - feature for future enhancement
       percentage: 0
     }
 

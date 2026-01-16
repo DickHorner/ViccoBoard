@@ -142,7 +142,9 @@ const loadData = async () => {
 }
 
 const getInitials = (student: Student): string => {
-  return `${student.firstName.charAt(0)}${student.lastName.charAt(0)}`.toUpperCase()
+  const first = (student.firstName ?? '').charAt(0) || '?'
+  const last = (student.lastName ?? '').charAt(0) || '?'
+  return `${first}${last}`.toUpperCase()
 }
 
 const capitalize = (str: string): string => {
