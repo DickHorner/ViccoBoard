@@ -199,7 +199,7 @@ const loadClass = async () => {
     classGroup.value = foundClass
     
     // Load students
-    loadStudents(classId)
+    await loadStudents(classId)
   } catch (err) {
     console.error('Failed to load class:', err)
     error.value = 'Failed to load class. Please try again.'

@@ -233,6 +233,71 @@
         </div>
       </div>
     </div>
+    
+    <!-- Delete Student Confirmation Modal -->
+    <div v-if="showDeleteModal && student" class="modal-overlay" @click="showDeleteModal = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Delete Student</h3>
+          <button class="modal-close" @click="showDeleteModal = false">✕</button>
+        </div>
+        
+        <div class="modal-form">
+          <p class="confirmation-text">
+            Are you sure you want to delete <strong>{{ student.firstName }} {{ student.lastName }}</strong>?
+            This action cannot be undone.
+          </p>
+          
+          <div v-if="deleteError" class="error-message">
+            {{ deleteError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" @click="showDeleteModal = false" class="btn-secondary">
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="handleDelete"
+              :disabled="saving"
+              class="btn-primary btn-danger-solid"
+            >
+              {{ saving ? 'Deleting...' : 'Delete Student' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Remove Photo Confirmation Modal -->
+    <div v-if="showRemovePhotoModal && student" class="modal-overlay" @click="showRemovePhotoModal = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Remove Photo</h3>
+          <button class="modal-close" @click="showRemovePhotoModal = false">✕</button>
+        </div>
+        
+        <div class="modal-form">
+          <p class="confirmation-text">
+            Are you sure you want to remove this photo?
+          </p>
+          
+          <div class="modal-actions">
+            <button type="button" @click="showRemovePhotoModal = false" class="btn-secondary">
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="confirmRemovePhoto"
+              :disabled="saving"
+              class="btn-primary btn-danger-solid"
+            >
+              {{ saving ? 'Removing...' : 'Remove Photo' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -255,8 +320,11 @@ const loadingAttendance = ref(true)
 const error = ref('')
 const showEditModal = ref(false)
 const showPhotoModal = ref(false)
+const showDeleteModal = ref(false)
+const showRemovePhotoModal = ref(false)
 const editError = ref('')
 const photoError = ref('')
+const deleteError = ref('')
 const saving = ref(false)
 const photoPreview = ref('')
 const photoInput = ref<HTMLInputElement | null>(null)
@@ -300,7 +368,7 @@ const loadStudent = async () => {
     }
     
     // Load attendance
-    loadAttendance(studentId)
+    await loadAttendance(studentId)
   } catch (err) {
     console.error('Failed to load student:', err)
     error.value = 'Failed to load student profile. Please try again.'
@@ -400,7 +468,11 @@ const savePhoto = async () => {
 const removePhoto = async () => {
   if (!student.value) return
   
-  if (!confirm('Are you sure you want to remove this photo?')) return
+  showRemovePhotoModal.value = true
+}
+
+const confirmRemovePhoto = async () => {
+  if (!student.value) return
   
   saving.value = true
   photoError.value = ''
@@ -413,6 +485,7 @@ const removePhoto = async () => {
     // Reload student
     await loadStudent()
     showPhotoModal.value = false
+    showRemovePhotoModal.value = false
   } catch (err) {
     console.error('Failed to remove photo:', err)
     photoError.value = 'Failed to remove photo. Please try again.'
@@ -421,21 +494,24 @@ const removePhoto = async () => {
   }
 }
 
-const confirmDelete = async () => {
+const confirmDelete = () => {
+  if (!student.value) return
+  showDeleteModal.value = true
+}
+
+const handleDelete = async () => {
   if (!student.value) return
   
-  const confirmation = confirm(
-    `Are you sure you want to delete ${student.value.firstName} ${student.value.lastName}? This action cannot be undone.`
-  )
-  
-  if (!confirmation) return
+  deleteError.value = ''
+  saving.value = true
   
   try {
     await studentsDb.remove(student.value.id)
     router.push('/students')
   } catch (err) {
     console.error('Failed to delete student:', err)
-    alert('Failed to delete student. Please try again.')
+    deleteError.value = err instanceof Error ? err.message : 'Failed to delete student. Please try again.'
+    saving.value = false
   }
 }
 
@@ -915,6 +991,21 @@ onMounted(() => {
 .btn-secondary.btn-danger:hover {
   background: #dc3545;
   color: white;
+}
+
+.btn-danger-solid {
+  background: #dc3545 !important;
+}
+
+.btn-danger-solid:hover {
+  background: #c82333 !important;
+}
+
+.confirmation-text {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .photo-preview-container {
