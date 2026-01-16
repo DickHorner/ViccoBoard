@@ -31,6 +31,14 @@
             <p>Loading classes...</p>
           </div>
           
+          <!-- Error State -->
+          <div v-else-if="loadError" class="error-state">
+            <p>{{ loadError }}</p>
+            <button class="btn-primary btn-small" @click="loadData">
+              Retry
+            </button>
+          </div>
+          
           <!-- Empty State -->
           <div v-else-if="filteredClasses.length === 0 && searchQuery === ''" class="empty-state">
             <p>No classes yet. Create your first class to get started.</p>
@@ -171,6 +179,7 @@ import type { ClassGroup, AttendanceRecord } from '../db'
 const classes = ref<ClassGroup[]>([])
 const recentActivity = ref<AttendanceRecord[]>([])
 const loading = ref(true)
+const loadError = ref('')
 const searchQuery = ref('')
 const showCreateModal = ref(false)
 const creating = ref(false)
@@ -200,11 +209,13 @@ const filteredClasses = computed(() => {
 // Methods
 const loadData = async () => {
   loading.value = true
+  loadError.value = ''
   try {
     classes.value = await classGroups.getAll()
     recentActivity.value = await attendance.getRecent(5)
   } catch (err) {
     console.error('Failed to load data:', err)
+    loadError.value = 'Failed to load dashboard data. Please refresh the page.'
   } finally {
     loading.value = false
   }
@@ -227,7 +238,21 @@ const handleCreateClass = async () => {
     newClass.value = { name: '', schoolYear: '' }
     showCreateModal.value = false
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to create class'
+    console.error('Failed to create class:', err)
+    if (err instanceof Error) {
+      // Check for specific error types
+      if (err.message.includes('already exists')) {
+        error.value = 'A class with this name already exists for this school year.'
+      } else if (err.message.includes('name is required')) {
+        error.value = 'Please enter a class name.'
+      } else if (err.message.includes('School year')) {
+        error.value = 'Please enter a valid school year in format YYYY/YYYY (e.g., 2025/2026).'
+      } else {
+        error.value = err.message
+      }
+    } else {
+      error.value = 'Failed to create class. Please try again.'
+    }
   } finally {
     creating.value = false
   }
@@ -402,6 +427,17 @@ onMounted(() => {
   font-style: italic;
   text-align: center;
   padding: 2rem 1rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.error-state p {
+  color: #c33;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
 }
 
 .class-list {
