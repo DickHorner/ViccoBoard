@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 
 const sidebarCollapsed = ref(false)
@@ -45,10 +45,24 @@ const toggleSidebar = () => {
   sidebarCollapsed.value = !sidebarCollapsed.value
 }
 
-// Auto-collapse on small screens
-if (typeof window !== 'undefined' && window.innerWidth < 768) {
-  sidebarCollapsed.value = true
+const handleResize = () => {
+  if (window.innerWidth < 768) {
+    sidebarCollapsed.value = true
+  } else {
+    sidebarCollapsed.value = false
+  }
 }
+
+onMounted(() => {
+  // Set initial state
+  handleResize()
+  // Listen for resize events
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
