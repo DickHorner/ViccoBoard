@@ -25,7 +25,7 @@ export interface AttendanceRecord {
   studentId: string
   lessonId: string
   date: Date
-  status: 'present' | 'absent' | 'excused' | 'late'
+  status: 'present' | 'absent' | 'excused' | 'late' | 'passive'
   notes?: string
   createdAt: Date
   updatedAt: Date

@@ -103,7 +103,7 @@
                   </td>
                   <td class="reason-cell">
                     <input 
-                      v-if="['absent', 'excused'].includes(attendance[student.id]?.status)"
+                      v-if="attendance[student.id] && ['absent', 'excused'].includes(attendance[student.id].status)"
                       v-model="attendance[student.id].reason"
                       type="text"
                       class="reason-input"
@@ -173,6 +173,9 @@ const classGroupsApi = useClassGroups()
 const studentsApi = useStudents()
 const attendanceApi = useAttendance()
 
+// Constants
+const SUCCESS_MESSAGE_TIMEOUT_MS = 3000
+
 // Current date display
 const currentDate = computed(() => {
   return new Date().toLocaleDateString('en-US', { 
@@ -194,7 +197,7 @@ const statusCounts = computed(() => {
   }
   
   for (const record of Object.values(attendance)) {
-    if (record.status && counts.hasOwnProperty(record.status)) {
+    if (record.status && record.status in counts) {
       counts[record.status as keyof typeof counts]++
     }
   }
@@ -283,11 +286,13 @@ async function saveAttendance() {
     let savedCount = 0
     for (const [studentId, record] of Object.entries(attendance)) {
       if (record.status) {
+        // Type assertion is safe here as we validate status in setStudentStatus
+        const validStatus = record.status as 'present' | 'absent' | 'excused' | 'late' | 'passive'
         await attendanceApi.create({
           studentId,
           lessonId,
           date: new Date(),
-          status: record.status as any,
+          status: validStatus,
           notes: record.reason || undefined
         })
         savedCount++
@@ -301,7 +306,7 @@ async function saveAttendance() {
     setTimeout(() => {
       clearAttendance()
       saveMessage.value = ''
-    }, 3000)
+    }, SUCCESS_MESSAGE_TIMEOUT_MS)
   } catch (error) {
     console.error('Failed to save attendance:', error)
     saveMessage.value = 'Failed to save attendance. Please try again.'
