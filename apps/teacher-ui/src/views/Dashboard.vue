@@ -108,7 +108,7 @@
               <span class="activity-icon">{{ getActivityIcon(activity.status) }}</span>
               <div class="activity-details">
                 <p class="activity-text">Attendance recorded</p>
-                <p class="activity-time">{{ formatDate(activity.date) }}</p>
+                <p class="activity-time">{{ formatDate(activity.timestamp) }}</p>
               </div>
             </div>
           </div>
@@ -172,8 +172,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useClassGroups, useAttendance } from '../composables/useDatabase'
-import type { ClassGroup, AttendanceRecord } from '../db'
+import { useClassGroups, useAttendance } from '../composables/useSportModule'
+import type { ClassGroup, AttendanceRecord } from '@viccoboard/core'
 
 // State
 const classes = ref<ClassGroup[]>([])
@@ -200,7 +200,7 @@ const filteredClasses = computed(() => {
     return classes.value
   }
   const query = searchQuery.value.toLowerCase()
-  return classes.value.filter(cls => 
+  return classes.value.filter((cls: ClassGroup) => 
     cls.name.toLowerCase().includes(query) ||
     cls.schoolYear.toLowerCase().includes(query)
   )
@@ -240,16 +240,7 @@ const handleCreateClass = async () => {
   } catch (err) {
     console.error('Failed to create class:', err)
     if (err instanceof Error) {
-      // Check for specific error types
-      if (err.message.includes('already exists')) {
-        error.value = 'A class with this name already exists for this school year.'
-      } else if (err.message.includes('name is required')) {
-        error.value = 'Please enter a class name.'
-      } else if (err.message.includes('School year')) {
-        error.value = 'Please enter a valid school year in format YYYY/YYYY (e.g., 2025/2026).'
-      } else {
-        error.value = err.message
-      }
+      error.value = err.message
     } else {
       error.value = 'Failed to create class. Please try again.'
     }
@@ -276,7 +267,8 @@ const getActivityIcon = (status: string): string => {
 
 const formatDate = (date: Date): string => {
   const now = new Date()
-  const diffMs = now.getTime() - new Date(date).getTime()
+  const recordDate = new Date(date)
+  const diffMs = now.getTime() - recordDate.getTime()
   const diffMins = Math.floor(diffMs / 60000)
   const diffHours = Math.floor(diffMs / 3600000)
   const diffDays = Math.floor(diffMs / 86400000)
@@ -286,7 +278,7 @@ const formatDate = (date: Date): string => {
   if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
   if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
   
-  return new Date(date).toLocaleDateString()
+  return recordDate.toLocaleDateString()
 }
 
 // Lifecycle
