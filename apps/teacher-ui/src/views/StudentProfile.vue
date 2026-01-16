@@ -403,8 +403,13 @@ const handleEditStudent = async () => {
       email: editForm.value.email || undefined
     })
     
-    // Reload student
-    await loadStudent()
+    // Update local state
+    student.value.firstName = editForm.value.firstName.trim()
+    student.value.lastName = editForm.value.lastName.trim()
+    student.value.classId = editForm.value.classId
+    student.value.dateOfBirth = editForm.value.dateOfBirth ? new Date(editForm.value.dateOfBirth) : undefined
+    student.value.email = editForm.value.email || undefined
+    
     showEditModal.value = false
   } catch (err) {
     console.error('Failed to update student:', err)
@@ -453,8 +458,8 @@ const savePhoto = async () => {
       photo: photoPreview.value
     })
     
-    // Reload student
-    await loadStudent()
+    // Update local state
+    student.value.photo = photoPreview.value
     photoPreview.value = ''
     showPhotoModal.value = false
   } catch (err) {
@@ -482,8 +487,8 @@ const confirmRemovePhoto = async () => {
       photo: undefined
     })
     
-    // Reload student
-    await loadStudent()
+    // Update local state
+    student.value.photo = undefined
     showPhotoModal.value = false
     showRemovePhotoModal.value = false
   } catch (err) {
