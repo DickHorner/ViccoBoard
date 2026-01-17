@@ -30,6 +30,18 @@ A concise, at-a-glance reference covering:
 
 **Target Audience**: AI agents needing quick reference during reviews
 
+#### [AI_AGENT_REVIEW_QUALITY_CHECKLIST.md](./AI_AGENT_REVIEW_QUALITY_CHECKLIST.md)
+**Quality checklist for evaluating AI agent reviews.**
+
+Helps humans verify AI agent reviews meet standards:
+- Review format verification
+- Comment quality assessment
+- Project compliance checks
+- Scoring guide (1-5 scale)
+- Good vs. bad review examples
+
+**Target Audience**: Humans evaluating AI agent review quality
+
 #### [PULL_REQUEST_TEMPLATE.md](./PULL_REQUEST_TEMPLATE.md)
 **Template for all pull requests.**
 
