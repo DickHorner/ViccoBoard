@@ -70,16 +70,16 @@
                 <button 
                   @click.stop="editClass(cls)" 
                   class="action-btn"
-                  title="Edit class"
-                  aria-label="Edit class"
+                  :title="`Edit class ${cls.name}`"
+                  :aria-label="`Edit class ${cls.name}`"
                 >
                   ✏️
                 </button>
                 <button 
                   @click.stop="confirmDeleteClass(cls)" 
                   class="action-btn action-btn-danger"
-                  title="Delete class"
-                  aria-label="Delete class"
+                  :title="`Delete class ${cls.name}`"
+                  :aria-label="`Delete class ${cls.name}`"
                 >
                   🗑️
                 </button>
