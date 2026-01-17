@@ -96,7 +96,6 @@
                         }]"
                         :disabled="saving"
                         :title="status.label"
-                        :aria-label="'Mark ' + student.firstName + ' ' + student.lastName + ' as ' + status.label"
                       >
                         {{ status.short }}
                       </button>
@@ -110,7 +109,6 @@
                       class="reason-input"
                       placeholder="Enter reason..."
                       :disabled="saving"
-                      maxlength="255"
                     />
                   </td>
                 </tr>
@@ -149,13 +147,16 @@ import { ref, computed, onMounted, reactive } from 'vue'
 import { useClassGroups, useStudents, useAttendance } from '../composables/useDatabase'
 import type { ClassGroup, Student } from '../db'
 
+// Status type definition
+type AttendanceStatus = 'present' | 'absent' | 'excused' | 'late' | 'passive'
+
 // Status options for quick selection
-const statusOptions = [
+const statusOptions: Array<{ value: AttendanceStatus; label: string; short: string }> = [
   { value: 'present', label: 'Present', short: 'P' },
   { value: 'absent', label: 'Absent', short: 'A' },
   { value: 'late', label: 'Late', short: 'L' },
   { value: 'excused', label: 'Excused', short: 'E' },
-  { value: 'passive', label: 'Passive', short: 'Pa' }
+  { value: 'passive', label: 'Passive', short: 'Pass' }
 ]
 
 // State
@@ -168,7 +169,7 @@ const saveMessage = ref('')
 const saveMessageType = ref<'success' | 'error'>('success')
 
 // Attendance tracking: { studentId: { status, reason } }
-const attendance = reactive<Record<string, { status: string; reason?: string }>>({})
+const attendance = reactive<Record<string, { status: AttendanceStatus; reason?: string }>>({})
 
 // Composables
 const classGroupsApi = useClassGroups()
@@ -241,7 +242,7 @@ async function onClassChange() {
 }
 
 // Set status for a student
-function setStudentStatus(studentId: string, status: string) {
+function setStudentStatus(studentId: string, status: AttendanceStatus) {
   if (!attendance[studentId]) {
     attendance[studentId] = { status }
   } else {
@@ -279,22 +280,23 @@ async function saveAttendance() {
   saveMessage.value = ''
   
   try {
-    // Generate a lesson ID for today
+    // Generate a lesson ID for today (same for all saves on the same day)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const lessonId = `lesson-${selectedClassId.value}-${today.getTime()}`
     
-    // Generate a unique lesson ID for this attendance save
-    const lessonId = `lesson-${selectedClassId.value}-${Date.now()}`
+    // Get existing records for this lesson to check for duplicates
+    const existingRecords = await attendanceApi.getByLessonId(lessonId)
+    
+    // Track which students were successfully saved for error recovery
+    const savedStudents: string[] = []
     
     // Save each attendance record
     let savedCount = 0
-    let savedCount = 0
     for (const [studentId, record] of Object.entries(attendance)) {
       if (record.status) {
-        // Type assertion is safe here as we validate status in setStudentStatus
-        const validStatus = record.status as 'present' | 'absent' | 'excused' | 'late' | 'passive'
-
+        const validStatus = record.status as AttendanceStatus
+        
         const payload = {
           studentId,
           lessonId,
@@ -302,18 +304,19 @@ async function saveAttendance() {
           status: validStatus,
           notes: record.reason || undefined
         }
-
-        // If an existing record for this student/lesson exists, update it; otherwise create a new one
-        const existing =
-          Array.isArray(existingRecords)
-            ? existingRecords.find((r: any) => r.studentId === studentId)
-            : undefined
-
-        if (existing && typeof attendanceApi.update === 'function') {
+        
+        // Check if record already exists for this student and lesson
+        const existing = existingRecords.find(r => r.studentId === studentId)
+        
+        if (existing) {
+          // Update existing record instead of creating duplicate
           await attendanceApi.update(existing.id, payload)
         } else {
+          // Create new record
           await attendanceApi.create(payload)
         }
+        
+        savedStudents.push(studentId)
         savedCount++
       }
     }
@@ -330,6 +333,7 @@ async function saveAttendance() {
     console.error('Failed to save attendance:', error)
     saveMessage.value = 'Failed to save attendance. Please try again.'
     saveMessageType.value = 'error'
+    // Don't clear form on error so user can retry
   } finally {
     saving.value = false
   }
