@@ -262,11 +262,11 @@ const closeAddModal = () => {
   }
 }
 
-const getInitials = (firstName: string, lastName: string): string => {
+export const getInitials = (firstName: string, lastName: string): string => {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 }
 
-const getClassName = (classId: string): string => {
+export const getClassName = (classId: string): string => {
   const cls = classes.value.find(c => c.id === classId)
   return cls ? cls.name : 'Unknown Class'
 }
