@@ -133,6 +133,21 @@ ng ohne expliziten Plan-Abschnitt + Opt-in.
 
 **Commit-Stil:** klein, logisch getrennt (keine 2.000-Zeilen-Wundertüte).
 
+### 4.1) AI Agent Review-Richtlinien
+
+Für AI Agents, die Pull Request Reviews durchführen:
+
+**Vollständige Richtlinien:** [`.github/AI_PR_REVIEW_GUIDELINES.md`](.github/AI_PR_REVIEW_GUIDELINES.md)  
+**Kurzreferenz:** [`.github/AI_CODE_REVIEW_QUICK_REFERENCE.md`](.github/AI_CODE_REVIEW_QUICK_REFERENCE.md)  
+**PR-Template:** [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md)
+
+**Kernprinzipien:**
+- ✅ **IMMER** Inline-Kommentare mit GitHub Suggestion-Syntax verwenden
+- ✅ Konstruktives Feedback mit Begründung (WHY, nicht nur WHAT)
+- ✅ Prüfe Safari/Offline/Modularität-Constraints
+- ✅ Keine Features aus `Plan.md` entfernt
+- ✅ Severity-Marker: 🚨 Kritisch, ⚠️ Wichtig, 💡 Vorschlag
+
 ---
 
 
