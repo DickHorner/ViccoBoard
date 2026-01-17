@@ -282,19 +282,37 @@ async function saveAttendance() {
     today.setHours(0, 0, 0, 0)
     const lessonId = `lesson-${selectedClassId.value}-${today.getTime()}`
     
+    // Load existing attendance records for this lesson so we can update instead of duplicating
+    const existingRecords = await attendanceApi.list
+      ? await attendanceApi.list({ lessonId })
+      : []
+    
     // Save each attendance record
     let savedCount = 0
     for (const [studentId, record] of Object.entries(attendance)) {
       if (record.status) {
         // Type assertion is safe here as we validate status in setStudentStatus
         const validStatus = record.status as 'present' | 'absent' | 'excused' | 'late' | 'passive'
-        await attendanceApi.create({
+
+        const payload = {
           studentId,
           lessonId,
           date: new Date(),
           status: validStatus,
           notes: record.reason || undefined
-        })
+        }
+
+        // If an existing record for this student/lesson exists, update it; otherwise create a new one
+        const existing =
+          Array.isArray(existingRecords)
+            ? existingRecords.find((r: any) => r.studentId === studentId)
+            : undefined
+
+        if (existing && typeof attendanceApi.update === 'function') {
+          await attendanceApi.update(existing.id, payload)
+        } else {
+          await attendanceApi.create(payload)
+        }
         savedCount++
       }
     }
