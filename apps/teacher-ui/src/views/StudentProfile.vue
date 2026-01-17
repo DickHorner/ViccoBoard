@@ -61,6 +61,23 @@
             <p>No attendance records yet.</p>
           </div>
           <div v-else class="attendance-table-container">
+            <div class="attendance-header">
+              <p class="attendance-count">Showing {{ displayedAttendance.length }} of {{ attendance.length }} records</p>
+              <button 
+                v-if="attendance.length > attendancePageSize && !showAllAttendance"
+                @click="showAllAttendance = true"
+                class="btn-link"
+              >
+                Show all
+              </button>
+              <button 
+                v-if="showAllAttendance"
+                @click="showAllAttendance = false"
+                class="btn-link"
+              >
+                Show recent
+              </button>
+            </div>
             <table class="attendance-table">
               <thead>
                 <tr>
@@ -70,7 +87,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="record in attendance" :key="record.id">
+                <tr v-for="record in displayedAttendance" :key="record.id">
                   <td>{{ formatDate(record.date) }}</td>
                   <td>
                     <span :class="['status-badge', `status-${record.status}`]">
@@ -132,11 +149,16 @@
               v-model="editForm.classId"
               required
               class="form-input"
+              :disabled="!hasClasses"
             >
-              <option v-for="cls in classes" :key="cls.id" :value="cls.id">
-                {{ cls.name }}
+              <option value="" disabled>{{ hasClasses ? 'Select a class' : 'No classes available' }}</option>
+              <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
+                {{ classGroup.name }}
               </option>
             </select>
+            <small v-if="!hasClasses" class="form-hint error-hint">
+              Please create a class first in the Dashboard.
+            </small>
           </div>
           
           <div class="form-group">
@@ -145,6 +167,7 @@
               id="editDateOfBirth"
               v-model="editForm.dateOfBirth"
               type="date"
+              :max="getTodayDateString()"
               class="form-input"
             />
           </div>
@@ -302,9 +325,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStudents, useClassGroups, useAttendance } from '../composables/useDatabase'
+import { useModal } from '../composables/useModal'
+import { getInitials, formatDate, formatDateForInput, getTodayDateString } from '../utils/student'
 import type { Student, ClassGroup, AttendanceRecord } from '../db'
 
 // Router
@@ -328,6 +353,8 @@ const deleteError = ref('')
 const saving = ref(false)
 const photoPreview = ref('')
 const photoInput = ref<HTMLInputElement | null>(null)
+const showAllAttendance = ref(false)
+const attendancePageSize = 10
 
 const editForm = ref({
   firstName: '',
@@ -341,6 +368,16 @@ const editForm = ref({
 const studentsDb = useStudents()
 const classGroupsDb = useClassGroups()
 const attendanceDb = useAttendance()
+
+// Computed
+const displayedAttendance = computed(() => {
+  if (showAllAttendance.value) {
+    return attendance.value
+  }
+  return attendance.value.slice(0, attendancePageSize)
+})
+
+const hasClasses = computed(() => classes.value.length > 0)
 
 // Methods
 const loadStudent = async () => {
@@ -403,12 +440,11 @@ const handleEditStudent = async () => {
       email: editForm.value.email || undefined
     })
     
-    // Update local state
-    student.value.firstName = editForm.value.firstName.trim()
-    student.value.lastName = editForm.value.lastName.trim()
-    student.value.classId = editForm.value.classId
-    student.value.dateOfBirth = editForm.value.dateOfBirth ? new Date(editForm.value.dateOfBirth) : undefined
-    student.value.email = editForm.value.email || undefined
+    // Reload from database to ensure consistency
+    const updatedStudent = await studentsDb.getById(student.value.id)
+    if (updatedStudent) {
+      student.value = updatedStudent
+    }
     
     showEditModal.value = false
   } catch (err) {
@@ -458,8 +494,11 @@ const savePhoto = async () => {
       photo: photoPreview.value
     })
     
-    // Update local state
-    student.value.photo = photoPreview.value
+    // Reload from database to ensure consistency
+    const updatedStudent = await studentsDb.getById(student.value.id)
+    if (updatedStudent) {
+      student.value = updatedStudent
+    }
     photoPreview.value = ''
     showPhotoModal.value = false
   } catch (err) {
@@ -487,8 +526,11 @@ const confirmRemovePhoto = async () => {
       photo: undefined
     })
     
-    // Update local state
-    student.value.photo = undefined
+    // Reload from database to ensure consistency
+    const updatedStudent = await studentsDb.getById(student.value.id)
+    if (updatedStudent) {
+      student.value = updatedStudent
+    }
     showPhotoModal.value = false
     showRemovePhotoModal.value = false
   } catch (err) {
@@ -534,24 +576,16 @@ const closePhotoModal = () => {
   }
 }
 
-const getInitials = (firstName: string, lastName: string): string => {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-}
-
 const getClassName = (classId: string): string => {
-  const cls = classes.value.find(c => c.id === classId)
-  return cls ? cls.name : 'Unknown Class'
+  const classGroup = classes.value.find(c => c.id === classId)
+  return classGroup ? classGroup.name : 'Unknown Class'
 }
 
-const formatDate = (date: Date | string): string => {
-  const d = typeof date === 'string' ? new Date(date) : date
-  return d.toLocaleDateString()
-}
-
-const formatDateForInput = (date: Date): string => {
-  const d = new Date(date)
-  return d.toISOString().split('T')[0]
-}
+// Enable keyboard accessibility for modals (after function definitions)
+useModal(showEditModal, closeEditModal)
+useModal(showPhotoModal, closePhotoModal)
+useModal(showDeleteModal, () => { showDeleteModal.value = false })
+useModal(showRemovePhotoModal, () => { showRemovePhotoModal.value = false })
 
 // Lifecycle
 onMounted(() => {
@@ -782,6 +816,37 @@ onMounted(() => {
 
 .attendance-table-container {
   overflow-x: auto;
+}
+
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+}
+
+.attendance-count {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: #667eea;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem;
+  text-decoration: underline;
+  min-height: 32px;
+  transition: color 0.2s ease;
+}
+
+.btn-link:hover {
+  color: #5568d3;
 }
 
 .attendance-table {

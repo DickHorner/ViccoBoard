@@ -61,7 +61,15 @@
               class="student-item"
             >
               <div class="student-avatar-small">
-                {{ getInitials(student.firstName, student.lastName) }}
+                <img
+                  v-if="student.photo"
+                  :src="student.photo"
+                  :alt="`${student.firstName} ${student.lastName}`"
+                  class="student-avatar-img"
+                />
+                <span v-else>
+                  {{ getInitials(student.firstName, student.lastName) }}
+                </span>
               </div>
               <span>{{ student.firstName }} {{ student.lastName }}</span>
               <span class="student-arrow">→</span>
@@ -120,6 +128,7 @@
               id="dateOfBirth"
               v-model="newStudent.dateOfBirth"
               type="date"
+              :max="getTodayDateString()"
               class="form-input"
             />
           </div>
@@ -157,6 +166,8 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useClassGroups, useStudents } from '../composables/useDatabase'
+import { useModal } from '../composables/useModal'
+import { getInitials, getTodayDateString } from '../utils/student'
 import type { ClassGroup, Student } from '../db'
 
 // Router
@@ -264,9 +275,8 @@ const closeAddModal = () => {
   }
 }
 
-const getInitials = (firstName: string, lastName: string): string => {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-}
+// Enable keyboard accessibility for modal (after function definitions)
+useModal(showAddModal, closeAddModal)
 
 // Lifecycle
 onMounted(() => {
@@ -486,6 +496,13 @@ onMounted(() => {
   font-size: 0.75rem;
   font-weight: 600;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.student-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .student-arrow {

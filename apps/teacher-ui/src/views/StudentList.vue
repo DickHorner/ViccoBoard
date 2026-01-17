@@ -17,7 +17,12 @@
       </div>
       
       <!-- Add Student Button -->
-      <button class="btn-primary" @click="showAddModal = true">
+      <button 
+        class="btn-primary" 
+        @click="openAddModal"
+        :disabled="!canAddStudent"
+        :title="!canAddStudent ? 'Create a class first' : 'Add a new student'"
+      >
         + Add Student
       </button>
     </div>
@@ -36,8 +41,13 @@
     
     <!-- Empty State -->
     <div v-else-if="students.length === 0" class="empty-state">
-      <p>No students yet. Add your first student to get started.</p>
-      <button class="btn-primary" @click="showAddModal = true">
+      <p v-if="!hasClasses">No classes yet. Create a class first before adding students.</p>
+      <p v-else>No students yet. Add your first student to get started.</p>
+      <button 
+        class="btn-primary" 
+        @click="openAddModal"
+        :disabled="!canAddStudent"
+      >
         + Add Student
       </button>
     </div>
@@ -68,7 +78,7 @@
         <div class="student-info">
           <h3>{{ student.firstName }} {{ student.lastName }}</h3>
           <p class="student-class">{{ getClassName(student.classId) }}</p>
-          <p class="student-id">ID: {{ student.id.substring(0, 8) }}</p>
+          <p class="student-id" :title="`Full ID: ${student.id}`">ID: {{ student.id.substring(0, 8) }}</p>
         </div>
         <div class="student-arrow">→</div>
       </RouterLink>
@@ -114,12 +124,16 @@
               v-model="newStudent.classId"
               required
               class="form-input"
+              :disabled="!hasClasses"
             >
-              <option value="">Select a class</option>
-              <option v-for="cls in classes" :key="cls.id" :value="cls.id">
-                {{ cls.name }}
+              <option value="">{{ hasClasses ? 'Select a class' : 'No classes available' }}</option>
+              <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
+                {{ classGroup.name }}
               </option>
             </select>
+            <small v-if="!hasClasses" class="form-hint error-hint">
+              Please create a class first in the Dashboard.
+            </small>
           </div>
           
           <div class="form-group">
@@ -128,6 +142,7 @@
               id="dateOfBirth"
               v-model="newStudent.dateOfBirth"
               type="date"
+              :max="getTodayDateString()"
               class="form-input"
             />
           </div>
@@ -162,9 +177,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useStudents, useClassGroups } from '../composables/useDatabase'
+import { useModal } from '../composables/useModal'
+import { getInitials, getTodayDateString, debounce } from '../utils/student'
 import type { Student, ClassGroup } from '../db'
 
 // State
@@ -189,18 +206,31 @@ const newStudent = ref({
 const studentsDb = useStudents()
 const classGroupsDb = useClassGroups()
 
+// Debounced search for performance
+const debouncedSearchQuery = ref('')
+const debouncedSearch = debounce((value: string) => {
+  debouncedSearchQuery.value = value
+}, 300)
+
+watch(searchQuery, (newValue) => {
+  debouncedSearch(newValue)
+})
+
 // Computed
 const filteredStudents = computed(() => {
-  if (!searchQuery.value) {
+  if (!debouncedSearchQuery.value) {
     return students.value
   }
-  const query = searchQuery.value.toLowerCase()
+  const query = debouncedSearchQuery.value.toLowerCase()
   return students.value.filter(student => 
     student.firstName.toLowerCase().includes(query) ||
     student.lastName.toLowerCase().includes(query) ||
     student.id.toLowerCase().includes(query)
   )
 })
+
+const hasClasses = computed(() => classes.value.length > 0)
+const canAddStudent = computed(() => hasClasses.value)
 
 // Methods
 const loadStudents = async () => {
@@ -262,14 +292,21 @@ const closeAddModal = () => {
   }
 }
 
-export const getInitials = (firstName: string, lastName: string): string => {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+const getClassName = (classId: string): string => {
+  const classGroup = classes.value.find(c => c.id === classId)
+  return classGroup ? classGroup.name : 'Unknown Class'
 }
 
-export const getClassName = (classId: string): string => {
-  const cls = classes.value.find(c => c.id === classId)
-  return cls ? cls.name : 'Unknown Class'
+const openAddModal = () => {
+  if (!hasClasses.value) {
+    error.value = 'Please create a class first before adding students.'
+    return
+  }
+  showAddModal.value = true
 }
+
+// Enable keyboard accessibility for modal (after function definitions)
+useModal(showAddModal, closeAddModal)
 
 // Lifecycle
 onMounted(() => {
@@ -410,6 +447,13 @@ onMounted(() => {
   font-size: 1.25rem;
   font-weight: 600;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.student-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .student-info {
@@ -433,6 +477,7 @@ onMounted(() => {
   color: #999;
   margin: 0;
   font-family: monospace;
+  cursor: help;
 }
 
 .student-arrow {
@@ -515,6 +560,16 @@ onMounted(() => {
   font-weight: 600;
   color: #333;
   font-size: 0.875rem;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: -0.25rem;
+}
+
+.error-hint {
+  color: #c33;
 }
 
 .form-input {
