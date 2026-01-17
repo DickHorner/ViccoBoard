@@ -110,6 +110,7 @@
                       class="reason-input"
                       placeholder="Enter reason..."
                       :disabled="saving"
+                      maxlength="255"
                     />
                   </td>
                 </tr>
