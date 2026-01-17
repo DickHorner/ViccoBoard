@@ -96,6 +96,7 @@
                         }]"
                         :disabled="saving"
                         :title="status.label"
+                        :aria-label="'Mark ' + student.firstName + ' ' + student.lastName + ' as ' + status.label"
                       >
                         {{ status.short }}
                       </button>
