@@ -56,7 +56,14 @@
         class="student-card"
       >
         <div class="student-avatar">
-          {{ getInitials(student.firstName, student.lastName) }}
+          <img
+            v-if="student.photo"
+            :src="student.photo"
+            :alt="student.firstName + ' ' + student.lastName"
+          />
+          <span v-else>
+            {{ getInitials(student.firstName, student.lastName) }}
+          </span>
         </div>
         <div class="student-info">
           <h3>{{ student.firstName }} {{ student.lastName }}</h3>
