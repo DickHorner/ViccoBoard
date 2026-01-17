@@ -282,12 +282,11 @@ async function saveAttendance() {
     today.setHours(0, 0, 0, 0)
     const lessonId = `lesson-${selectedClassId.value}-${today.getTime()}`
     
-    // Load existing attendance records for this lesson so we can update instead of duplicating
-    const existingRecords = await attendanceApi.list
-      ? await attendanceApi.list({ lessonId })
-      : []
+    // Generate a unique lesson ID for this attendance save
+    const lessonId = `lesson-${selectedClassId.value}-${Date.now()}`
     
     // Save each attendance record
+    let savedCount = 0
     let savedCount = 0
     for (const [studentId, record] of Object.entries(attendance)) {
       if (record.status) {
