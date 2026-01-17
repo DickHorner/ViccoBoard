@@ -7,7 +7,7 @@ This repository contains ViccoBoard, a unified teacher application combining Spo
 This is an npm workspaces monorepo with three main directories:
 - `packages/` - Core shared packages (core types, plugins, storage)
 - `modules/` - Domain-specific modules (sport, exams)
-- `apps/` - Applications (teacher-ui, demo, wow-web)
+- `apps/` - Applications (demo, teacher-ui; wow-web planned)
 
 ## Architecture Principles
 
