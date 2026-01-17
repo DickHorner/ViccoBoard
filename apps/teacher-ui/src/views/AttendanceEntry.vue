@@ -288,9 +288,6 @@ async function saveAttendance() {
     // Get existing records for this lesson to check for duplicates
     const existingRecords = await attendanceApi.getByLessonId(lessonId)
     
-    // Track which students were successfully saved for error recovery
-    const savedStudents: string[] = []
-    
     // Save each attendance record
     let savedCount = 0
     for (const [studentId, record] of Object.entries(attendance)) {
@@ -316,7 +313,6 @@ async function saveAttendance() {
           await attendanceApi.create(payload)
         }
         
-        savedStudents.push(studentId)
         savedCount++
       }
     }
