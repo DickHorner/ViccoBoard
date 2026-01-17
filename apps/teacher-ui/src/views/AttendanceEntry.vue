@@ -154,7 +154,7 @@ const statusOptions = [
   { value: 'absent', label: 'Absent', short: 'A' },
   { value: 'late', label: 'Late', short: 'L' },
   { value: 'excused', label: 'Excused', short: 'E' },
-  { value: 'passive', label: 'Passive', short: 'Pass' }
+  { value: 'passive', label: 'Passive', short: 'Pa' }
 ]
 
 // State
