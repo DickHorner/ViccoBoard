@@ -253,13 +253,12 @@ async function onClassChange() {
     categories.value = await sportBridge.value.gradeCategoryRepository.findByClassGroup(selectedClassId.value);
     students.value = await sportBridge.value.studentRepository.findByClassGroup(selectedClassId.value);
     
-    // Load all performance entries for students in this class
-    const allEntries: PerformanceEntry[] = [];
-    for (const student of students.value) {
-      const entries = await sportBridge.value.performanceEntryRepository.findByStudent(student.id);
-      allEntries.push(...entries);
-    }
-    performanceEntries.value = allEntries;
+    // Load all performance entries for students in this class in parallel
+    const entryPromises = students.value.map((student) =>
+      sportBridge.value.performanceEntryRepository.findByStudent(student.id)
+    );
+    const entriesPerStudent = await Promise.all(entryPromises);
+    performanceEntries.value = entriesPerStudent.flat();
   } catch (error) {
     console.error('Failed to load grading data:', error);
   } finally {
