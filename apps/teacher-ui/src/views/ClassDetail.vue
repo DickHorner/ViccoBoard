@@ -2,23 +2,30 @@
   <div class="class-detail-view">
     <div class="page-header">
       <button class="back-button" @click="$router.back()">← Back</button>
-      <h2>Class Detail</h2>
-      <p class="page-description">View and manage class information, students, and lessons.</p>
+      <div class="header-content">
+        <div>
+          <h2>{{ classGroup?.name || 'Loading...' }}</h2>
+          <p class="page-description">View and manage class information, students, and lessons.</p>
+        </div>
+        <button v-if="classGroup" class="btn-primary" @click="showEditModal = true">
+          Edit Class
+        </button>
+      </div>
     </div>
     
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading class...</p>
+      <p>Loading class details...</p>
     </div>
     
     <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadClass">Retry</button>
+      <button class="btn-primary" @click="loadData">Retry</button>
     </div>
     
-    <!-- Class Content -->
+    <!-- Content -->
     <div v-else-if="classGroup" class="class-info">
       <section class="card">
         <h3>Class Information</h3>
@@ -35,45 +42,65 @@
             <label>Students:</label>
             <span>{{ students.length }}</span>
           </div>
+          <div class="info-item">
+            <label>Grading Scheme:</label>
+            <span>{{ getGradingSchemeDisplay() }}</span>
+          </div>
+          <div class="info-item">
+            <label>Created:</label>
+            <span>{{ formatDate(classGroup.createdAt) }}</span>
+          </div>
         </div>
       </section>
       
       <section class="card">
         <div class="card-header">
           <h3>Students</h3>
-          <button class="btn-primary btn-small" @click="showAddModal = true">
+          <button class="btn-primary btn-small" @click="showAddStudentModal = true">
             + Add Student
           </button>
         </div>
         <div class="card-content">
-          <div v-if="loadingStudents" class="loading-state-small">
-            <div class="spinner-small"></div>
-            <p>Loading students...</p>
-          </div>
-          <div v-else-if="students.length === 0" class="empty-state">
+          <!-- Empty State -->
+          <div v-if="students.length === 0" class="empty-state">
             <p>No students in this class yet.</p>
           </div>
+          
+          <!-- Students List -->
           <div v-else class="student-list">
-            <RouterLink
-              v-for="student in students"
+            <RouterLink 
+              v-for="student in students" 
               :key="student.id"
               :to="`/students/${student.id}`"
-              class="student-item"
+              class="student-card"
             >
-              <div class="student-avatar-small">
-                <img
-                  v-if="student.photo"
-                  :src="student.photo"
-                  :alt="`${student.firstName} ${student.lastName}`"
-                  class="student-avatar-img"
-                />
-                <span v-else>
-                  {{ getInitials(student.firstName, student.lastName) }}
-                </span>
+              <div class="student-info">
+                <h4>{{ student.firstName }} {{ student.lastName }}</h4>
+                <p v-if="student.email" class="student-email">{{ student.email }}</p>
               </div>
-              <span>{{ student.firstName }} {{ student.lastName }}</span>
-              <span class="student-arrow">→</span>
+              <div class="student-arrow">→</div>
             </RouterLink>
+          </div>
+        </div>
+      </section>
+      
+      <section class="card">
+        <h3>Statistics</h3>
+        <div class="card-content">
+          <p class="info-note">📊 Statistics will be calculated from actual attendance and assessment data.</p>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value">{{ statistics.attendanceRate }}%</div>
+              <div class="stat-label">Attendance Rate</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ statistics.totalLessons }}</div>
+              <div class="stat-label">Total Lessons</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ statistics.assessmentCount }}</div>
+              <div class="stat-label">Assessments</div>
+            </div>
           </div>
         </div>
       </section>
@@ -85,16 +112,69 @@
             <span class="action-icon">✓</span>
             <span>Record Attendance</span>
           </RouterLink>
+          <button class="action-button" @click="showEditModal = true">
+            <span class="action-icon">✏️</span>
+            <span>Edit Class Info</span>
+          </button>
         </div>
       </section>
     </div>
     
-    <!-- Add Student Modal -->
-    <div v-if="showAddModal" class="modal-overlay" @click="closeAddModal">
+    <!-- Edit Class Modal -->
+    <div v-if="showEditModal" class="modal-overlay" @click="closeEditModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Add Student to {{ classGroup?.name }}</h3>
-          <button class="modal-close" @click="closeAddModal">✕</button>
+          <h3>Edit Class</h3>
+          <button class="modal-close" @click="closeEditModal">✕</button>
+        </div>
+        
+        <form @submit.prevent="handleUpdateClass" class="modal-form">
+          <div class="form-group">
+            <label for="className">Class Name *</label>
+            <input
+              id="className"
+              v-model="editForm.name"
+              type="text"
+              required
+              class="form-input"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="schoolYear">School Year *</label>
+            <input
+              id="schoolYear"
+              v-model="editForm.schoolYear"
+              type="text"
+              pattern="\d{4}/\d{4}"
+              required
+              class="form-input"
+            />
+            <small class="form-hint">Format: YYYY/YYYY</small>
+          </div>
+          
+          <div v-if="editError" class="error-message">
+            {{ editError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" @click="closeEditModal" class="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" :disabled="updating" class="btn-primary">
+              {{ updating ? 'Updating...' : 'Update Class' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Add Student Modal -->
+    <div v-if="showAddStudentModal" class="modal-overlay" @click="closeAddStudentModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Add Student</h3>
+          <button class="modal-close" @click="closeAddStudentModal">✕</button>
         </div>
         
         <form @submit.prevent="handleAddStudent" class="modal-form">
@@ -102,9 +182,8 @@
             <label for="firstName">First Name *</label>
             <input
               id="firstName"
-              v-model="newStudent.firstName"
+              v-model="studentForm.firstName"
               type="text"
-              placeholder="Enter first name"
               required
               class="form-input"
             />
@@ -114,21 +193,9 @@
             <label for="lastName">Last Name *</label>
             <input
               id="lastName"
-              v-model="newStudent.lastName"
+              v-model="studentForm.lastName"
               type="text"
-              placeholder="Enter last name"
               required
-              class="form-input"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="dateOfBirth">Date of Birth</label>
-            <input
-              id="dateOfBirth"
-              v-model="newStudent.dateOfBirth"
-              type="date"
-              :max="getTodayDateString()"
               class="form-input"
             />
           </div>
@@ -137,23 +204,22 @@
             <label for="email">Email</label>
             <input
               id="email"
-              v-model="newStudent.email"
+              v-model="studentForm.email"
               type="email"
-              placeholder="student@example.com"
               class="form-input"
             />
           </div>
           
-          <div v-if="addError" class="error-message">
-            {{ addError }}
+          <div v-if="studentError" class="error-message">
+            {{ studentError }}
           </div>
           
           <div class="modal-actions">
-            <button type="button" @click="closeAddModal" class="btn-secondary">
+            <button type="button" @click="closeAddStudentModal" class="btn-secondary">
               Cancel
             </button>
-            <button type="submit" :disabled="creating" class="btn-primary">
-              {{ creating ? 'Adding...' : 'Add Student' }}
+            <button type="submit" :disabled="addingStudent" class="btn-primary">
+              {{ addingStudent ? 'Adding...' : 'Add Student' }}
             </button>
           </div>
         </form>
@@ -163,126 +229,159 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useClassGroups, useStudents } from '../composables/useDatabase'
-import { useModal } from '../composables/useModal'
-import { getInitials, getTodayDateString } from '../utils/student'
+import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading'
 import type { ClassGroup, Student } from '../db'
 
-// Router
 const route = useRoute()
+const classId = route.params.id as string
 
 // State
 const classGroup = ref<ClassGroup | null>(null)
 const students = ref<Student[]>([])
 const loading = ref(true)
-const loadingStudents = ref(true)
 const error = ref('')
-const showAddModal = ref(false)
-const creating = ref(false)
-const addError = ref('')
 
-const newStudent = ref({
-  firstName: '',
-  lastName: '',
-  dateOfBirth: '',
-  email: ''
-})
+// Edit modal
+const showEditModal = ref(false)
+const editForm = ref({ name: '', schoolYear: '' })
+const editError = ref('')
+const updating = ref(false)
+
+// Add student modal
+const showAddStudentModal = ref(false)
+const studentForm = ref({ firstName: '', lastName: '', email: '' })
+const studentError = ref('')
+const addingStudent = ref(false)
 
 // Composables
-const classGroupsDb = useClassGroups()
+const classGroups = useClassGroups()
 const studentsDb = useStudents()
+// const attendance = useAttendance() // TODO: Use for real statistics calculation
+
+// Computed statistics
+const statistics = computed(() => {
+  const totalLessons = 0 // TODO: Implement lesson counting
+  const assessmentCount = 0 // TODO: Implement assessment counting
+  const attendanceRate = 0 // TODO: Calculate real attendance rate from attendance records
+  
+  return {
+    totalLessons,
+    assessmentCount,
+    attendanceRate
+  }
+})
 
 // Methods
-const loadClass = async () => {
+const loadData = async () => {
   loading.value = true
   error.value = ''
+  
   try {
-    const classId = route.params.id as string
-    const foundClass = await classGroupsDb.getById(classId)
-    
-    if (!foundClass) {
+    const cls = await classGroups.getById(classId)
+    if (!cls) {
       error.value = 'Class not found'
       return
     }
     
-    classGroup.value = foundClass
+    classGroup.value = cls
+    students.value = await studentsDb.getByClassId(classId)
     
-    // Load students
-    await loadStudents(classId)
+    // Initialize edit form
+    editForm.value = {
+      name: cls.name,
+      schoolYear: cls.schoolYear
+    }
   } catch (err) {
     console.error('Failed to load class:', err)
-    error.value = 'Failed to load class. Please try again.'
+    error.value = 'Failed to load class details. Please try again.'
   } finally {
     loading.value = false
   }
 }
 
-const loadStudents = async (classId: string) => {
-  loadingStudents.value = true
+const handleUpdateClass = async () => {
+  editError.value = ''
+  updating.value = true
+  
   try {
-    students.value = await studentsDb.getByClassId(classId)
+    await classGroups.update(classId, {
+      name: editForm.value.name.trim(),
+      schoolYear: editForm.value.schoolYear.trim()
+    })
+    
+    // Reload data
+    await loadData()
+    showEditModal.value = false
   } catch (err) {
-    console.error('Failed to load students:', err)
+    console.error('Failed to update class:', err)
+    editError.value = err instanceof Error ? err.message : 'Failed to update class'
   } finally {
-    loadingStudents.value = false
+    updating.value = false
   }
 }
 
 const handleAddStudent = async () => {
-  if (!classGroup.value) return
-  
-  addError.value = ''
-  creating.value = true
+  studentError.value = ''
+  addingStudent.value = true
   
   try {
     await studentsDb.create({
-      firstName: newStudent.value.firstName.trim(),
-      lastName: newStudent.value.lastName.trim(),
-      classId: classGroup.value.id,
-      dateOfBirth: newStudent.value.dateOfBirth ? new Date(newStudent.value.dateOfBirth) : undefined,
-      email: newStudent.value.email || undefined
+      classId,
+      firstName: studentForm.value.firstName.trim(),
+      lastName: studentForm.value.lastName.trim(),
+      email: studentForm.value.email.trim() || undefined
     })
     
     // Reload students
-    await loadStudents(classGroup.value.id)
+    students.value = await studentsDb.getByClassId(classId)
     
     // Reset form and close modal
-    newStudent.value = {
-      firstName: '',
-      lastName: '',
-      dateOfBirth: '',
-      email: ''
-    }
-    showAddModal.value = false
+    studentForm.value = { firstName: '', lastName: '', email: '' }
+    showAddStudentModal.value = false
   } catch (err) {
     console.error('Failed to add student:', err)
-    addError.value = err instanceof Error ? err.message : 'Failed to add student. Please try again.'
+    studentError.value = err instanceof Error ? err.message : 'Failed to add student'
   } finally {
-    creating.value = false
+    addingStudent.value = false
   }
 }
 
-const closeAddModal = () => {
-  showAddModal.value = false
-  addError.value = ''
-  newStudent.value = {
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    email: ''
+const closeEditModal = () => {
+  showEditModal.value = false
+  editError.value = ''
+  if (classGroup.value) {
+    editForm.value = {
+      name: classGroup.value.name,
+      schoolYear: classGroup.value.schoolYear
+    }
   }
 }
 
-// Enable keyboard accessibility for modal (after function definitions)
-useModal(showAddModal, closeAddModal)
+const closeAddStudentModal = () => {
+  showAddStudentModal.value = false
+  studentError.value = ''
+  studentForm.value = { firstName: '', lastName: '', email: '' }
+}
+
+const formatDate = (date: Date): string => {
+  return new Date(date).toLocaleDateString()
+}
+
+const getGradingSchemeDisplay = (): string => {
+  // TODO: Get actual grading scheme from class when gradingScheme field is added to ClassGroup
+  return GRADING_SCHEMES[DEFAULT_GRADING_SCHEME] || 'Not set'
+}
 
 // Lifecycle
 onMounted(() => {
-  loadClass()
+  loadData()
 })
 </script>
+
+<style src="../styles/modal.css"></style>
 
 <style scoped>
 .class-detail-view {
@@ -292,6 +391,13 @@ onMounted(() => {
 
 .page-header {
   margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .back-button {
@@ -304,7 +410,7 @@ onMounted(() => {
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  min-height: 44px;
+  min-height: 44px; /* Touch target minimum */
   transition: all 0.2s ease;
 }
 
@@ -325,42 +431,48 @@ onMounted(() => {
   margin: 0;
 }
 
-.loading-state,
-.error-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #666;
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
 }
 
-.loading-state-small {
-  text-align: center;
-  padding: 2rem 1rem;
-  color: #666;
-}
-
-.spinner,
-.spinner-small {
+.spinner {
+  width: 40px;
+  height: 40px;
   border: 4px solid #f3f3f3;
   border-top: 4px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-}
-
-.spinner-small {
-  width: 32px;
-  height: 32px;
-  border-width: 3px;
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.error-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.error-state p {
+  color: #c33;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.info-note {
+  background: #e7f3ff;
+  border-left: 4px solid #667eea;
+  padding: 0.75rem 1rem;
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 0.9rem;
+  border-radius: 4px;
 }
 
 .class-info {
@@ -376,23 +488,27 @@ onMounted(() => {
   padding: 1.5rem;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.card-header h3 {
-  margin: 0;
-}
-
 .card h3 {
   font-size: 1.25rem;
   color: #333;
   margin: 0 0 1rem 0;
   border-bottom: 2px solid #667eea;
   padding-bottom: 0.5rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  border: none;
+  padding: 0;
 }
 
 .info-grid {
@@ -429,6 +545,74 @@ onMounted(() => {
   padding: 2rem 1rem;
 }
 
+.student-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.student-card:hover {
+  background: #e9ecef;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.student-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.student-email {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.student-arrow {
+  font-size: 1.5rem;
+  color: #667eea;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
 .btn-primary {
   background: #667eea;
   color: white;
@@ -439,13 +623,17 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
+  min-height: 44px; /* Touch target minimum */
 }
 
 .btn-primary:hover {
   background: #5568d3;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-primary:disabled {
@@ -460,55 +648,21 @@ onMounted(() => {
   min-height: 36px;
 }
 
-.student-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.student-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: #f8f9fa;
+.btn-secondary {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
   border-radius: 8px;
-  text-decoration: none;
-  color: #333;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s ease;
   min-height: 44px;
 }
 
-.student-item:hover {
-  background: #e9ecef;
-  transform: translateX(4px);
-}
-
-.student-avatar-small {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.student-avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.student-arrow {
-  margin-left: auto;
-  color: #667eea;
-  font-size: 1.25rem;
+.btn-secondary:hover {
+  background: #f8f9fa;
 }
 
 .action-button {
@@ -521,8 +675,12 @@ onMounted(() => {
   text-decoration: none;
   color: #333;
   transition: all 0.2s ease;
-  min-height: 44px;
+  min-height: 44px; /* Touch target minimum */
   font-weight: 500;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
 }
 
 .action-button:hover {
@@ -554,47 +712,49 @@ onMounted(() => {
 .modal {
   background: white;
   border-radius: 12px;
-  padding: 2rem;
   max-width: 500px;
   width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .modal-header h3 {
+  margin: 0;
   font-size: 1.5rem;
   color: #333;
-  margin: 0;
 }
 
 .modal-close {
-  background: transparent;
+  background: none;
   border: none;
   font-size: 1.5rem;
   color: #666;
   cursor: pointer;
-  padding: 0.5rem;
-  min-width: 44px;
-  min-height: 44px;
+  padding: 0;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease;
+  border-radius: 4px;
+  transition: background 0.2s ease;
 }
 
 .modal-close:hover {
-  color: #333;
+  background: #f8f9fa;
 }
 
 .modal-form {
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -609,16 +769,15 @@ onMounted(() => {
 .form-group label {
   font-weight: 600;
   color: #333;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
 }
 
 .form-input {
-  padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s ease;
-  min-height: 44px;
 }
 
 .form-input:focus {
@@ -627,36 +786,24 @@ onMounted(() => {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-hint {
+  font-size: 0.8rem;
+  color: #666;
+}
+
 .error-message {
-  padding: 0.75rem;
+  padding: 0.875rem;
   background: #fee;
-  color: #c33;
+  border: 1px solid #fcc;
   border-radius: 8px;
-  font-size: 0.875rem;
+  color: #c33;
+  font-size: 0.9rem;
 }
 
 .modal-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  margin-top: 0.5rem;
-}
-
-.btn-secondary {
-  background: #f0f0f0;
-  color: #333;
-  border: none;
-  border-radius: 8px;
-  padding: 0.875rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 44px;
-}
-
-.btn-secondary:hover {
-  background: #e0e0e0;
 }
 
 /* Responsive adjustments */
@@ -669,15 +816,27 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
   
-  .card-header {
+  .header-content {
     flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
   }
   
-  .btn-small {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal {
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+    height: 100%;
+  }
+  
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .modal-actions button {
     width: 100%;
   }
 }
 </style>
-
