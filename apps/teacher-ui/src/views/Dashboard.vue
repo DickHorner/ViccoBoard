@@ -51,18 +51,40 @@
           
           <!-- Classes List -->
           <div v-else class="class-list">
-            <RouterLink 
+            <div 
               v-for="cls in filteredClasses" 
               :key="cls.id"
-              :to="`/classes/${cls.id}`"
-              class="class-card"
+              class="class-card-wrapper"
             >
-              <div class="class-info">
-                <h4>{{ cls.name }}</h4>
-                <p class="class-meta">{{ cls.schoolYear }}</p>
+              <RouterLink 
+                :to="`/classes/${cls.id}`"
+                class="class-card"
+              >
+                <div class="class-info">
+                  <h4>{{ cls.name }}</h4>
+                  <p class="class-meta">{{ cls.schoolYear }}</p>
+                </div>
+                <div class="class-arrow">→</div>
+              </RouterLink>
+              <div class="class-actions">
+                <button 
+                  @click.stop="editClass(cls)" 
+                  class="action-btn"
+                  :title="`Edit class ${cls.name}`"
+                  :aria-label="`Edit class ${cls.name}`"
+                >
+                  ✏️
+                </button>
+                <button 
+                  @click.stop="confirmDeleteClass(cls)" 
+                  class="action-btn action-btn-danger"
+                  :title="`Delete class ${cls.name}`"
+                  :aria-label="`Delete class ${cls.name}`"
+                >
+                  🗑️
+                </button>
               </div>
-              <div class="class-arrow">→</div>
-            </RouterLink>
+            </div>
           </div>
         </div>
       </section>
@@ -77,6 +99,10 @@
             <span class="action-icon">📚</span>
             <span>Create New Class</span>
           </button>
+          <RouterLink to="/students" class="action-button">
+            <span class="action-icon">👥</span>
+            <span>View All Students</span>
+          </RouterLink>
           <RouterLink to="/attendance" class="action-button">
             <span class="action-icon">✓</span>
             <span>Record Attendance</span>
@@ -166,6 +192,83 @@
         </form>
       </div>
     </div>
+    
+    <!-- Edit Class Modal -->
+    <div v-if="showEditModal" class="modal-overlay" @click="closeEditModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Edit Class</h3>
+          <button class="modal-close" @click="closeEditModal">✕</button>
+        </div>
+        
+        <form @submit.prevent="handleUpdateClass" class="modal-form">
+          <div class="form-group">
+            <label for="editClassName">Class Name *</label>
+            <input
+              id="editClassName"
+              v-model="editClassData.name"
+              type="text"
+              required
+              class="form-input"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="editSchoolYear">School Year *</label>
+            <input
+              id="editSchoolYear"
+              v-model="editClassData.schoolYear"
+              type="text"
+              pattern="\d{4}/\d{4}"
+              required
+              class="form-input"
+            />
+            <small class="form-hint">Format: YYYY/YYYY</small>
+          </div>
+          
+          <div v-if="editError" class="error-message">
+            {{ editError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" @click="closeEditModal" class="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" :disabled="updating" class="btn-primary">
+              {{ updating ? 'Updating...' : 'Update Class' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
+      <div class="modal modal-small" @click.stop>
+        <div class="modal-header">
+          <h3>Delete Class</h3>
+          <button class="modal-close" @click="closeDeleteModal">✕</button>
+        </div>
+        
+        <div class="modal-content">
+          <p>Are you sure you want to delete <strong>{{ classToDelete?.name }}</strong>?</p>
+          <p class="warning-text">This action cannot be undone.</p>
+          
+          <div v-if="deleteError" class="error-message">
+            {{ deleteError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" @click="closeDeleteModal" class="btn-secondary">
+              Cancel
+            </button>
+            <button @click="handleDeleteClass" :disabled="deleting" class="btn-danger">
+              {{ deleting ? 'Deleting...' : 'Delete Class' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -189,6 +292,18 @@ const newClass = ref({
   name: '',
   schoolYear: ''
 })
+
+// Edit state
+const showEditModal = ref(false)
+const editClassData = ref({ id: '', name: '', schoolYear: '' })
+const editError = ref('')
+const updating = ref(false)
+
+// Delete state
+const showDeleteModal = ref(false)
+const classToDelete = ref<ClassGroup | null>(null)
+const deleteError = ref('')
+const deleting = ref(false)
 
 // Composables
 const classGroups = useClassGroups()
@@ -255,6 +370,78 @@ const closeModal = () => {
   newClass.value = { name: '', schoolYear: '' }
 }
 
+const editClass = (cls: ClassGroup) => {
+  editClassData.value = {
+    id: cls.id,
+    name: cls.name,
+    schoolYear: cls.schoolYear
+  }
+  showEditModal.value = true
+}
+
+const handleUpdateClass = async () => {
+  editError.value = ''
+  updating.value = true
+  
+  try {
+    await classGroups.update(editClassData.value.id, {
+      name: editClassData.value.name.trim(),
+      schoolYear: editClassData.value.schoolYear.trim()
+    })
+    
+    // Reload classes
+    await loadData()
+    
+    // Close modal
+    showEditModal.value = false
+  } catch (err) {
+    console.error('Failed to update class:', err)
+    editError.value = err instanceof Error ? err.message : 'Failed to update class'
+  } finally {
+    updating.value = false
+  }
+}
+
+const closeEditModal = () => {
+  showEditModal.value = false
+  editError.value = ''
+  editClassData.value = { id: '', name: '', schoolYear: '' }
+}
+
+const confirmDeleteClass = (cls: ClassGroup) => {
+  classToDelete.value = cls
+  showDeleteModal.value = true
+}
+
+const handleDeleteClass = async () => {
+  if (!classToDelete.value) return
+  
+  deleteError.value = ''
+  deleting.value = true
+  
+  try {
+    await classGroups.remove(classToDelete.value.id)
+    
+    // Reload classes
+    await loadData()
+    
+    // Close modal
+    showDeleteModal.value = false
+    classToDelete.value = null
+  } catch (err) {
+    console.error('Failed to delete class:', err)
+    deleteError.value = err instanceof Error ? err.message : 'Failed to delete class'
+  } finally {
+    deleting.value = false
+  }
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deleteError.value = ''
+  classToDelete.value = null
+}
+
 const getActivityIcon = (status: string): string => {
   const icons: Record<string, string> = {
     present: '✓',
@@ -286,6 +473,8 @@ onMounted(() => {
   loadData()
 })
 </script>
+
+<style src="../styles/modal.css"></style>
 
 <style scoped>
 .dashboard-view {
@@ -438,7 +627,14 @@ onMounted(() => {
   gap: 0.5rem;
 }
 
+.class-card-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .class-card {
+  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -472,6 +668,37 @@ onMounted(() => {
 .class-arrow {
   font-size: 1.5rem;
   color: #667eea;
+}
+
+.class-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background: #f8f9fa;
+  border-color: #667eea;
+  transform: scale(1.05);
+}
+
+.action-btn-danger:hover {
+  background: #fee;
+  border-color: #fcc;
 }
 
 .activity-list {
@@ -565,6 +792,31 @@ onMounted(() => {
   background: #f8f9fa;
 }
 
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .action-button {
   display: flex;
   align-items: center;
@@ -619,6 +871,10 @@ onMounted(() => {
   overflow-y: auto;
 }
 
+.modal-small {
+  max-width: 400px;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -658,6 +914,25 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.modal-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-content p {
+  margin: 0;
+  color: #333;
+  line-height: 1.5;
+}
+
+.warning-text {
+  color: #dc3545;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .form-group {

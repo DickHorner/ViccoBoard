@@ -92,6 +92,61 @@
               />
             </div>
           </div>
+
+          <div class="bulk-actions">
+            <button 
+              class="btn-bulk" 
+              @click="markAllPresent"
+              :disabled="saving"
+            >
+              Mark All Present
+            </button>
+          </div>
+          
+          <div class="attendance-table-wrapper">
+            <table class="attendance-table">
+              <thead>
+                <tr>
+                  <th class="student-name-col">Student</th>
+                  <th class="status-col">Status</th>
+                  <th class="reason-col">Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="student in students" :key="student.id" class="student-row">
+                  <td class="student-name">
+                    {{ student.firstName }} {{ student.lastName }}
+                  </td>
+                  <td class="status-buttons-cell">
+                    <div class="status-buttons">
+                      <button 
+                        v-for="status in statusOptions" 
+                        :key="status.value"
+                        @click="setStudentStatus(student.id, status.value)"
+                        :class="['status-btn', `status-btn-${status.value}`, { 
+                          'active': attendance[student.id]?.status === status.value 
+                        }]"
+                        :disabled="saving"
+                        :title="status.label"
+                      >
+                        {{ status.short }}
+                      </button>
+                    </div>
+                  </td>
+                  <td class="reason-cell">
+                    <input 
+                      v-if="attendance[student.id] && ['absent', 'excused'].includes(attendance[student.id].status)"
+                      v-model="attendance[student.id].reason"
+                      type="text"
+                      class="reason-input"
+                      placeholder="Enter reason..."
+                      :disabled="saving"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           
           <div v-if="saveError" class="error-message">
             {{ saveError }}
@@ -267,8 +322,9 @@ onMounted(async () => {
 
 <style scoped>
 .attendance-view {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .page-header {
@@ -386,11 +442,18 @@ onMounted(async () => {
   padding: 2rem 1rem;
 }
 
+.loading-state {
+  color: #667eea;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
 .status-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.75rem;
   padding: 1rem 0;
+  margin-bottom: 1rem;
 }
 
 .status-item {
@@ -398,7 +461,7 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem;
+  padding: 0.875rem;
   border-radius: 8px;
   background: #f8f9fa;
 }
@@ -419,8 +482,12 @@ onMounted(async () => {
   border-left: 4px solid #2196f3;
 }
 
+.status-passive {
+  border-left: 4px solid #9c27b0;
+}
+
 .status-label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #666;
   font-weight: 600;
   text-transform: uppercase;
@@ -546,6 +613,17 @@ onMounted(async () => {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.reason-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
 .btn-primary {
   background: #667eea;
   color: white;
@@ -556,7 +634,7 @@ onMounted(async () => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px; /* Touch target minimum */
+  min-height: 44px;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -571,28 +649,47 @@ onMounted(async () => {
   opacity: 0.6;
 }
 
-.btn-large {
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
+.btn-secondary {
+  background: white;
+  color: #666;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
 }
 
-.error-message {
-  padding: 0.875rem;
-  background: #fee;
-  border: 1px solid #fcc;
-  border-radius: 8px;
-  color: #c33;
-  font-size: 0.9rem;
+.btn-secondary:hover:not(:disabled) {
+  border-color: #ccc;
+  background: #f8f9fa;
 }
 
-.success-message {
-  padding: 0.875rem;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
-  border-radius: 8px;
-  color: #2e7d32;
-  font-size: 0.9rem;
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.save-message {
+  padding: 1rem;
+  border-radius: 6px;
   font-weight: 500;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.save-message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #4caf50;
+}
+
+.save-message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #f44336;
 }
 
 /* Responsive adjustments */
@@ -601,18 +698,36 @@ onMounted(async () => {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .attendance-row {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+  .attendance-table {
+    font-size: 0.8rem;
   }
   
   .status-buttons {
-    justify-content: flex-start;
+    flex-direction: column;
   }
   
   .status-btn {
-    min-width: 50px;
-    min-height: 50px;
+    width: 100%;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+}
+
+/* iPad landscape and larger */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .attendance-view {
+    max-width: 100%;
+  }
+  
+  .status-summary {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
 </style>

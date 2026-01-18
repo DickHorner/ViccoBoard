@@ -2,8 +2,27 @@
   <div class="class-detail-view">
     <div class="page-header">
       <button class="back-button" @click="$router.back()">← Back</button>
-      <h2>Class Detail</h2>
-      <p class="page-description">View and manage class information, students, and lessons.</p>
+      <div class="header-content">
+        <div>
+          <h2>{{ classGroup?.name || 'Loading...' }}</h2>
+          <p class="page-description">View and manage class information, students, and lessons.</p>
+        </div>
+        <button v-if="classGroup" class="btn-primary" @click="showEditModal = true">
+          Edit Class
+        </button>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading class details...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div v-else-if="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="btn-primary" @click="loadData">Retry</button>
     </div>
     
     <!-- Loading State -->
@@ -34,6 +53,14 @@
           <div class="info-item">
             <label>Students:</label>
             <span>{{ students.length }}</span>
+          </div>
+          <div class="info-item">
+            <label>Grading Scheme:</label>
+            <span>{{ getGradingSchemeDisplay() }}</span>
+          </div>
+          <div class="info-item">
+            <label>Created:</label>
+            <span>{{ formatDate(classGroup.createdAt) }}</span>
           </div>
         </div>
       </section>
@@ -71,6 +98,27 @@
       </section>
       
       <section class="card">
+        <h3>Statistics</h3>
+        <div class="card-content">
+          <p class="info-note">📊 Statistics will be calculated from actual attendance and assessment data.</p>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value">{{ statistics.attendanceRate }}%</div>
+              <div class="stat-label">Attendance Rate</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ statistics.totalLessons }}</div>
+              <div class="stat-label">Total Lessons</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ statistics.assessmentCount }}</div>
+              <div class="stat-label">Assessments</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="card">
         <h3>Quick Actions</h3>
         <div class="card-content">
           <RouterLink 
@@ -80,6 +128,10 @@
             <span class="action-icon">✓</span>
             <span>Record Attendance</span>
           </RouterLink>
+          <button class="action-button" @click="showEditModal = true">
+            <span class="action-icon">✏️</span>
+            <span>Edit Class Info</span>
+          </button>
         </div>
       </section>
     </div>
@@ -261,16 +313,30 @@ const handleAddStudent = async () => {
   }
 }
 
+const closeEditModal = () => {
+  showEditModal.value = false
+  editError.value = ''
+  if (classGroup.value) {
+    editForm.value = {
+      name: classGroup.value.name,
+      schoolYear: classGroup.value.schoolYear
+    }
+  }
+}
+
 const closeAddStudentModal = () => {
   showAddStudentModal.value = false
-  addStudentError.value = ''
-  newStudent.value = {
-    firstName: '',
-    lastName: '',
-    birthYear: undefined,
-    gender: '',
-    email: ''
-  }
+  studentError.value = ''
+  studentForm.value = { firstName: '', lastName: '', email: '' }
+}
+
+const formatDate = (date: Date): string => {
+  return new Date(date).toLocaleDateString()
+}
+
+const getGradingSchemeDisplay = (): string => {
+  // TODO: Get actual grading scheme from class when gradingScheme field is added to ClassGroup
+  return GRADING_SCHEMES[DEFAULT_GRADING_SCHEME] || 'Not set'
 }
 
 // Lifecycle
@@ -278,6 +344,8 @@ onMounted(() => {
   loadData()
 })
 </script>
+
+<style src="../styles/modal.css"></style>
 
 <style scoped>
 .class-detail-view {
@@ -287,6 +355,13 @@ onMounted(() => {
 
 .page-header {
   margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .back-button {
@@ -352,7 +427,16 @@ onMounted(() => {
   color: #c33;
   margin: 0 0 1rem 0;
   font-weight: 500;
-  font-size: 1.1rem;
+}
+
+.info-note {
+  background: #e7f3ff;
+  border-left: 4px solid #667eea;
+  padding: 0.75rem 1rem;
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 0.9rem;
+  border-radius: 4px;
 }
 
 .class-info {
@@ -435,6 +519,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem 1.25rem;
   background: #f8f9fa;
   border-radius: 8px;
@@ -485,6 +571,32 @@ onMounted(() => {
   color: #667eea;
 }
 
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
 .btn-primary {
   background: #667eea;
   color: white;
@@ -502,6 +614,10 @@ onMounted(() => {
   background: #5568d3;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-primary:disabled {
@@ -545,6 +661,10 @@ onMounted(() => {
   transition: all 0.2s ease;
   min-height: 44px; /* Touch target minimum */
   font-weight: 500;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
 }
 
 .action-button:hover {
@@ -650,6 +770,11 @@ onMounted(() => {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-hint {
+  font-size: 0.8rem;
+  color: #666;
+}
+
 .error-message {
   padding: 0.875rem;
   background: #fee;
@@ -675,10 +800,12 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
   
-  .card-header {
+  .header-content {
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
   
   .modal {

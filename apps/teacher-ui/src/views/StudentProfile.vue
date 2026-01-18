@@ -3,34 +3,53 @@
     <div class="page-header">
       <button class="back-button" @click="$router.back()">← Back</button>
       <h2>Student Profile</h2>
-      <p class="page-description">View student information, attendance history, and performance.</p>
+      <p class="page-description">View and manage student information, attendance, and performance.</p>
     </div>
     
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading student information...</p>
+      <p>Loading student profile...</p>
     </div>
     
     <!-- Error State -->
-    <div v-else-if="loadError" class="error-state">
-      <p>{{ loadError }}</p>
-      <button class="btn-primary" @click="loadData">Retry</button>
+    <div v-else-if="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="btn-primary" @click="loadStudent">Retry</button>
     </div>
     
-    <!-- Student Profile -->
+    <!-- Profile Content -->
     <div v-else-if="student" class="profile-layout">
+      <!-- Profile Card -->
       <section class="card profile-card">
         <div class="student-header">
-          <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
+          <div class="photo-container">
+            <img v-if="student.photo" :src="student.photo" class="student-photo" alt="Student photo" />
+            <div v-else class="student-avatar">
+              {{ getInitials(student.firstName, student.lastName) }}
+            </div>
+            <button class="photo-upload-btn" @click="showPhotoModal = true" title="Manage photo">
+              📷
+            </button>
+          </div>
           <div class="student-info">
             <h3>{{ student.firstName }} {{ student.lastName }}</h3>
-            <p v-if="student.dateOfBirth">Born: {{ student.dateOfBirth.getFullYear() }}</p>
+            <p v-if="student.dateOfBirth">Born: {{ formatDate(student.dateOfBirth) }}</p>
             <p v-if="student.email">{{ student.email }}</p>
+            <p class="class-info">{{ getClassName(student.classId) }}</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn-icon" @click="showEditModal = true" title="Edit student">
+              ✏️
+            </button>
+            <button class="btn-icon btn-danger" @click="confirmDelete" title="Delete student">
+              🗑️
+            </button>
           </div>
         </div>
       </section>
       
+      <!-- Attendance Record -->
       <section class="card">
         <h3>Attendance Summary</h3>
         <div v-if="attendanceSummary" class="card-content">
@@ -58,6 +77,7 @@
         </div>
       </section>
       
+      <!-- Performance Summary -->
       <section class="card">
         <h3>Attendance History</h3>
         <div class="card-content">
@@ -83,6 +103,217 @@
           </div>
         </div>
       </section>
+    </div>
+    
+    <!-- Edit Student Modal -->
+    <div v-if="showEditModal && student" class="modal-overlay" @click="closeEditModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Edit Student</h3>
+          <button class="modal-close" @click="closeEditModal">✕</button>
+        </div>
+        
+        <form @submit.prevent="handleEditStudent" class="modal-form">
+          <div class="form-group">
+            <label for="editFirstName">First Name *</label>
+            <input
+              id="editFirstName"
+              v-model="editForm.firstName"
+              type="text"
+              required
+              class="form-input"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="editLastName">Last Name *</label>
+            <input
+              id="editLastName"
+              v-model="editForm.lastName"
+              type="text"
+              required
+              class="form-input"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="editClassId">Class *</label>
+            <select
+              id="editClassId"
+              v-model="editForm.classId"
+              required
+              class="form-input"
+              :disabled="!hasClasses"
+            >
+              <option value="" disabled>{{ hasClasses ? 'Select a class' : 'No classes available' }}</option>
+              <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
+                {{ classGroup.name }}
+              </option>
+            </select>
+            <small v-if="!hasClasses" class="form-hint error-hint">
+              Please create a class first in the Dashboard.
+            </small>
+          </div>
+          
+          <div class="form-group">
+            <label for="editDateOfBirth">Date of Birth</label>
+            <input
+              id="editDateOfBirth"
+              v-model="editForm.dateOfBirth"
+              type="date"
+              :max="getTodayDateString()"
+              class="form-input"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input
+              id="editEmail"
+              v-model="editForm.email"
+              type="email"
+              class="form-input"
+            />
+          </div>
+          
+          <div v-if="editError" class="error-message">
+            {{ editError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" @click="closeEditModal" class="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" :disabled="saving" class="btn-primary">
+              {{ saving ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Photo Management Modal -->
+    <div v-if="showPhotoModal && student" class="modal-overlay" @click="closePhotoModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Manage Photo</h3>
+          <button class="modal-close" @click="closePhotoModal">✕</button>
+        </div>
+        
+        <div class="modal-form">
+          <div class="photo-preview-container">
+            <img v-if="student.photo || photoPreview" :src="photoPreview || student.photo" class="photo-preview" alt="Preview" />
+            <div v-else class="photo-preview-placeholder">
+              <span>No photo</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="photoInput">Upload Photo</label>
+            <input
+              id="photoInput"
+              ref="photoInput"
+              type="file"
+              accept="image/*"
+              @change="handlePhotoSelect"
+              class="form-input"
+            />
+            <small class="form-hint">Recommended: Square image, max 2MB</small>
+          </div>
+          
+          <div v-if="photoError" class="error-message">
+            {{ photoError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button
+              v-if="student.photo"
+              type="button"
+              @click="removePhoto"
+              class="btn-secondary btn-danger"
+            >
+              Remove Photo
+            </button>
+            <button type="button" @click="closePhotoModal" class="btn-secondary">
+              Cancel
+            </button>
+            <button
+              v-if="photoPreview"
+              type="button"
+              @click="savePhoto"
+              :disabled="saving"
+              class="btn-primary"
+            >
+              {{ saving ? 'Saving...' : 'Save Photo' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Delete Student Confirmation Modal -->
+    <div v-if="showDeleteModal && student" class="modal-overlay" @click="showDeleteModal = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Delete Student</h3>
+          <button class="modal-close" @click="showDeleteModal = false">✕</button>
+        </div>
+        
+        <div class="modal-form">
+          <p class="confirmation-text">
+            Are you sure you want to delete <strong>{{ student.firstName }} {{ student.lastName }}</strong>?
+            This action cannot be undone.
+          </p>
+          
+          <div v-if="deleteError" class="error-message">
+            {{ deleteError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" @click="showDeleteModal = false" class="btn-secondary">
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="handleDelete"
+              :disabled="saving"
+              class="btn-primary btn-danger-solid"
+            >
+              {{ saving ? 'Deleting...' : 'Delete Student' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Remove Photo Confirmation Modal -->
+    <div v-if="showRemovePhotoModal && student" class="modal-overlay" @click="showRemovePhotoModal = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Remove Photo</h3>
+          <button class="modal-close" @click="showRemovePhotoModal = false">✕</button>
+        </div>
+        
+        <div class="modal-form">
+          <p class="confirmation-text">
+            Are you sure you want to remove this photo?
+          </p>
+          
+          <div class="modal-actions">
+            <button type="button" @click="showRemovePhotoModal = false" class="btn-secondary">
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="confirmRemovePhoto"
+              :disabled="saving"
+              class="btn-primary btn-danger-solid"
+            >
+              {{ saving ? 'Removing...' : 'Remove Photo' }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -142,18 +373,182 @@ const loadData = async () => {
   }
 }
 
-const formatDate = (date: Date): string => {
-  // Date parameter is already a Date object from the database
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  })
+const loadAttendance = async (studentId: string) => {
+  loadingAttendance.value = true
+  try {
+    attendance.value = await attendanceDb.getByStudentId(studentId)
+  } catch (err) {
+    console.error('Failed to load attendance:', err)
+  } finally {
+    loadingAttendance.value = false
+  }
 }
+
+const handleEditStudent = async () => {
+  if (!student.value) return
+  
+  editError.value = ''
+  saving.value = true
+  
+  try {
+    await studentsDb.update(student.value.id, {
+      firstName: editForm.value.firstName.trim(),
+      lastName: editForm.value.lastName.trim(),
+      classId: editForm.value.classId,
+      dateOfBirth: editForm.value.dateOfBirth ? new Date(editForm.value.dateOfBirth) : undefined,
+      email: editForm.value.email || undefined
+    })
+    
+    // Reload from database to ensure consistency
+    const updatedStudent = await studentsDb.getById(student.value.id)
+    if (updatedStudent) {
+      student.value = updatedStudent
+    }
+    
+    showEditModal.value = false
+  } catch (err) {
+    console.error('Failed to update student:', err)
+    editError.value = err instanceof Error ? err.message : 'Failed to update student'
+  } finally {
+    saving.value = false
+  }
+}
+
+const handlePhotoSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+  
+  // Validate file size (2MB max)
+  if (file.size > 2 * 1024 * 1024) {
+    photoError.value = 'Photo size must be less than 2MB'
+    return
+  }
+  
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    photoError.value = 'Please select an image file'
+    return
+  }
+  
+  photoError.value = ''
+  
+  // Create preview
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    photoPreview.value = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
+}
+
+const savePhoto = async () => {
+  if (!student.value || !photoPreview.value) return
+  
+  saving.value = true
+  photoError.value = ''
+  
+  try {
+    await studentsDb.update(student.value.id, {
+      photo: photoPreview.value
+    })
+    
+    // Reload from database to ensure consistency
+    const updatedStudent = await studentsDb.getById(student.value.id)
+    if (updatedStudent) {
+      student.value = updatedStudent
+    }
+    photoPreview.value = ''
+    showPhotoModal.value = false
+  } catch (err) {
+    console.error('Failed to save photo:', err)
+    photoError.value = 'Failed to save photo. Please try again.'
+  } finally {
+    saving.value = false
+  }
+}
+
+const removePhoto = async () => {
+  if (!student.value) return
+  
+  showRemovePhotoModal.value = true
+}
+
+const confirmRemovePhoto = async () => {
+  if (!student.value) return
+  
+  saving.value = true
+  photoError.value = ''
+  
+  try {
+    await studentsDb.update(student.value.id, {
+      photo: undefined
+    })
+    
+    // Reload from database to ensure consistency
+    const updatedStudent = await studentsDb.getById(student.value.id)
+    if (updatedStudent) {
+      student.value = updatedStudent
+    }
+    showPhotoModal.value = false
+    showRemovePhotoModal.value = false
+  } catch (err) {
+    console.error('Failed to remove photo:', err)
+    photoError.value = 'Failed to remove photo. Please try again.'
+  } finally {
+    saving.value = false
+  }
+}
+
+const confirmDelete = () => {
+  if (!student.value) return
+  showDeleteModal.value = true
+}
+
+const handleDelete = async () => {
+  if (!student.value) return
+  
+  deleteError.value = ''
+  saving.value = true
+  
+  try {
+    await studentsDb.remove(student.value.id)
+    router.push('/students')
+  } catch (err) {
+    console.error('Failed to delete student:', err)
+    deleteError.value = err instanceof Error ? err.message : 'Failed to delete student. Please try again.'
+    saving.value = false
+  }
+}
+
+const closeEditModal = () => {
+  showEditModal.value = false
+  editError.value = ''
+}
+
+const closePhotoModal = () => {
+  showPhotoModal.value = false
+  photoPreview.value = ''
+  photoError.value = ''
+  if (photoInput.value) {
+    photoInput.value.value = ''
+  }
+}
+
+const getClassName = (classId: string): string => {
+  const classGroup = classes.value.find(c => c.id === classId)
+  return classGroup ? classGroup.name : 'Unknown Class'
+}
+
+// Enable keyboard accessibility for modals (after function definitions)
+useModal(showEditModal, closeEditModal)
+useModal(showPhotoModal, closePhotoModal)
+useModal(showDeleteModal, () => { showDeleteModal.value = false })
+useModal(showRemovePhotoModal, () => { showRemovePhotoModal.value = false })
 
 // Lifecycle
 onMounted(() => {
-  loadData()
+  loadStudent()
 })
 </script>
 
@@ -177,7 +572,7 @@ onMounted(() => {
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  min-height: 44px; /* Touch target minimum */
+  min-height: 44px;
   transition: all 0.2s ease;
 }
 
@@ -198,58 +593,42 @@ onMounted(() => {
   margin: 0;
 }
 
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 1rem;
-  gap: 1rem;
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
+.loading-state-small {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #666;
+}
+
+.spinner,
+.spinner-small {
   border: 4px solid #f3f3f3;
   border-top: 4px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+}
+
+.spinner-small {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-.error-state {
-  text-align: center;
-  padding: 3rem 1rem;
-}
-
-.error-state p {
-  color: #c33;
-  margin: 0 0 1rem 0;
-  font-weight: 500;
-  font-size: 1.1rem;
-}
-
-.btn-primary {
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.875rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 44px;
-}
-
-.btn-primary:hover {
-  background: #5568d3;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .profile-layout {
@@ -279,26 +658,65 @@ onMounted(() => {
 
 .student-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1.5rem;
+  position: relative;
+}
+
+.photo-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.student-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .student-avatar {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
-  font-weight: 600;
-  flex-shrink: 0;
+  font-size: 2.5rem;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.photo-upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #667eea;
+  border: 2px solid white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.photo-upload-btn:hover {
+  transform: scale(1.1);
+  background: #5568d3;
+}
+
+.student-info {
+  flex: 1;
 }
 
 .student-info h3 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   border: none;
   padding: 0;
   color: white;
@@ -308,6 +726,39 @@ onMounted(() => {
   margin: 0.25rem 0;
   opacity: 0.9;
   font-size: 0.95rem;
+}
+
+.class-info {
+  font-weight: 600;
+  font-size: 1rem !important;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-icon.btn-danger:hover {
+  background: rgba(220, 53, 69, 0.9);
 }
 
 .card-content {
@@ -323,120 +774,295 @@ onMounted(() => {
   padding: 2rem 1rem;
 }
 
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1.5rem;
+.attendance-table-container {
+  overflow-x: auto;
+}
+
+.attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
   padding: 0.5rem 0;
 }
 
-.summary-item {
+.attendance-count {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: #667eea;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem;
+  text-decoration: underline;
+  min-height: 32px;
+  transition: color 0.2s ease;
+}
+
+.btn-link:hover {
+  color: #5568d3;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.attendance-table th {
+  font-weight: 600;
+  color: #666;
+  background: #f8f9fa;
+}
+
+.attendance-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-present {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-absent {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-excused {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-late {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.summary-item label {
-  font-size: 0.875rem;
-  color: #666;
+.form-group label {
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.summary-value {
-  font-size: 1.5rem;
-  font-weight: 700;
   color: #333;
+  font-size: 0.875rem;
 }
 
-.summary-value.status-present {
-  color: #4caf50;
-}
-
-.summary-value.status-absent {
-  color: #f44336;
-}
-
-.attendance-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.attendance-record {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 1rem;
-  align-items: center;
-  padding: 1rem;
-  background: #f8f9fa;
+.form-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  border-left: 4px solid #e0e0e0;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+  min-height: 44px;
 }
 
-.attendance-record:has(.status-present) {
-  border-left-color: #4caf50;
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.attendance-record:has(.status-absent) {
-  border-left-color: #f44336;
-}
-
-.attendance-record:has(.status-late) {
-  border-left-color: #ff9800;
-}
-
-.attendance-record:has(.status-excused) {
-  border-left-color: #2196f3;
-}
-
-.record-date {
-  font-size: 0.95rem;
+.form-hint {
+  font-size: 0.75rem;
   color: #666;
-  white-space: nowrap;
+  margin-top: -0.25rem;
 }
 
-.record-status {
+.error-message {
+  padding: 0.75rem;
+  background: #fee;
+  color: #c33;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
   font-weight: 600;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
 }
 
-.record-status.status-present {
-  color: #2e7d32;
-  background: #e8f5e9;
+.btn-primary:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.record-status.status-absent {
-  color: #c62828;
-  background: #ffebee;
+.btn-primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.record-status.status-late {
-  color: #e65100;
-  background: #fff3e0;
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
 }
 
-.record-status.status-excused {
-  color: #1565c0;
-  background: #e3f2fd;
+.btn-secondary:hover {
+  background: #e0e0e0;
 }
 
-.record-status.status-passive {
-  color: #6a1b9a;
-  background: #f3e5f5;
+.btn-secondary.btn-danger {
+  color: #dc3545;
 }
 
-.record-reason {
-  grid-column: 1 / -1;
-  font-size: 0.875rem;
-  color: #666;
+.btn-secondary.btn-danger:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger-solid {
+  background: #dc3545 !important;
+}
+
+.btn-danger-solid:hover {
+  background: #c82333 !important;
+}
+
+.confirmation-text {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.photo-preview-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.photo-preview {
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.photo-preview-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
   font-style: italic;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e0e0e0;
+  border: 2px dashed #ddd;
 }
 
 /* Responsive adjustments */
@@ -444,25 +1070,23 @@ onMounted(() => {
   .student-header {
     flex-direction: column;
     text-align: center;
+    align-items: center;
   }
   
-  .student-avatar {
-    width: 64px;
-    height: 64px;
-    font-size: 1.5rem;
+  .header-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
   }
   
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .attendance-table {
+    font-size: 0.875rem;
   }
   
-  .attendance-record {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-  
-  .record-date {
-    font-size: 0.85rem;
+  .attendance-table th,
+  .attendance-table td {
+    padding: 0.5rem;
   }
 }
 </style>
+

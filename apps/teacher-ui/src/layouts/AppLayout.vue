@@ -13,6 +13,10 @@
           <span class="nav-icon">📊</span>
           <span class="nav-label">Dashboard</span>
         </RouterLink>
+        <RouterLink to="/students" class="nav-item" active-class="active">
+          <span class="nav-icon">👥</span>
+          <span class="nav-label">Students</span>
+        </RouterLink>
         <RouterLink to="/attendance" class="nav-item" active-class="active">
           <span class="nav-icon">✓</span>
           <span class="nav-label">Attendance</span>
