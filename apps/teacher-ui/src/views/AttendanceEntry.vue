@@ -14,50 +14,82 @@
           <label for="class-select" class="form-label">Select Class:</label>
           <select 
             id="class-select" 
-            class="form-select" 
-            v-model="selectedClassId"
+            v-model="selectedClassId" 
+            class="form-select"
             @change="onClassChange"
           >
             <option value="">Choose a class...</option>
-            <option v-for="cls in classes" :key="cls.id" :value="cls.id">
+            <option 
+              v-for="cls in classes" 
+              :key="cls.id" 
+              :value="cls.id"
+            >
               {{ cls.name }} ({{ cls.schoolYear }})
             </option>
           </select>
         </div>
         
-        <div class="card-content" v-if="!selectedClassId">
-          <p class="empty-state">Select a class to begin recording attendance.</p>
+        <div v-if="loading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading students...</p>
         </div>
-
-        <div class="card-content" v-else-if="loading">
-          <p class="loading-state">Loading students...</p>
+        
+        <div v-else-if="selectedClassId && students.length === 0" class="empty-state">
+          <p>No students in this class yet. Add students first.</p>
         </div>
-
-        <div class="card-content" v-else-if="students.length === 0">
-          <p class="empty-state">No students in this class. Add students first.</p>
-        </div>
-
-        <div class="card-content" v-else>
+        
+        <div v-else-if="students.length > 0" class="card-content">
           <div class="status-summary">
             <div class="status-item status-present">
               <span class="status-label">Present</span>
-              <span class="status-count">{{ statusCounts.present }}</span>
+              <span class="status-count">{{ countByStatus('present') }}</span>
             </div>
             <div class="status-item status-absent">
               <span class="status-label">Absent</span>
-              <span class="status-count">{{ statusCounts.absent }}</span>
+              <span class="status-count">{{ countByStatus('absent') }}</span>
             </div>
             <div class="status-item status-late">
               <span class="status-label">Late</span>
-              <span class="status-count">{{ statusCounts.late }}</span>
+              <span class="status-count">{{ countByStatus('late') }}</span>
             </div>
             <div class="status-item status-excused">
               <span class="status-label">Excused</span>
-              <span class="status-count">{{ statusCounts.excused }}</span>
+              <span class="status-count">{{ countByStatus('excused') }}</span>
             </div>
-            <div class="status-item status-passive">
-              <span class="status-label">Passive</span>
-              <span class="status-count">{{ statusCounts.passive }}</span>
+          </div>
+          
+          <div class="attendance-table">
+            <div 
+              v-for="student in students" 
+              :key="student.id" 
+              class="attendance-row"
+            >
+              <div class="student-name">
+                {{ student.firstName }} {{ student.lastName }}
+              </div>
+              <div class="status-buttons">
+                <button
+                  v-for="status in statuses"
+                  :key="status.value"
+                  type="button"
+                  @click="setStatus(student.id, status.value)"
+                  :class="['status-btn', `status-${status.value}`, { 
+                    active: attendance[student.id]?.status === status.value 
+                  }]"
+                  :aria-label="`Mark ${student.firstName} ${student.lastName} as ${status.label}`"
+                  :title="status.label"
+                >
+                  <span aria-hidden="true">{{ status.emoji }}</span>
+                  <span class="sr-only">{{ status.label }}</span>
+                </button>
+              </div>
+              <input
+                v-if="attendance[student.id]?.status === 'absent'"
+                v-model="attendance[student.id].reason"
+                type="text"
+                placeholder="Reason for absence..."
+                class="reason-input"
+              />
             </div>
           </div>
 
@@ -116,26 +148,25 @@
             </table>
           </div>
           
-          <div class="form-actions">
-            <button 
-              class="btn-primary" 
-              @click="saveAttendance"
-              :disabled="!hasChanges || saving"
-            >
-              {{ saving ? 'Saving...' : 'Save Attendance' }}
-            </button>
-            <button 
-              class="btn-secondary" 
-              @click="clearAttendance"
-              :disabled="!hasChanges || saving"
-            >
-              Clear All
-            </button>
+          <div v-if="saveError" class="error-message">
+            {{ saveError }}
           </div>
-
-          <div v-if="saveMessage" :class="['save-message', saveMessageType]">
-            {{ saveMessage }}
+          
+          <div v-if="saveSuccess" class="success-message">
+            {{ saveSuccess }}
           </div>
+          
+          <button 
+            class="btn-primary btn-large" 
+            @click="handleSaveAttendance"
+            :disabled="saving || !hasAnyAttendance"
+          >
+            {{ saving ? 'Saving...' : 'Save Attendance' }}
+          </button>
+        </div>
+        
+        <div v-else class="card-content">
+          <p class="empty-state">Select a class to begin recording attendance.</p>
         </div>
       </section>
     </div>
@@ -143,21 +174,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
-import { useClassGroups, useStudents, useAttendance } from '../composables/useDatabase'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useClassGroups, useStudents, useAttendance } from '../composables/useSportBridge'
 import type { ClassGroup, Student } from '../db'
 
-// Status type definition
-type AttendanceStatus = 'present' | 'absent' | 'excused' | 'late' | 'passive'
-
-// Status options for quick selection
-const statusOptions: Array<{ value: AttendanceStatus; label: string; short: string }> = [
-  { value: 'present', label: 'Present', short: 'P' },
-  { value: 'absent', label: 'Absent', short: 'A' },
-  { value: 'late', label: 'Late', short: 'L' },
-  { value: 'excused', label: 'Excused', short: 'E' },
-  { value: 'passive', label: 'Passive', short: 'Pass' }
-]
+const route = useRoute()
 
 // State
 const classes = ref<ClassGroup[]>([])
@@ -165,21 +187,29 @@ const students = ref<Student[]>([])
 const selectedClassId = ref<string>('')
 const loading = ref(false)
 const saving = ref(false)
-const saveMessage = ref('')
-const saveMessageType = ref<'success' | 'error'>('success')
+const saveError = ref('')
+const saveSuccess = ref('')
 
-// Attendance tracking: { studentId: { status, reason } }
-const attendance = reactive<Record<string, { status: AttendanceStatus; reason?: string }>>({})
+interface AttendanceEntry {
+  status: string
+  reason?: string
+}
+
+const attendance = ref<Record<string, AttendanceEntry>>({})
+
+const statuses = [
+  { value: 'present', label: 'Present', emoji: '✓' },
+  { value: 'absent', label: 'Absent', emoji: '✗' },
+  { value: 'late', label: 'Late', emoji: '⏰' },
+  { value: 'excused', label: 'Excused', emoji: '📋' }
+]
 
 // Composables
-const classGroupsApi = useClassGroups()
-const studentsApi = useStudents()
-const attendanceApi = useAttendance()
+const classGroups = useClassGroups()
+const studentsComposable = useStudents()
+const attendanceComposable = useAttendance()
 
-// Constants
-const SUCCESS_MESSAGE_TIMEOUT_MS = 3000
-
-// Current date display
+// Computed
 const currentDate = computed(() => {
   return new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
@@ -189,151 +219,105 @@ const currentDate = computed(() => {
   })
 })
 
-// Status counts for summary
-const statusCounts = computed(() => {
-  const counts = {
-    present: 0,
-    absent: 0,
-    late: 0,
-    excused: 0,
-    passive: 0
+const hasAnyAttendance = computed(() => {
+  return Object.keys(attendance.value).length > 0
+})
+
+// Methods
+const countByStatus = (status: string): number => {
+  return Object.values(attendance.value).filter(a => a.status === status).length
+}
+
+const setStatus = (studentId: string, status: string) => {
+  if (!attendance.value[studentId]) {
+    attendance.value[studentId] = { status }
+  } else {
+    attendance.value[studentId].status = status
   }
   
-  for (const record of Object.values(attendance)) {
-    if (record.status && record.status in counts) {
-      counts[record.status as keyof typeof counts]++
-    }
+  // Clear reason if not absent
+  if (status !== 'absent') {
+    delete attendance.value[studentId].reason
   }
-  
-  return counts
-})
+}
 
-// Check if there are any changes
-const hasChanges = computed(() => {
-  return Object.keys(attendance).length > 0
-})
-
-// Load classes on mount
-onMounted(async () => {
-  try {
-    classes.value = await classGroupsApi.getAll()
-  } catch (error) {
-    console.error('Failed to load classes:', error)
-  }
-})
-
-// When class is selected, load students
-async function onClassChange() {
+const onClassChange = async () => {
   if (!selectedClassId.value) {
     students.value = []
-    clearAttendance()
+    attendance.value = {}
     return
   }
   
   loading.value = true
   try {
-    students.value = await studentsApi.getByClassId(selectedClassId.value)
-    clearAttendance()
-  } catch (error) {
-    console.error('Failed to load students:', error)
+    students.value = await studentsComposable.getByClassId(selectedClassId.value)
+    attendance.value = {}
+  } catch (err) {
+    console.error('Failed to load students:', err)
   } finally {
     loading.value = false
   }
 }
 
-// Set status for a student
-function setStudentStatus(studentId: string, status: AttendanceStatus) {
-  if (!attendance[studentId]) {
-    attendance[studentId] = { status }
-  } else {
-    attendance[studentId].status = status
-    // Clear reason if changing from absent/excused to other status
-    if (!['absent', 'excused'].includes(status)) {
-      delete attendance[studentId].reason
-    }
-  }
-}
-
-// Mark all students as present
-function markAllPresent() {
-  for (const student of students.value) {
-    attendance[student.id] = { status: 'present' }
-  }
-}
-
-// Clear all attendance records
-function clearAttendance() {
-  // Clear the reactive object
-  for (const key in attendance) {
-    delete attendance[key]
-  }
-  saveMessage.value = ''
-}
-
-// Save attendance to database
-async function saveAttendance() {
-  if (!selectedClassId.value || !hasChanges.value) {
-    return
-  }
-
+const handleSaveAttendance = async () => {
+  saveError.value = ''
+  saveSuccess.value = ''
   saving.value = true
-  saveMessage.value = ''
   
   try {
-    // Generate a lesson ID for today (same for all saves on the same day)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const lessonId = `lesson-${selectedClassId.value}-${today.getTime()}`
+    // Generate a unique lesson ID for this attendance session
+    const lessonId = `lesson-${crypto.randomUUID()}`
     
-    // Get existing records for this lesson to check for duplicates
-    const existingRecords = await attendanceApi.getByLessonId(lessonId)
+    // Prepare attendance records
+    const records = Object.entries(attendance.value).map(([studentId, entry]) => ({
+      studentId,
+      lessonId,
+      status: entry.status,
+      reason: entry.reason,
+      notes: undefined
+    }))
     
-    // Save each attendance record
-    let savedCount = 0
-    for (const [studentId, record] of Object.entries(attendance)) {
-      if (record.status) {
-        const validStatus = record.status as AttendanceStatus
-        
-        const payload = {
-          studentId,
-          lessonId,
-          date: new Date(),
-          status: validStatus,
-          notes: record.reason || undefined
-        }
-        
-        // Check if record already exists for this student and lesson
-        const existing = existingRecords.find(r => r.studentId === studentId)
-        
-        if (existing) {
-          // Update existing record instead of creating duplicate
-          await attendanceApi.update(existing.id, payload)
-        } else {
-          // Create new record
-          await attendanceApi.create(payload)
-        }
-        
-        savedCount++
-      }
-    }
+    // Save using batch record
+    await attendanceComposable.recordBatch(records)
     
-    saveMessage.value = `Successfully saved attendance for ${savedCount} student(s)`
-    saveMessageType.value = 'success'
+    const successMessage = `Attendance recorded successfully for ${records.length} student${records.length > 1 ? 's' : ''}!`
+    saveSuccess.value = successMessage
     
-    // Clear form after successful save
+    // Reset attendance after brief display with unique identifier check
     setTimeout(() => {
-      clearAttendance()
-      saveMessage.value = ''
-    }, SUCCESS_MESSAGE_TIMEOUT_MS)
-  } catch (error) {
-    console.error('Failed to save attendance:', error)
-    saveMessage.value = 'Failed to save attendance. Please try again.'
-    saveMessageType.value = 'error'
-    // Don't clear form on error so user can retry
+      // Only clear if the message hasn't been replaced by a new one
+      if (saveSuccess.value === successMessage) {
+        attendance.value = {}
+        saveSuccess.value = ''
+      }
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to save attendance:', err)
+    if (err instanceof Error) {
+      saveError.value = err.message
+    } else {
+      saveError.value = 'Failed to save attendance. Please try again.'
+    }
   } finally {
     saving.value = false
   }
 }
+
+// Lifecycle
+onMounted(async () => {
+  try {
+    classes.value = await classGroups.getAll()
+    
+    // Check if classId is passed via query params
+    const classIdFromQuery = route.query.classId as string
+    if (classIdFromQuery) {
+      selectedClassId.value = classIdFromQuery
+      await onClassChange()
+    }
+  } catch (err) {
+    console.error('Failed to load classes:', err)
+  }
+})
 </script>
 
 <style scoped>
@@ -422,6 +406,29 @@ async function saveAttendance() {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: #666;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .card-content {
   display: flex;
   flex-direction: column;
@@ -493,140 +500,111 @@ async function saveAttendance() {
   color: #333;
 }
 
-.bulk-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.btn-bulk {
-  background: #f0f0f0;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 44px;
-}
-
-.btn-bulk:hover:not(:disabled) {
-  background: #e0e0e0;
-  border-color: #ccc;
-}
-
-.btn-bulk:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.attendance-table-wrapper {
-  overflow-x: auto;
-  margin-bottom: 1.5rem;
+/* Screen reader only class for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .attendance-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.attendance-table thead {
+.attendance-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
   background: #f8f9fa;
+  border-radius: 8px;
 }
 
-.attendance-table th {
-  text-align: left;
-  padding: 0.875rem;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.attendance-table td {
-  padding: 0.75rem 0.875rem;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.student-row:hover {
-  background: #fafafa;
+.attendance-row:has(.reason-input) {
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
 }
 
 .student-name {
   font-weight: 500;
   color: #333;
+  font-size: 1rem;
 }
 
 .status-buttons {
   display: flex;
-  gap: 0.375rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .status-btn {
-  padding: 0.5rem 0.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem;
   border: 2px solid #e0e0e0;
-  border-radius: 6px;
+  border-radius: 8px;
   background: white;
-  color: #666;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 1.25rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 48px;
-  min-height: 44px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.status-btn:hover:not(:disabled):not(.active) {
-  border-color: #ccc;
-  background: #f8f9fa;
-}
-
-.status-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.status-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .status-btn.active {
-  color: white;
-  font-weight: 700;
+  border-width: 3px;
+  transform: scale(1.05);
 }
 
-.status-btn-present.active {
-  background: #4caf50;
+.status-btn.status-present.active {
   border-color: #4caf50;
+  background: #e8f5e9;
 }
 
-.status-btn-absent.active {
-  background: #f44336;
+.status-btn.status-absent.active {
   border-color: #f44336;
+  background: #ffebee;
 }
 
-.status-btn-late.active {
-  background: #ff9800;
+.status-btn.status-late.active {
   border-color: #ff9800;
+  background: #fff3e0;
 }
 
-.status-btn-excused.active {
-  background: #2196f3;
+.status-btn.status-excused.active {
   border-color: #2196f3;
+  background: #e3f2fd;
 }
 
-.status-btn-passive.active {
-  background: #9c27b0;
+.status-btn.status-passive.active {
   border-color: #9c27b0;
+  background: #f3e5f5;
 }
 
 .reason-input {
-  width: 100%;
-  padding: 0.5rem;
+  grid-column: 1 / -1;
+  padding: 0.75rem;
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
 }
 
 .reason-input:focus {

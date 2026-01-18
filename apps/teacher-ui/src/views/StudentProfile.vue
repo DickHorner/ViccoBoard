@@ -51,62 +51,56 @@
       
       <!-- Attendance Record -->
       <section class="card">
-        <h3>Attendance Record</h3>
-        <div class="card-content">
-          <div v-if="loadingAttendance" class="loading-state-small">
-            <div class="spinner-small"></div>
-            <p>Loading attendance...</p>
-          </div>
-          <div v-else-if="attendance.length === 0" class="empty-state">
-            <p>No attendance records yet.</p>
-          </div>
-          <div v-else class="attendance-table-container">
-            <div class="attendance-header">
-              <p class="attendance-count">Showing {{ displayedAttendance.length }} of {{ attendance.length }} records</p>
-              <button 
-                v-if="attendance.length > attendancePageSize && !showAllAttendance"
-                @click="showAllAttendance = true"
-                class="btn-link"
-              >
-                Show all
-              </button>
-              <button 
-                v-if="showAllAttendance"
-                @click="showAllAttendance = false"
-                class="btn-link"
-              >
-                Show recent
-              </button>
+        <h3>Attendance Summary</h3>
+        <div v-if="attendanceSummary" class="card-content">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <label>Total Lessons:</label>
+              <span class="summary-value">{{ attendanceSummary.total }}</span>
             </div>
-            <table class="attendance-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="record in displayedAttendance" :key="record.id">
-                  <td>{{ formatDate(record.date) }}</td>
-                  <td>
-                    <span :class="['status-badge', `status-${record.status}`]">
-                      {{ record.status }}
-                    </span>
-                  </td>
-                  <td>{{ record.notes || '-' }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="summary-item">
+              <label>Present:</label>
+              <span class="summary-value status-present">{{ attendanceSummary.present }}</span>
+            </div>
+            <div class="summary-item">
+              <label>Absent:</label>
+              <span class="summary-value status-absent">{{ attendanceSummary.absent }}</span>
+            </div>
+            <div class="summary-item">
+              <label>Attendance Rate:</label>
+              <span class="summary-value">{{ attendanceSummary.percentage.toFixed(1) }}%</span>
+            </div>
           </div>
+        </div>
+        <div v-else class="empty-state">
+          <p>No attendance data available.</p>
         </div>
       </section>
       
       <!-- Performance Summary -->
       <section class="card">
-        <h3>Performance Summary</h3>
+        <h3>Attendance History</h3>
         <div class="card-content">
-          <p class="empty-state">Performance tracking coming in Phase 3.</p>
+          <div v-if="attendanceRecords.length === 0" class="empty-state">
+            <p>No attendance records yet.</p>
+          </div>
+          <div v-else class="attendance-list">
+            <div 
+              v-for="record in attendanceRecords" 
+              :key="record.id"
+              class="attendance-record"
+            >
+              <div class="record-date">
+                {{ formatDate(record.date) }}
+              </div>
+              <div :class="['record-status', `status-${record.status}`]">
+                {{ capitalize(record.status) }}
+              </div>
+              <div v-if="record.notes" class="record-reason">
+                {{ record.notes }}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -325,90 +319,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useStudents, useClassGroups, useAttendance } from '../composables/useDatabase'
-import { useModal } from '../composables/useModal'
-import { getInitials, formatDate, formatDateForInput, getTodayDateString } from '../utils/student'
-import type { Student, ClassGroup, AttendanceRecord } from '../db'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useStudents, useAttendance } from '../composables/useSportBridge'
+import { getInitials, capitalize } from '../utils/stringUtils'
+import type { Student, AttendanceRecord } from '../db'
 
-// Router
 const route = useRoute()
-const router = useRouter()
+const studentId = route.params.id as string
 
 // State
-const student = ref<Student | null>(null)
-const classes = ref<ClassGroup[]>([])
-const attendance = ref<AttendanceRecord[]>([])
+const student = ref<Student | undefined>(undefined)
+const attendanceRecords = ref<AttendanceRecord[]>([])
+const attendanceSummary = ref<{
+  total: number
+  present: number
+  absent: number
+  excused: number
+  passive: number
+  percentage: number
+} | null>(null)
 const loading = ref(true)
-const loadingAttendance = ref(true)
-const error = ref('')
-const showEditModal = ref(false)
-const showPhotoModal = ref(false)
-const showDeleteModal = ref(false)
-const showRemovePhotoModal = ref(false)
-const editError = ref('')
-const photoError = ref('')
-const deleteError = ref('')
-const saving = ref(false)
-const photoPreview = ref('')
-const photoInput = ref<HTMLInputElement | null>(null)
-const showAllAttendance = ref(false)
-const attendancePageSize = 10
-
-const editForm = ref({
-  firstName: '',
-  lastName: '',
-  classId: '',
-  dateOfBirth: '',
-  email: ''
-})
+const loadError = ref('')
 
 // Composables
-const studentsDb = useStudents()
-const classGroupsDb = useClassGroups()
-const attendanceDb = useAttendance()
-
-// Computed
-const displayedAttendance = computed(() => {
-  if (showAllAttendance.value) {
-    return attendance.value
-  }
-  return attendance.value.slice(0, attendancePageSize)
-})
-
-const hasClasses = computed(() => classes.value.length > 0)
+const students = useStudents()
+const attendance = useAttendance()
 
 // Methods
-const loadStudent = async () => {
+const loadData = async () => {
   loading.value = true
-  error.value = ''
+  loadError.value = ''
+  
   try {
-    const studentId = route.params.id as string
-    const foundStudent = await studentsDb.getById(studentId)
+    // Load student details
+    student.value = await students.getById(studentId)
     
-    if (!foundStudent) {
-      error.value = 'Student not found'
+    if (!student.value) {
+      loadError.value = 'Student not found'
       return
     }
     
-    student.value = foundStudent
-    classes.value = await classGroupsDb.getAll()
+    // Load attendance records
+    attendanceRecords.value = await attendance.getByStudentId(studentId)
     
-    // Initialize edit form
-    editForm.value = {
-      firstName: foundStudent.firstName,
-      lastName: foundStudent.lastName,
-      classId: foundStudent.classId,
-      dateOfBirth: foundStudent.dateOfBirth ? formatDateForInput(foundStudent.dateOfBirth) : '',
-      email: foundStudent.email || ''
-    }
-    
-    // Load attendance
-    await loadAttendance(studentId)
+    // Load attendance summary
+    attendanceSummary.value = await attendance.getAttendanceSummary(studentId)
   } catch (err) {
-    console.error('Failed to load student:', err)
-    error.value = 'Failed to load student profile. Please try again.'
+    console.error('Failed to load student profile:', err)
+    loadError.value = 'Failed to load student profile. Please try again.'
   } finally {
     loading.value = false
   }
@@ -760,6 +719,7 @@ onMounted(() => {
   font-size: 1.75rem;
   border: none;
   padding: 0;
+  color: white;
 }
 
 .student-info p {

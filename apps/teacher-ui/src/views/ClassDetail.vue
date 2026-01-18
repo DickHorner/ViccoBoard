@@ -25,7 +25,19 @@
       <button class="btn-primary" @click="loadData">Retry</button>
     </div>
     
-    <!-- Content -->
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading class details...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div v-else-if="loadError" class="error-state">
+      <p>{{ loadError }}</p>
+      <button class="btn-primary" @click="loadData">Retry</button>
+    </div>
+    
+    <!-- Class Details -->
     <div v-else-if="classGroup" class="class-info">
       <section class="card">
         <h3>Class Information</h3>
@@ -63,7 +75,7 @@
         <div class="card-content">
           <!-- Empty State -->
           <div v-if="students.length === 0" class="empty-state">
-            <p>No students in this class yet.</p>
+            <p>No students in this class yet. Add your first student to get started.</p>
           </div>
           
           <!-- Students List -->
@@ -74,9 +86,10 @@
               :to="`/students/${student.id}`"
               class="student-card"
             >
+              <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
               <div class="student-info">
                 <h4>{{ student.firstName }} {{ student.lastName }}</h4>
-                <p v-if="student.email" class="student-email">{{ student.email }}</p>
+                <p v-if="student.dateOfBirth">Birth: {{ student.dateOfBirth.getFullYear() }}</p>
               </div>
               <div class="student-arrow">→</div>
             </RouterLink>
@@ -108,7 +121,10 @@
       <section class="card">
         <h3>Quick Actions</h3>
         <div class="card-content">
-          <RouterLink to="/attendance" class="action-button">
+          <RouterLink 
+            :to="`/attendance?classId=${classGroup.id}`" 
+            class="action-button"
+          >
             <span class="action-icon">✓</span>
             <span>Record Attendance</span>
           </RouterLink>
@@ -120,61 +136,18 @@
       </section>
     </div>
     
-    <!-- Edit Class Modal -->
-    <div v-if="showEditModal" class="modal-overlay" @click="closeEditModal">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>Edit Class</h3>
-          <button class="modal-close" @click="closeEditModal">✕</button>
-        </div>
-        
-        <form @submit.prevent="handleUpdateClass" class="modal-form">
-          <div class="form-group">
-            <label for="className">Class Name *</label>
-            <input
-              id="className"
-              v-model="editForm.name"
-              type="text"
-              required
-              class="form-input"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="schoolYear">School Year *</label>
-            <input
-              id="schoolYear"
-              v-model="editForm.schoolYear"
-              type="text"
-              pattern="\d{4}/\d{4}"
-              required
-              class="form-input"
-            />
-            <small class="form-hint">Format: YYYY/YYYY</small>
-          </div>
-          
-          <div v-if="editError" class="error-message">
-            {{ editError }}
-          </div>
-          
-          <div class="modal-actions">
-            <button type="button" @click="closeEditModal" class="btn-secondary">
-              Cancel
-            </button>
-            <button type="submit" :disabled="updating" class="btn-primary">
-              {{ updating ? 'Updating...' : 'Update Class' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-    
     <!-- Add Student Modal -->
     <div v-if="showAddStudentModal" class="modal-overlay" @click="closeAddStudentModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
           <h3>Add Student</h3>
-          <button class="modal-close" @click="closeAddStudentModal">✕</button>
+          <button 
+            class="modal-close" 
+            @click="closeAddStudentModal"
+            aria-label="Close add student form"
+          >
+            ✕
+          </button>
         </div>
         
         <form @submit.prevent="handleAddStudent" class="modal-form">
@@ -182,8 +155,9 @@
             <label for="firstName">First Name *</label>
             <input
               id="firstName"
-              v-model="studentForm.firstName"
+              v-model="newStudent.firstName"
               type="text"
+              placeholder="e.g., John"
               required
               class="form-input"
             />
@@ -193,25 +167,50 @@
             <label for="lastName">Last Name *</label>
             <input
               id="lastName"
-              v-model="studentForm.lastName"
+              v-model="newStudent.lastName"
               type="text"
+              placeholder="e.g., Doe"
               required
               class="form-input"
             />
           </div>
           
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="birthYear">Birth Year</label>
             <input
-              id="email"
-              v-model="studentForm.email"
-              type="email"
+              id="birthYear"
+              v-model.number="newStudent.birthYear"
+              type="number"
+              placeholder="e.g., 2010"
+              min="1900"
+              :max="new Date().getFullYear()"
               class="form-input"
             />
           </div>
           
-          <div v-if="studentError" class="error-message">
-            {{ studentError }}
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" v-model="newStudent.gender" class="form-input">
+              <option value="">Not specified</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="diverse">Diverse</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              v-model="newStudent.email"
+              type="email"
+              placeholder="student@example.com"
+              class="form-input"
+            />
+          </div>
+          
+          <div v-if="addStudentError" class="error-message">
+            {{ addStudentError }}
           </div>
           
           <div class="modal-actions">
@@ -229,121 +228,86 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { useClassGroups, useStudents } from '../composables/useDatabase'
-import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading'
+import { useClassGroups, useStudents } from '../composables/useSportBridge'
+import { getInitials } from '../utils/stringUtils'
 import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
 const classId = route.params.id as string
 
 // State
-const classGroup = ref<ClassGroup | null>(null)
+const classGroup = ref<ClassGroup | undefined>(undefined)
 const students = ref<Student[]>([])
 const loading = ref(true)
-const error = ref('')
-
-// Edit modal
-const showEditModal = ref(false)
-const editForm = ref({ name: '', schoolYear: '' })
-const editError = ref('')
-const updating = ref(false)
-
-// Add student modal
+const loadError = ref('')
 const showAddStudentModal = ref(false)
-const studentForm = ref({ firstName: '', lastName: '', email: '' })
-const studentError = ref('')
 const addingStudent = ref(false)
+const addStudentError = ref('')
+
+const newStudent = ref({
+  firstName: '',
+  lastName: '',
+  birthYear: undefined as number | undefined,
+  gender: '' as '' | 'male' | 'female' | 'diverse',
+  email: ''
+})
 
 // Composables
 const classGroups = useClassGroups()
-const studentsDb = useStudents()
-// const attendance = useAttendance() // TODO: Use for real statistics calculation
-
-// Computed statistics
-const statistics = computed(() => {
-  const totalLessons = 0 // TODO: Implement lesson counting
-  const assessmentCount = 0 // TODO: Implement assessment counting
-  const attendanceRate = 0 // TODO: Calculate real attendance rate from attendance records
-  
-  return {
-    totalLessons,
-    assessmentCount,
-    attendanceRate
-  }
-})
+const studentsComposable = useStudents()
 
 // Methods
 const loadData = async () => {
   loading.value = true
-  error.value = ''
+  loadError.value = ''
   
   try {
-    const cls = await classGroups.getById(classId)
-    if (!cls) {
-      error.value = 'Class not found'
+    // Load class details
+    classGroup.value = await classGroups.getById(classId)
+    
+    if (!classGroup.value) {
+      loadError.value = 'Class not found'
       return
     }
     
-    classGroup.value = cls
-    students.value = await studentsDb.getByClassId(classId)
-    
-    // Initialize edit form
-    editForm.value = {
-      name: cls.name,
-      schoolYear: cls.schoolYear
-    }
+    // Load students for this class
+    students.value = await studentsComposable.getByClassId(classId)
   } catch (err) {
-    console.error('Failed to load class:', err)
-    error.value = 'Failed to load class details. Please try again.'
+    console.error('Failed to load class details:', err)
+    loadError.value = 'Failed to load class details. Please try again.'
   } finally {
     loading.value = false
   }
 }
 
-const handleUpdateClass = async () => {
-  editError.value = ''
-  updating.value = true
-  
-  try {
-    await classGroups.update(classId, {
-      name: editForm.value.name.trim(),
-      schoolYear: editForm.value.schoolYear.trim()
-    })
-    
-    // Reload data
-    await loadData()
-    showEditModal.value = false
-  } catch (err) {
-    console.error('Failed to update class:', err)
-    editError.value = err instanceof Error ? err.message : 'Failed to update class'
-  } finally {
-    updating.value = false
-  }
-}
-
 const handleAddStudent = async () => {
-  studentError.value = ''
+  addStudentError.value = ''
   addingStudent.value = true
   
   try {
-    await studentsDb.create({
-      classId,
-      firstName: studentForm.value.firstName.trim(),
-      lastName: studentForm.value.lastName.trim(),
-      email: studentForm.value.email.trim() || undefined
+    await studentsComposable.create({
+      firstName: newStudent.value.firstName.trim(),
+      lastName: newStudent.value.lastName.trim(),
+      classGroupId: classId,
+      birthYear: newStudent.value.birthYear,
+      gender: newStudent.value.gender || undefined,
+      email: newStudent.value.email.trim() || undefined
     })
     
     // Reload students
-    students.value = await studentsDb.getByClassId(classId)
+    students.value = await studentsComposable.getByClassId(classId)
     
     // Reset form and close modal
-    studentForm.value = { firstName: '', lastName: '', email: '' }
-    showAddStudentModal.value = false
+    closeAddStudentModal()
   } catch (err) {
     console.error('Failed to add student:', err)
-    studentError.value = err instanceof Error ? err.message : 'Failed to add student'
+    if (err instanceof Error) {
+      addStudentError.value = err.message
+    } else {
+      addStudentError.value = 'Failed to add student. Please try again.'
+    }
   } finally {
     addingStudent.value = false
   }
@@ -436,7 +400,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
+  padding: 4rem 1rem;
   gap: 1rem;
 }
 
@@ -553,6 +517,8 @@ onMounted(() => {
 
 .student-card {
   display: flex;
+  align-items: center;
+  gap: 1rem;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
@@ -570,15 +536,33 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.student-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #667eea;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.student-info {
+  flex: 1;
+}
+
 .student-info h4 {
   margin: 0 0 0.25rem 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #333;
 }
 
-.student-email {
+.student-info p {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: #666;
 }
 
