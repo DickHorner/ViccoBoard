@@ -152,13 +152,13 @@ export class CriteriaGradingEngine {
    */
   updateWeights(criteria: Criterion[], newWeights: Map<string, number>): Criterion[] {
     // Check for negative weights first
-    for (const [criterionId, weight] of newWeights.entries()) {
+    newWeights.forEach((weight, criterionId) => {
       if (weight < 0) {
         const criterion = criteria.find(c => c.id === criterionId);
         const name = criterion?.name || criterionId;
         throw new Error(`Weight for ${name} must be non-negative`);
       }
-    }
+    });
 
     const totalWeight = Array.from(newWeights.values()).reduce((sum, w) => sum + w, 0);
     
