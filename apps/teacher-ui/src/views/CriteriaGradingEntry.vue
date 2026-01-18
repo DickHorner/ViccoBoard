@@ -587,7 +587,7 @@ async function removeCriterion(index: number) {
 }
 
 function toggleBulkMode() {
-  bulkMode.value = !bulkMode.value;
+  alert('Der Bulk-Modus ist derzeit nicht verfügbar.');
 }
 
 function addComment(studentId: string) {
