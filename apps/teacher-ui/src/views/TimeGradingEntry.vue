@@ -88,7 +88,7 @@
                   <td class="input-cell">
                     <input 
                       type="text"
-                      v-model="getTimeValue(student.id)"
+                      :value="getTimeValue(student.id)"
                       @input="onTimeChange(student.id)"
                       @blur="saveStudentTime(student.id)"
                       placeholder="MM:SS.MS"
