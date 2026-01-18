@@ -266,12 +266,15 @@ const closeAddStudentModal = () => {
   }
 }
 
-const getInitials = (student: Student): string => {
-  const first = (student.firstName ?? '').charAt(0) || '?'
-  const last = (student.lastName ?? '').charAt(0) || '?'
+const getStudentInitials = (firstName?: string | null, lastName?: string | null): string => {
+  const first = (firstName ?? '').charAt(0) || '?'
+  const last = (lastName ?? '').charAt(0) || '?'
   return `${first}${last}`.toUpperCase()
 }
 
+const getInitials = (student: Student): string => {
+  return getStudentInitials(student.firstName, student.lastName)
+}
 // Lifecycle
 onMounted(() => {
   loadData()
