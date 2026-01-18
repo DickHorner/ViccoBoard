@@ -482,6 +482,8 @@ onMounted(() => {
 })
 </script>
 
+<style src="../styles/modal.css"></style>
+
 <style scoped>
 .dashboard-view {
   max-width: 1200px;
