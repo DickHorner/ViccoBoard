@@ -1,24 +1,24 @@
 <template>
   <div class="attendance-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Back</button>
-      <h2>Attendance Entry</h2>
-      <p class="page-description">Record student attendance for today's lesson.</p>
+      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <h2>Anwesenheit erfassen</h2>
+      <p class="page-description">Erfassen Sie die Schüleranwesenheit für heutige Stunde.</p>
     </div>
     
     <div class="attendance-form">
       <section class="card">
-        <h3>Attendance for: {{ currentDate }}</h3>
+        <h3>Anwesenheit für: {{ currentDate }}</h3>
         
         <div class="form-section">
-          <label for="class-select" class="form-label">Select Class:</label>
+          <label for="class-select" class="form-label">Klasse auswählen:</label>
           <select 
             id="class-select" 
             v-model="selectedClassId" 
             class="form-select"
             @change="onClassChange"
           >
-            <option value="">Choose a class...</option>
+            <option value="">Klasse auswählen...</option>
             <option 
               v-for="cls in classes" 
               :key="cls.id" 
@@ -29,67 +29,36 @@
           </select>
         </div>
         
-        <div v-if="loading" class="loading-state">
+        <div class="card-content" v-if="!selectedClassId">
+          <p class="empty-state">Wählen Sie eine Klasse, um mit der Erfassung zu beginnen.</p>
+        </div>
+
+        <div v-else-if="loading" class="loading-state">
           <div class="spinner"></div>
-          <p>Loading students...</p>
+          <p>Schüler werden geladen...</p>
         </div>
         
         <div v-else-if="selectedClassId && students.length === 0" class="empty-state">
-          <p>No students in this class yet. Add students first.</p>
+          <p>Keine Schüler in dieser Klasse. Fügen Sie zunächst Schüler hinzu.</p>
         </div>
-        
+
         <div v-else-if="students.length > 0" class="card-content">
           <div class="status-summary">
             <div class="status-item status-present">
-              <span class="status-label">Present</span>
+              <span class="status-label">Anwesend</span>
               <span class="status-count">{{ countByStatus('present') }}</span>
             </div>
             <div class="status-item status-absent">
-              <span class="status-label">Absent</span>
+              <span class="status-label">Abwesend</span>
               <span class="status-count">{{ countByStatus('absent') }}</span>
             </div>
             <div class="status-item status-late">
-              <span class="status-label">Late</span>
+              <span class="status-label">Verspätet</span>
               <span class="status-count">{{ countByStatus('late') }}</span>
             </div>
             <div class="status-item status-excused">
-              <span class="status-label">Excused</span>
+              <span class="status-label">Entschuldigt</span>
               <span class="status-count">{{ countByStatus('excused') }}</span>
-            </div>
-          </div>
-          
-          <div class="attendance-table">
-            <div 
-              v-for="student in students" 
-              :key="student.id" 
-              class="attendance-row"
-            >
-              <div class="student-name">
-                {{ student.firstName }} {{ student.lastName }}
-              </div>
-              <div class="status-buttons">
-                <button
-                  v-for="status in statuses"
-                  :key="status.value"
-                  type="button"
-                  @click="setStatus(student.id, status.value)"
-                  :class="['status-btn', `status-${status.value}`, { 
-                    active: attendance[student.id]?.status === status.value 
-                  }]"
-                  :aria-label="`Mark ${student.firstName} ${student.lastName} as ${status.label}`"
-                  :title="status.label"
-                >
-                  <span aria-hidden="true">{{ status.emoji }}</span>
-                  <span class="sr-only">{{ status.label }}</span>
-                </button>
-              </div>
-              <input
-                v-if="attendance[student.id]?.status === 'absent'"
-                v-model="attendance[student.id].reason"
-                type="text"
-                placeholder="Reason for absence..."
-                class="reason-input"
-              />
             </div>
           </div>
 
@@ -99,7 +68,7 @@
               @click="markAllPresent"
               :disabled="saving"
             >
-              Mark All Present
+              Alle als anwesend markieren
             </button>
           </div>
           
@@ -107,9 +76,9 @@
             <table class="attendance-table">
               <thead>
                 <tr>
-                  <th class="student-name-col">Student</th>
+                  <th class="student-name-col">Schüler</th>
                   <th class="status-col">Status</th>
-                  <th class="reason-col">Reason</th>
+                  <th class="reason-col">Grund</th>
                 </tr>
               </thead>
               <tbody>
@@ -139,13 +108,30 @@
                       v-model="attendance[student.id].reason"
                       type="text"
                       class="reason-input"
-                      placeholder="Enter reason..."
+                      placeholder="Grund eingeben..."
                       :disabled="saving"
                     />
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          
+          <div class="form-actions">
+            <button 
+              class="btn-primary" 
+              @click="handleSaveAttendance"
+              :disabled="!hasAnyAttendance || saving"
+            >
+              {{ saving ? 'Wird gespeichert...' : 'Anwesenheit speichern' }}
+            </button>
+            <button 
+              class="btn-secondary" 
+              @click="clearAttendance"
+              :disabled="!hasAnyAttendance || saving"
+            >
+              Alles löschen
+            </button>
           </div>
           
           <div v-if="saveError" class="error-message">
@@ -155,18 +141,6 @@
           <div v-if="saveSuccess" class="success-message">
             {{ saveSuccess }}
           </div>
-          
-          <button 
-            class="btn-primary btn-large" 
-            @click="handleSaveAttendance"
-            :disabled="saving || !hasAnyAttendance"
-          >
-            {{ saving ? 'Saving...' : 'Save Attendance' }}
-          </button>
-        </div>
-        
-        <div v-else class="card-content">
-          <p class="empty-state">Select a class to begin recording attendance.</p>
         </div>
       </section>
     </div>
@@ -181,6 +155,15 @@ import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
 
+type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
+
+// Status options for quick selection
+const statusOptions: Array<{ value: AttendanceStatus; label: string; short: string }> = [
+  { value: 'present', label: 'Anwesend', short: 'A' },
+  { value: 'absent', label: 'Abwesend', short: 'Ab' },
+  { value: 'late', label: 'Verspätet', short: 'V' },
+  { value: 'excused', label: 'Entschuldigt', short: 'E' }
+]
 // State
 const classes = ref<ClassGroup[]>([])
 const students = ref<Student[]>([])
@@ -211,7 +194,7 @@ const attendanceComposable = useAttendance()
 
 // Computed
 const currentDate = computed(() => {
-  return new Date().toLocaleDateString('en-US', { 
+  return new Date().toLocaleDateString('de-DE', { 
     weekday: 'long', 
     year: 'numeric', 
     month: 'long', 
@@ -239,6 +222,21 @@ const setStatus = (studentId: string, status: string) => {
   if (status !== 'absent') {
     delete attendance.value[studentId].reason
   }
+}
+
+const setStudentStatus = (studentId: string, status: AttendanceStatus) => {
+  setStatus(studentId, status)
+}
+
+const markAllPresent = async () => {
+  students.value.forEach(student => {
+    setStatus(student.id, 'present')
+  })
+}
+
+const clearAttendance = () => {
+  attendance.value = {}
+  saveError.value = ''
 }
 
 const onClassChange = async () => {
@@ -280,13 +278,12 @@ const handleSaveAttendance = async () => {
     // Save using batch record
     await attendanceComposable.recordBatch(records)
     
-    const successMessage = `Attendance recorded successfully for ${records.length} student${records.length > 1 ? 's' : ''}!`
-    saveSuccess.value = successMessage
+    const savedCount = records.length
+    saveSuccess.value = `Anwesenheit für ${savedCount} Schüler erfolgreich gespeichert`
     
-    // Reset attendance after brief display with unique identifier check
+    // Reset attendance after brief display
     setTimeout(() => {
-      // Only clear if the message hasn't been replaced by a new one
-      if (saveSuccess.value === successMessage) {
+      if (saveSuccess.value.includes(savedCount.toString())) {
         attendance.value = {}
         saveSuccess.value = ''
       }
@@ -296,7 +293,7 @@ const handleSaveAttendance = async () => {
     if (err instanceof Error) {
       saveError.value = err.message
     } else {
-      saveError.value = 'Failed to save attendance. Please try again.'
+      saveError.value = 'Fehler beim Speichern der Anwesenheit. Bitte versuchen Sie es erneut.'
     }
   } finally {
     saving.value = false

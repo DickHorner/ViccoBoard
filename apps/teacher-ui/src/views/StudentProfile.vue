@@ -1,21 +1,21 @@
 <template>
   <div class="student-profile-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Back</button>
-      <h2>Student Profile</h2>
-      <p class="page-description">View and manage student information, attendance, and performance.</p>
+      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <h2>Schülerprofil</h2>
+      <p class="page-description">Verwalten Sie Schülerinformationen, Anwesenheit und Leistung.</p>
     </div>
     
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading student profile...</p>
+      <p>Schülerprofil wird geladen...</p>
     </div>
     
     <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadStudent">Retry</button>
+      <button class="btn-primary" @click="loadStudent">Erneut versuchen</button>
     </div>
     
     <!-- Profile Content -->
@@ -28,7 +28,7 @@
             <div v-else class="student-avatar">
               {{ getInitials(student.firstName, student.lastName) }}
             </div>
-            <button class="photo-upload-btn" @click="showPhotoModal = true" title="Manage photo">
+            <button class="photo-upload-btn" @click="showPhotoModal = true" title="Foto verwalten">
               📷
             </button>
           </div>
@@ -39,50 +39,50 @@
             <p class="class-info">{{ getClassName(student.classId) }}</p>
           </div>
           <div class="header-actions">
-            <button class="btn-icon" @click="showEditModal = true" title="Edit student">
+            <button class="btn-icon" @click="showEditModal = true" title="Schüler bearbeiten">
               ✏️
             </button>
-            <button class="btn-icon btn-danger" @click="confirmDelete" title="Delete student">
+            <button class="btn-icon btn-danger" @click="confirmDelete" title="Schüler löschen">
               🗑️
             </button>
           </div>
         </div>
       </section>
       
-      <!-- Attendance Record -->
+      <!-- Attendance Summary -->
       <section class="card">
-        <h3>Attendance Summary</h3>
+        <h3>Anwesenheitsübersicht</h3>
         <div v-if="attendanceSummary" class="card-content">
           <div class="summary-grid">
             <div class="summary-item">
-              <label>Total Lessons:</label>
+              <label>Unterrichtsstunden gesamt:</label>
               <span class="summary-value">{{ attendanceSummary.total }}</span>
             </div>
             <div class="summary-item">
-              <label>Present:</label>
+              <label>Anwesend:</label>
               <span class="summary-value status-present">{{ attendanceSummary.present }}</span>
             </div>
             <div class="summary-item">
-              <label>Absent:</label>
+              <label>Abwesend:</label>
               <span class="summary-value status-absent">{{ attendanceSummary.absent }}</span>
             </div>
             <div class="summary-item">
-              <label>Attendance Rate:</label>
+              <label>Anwesenheitsquote:</label>
               <span class="summary-value">{{ attendanceSummary.percentage.toFixed(1) }}%</span>
             </div>
           </div>
         </div>
         <div v-else class="empty-state">
-          <p>No attendance data available.</p>
+          <p>Keine Anwesenheitsdaten verfügbar.</p>
         </div>
       </section>
       
-      <!-- Performance Summary -->
+      <!-- Attendance History -->
       <section class="card">
-        <h3>Attendance History</h3>
+        <h3>Anwesenheitsverlauf</h3>
         <div class="card-content">
           <div v-if="attendanceRecords.length === 0" class="empty-state">
-            <p>No attendance records yet.</p>
+            <p>Noch keine Anwesenheitsprotokollen.</p>
           </div>
           <div v-else class="attendance-list">
             <div 
@@ -109,13 +109,13 @@
     <div v-if="showEditModal && student" class="modal-overlay" @click="closeEditModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Edit Student</h3>
+          <h3>Schüler bearbeiten</h3>
           <button class="modal-close" @click="closeEditModal">✕</button>
         </div>
         
         <form @submit.prevent="handleEditStudent" class="modal-form">
           <div class="form-group">
-            <label for="editFirstName">First Name *</label>
+            <label for="editFirstName">Vorname *</label>
             <input
               id="editFirstName"
               v-model="editForm.firstName"
@@ -126,7 +126,7 @@
           </div>
           
           <div class="form-group">
-            <label for="editLastName">Last Name *</label>
+            <label for="editLastName">Nachname *</label>
             <input
               id="editLastName"
               v-model="editForm.lastName"
@@ -137,7 +137,7 @@
           </div>
           
           <div class="form-group">
-            <label for="editClassId">Class *</label>
+            <label for="editClassId">Klasse *</label>
             <select
               id="editClassId"
               v-model="editForm.classId"
@@ -145,18 +145,18 @@
               class="form-input"
               :disabled="!hasClasses"
             >
-              <option value="" disabled>{{ hasClasses ? 'Select a class' : 'No classes available' }}</option>
+              <option value="" disabled>{{ hasClasses ? 'Wählen Sie eine Klasse' : 'Keine Klassen verfügbar' }}</option>
               <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
                 {{ classGroup.name }}
               </option>
             </select>
             <small v-if="!hasClasses" class="form-hint error-hint">
-              Please create a class first in the Dashboard.
+              Erstellen Sie zunächst eine Klasse im Übersichts-Tab.
             </small>
           </div>
           
           <div class="form-group">
-            <label for="editDateOfBirth">Date of Birth</label>
+            <label for="editDateOfBirth">Geburtsdatum</label>
             <input
               id="editDateOfBirth"
               v-model="editForm.dateOfBirth"
@@ -167,7 +167,7 @@
           </div>
           
           <div class="form-group">
-            <label for="editEmail">Email</label>
+            <label for="editEmail">E-Mail</label>
             <input
               id="editEmail"
               v-model="editForm.email"
@@ -182,10 +182,10 @@
           
           <div class="modal-actions">
             <button type="button" @click="closeEditModal" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button type="submit" :disabled="saving" class="btn-primary">
-              {{ saving ? 'Saving...' : 'Save Changes' }}
+              {{ saving ? 'Wird gespeichert...' : 'Änderungen speichern' }}
             </button>
           </div>
         </form>
@@ -196,7 +196,7 @@
     <div v-if="showPhotoModal && student" class="modal-overlay" @click="closePhotoModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Manage Photo</h3>
+          <h3>Foto verwalten</h3>
           <button class="modal-close" @click="closePhotoModal">✕</button>
         </div>
         
@@ -204,12 +204,12 @@
           <div class="photo-preview-container">
             <img v-if="student.photo || photoPreview" :src="photoPreview || student.photo" class="photo-preview" alt="Preview" />
             <div v-else class="photo-preview-placeholder">
-              <span>No photo</span>
+              <span>Kein Foto</span>
             </div>
           </div>
           
           <div class="form-group">
-            <label for="photoInput">Upload Photo</label>
+            <label for="photoInput">Foto hochladen</label>
             <input
               id="photoInput"
               ref="photoInput"
@@ -218,7 +218,7 @@
               @change="handlePhotoSelect"
               class="form-input"
             />
-            <small class="form-hint">Recommended: Square image, max 2MB</small>
+            <small class="form-hint">Empfohlen: Quadratisches Bild, max. 2MB</small>
           </div>
           
           <div v-if="photoError" class="error-message">
@@ -232,10 +232,10 @@
               @click="removePhoto"
               class="btn-secondary btn-danger"
             >
-              Remove Photo
+              Foto entfernen
             </button>
             <button type="button" @click="closePhotoModal" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button
               v-if="photoPreview"
@@ -244,7 +244,7 @@
               :disabled="saving"
               class="btn-primary"
             >
-              {{ saving ? 'Saving...' : 'Save Photo' }}
+              {{ saving ? 'Wird gespeichert...' : 'Foto speichern' }}
             </button>
           </div>
         </div>
@@ -255,14 +255,14 @@
     <div v-if="showDeleteModal && student" class="modal-overlay" @click="showDeleteModal = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Delete Student</h3>
+          <h3>Schüler löschen</h3>
           <button class="modal-close" @click="showDeleteModal = false">✕</button>
         </div>
         
         <div class="modal-form">
           <p class="confirmation-text">
-            Are you sure you want to delete <strong>{{ student.firstName }} {{ student.lastName }}</strong>?
-            This action cannot be undone.
+            Sind Sie sicher, dass Sie <strong>{{ student.firstName }} {{ student.lastName }}</strong> löschen möchten?
+            Diese Aktion kann nicht rückgängig gemacht werden.
           </p>
           
           <div v-if="deleteError" class="error-message">
@@ -271,7 +271,7 @@
           
           <div class="modal-actions">
             <button type="button" @click="showDeleteModal = false" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button
               type="button"
@@ -279,7 +279,7 @@
               :disabled="saving"
               class="btn-primary btn-danger-solid"
             >
-              {{ saving ? 'Deleting...' : 'Delete Student' }}
+              {{ saving ? 'Wird gelöscht...' : 'Schüler löschen' }}
             </button>
           </div>
         </div>
@@ -290,18 +290,18 @@
     <div v-if="showRemovePhotoModal && student" class="modal-overlay" @click="showRemovePhotoModal = false">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Remove Photo</h3>
+          <h3>Foto entfernen</h3>
           <button class="modal-close" @click="showRemovePhotoModal = false">✕</button>
         </div>
         
         <div class="modal-form">
           <p class="confirmation-text">
-            Are you sure you want to remove this photo?
+            Sind Sie sicher, dass Sie dieses Foto entfernen möchten?
           </p>
           
           <div class="modal-actions">
             <button type="button" @click="showRemovePhotoModal = false" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button
               type="button"
@@ -309,7 +309,7 @@
               :disabled="saving"
               class="btn-primary btn-danger-solid"
             >
-              {{ saving ? 'Removing...' : 'Remove Photo' }}
+              {{ saving ? 'Wird entfernt...' : 'Foto entfernen' }}
             </button>
           </div>
         </div>
@@ -335,12 +335,30 @@ const attendanceSummary = ref<{
   total: number
   present: number
   absent: number
-  excused: number
-  passive: number
+  excused?: number
+  passive?: number
   percentage: number
 } | null>(null)
 const loading = ref(true)
-const loadError = ref('')
+const error = ref('')
+const showEditModal = ref(false)
+const showPhotoModal = ref(false)
+const showDeleteModal = ref(false)
+const showRemovePhotoModal = ref(false)
+const saving = ref(false)
+const editError = ref('')
+const photoError = ref('')
+const deleteError = ref('')
+const photoPreview = ref('')
+const photoInput = ref<HTMLInputElement | null>(null)
+
+const editForm = ref({
+  firstName: '',
+  lastName: '',
+  classId: '',
+  dateOfBirth: '',
+  email: ''
+})
 
 // Composables
 const students = useStudents()
@@ -356,33 +374,9 @@ const loadData = async () => {
     student.value = await students.getById(studentId)
     
     if (!student.value) {
-      loadError.value = 'Student not found'
+      error.value = 'Schüler nicht gefunden'
       return
     }
-    
-    // Load attendance records
-    attendanceRecords.value = await attendance.getByStudentId(studentId)
-    
-    // Load attendance summary
-    attendanceSummary.value = await attendance.getAttendanceSummary(studentId)
-  } catch (err) {
-    console.error('Failed to load student profile:', err)
-    loadError.value = 'Failed to load student profile. Please try again.'
-  } finally {
-    loading.value = false
-  }
-}
-
-const loadAttendance = async (studentId: string) => {
-  loadingAttendance.value = true
-  try {
-    attendance.value = await attendanceDb.getByStudentId(studentId)
-  } catch (err) {
-    console.error('Failed to load attendance:', err)
-  } finally {
-    loadingAttendance.value = false
-  }
-}
 
 const handleEditStudent = async () => {
   if (!student.value) return
@@ -391,24 +385,24 @@ const handleEditStudent = async () => {
   saving.value = true
   
   try {
-    await studentsDb.update(student.value.id, {
+    await students.update(student.value.id, {
       firstName: editForm.value.firstName.trim(),
       lastName: editForm.value.lastName.trim(),
-      classId: editForm.value.classId,
+      classGroupId: editForm.value.classId,
       dateOfBirth: editForm.value.dateOfBirth ? new Date(editForm.value.dateOfBirth) : undefined,
       email: editForm.value.email || undefined
     })
     
     // Reload from database to ensure consistency
-    const updatedStudent = await studentsDb.getById(student.value.id)
+    const updatedStudent = await students.getById(student.value.id)
     if (updatedStudent) {
       student.value = updatedStudent
     }
     
-    showEditModal.value = false
+    closeEditModal()
   } catch (err) {
     console.error('Failed to update student:', err)
-    editError.value = err instanceof Error ? err.message : 'Failed to update student'
+    editError.value = err instanceof Error ? err.message : 'Fehler beim Aktualisieren des Schülers'
   } finally {
     saving.value = false
   }
@@ -422,13 +416,13 @@ const handlePhotoSelect = (event: Event) => {
   
   // Validate file size (2MB max)
   if (file.size > 2 * 1024 * 1024) {
-    photoError.value = 'Photo size must be less than 2MB'
+    photoError.value = 'Fotogröße muss kleiner als 2MB sein'
     return
   }
   
   // Validate file type
   if (!file.type.startsWith('image/')) {
-    photoError.value = 'Please select an image file'
+    photoError.value = 'Bitte wählen Sie eine Bilddatei'
     return
   }
   
@@ -449,12 +443,12 @@ const savePhoto = async () => {
   photoError.value = ''
   
   try {
-    await studentsDb.update(student.value.id, {
+    await students.update(student.value.id, {
       photo: photoPreview.value
     })
     
     // Reload from database to ensure consistency
-    const updatedStudent = await studentsDb.getById(student.value.id)
+    const updatedStudent = await students.getById(student.value.id)
     if (updatedStudent) {
       student.value = updatedStudent
     }
@@ -462,7 +456,7 @@ const savePhoto = async () => {
     showPhotoModal.value = false
   } catch (err) {
     console.error('Failed to save photo:', err)
-    photoError.value = 'Failed to save photo. Please try again.'
+    photoError.value = 'Fehler beim Speichern des Fotos. Bitte versuchen Sie es erneut.'
   } finally {
     saving.value = false
   }
@@ -481,12 +475,12 @@ const confirmRemovePhoto = async () => {
   photoError.value = ''
   
   try {
-    await studentsDb.update(student.value.id, {
+    await students.update(student.value.id, {
       photo: undefined
     })
     
     // Reload from database to ensure consistency
-    const updatedStudent = await studentsDb.getById(student.value.id)
+    const updatedStudent = await students.getById(student.value.id)
     if (updatedStudent) {
       student.value = updatedStudent
     }
@@ -494,7 +488,7 @@ const confirmRemovePhoto = async () => {
     showRemovePhotoModal.value = false
   } catch (err) {
     console.error('Failed to remove photo:', err)
-    photoError.value = 'Failed to remove photo. Please try again.'
+    photoError.value = 'Fehler beim Entfernen des Fotos. Bitte versuchen Sie es erneut.'
   } finally {
     saving.value = false
   }
@@ -512,11 +506,11 @@ const handleDelete = async () => {
   saving.value = true
   
   try {
-    await studentsDb.remove(student.value.id)
+    await students.remove(student.value.id)
     router.push('/students')
   } catch (err) {
     console.error('Failed to delete student:', err)
-    deleteError.value = err instanceof Error ? err.message : 'Failed to delete student. Please try again.'
+    deleteError.value = err instanceof Error ? err.message : 'Fehler beim Löschen des Schülers. Bitte versuchen Sie es erneut.'
     saving.value = false
   }
 }
@@ -536,15 +530,17 @@ const closePhotoModal = () => {
 }
 
 const getClassName = (classId: string): string => {
-  const classGroup = classes.value.find(c => c.id === classId)
-  return classGroup ? classGroup.name : 'Unknown Class'
+  // TODO: Implement class lookup from composable
+  return 'Klassenname'
 }
 
-// Enable keyboard accessibility for modals (after function definitions)
-useModal(showEditModal, closeEditModal)
-useModal(showPhotoModal, closePhotoModal)
-useModal(showDeleteModal, () => { showDeleteModal.value = false })
-useModal(showRemovePhotoModal, () => { showRemovePhotoModal.value = false })
+const formatDate = (date: Date): string => {
+  return new Date(date).toLocaleDateString('de-DE')
+}
+
+const capitalize = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
 
 // Lifecycle
 onMounted(() => {

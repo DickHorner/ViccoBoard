@@ -1,8 +1,8 @@
 <template>
   <div class="student-list-view">
     <div class="page-header">
-      <h2>Students</h2>
-      <p class="page-description">View and manage all students across your classes.</p>
+      <h2>Schüler</h2>
+      <p class="page-description">Verwalten Sie alle Schüler über Ihre Klassen.</p>
     </div>
     
     <div class="controls-bar">
@@ -11,7 +11,7 @@
         <input 
           v-model="searchQuery"
           type="text"
-          placeholder="Search by name or ID..."
+          placeholder="Nach Name oder ID durchsuchen..."
           class="search-input"
         />
       </div>
@@ -21,40 +21,40 @@
         class="btn-primary" 
         @click="openAddModal"
         :disabled="!canAddStudent"
-        :title="!canAddStudent ? 'Create a class first' : 'Add a new student'"
+        :title="!canAddStudent ? 'Erstellen Sie zunächst eine Klasse' : 'Neuen Schüler hinzufügen'"
       >
-        + Add Student
+        + Schüler hinzufügen
       </button>
     </div>
     
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading students...</p>
+      <p>Schüler werden geladen...</p>
     </div>
     
     <!-- Error State -->
     <div v-else-if="loadError" class="error-state">
       <p>{{ loadError }}</p>
-      <button class="btn-primary" @click="loadStudents">Retry</button>
+      <button class="btn-primary" @click="loadStudents">Erneut versuchen</button>
     </div>
     
     <!-- Empty State -->
     <div v-else-if="students.length === 0" class="empty-state">
-      <p v-if="!hasClasses">No classes yet. Create a class first before adding students.</p>
-      <p v-else>No students yet. Add your first student to get started.</p>
+      <p v-if="!hasClasses">Noch keine Klassen. Erstellen Sie zunächst eine Klasse, bevor Sie Schüler hinzufügen.</p>
+      <p v-else>Noch keine Schüler. Fügen Sie Ihren ersten Schüler hinzu.</p>
       <button 
         class="btn-primary" 
         @click="openAddModal"
         :disabled="!canAddStudent"
       >
-        + Add Student
+        + Schüler hinzufügen
       </button>
     </div>
     
     <!-- No Results State -->
     <div v-else-if="filteredStudents.length === 0" class="empty-state">
-      <p>No students found matching "{{ searchQuery }}"</p>
+      <p>Keine Schüler gefunden, die "{{ searchQuery }}" entsprechen</p>
     </div>
     
     <!-- Students List -->
@@ -88,37 +88,37 @@
     <div v-if="showAddModal" class="modal-overlay" @click="closeAddModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Add Student</h3>
+          <h3>Schüler hinzufügen</h3>
           <button class="modal-close" @click="closeAddModal">✕</button>
         </div>
         
         <form @submit.prevent="handleAddStudent" class="modal-form">
           <div class="form-group">
-            <label for="firstName">First Name *</label>
+            <label for="firstName">Vorname *</label>
             <input
               id="firstName"
               v-model="newStudent.firstName"
               type="text"
-              placeholder="Enter first name"
+              placeholder="Vorname eingeben"
               required
               class="form-input"
             />
           </div>
           
           <div class="form-group">
-            <label for="lastName">Last Name *</label>
+            <label for="lastName">Nachname *</label>
             <input
               id="lastName"
               v-model="newStudent.lastName"
               type="text"
-              placeholder="Enter last name"
+              placeholder="Nachname eingeben"
               required
               class="form-input"
             />
           </div>
           
           <div class="form-group">
-            <label for="classId">Class *</label>
+            <label for="classId">Klasse *</label>
             <select
               id="classId"
               v-model="newStudent.classId"
@@ -126,18 +126,18 @@
               class="form-input"
               :disabled="!hasClasses"
             >
-              <option value="">{{ hasClasses ? 'Select a class' : 'No classes available' }}</option>
+              <option value="">{{ hasClasses ? 'Wählen Sie eine Klasse' : 'Keine Klassen verfügbar' }}</option>
               <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
                 {{ classGroup.name }}
               </option>
             </select>
             <small v-if="!hasClasses" class="form-hint error-hint">
-              Please create a class first in the Dashboard.
+              Erstellen Sie zunächst eine Klasse im Übersichts-Tab.
             </small>
           </div>
           
           <div class="form-group">
-            <label for="dateOfBirth">Date of Birth</label>
+            <label for="dateOfBirth">Geburtsdatum</label>
             <input
               id="dateOfBirth"
               v-model="newStudent.dateOfBirth"
@@ -148,12 +148,12 @@
           </div>
           
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email">E-Mail</label>
             <input
               id="email"
               v-model="newStudent.email"
               type="email"
-              placeholder="student@example.com"
+              placeholder="schueler@example.de"
               class="form-input"
             />
           </div>
@@ -164,10 +164,10 @@
           
           <div class="modal-actions">
             <button type="button" @click="closeAddModal" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button type="submit" :disabled="creating" class="btn-primary">
-              {{ creating ? 'Adding...' : 'Add Student' }}
+              {{ creating ? 'Wird hinzugefügt...' : 'Schüler hinzufügen' }}
             </button>
           </div>
         </form>
@@ -241,7 +241,7 @@ const loadStudents = async () => {
     classes.value = await classGroupsDb.getAll()
   } catch (err) {
     console.error('Failed to load students:', err)
-    loadError.value = 'Failed to load students. Please try again.'
+    loadError.value = 'Fehler beim Laden der Schüler. Bitte versuchen Sie es erneut.'
   } finally {
     loading.value = false
   }
@@ -294,12 +294,12 @@ const closeAddModal = () => {
 
 const getClassName = (classId: string): string => {
   const classGroup = classes.value.find(c => c.id === classId)
-  return classGroup ? classGroup.name : 'Unknown Class'
+  return classGroup ? classGroup.name : 'Unbekannte Klasse'
 }
 
 const openAddModal = () => {
   if (!hasClasses.value) {
-    error.value = 'Please create a class first before adding students.'
+    error.value = 'Erstellen Sie zunächst eine Klasse, bevor Sie Schüler hinzufügen.'
     return
   }
   showAddModal.value = true

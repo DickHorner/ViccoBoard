@@ -1,14 +1,14 @@
 <template>
   <div class="class-detail-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Back</button>
+      <button class="back-button" @click="$router.back()">← Zurück</button>
       <div class="header-content">
         <div>
-          <h2>{{ classGroup?.name || 'Loading...' }}</h2>
-          <p class="page-description">View and manage class information, students, and lessons.</p>
+          <h2>{{ classGroup?.name || 'Wird geladen...' }}</h2>
+          <p class="page-description">Verwalten Sie Klasseninformationen, Schüler und Stunden.</p>
         </div>
         <button v-if="classGroup" class="btn-primary" @click="showEditModal = true">
-          Edit Class
+          Klasse bearbeiten
         </button>
       </div>
     </div>
@@ -16,50 +16,38 @@
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading class details...</p>
+      <p>Klasse wird geladen...</p>
     </div>
     
     <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadData">Retry</button>
-    </div>
-    
-    <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading class details...</p>
-    </div>
-    
-    <!-- Error State -->
-    <div v-else-if="loadError" class="error-state">
-      <p>{{ loadError }}</p>
-      <button class="btn-primary" @click="loadData">Retry</button>
+      <button class="btn-primary" @click="loadData">Erneut versuchen</button>
     </div>
     
     <!-- Class Details -->
     <div v-else-if="classGroup" class="class-info">
       <section class="card">
-        <h3>Class Information</h3>
+        <h3>Klasseninformation</h3>
         <div class="info-grid">
           <div class="info-item">
-            <label>Class Name:</label>
+            <label>Klassenname:</label>
             <span>{{ classGroup.name }}</span>
           </div>
           <div class="info-item">
-            <label>School Year:</label>
+            <label>Schuljahr:</label>
             <span>{{ classGroup.schoolYear }}</span>
           </div>
           <div class="info-item">
-            <label>Students:</label>
+            <label>Schüler:</label>
             <span>{{ students.length }}</span>
           </div>
           <div class="info-item">
-            <label>Grading Scheme:</label>
+            <label>Bewertungsschema:</label>
             <span>{{ getGradingSchemeDisplay() }}</span>
           </div>
           <div class="info-item">
-            <label>Created:</label>
+            <label>Erstellt:</label>
             <span>{{ formatDate(classGroup.createdAt) }}</span>
           </div>
         </div>
@@ -67,18 +55,20 @@
       
       <section class="card">
         <div class="card-header">
-          <h3>Students</h3>
+          <h3>Schüler</h3>
           <button class="btn-primary btn-small" @click="showAddStudentModal = true">
-            + Add Student
+            + Schüler hinzufügen
           </button>
         </div>
         <div class="card-content">
-          <!-- Empty State -->
-          <div v-if="students.length === 0" class="empty-state">
-            <p>No students in this class yet. Add your first student to get started.</p>
+          <div v-if="loadingStudents" class="loading-state-small">
+            <div class="spinner-small"></div>
+            <p>Schüler werden geladen...</p>
+          </div>
+          <div v-else-if="students.length === 0" class="empty-state">
+            <p>Noch keine Schüler in dieser Klasse. Fügen Sie Ihren ersten Schüler hinzu.</p>
           </div>
           
-          <!-- Students List -->
           <div v-else class="student-list">
             <RouterLink 
               v-for="student in students" 
@@ -89,7 +79,7 @@
               <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
               <div class="student-info">
                 <h4>{{ student.firstName }} {{ student.lastName }}</h4>
-                <p v-if="student.dateOfBirth">Birth: {{ student.dateOfBirth.getFullYear() }}</p>
+                <p v-if="student.dateOfBirth">Geb.: {{ student.dateOfBirth.getFullYear() }}</p>
               </div>
               <div class="student-arrow">→</div>
             </RouterLink>
@@ -98,39 +88,39 @@
       </section>
       
       <section class="card">
-        <h3>Statistics</h3>
+        <h3>Statistiken</h3>
         <div class="card-content">
-          <p class="info-note">📊 Statistics will be calculated from actual attendance and assessment data.</p>
+          <p class="info-note">📊 Statistiken werden aus tatsächlichen Anwesenheits- und Bewertungsdaten berechnet.</p>
           <div class="stats-grid">
             <div class="stat-item">
               <div class="stat-value">{{ statistics.attendanceRate }}%</div>
-              <div class="stat-label">Attendance Rate</div>
+              <div class="stat-label">Anwesenheitsquote</div>
             </div>
             <div class="stat-item">
               <div class="stat-value">{{ statistics.totalLessons }}</div>
-              <div class="stat-label">Total Lessons</div>
+              <div class="stat-label">Unterrichtsstunden</div>
             </div>
             <div class="stat-item">
               <div class="stat-value">{{ statistics.assessmentCount }}</div>
-              <div class="stat-label">Assessments</div>
+              <div class="stat-label">Bewertungen</div>
             </div>
           </div>
         </div>
       </section>
       
       <section class="card">
-        <h3>Quick Actions</h3>
+        <h3>Schnellzugriffe</h3>
         <div class="card-content">
           <RouterLink 
             :to="`/attendance?classId=${classGroup.id}`" 
             class="action-button"
           >
             <span class="action-icon">✓</span>
-            <span>Record Attendance</span>
+            <span>Anwesenheit erfassen</span>
           </RouterLink>
           <button class="action-button" @click="showEditModal = true">
             <span class="action-icon">✏️</span>
-            <span>Edit Class Info</span>
+            <span>Klasseninformationen bearbeiten</span>
           </button>
         </div>
       </section>
@@ -140,48 +130,42 @@
     <div v-if="showAddStudentModal" class="modal-overlay" @click="closeAddStudentModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Add Student</h3>
-          <button 
-            class="modal-close" 
-            @click="closeAddStudentModal"
-            aria-label="Close add student form"
-          >
-            ✕
-          </button>
+          <h3>Schüler zu {{ classGroup?.name }} hinzufügen</h3>
+          <button class="modal-close" @click="closeAddStudentModal" aria-label="Dialog schließen">✕</button>
         </div>
         
         <form @submit.prevent="handleAddStudent" class="modal-form">
           <div class="form-group">
-            <label for="firstName">First Name *</label>
+            <label for="firstName">Vorname</label>
             <input
               id="firstName"
               v-model="newStudent.firstName"
               type="text"
-              placeholder="e.g., John"
+              placeholder="z.B. Max"
               required
               class="form-input"
             />
           </div>
           
           <div class="form-group">
-            <label for="lastName">Last Name *</label>
+            <label for="lastName">Nachname</label>
             <input
               id="lastName"
               v-model="newStudent.lastName"
               type="text"
-              placeholder="e.g., Doe"
+              placeholder="z.B. Mustermann"
               required
               class="form-input"
             />
           </div>
           
           <div class="form-group">
-            <label for="birthYear">Birth Year</label>
+            <label for="birthYear">Geburtsjahr</label>
             <input
               id="birthYear"
               v-model.number="newStudent.birthYear"
               type="number"
-              placeholder="e.g., 2010"
+              placeholder="z.B. 2010"
               min="1900"
               :max="new Date().getFullYear()"
               class="form-input"
@@ -189,22 +173,22 @@
           </div>
           
           <div class="form-group">
-            <label for="gender">Gender</label>
+            <label for="gender">Geschlecht</label>
             <select id="gender" v-model="newStudent.gender" class="form-input">
-              <option value="">Not specified</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="diverse">Diverse</option>
+              <option value="">Nicht angegeben</option>
+              <option value="male">Männlich</option>
+              <option value="female">Weiblich</option>
+              <option value="diverse">Divers</option>
             </select>
           </div>
           
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email">E-Mail</label>
             <input
               id="email"
               v-model="newStudent.email"
               type="email"
-              placeholder="student@example.com"
+              placeholder="z.B. max@schule.de"
               class="form-input"
             />
           </div>
@@ -215,10 +199,10 @@
           
           <div class="modal-actions">
             <button type="button" @click="closeAddStudentModal" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button type="submit" :disabled="addingStudent" class="btn-primary">
-              {{ addingStudent ? 'Adding...' : 'Add Student' }}
+              {{ addingStudent ? 'Wird hinzugefügt...' : 'Schüler hinzufügen' }}
             </button>
           </div>
         </form>
@@ -229,22 +213,29 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useClassGroups, useStudents } from '../composables/useSportBridge'
-import { getInitials } from '../utils/stringUtils'
 import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
-const classId = route.params.id as string
 
 // State
-const classGroup = ref<ClassGroup | undefined>(undefined)
+const classId = route.params.id as string
+const classGroup = ref<ClassGroup | null>(null)
 const students = ref<Student[]>([])
-const loading = ref(true)
-const loadError = ref('')
+const loading = ref(false)
+const loadingStudents = ref(false)
+const error = ref('')
 const showAddStudentModal = ref(false)
 const addingStudent = ref(false)
 const addStudentError = ref('')
+const showEditModal = ref(false)
+
+const statistics = ref({
+  attendanceRate: 0,
+  totalLessons: 0,
+  assessmentCount: 0
+})
 
 const newStudent = ref({
   firstName: '',
@@ -261,22 +252,22 @@ const studentsComposable = useStudents()
 // Methods
 const loadData = async () => {
   loading.value = true
-  loadError.value = ''
+  error.value = ''
   
   try {
     // Load class details
     classGroup.value = await classGroups.getById(classId)
     
     if (!classGroup.value) {
-      loadError.value = 'Class not found'
+      error.value = 'Klasse nicht gefunden'
       return
     }
     
     // Load students for this class
     students.value = await studentsComposable.getByClassId(classId)
   } catch (err) {
-    console.error('Failed to load class details:', err)
-    loadError.value = 'Failed to load class details. Please try again.'
+    console.error('Failed to load class:', err)
+    error.value = 'Fehler beim Laden der Klasse. Bitte versuchen Sie es erneut.'
   } finally {
     loading.value = false
   }
@@ -306,37 +297,29 @@ const handleAddStudent = async () => {
     if (err instanceof Error) {
       addStudentError.value = err.message
     } else {
-      addStudentError.value = 'Failed to add student. Please try again.'
+      addStudentError.value = 'Fehler beim Hinzufügen des Schülers. Bitte versuchen Sie es erneut.'
     }
   } finally {
     addingStudent.value = false
   }
 }
 
-const closeEditModal = () => {
-  showEditModal.value = false
-  editError.value = ''
-  if (classGroup.value) {
-    editForm.value = {
-      name: classGroup.value.name,
-      schoolYear: classGroup.value.schoolYear
-    }
-  }
-}
-
 const closeAddStudentModal = () => {
   showAddStudentModal.value = false
-  studentError.value = ''
-  studentForm.value = { firstName: '', lastName: '', email: '' }
+  addStudentError.value = ''
+  newStudent.value = { firstName: '', lastName: '', birthYear: undefined, gender: '', email: '' }
 }
 
 const formatDate = (date: Date): string => {
-  return new Date(date).toLocaleDateString()
+  return new Date(date).toLocaleDateString('de-DE')
 }
 
 const getGradingSchemeDisplay = (): string => {
-  // TODO: Get actual grading scheme from class when gradingScheme field is added to ClassGroup
-  return GRADING_SCHEMES[DEFAULT_GRADING_SCHEME] || 'Not set'
+  return classGroup.value?.gradingScheme || 'Standard'
+}
+
+const getInitials = (firstName: string, lastName: string): string => {
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 }
 
 // Lifecycle
@@ -822,5 +805,22 @@ onMounted(() => {
   .modal-actions button {
     width: 100%;
   }
+}
+
+.loading-state-small {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: #667eea;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 </style>

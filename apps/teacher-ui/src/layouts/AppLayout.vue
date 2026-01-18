@@ -3,7 +3,7 @@
     <header class="app-header">
       <div class="header-content">
         <h1 class="app-title">🎓 ViccoBoard</h1>
-        <p class="app-subtitle">Unified Teacher Suite</p>
+        <p class="app-subtitle">Einheitliche Lehrerplattform</p>
       </div>
     </header>
     
@@ -11,15 +11,15 @@
       <nav class="nav-menu">
         <RouterLink to="/" class="nav-item" active-class="active">
           <span class="nav-icon">📊</span>
-          <span class="nav-label">Dashboard</span>
+          <span class="nav-label">Übersicht</span>
         </RouterLink>
         <RouterLink to="/students" class="nav-item" active-class="active">
           <span class="nav-icon">👥</span>
-          <span class="nav-label">Students</span>
+          <span class="nav-label">Schüler</span>
         </RouterLink>
         <RouterLink to="/attendance" class="nav-item" active-class="active">
           <span class="nav-icon">✓</span>
-          <span class="nav-label">Attendance</span>
+          <span class="nav-label">Anwesenheit</span>
         </RouterLink>
       </nav>
       

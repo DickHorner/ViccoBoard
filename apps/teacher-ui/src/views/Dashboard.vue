@@ -1,16 +1,16 @@
 <template>
   <div class="dashboard-view">
     <div class="page-header">
-      <h2>Dashboard</h2>
-      <p class="page-description">Welcome to ViccoBoard! Manage your classes, students, and attendance.</p>
+      <h2>Übersicht</h2>
+      <p class="page-description">Willkommen bei ViccoBoard! Verwalten Sie Ihre Klassen, Schüler und Anwesenheit.</p>
     </div>
     
     <div class="dashboard-grid">
       <section class="card classes-card">
         <div class="card-header">
-          <h3>My Classes</h3>
+          <h3>Meine Klassen</h3>
           <button class="btn-primary btn-small" @click="showCreateModal = true">
-            + New Class
+            + Neue Klasse
           </button>
         </div>
         
@@ -19,7 +19,7 @@
           <input 
             v-model="searchQuery"
             type="text"
-            placeholder="Search classes..."
+            placeholder="Klassen durchsuchen..."
             class="search-input"
           />
         </div>
@@ -28,25 +28,25 @@
           <!-- Loading State -->
           <div v-if="loading" class="loading-state">
             <div class="spinner"></div>
-            <p>Loading classes...</p>
+            <p>Klassen werden geladen...</p>
           </div>
           
           <!-- Error State -->
           <div v-else-if="loadError" class="error-state">
             <p>{{ loadError }}</p>
             <button class="btn-primary btn-small" @click="loadData">
-              Retry
+              Erneut versuchen
             </button>
           </div>
           
           <!-- Empty State -->
           <div v-else-if="filteredClasses.length === 0 && searchQuery === ''" class="empty-state">
-            <p>No classes yet. Create your first class to get started.</p>
+            <p>Noch keine Klassen. Erstellen Sie Ihre erste Klasse zum Starten.</p>
           </div>
           
           <!-- No Results State -->
           <div v-else-if="filteredClasses.length === 0" class="empty-state">
-            <p>No classes found matching "{{ searchQuery }}"</p>
+            <p>Keine Klassen gefunden, die "{{ searchQuery }}" entsprechen</p>
           </div>
           
           <!-- Classes List -->
@@ -90,38 +90,38 @@
       </section>
       
       <section class="card">
-        <h3>Quick Actions</h3>
+        <h3>Schnellzugriffe</h3>
         <div class="card-content">
           <button 
             class="action-button"
             @click="showCreateModal = true"
           >
             <span class="action-icon">📚</span>
-            <span>Create New Class</span>
+            <span>Neue Klasse erstellen</span>
           </button>
           <RouterLink to="/students" class="action-button">
             <span class="action-icon">👥</span>
-            <span>View All Students</span>
+            <span>Alle Schüler anzeigen</span>
           </RouterLink>
           <RouterLink to="/attendance" class="action-button">
             <span class="action-icon">✓</span>
-            <span>Record Attendance</span>
+            <span>Anwesenheit erfassen</span>
           </RouterLink>
         </div>
       </section>
       
       <section class="card">
-        <h3>Recent Activity</h3>
+        <h3>Letzte Aktivitäten</h3>
         <div class="card-content">
           <!-- Loading State -->
           <div v-if="loading" class="loading-state-small">
             <div class="spinner-small"></div>
-            <p>Loading...</p>
+            <p>Wird geladen...</p>
           </div>
           
           <!-- Empty State -->
           <div v-else-if="recentActivity.length === 0" class="empty-state">
-            <p>No recent activity to display.</p>
+            <p>Keine Aktivitäten zum Anzeigen.</p>
           </div>
           
           <!-- Recent Activity List -->
@@ -133,7 +133,7 @@
             >
               <span class="activity-icon">{{ getActivityIcon(activity.status) }}</span>
               <div class="activity-details">
-                <p class="activity-text">Attendance recorded</p>
+                <p class="activity-text">Anwesenheit erfasst</p>
                 <p class="activity-time">{{ formatDate(activity.date) }}</p>
               </div>
             </div>
@@ -146,30 +146,30 @@
     <div v-if="showCreateModal" class="modal-overlay" @click="closeModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Create New Class</h3>
+          <h3>Neue Klasse erstellen</h3>
           <button class="modal-close" @click="closeModal">✕</button>
         </div>
         
         <form @submit.prevent="handleCreateClass" class="modal-form">
           <div class="form-group">
-            <label for="className">Class Name *</label>
+            <label for="className">Klassenname *</label>
             <input
               id="className"
               v-model="newClass.name"
               type="text"
-              placeholder="e.g., Grade 9A Sports"
+              placeholder="z.B. Klasse 9a Sport"
               required
               class="form-input"
             />
           </div>
           
           <div class="form-group">
-            <label for="schoolYear">School Year *</label>
+            <label for="schoolYear">Schuljahr *</label>
             <input
               id="schoolYear"
               v-model="newClass.schoolYear"
               type="text"
-              placeholder="e.g., 2025/2026"
+              placeholder="z.B. 2025/2026"
               pattern="\d{4}/\d{4}"
               required
               class="form-input"
@@ -183,10 +183,10 @@
           
           <div class="modal-actions">
             <button type="button" @click="closeModal" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button type="submit" :disabled="creating" class="btn-primary">
-              {{ creating ? 'Creating...' : 'Create Class' }}
+              {{ creating ? 'Wird erstellt...' : 'Klasse erstellen' }}
             </button>
           </div>
         </form>
@@ -330,7 +330,7 @@ const loadData = async () => {
     recentActivity.value = await attendance.getRecent(5)
   } catch (err) {
     console.error('Failed to load data:', err)
-    loadError.value = 'Failed to load dashboard data. Please refresh the page.'
+    loadError.value = 'Fehler beim Laden der Übersichtsdaten. Bitte aktualisieren Sie die Seite.'
   } finally {
     loading.value = false
   }
@@ -355,9 +355,18 @@ const handleCreateClass = async () => {
   } catch (err) {
     console.error('Failed to create class:', err)
     if (err instanceof Error) {
-      error.value = err.message
+      // Check for specific error types
+      if (err.message.includes('already exists')) {
+        error.value = 'Eine Klasse mit diesem Namen existiert bereits für dieses Schuljahr.'
+      } else if (err.message.includes('name is required')) {
+        error.value = 'Bitte geben Sie einen Klassennamen ein.'
+      } else if (err.message.includes('School year')) {
+        error.value = 'Bitte geben Sie ein gültiges Schuljahr im Format YYYY/YYYY ein (z.B. 2025/2026).'
+      } else {
+        error.value = err.message
+      }
     } else {
-      error.value = 'Failed to create class. Please try again.'
+      error.value = 'Fehler beim Erstellen der Klasse. Bitte versuchen Sie es erneut.'
     }
   } finally {
     creating.value = false
@@ -460,10 +469,10 @@ const formatDate = (date: Date): string => {
   const diffHours = Math.floor(diffMs / 3600000)
   const diffDays = Math.floor(diffMs / 86400000)
   
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  if (diffMins < 1) return 'Eben eben'
+  if (diffMins < 60) return `vor ${diffMins} Minute${diffMins > 1 ? 'n' : ''}`
+  if (diffHours < 24) return `vor ${diffHours} Stunde${diffHours > 1 ? 'n' : ''}`
+  if (diffDays < 7) return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`
   
   return recordDate.toLocaleDateString()
 }
