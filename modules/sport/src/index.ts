@@ -7,6 +7,9 @@
 export { ClassGroupRepository } from './repositories/class-group.repository';
 export { StudentRepository } from './repositories/student.repository';
 export { AttendanceRepository } from './repositories/attendance.repository';
+export { GradeSchemeRepository } from './repositories/grade-scheme.repository';
+export { GradeCategoryRepository } from './repositories/grade-category.repository';
+export { PerformanceEntryRepository } from './repositories/performance-entry.repository';
 
 // Use Cases
 export { CreateClassUseCase } from './use-cases/create-class.use-case';
