@@ -66,8 +66,10 @@ export class PerformanceEntryRepository extends AdapterRepository<PerformanceEnt
    * Find performance entries for a student in a specific category
    */
   async findByStudentAndCategory(studentId: string, categoryId: string): Promise<PerformanceEntry[]> {
-    const entries = await this.findByStudent(studentId);
-    return entries.filter(entry => entry.categoryId === categoryId);
+    return this.find({
+      student_id: studentId,
+      category_id: categoryId
+    });
   }
 
   /**
