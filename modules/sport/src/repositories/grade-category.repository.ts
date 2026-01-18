@@ -66,7 +66,9 @@ export class GradeCategoryRepository extends AdapterRepository<GradeCategory> {
    * Find grade categories by class and type
    */
   async findByClassGroupAndType(classGroupId: string, type: GradeCategoryType): Promise<GradeCategory[]> {
-    const categories = await this.findByClassGroup(classGroupId);
-    return categories.filter(cat => cat.type === type);
+    return this.find({
+      class_group_id: classGroupId,
+      type
+    });
   }
 }
