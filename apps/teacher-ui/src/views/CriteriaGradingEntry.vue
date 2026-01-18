@@ -425,25 +425,44 @@ function calculateTotal(studentId: string): number {
   return total;
 }
 
+const DEFAULT_GRADING_THRESHOLDS: Array<{ minPercentage: number; grade: string }> = [
+  { minPercentage: 92, grade: '1' },
+  { minPercentage: 81, grade: '2' },
+  { minPercentage: 67, grade: '3' },
+  { minPercentage: 50, grade: '4' },
+  { minPercentage: 30, grade: '5' },
+  { minPercentage: 0, grade: '6' }
+];
+
 function calculateGrade(studentId: string): string {
   const total = calculateTotal(studentId);
   
-  // Simple German grading: convert total to 1-6 scale
-  // This is a placeholder - should use actual grading scheme
-  const maxPossible = criteria.value.reduce((sum, c) => 
-    sum + (c.maxValue * (c.weight / 100)), 0
+  // Determine the maximum possible weighted score based on criteria
+  const maxPossible = criteria.value.reduce(
+    (sum, c) => sum + (c.maxValue * (c.weight / 100)),
+    0
   );
   
   if (maxPossible === 0) return '—';
   
   const percentage = (total / maxPossible) * 100;
   
-  if (percentage >= 92) return '1';
-  if (percentage >= 81) return '2';
-  if (percentage >= 67) return '3';
-  if (percentage >= 50) return '4';
-  if (percentage >= 30) return '5';
-  return '6';
+  // Allow category-specific grading scales when available, otherwise fall back to default
+  const categoryGradingScale = (category.value as any)?.gradingScale as
+    Array<{ minPercentage: number; grade: string }> | undefined;
+  const gradingScale =
+    categoryGradingScale && categoryGradingScale.length > 0
+      ? categoryGradingScale
+      : DEFAULT_GRADING_THRESHOLDS;
+
+  for (const threshold of gradingScale) {
+    if (percentage >= threshold.minPercentage) {
+      return threshold.grade;
+    }
+  }
+
+  // Fallback: return the lowest grade defined in the scale
+  return gradingScale[gradingScale.length - 1]?.grade ?? '—';
 }
 
 async function saveStudentGrade(studentId: string) {
