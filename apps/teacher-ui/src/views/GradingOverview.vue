@@ -364,7 +364,15 @@ async function createCategory() {
     await onClassChange();
   } catch (error) {
     console.error('Failed to create category:', error);
-    alert('Fehler beim Erstellen der Kategorie: ' + (error as Error).message);
+    let userMessage = 'Die Kategorie konnte nicht erstellt werden.';
+    if (error instanceof Error) {
+      if (error.message === 'Unsupported category type') {
+        userMessage = 'Die ausgewählte Bewertungskategorie wird nicht unterstützt. Bitte wählen Sie einen anderen Typ.';
+      } else if (error.message && error.message.trim().length > 0) {
+        userMessage = `Die Kategorie konnte nicht erstellt werden: ${error.message}`;
+      }
+    }
+    alert(userMessage);
   } finally {
     saving.value = false;
   }
