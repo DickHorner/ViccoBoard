@@ -281,9 +281,12 @@ function parseTimeToSeconds(timeStr: string): number | null {
 function formatSecondsToTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = (seconds % 60).toFixed(2);
-  
+
   if (mins > 0) {
-    return `${mins}:${secs.padStart(5, '0')}`;
+    const [secIntPart, secFracPart] = secs.split('.');
+    const paddedIntPart = secIntPart.length < 2 ? secIntPart.padStart(2, '0') : secIntPart;
+    const formattedSecs = `${paddedIntPart}.${secFracPart ?? '00'}`;
+    return `${mins}:${formattedSecs}`;
   }
   return secs;
 }
