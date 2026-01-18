@@ -26,6 +26,19 @@
     </div>
     
     <!-- Content -->
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading class...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div v-else-if="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="btn-primary" @click="loadClass">Retry</button>
+    </div>
+    
+    <!-- Class Content -->
     <div v-else-if="classGroup" class="class-info">
       <section class="card">
         <h3>Class Information</h3>
@@ -57,6 +70,7 @@
         <div class="card-header">
           <h3>Students</h3>
           <button class="btn-primary btn-small" @click="showAddStudentModal = true">
+          <button class="btn-primary btn-small" @click="showAddModal = true">
             + Add Student
           </button>
         </div>
@@ -101,6 +115,35 @@
               <div class="stat-value">{{ statistics.assessmentCount }}</div>
               <div class="stat-label">Assessments</div>
             </div>
+          </div>
+          <div v-if="loadingStudents" class="loading-state-small">
+            <div class="spinner-small"></div>
+            <p>Loading students...</p>
+          </div>
+          <div v-else-if="students.length === 0" class="empty-state">
+            <p>No students in this class yet.</p>
+          </div>
+          <div v-else class="student-list">
+            <RouterLink
+              v-for="student in students"
+              :key="student.id"
+              :to="`/students/${student.id}`"
+              class="student-item"
+            >
+              <div class="student-avatar-small">
+                <img
+                  v-if="student.photo"
+                  :src="student.photo"
+                  :alt="`${student.firstName} ${student.lastName}`"
+                  class="student-avatar-img"
+                />
+                <span v-else>
+                  {{ getInitials(student.firstName, student.lastName) }}
+                </span>
+              </div>
+              <span>{{ student.firstName }} {{ student.lastName }}</span>
+              <span class="student-arrow">→</span>
+            </RouterLink>
           </div>
         </div>
       </section>
@@ -190,6 +233,12 @@
         <div class="modal-header">
           <h3>Add Student</h3>
           <button class="modal-close" @click="closeAddStudentModal">✕</button>
+    <!-- Add Student Modal -->
+    <div v-if="showAddModal" class="modal-overlay" @click="closeAddModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Add Student to {{ classGroup?.name }}</h3>
+          <button class="modal-close" @click="closeAddModal">✕</button>
         </div>
         
         <form @submit.prevent="handleAddStudent" class="modal-form">
@@ -199,6 +248,9 @@
               id="firstName"
               v-model="studentForm.firstName"
               type="text"
+              v-model="newStudent.firstName"
+              type="text"
+              placeholder="Enter first name"
               required
               class="form-input"
             />
@@ -210,6 +262,9 @@
               id="lastName"
               v-model="studentForm.lastName"
               type="text"
+              v-model="newStudent.lastName"
+              type="text"
+              placeholder="Enter last name"
               required
               class="form-input"
             />
@@ -221,6 +276,23 @@
               id="email"
               v-model="studentForm.email"
               type="email"
+            <label for="dateOfBirth">Date of Birth</label>
+            <input
+              id="dateOfBirth"
+              v-model="newStudent.dateOfBirth"
+              type="date"
+              :max="getTodayDateString()"
+              class="form-input"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              v-model="newStudent.email"
+              type="email"
+              placeholder="student@example.com"
               class="form-input"
             />
           </div>
@@ -235,6 +307,16 @@
             </button>
             <button type="submit" :disabled="addingStudent" class="btn-primary">
               {{ addingStudent ? 'Adding...' : 'Add Student' }}
+          <div v-if="addError" class="error-message">
+            {{ addError }}
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" @click="closeAddModal" class="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" :disabled="creating" class="btn-primary">
+              {{ creating ? 'Adding...' : 'Add Student' }}
             </button>
           </div>
         </form>
@@ -244,61 +326,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useClassGroups, useStudents } from '../composables/useDatabase'
+import { useModal } from '../composables/useModal'
+import { getInitials, getTodayDateString } from '../utils/student'
 import type { ClassGroup, Student } from '../db'
 
+// Router
 const route = useRoute()
-const classId = route.params.id as string
-
-// Constants
-const DEFAULT_GRADING_SCHEME = 'default'
 
 // State
 const classGroup = ref<ClassGroup | null>(null)
 const students = ref<Student[]>([])
 const loading = ref(true)
+const loadingStudents = ref(true)
 const error = ref('')
+const showAddModal = ref(false)
+const creating = ref(false)
+const addError = ref('')
 
-// Edit modal
-const showEditModal = ref(false)
-const editForm = ref({ name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME })
-const editError = ref('')
-const updating = ref(false)
-
-// Add student modal
-const showAddStudentModal = ref(false)
-const studentForm = ref({ firstName: '', lastName: '', email: '' })
-const studentError = ref('')
-const addingStudent = ref(false)
-
-// Composables
-const classGroups = useClassGroups()
-const studentsDb = useStudents()
-// const attendance = useAttendance() // TODO: Use for real statistics calculation
-
-// Computed statistics
-const statistics = computed(() => {
-  const totalLessons = 0 // TODO: Implement lesson counting
-  const assessmentCount = 0 // TODO: Implement assessment counting
-  const attendanceRate = 0 // TODO: Calculate real attendance rate from attendance records
-  
-  return {
-    totalLessons,
-    assessmentCount,
-    attendanceRate
-  }
+const newStudent = ref({
+  firstName: '',
+  lastName: '',
+  dateOfBirth: '',
+  email: ''
 })
 
+// Composables
+const classGroupsDb = useClassGroups()
+const studentsDb = useStudents()
+
 // Methods
-const loadData = async () => {
+const loadClass = async () => {
   loading.value = true
   error.value = ''
-  
   try {
-    const cls = await classGroups.getById(classId)
-    if (!cls) {
+    const classId = route.params.id as string
+    const foundClass = await classGroupsDb.getById(classId)
+    
+    if (!foundClass) {
       error.value = 'Class not found'
       return
     }
@@ -433,7 +500,7 @@ onMounted(() => {
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  min-height: 44px; /* Touch target minimum */
+  min-height: 44px;
   transition: all 0.2s ease;
 }
 
@@ -509,6 +576,17 @@ onMounted(() => {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  margin: 0;
 }
 
 .card h3 {
@@ -646,7 +724,7 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px; /* Touch target minimum */
+  min-height: 44px;
 }
 
 .btn-primary:hover {
@@ -698,7 +776,7 @@ onMounted(() => {
   text-decoration: none;
   color: #333;
   transition: all 0.2s ease;
-  min-height: 44px; /* Touch target minimum */
+  min-height: 44px;
   font-weight: 500;
   border: none;
   cursor: pointer;
@@ -863,3 +941,4 @@ onMounted(() => {
   }
 }
 </style>
+

@@ -99,6 +99,10 @@
             <span class="action-icon">📚</span>
             <span>Create New Class</span>
           </button>
+          <RouterLink to="/students" class="action-button">
+            <span class="action-icon">👥</span>
+            <span>View All Students</span>
+          </RouterLink>
           <RouterLink to="/attendance" class="action-button">
             <span class="action-icon">✓</span>
             <span>Record Attendance</span>
