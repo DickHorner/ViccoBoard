@@ -399,8 +399,9 @@ async function loadData() {
   }
 }
 
-function getGradeValue(studentId: string, criterionId: string): number | undefined {
-  return gradeEntries.value.get(studentId)?.get(criterionId);
+function getGradeValue(studentId: string, criterionId: string): number | '' {
+  const value = gradeEntries.value.get(studentId)?.get(criterionId);
+  return value === undefined ? '' : value;
 }
 
 function onGradeChange(
