@@ -160,19 +160,23 @@ export class CriteriaGradingEngine {
       }
     });
 
-    const totalWeight = Array.from(newWeights.values()).reduce((sum, w) => sum + w, 0);
-    
-    if (totalWeight <= 0) {
-      throw new Error('Total weight must be greater than zero');
-    }
-
-    return criteria.map(criterion => {
+    // Apply updates to get final criteria
+    const updatedCriteria = criteria.map(criterion => {
       const newWeight = newWeights.get(criterion.id);
       if (newWeight !== undefined) {
         return { ...criterion, weight: newWeight };
       }
       return criterion;
     });
+
+    // Calculate total weight from all criteria (not just the updated ones)
+    const totalWeight = updatedCriteria.reduce((sum, c) => sum + c.weight, 0);
+    
+    if (totalWeight <= 0) {
+      throw new Error('Total weight must be greater than zero');
+    }
+
+    return updatedCriteria;
   }
 
   /**
@@ -199,12 +203,15 @@ export class CriteriaGradingEngine {
         errors.push(`Criterion ${criterion.id} must have a name`);
       }
       if (criterion.weight < 0) {
-        errors.push(`Weight for ${criterion.name} must be non-negative`);
+        const name = criterion.name || criterion.id;
+        errors.push(`Weight for ${name} must be non-negative`);
       }
     }
 
     // Check for duplicate names
-    const names = criteria.map(c => c.name.toLowerCase());
+    const names = criteria
+      .filter(c => c.name && c.name.trim() !== '')
+      .map(c => c.name.toLowerCase().trim());
     const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
     if (duplicates.length > 0) {
       errors.push(`Duplicate criterion names found: ${duplicates.join(', ')}`);
