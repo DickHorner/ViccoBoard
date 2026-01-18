@@ -320,12 +320,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStudents, useAttendance } from '../composables/useSportBridge'
 import { getInitials, capitalize } from '../utils/stringUtils'
 import type { Student, AttendanceRecord } from '../db'
 
 const route = useRoute()
+const router = useRouter()
 const studentId = route.params.id as string
 
 // State
@@ -365,9 +366,9 @@ const students = useStudents()
 const attendance = useAttendance()
 
 // Methods
-const loadData = async () => {
+const loadStudent = async () => {
   loading.value = true
-  loadError.value = ''
+  error.value = ''
   
   try {
     // Load student details
@@ -377,6 +378,32 @@ const loadData = async () => {
       error.value = 'Schüler nicht gefunden'
       return
     }
+
+    // Load attendance records
+    attendanceRecords.value = await attendance.getByStudentId(studentId)
+
+    // Calculate attendance summary
+    if (attendanceRecords.value.length > 0) {
+      const present = attendanceRecords.value.filter(r => r.status === 'present').length
+      const absent = attendanceRecords.value.filter(r => r.status === 'absent').length
+      const excused = attendanceRecords.value.filter(r => r.status === 'excused').length
+      const total = attendanceRecords.value.length
+      
+      attendanceSummary.value = {
+        total,
+        present,
+        absent,
+        excused,
+        percentage: Math.round((present / total) * 100)
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load student:', err)
+    error.value = 'Fehler beim Laden des Schülers. Bitte versuchen Sie es erneut.'
+  } finally {
+    loading.value = false
+  }
+}
 
 const handleEditStudent = async () => {
   if (!student.value) return
@@ -536,10 +563,6 @@ const getClassName = (classId: string): string => {
 
 const formatDate = (date: Date): string => {
   return new Date(date).toLocaleDateString('de-DE')
-}
-
-const capitalize = (str: string): string => {
-  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 // Lifecycle
