@@ -92,10 +92,22 @@ async function validateStudentInput(input: AddStudentInput): Promise<void> {
   if (input.parentEmail && !isValidEmail(input.parentEmail)) {
     throw new Error('Invalid parent email format')
   }
+
+  // Check for duplicate email addresses
+  if (input.email) {
+    const existingStudents = await db.students.toArray()
+    const duplicateEmail = existingStudents.find(s => 
+      s.email?.toLowerCase() === input.email!.toLowerCase()
+    )
+    if (duplicateEmail) {
+      throw new Error('A student with this email address already exists')
+    }
+  }
 }
 
 function isValidEmail(email: string): boolean {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  // More robust email validation pattern
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
   return emailPattern.test(email)
 }
 
@@ -112,7 +124,8 @@ async function validateAttendanceInput(input: RecordAttendanceInput): Promise<vo
     throw new Error('Attendance status is required')
   }
 
-  const validStatuses = ['present', 'absent', 'excused', 'passive', 'late']
+  // Only allow statuses that are supported by the database schema
+  const validStatuses = ['present', 'absent', 'excused', 'late']
   if (!validStatuses.includes(input.status)) {
     throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`)
   }
@@ -132,9 +145,8 @@ export function useClassGroups() {
     return await db.classGroups.toArray()
   }
 
-  const getById = async (id: string): Promise<ClassGroup | null> => {
-    const result = await db.classGroups.get(id)
-    return result || null
+  const getById = async (id: string): Promise<ClassGroup | undefined> => {
+    return await db.classGroups.get(id)
   }
 
   const create = async (input: CreateClassInput): Promise<ClassGroup> => {
@@ -243,9 +255,8 @@ export function useAttendance() {
     return await db.attendanceRecords.toArray()
   }
 
-  const getById = async (id: string): Promise<AttendanceRecord | null> => {
-    const result = await db.attendanceRecords.get(id)
-    return result || null
+  const getById = async (id: string): Promise<AttendanceRecord | undefined> => {
+    return await db.attendanceRecords.get(id)
   }
 
   const getByStudentId = async (studentId: string): Promise<AttendanceRecord[]> => {
@@ -314,14 +325,52 @@ export function useAttendance() {
   }
 
   const recordBatch = async (inputs: RecordAttendanceInput[]): Promise<AttendanceRecord[]> => {
-    const results: AttendanceRecord[] = []
+    // Process all records in a single transaction for better performance
+    return await db.transaction('rw', db.attendanceRecords, async () => {
+      const results: AttendanceRecord[] = []
+      
+      for (const input of inputs) {
+        // Validate using Sport module logic
+        await validateAttendanceInput(input)
+        
+        // Check if attendance already recorded for this lesson and student
+        const existingRecord = await db.attendanceRecords
+          .where({ lessonId: input.lessonId, studentId: input.studentId })
+          .first()
 
-    for (const input of inputs) {
-      const result = await record(input)
-      results.push(result)
-    }
+        if (existingRecord) {
+          // Update existing record
+          const updatedAt = new Date()
+          await db.attendanceRecords.update(existingRecord.id, {
+            status: input.status as 'present' | 'absent' | 'excused' | 'late',
+            notes: input.notes || input.reason,
+            updatedAt
+          })
+          const updated = await db.attendanceRecords.get(existingRecord.id)
+          if (updated) results.push(updated)
+        } else {
+          // Create new attendance record
+          const id = crypto.randomUUID()
+          const now = new Date()
 
-    return results
+          const record: AttendanceRecord = {
+            id,
+            studentId: input.studentId,
+            lessonId: input.lessonId,
+            date: now,
+            status: input.status as 'present' | 'absent' | 'excused' | 'late',
+            notes: input.notes || input.reason,
+            createdAt: now,
+            updatedAt: now
+          }
+
+          await db.attendanceRecords.add(record)
+          results.push(record)
+        }
+      }
+
+      return results
+    })
   }
 
   const getAttendanceSummary = async (studentId: string) => {

@@ -59,7 +59,7 @@
               :to="`/students/${student.id}`"
               class="student-card"
             >
-              <div class="student-avatar">{{ getInitials(student) }}</div>
+              <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
               <div class="student-info">
                 <h4>{{ student.firstName }} {{ student.lastName }}</h4>
                 <p v-if="student.dateOfBirth">Birth: {{ student.dateOfBirth.getFullYear() }}</p>
@@ -89,7 +89,13 @@
       <div class="modal" @click.stop>
         <div class="modal-header">
           <h3>Add Student</h3>
-          <button class="modal-close" @click="closeAddStudentModal">✕</button>
+          <button 
+            class="modal-close" 
+            @click="closeAddStudentModal"
+            aria-label="Close add student form"
+          >
+            ✕
+          </button>
         </div>
         
         <form @submit.prevent="handleAddStudent" class="modal-form">
@@ -173,13 +179,14 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { useClassGroups, useStudents } from '../composables/useSportBridge'
+import { getInitials } from '../utils/stringUtils'
 import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
 const classId = route.params.id as string
 
 // State
-const classGroup = ref<ClassGroup | null>(null)
+const classGroup = ref<ClassGroup | undefined>(undefined)
 const students = ref<Student[]>([])
 const loading = ref(true)
 const loadError = ref('')
@@ -266,15 +273,6 @@ const closeAddStudentModal = () => {
   }
 }
 
-const getStudentInitials = (firstName?: string | null, lastName?: string | null): string => {
-  const first = (firstName ?? '').charAt(0) || '?'
-  const last = (lastName ?? '').charAt(0) || '?'
-  return `${first}${last}`.toUpperCase()
-}
-
-const getInitials = (student: Student): string => {
-  return getStudentInitials(student.firstName, student.lastName)
-}
 // Lifecycle
 onMounted(() => {
   loadData()

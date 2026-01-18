@@ -22,7 +22,7 @@
     <div v-else-if="student" class="profile-layout">
       <section class="card profile-card">
         <div class="student-header">
-          <div class="student-avatar">{{ getInitials(student) }}</div>
+          <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
           <div class="student-info">
             <h3>{{ student.firstName }} {{ student.lastName }}</h3>
             <p v-if="student.dateOfBirth">Born: {{ student.dateOfBirth.getFullYear() }}</p>
@@ -91,13 +91,14 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStudents, useAttendance } from '../composables/useSportBridge'
+import { getInitials, capitalize } from '../utils/stringUtils'
 import type { Student, AttendanceRecord } from '../db'
 
 const route = useRoute()
 const studentId = route.params.id as string
 
 // State
-const student = ref<Student | null>(null)
+const student = ref<Student | undefined>(undefined)
 const attendanceRecords = ref<AttendanceRecord[]>([])
 const attendanceSummary = ref<{
   total: number
@@ -141,18 +142,9 @@ const loadData = async () => {
   }
 }
 
-const getInitials = (student: Student): string => {
-  const first = (student.firstName ?? '').charAt(0) || '?'
-  const last = (student.lastName ?? '').charAt(0) || '?'
-  return `${first}${last}`.toUpperCase()
-}
-
-const capitalize = (str: string): string => {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
 const formatDate = (date: Date): string => {
-  return new Date(date).toLocaleDateString('en-US', { 
+  // Date parameter is already a Date object from the database
+  return date.toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'short', 
     day: 'numeric' 

@@ -76,9 +76,11 @@
                   :class="['status-btn', `status-${status.value}`, { 
                     active: attendance[student.id]?.status === status.value 
                   }]"
+                  :aria-label="`Mark ${student.firstName} ${student.lastName} as ${status.label}`"
                   :title="status.label"
                 >
-                  {{ status.emoji }}
+                  <span aria-hidden="true">{{ status.emoji }}</span>
+                  <span class="sr-only">{{ status.label }}</span>
                 </button>
               </div>
               <input
@@ -144,8 +146,7 @@ const statuses = [
   { value: 'present', label: 'Present', emoji: '✓' },
   { value: 'absent', label: 'Absent', emoji: '✗' },
   { value: 'late', label: 'Late', emoji: '⏰' },
-  { value: 'excused', label: 'Excused', emoji: '📋' },
-  { value: 'passive', label: 'Passive', emoji: '👁' }
+  { value: 'excused', label: 'Excused', emoji: '📋' }
 ]
 
 // Composables
@@ -224,11 +225,13 @@ const handleSaveAttendance = async () => {
     // Save using batch record
     await attendanceComposable.recordBatch(records)
     
-    saveSuccess.value = `Attendance recorded successfully for ${records.length} student${records.length > 1 ? 's' : ''}!`
+    const successMessage = `Attendance recorded successfully for ${records.length} student${records.length > 1 ? 's' : ''}!`
+    saveSuccess.value = successMessage
     
-    // Reset attendance after brief display
+    // Reset attendance after brief display with unique identifier check
     setTimeout(() => {
-      if (saveSuccess.value) { // Only clear if still showing this success message
+      // Only clear if the message hasn't been replaced by a new one
+      if (saveSuccess.value === successMessage) {
         attendance.value = {}
         saveSuccess.value = ''
       }
@@ -428,6 +431,19 @@ onMounted(async () => {
   font-size: 1.5rem;
   font-weight: 700;
   color: #333;
+}
+
+/* Screen reader only class for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 .attendance-table {
