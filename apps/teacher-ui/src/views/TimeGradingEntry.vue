@@ -291,25 +291,62 @@ function formatSecondsToTime(seconds: number): string {
 function getCalculatedGrade(studentId: string): string | null {
   const time = timeEntries.value.get(studentId);
   if (!time) return null;
-  
+
   const seconds = parseTimeToSeconds(time);
   if (seconds === null || !config.value) return null;
-  
-  // Simple linear interpolation between best and worst grade
-  // This is a placeholder - actual implementation should use custom boundaries if defined
-  
-  // For now, assume best time = 60s, worst time = 300s
-  const bestTime = 60;
-  const worstTime = 300;
-  const bestGrade = Number(config.value.bestGrade);
-  const worstGrade = Number(config.value.worstGrade);
-  
+
+  const cfg: any = config.value;
+  const rawBoundaries = Array.isArray(cfg.customBoundaries) ? cfg.customBoundaries : [];
+  const boundaries = rawBoundaries
+    .filter((b: any) => typeof b?.timeSeconds === 'number' && typeof b?.grade === 'number')
+    .slice()
+    .sort((a: any, b: any) => a.timeSeconds - b.timeSeconds);
+
+  const linearMapping: boolean = cfg.linearMapping !== false;
+  const bestGrade = Number(cfg.bestGrade);
+  const worstGrade = Number(cfg.worstGrade);
+
+  // If we have custom boundaries and linear mapping is disabled, use step-wise thresholds.
+  if (!linearMapping && boundaries.length > 0) {
+    // Faster or equal to the best boundary time gets the best boundary grade.
+    if (seconds <= boundaries[0].timeSeconds) {
+      return String(boundaries[0].grade);
+    }
+
+    const lastBoundary = boundaries[boundaries.length - 1];
+    // Slower or equal to the worst boundary time gets the worst boundary grade.
+    if (seconds >= lastBoundary.timeSeconds) {
+      return String(lastBoundary.grade);
+    }
+
+    // Otherwise, find the first boundary that the time is better than or equal to.
+    for (let i = 1; i < boundaries.length; i += 1) {
+      const boundary = boundaries[i];
+      if (seconds <= boundary.timeSeconds) {
+        return String(boundary.grade);
+      }
+    }
+  }
+
+  // Linear interpolation between best and worst grade.
+  // Derive best and worst times from custom boundaries if available, otherwise fall back.
+  let bestTime: number;
+  let worstTime: number;
+
+  if (boundaries.length >= 2) {
+    bestTime = boundaries[0].timeSeconds;
+    worstTime = boundaries[boundaries.length - 1].timeSeconds;
+  } else {
+    // Fallback to placeholder values if no valid boundaries are configured.
+    bestTime = 60;
+    worstTime = 300;
+  }
+
   if (seconds <= bestTime) return String(bestGrade);
   if (seconds >= worstTime) return String(worstGrade);
-  
+
   const ratio = (seconds - bestTime) / (worstTime - bestTime);
   const grade = bestGrade + ratio * (worstGrade - bestGrade);
-  
   return grade.toFixed(1);
 }
 
