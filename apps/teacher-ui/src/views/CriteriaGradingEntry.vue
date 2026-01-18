@@ -403,9 +403,44 @@ function getGradeValue(studentId: string, criterionId: string): number | undefin
   return gradeEntries.value.get(studentId)?.get(criterionId);
 }
 
-function onGradeChange(studentId: string, criterionId: string) {
+function onGradeChange(
+  studentId: string,
+  criterionId: string,
+  rawValue?: unknown
+): void {
+  // Mark student as having unsaved changes
   hasUnsavedChanges.value = true;
   unsavedStudents.value.add(studentId);
+
+  // Derive numeric value from various possible input forms
+  let value: number | undefined;
+
+  if (typeof rawValue === 'number') {
+    value = rawValue;
+  } else if (typeof rawValue === 'string') {
+    const parsed = Number(rawValue);
+    value = Number.isNaN(parsed) ? undefined : parsed;
+  } else if (rawValue && typeof rawValue === 'object' && 'target' in (rawValue as any)) {
+    const eventTarget = (rawValue as { target: unknown }).target as HTMLInputElement | null;
+    if (eventTarget && typeof eventTarget.value === 'string') {
+      const parsed = Number(eventTarget.value);
+      value = Number.isNaN(parsed) ? undefined : parsed;
+    }
+  }
+
+  // Ensure there is a grade map for this student
+  let studentGrades = gradeEntries.value.get(studentId);
+  if (!studentGrades) {
+    studentGrades = new Map<string, number>();
+    gradeEntries.value.set(studentId, studentGrades);
+  }
+
+  // Update or remove the grade entry for this criterion
+  if (value === undefined) {
+    studentGrades.delete(criterionId);
+  } else {
+    studentGrades.set(criterionId, value);
+  }
 }
 
 function hasUnsavedChangesForStudent(studentId: string): boolean {
