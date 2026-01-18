@@ -194,11 +194,9 @@ export function useStudents() {
     return await db.students.toArray()
   }
 
-  const getById = async (id: string): Promise<Student | null> => {
-    const result = await db.students.get(id)
-    return result || null
+  const getById = async (id: string): Promise<Student | undefined> => {
+    return await db.students.get(id)
   }
-
   const getByClassId = async (classId: string): Promise<Student[]> => {
     return await db.students
       .where('classId')
