@@ -15,6 +15,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Class Detail' }
   },
   {
+    path: '/students',
+    name: 'students',
+    component: () => import('../views/StudentList.vue'),
+    meta: { title: 'Students' }
+  },
+  {
     path: '/students/:id',
     name: 'student-profile',
     component: () => import('../views/StudentProfile.vue'),

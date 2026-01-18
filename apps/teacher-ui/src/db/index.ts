@@ -16,6 +16,13 @@ export interface Student {
   lastName: string
   dateOfBirth?: Date
   email?: string
+  /**
+   * Base64 encoded image
+   * Note: Base64 encoding adds ~33% size overhead vs binary storage.
+   * For a 2MB image limit, this results in ~2.7MB of storage per photo.
+   * Consider using Blob storage in IndexedDB for more efficient storage if this becomes a bottleneck.
+   */
+  photo?: string
   createdAt: Date
   updatedAt: Date
 }
