@@ -275,37 +275,42 @@ export function useAttendance() {
     // Validate using Sport module logic
     await validateAttendanceInput(input)
 
-    // Check if attendance already recorded for this lesson
-    const existingRecords = await getByLessonId(input.lessonId)
-    const existingRecord = existingRecords.find(r => r.studentId === input.studentId)
+    // Perform read-modify-write in a single transaction to avoid race conditions
+    return await db.transaction('rw', db.attendanceRecords, async () => {
+      // Check if attendance already recorded for this lesson and student
+      const existingRecord = await db.attendanceRecords
+        .where({ lessonId: input.lessonId, studentId: input.studentId })
+        .first()
 
-    if (existingRecord) {
-      // Update existing record
-      await db.attendanceRecords.update(existingRecord.id, {
+      if (existingRecord) {
+        // Update existing record
+        const updatedAt = new Date()
+        await db.attendanceRecords.update(existingRecord.id, {
+          status: input.status as 'present' | 'absent' | 'excused' | 'late',
+          notes: input.notes || input.reason,
+          updatedAt
+        })
+        return (await db.attendanceRecords.get(existingRecord.id))!
+      }
+
+      // Create new attendance record
+      const id = crypto.randomUUID()
+      const now = new Date()
+
+      const record: AttendanceRecord = {
+        id,
+        studentId: input.studentId,
+        lessonId: input.lessonId,
+        date: now,
         status: input.status as 'present' | 'absent' | 'excused' | 'late',
         notes: input.notes || input.reason,
-        updatedAt: new Date()
-      })
-      return (await db.attendanceRecords.get(existingRecord.id))!
-    }
+        createdAt: now,
+        updatedAt: now
+      }
 
-    // Create new attendance record
-    const id = crypto.randomUUID()
-    const now = new Date()
-
-    const record: AttendanceRecord = {
-      id,
-      studentId: input.studentId,
-      lessonId: input.lessonId,
-      date: now,
-      status: input.status as 'present' | 'absent' | 'excused' | 'late',
-      notes: input.notes || input.reason,
-      createdAt: now,
-      updatedAt: now
-    }
-
-    await db.attendanceRecords.add(record)
-    return record
+      await db.attendanceRecords.add(record)
+      return record
+    })
   }
 
   const recordBatch = async (inputs: RecordAttendanceInput[]): Promise<AttendanceRecord[]> => {
