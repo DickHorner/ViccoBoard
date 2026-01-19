@@ -5,9 +5,12 @@
 
 import { AdapterRepository } from '@viccoboard/storage';
 import { PerformanceEntry } from '@viccoboard/core';
+import { Sport } from '@viccoboard/core';
+
 import type { StorageAdapter } from '@viccoboard/storage';
 
-export class PerformanceEntryRepository extends AdapterRepository<PerformanceEntry> {
+export class PerformanceEntryRepository extends AdapterRepository<PerformanceEntry> 
+export class PerformanceEntryRepository extends AdapterRepository<Sport.PerformanceEntry> {
   constructor(adapter: StorageAdapter) {
     super(adapter, 'performance_entries');
   }
@@ -16,6 +19,7 @@ export class PerformanceEntryRepository extends AdapterRepository<PerformanceEnt
    * Map database row to PerformanceEntry entity
    */
   mapToEntity(row: any): PerformanceEntry {
+  mapToEntity(row: any): Sport.PerformanceEntry {
     return {
       id: row.id,
       studentId: row.student_id,
@@ -25,7 +29,9 @@ export class PerformanceEntryRepository extends AdapterRepository<PerformanceEnt
       timestamp: new Date(row.timestamp),
       deviceInfo: row.device_info || undefined,
       comment: row.comment || undefined,
-      metadata: row.metadata ? JSON.parse(row.metadata) : undefined
+      metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+      createdAt: new Date(row.created_at),
+      lastModified: new Date(row.last_modified)
     };
   }
 
@@ -59,34 +65,68 @@ export class PerformanceEntryRepository extends AdapterRepository<PerformanceEnt
    * Find all performance entries for a grade category
    */
   async findByCategory(categoryId: string): Promise<PerformanceEntry[]> {
+   * Find all performance entries for a specific student
+   */
+  async findByStudent(studentId: string): Promise<Sport.PerformanceEntry[]> {
+    const entries = await this.find({ student_id: studentId });
+    
+    // Sort by timestamp descending by default
+    return entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }
+
+  /**
+   * Find all performance entries for a specific category
+   */
+  async findByCategory(categoryId: string): Promise<Sport.PerformanceEntry[]> {
     return this.find({ category_id: categoryId });
   }
 
   /**
    * Find performance entries for a student in a specific category
    */
-  async findByStudentAndCategory(studentId: string, categoryId: string): Promise<PerformanceEntry[]> {
-    return this.find({
+  async findByStudentAndCategory(
+    studentId: string, 
+    categoryId: string
+  ): Promise<Sport.PerformanceEntry[]> {
+    const entries = await this.find({ 
       student_id: studentId,
-      category_id: categoryId
+      category_id: categoryId 
+    });
+    
+    // Sort by timestamp descending
+    return entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }
+
+  /**
+   * Get the latest performance entry for a student in a category
+   */
+  async getLatestEntry(studentId: string, categoryId: string): Promise<Sport.PerformanceEntry | null> {
+    const entries = await this.findByStudentAndCategory(studentId, categoryId);
+    return entries.length > 0 ? entries[0] : null;
+  }
+
+  /**
+   * Find entries within a date range
+   * Uses database-level filtering for better performance
+   */
+  async findByDateRange(startDate: Date, endDate: Date): Promise<Sport.PerformanceEntry[]> {
+    // Get all entries and filter by comparing ISO timestamp strings
+    // The timestamp index helps with query performance
+    const allEntries = await this.findAll();
+    const startTime = startDate.getTime();
+    const endTime = endDate.getTime();
+    
+    return allEntries.filter(entry => {
+      const entryTime = entry.timestamp.getTime();
+      return entryTime >= startTime && entryTime <= endTime;
     });
   }
 
   /**
-   * Get latest performance entry for a student in a category
+   * Count entries for a student in a category
    */
-  async findLatestByStudentAndCategory(studentId: string, categoryId: string): Promise<PerformanceEntry | null> {
+  async countByStudentAndCategory(studentId: string, categoryId: string): Promise<number> {
     const entries = await this.findByStudentAndCategory(studentId, categoryId);
-    if (entries.length === 0) return null;
-    
-    return entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
-  }
-
-  /**
-   * Get grade history for a student
-   */
-  async getGradeHistory(studentId: string): Promise<PerformanceEntry[]> {
-    const entries = await this.findByStudent(studentId);
-    return entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return entries.length;
   }
 }

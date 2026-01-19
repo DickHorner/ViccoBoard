@@ -86,7 +86,7 @@ export abstract class AdapterRepository<T> implements Repository<T> {
 
     const updatesWithMeta = {
       ...updates,
-      lastModified: new Date().toISOString()
+      lastModified: new Date()
     };
 
     const row = this.mapToRow(updatesWithMeta);

@@ -170,6 +170,8 @@ export interface PerformanceEntry {
   deviceInfo?: string;
   comment?: string;
   metadata?: Record<string, any>;
+  createdAt: Date;
+  lastModified: Date;
 }
 
 // ============================================================================
