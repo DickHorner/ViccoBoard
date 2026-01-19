@@ -143,13 +143,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDatabase } from '../composables/useDatabase';
+import { useToast } from '../composables/useToast';
 import type { GradeCategory, Student, PerformanceEntry } from '@viccoboard/core';
 
 const route = useRoute();
 const { sportBridge } = useDatabase();
+const toast = useToast();
 
 const categoryId = route.params.id as string;
 const category = ref<GradeCategory | null>(null);
@@ -164,10 +166,6 @@ const dateTo = ref<string>('');
 
 onMounted(async () => {
   await loadData();
-});
-
-watch([selectedStudentId, dateFrom, dateTo], () => {
-  // Filters will automatically update filteredEntries via computed property
 });
 
 async function loadData() {
@@ -300,9 +298,18 @@ function formatMeasurements(measurements: Record<string, any>): string {
   return formatted.join(', ');
 }
 
+function escapeCSVField(field: string): string {
+  // Escape quotes by doubling them and wrap in quotes if contains special chars
+  const needsEscape = /[",\n\r]/.test(field);
+  if (needsEscape) {
+    return `"${field.replace(/"/g, '""')}"`;
+  }
+  return field;
+}
+
 function exportHistory() {
   try {
-    // Create CSV content
+    // Create CSV content with proper escaping
     let csv = 'Datum/Zeit,Schüler,Messwerte,Note,Kommentar\n';
     
     for (const entry of filteredEntries.value) {
@@ -310,11 +317,11 @@ function exportHistory() {
         formatDateTime(entry.timestamp),
         getStudentName(entry.studentId),
         formatMeasurements(entry.measurements),
-        entry.calculatedGrade || '',
+        entry.calculatedGrade?.toString() || '',
         entry.comment || ''
       ];
       
-      csv += row.map(field => `"${field}"`).join(',') + '\n';
+      csv += row.map(field => escapeCSVField(field)).join(',') + '\n';
     }
     
     // Create download link
@@ -327,7 +334,7 @@ function exportHistory() {
     URL.revokeObjectURL(url);
   } catch (err) {
     console.error('Failed to export history:', err);
-    alert('Fehler beim Exportieren der Historie');
+    toast.error('Fehler beim Exportieren der Historie');
   }
 }
 </script>

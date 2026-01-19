@@ -304,11 +304,13 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDatabase } from '../composables/useDatabase';
+import { useToast } from '../composables/useToast';
 import { v4 as uuidv4 } from 'uuid';
 import type { GradeCategory, Student, Criterion, CriteriaGradingConfig } from '@viccoboard/core';
 
 const route = useRoute();
 const { sportBridge } = useDatabase();
+const toast = useToast();
 
 const categoryId = route.params.id as string;
 const category = ref<GradeCategory | null>(null);
@@ -528,7 +530,7 @@ async function saveStudentGrade(studentId: string) {
     }
   } catch (err) {
     console.error('Failed to save grade:', err);
-    alert('Fehler beim Speichern der Note');
+    toast.error('Fehler beim Speichern der Note');
   } finally {
     saving.value = false;
   }
@@ -540,10 +542,10 @@ async function saveAllGrades() {
     for (const studentId of unsavedStudents.value) {
       await saveStudentGrade(studentId);
     }
-    alert('Alle Noten gespeichert!');
+    toast.success('Alle Noten gespeichert!');
   } catch (err) {
     console.error('Failed to save all grades:', err);
-    alert('Fehler beim Speichern einiger Noten');
+    toast.error('Fehler beim Speichern einiger Noten');
   } finally {
     saving.value = false;
   }
@@ -553,7 +555,13 @@ async function addCriterion() {
   if (!newCriterion.value.name || !category.value) return;
   
   if (newCriterion.value.weight > remainingWeight.value) {
-    alert(`Die Gewichtung darf ${remainingWeight.value}% nicht überschreiten.`);
+    toast.warning(`Die Gewichtung darf ${remainingWeight.value}% nicht überschreiten.`);
+    return;
+  }
+  
+  // Validate minValue < maxValue
+  if (newCriterion.value.minValue >= newCriterion.value.maxValue) {
+    toast.error('Der Minimalwert muss kleiner als der Maximalwert sein.');
     return;
   }
   
@@ -601,7 +609,7 @@ async function addCriterion() {
     showAddCriterionModal.value = false;
   } catch (err) {
     console.error('Failed to add criterion:', err);
-    alert('Fehler beim Hinzufügen des Kriteriums');
+    toast.error('Fehler beim Hinzufügen des Kriteriums');
   } finally {
     saving.value = false;
   }
@@ -635,14 +643,14 @@ async function removeCriterion(index: number) {
     category.value = updatedCategory;
   } catch (err) {
     console.error('Failed to remove criterion:', err);
-    alert('Fehler beim Entfernen des Kriteriums');
+    toast.error('Fehler beim Entfernen des Kriteriums');
   } finally {
     saving.value = false;
   }
 }
 
 function toggleBulkMode() {
-  alert('Der Bulk-Modus ist derzeit nicht verfügbar.');
+  toast.info('Der Bulk-Modus ist derzeit nicht verfügbar.');
 }
 
 function addComment(studentId: string) {

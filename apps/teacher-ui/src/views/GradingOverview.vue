@@ -206,10 +206,12 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useDatabase } from '../composables/useDatabase';
+import { useToast } from '../composables/useToast';
 import type { ClassGroup, Student, GradeCategory, PerformanceEntry, GradeCategoryType } from '@viccoboard/core';
 
 const router = useRouter();
 const { sportBridge } = useDatabase();
+const toast = useToast();
 
 const classes = ref<ClassGroup[]>([]);
 const selectedClassId = ref<string>('');
@@ -296,7 +298,7 @@ function openGradingEntry(category: GradeCategory) {
   } else if (category.type === 'time') {
     router.push(`/grading/time/${category.id}`);
   } else {
-    alert('Dieser Bewertungstyp wird noch nicht unterstützt.');
+    toast.info('Dieser Bewertungstyp wird noch nicht unterstützt.');
   }
 }
 
@@ -371,7 +373,7 @@ async function createCategory() {
         userMessage = `Die Kategorie konnte nicht erstellt werden: ${error.message}`;
       }
     }
-    alert(userMessage);
+    toast.error(userMessage);
   } finally {
     saving.value = false;
   }

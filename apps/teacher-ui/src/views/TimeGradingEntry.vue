@@ -89,7 +89,7 @@
                     <input 
                       type="text"
                       :value="getTimeValue(student.id)"
-                      @input="onTimeChange(student.id)"
+                      @input="onTimeChange(student.id, ($event.target as HTMLInputElement).value)"
                       @blur="saveStudentTime(student.id)"
                       placeholder="MM:SS.MS"
                       class="time-input"
@@ -170,10 +170,12 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDatabase } from '../composables/useDatabase';
+import { useToast } from '../composables/useToast';
 import type { GradeCategory, Student, TimeGradingConfig } from '@viccoboard/core';
 
 const route = useRoute();
 const { sportBridge } = useDatabase();
+const toast = useToast();
 
 const categoryId = route.params.id as string;
 const category = ref<GradeCategory | null>(null);
@@ -353,7 +355,8 @@ function getCalculatedGrade(studentId: string): string | null {
   return grade.toFixed(1);
 }
 
-function onTimeChange(studentId: string) {
+function onTimeChange(studentId: string, newTime: string) {
+  timeEntries.value.set(studentId, newTime);
   hasUnsavedChanges.value = true;
   unsavedStudents.value.add(studentId);
 }
@@ -370,7 +373,7 @@ async function saveStudentTime(studentId: string) {
   
   const seconds = parseTimeToSeconds(timeStr);
   if (seconds === null) {
-    alert('Ungültiges Zeitformat. Verwenden Sie MM:SS.MS oder SS.MS');
+    toast.error('Ungültiges Zeitformat. Verwenden Sie MM:SS.MS oder SS.MS');
     return;
   }
   
@@ -390,7 +393,7 @@ async function saveStudentTime(studentId: string) {
     }
   } catch (err) {
     console.error('Failed to save time:', err);
-    alert('Fehler beim Speichern der Zeit');
+    toast.error('Fehler beim Speichern der Zeit');
   } finally {
     saving.value = false;
   }
@@ -402,10 +405,10 @@ async function saveAllTimes() {
     for (const studentId of unsavedStudents.value) {
       await saveStudentTime(studentId);
     }
-    alert('Alle Zeiten gespeichert!');
+    toast.success('Alle Zeiten gespeichert!');
   } catch (err) {
     console.error('Failed to save all times:', err);
-    alert('Fehler beim Speichern einiger Zeiten');
+    toast.error('Fehler beim Speichern einiger Zeiten');
   } finally {
     saving.value = false;
   }
