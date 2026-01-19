@@ -130,8 +130,16 @@ export class TimeGradingService {
     const lowerBoundary = sortedBoundaries[segmentIndex];
     const upperBoundary = sortedBoundaries[segmentIndex + 1];
 
-    // Linear interpolation between the two boundaries
+    // Guard against duplicate time boundaries
     const timeRange = upperBoundary.time - lowerBoundary.time;
+    if (timeRange === 0) {
+      throw new Error(
+        `Duplicate time boundary detected at ${lowerBoundary.time}s. ` +
+        'Adjacent boundaries must have different time values.'
+      );
+    }
+
+    // Linear interpolation between the two boundaries
     const timeOffset = timeInSeconds - lowerBoundary.time;
     const timeRatio = timeOffset / timeRange;
 
