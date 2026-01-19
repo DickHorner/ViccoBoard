@@ -30,4 +30,12 @@ export type {
   CriteriaBreakdown
 } from './grading/criteria-grading.engine';
 
+// Services
+export { TimeGradingService } from './services/time-grading.service';
+export type {
+  TimeToGradeInput,
+  TimeToGradeResult,
+  AdjustBoundariesInput
+} from './services/time-grading.service';
+
 export const SPORT_MODULE_VERSION = '0.1.0';
