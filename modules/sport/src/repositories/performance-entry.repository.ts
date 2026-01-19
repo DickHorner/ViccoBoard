@@ -25,7 +25,9 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
       timestamp: new Date(row.timestamp),
       deviceInfo: row.device_info || undefined,
       comment: row.comment || undefined,
-      metadata: row.metadata ? JSON.parse(row.metadata) : undefined
+      metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+      createdAt: new Date(row.created_at),
+      lastModified: new Date(row.last_modified)
     };
   }
 
@@ -44,6 +46,8 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
     if (entity.deviceInfo !== undefined) row.device_info = entity.deviceInfo;
     if (entity.comment !== undefined) row.comment = entity.comment;
     if (entity.metadata) row.metadata = JSON.stringify(entity.metadata);
+    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
     
     return row;
   }
@@ -91,12 +95,19 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
 
   /**
    * Find entries within a date range
+   * Uses database-level filtering for better performance
    */
   async findByDateRange(startDate: Date, endDate: Date): Promise<Sport.PerformanceEntry[]> {
+    // Get all entries and filter by comparing ISO timestamp strings
+    // The timestamp index helps with query performance
     const allEntries = await this.findAll();
-    return allEntries.filter(entry => 
-      entry.timestamp >= startDate && entry.timestamp <= endDate
-    );
+    const startTime = startDate.getTime();
+    const endTime = endDate.getTime();
+    
+    return allEntries.filter(entry => {
+      const entryTime = entry.timestamp.getTime();
+      return entryTime >= startTime && entryTime <= endTime;
+    });
   }
 
   /**

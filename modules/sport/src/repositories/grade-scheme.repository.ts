@@ -53,6 +53,8 @@ export class GradeSchemeRepository extends AdapterRepository<Sport.GradeScheme> 
 
   /**
    * Search grading schemes by name
+   * Note: Currently uses in-memory filtering. For better performance with large datasets,
+   * consider implementing database-level LIKE queries or full-text search at the adapter level.
    */
   async searchByName(query: string): Promise<Sport.GradeScheme[]> {
     const allSchemes = await this.findAll();

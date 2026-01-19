@@ -56,6 +56,8 @@ export class GradingSchemaMigration implements Migration {
         device_info TEXT,
         comment TEXT,
         metadata TEXT,
+        created_at TEXT NOT NULL,
+        last_modified TEXT NOT NULL,
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
         FOREIGN KEY (category_id) REFERENCES grade_categories(id) ON DELETE CASCADE
       )

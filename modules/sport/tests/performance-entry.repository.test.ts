@@ -72,7 +72,7 @@ describe('PerformanceEntryRepository', () => {
 
   describe('create', () => {
     test('creates a performance entry successfully', async () => {
-      const entry: Omit<Sport.PerformanceEntry, 'id'> = {
+      const entry: Omit<Sport.PerformanceEntry, 'id' | 'createdAt' | 'lastModified'> = {
         studentId: testStudentId,
         categoryId: testCategoryId,
         measurements: {
@@ -93,10 +93,12 @@ describe('PerformanceEntryRepository', () => {
       expect(result.measurements.c2).toBe(9);
       expect(result.calculatedGrade).toBe('1');
       expect(result.comment).toBe('Excellent performance');
+      expect(result.createdAt).toBeInstanceOf(Date);
+      expect(result.lastModified).toBeInstanceOf(Date);
     });
 
     test('creates entry with metadata', async () => {
-      const entry: Omit<Sport.PerformanceEntry, 'id'> = {
+      const entry: Omit<Sport.PerformanceEntry, 'id' | 'createdAt' | 'lastModified'> = {
         studentId: testStudentId,
         categoryId: testCategoryId,
         measurements: { distance: 2800 },
@@ -116,6 +118,8 @@ describe('PerformanceEntryRepository', () => {
       expect(result.metadata?.weather).toBe('sunny');
       expect(result.metadata?.temperature).toBe(22);
       expect(result.deviceInfo).toBe('iPad Pro 12.9');
+      expect(result.createdAt).toBeInstanceOf(Date);
+      expect(result.lastModified).toBeInstanceOf(Date);
     });
   });
 
