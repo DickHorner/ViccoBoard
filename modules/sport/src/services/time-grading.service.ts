@@ -6,7 +6,6 @@
 import { Sport } from '@viccoboard/core';
 
 type TimeGradingConfig = Sport.TimeGradingConfig;
-type TimeBoundary = Sport.TimeBoundary;
 
 export interface TimeToGradeInput {
   timeInSeconds: number;
