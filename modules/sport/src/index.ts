@@ -18,4 +18,12 @@ export type { AddStudentInput } from './use-cases/add-student.use-case';
 export { RecordAttendanceUseCase } from './use-cases/record-attendance.use-case';
 export type { RecordAttendanceInput } from './use-cases/record-attendance.use-case';
 
+// Services
+export { TimeGradingService } from './services/time-grading.service';
+export type {
+  TimeToGradeInput,
+  TimeToGradeResult,
+  AdjustBoundariesInput
+} from './services/time-grading.service';
+
 export const SPORT_MODULE_VERSION = '0.1.0';
