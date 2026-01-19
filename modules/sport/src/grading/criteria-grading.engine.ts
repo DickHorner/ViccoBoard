@@ -67,12 +67,11 @@ export class CriteriaGradingEngine {
    * Validate grading input
    */
   private validateInput(input: CriteriaGradingInput): void {
-    if (!input.criteria || input.criteria.length === 0) {
-      throw new Error('At least one criterion is required');
-    }
-
-    if (input.criteria.length > CriteriaGradingEngine.MAX_CRITERIA) {
-      throw new Error(`Maximum ${CriteriaGradingEngine.MAX_CRITERIA} criteria allowed`);
+    // Fully validate criteria (count, weights, names, duplicates, total weight)
+    const criteriaValidation = this.validateCriteria(input.criteria);
+    if (!criteriaValidation.valid) {
+      // Preserve existing error messages: throw the first error verbatim
+      throw new Error(criteriaValidation.errors[0]);
     }
 
     if (!input.scores || input.scores.length === 0) {
@@ -92,12 +91,6 @@ export class CriteriaGradingEngine {
       if (!scoreMap.has(criterion.id)) {
         throw new Error(`Missing score for criterion: ${criterion.name || criterion.id}`);
       }
-    }
-
-    // Validate weights
-    const totalWeight = input.criteria.reduce((sum, c) => sum + c.weight, 0);
-    if (totalWeight <= 0) {
-      throw new Error('Total weight must be greater than zero');
     }
   }
 
