@@ -31,6 +31,30 @@ const routes: RouteRecordRaw[] = [
     name: 'attendance',
     component: () => import('../views/AttendanceEntry.vue'),
     meta: { title: 'Attendance Entry' }
+  },
+  {
+    path: '/grading',
+    name: 'grading-overview',
+    component: () => import('../views/GradingOverview.vue'),
+    meta: { title: 'Grading Overview' }
+  },
+  {
+    path: '/grading/criteria/:id',
+    name: 'criteria-grading',
+    component: () => import('../views/CriteriaGradingEntry.vue'),
+    meta: { title: 'Criteria Grading' }
+  },
+  {
+    path: '/grading/time/:id',
+    name: 'time-grading',
+    component: () => import('../views/TimeGradingEntry.vue'),
+    meta: { title: 'Time-Based Grading' }
+  },
+  {
+    path: '/grading/history/:id',
+    name: 'grade-history',
+    component: () => import('../views/GradeHistory.vue'),
+    meta: { title: 'Grade History' }
   }
 ]
 

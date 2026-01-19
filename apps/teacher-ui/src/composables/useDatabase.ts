@@ -2,16 +2,232 @@
  * Database composable for managing Dexie database and repositories
  */
 
+import { ref } from 'vue'
 import { db } from '../db'
-import type { ClassGroup, Student, AttendanceRecord } from '../db'
+import type { ClassGroup, Student, AttendanceRecord, GradeCategory, PerformanceEntry } from '../db'
 
 export function useDatabase() {
+  // Mock bridge structure for Sport module compatibility
+  const sportBridge = ref({
+    classGroupRepository: {
+      findAll: async () => await db.classGroups.toArray(),
+      read: async (id: string) => await db.classGroups.get(id),
+      create: async (entity: any) => {
+        const id = crypto.randomUUID()
+        const now = new Date()
+        await db.classGroups.add({
+          id,
+          name: entity.name,
+          schoolYear: entity.schoolYear,
+          createdAt: now,
+          updatedAt: now
+        })
+        return { ...entity, id, createdAt: now, lastModified: now }
+      },
+      update: async (id: string, entity: any) => {
+        await db.classGroups.update(id, { ...entity, updatedAt: new Date() })
+      }
+    },
+    studentRepository: {
+      findAll: async () => await db.students.toArray(),
+      read: async (id: string) => await db.students.get(id),
+      findByClassGroup: async (classId: string) => 
+        await db.students.where('classId').equals(classId).toArray(),
+      create: async (entity: any) => {
+        const id = crypto.randomUUID()
+        const now = new Date()
+        await db.students.add({
+          id,
+          classId: entity.classGroupId,
+          firstName: entity.firstName,
+          lastName: entity.lastName,
+          dateOfBirth: entity.birthYear ? new Date(entity.birthYear, 0, 1) : undefined,
+          email: entity.email,
+          createdAt: now,
+          updatedAt: now
+        })
+        return { ...entity, id, createdAt: now, lastModified: now }
+      }
+    },
+    gradeCategoryRepository: {
+      findAll: async () => {
+        const categories = await db.gradeCategories.toArray()
+        return categories.map(c => ({
+          ...c,
+          configuration: JSON.parse(c.configuration),
+          createdAt: c.createdAt,
+          lastModified: c.updatedAt
+        }))
+      },
+      read: async (id: string) => {
+        const category = await db.gradeCategories.get(id)
+        if (!category) return null
+        return {
+          ...category,
+          configuration: JSON.parse(category.configuration),
+          createdAt: category.createdAt,
+          lastModified: category.updatedAt
+        }
+      },
+      findByClassGroup: async (classId: string) => {
+        const categories = await db.gradeCategories
+          .where('classGroupId')
+          .equals(classId)
+          .toArray()
+        return categories.map(c => ({
+          ...c,
+          configuration: JSON.parse(c.configuration),
+          createdAt: c.createdAt,
+          lastModified: c.updatedAt
+        }))
+      },
+      create: async (entity: any) => {
+        const id = crypto.randomUUID()
+        const now = new Date()
+        await db.gradeCategories.add({
+          id,
+          classGroupId: entity.classGroupId,
+          name: entity.name,
+          description: entity.description,
+          type: entity.type,
+          weight: entity.weight,
+          configuration: JSON.stringify(entity.configuration),
+          createdAt: now,
+          updatedAt: now
+        })
+        return { ...entity, id, createdAt: now, lastModified: now }
+      },
+      update: async (id: string, entity: any) => {
+        await db.gradeCategories.update(id, {
+          name: entity.name,
+          description: entity.description,
+          type: entity.type,
+          weight: entity.weight,
+          configuration: JSON.stringify(entity.configuration),
+          updatedAt: new Date()
+        })
+      }
+    },
+    performanceEntryRepository: {
+      findAll: async () => {
+        const entries = await db.performanceEntries.toArray()
+        return entries.map(e => ({
+          ...e,
+          measurements: JSON.parse(e.measurements || '{}'),
+          metadata: e.metadata ? JSON.parse(e.metadata) : undefined
+        }))
+      },
+      read: async (id: string) => {
+        const entry = await db.performanceEntries.get(id)
+        if (!entry) return null
+        return {
+          ...entry,
+          measurements: JSON.parse(entry.measurements || '{}'),
+          metadata: entry.metadata ? JSON.parse(entry.metadata) : undefined
+        }
+      },
+      findByStudent: async (studentId: string) => {
+        const entries = await db.performanceEntries
+          .where('studentId')
+          .equals(studentId)
+          .toArray()
+        return entries.map(e => ({
+          ...e,
+          measurements: JSON.parse(e.measurements || '{}'),
+          metadata: e.metadata ? JSON.parse(e.metadata) : undefined
+        }))
+      },
+      findByCategory: async (categoryId: string) => {
+        const entries = await db.performanceEntries
+          .where('categoryId')
+          .equals(categoryId)
+          .toArray()
+        return entries.map(e => ({
+          ...e,
+          measurements: JSON.parse(e.measurements || '{}'),
+          metadata: e.metadata ? JSON.parse(e.metadata) : undefined
+        }))
+      },
+      findByStudentAndCategory: async (studentId: string, categoryId: string) => {
+        const entries = await db.performanceEntries
+          .where({ studentId, categoryId })
+          .toArray()
+        return entries.map(e => ({
+          ...e,
+          measurements: JSON.parse(e.measurements || '{}'),
+          metadata: e.metadata ? JSON.parse(e.metadata) : undefined
+        }))
+      },
+      create: async (entity: any) => {
+        const id = crypto.randomUUID()
+        await db.performanceEntries.add({
+          id,
+          studentId: entity.studentId,
+          categoryId: entity.categoryId,
+          measurements: JSON.stringify(entity.measurements),
+          calculatedGrade: entity.calculatedGrade,
+          timestamp: entity.timestamp,
+          comment: entity.comment,
+          metadata: entity.metadata ? JSON.stringify(entity.metadata) : undefined
+        })
+        return { ...entity, id }
+      }
+    },
+    createGradeCategoryUseCase: {
+      execute: async (input: any) => {
+        const id = crypto.randomUUID()
+        const now = new Date()
+        await db.gradeCategories.add({
+          id,
+          classGroupId: input.classGroupId,
+          name: input.name,
+          description: input.description,
+          type: input.type,
+          weight: input.weight,
+          configuration: JSON.stringify(input.configuration),
+          createdAt: now,
+          updatedAt: now
+        })
+        return {
+          id,
+          ...input,
+          createdAt: now,
+          lastModified: now
+        }
+      }
+    },
+    recordGradeUseCase: {
+      execute: async (input: any) => {
+        const id = crypto.randomUUID()
+        const now = new Date()
+        await db.performanceEntries.add({
+          id,
+          studentId: input.studentId,
+          categoryId: input.categoryId,
+          measurements: JSON.stringify(input.measurements),
+          calculatedGrade: input.calculatedGrade,
+          timestamp: now,
+          comment: input.comment,
+          metadata: input.metadata ? JSON.stringify(input.metadata) : undefined
+        })
+        return {
+          id,
+          ...input,
+          timestamp: now
+        }
+      }
+    }
+  })
+
   return {
     db,
+    sportBridge,
     classGroups: db.classGroups,
     students: db.students,
     attendanceRecords: db.attendanceRecords,
-    assessments: db.assessments
+    assessments: db.assessments,
+    gradeCategories: db.gradeCategories,
+    performanceEntries: db.performanceEntries
   }
 }
 

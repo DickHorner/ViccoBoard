@@ -21,6 +21,10 @@
           <span class="nav-icon">✓</span>
           <span class="nav-label">Anwesenheit</span>
         </RouterLink>
+        <RouterLink to="/grading" class="nav-item" active-class="active">
+          <span class="nav-icon">📝</span>
+          <span class="nav-label">Bewertung</span>
+        </RouterLink>
       </nav>
       
       <button 
