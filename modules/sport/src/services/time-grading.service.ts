@@ -41,6 +41,10 @@ export class TimeGradingService {
    * - If time >= worstTime → worstGrade
    * - Otherwise: grade = bestGrade + ((time - bestTime) / (worstTime - bestTime)) * (worstGrade - bestGrade)
    * 
+   * Notes:
+   * - No rounding is applied. Consumers should format or round the result
+   *   (e.g., to 1 or 2 decimals) according to UI or grading policy.
+   * 
    * @param input Time measurement and grading configuration
    * @returns Calculated grade and metadata
    */
@@ -61,7 +65,10 @@ export class TimeGradingService {
       throw new Error('Best and worst grades must be defined for time-based grading');
     }
 
-    throw new Error('Custom boundaries with time values are required for time-based grading');
+    throw new Error(
+      'Custom boundaries with time values are required for time-based grading. ' +
+      'Use createDefaultConfig(bestTime, worstTime, bestGrade, worstGrade) to initialize a valid configuration.'
+    );
   }
 
   /**
@@ -103,20 +110,25 @@ export class TimeGradingService {
       };
     }
 
-    // Find the two boundaries that the time falls between
-    let lowerBoundary = bestBoundary;
-    let upperBoundary = worstBoundary;
+    // Find the two boundaries that the time falls between using binary search
+    let lo = 0;
+    let hi = sortedBoundaries.length - 2;
+    let segmentIndex = 0;
 
-    for (let i = 0; i < sortedBoundaries.length - 1; i++) {
-      if (
-        timeInSeconds >= sortedBoundaries[i].time &&
-        timeInSeconds <= sortedBoundaries[i + 1].time
-      ) {
-        lowerBoundary = sortedBoundaries[i];
-        upperBoundary = sortedBoundaries[i + 1];
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (timeInSeconds < sortedBoundaries[mid].time) {
+        hi = mid - 1;
+      } else if (timeInSeconds > sortedBoundaries[mid + 1].time) {
+        lo = mid + 1;
+      } else {
+        segmentIndex = mid;
         break;
       }
     }
+
+    const lowerBoundary = sortedBoundaries[segmentIndex];
+    const upperBoundary = sortedBoundaries[segmentIndex + 1];
 
     // Linear interpolation between the two boundaries
     const timeRange = upperBoundary.time - lowerBoundary.time;
@@ -174,6 +186,15 @@ export class TimeGradingService {
    */
   adjustBoundaries(input: AdjustBoundariesInput): TimeGradingConfig {
     const { config, newBestTime, newWorstTime, newBestGrade, newWorstGrade } = input;
+
+    // Guard against inverted boundaries
+    if (
+      newBestTime !== undefined &&
+      newWorstTime !== undefined &&
+      newBestTime >= newWorstTime
+    ) {
+      throw new Error('Best time must be less than worst time');
+    }
 
     // Clone the configuration
     const updatedConfig: TimeGradingConfig = {
@@ -289,10 +310,18 @@ export class TimeGradingService {
         throw new Error('Boundary times must be unique');
       }
 
-      // Validate time values are positive
+      // Validate time values are non-negative
       for (const boundary of config.customBoundaries) {
         if (boundary.time < 0) {
           throw new Error('Time values must be non-negative');
+        }
+      }
+
+      // Validate strictly increasing times
+      const sorted = [...config.customBoundaries].sort((a, b) => a.time - b.time);
+      for (let i = 1; i < sorted.length; i++) {
+        if (sorted[i].time <= sorted[i - 1].time) {
+          throw new Error('Boundary times must be strictly increasing');
         }
       }
     }
