@@ -6,6 +6,8 @@
   ],
   "compilerOptions": {
     "composite": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
   }
 }
