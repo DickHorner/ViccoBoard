@@ -1,0 +1,468 @@
+# AI Agent Pull Request Review Guidelines
+
+## Purpose
+This document provides comprehensive instructions for AI agents performing pull request reviews on the ViccoBoard project. These guidelines ensure consistent, high-quality code reviews that align with industry standards, best practices, and community learnings.
+
+## Core Principles
+
+### 1. Always Use Inline Comments
+- **MANDATORY**: All suggestions must be made as inline comments on specific lines of code
+- Users should be able to commit suggestions directly from the review interface
+- Never provide general feedback without linking it to specific code locations
+- Use GitHub's suggestion feature for code changes:
+  ```suggestion
+  // Your improved code here
+  ```
+
+### 2. Be Constructive and Specific
+- Focus on **why** a change is needed, not just **what** to change
+- Provide context and reasoning for each suggestion
+- Link to relevant documentation, standards, or examples when applicable
+- Prioritize learning and improvement over criticism
+
+### 3. Respect Project Context
+- Understand the ViccoBoard architecture before reviewing (see `agents.md` and `Plan.md`)
+- Respect the project's hard constraints (local-first, iPad/Safari compatibility, no feature removal)
+- Align with the modular architecture and plugin system
+- Follow the established conventions in the codebase
+
+## Review Checklist
+
+### Architecture & Design
+
+#### Modularity ✓
+- [ ] Changes are in the appropriate module (`sport/`, `exams/`, `core/`, `export/`, `integrations/`)
+- [ ] No business logic in UI components or database layers
+- [ ] Core package only contains interfaces and contracts, never concrete implementations
+- [ ] New features are implemented as plugins when applicable
+- [ ] Dependencies point inward (UI → Application → Domain)
+
+**Inline Comment Template:**
+```
+This logic should be moved to the domain layer. Business rules belong in use cases, not in UI components.
+
+Consider:
+```suggestion
+// Move this to modules/sport/useCases/calculateGrade.ts
+```
+
+#### Plugin System ✓
+- [ ] New functionality extends via plugin interfaces (`AssessmentType`, `ToolPlugin`, `Exporter`, `Integration`)
+- [ ] Plugin contracts are properly defined in `packages/plugins/`
+- [ ] No hard dependencies on specific plugin implementations in core code
+
+### Code Quality
+
+#### TypeScript Best Practices ✓
+- [ ] Strong typing throughout (no `any` without justification)
+- [ ] Interfaces properly defined for public APIs
+- [ ] Type guards used for runtime type checking
+- [ ] Proper error types and error handling
+- [ ] Null/undefined handled explicitly
+
+**Inline Comment Template:**
+```
+Avoid using `any` type as it defeats TypeScript's type safety.
+
+```suggestion
+function processData(data: StudentData): Result {
+  // typed implementation
+}
+```
+
+#### Clean Code ✓
+- [ ] Functions are small and do one thing well
+- [ ] Descriptive variable and function names
+- [ ] No magic numbers (use named constants)
+- [ ] No commented-out code (use version control)
+- [ ] Consistent formatting and style
+
+**Inline Comment Template:**
+```
+This magic number should be a named constant for clarity and maintainability.
+
+```suggestion
+const MAX_STUDENTS_PER_CLASS = 40;
+```
+
+#### Error Handling ✓
+- [ ] All async operations have error handling
+- [ ] User-facing error messages are clear and actionable
+- [ ] Errors don't expose sensitive information
+- [ ] Proper cleanup in error scenarios (especially for IndexedDB transactions)
+
+### Security & Privacy
+
+#### Data Protection ✓
+- [ ] No sensitive data in logs or console output
+- [ ] Encryption used for local storage (IndexedDB)
+- [ ] No data leakage through error messages
+- [ ] User data properly sanitized before display (XSS prevention)
+- [ ] No hardcoded credentials or secrets
+
+**Inline Comment Template:**
+```
+⚠️ SECURITY: This could expose sensitive student data in error logs.
+
+```suggestion
+console.error('Failed to load data:', error.message); // Don't log full error with data
+```
+
+#### Privacy by Default ✓
+- [ ] No telemetry or tracking without explicit opt-in
+- [ ] No external network calls in default configuration
+- [ ] User consent for any data sharing features
+- [ ] GDPR compliance considerations (right to deletion, export, etc.)
+
+### Platform Compatibility
+
+#### iPad/Safari Compatibility ✓
+- [ ] No use of File System Access API (not supported in Safari)
+- [ ] Export via download, import via file input
+- [ ] Touch targets ≥ 44px
+- [ ] No hover-only interactions
+- [ ] Responsive for split view (½ and ⅓ screen)
+- [ ] Works in both portrait and landscape
+- [ ] Tested on WebKit/Safari
+
+**Inline Comment Template:**
+```
+⚠️ COMPATIBILITY: File System Access API is not supported in Safari/iPadOS.
+
+Use download + file input instead:
+```suggestion
+// Export
+const blob = new Blob([data], { type: 'application/json' });
+const url = URL.createObjectURL(blob);
+// Trigger download via <a> element
+```
+
+#### Offline-First ✓
+- [ ] Core functionality works without network
+- [ ] Graceful degradation when offline
+- [ ] Clear offline/online status indicators
+- [ ] Service Worker usage is optional, not required
+- [ ] IndexedDB operations handle quota errors
+
+### Performance
+
+#### Optimization ✓
+- [ ] Large lists use virtualization
+- [ ] Images optimized and lazy-loaded
+- [ ] No unnecessary re-renders in React components
+- [ ] Database queries are indexed appropriately
+- [ ] Debouncing/throttling for expensive operations
+
+**Inline Comment Template:**
+```
+This list could have thousands of students. Consider virtualizing to improve performance.
+
+```suggestion
+import { VirtualizedList } from '@components/VirtualizedList';
+```
+
+#### Bundle Size ✓
+- [ ] No unnecessary dependencies added
+- [ ] Tree-shaking friendly imports
+- [ ] Code splitting for large modules
+- [ ] Lazy loading for routes and heavy components
+
+### Testing
+
+#### Test Coverage ✓
+- [ ] Unit tests for business logic and use cases
+- [ ] Integration tests for critical flows
+- [ ] No tests removed without justification
+- [ ] Tests are maintainable and focused
+- [ ] Edge cases and error scenarios covered
+
+**Inline Comment Template:**
+```
+This business logic needs unit tests to ensure correctness.
+
+Add tests covering:
+- Valid input cases
+- Edge cases (empty, max values)
+- Error scenarios
+```
+
+#### Test Quality ✓
+- [ ] Tests follow AAA pattern (Arrange, Act, Assert)
+- [ ] Tests are isolated and independent
+- [ ] No flaky tests (time-dependent, order-dependent)
+- [ ] Meaningful test descriptions
+- [ ] Mock external dependencies appropriately
+
+### Documentation
+
+#### Code Documentation ✓
+- [ ] Public APIs have JSDoc comments
+- [ ] Complex algorithms explained
+- [ ] Non-obvious decisions documented
+- [ ] README updated if public API changes
+- [ ] Migration guide for breaking changes
+
+**Inline Comment Template:**
+```
+This complex algorithm needs documentation explaining the logic.
+
+```suggestion
+/**
+ * Calculates the final grade using linear interpolation between min and max times.
+ * 
+ * @param time - Student's measured time in seconds
+ * @param minTime - Best time for grade 1.0
+ * @param maxTime - Minimum passing time for grade 6.0
+ * @returns Grade from 1.0 to 6.0, or null if outside range
+ */
+```
+
+#### User-Facing Documentation ✓
+- [ ] User-facing changes documented in relevant guides
+- [ ] Feature documentation updated if behavior changes
+- [ ] Examples provided for new features
+
+### Feature Completeness
+
+#### No Feature Loss ✓
+- [ ] All features from Plan.md are preserved
+- [ ] No simplification that removes options
+- [ ] All configuration options maintained
+- [ ] Backward compatibility for data formats
+
+**Inline Comment Template:**
+```
+⚠️ This removes the option for manual time entry, which is required per Plan.md §6.4.
+
+Please preserve all existing functionality.
+```
+
+#### Feature Traceability ✓
+- [ ] PR references checkbox IDs from `Plan.md` §6
+- [ ] New features added to checklist if not present
+- [ ] TBD items documented in `Plan.md` §9 if incomplete
+
+### Database & Persistence
+
+#### Data Integrity ✓
+- [ ] Database migrations are properly versioned
+- [ ] No data loss during upgrades
+- [ ] Backup/restore tested for affected schemas
+- [ ] IndexedDB transactions properly scoped
+- [ ] Schema changes backward compatible or migrated
+
+**Inline Comment Template:**
+```
+This schema change needs a migration to preserve existing data.
+
+Add to migrations:
+```suggestion
+async function migrate_v5_to_v6(db: IDBDatabase) {
+  // Migration logic
+}
+```
+
+#### Backup Considerations ✓
+- [ ] Export format includes all necessary data
+- [ ] Import validates and handles errors gracefully
+- [ ] Version information in exports
+- [ ] Large attachments handled efficiently
+
+### Specific Domain Rules
+
+#### SportZens Module ✓
+- [ ] Grading calculations match specifications (criteria-based, time-based, Cooper)
+- [ ] Statistical calculations are accurate
+- [ ] CSV import/export formats preserved
+- [ ] All test workflows supported (Shuttle Run, Cooper, etc.)
+- [ ] WOW functionality works offline
+
+#### KURT Module ✓
+- [ ] Exam structure supports 3 levels, choice tasks, bonus points
+- [ ] Grading key calculations accurate
+- [ ] Correction interface supports all modes (compact, table, AWK)
+- [ ] PDF layouts match specifications
+- [ ] Email templates handle all placeholders
+
+### Integration & Export
+
+#### Export Quality ✓
+- [ ] PDF output matches design specifications
+- [ ] CSV format is standard and importable
+- [ ] Email templates properly sanitize variables
+- [ ] QR codes are readable and contain correct data
+- [ ] Exports handle special characters and Unicode
+
+**Inline Comment Template:**
+```
+CSV export should use standard RFC 4180 format with proper escaping.
+
+```suggestion
+// Escape quotes and handle line breaks
+const escapeCsv = (val: string) => `"${val.replace(/"/g, '""')}"`;
+```
+
+#### Integration Safety ✓
+- [ ] External integrations are behind feature flags
+- [ ] Network errors handled gracefully
+- [ ] No assumptions about external API stability
+- [ ] User consent before external data access
+
+## Review Process
+
+### 1. Initial Scan (5 minutes)
+- Read PR description and linked checkboxes from `Plan.md`
+- Understand the scope and intent
+- Check if tests are included
+- Verify no unrelated changes
+
+### 2. Detailed Code Review (15-30 minutes)
+- Review each file change sequentially
+- Check against the checklist above
+- Leave inline comments for all issues found
+- Categorize issues by severity:
+  - 🚨 **Critical**: Security, data loss, breaking changes
+  - ⚠️ **Important**: Architecture violations, bugs, compatibility
+  - 💡 **Suggestion**: Improvements, best practices, optimization
+
+### 3. Test Review (10 minutes)
+- Verify test coverage for changed code
+- Check test quality and maintainability
+- Ensure no tests were removed without justification
+
+### 4. Manual Verification Checklist
+Confirm the PR author has completed these checks (listed in PR description):
+- [ ] **Offline Check**: Tested with network disabled
+- [ ] **Cold Start**: Cleared site data and retested
+- [ ] **Export/Import**: Tested data roundtrip (if persistence changed)
+- [ ] **iPad Safari**: Tested on iPad or simulator (if UI/storage/export changed)
+- [ ] **Split View**: Tested at ½ screen width (if UI changed)
+
+### 5. Summary Comment
+After all inline comments, provide a summary comment:
+
+```markdown
+## Review Summary
+
+**Approval Status**: ✅ Approved / ⚠️ Approved with comments / ❌ Changes requested
+
+### Critical Issues (Must Fix)
+- [List any critical issues]
+
+### Important Issues (Should Fix)
+- [List important issues]
+
+### Suggestions (Nice to Have)
+- [List suggestions]
+
+### Positive Observations
+- [Highlight good practices, clever solutions, thorough testing]
+
+### Recommendation
+[Approve / Request changes / More discussion needed]
+```
+
+## Common Pitfalls to Watch For
+
+### 1. Accidental Feature Removal
+- **Watch for**: Simplified conditions, removed branches, consolidated options
+- **Check**: Cross-reference with `Plan.md` feature checklist
+
+### 2. Safari Incompatibility
+- **Watch for**: `showOpenFilePicker()`, `showSaveFilePicker()`, Chrome-only APIs
+- **Check**: Can it run on iPad Safari/WebKit?
+
+### 3. Online Dependencies Creeping In
+- **Watch for**: Network calls in initialization, external API dependencies
+- **Check**: Does it work completely offline?
+
+### 4. Broken Modularity
+- **Watch for**: Core importing from modules, cross-module dependencies
+- **Check**: Dependency graph flows inward correctly?
+
+### 5. Security Regressions
+- **Watch for**: Logging sensitive data, storing unencrypted data, XSS vulnerabilities
+- **Check**: Is student/teacher data protected?
+
+### 6. Database Migration Issues
+- **Watch for**: Schema changes without migrations, destructive updates
+- **Check**: Can existing users upgrade without data loss?
+
+### 7. Missing Tests
+- **Watch for**: Complex logic without tests, removed test files
+- **Check**: Is test coverage maintained or improved?
+
+### 8. Poor Error Handling
+- **Watch for**: Unhandled promises, generic error messages, missing cleanup
+- **Check**: Are errors caught and users informed appropriately?
+
+## Example Review Comments
+
+### Good Example ✅
+```markdown
+**File: `modules/sport/domain/grading/TimeBasedGrading.ts:42`**
+
+This linear interpolation assumes `minTime < maxTime`, but doesn't handle the edge case where they're equal or inverted.
+
+```suggestion
+if (minTime >= maxTime) {
+  throw new Error('Invalid time range: minTime must be less than maxTime');
+}
+const normalized = (time - minTime) / (maxTime - minTime);
+```
+
+This prevents division by zero and provides a clear error message. See also the criteria-based grading implementation for a similar pattern.
+```
+
+### Poor Example ❌
+```markdown
+This code is wrong. Fix it.
+```
+**Why poor**: Not specific, no location, no suggestion, not constructive
+
+## AI Agent Self-Check
+
+Before submitting your review, verify:
+- [ ] Every comment is attached to a specific line or code block
+- [ ] Every suggestion uses the GitHub suggestion syntax
+- [ ] Each comment explains WHY, not just WHAT
+- [ ] Critical issues are clearly marked with 🚨
+- [ ] You've provided at least one positive observation
+- [ ] Summary comment captures the overall assessment
+- [ ] You've checked against project-specific constraints (Safari, offline, modularity)
+
+## Continuous Improvement
+
+This document should evolve based on:
+- Common issues found in reviews
+- New platform constraints or requirements
+- Community feedback and best practices
+- Project-specific patterns that emerge
+
+Suggest updates via PR to this file when you identify gaps or improvements.
+
+## References
+
+### Project Documentation
+- `agents.md` - Agent setup and development guidelines
+- `Plan.md` - Complete feature specification and constraints
+- `README.md` - Project overview and architecture
+
+### Industry Standards
+- [Google Engineering Practices - Code Review](https://google.github.io/eng-practices/review/)
+- [Conventional Comments](https://conventionalcomments.org/)
+- [GitHub Code Review Best Practices](https://github.blog/2015-01-21-how-to-write-the-perfect-pull-request/)
+
+### Security References
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [Web Storage Security](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html)
+
+### TypeScript Best Practices
+- [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
+- [Effective TypeScript](https://effectivetypescript.com/)
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2026-01-17  
+**Maintained By**: ViccoBoard Development Team
