@@ -1,12 +1,15 @@
 /**
- * PerformanceEntry Repository
- * Handles persistence of performance entries (assessment results)
+ * Performance Entry Repository
+ * Handles persistence of grade/performance entries
  */
 
 import { AdapterRepository } from '@viccoboard/storage';
+import { PerformanceEntry } from '@viccoboard/core';
 import { Sport } from '@viccoboard/core';
+
 import type { StorageAdapter } from '@viccoboard/storage';
 
+export class PerformanceEntryRepository extends AdapterRepository<PerformanceEntry> 
 export class PerformanceEntryRepository extends AdapterRepository<Sport.PerformanceEntry> {
   constructor(adapter: StorageAdapter) {
     super(adapter, 'performance_entries');
@@ -15,12 +18,13 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
   /**
    * Map database row to PerformanceEntry entity
    */
+  mapToEntity(row: any): PerformanceEntry {
   mapToEntity(row: any): Sport.PerformanceEntry {
     return {
       id: row.id,
       studentId: row.student_id,
       categoryId: row.category_id,
-      measurements: JSON.parse(row.measurements),
+      measurements: JSON.parse(row.measurements || '{}'),
       calculatedGrade: row.calculated_grade || undefined,
       timestamp: new Date(row.timestamp),
       deviceInfo: row.device_info || undefined,
@@ -34,7 +38,7 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
   /**
    * Map PerformanceEntry entity to database row
    */
-  mapToRow(entity: Partial<Sport.PerformanceEntry>): any {
+  mapToRow(entity: Partial<PerformanceEntry>): any {
     const row: any = {};
     
     if (entity.id) row.id = entity.id;
@@ -43,16 +47,24 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
     if (entity.measurements) row.measurements = JSON.stringify(entity.measurements);
     if (entity.calculatedGrade !== undefined) row.calculated_grade = entity.calculatedGrade;
     if (entity.timestamp) row.timestamp = entity.timestamp.toISOString();
-    if (entity.deviceInfo !== undefined) row.device_info = entity.deviceInfo;
-    if (entity.comment !== undefined) row.comment = entity.comment;
+    if (entity.deviceInfo) row.device_info = entity.deviceInfo;
+    if (entity.comment) row.comment = entity.comment;
     if (entity.metadata) row.metadata = JSON.stringify(entity.metadata);
-    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
     
     return row;
   }
 
   /**
+   * Find all performance entries for a student
+   */
+  async findByStudent(studentId: string): Promise<PerformanceEntry[]> {
+    return this.find({ student_id: studentId });
+  }
+
+  /**
+   * Find all performance entries for a grade category
+   */
+  async findByCategory(categoryId: string): Promise<PerformanceEntry[]> {
    * Find all performance entries for a specific student
    */
   async findByStudent(studentId: string): Promise<Sport.PerformanceEntry[]> {
