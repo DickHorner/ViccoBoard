@@ -19,6 +19,11 @@ export interface TimeToGradeResult {
   worstTime?: number;
 }
 
+export interface TimeBoundary {
+  time: number;
+  grade: number | string;
+}
+
 export interface AdjustBoundariesInput {
   config: TimeGradingConfig;
   newBestTime?: number;
@@ -130,18 +135,9 @@ export class TimeGradingService {
     const lowerBoundary = sortedBoundaries[segmentIndex];
     const upperBoundary = sortedBoundaries[segmentIndex + 1];
 
-    // Guard against duplicate time boundaries
-    const timeRange = upperBoundary.time - lowerBoundary.time;
-    if (timeRange === 0) {
-      throw new Error(
-        `Duplicate time boundary detected at ${lowerBoundary.time}s. ` +
-        'Adjacent boundaries must have different time values.'
-      );
-    }
-
     // Linear interpolation between the two boundaries
     const timeOffset = timeInSeconds - lowerBoundary.time;
-    const timeRatio = timeOffset / timeRange;
+    const timeRatio = timeOffset / (upperBoundary.time - lowerBoundary.time);
 
     // Calculate grade based on linear interpolation
     const calculatedGrade = this.interpolateGrade(
@@ -312,8 +308,8 @@ export class TimeGradingService {
       }
 
       // Check that times are unique
-      const times = config.customBoundaries.map(b => b.time);
-      const uniqueTimes = new Set(times);
+      const times: number[] = config.customBoundaries.map((b: TimeBoundary) => b.time);
+      const uniqueTimes: Set<number> = new Set(times);
       if (times.length !== uniqueTimes.size) {
         throw new Error('Boundary times must be unique');
       }
