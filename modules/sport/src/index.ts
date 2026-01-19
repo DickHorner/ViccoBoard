@@ -21,6 +21,15 @@ export type { AddStudentInput } from './use-cases/add-student.use-case';
 export { RecordAttendanceUseCase } from './use-cases/record-attendance.use-case';
 export type { RecordAttendanceInput } from './use-cases/record-attendance.use-case';
 
+// Grading Engine
+export { CriteriaGradingEngine } from './grading/criteria-grading.engine';
+export type {
+  CriteriaScore,
+  CriteriaGradingInput,
+  CriteriaGradingResult,
+  CriteriaBreakdown
+} from './grading/criteria-grading.engine';
+
 // Services
 export { TimeGradingService } from './services/time-grading.service';
 export type {

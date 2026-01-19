@@ -11,6 +11,7 @@ export * from './adapters/storage-adapter.interface';
 export * from './adapters/sqlite.adapter';
 export * from './adapters/indexeddb.adapter';
 export * from './migrations/001_initial_schema_new';
+export * from './migrations/002_grading_schema';
 export * from './indexeddb.storage';
 
 // Version

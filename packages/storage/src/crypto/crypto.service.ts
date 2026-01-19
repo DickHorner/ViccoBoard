@@ -3,7 +3,7 @@
  * Provides encryption, hashing, and secure key management
  */
 
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as CryptoJS from 'crypto-js';
 import { CryptoService, SecureStorage } from '@viccoboard/core';
 import { randomBytes, createHash } from 'crypto';
