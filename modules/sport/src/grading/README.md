@@ -159,6 +159,8 @@ The engine uses the German grading system:
 | 30-49%    | 5     | Mangelhaft (Poor) |
 | 0-29%     | 6     | Ungenügend (Insufficient) |
 
+Note: Grade ranges use an inclusive lower bound and an exclusive upper bound, except for the top range which includes 100%. For example, grade 3 applies for 67% ≤ percentage < 81%.
+
 ## Calculation Method
 
 The weighted average is calculated as:

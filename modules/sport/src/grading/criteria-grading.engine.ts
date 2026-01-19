@@ -213,8 +213,9 @@ export class CriteriaGradingEngine {
       .filter(c => c.name && c.name.trim() !== '')
       .map(c => c.name.toLowerCase().trim());
     const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
-    if (duplicates.length > 0) {
-      errors.push(`Duplicate criterion names found: ${duplicates.join(', ')}`);
+    const uniqueDuplicates = Array.from(new Set(duplicates));
+    if (uniqueDuplicates.length > 0) {
+      errors.push(`Duplicate criterion names found: ${uniqueDuplicates.join(', ')}`);
     }
 
     return {

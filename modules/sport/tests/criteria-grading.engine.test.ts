@@ -372,6 +372,24 @@ describe('CriteriaGradingEngine', () => {
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Duplicate criterion names found: test');
     });
+
+    test('detects multiple duplicate criterion names only once each', () => {
+      const criteria: Criterion[] = [
+        { id: 'c1', name: 'Test', weight: 1, minValue: 0, maxValue: 100 },
+        { id: 'c2', name: 'Test', weight: 1, minValue: 0, maxValue: 100 },
+        { id: 'c3', name: 'Test', weight: 1, minValue: 0, maxValue: 100 }
+      ];
+
+      const result = engine.validateCriteria(criteria);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]).toBe('Duplicate criterion names found: test');
+      // Verify "test" is only mentioned once, not multiple times
+      const errorText = result.errors[0];
+      const matches = errorText.match(/test/g);
+      expect(matches?.length).toBe(1);
+    });
   });
 
   describe('edge cases', () => {
