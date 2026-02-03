@@ -38,4 +38,7 @@ export type {
   AdjustBoundariesInput
 } from './services/time-grading.service';
 
+// Plugins
+export { TimerToolPlugin } from './plugins/timer.plugin';
+
 export const SPORT_MODULE_VERSION = '0.1.0';
