@@ -7,6 +7,7 @@
       </div>
       <div class="header-actions">
         <button class="ghost" type="button" @click="goBack">Back</button>
+        <button class="ghost" type="button" @click="openTaskWise">Task-wise view</button>
         <button class="primary" type="button" :disabled="!canSave" @click="saveCorrection">
           Save correction
         </button>
@@ -240,6 +241,12 @@ const saveCorrection = async () => {
 
 const goBack = () => router.push('/exams')
 
+const openTaskWise = () => {
+  if (exam.value) {
+    router.push(`/corrections/${exam.value.id}/task-wise`)
+  }
+}
+
 watch(useAlternativeGrading, (enabled) => {
   if (enabled) {
     tasks.value.forEach(task => {
@@ -418,6 +425,7 @@ onMounted(() => {
   }
 }
 </style>
+
 
 
 

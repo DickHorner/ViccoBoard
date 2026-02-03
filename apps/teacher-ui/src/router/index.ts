@@ -27,6 +27,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Exam Builder' }
   },
   {
+    path: '/corrections/:examId',
+    name: 'correction-compact',
+    component: () => import('../views/CorrectionCompact.vue'),
+    meta: { title: 'Compact Correction' }
+  },
+  {
+    path: '/corrections/:examId/task-wise',
+    name: 'correction-task-wise',
+    component: () => import('../views/CorrectionTaskWise.vue'),
+    meta: { title: 'Task-wise Correction' }
+  },
+  {
     path: '/classes/:id',
     name: 'class-detail',
     component: () => import('../views/ClassDetail.vue'),
@@ -94,4 +106,5 @@ const router = createRouter({
 })
 
 export default router
+
 
