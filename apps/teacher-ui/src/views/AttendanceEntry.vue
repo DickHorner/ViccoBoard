@@ -60,6 +60,10 @@
               <span class="status-label">Entschuldigt</span>
               <span class="status-count">{{ countByStatus('excused') }}</span>
             </div>
+            <div class="status-item status-passive">
+              <span class="status-label">Passiv</span>
+              <span class="status-count">{{ countByStatus('passive') }}</span>
+            </div>
           </div>
 
           <div class="bulk-actions">
@@ -151,18 +155,20 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useClassGroups, useStudents, useAttendance } from '../composables/useSportBridge'
+import { createUuid } from '../utils/uuid'
 import type { ClassGroup, Student } from '../db'
 
 const route = useRoute()
 
-type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
+type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused' | 'passive'
 
 // Status options for quick selection
 const statusOptions: Array<{ value: AttendanceStatus; label: string; short: string }> = [
   { value: 'present', label: 'Anwesend', short: 'A' },
   { value: 'absent', label: 'Abwesend', short: 'Ab' },
   { value: 'late', label: 'Verspätet', short: 'V' },
-  { value: 'excused', label: 'Entschuldigt', short: 'E' }
+  { value: 'excused', label: 'Entschuldigt', short: 'E' },
+  { value: 'passive', label: 'Passiv', short: 'P' }
 ]
 // State
 const classes = ref<ClassGroup[]>([])
@@ -179,13 +185,6 @@ interface AttendanceEntry {
 }
 
 const attendance = ref<Record<string, AttendanceEntry>>({})
-
-const statuses = [
-  { value: 'present', label: 'Present', emoji: '✓' },
-  { value: 'absent', label: 'Absent', emoji: '✗' },
-  { value: 'late', label: 'Late', emoji: '⏰' },
-  { value: 'excused', label: 'Excused', emoji: '📋' }
-]
 
 // Composables
 const classGroups = useClassGroups()
@@ -218,8 +217,8 @@ const setStatus = (studentId: string, status: string) => {
     attendance.value[studentId].status = status
   }
   
-  // Clear reason if not absent
-  if (status !== 'absent') {
+  // Clear reason if not absent/excused
+  if (!['absent', 'excused'].includes(status)) {
     delete attendance.value[studentId].reason
   }
 }
@@ -264,7 +263,7 @@ const handleSaveAttendance = async () => {
   
   try {
     // Generate a unique lesson ID for this attendance session
-    const lessonId = `lesson-${crypto.randomUUID()}`
+    const lessonId = `lesson-${createUuid()}`
     
     // Prepare attendance records
     const records = Object.entries(attendance.value).map(([studentId, entry]) => ({
@@ -728,3 +727,6 @@ onMounted(async () => {
   }
 }
 </style>
+
+
+

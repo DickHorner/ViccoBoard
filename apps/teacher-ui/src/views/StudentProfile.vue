@@ -319,11 +319,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useStudents, useAttendance } from '../composables/useSportBridge'
+import { useClassGroups, useStudents, useAttendance } from '../composables/useSportBridge'
 import { getInitials, capitalize } from '../utils/stringUtils'
-import type { Student, AttendanceRecord } from '../db'
+import { getTodayDateString } from '../utils/student'
+import type { Student, AttendanceRecord, ClassGroup } from '../db'
 
 const route = useRoute()
 const router = useRouter()
@@ -331,6 +332,7 @@ const studentId = route.params.id as string
 
 // State
 const student = ref<Student | undefined>(undefined)
+const classes = ref<ClassGroup[]>([])
 const attendanceRecords = ref<AttendanceRecord[]>([])
 const attendanceSummary = ref<{
   total: number
@@ -338,6 +340,7 @@ const attendanceSummary = ref<{
   absent: number
   excused?: number
   passive?: number
+  late?: number
   percentage: number
 } | null>(null)
 const loading = ref(true)
@@ -362,8 +365,11 @@ const editForm = ref({
 })
 
 // Composables
+const classGroups = useClassGroups()
 const students = useStudents()
 const attendance = useAttendance()
+
+const hasClasses = computed(() => classes.value.length > 0)
 
 // Methods
 const loadStudent = async () => {
@@ -379,6 +385,17 @@ const loadStudent = async () => {
       return
     }
 
+    classes.value = await classGroups.getAll()
+    editForm.value = {
+      firstName: student.value.firstName,
+      lastName: student.value.lastName,
+      classId: student.value.classId,
+      dateOfBirth: student.value.dateOfBirth
+        ? new Date(student.value.dateOfBirth).toISOString().split('T')[0]
+        : '',
+      email: student.value.email ?? ''
+    }
+
     // Load attendance records
     attendanceRecords.value = await attendance.getByStudentId(studentId)
 
@@ -387,6 +404,8 @@ const loadStudent = async () => {
       const present = attendanceRecords.value.filter(r => r.status === 'present').length
       const absent = attendanceRecords.value.filter(r => r.status === 'absent').length
       const excused = attendanceRecords.value.filter(r => r.status === 'excused').length
+      const passive = attendanceRecords.value.filter(r => r.status === 'passive').length
+      const late = attendanceRecords.value.filter(r => r.status === 'late').length
       const total = attendanceRecords.value.length
       
       attendanceSummary.value = {
@@ -394,6 +413,8 @@ const loadStudent = async () => {
         present,
         absent,
         excused,
+        passive,
+        late,
         percentage: Math.round((present / total) * 100)
       }
     }
@@ -557,8 +578,8 @@ const closePhotoModal = () => {
 }
 
 const getClassName = (classId: string): string => {
-  // TODO: Implement class lookup from composable
-  return 'Klassenname'
+  const classGroup = classes.value.find(c => c.id === classId)
+  return classGroup ? classGroup.name : 'Unbekannte Klasse'
 }
 
 const formatDate = (date: Date): string => {
@@ -1108,4 +1129,3 @@ onMounted(() => {
   }
 }
 </style>
-

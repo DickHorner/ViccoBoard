@@ -1,5 +1,6 @@
 import 'fake-indexeddb/auto';
 import { IndexedDBStorage } from '../src/indexeddb.storage';
+import type { IndexedDBMigration } from '../src/migrations/indexeddb/indexeddb-migration';
 
 describe('IndexedDBStorage (basic)', () => {
   it('initializes and runs simple migration', async () => {
@@ -7,23 +8,19 @@ describe('IndexedDBStorage (basic)', () => {
 
     let migrated = false;
 
-    storage.registerMigration({
+    const migration: IndexedDBMigration = {
+      storage: 'indexeddb',
       version: 1,
       name: 'create_test_store',
-      up: async () => {
-        // create an object store
-        const req = indexedDB.open('viccoboard-test');
-        await new Promise<void>((resolve, reject) => {
-          req.onupgradeneeded = () => {
-            req.result.createObjectStore('tests', { keyPath: 'id' });
-          };
-          req.onsuccess = () => resolve();
-          req.onerror = () => reject(req.error);
-        });
+      up: (db) => {
+        if (!db.objectStoreNames.contains('tests')) {
+          db.createObjectStore('tests', { keyPath: 'id' });
+        }
         migrated = true;
-      },
-      down: async () => {},
-    });
+      }
+    };
+
+    storage.registerMigration(migration);
 
     await storage.initialize('pass');
     await storage.migrate();

@@ -15,14 +15,12 @@ export class GradeCategoryRepository extends AdapterRepository<Sport.GradeCatego
   /**
    * Map database row to GradeCategory entity
    */
-  mapToEntity(row: any): GradeCategory {
   mapToEntity(row: any): Sport.GradeCategory {
     return {
       id: row.id,
       classGroupId: row.class_group_id,
       name: row.name,
-      description: row.description || undefined,
-      type: row.type as GradeCategoryType,
+      description: row.description ?? undefined,
       type: row.type as Sport.GradeCategoryType,
       weight: row.weight,
       configuration: JSON.parse(row.configuration),
@@ -34,28 +32,23 @@ export class GradeCategoryRepository extends AdapterRepository<Sport.GradeCatego
   /**
    * Map GradeCategory entity to database row
    */
-  mapToRow(entity: Partial<GradeCategory>): any {
   mapToRow(entity: Partial<Sport.GradeCategory>): any {
     const row: any = {};
-    
-    if (entity.id) row.id = entity.id;
-    if (entity.classGroupId) row.class_group_id = entity.classGroupId;
-    if (entity.name) row.name = entity.name;
-    if (entity.description) row.description = entity.description;
+
+    if (entity.id !== undefined) row.id = entity.id;
+    if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
+    if (entity.name !== undefined) row.name = entity.name;
     if (entity.description !== undefined) row.description = entity.description;
-    if (entity.type) row.type = entity.type;
+    if (entity.type !== undefined) row.type = entity.type;
     if (entity.weight !== undefined) row.weight = entity.weight;
-    if (entity.configuration) row.configuration = JSON.stringify(entity.configuration);
-    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
-    
+    if (entity.configuration !== undefined) row.configuration = JSON.stringify(entity.configuration);
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+
     return row;
   }
 
   /**
-   * Find all grade categories for a specific class
-   */
-  async findByClassGroup(classGroupId: string): Promise<GradeCategory[]> {
    * Find all grade categories for a specific class group
    */
   async findByClassGroup(classGroupId: string): Promise<Sport.GradeCategory[]> {
@@ -65,29 +58,20 @@ export class GradeCategoryRepository extends AdapterRepository<Sport.GradeCatego
   /**
    * Find grade categories by type
    */
-  async findByType(type: GradeCategoryType): Promise<GradeCategory[]> {
   async findByType(type: Sport.GradeCategoryType): Promise<Sport.GradeCategory[]> {
     return this.find({ type });
   }
 
   /**
-   * Find grade categories by class and type
-   */
-  async findByClassGroupAndType(classGroupId: string, type: GradeCategoryType): Promise<GradeCategory[]> {
-    return this.find({
-      class_group_id: classGroupId,
-      type
-    });
-  }
    * Find grade categories for a class group by type
    */
   async findByClassGroupAndType(
-    classGroupId: string, 
+    classGroupId: string,
     type: Sport.GradeCategoryType
   ): Promise<Sport.GradeCategory[]> {
-    return this.find({ 
+    return this.find({
       class_group_id: classGroupId,
-      type 
+      type
     });
   }
 

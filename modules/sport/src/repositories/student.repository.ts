@@ -39,20 +39,20 @@ export class StudentRepository extends AdapterRepository<Student> {
    */
   mapToRow(entity: Partial<Student>): any {
     const row: any = {};
-    
-    if (entity.id) row.id = entity.id;
-    if (entity.firstName) row.first_name = entity.firstName;
-    if (entity.lastName) row.last_name = entity.lastName;
+
+    if (entity.id !== undefined) row.id = entity.id;
+    if (entity.firstName !== undefined) row.first_name = entity.firstName;
+    if (entity.lastName !== undefined) row.last_name = entity.lastName;
     if (entity.birthYear !== undefined) row.birth_year = entity.birthYear;
-    if (entity.gender) row.gender = entity.gender;
-    if (entity.photoUri) row.photo_uri = entity.photoUri;
-    if (entity.contactInfo?.email) row.email = entity.contactInfo.email;
-    if (entity.contactInfo?.parentEmail) row.parent_email = entity.contactInfo.parentEmail;
-    if (entity.contactInfo?.phone) row.phone = entity.contactInfo.phone;
-    if (entity.classGroupId) row.class_group_id = entity.classGroupId;
-    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
-    
+    if (entity.gender !== undefined) row.gender = entity.gender;
+    if (entity.photoUri !== undefined) row.photo_uri = entity.photoUri;
+    if (entity.contactInfo?.email !== undefined) row.email = entity.contactInfo.email;
+    if (entity.contactInfo?.parentEmail !== undefined) row.parent_email = entity.contactInfo.parentEmail;
+    if (entity.contactInfo?.phone !== undefined) row.phone = entity.contactInfo.phone;
+    if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+
     return row;
   }
 
@@ -69,7 +69,7 @@ export class StudentRepository extends AdapterRepository<Student> {
   async findByName(searchTerm: string): Promise<Student[]> {
     const allStudents = await this.findAll();
     const lowerSearch = searchTerm.toLowerCase();
-    return allStudents.filter(student => 
+    return allStudents.filter(student =>
       student.firstName.toLowerCase().includes(lowerSearch) ||
       student.lastName.toLowerCase().includes(lowerSearch)
     );

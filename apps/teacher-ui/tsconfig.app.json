@@ -18,10 +18,6 @@
     "baseUrl": ".",
     "paths": {
       "@viccoboard/core": ["../../packages/core/src"],
-      "@viccoboard/plugins": ["../../packages/plugins/src"],
-      "@viccoboard/storage": ["../../packages/storage/src"],
-      "@viccoboard/sport": ["../../modules/sport/src"],
-      "@viccoboard/exams": ["../../modules/exams/src"],
       "@/*": ["./src/*"]
     },
     "types": ["vite/client"],

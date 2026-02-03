@@ -32,15 +32,15 @@ export class GradeSchemeRepository extends AdapterRepository<Sport.GradeScheme> 
    */
   mapToRow(entity: Partial<Sport.GradeScheme>): any {
     const row: any = {};
-    
-    if (entity.id) row.id = entity.id;
-    if (entity.name) row.name = entity.name;
+
+    if (entity.id !== undefined) row.id = entity.id;
+    if (entity.name !== undefined) row.name = entity.name;
     if (entity.description !== undefined) row.description = entity.description;
-    if (entity.grades) row.grades = JSON.stringify(entity.grades);
-    if (entity.type) row.type = entity.type;
-    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
-    
+    if (entity.grades !== undefined) row.grades = JSON.stringify(entity.grades);
+    if (entity.type !== undefined) row.type = entity.type;
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+
     return row;
   }
 
@@ -58,7 +58,7 @@ export class GradeSchemeRepository extends AdapterRepository<Sport.GradeScheme> 
    */
   async searchByName(query: string): Promise<Sport.GradeScheme[]> {
     const allSchemes = await this.findAll();
-    return allSchemes.filter((scheme: Sport.GradeScheme) => 
+    return allSchemes.filter((scheme: Sport.GradeScheme) =>
       scheme.name.toLowerCase().includes(query.toLowerCase())
     );
   }

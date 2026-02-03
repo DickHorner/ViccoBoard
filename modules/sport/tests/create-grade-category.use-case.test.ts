@@ -4,13 +4,16 @@
 
 import { CreateGradeCategoryUseCase } from '../src/use-cases/create-grade-category.use-case';
 import { GradeCategoryRepository } from '../src/repositories/grade-category.repository';
-import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage';
-import { GradeCategoryType } from '@viccoboard/core';
+import { ClassGroupRepository } from '../src/repositories/class-group.repository';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage';
+import { Sport } from '@viccoboard/core';
 
 describe('CreateGradeCategoryUseCase', () => {
   let storage: SQLiteStorage;
   let repository: GradeCategoryRepository;
+  let classGroupRepository: ClassGroupRepository;
   let useCase: CreateGradeCategoryUseCase;
+  let classGroupId: string;
 
   beforeEach(async () => {
     // Use in-memory database for tests
@@ -20,10 +23,19 @@ describe('CreateGradeCategoryUseCase', () => {
     });
     await storage.initialize('test-password');
     storage.registerMigration(new InitialSchemaMigration(storage));
+    storage.registerMigration(new GradingSchemaMigration(storage));
     await storage.migrate();
 
     repository = new GradeCategoryRepository(storage.getAdapter());
+    classGroupRepository = new ClassGroupRepository(storage.getAdapter());
     useCase = new CreateGradeCategoryUseCase(repository);
+
+    const classGroup = await classGroupRepository.create({
+      name: 'Test Class',
+      schoolYear: '2023/2024',
+      gradingScheme: 'default'
+    });
+    classGroupId = classGroup.id;
   });
 
   afterEach(async () => {
@@ -32,10 +44,10 @@ describe('CreateGradeCategoryUseCase', () => {
 
   test('creates a criteria-based grade category successfully', async () => {
     const input = {
-      classGroupId: 'class-123',
+      classGroupId,
       name: 'Technik',
       description: 'Technische Fähigkeiten',
-      type: GradeCategoryType.Criteria,
+      type: Sport.GradeCategoryType.Criteria,
       weight: 50,
       configuration: {
         type: 'criteria' as const,
@@ -48,19 +60,19 @@ describe('CreateGradeCategoryUseCase', () => {
     const result = await useCase.execute(input);
 
     expect(result.id).toBeDefined();
-    expect(result.classGroupId).toBe('class-123');
+    expect(result.classGroupId).toBe(classGroupId);
     expect(result.name).toBe('Technik');
     expect(result.description).toBe('Technische Fähigkeiten');
-    expect(result.type).toBe(GradeCategoryType.Criteria);
+    expect(result.type).toBe(Sport.GradeCategoryType.Criteria);
     expect(result.weight).toBe(50);
     expect(result.configuration).toEqual(input.configuration);
   });
 
   test('creates a time-based grade category successfully', async () => {
     const input = {
-      classGroupId: 'class-123',
+      classGroupId,
       name: 'Sprint 100m',
-      type: GradeCategoryType.Time,
+      type: Sport.GradeCategoryType.Time,
       weight: 30,
       configuration: {
         type: 'time' as const,
@@ -74,7 +86,7 @@ describe('CreateGradeCategoryUseCase', () => {
     const result = await useCase.execute(input);
 
     expect(result.id).toBeDefined();
-    expect(result.type).toBe(GradeCategoryType.Time);
+    expect(result.type).toBe(Sport.GradeCategoryType.Time);
     expect(result.configuration).toEqual(input.configuration);
   });
 
@@ -82,7 +94,7 @@ describe('CreateGradeCategoryUseCase', () => {
     const input = {
       classGroupId: '',
       name: 'Test Category',
-      type: GradeCategoryType.Criteria,
+      type: Sport.GradeCategoryType.Criteria,
       weight: 50,
       configuration: {
         type: 'criteria' as const,
@@ -97,9 +109,9 @@ describe('CreateGradeCategoryUseCase', () => {
 
   test('throws error for missing name', async () => {
     const input = {
-      classGroupId: 'class-123',
+      classGroupId,
       name: '',
-      type: GradeCategoryType.Criteria,
+      type: Sport.GradeCategoryType.Criteria,
       weight: 50,
       configuration: {
         type: 'criteria' as const,
@@ -114,7 +126,7 @@ describe('CreateGradeCategoryUseCase', () => {
 
   test('throws error for missing type', async () => {
     const input = {
-      classGroupId: 'class-123',
+      classGroupId,
       name: 'Test Category',
       type: '' as any,
       weight: 50,
@@ -131,9 +143,9 @@ describe('CreateGradeCategoryUseCase', () => {
 
   test('throws error for weight less than 0', async () => {
     const input = {
-      classGroupId: 'class-123',
+      classGroupId,
       name: 'Test Category',
-      type: GradeCategoryType.Criteria,
+      type: Sport.GradeCategoryType.Criteria,
       weight: -10,
       configuration: {
         type: 'criteria' as const,
@@ -148,9 +160,9 @@ describe('CreateGradeCategoryUseCase', () => {
 
   test('throws error for weight greater than 100', async () => {
     const input = {
-      classGroupId: 'class-123',
+      classGroupId,
       name: 'Test Category',
-      type: GradeCategoryType.Criteria,
+      type: Sport.GradeCategoryType.Criteria,
       weight: 150,
       configuration: {
         type: 'criteria' as const,
@@ -165,9 +177,9 @@ describe('CreateGradeCategoryUseCase', () => {
 
   test('throws error for missing configuration', async () => {
     const input = {
-      classGroupId: 'class-123',
+      classGroupId,
       name: 'Test Category',
-      type: GradeCategoryType.Criteria,
+      type: Sport.GradeCategoryType.Criteria,
       weight: 50,
       configuration: null as any
     };

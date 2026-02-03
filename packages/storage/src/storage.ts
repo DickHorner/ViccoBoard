@@ -78,7 +78,7 @@ export class SQLiteStorage implements Storage {
     if (this.db) {
       this.db.close();
       this.db = null;
-    this.adapter = null;
+      this.adapter = null;
       this.initialized = false;
     }
   }
@@ -117,23 +117,23 @@ export class SQLiteStorage implements Storage {
     const result = this.db
       .prepare('SELECT MAX(version) as version FROM migrations')
       .get() as { version: number | null };
-    
+
     const currentVersion = result.version || 0;
 
     // Apply pending migrations
     for (const migration of this.migrations) {
       if (migration.version > currentVersion) {
         console.log(`Applying migration ${migration.version}: ${migration.name}`);
-        
+
         try {
           // Call up() method - should be synchronous
           await migration.up();
-          
+
           // Record migration in migrations table
           this.db.prepare(
             'INSERT INTO migrations (version, name) VALUES (?, ?)'
           ).run(migration.version, migration.name);
-          
+
           console.log(`✓ Migration ${migration.version} completed`);
         } catch (error) {
           console.error(`✗ Migration ${migration.version} failed:`, error);
@@ -143,12 +143,19 @@ export class SQLiteStorage implements Storage {
     }
   }
 
-  async transaction<T>(callback: () => Promise<T>): Promise<T> {
+  async transaction<T>(callback: () => T | Promise<T>): Promise<T> {
     if (!this.db) {
       throw new Error('Storage not initialized');
     }
 
-    const transaction = this.db.transaction(() => callback());
+    const transaction = this.db.transaction(() => {
+      const result = callback();
+      if (result && typeof (result as any).then === 'function') {
+        throw new Error('SQLiteStorage.transaction callback must be synchronous');
+      }
+      return result as T;
+    });
+
     return transaction() as T;
   }
 

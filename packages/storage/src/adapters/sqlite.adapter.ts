@@ -30,7 +30,13 @@ export class SQLiteAdapter implements StorageAdapter {
   }
 
   async transaction<T>(callback: () => T | Promise<T>): Promise<T> {
-    const transaction = this.db.transaction(() => callback());
+    const transaction = this.db.transaction(() => {
+      const result = callback();
+      if (result && typeof (result as any).then === 'function') {
+        throw new Error('SQLiteAdapter.transaction callback must be synchronous');
+      }
+      return result as T;
+    });
     return transaction() as T;
   }
 

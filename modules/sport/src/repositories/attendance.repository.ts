@@ -25,7 +25,8 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
       notes: row.notes || undefined,
       timestamp: new Date(row.timestamp),
       createdAt: new Date(row.created_at),
-      lastModified: new Date(row.last_modified)
+      lastModified: new Date(row.last_modified),
+      exported: row.exported ? true : false
     };
   }
 
@@ -34,17 +35,18 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
    */
   mapToRow(entity: Partial<AttendanceRecord>): any {
     const row: any = {};
-    
-    if (entity.id) row.id = entity.id;
-    if (entity.studentId) row.student_id = entity.studentId;
-    if (entity.lessonId) row.lesson_id = entity.lessonId;
-    if (entity.status) row.status = entity.status;
-    if (entity.reason) row.reason = entity.reason;
-    if (entity.notes) row.notes = entity.notes;
-    if (entity.timestamp) row.timestamp = entity.timestamp.toISOString();
-    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
-    
+
+    if (entity.id !== undefined) row.id = entity.id;
+    if (entity.studentId !== undefined) row.student_id = entity.studentId;
+    if (entity.lessonId !== undefined) row.lesson_id = entity.lessonId;
+    if (entity.status !== undefined) row.status = entity.status;
+    if (entity.reason !== undefined) row.reason = entity.reason;
+    if (entity.notes !== undefined) row.notes = entity.notes;
+    if (entity.timestamp !== undefined) row.timestamp = entity.timestamp.toISOString();
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+    if (entity.exported !== undefined) row.exported = entity.exported ? 1 : 0;
+
     return row;
   }
 
@@ -67,9 +69,9 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
    */
   async getAttendancePercentage(studentId: string): Promise<number> {
     const records = await this.findByStudent(studentId);
-    
+
     if (records.length === 0) return 100;
-    
+
     const presentCount = records.filter(r => r.status === AttendanceStatus.Present).length;
     return (presentCount / records.length) * 100;
   }
@@ -86,7 +88,7 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
     percentage: number;
   }> {
     const records = await this.findByStudent(studentId);
-    
+
     const summary = {
       total: records.length,
       present: records.filter(r => r.status === 'present').length,
@@ -95,11 +97,11 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
       passive: records.filter(r => r.status === 'passive').length,
       percentage: 0
     };
-    
-    summary.percentage = summary.total > 0 
-      ? (summary.present / summary.total) * 100 
+
+    summary.percentage = summary.total > 0
+      ? (summary.present / summary.total) * 100
       : 100;
-    
+
     return summary;
   }
 }

@@ -4,6 +4,7 @@
 
 import { ref } from 'vue'
 import { db } from '../db'
+import { createUuid } from '../utils/uuid'
 import type { ClassGroup, Student, AttendanceRecord, GradeCategory, PerformanceEntry } from '../db'
 
 export function useDatabase() {
@@ -13,7 +14,7 @@ export function useDatabase() {
       findAll: async () => await db.classGroups.toArray(),
       read: async (id: string) => await db.classGroups.get(id),
       create: async (entity: any) => {
-        const id = crypto.randomUUID()
+        const id = createUuid()
         const now = new Date()
         await db.classGroups.add({
           id,
@@ -34,7 +35,7 @@ export function useDatabase() {
       findByClassGroup: async (classId: string) => 
         await db.students.where('classId').equals(classId).toArray(),
       create: async (entity: any) => {
-        const id = crypto.randomUUID()
+        const id = createUuid()
         const now = new Date()
         await db.students.add({
           id,
@@ -82,7 +83,7 @@ export function useDatabase() {
         }))
       },
       create: async (entity: any) => {
-        const id = crypto.randomUUID()
+        const id = createUuid()
         const now = new Date()
         await db.gradeCategories.add({
           id,
@@ -159,7 +160,7 @@ export function useDatabase() {
         }))
       },
       create: async (entity: any) => {
-        const id = crypto.randomUUID()
+        const id = createUuid()
         await db.performanceEntries.add({
           id,
           studentId: entity.studentId,
@@ -175,7 +176,7 @@ export function useDatabase() {
     },
     createGradeCategoryUseCase: {
       execute: async (input: any) => {
-        const id = crypto.randomUUID()
+        const id = createUuid()
         const now = new Date()
         await db.gradeCategories.add({
           id,
@@ -198,7 +199,7 @@ export function useDatabase() {
     },
     recordGradeUseCase: {
       execute: async (input: any) => {
-        const id = crypto.randomUUID()
+        const id = createUuid()
         const now = new Date()
         await db.performanceEntries.add({
           id,
@@ -246,7 +247,7 @@ export function useClassGroups() {
   }
 
   const create = async (data: Omit<ClassGroup, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
-    const id = crypto.randomUUID()
+    const id = createUuid()
     const now = new Date()
     await classGroups.add({
       id,
@@ -307,7 +308,7 @@ export function useStudents() {
   }
 
   const create = async (data: Omit<Student, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
-    const id = crypto.randomUUID()
+    const id = createUuid()
     const now = new Date()
     await students.add({
       id,
@@ -377,7 +378,7 @@ export function useAttendance() {
   }
 
   const create = async (data: Omit<AttendanceRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
-    const id = crypto.randomUUID()
+    const id = createUuid()
     const now = new Date()
     await attendanceRecords.add({
       id,
@@ -410,3 +411,5 @@ export function useAttendance() {
     remove
   }
 }
+
+

@@ -4,12 +4,9 @@
  */
 
 import { AdapterRepository } from '@viccoboard/storage';
-import { PerformanceEntry } from '@viccoboard/core';
 import { Sport } from '@viccoboard/core';
-
 import type { StorageAdapter } from '@viccoboard/storage';
 
-export class PerformanceEntryRepository extends AdapterRepository<PerformanceEntry> 
 export class PerformanceEntryRepository extends AdapterRepository<Sport.PerformanceEntry> {
   constructor(adapter: StorageAdapter) {
     super(adapter, 'performance_entries');
@@ -18,17 +15,16 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
   /**
    * Map database row to PerformanceEntry entity
    */
-  mapToEntity(row: any): PerformanceEntry {
   mapToEntity(row: any): Sport.PerformanceEntry {
     return {
       id: row.id,
       studentId: row.student_id,
       categoryId: row.category_id,
       measurements: JSON.parse(row.measurements || '{}'),
-      calculatedGrade: row.calculated_grade || undefined,
+      calculatedGrade: row.calculated_grade ?? undefined,
       timestamp: new Date(row.timestamp),
-      deviceInfo: row.device_info || undefined,
-      comment: row.comment || undefined,
+      deviceInfo: row.device_info ?? undefined,
+      comment: row.comment ?? undefined,
       metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
@@ -38,38 +34,30 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
   /**
    * Map PerformanceEntry entity to database row
    */
-  mapToRow(entity: Partial<PerformanceEntry>): any {
+  mapToRow(entity: Partial<Sport.PerformanceEntry>): any {
     const row: any = {};
-    
-    if (entity.id) row.id = entity.id;
-    if (entity.studentId) row.student_id = entity.studentId;
-    if (entity.categoryId) row.category_id = entity.categoryId;
-    if (entity.measurements) row.measurements = JSON.stringify(entity.measurements);
+
+    if (entity.id !== undefined) row.id = entity.id;
+    if (entity.studentId !== undefined) row.student_id = entity.studentId;
+    if (entity.categoryId !== undefined) row.category_id = entity.categoryId;
+    if (entity.measurements !== undefined) row.measurements = JSON.stringify(entity.measurements);
     if (entity.calculatedGrade !== undefined) row.calculated_grade = entity.calculatedGrade;
-    if (entity.timestamp) row.timestamp = entity.timestamp.toISOString();
-    if (entity.deviceInfo) row.device_info = entity.deviceInfo;
-    if (entity.comment) row.comment = entity.comment;
-    if (entity.metadata) row.metadata = JSON.stringify(entity.metadata);
-    
+    if (entity.timestamp !== undefined) row.timestamp = entity.timestamp.toISOString();
+    if (entity.deviceInfo !== undefined) row.device_info = entity.deviceInfo;
+    if (entity.comment !== undefined) row.comment = entity.comment;
+    if (entity.metadata !== undefined) row.metadata = JSON.stringify(entity.metadata);
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+
     return row;
   }
 
   /**
-   * Find all performance entries for a student
-   */
-  async findByStudent(studentId: string): Promise<PerformanceEntry[]> {
-    return this.find({ student_id: studentId });
-  }
-
-  /**
-   * Find all performance entries for a grade category
-   */
-  async findByCategory(categoryId: string): Promise<PerformanceEntry[]> {
    * Find all performance entries for a specific student
    */
   async findByStudent(studentId: string): Promise<Sport.PerformanceEntry[]> {
     const entries = await this.find({ student_id: studentId });
-    
+
     // Sort by timestamp descending by default
     return entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
@@ -85,14 +73,14 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
    * Find performance entries for a student in a specific category
    */
   async findByStudentAndCategory(
-    studentId: string, 
+    studentId: string,
     categoryId: string
   ): Promise<Sport.PerformanceEntry[]> {
-    const entries = await this.find({ 
+    const entries = await this.find({
       student_id: studentId,
-      category_id: categoryId 
+      category_id: categoryId
     });
-    
+
     // Sort by timestamp descending
     return entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
@@ -115,7 +103,7 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
     const allEntries = await this.findAll();
     const startTime = startDate.getTime();
     const endTime = endDate.getTime();
-    
+
     return allEntries.filter(entry => {
       const entryTime = entry.timestamp.getTime();
       return entryTime >= startTime && entryTime <= endTime;

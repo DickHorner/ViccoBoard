@@ -1,7 +1,7 @@
 # AI Agent Pull Request Review Guidelines
 
 ## Purpose
-This document provides comprehensive instructions for AI agents performing pull request reviews on the ViccoBoard project. These guidelines ensure consistent, high-quality code reviews that align with industry standards, best practices, and community learnings.
+This document provides comprehensive instructions for AI agents performing pull request reviews on any project. These guidelines ensure consistent, high-quality code reviews that align with industry standards, best practices, and community learnings.
 
 ## Core Principles
 
@@ -21,9 +21,9 @@ This document provides comprehensive instructions for AI agents performing pull 
 - Prioritize learning and improvement over criticism
 
 ### 3. Respect Project Context
-- Understand the ViccoBoard architecture before reviewing (see `agents.md` and `Plan.md`)
-- Respect the project's hard constraints (local-first, iPad/Safari compatibility, no feature removal)
-- Align with the modular architecture and plugin system
+- Understand project's architecture before reviewing (if applicable, see `agents.md` and `Plan.md`)
+- Respect the project's hard constraints if applicable
+- Align with the architecture and plugin system if applicable
 - Follow the established conventions in the codebase
 
 ## Review Checklist

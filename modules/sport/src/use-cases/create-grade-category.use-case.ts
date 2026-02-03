@@ -3,17 +3,16 @@
  * Creates a new grading category for a class
  */
 
-import { v4 as uuidv4 } from 'uuid';
-import { GradeCategory, GradeCategoryType, GradeCategoryConfig } from '@viccoboard/core';
+import { Sport } from '@viccoboard/core';
 import type { GradeCategoryRepository } from '../repositories/grade-category.repository';
 
 export interface CreateGradeCategoryInput {
   classGroupId: string;
   name: string;
   description?: string;
-  type: GradeCategoryType;
+  type: Sport.GradeCategoryType;
   weight: number;
-  configuration: GradeCategoryConfig;
+  configuration: Sport.GradeCategoryConfig;
 }
 
 export class CreateGradeCategoryUseCase {
@@ -21,7 +20,7 @@ export class CreateGradeCategoryUseCase {
     private gradeCategoryRepository: GradeCategoryRepository
   ) {}
 
-  async execute(input: CreateGradeCategoryInput): Promise<GradeCategory> {
+  async execute(input: CreateGradeCategoryInput): Promise<Sport.GradeCategory> {
     // Validate input
     if (!input.classGroupId) {
       throw new Error('Class Group ID is required');
@@ -39,24 +38,14 @@ export class CreateGradeCategoryUseCase {
       throw new Error('Category configuration is required');
     }
 
-    const now = new Date();
-
-    // Create grade category
-    const category: GradeCategory = {
-      id: uuidv4(),
+    // Save to repository (repository assigns id and timestamps)
+    return this.gradeCategoryRepository.create({
       classGroupId: input.classGroupId,
       name: input.name.trim(),
       description: input.description,
       type: input.type,
       weight: input.weight,
-      configuration: input.configuration,
-      createdAt: now,
-      lastModified: now
-    };
-
-    // Save to repository
-    await this.gradeCategoryRepository.create(category);
-
-    return category;
+      configuration: input.configuration
+    });
   }
 }

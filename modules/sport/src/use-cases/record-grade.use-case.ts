@@ -3,8 +3,7 @@
  * Records a grade/performance entry for a student
  */
 
-import { v4 as uuidv4 } from 'uuid';
-import { PerformanceEntry } from '@viccoboard/core';
+import { Sport } from '@viccoboard/core';
 import type { PerformanceEntryRepository } from '../repositories/performance-entry.repository';
 
 export interface RecordGradeInput {
@@ -21,7 +20,7 @@ export class RecordGradeUseCase {
     private performanceEntryRepository: PerformanceEntryRepository
   ) {}
 
-  async execute(input: RecordGradeInput): Promise<PerformanceEntry> {
+  async execute(input: RecordGradeInput): Promise<Sport.PerformanceEntry> {
     // Validate input
     if (!input.studentId) {
       throw new Error('Student ID is required');
@@ -35,9 +34,8 @@ export class RecordGradeUseCase {
 
     const now = new Date();
 
-    // Create performance entry
-    const entry: PerformanceEntry = {
-      id: uuidv4(),
+    // Save to repository (repository assigns id and timestamps)
+    return this.performanceEntryRepository.create({
       studentId: input.studentId,
       categoryId: input.categoryId,
       measurements: input.measurements,
@@ -45,11 +43,6 @@ export class RecordGradeUseCase {
       timestamp: now,
       comment: input.comment,
       metadata: input.metadata
-    };
-
-    // Save to repository
-    await this.performanceEntryRepository.create(entry);
-
-    return entry;
+    });
   }
 }

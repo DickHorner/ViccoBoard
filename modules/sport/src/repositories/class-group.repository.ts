@@ -34,17 +34,17 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
    */
   mapToRow(entity: Partial<ClassGroup>): any {
     const row: any = {};
-    
-    if (entity.id) row.id = entity.id;
-    if (entity.name) row.name = entity.name;
-    if (entity.schoolYear) row.school_year = entity.schoolYear;
-    if (entity.state) row.state = entity.state;
-    if (entity.holidayCalendarRef) row.holiday_calendar_ref = entity.holidayCalendarRef;
-    if (entity.gradingScheme) row.grading_scheme = entity.gradingScheme;
-    if (entity.subjectProfile) row.subject_profile = JSON.stringify(entity.subjectProfile);
-    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
-    
+
+    if (entity.id !== undefined) row.id = entity.id;
+    if (entity.name !== undefined) row.name = entity.name;
+    if (entity.schoolYear !== undefined) row.school_year = entity.schoolYear;
+    if (entity.state !== undefined) row.state = entity.state;
+    if (entity.holidayCalendarRef !== undefined) row.holiday_calendar_ref = entity.holidayCalendarRef;
+    if (entity.gradingScheme !== undefined) row.grading_scheme = entity.gradingScheme;
+    if (entity.subjectProfile !== undefined) row.subject_profile = JSON.stringify(entity.subjectProfile);
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+
     return row;
   }
 

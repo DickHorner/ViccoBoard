@@ -6,9 +6,8 @@
 
 import { ref, readonly } from 'vue'
 import { db } from '../db'
+import { createUuid } from '../utils/uuid'
 import type { ClassGroup, Student, AttendanceRecord } from '../db'
-
-// Import Sport module types for validation (not used directly)
 
 interface CreateClassInput {
   name: string
@@ -26,6 +25,19 @@ interface AddStudentInput {
   email?: string
   parentEmail?: string
   phone?: string
+}
+
+interface UpdateStudentInput {
+  firstName?: string
+  lastName?: string
+  classGroupId?: string
+  birthYear?: number
+  gender?: 'male' | 'female' | 'diverse'
+  email?: string
+  parentEmail?: string
+  phone?: string
+  photo?: string
+  dateOfBirth?: Date
 }
 
 interface RecordAttendanceInput {
@@ -96,7 +108,7 @@ async function validateStudentInput(input: AddStudentInput): Promise<void> {
   // Check for duplicate email addresses
   if (input.email) {
     const existingStudents = await db.students.toArray()
-    const duplicateEmail = existingStudents.find(s => 
+    const duplicateEmail = existingStudents.find(s =>
       s.email?.toLowerCase() === input.email!.toLowerCase()
     )
     if (duplicateEmail) {
@@ -125,7 +137,7 @@ async function validateAttendanceInput(input: RecordAttendanceInput): Promise<vo
   }
 
   // Only allow statuses that are supported by the database schema
-  const validStatuses = ['present', 'absent', 'excused', 'late']
+  const validStatuses = ['present', 'absent', 'excused', 'late', 'passive']
   if (!validStatuses.includes(input.status)) {
     throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`)
   }
@@ -158,19 +170,19 @@ export function useClassGroups() {
       .where('schoolYear')
       .equals(input.schoolYear)
       .toArray()
-    
-    const duplicate = existing.find(c => 
+
+    const duplicate = existing.find(c =>
       c.name.toLowerCase() === input.name.toLowerCase()
     )
-    
+
     if (duplicate) {
       throw new Error(`Class "${input.name}" already exists for ${input.schoolYear}`)
     }
 
     // Create the class
-    const id = crypto.randomUUID()
+    const id = createUuid()
     const now = new Date()
-    
+
     const classGroup: ClassGroup = {
       id,
       name: input.name,
@@ -209,6 +221,7 @@ export function useStudents() {
   const getById = async (id: string): Promise<Student | undefined> => {
     return await db.students.get(id)
   }
+
   const getByClassId = async (classId: string): Promise<Student[]> => {
     return await db.students
       .where('classId')
@@ -221,7 +234,7 @@ export function useStudents() {
     await validateStudentInput(input)
 
     // Create the student
-    const id = crypto.randomUUID()
+    const id = createUuid()
     const now = new Date()
 
     const student: Student = {
@@ -239,11 +252,43 @@ export function useStudents() {
     return student
   }
 
+  const update = async (id: string, updates: UpdateStudentInput): Promise<Student | undefined> => {
+    const existing = await db.students.get(id)
+    if (!existing) {
+      throw new Error(`Student with ID "${id}" not found`)
+    }
+
+    const updatedAt = new Date()
+    const payload: Record<string, any> = {
+      ...updates,
+      updatedAt
+    }
+
+    if (payload.classGroupId !== undefined) {
+      payload.classId = payload.classGroupId
+      delete payload.classGroupId
+    }
+
+    if (payload.birthYear !== undefined && payload.dateOfBirth === undefined) {
+      payload.dateOfBirth = new Date(payload.birthYear, 0, 1)
+      delete payload.birthYear
+    }
+
+    await db.students.update(id, payload)
+    return db.students.get(id)
+  }
+
+  const remove = async (id: string): Promise<void> => {
+    await db.students.delete(id)
+  }
+
   return {
     getAll,
     getById,
     getByClassId,
-    create
+    create,
+    update,
+    remove
   }
 }
 
@@ -297,7 +342,7 @@ export function useAttendance() {
         // Update existing record
         const updatedAt = new Date()
         await db.attendanceRecords.update(existingRecord.id, {
-          status: input.status as 'present' | 'absent' | 'excused' | 'late',
+          status: input.status as 'present' | 'absent' | 'excused' | 'late' | 'passive',
           notes: input.notes || input.reason,
           updatedAt
         })
@@ -305,7 +350,7 @@ export function useAttendance() {
       }
 
       // Create new attendance record
-      const id = crypto.randomUUID()
+      const id = createUuid()
       const now = new Date()
 
       const record: AttendanceRecord = {
@@ -313,7 +358,7 @@ export function useAttendance() {
         studentId: input.studentId,
         lessonId: input.lessonId,
         date: now,
-        status: input.status as 'present' | 'absent' | 'excused' | 'late',
+        status: input.status as 'present' | 'absent' | 'excused' | 'late' | 'passive',
         notes: input.notes || input.reason,
         createdAt: now,
         updatedAt: now
@@ -328,11 +373,11 @@ export function useAttendance() {
     // Process all records in a single transaction for better performance
     return await db.transaction('rw', db.attendanceRecords, async () => {
       const results: AttendanceRecord[] = []
-      
+
       for (const input of inputs) {
         // Validate using Sport module logic
         await validateAttendanceInput(input)
-        
+
         // Check if attendance already recorded for this lesson and student
         const existingRecord = await db.attendanceRecords
           .where({ lessonId: input.lessonId, studentId: input.studentId })
@@ -342,7 +387,7 @@ export function useAttendance() {
           // Update existing record
           const updatedAt = new Date()
           await db.attendanceRecords.update(existingRecord.id, {
-            status: input.status as 'present' | 'absent' | 'excused' | 'late',
+            status: input.status as 'present' | 'absent' | 'excused' | 'late' | 'passive',
             notes: input.notes || input.reason,
             updatedAt
           })
@@ -350,7 +395,7 @@ export function useAttendance() {
           if (updated) results.push(updated)
         } else {
           // Create new attendance record
-          const id = crypto.randomUUID()
+          const id = createUuid()
           const now = new Date()
 
           const record: AttendanceRecord = {
@@ -358,7 +403,7 @@ export function useAttendance() {
             studentId: input.studentId,
             lessonId: input.lessonId,
             date: now,
-            status: input.status as 'present' | 'absent' | 'excused' | 'late',
+            status: input.status as 'present' | 'absent' | 'excused' | 'late' | 'passive',
             notes: input.notes || input.reason,
             createdAt: now,
             updatedAt: now
@@ -381,12 +426,13 @@ export function useAttendance() {
       present: records.filter(r => r.status === 'present').length,
       absent: records.filter(r => r.status === 'absent').length,
       excused: records.filter(r => r.status === 'excused').length,
-      passive: 0, // Passive status not in Dexie schema - feature for future enhancement
+      passive: records.filter(r => r.status === 'passive').length,
+      late: records.filter(r => r.status === 'late').length,
       percentage: 0
     }
 
-    summary.percentage = summary.total > 0 
-      ? (summary.present / summary.total) * 100 
+    summary.percentage = summary.total > 0
+      ? (summary.present / summary.total) * 100
       : 100
 
     return summary
@@ -413,3 +459,5 @@ export function useSportModule() {
     initialize: async () => { /* Dexie is always ready */ }
   }
 }
+
+

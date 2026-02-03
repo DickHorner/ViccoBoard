@@ -6,6 +6,9 @@
 import { StorageAdapter, TableSchema } from './storage-adapter.interface';
 
 export class IndexedDBAdapter implements StorageAdapter {
+  private activeTransaction: IDBTransaction | null = null;
+  private activeMode: IDBTransactionMode | null = null;
+
   constructor(private db: IDBDatabase) {}
 
   async query<T = any>(query: string, params?: any[]): Promise<T[]> {
@@ -23,9 +26,81 @@ export class IndexedDBAdapter implements StorageAdapter {
   }
 
   async transaction<T>(callback: () => T | Promise<T>): Promise<T> {
-    // IndexedDB transactions are more complex - for now, just execute the callback
-    // Real implementation would create an IDBTransaction and handle rollback
-    return callback();
+    const storeNames = Array.from(this.db.objectStoreNames);
+    if (storeNames.length === 0) {
+      return callback();
+    }
+
+    return new Promise<T>((resolve, reject) => {
+      const tx = this.db.transaction(storeNames, 'readwrite');
+      this.activeTransaction = tx;
+      this.activeMode = 'readwrite';
+
+      let callbackResolved = false;
+      let callbackValue: T | undefined;
+      let callbackError: unknown;
+      let txCompleted = false;
+
+      const cleanup = () => {
+        this.activeTransaction = null;
+        this.activeMode = null;
+      };
+
+      const finishIfReady = () => {
+        if (!txCompleted || !callbackResolved) return;
+        if (callbackError) {
+          reject(callbackError);
+          return;
+        }
+        resolve(callbackValue as T);
+      };
+
+      tx.oncomplete = () => {
+        txCompleted = true;
+        cleanup();
+        finishIfReady();
+      };
+
+      tx.onerror = () => {
+        cleanup();
+        reject(tx.error ?? new Error('IndexedDB transaction failed'));
+      };
+
+      tx.onabort = () => {
+        cleanup();
+        reject(tx.error ?? new Error('IndexedDB transaction aborted'));
+      };
+
+      try {
+        const result = callback();
+        Promise.resolve(result).then(
+          (value) => {
+            callbackResolved = true;
+            callbackValue = value;
+            finishIfReady();
+          },
+          (error) => {
+            callbackResolved = true;
+            callbackError = error;
+            try {
+              tx.abort();
+            } catch {
+              // Ignore abort errors
+            }
+            finishIfReady();
+          }
+        );
+      } catch (error) {
+        callbackResolved = true;
+        callbackError = error;
+        try {
+          tx.abort();
+        } catch {
+          // Ignore abort errors
+        }
+        finishIfReady();
+      }
+    });
   }
 
   async tableExists(tableName: string): Promise<boolean> {
@@ -33,112 +108,113 @@ export class IndexedDBAdapter implements StorageAdapter {
   }
 
   async createTable(tableName: string, schema: TableSchema): Promise<void> {
-    // In IndexedDB, "tables" are object stores
-    // This would typically be done during database upgrade
-    if (!this.db.objectStoreNames.contains(tableName)) {
-      // Can't create object store outside of version change transaction
-      // This is a limitation - stores must be created during db.open
-      console.warn(`Cannot create object store ${tableName} - must be done during version upgrade`);
+    if (this.db.objectStoreNames.contains(tableName)) {
+      return;
+    }
+
+    let store: IDBObjectStore;
+    try {
+      store = this.db.createObjectStore(tableName, { keyPath: 'id' });
+    } catch (error) {
+      throw new Error('IndexedDB createTable must be called during a version upgrade');
+    }
+
+    if (schema.indexes) {
+      for (const index of schema.indexes) {
+        const keyPath = index.columns.length === 1 ? index.columns[0] : index.columns;
+        store.createIndex(index.name, keyPath, { unique: !!index.unique });
+      }
     }
   }
 
   async getAll<T = any>(tableName: string, criteria?: Record<string, any>): Promise<T[]> {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([tableName], 'readonly');
-      const store = transaction.objectStore(tableName);
-      const request = store.getAll();
+    const { store } = this.getStore(tableName, 'readonly');
+    const results = await this.requestToPromise(store.getAll());
 
-      request.onsuccess = () => {
-        let results = request.result as T[];
-        
-        // Filter by criteria if provided
-        if (criteria && Object.keys(criteria).length > 0) {
-          results = results.filter(item => {
-            return Object.keys(criteria).every(key => {
-              return (item as any)[key] === criteria[key];
-            });
-          });
-        }
-        
-        resolve(results);
-      };
+    let filtered = results as T[];
+    if (criteria && Object.keys(criteria).length > 0) {
+      filtered = filtered.filter(item => {
+        return Object.keys(criteria).every(key => {
+          return (item as any)[key] === criteria[key];
+        });
+      });
+    }
 
-      request.onerror = () => reject(request.error);
-    });
+    return filtered;
   }
 
   async getById<T = any>(tableName: string, id: string): Promise<T | null> {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([tableName], 'readonly');
-      const store = transaction.objectStore(tableName);
-      const request = store.get(id);
-
-      request.onsuccess = () => resolve(request.result || null);
-      request.onerror = () => reject(request.error);
-    });
+    const { store } = this.getStore(tableName, 'readonly');
+    const result = await this.requestToPromise(store.get(id));
+    return (result as T | undefined) ?? null;
   }
 
   async insert(tableName: string, record: Record<string, any>): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([tableName], 'readwrite');
-      const store = transaction.objectStore(tableName);
-      const request = store.add(record);
-
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+    const { store } = this.getStore(tableName, 'readwrite');
+    await this.requestToPromise(store.add(record));
   }
 
   async update(tableName: string, id: string, updates: Record<string, any>): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Get existing record
-        const existing = await this.getById(tableName, id);
+    const { store } = this.getStore(tableName, 'readwrite');
+
+    return new Promise<void>((resolve, reject) => {
+      const getRequest = store.get(id);
+
+      getRequest.onsuccess = () => {
+        const existing = getRequest.result as Record<string, any> | undefined;
         if (!existing) {
           reject(new Error(`Record with id ${id} not found`));
           return;
         }
 
-        // Merge updates
         const updated = { ...existing, ...updates, id };
+        const putRequest = store.put(updated);
 
-        const transaction = this.db.transaction([tableName], 'readwrite');
-        const store = transaction.objectStore(tableName);
-        const request = store.put(updated);
+        putRequest.onsuccess = () => resolve();
+        putRequest.onerror = () => reject(putRequest.error);
+      };
 
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      } catch (error) {
-        reject(error);
-      }
+      getRequest.onerror = () => reject(getRequest.error);
     });
   }
 
   async delete(tableName: string, id: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([tableName], 'readwrite');
-      const store = transaction.objectStore(tableName);
-      const request = store.delete(id);
-
-      request.onsuccess = () => resolve(true);
-      request.onerror = () => reject(request.error);
-    });
+    const { store } = this.getStore(tableName, 'readwrite');
+    await this.requestToPromise(store.delete(id));
+    return true;
   }
 
   async count(tableName: string, criteria?: Record<string, any>): Promise<number> {
     if (!criteria || Object.keys(criteria).length === 0) {
-      return new Promise((resolve, reject) => {
-        const transaction = this.db.transaction([tableName], 'readonly');
-        const store = transaction.objectStore(tableName);
-        const request = store.count();
-
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
+      const { store } = this.getStore(tableName, 'readonly');
+      return await this.requestToPromise(store.count());
     }
 
-    // With criteria, we need to getAll and filter
     const results = await this.getAll(tableName, criteria);
     return results.length;
+  }
+
+  private getStore(tableName: string, mode: IDBTransactionMode): {
+    store: IDBObjectStore;
+  } {
+    if (this.activeTransaction) {
+      if (!this.activeTransaction.objectStoreNames.contains(tableName)) {
+        throw new Error(`Store "${tableName}" is not part of the active transaction`);
+      }
+      if (mode === 'readwrite' && this.activeMode !== 'readwrite') {
+        throw new Error('Active transaction is read-only');
+      }
+      return { store: this.activeTransaction.objectStore(tableName) };
+    }
+
+    const tx = this.db.transaction([tableName], mode);
+    return { store: tx.objectStore(tableName) };
+  }
+
+  private requestToPromise<T>(request: IDBRequest<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
   }
 }
