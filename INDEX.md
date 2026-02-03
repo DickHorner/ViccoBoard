@@ -1,7 +1,7 @@
 # ViccoBoard Documentation Index
 
-**Generated:** January 16, 2026  
-**Status:** All Planning Documents Complete & Ready
+**Generated:** February 3, 2026  
+**Status:** Planning complete; implementation in progress
 
 ---
 
@@ -10,7 +10,7 @@
 ### 🎯 Start Here
 1. **[EXECUTION_SUMMARY.md](./EXECUTION_SUMMARY.md)** - Overview of all planning completed today
 2. **[ROADMAP.md](./ROADMAP.md)** - 12-phase delivery timeline (26 weeks)
-3. **[STATUS.md](./STATUS.md)** - Current progress (44/176 features, 25%)
+3. **[STATUS.md](./STATUS.md)** - Current progress (baseline 44/176 + backend additions)
 
 ### 🏗️ Architecture & Design
 4. **[ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md)** - 13 key decisions with rationale
@@ -157,7 +157,7 @@ ViccoBoard/
 ├── Plan.md                          (176 feature spec)
 ├── ROADMAP.md                       (12-phase timeline)
 ├── EXECUTION_SUMMARY.md             (Planning session summary)
-├── STATUS.md                        (Progress 44/176 = 25%)
+├── STATUS.md                        (Progress baseline 44/176 + backend additions)
 ├── ARCHITECTURE_DECISIONS.md        (13 key decisions)
 ├── PHASE_2_IMPLEMENTATION.md        (UI + 14-day sprint plan)
 ├── ISSUES_TRACKER.md                (20 formal tasks)
@@ -200,6 +200,7 @@ ViccoBoard/
 | Date | Changes | Status |
 |------|---------|--------|
 | Jan 16, 2026 | Initial planning complete | ✅ Ready for Phase 2 |
+| Feb 3, 2026 | Backend progress (P4-1..P5-1) documented | ✅ In progress |
 | (Future) | Update after Phase 2 | Pending |
 | (Future) | Update after Phase 3 | Pending |
 
@@ -268,6 +269,6 @@ Update [STATUS.md](./STATUS.md) weekly with progress. Refer to [ROADMAP.md](./RO
 
 ---
 
-**Last Updated:** January 16, 2026  
+**Last Updated:** February 3, 2026  
 **Baseline Commit:** d8875dd  
-**Status:** ✅ All Planning Complete, Ready for Phase 2
+**Status:** ✅ Planning complete, implementation underway
