@@ -1,261 +1,424 @@
 <template>
-  <div class="app-layout">
+  <div class="app-shell" :class="{ 'is-compact': isCompact }">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
     <header class="app-header">
-      <div class="header-content">
-        <h1 class="app-title">🎓 ViccoBoard</h1>
-        <p class="app-subtitle">Einheitliche Lehrerplattform</p>
+      <button
+        class="menu-button"
+        type="button"
+        :aria-expanded="isSidebarOpen"
+        aria-controls="primary-navigation"
+        @click="toggleSidebar"
+      >
+        Menu
+      </button>
+
+      <div class="brand">
+        <div class="brand-mark">VB</div>
+        <div class="brand-text">
+          <h1 class="brand-title">ViccoBoard</h1>
+          <p class="brand-subtitle">Teacher workspace</p>
+        </div>
+      </div>
+
+      <div class="header-meta">
+        <div class="page-title">{{ pageTitle }}</div>
+        <div class="status-pill">Offline-ready</div>
       </div>
     </header>
-    
-    <aside class="app-sidebar" :class="{ collapsed: sidebarCollapsed }">
-      <nav class="nav-menu">
-        <RouterLink to="/" class="nav-item" active-class="active">
-          <span class="nav-icon">📊</span>
-          <span class="nav-label">Übersicht</span>
-        </RouterLink>
-        <RouterLink to="/students" class="nav-item" active-class="active">
-          <span class="nav-icon">👥</span>
-          <span class="nav-label">Schüler</span>
-        </RouterLink>
-        <RouterLink to="/attendance" class="nav-item" active-class="active">
-          <span class="nav-icon">✓</span>
-          <span class="nav-label">Anwesenheit</span>
-        </RouterLink>
-        <RouterLink to="/grading" class="nav-item" active-class="active">
-          <span class="nav-icon">📝</span>
-          <span class="nav-label">Bewertung</span>
-        </RouterLink>
-      </nav>
-      
-      <button 
-        class="sidebar-toggle"
-        @click="toggleSidebar"
-        aria-label="Toggle sidebar"
-        :aria-expanded="!sidebarCollapsed"
+
+    <div class="app-body">
+      <aside
+        id="primary-navigation"
+        class="app-sidebar"
+        :class="{ open: isSidebarOpen }"
+        aria-label="Primary"
       >
-        <span v-if="sidebarCollapsed">☰</span>
-        <span v-else>✕</span>
-      </button>
-    </aside>
-    
-    <main class="app-content">
-      <RouterView />
-    </main>
+        <nav class="nav-menu">
+          <RouterLink
+            v-for="item in navItems"
+            :key="item.to"
+            :to="item.to"
+            class="nav-item"
+            active-class="active"
+            @click="handleNavClick"
+          >
+            <span class="nav-dot" aria-hidden="true"></span>
+            <span class="nav-label">{{ item.label }}</span>
+            <span class="nav-hint">{{ item.hint }}</span>
+          </RouterLink>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-card">
+            <p class="sidebar-card-title">Quick actions</p>
+            <p class="sidebar-card-body">New class, attendance, and grading shortcuts land in P2-3.</p>
+          </div>
+        </div>
+      </aside>
+
+      <button
+        v-if="isCompact && isSidebarOpen"
+        class="sidebar-backdrop"
+        type="button"
+        aria-label="Close navigation"
+        @click="closeSidebar"
+      ></button>
+
+      <main id="main-content" class="app-content">
+        <Transition name="view-fade" mode="out-in">
+          <RouterView :key="route.fullPath" />
+        </Transition>
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { RouterLink, RouterView } from 'vue-router'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 
-const sidebarCollapsed = ref(false)
+const route = useRoute()
 
-const toggleSidebar = () => {
-  sidebarCollapsed.value = !sidebarCollapsed.value
+const navItems = [
+  { to: '/', label: 'Dashboard', hint: 'Classes and activity' },
+  { to: '/students', label: 'Students', hint: 'Roster and profiles' },
+  { to: '/attendance', label: 'Attendance', hint: 'Daily check-in' },
+  { to: '/grading', label: 'Grading', hint: 'Entries and history' }
+]
+
+const pageTitle = computed(() => {
+  const metaTitle = route.meta?.title
+  if (typeof metaTitle === 'string' && metaTitle.trim().length > 0) {
+    return metaTitle
+  }
+  return 'Dashboard'
+})
+
+const isCompact = ref(false)
+const isSidebarOpen = ref(true)
+const compactWidth = 900
+
+const updateLayout = () => {
+  const compact = window.innerWidth < compactWidth
+  if (compact !== isCompact.value) {
+    isCompact.value = compact
+    isSidebarOpen.value = !compact
+  }
 }
 
-const handleResize = () => {
-  if (window.innerWidth < 768) {
-    sidebarCollapsed.value = true
-  } else {
-    sidebarCollapsed.value = false
+const toggleSidebar = () => {
+  if (!isCompact.value) {
+    return
+  }
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+
+const closeSidebar = () => {
+  if (isCompact.value) {
+    isSidebarOpen.value = false
+  }
+}
+
+const handleNavClick = () => {
+  if (isCompact.value) {
+    isSidebarOpen.value = false
   }
 }
 
 onMounted(() => {
-  // Set initial state
-  handleResize()
-  // Listen for resize events
-  window.addEventListener('resize', handleResize)
+  updateLayout()
+  window.addEventListener('resize', updateLayout)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
+  window.removeEventListener('resize', updateLayout)
 })
 </script>
 
 <style scoped>
-.app-layout {
+.app-shell {
   display: grid;
-  grid-template-areas:
-    "header header"
-    "sidebar content";
-  grid-template-columns: 240px 1fr;
-  grid-template-rows: 80px 1fr;
-  height: 100vh;
-  overflow: hidden;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  background: var(--page-background);
+  color: var(--color-ink);
+}
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 16px;
+  padding: 8px 12px;
+  background: var(--color-ink);
+  color: white;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  z-index: 20;
+}
+
+.skip-link:focus {
+  top: 16px;
 }
 
 .app-header {
-  grid-area: header;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--surface-glass);
+  backdrop-filter: blur(18px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.menu-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  min-width: 84px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: white;
+  color: var(--color-ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.brand {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
-.header-content {
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f97316 0%, #f43f5e 50%, #06b6d4 100%);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.brand-subtitle {
+  margin: 0.1rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.header-meta {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  align-items: flex-end;
+  gap: 0.4rem;
 }
 
-.app-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
+.page-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-ink);
 }
 
-.app-subtitle {
-  font-size: 0.875rem;
-  opacity: 0.9;
-  margin: 0;
-  font-weight: 400;
+.status-pill {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(14, 116, 144, 0.12);
+  color: #0e7490;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.app-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  position: relative;
 }
 
 .app-sidebar {
-  grid-area: sidebar;
-  background: #f8f9fa;
-  border-right: 1px solid #e0e0e0;
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  background: white;
+  height: calc(100vh - 96px);
+  position: sticky;
+  top: 96px;
   overflow-y: auto;
-  padding: 1rem;
-  position: relative;
   transition: transform 0.3s ease;
-}
-
-.app-sidebar.collapsed {
-  transform: translateX(-100%);
-  position: absolute;
-  z-index: 100;
-  visibility: hidden;
-  pointer-events: none;
 }
 
 .nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .nav-item {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 16px 1fr;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
   text-decoration: none;
-  color: #333;
-  transition: all 0.2s ease;
-  min-height: 44px; /* Touch target minimum */
-  font-weight: 500;
+  color: var(--color-ink);
+  background: rgba(15, 23, 42, 0.04);
+  min-height: 48px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-item:hover {
-  background: #e9ecef;
-  transform: translateX(2px);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
 .nav-item.active {
-  background: #667eea;
-  color: white;
+  background: linear-gradient(135deg, rgba(14, 116, 144, 0.15), rgba(56, 189, 248, 0.15));
+  border: 1px solid rgba(14, 116, 144, 0.25);
 }
 
-.nav-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
+.nav-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent-strong);
 }
 
 .nav-label {
-  font-size: 0.95rem;
+  font-weight: 600;
+  display: block;
 }
 
-.sidebar-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  width: 44px; /* Touch target minimum */
-  height: 44px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.25rem;
-  transition: all 0.2s ease;
+.nav-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  margin-top: 0.1rem;
 }
 
-.sidebar-toggle:hover {
-  background: #f8f9fa;
-  border-color: #667eea;
+.sidebar-footer {
+  margin-top: 2rem;
+}
+
+.sidebar-card {
+  background: var(--surface-soft);
+  border-radius: 16px;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.sidebar-card-title {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.sidebar-card-body {
+  margin: 0;
+  line-height: 1.4;
 }
 
 .app-content {
-  grid-area: content;
-  overflow-y: auto;
-  padding: 2rem;
-  background: #ffffff;
+  padding: 2rem 2.5rem 3rem;
+  min-height: calc(100vh - 96px);
 }
 
-/* Responsive design for iPad split-view */
-@media (max-width: 768px) {
-  .app-layout {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "header"
-      "content";
+.sidebar-backdrop {
+  position: fixed;
+  inset: 96px 0 0 0;
+  background: rgba(15, 23, 42, 0.45);
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.view-fade-enter-active,
+.view-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.view-fade-enter-from,
+.view-fade-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+@media (max-width: 900px) {
+  .app-header {
+    grid-template-columns: auto 1fr;
   }
-  
+
+  .menu-button {
+    display: inline-flex;
+  }
+
+  .header-meta {
+    align-items: flex-start;
+  }
+
+  .app-body {
+    grid-template-columns: 1fr;
+  }
+
   .app-sidebar {
     position: fixed;
-    left: 0;
-    top: 80px;
+    top: 96px;
     bottom: 0;
-    width: 240px;
-    z-index: 100;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    left: 0;
+    height: auto;
+    transform: translateX(-100%);
+    z-index: 10;
   }
-  
-  .sidebar-toggle {
-    display: flex;
+
+  .app-sidebar.open {
+    transform: translateX(0);
   }
-  
+
+  .app-content {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand-title {
+    font-size: 1.15rem;
+  }
+
   .app-content {
     padding: 1rem;
   }
 }
 
-/* Portrait orientation adjustments */
-@media (max-width: 600px) {
-  .app-header {
-    padding: 0.75rem 1rem;
-  }
-  
-  .app-title {
-    font-size: 1.5rem;
-  }
-  
-  .app-subtitle {
-    font-size: 0.75rem;
-  }
-  
+@media (min-width: 901px) and (max-width: 1200px) {
   .app-sidebar {
-    width: 200px;
+    width: 220px;
   }
-}
 
-/* Landscape orientation on tablets */
-@media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
-  .app-layout {
-    grid-template-columns: 200px 1fr;
-  }
-  
-  .nav-label {
-    font-size: 0.875rem;
+  .app-body {
+    grid-template-columns: 220px 1fr;
   }
 }
 </style>

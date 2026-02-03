@@ -1,11 +1,20 @@
+@import url('https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|urbanist:400,500,600&display=swap');
+
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Space Grotesk', 'Urbanist', 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  color: #0f172a;
+  background-color: #f8fafc;
 
-  color-scheme: light dark;
-  color: rgba(0, 0, 0, 0.87);
-  background-color: #ffffff;
+  --page-background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 55%),
+    radial-gradient(circle at 20% 20%, rgba(251, 146, 60, 0.08), transparent 45%),
+    linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --surface-soft: rgba(148, 163, 184, 0.14);
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --accent-strong: #0ea5a4;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,13 +30,15 @@
 
 body {
   margin: 0;
-  display: flex;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--page-background);
+  color: var(--color-ink);
 }
 
 #app {
   width: 100%;
+  min-height: 100vh;
 }
 
 /* Utility classes */
@@ -96,35 +107,35 @@ body {
 }
 
 .text-gray-900 {
-  color: rgb(17 24 39);
+  color: #0f172a;
 }
 
 .text-gray-600 {
-  color: rgb(75 85 99);
+  color: #64748b;
 }
 
 .text-green-600 {
-  color: rgb(22 163 74);
+  color: #16a34a;
 }
 
 .text-green-500 {
-  color: rgb(34 197 94);
+  color: #22c55e;
 }
 
 .text-red-600 {
-  color: rgb(220 38 38);
+  color: #dc2626;
 }
 
 .text-blue-600 {
-  color: rgb(37 99 235);
+  color: #2563eb;
 }
 
 .text-blue-500 {
-  color: rgb(59 130 246);
+  color: #3b82f6;
 }
 
 .bg-gray-50 {
-  background-color: rgb(249 250 251);
+  background-color: #f8fafc;
 }
 
 .grid {
@@ -160,25 +171,5 @@ body {
 @media (min-width: 1024px) {
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #1a1a1a;
-  }
-
-  .bg-gray-50 {
-    background-color: rgb(17 24 39);
-  }
-
-  .text-gray-900 {
-    color: rgb(249 250 251);
-  }
-
-  .text-gray-600 {
-    color: rgb(156 163 175);
   }
 }
