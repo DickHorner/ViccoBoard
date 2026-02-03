@@ -48,6 +48,11 @@
         </div>
       </div>
 
+      <label class="choice-toggle">
+        <input type="checkbox" v-model="useAlternativeGrading" />
+        Alternative grading (++/+/0/-/--)
+      </label>
+
       <div v-if="tasks.length === 0" class="empty">No tasks found for this exam.</div>
       <div v-else class="task-grid">
         <div v-for="task in tasks" :key="task.id" class="task-row">
@@ -55,14 +60,29 @@
             <strong>{{ task.title }}</strong>
             <span class="muted">Max {{ task.points }} pts</span>
           </div>
-          <input
-            v-model.number="taskScores[task.id]"
-            type="number"
-            min="0"
-            :max="task.points"
-            step="0.5"
-            class="score-input"
-          />
+          <div class="task-score">
+            <div v-if="useAlternativeGrading" class="alt-grade-group">
+              <button
+                v-for="option in alternativeOptions"
+                :key="option"
+                type="button"
+                class="alt-button"
+                :class="{ active: alternativeGrades[task.id] === option }"
+                @click="setAlternative(task, option)"
+              >
+                {{ option }}
+              </button>
+            </div>
+            <input
+              v-else
+              v-model.number="taskScores[task.id]"
+              type="number"
+              min="0"
+              :max="task.points"
+              step="0.5"
+              class="score-input"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -83,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { createUuid } from '../utils/uuid'
@@ -105,6 +125,33 @@ const candidateFirstName = ref('')
 const candidateLastName = ref('')
 
 const taskScores = ref<Record<string, number>>({})
+const useAlternativeGrading = ref(false)
+const alternativeGrades = ref<Record<string, ExamsTypes.AlternativeGrading['type']>>({})
+const alternativeOptions: ExamsTypes.AlternativeGrading['type'][] = ['++', '+', '0', '-', '--']
+
+const alternativeToPoints = (task: ExamsTypes.TaskNode, option: ExamsTypes.AlternativeGrading['type']) => {
+  const max = task.points || 0
+  switch (option) {
+    case '++':
+      return max
+    case '+':
+      return max * 0.75
+    case '0':
+      return max * 0.5
+    case '-':
+      return max * 0.25
+    case '--':
+      return 0
+    default:
+      return 0
+  }
+}
+
+const setAlternative = (task: ExamsTypes.TaskNode, option: ExamsTypes.AlternativeGrading['type']) => {
+  alternativeGrades.value[task.id] = option
+  taskScores.value[task.id] = Number(alternativeToPoints(task, option).toFixed(1))
+}
+
 
 const maxPoints = computed(() => exam.value?.gradingKey.totalPoints ?? 0)
 const totalPoints = computed(() =>
@@ -192,6 +239,16 @@ const saveCorrection = async () => {
 }
 
 const goBack = () => router.push('/exams')
+
+watch(useAlternativeGrading, (enabled) => {
+  if (enabled) {
+    tasks.value.forEach(task => {
+      if (!alternativeGrades.value[task.id]) {
+        setAlternative(task, '0')
+      }
+    })
+  }
+})
 
 onMounted(() => {
   loadExam()
@@ -361,3 +418,11 @@ onMounted(() => {
   }
 }
 </style>
+
+
+
+
+
+
+
+
