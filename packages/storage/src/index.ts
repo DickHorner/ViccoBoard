@@ -12,9 +12,11 @@ export * from './adapters/sqlite.adapter';
 export * from './adapters/indexeddb.adapter';
 export * from './migrations/001_initial_schema_new';
 export * from './migrations/002_grading_schema';
+export * from './migrations/005_sportabzeichen_schema';
 export * from './migrations/indexeddb/indexeddb-migration';
 export * from './migrations/indexeddb/001_initial_schema';
 export * from './migrations/indexeddb/002_grading_schema';
+export * from './migrations/indexeddb/005_sportabzeichen_schema';
 export * from './indexeddb.storage';
 
 // Version

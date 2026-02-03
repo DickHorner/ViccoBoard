@@ -114,6 +114,37 @@ export interface SportabzeichenDiscipline {
   measurementUnit: string;
 }
 
+export type SportabzeichenLevel = 'bronze' | 'silver' | 'gold' | 'none';
+export type SportabzeichenGender = 'male' | 'female' | 'diverse' | 'any';
+
+export interface SportabzeichenStandard {
+  id: string;
+  disciplineId: string;
+  gender: SportabzeichenGender;
+  ageMin: number;
+  ageMax: number;
+  level: Exclude<SportabzeichenLevel, 'none'>;
+  comparison: 'min' | 'max';
+  threshold: number;
+  unit: string;
+  createdAt: Date;
+  lastModified: Date;
+}
+
+export interface SportabzeichenResult {
+  id: string;
+  studentId: string;
+  disciplineId: string;
+  testDate: Date;
+  ageAtTest: number;
+  gender: SportabzeichenGender;
+  performanceValue: number;
+  unit: string;
+  achievedLevel: SportabzeichenLevel;
+  createdAt: Date;
+  lastModified: Date;
+}
+
 // Bundesjugendspiele (Federal Youth Games)
 export interface BJSConfig {
   type: 'bjs';
