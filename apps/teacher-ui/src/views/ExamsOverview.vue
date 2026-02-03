@@ -32,6 +32,7 @@
         </div>
         <div class="exam-actions">
           <button class="ghost" type="button" @click="editExam(exam.id)">Open</button>
+          <button class="ghost" type="button" @click="openCorrection(exam.id)">Correct</button>
         </div>
       </article>
     </div>
@@ -61,6 +62,10 @@ const createNew = () => {
 
 const editExam = (id: string) => {
   router.push(`/exams/${id}`)
+}
+
+const openCorrection = (id: string) => {
+  router.push(`/corrections/${id}`)
 }
 
 const formatStatus = (status: ExamsTypes.Exam['status']) => {
@@ -197,6 +202,15 @@ onMounted(() => {
   min-height: 44px;
 }
 </style>
+
+
+
+
+
+
+
+
+
 
 
 

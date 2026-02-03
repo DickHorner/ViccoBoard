@@ -87,6 +87,22 @@ export interface ExamRecord {
   updatedAt: Date
 }
 
+export interface CorrectionEntryRecord {
+  id: string
+  examId: string
+  candidateId: string
+  taskScores: string
+  totalPoints: number
+  totalGrade: string | number
+  percentageScore: number
+  comments: string
+  supportTips: string
+  highlightedWork?: string
+  status: 'not-started' | 'in-progress' | 'completed'
+  correctedAt?: Date
+  lastModified: Date
+}
+
 // Dexie database
 export class ViccoDb extends Dexie {
   classGroups!: EntityTable<ClassGroup, 'id'>
@@ -96,6 +112,7 @@ export class ViccoDb extends Dexie {
   gradeCategories!: EntityTable<GradeCategory, 'id'>
   performanceEntries!: EntityTable<PerformanceEntry, 'id'>
   exams!: EntityTable<ExamRecord, 'id'>
+  correctionEntries!: EntityTable<CorrectionEntryRecord, 'id'>
 
   constructor() {
     super('ViccoBoard')
@@ -126,6 +143,18 @@ export class ViccoDb extends Dexie {
       gradeCategories: 'id, classGroupId, type',
       performanceEntries: 'id, studentId, categoryId, timestamp',
       exams: 'id, title, status, classGroupId'
+    })
+
+    // Add correction entries in version 4
+    this.version(4).stores({
+      classGroups: 'id, name, schoolYear',
+      students: 'id, classId, firstName, lastName',
+      attendanceRecords: 'id, studentId, lessonId, date, status',
+      assessments: 'id, studentId, type, date',
+      gradeCategories: 'id, classGroupId, type',
+      performanceEntries: 'id, studentId, categoryId, timestamp',
+      exams: 'id, title, status, classGroupId',
+      correctionEntries: 'id, examId, candidateId, status'
     })
   }
 }

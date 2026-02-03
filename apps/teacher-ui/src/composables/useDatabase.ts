@@ -10,7 +10,8 @@ import type {
   ClassGroup,
   Student,
   AttendanceRecord,
-  ExamRecord
+  ExamRecord,
+  CorrectionEntryRecord
 } from '../db'
 
 export function useDatabase() {
@@ -38,7 +39,7 @@ export function useDatabase() {
     studentRepository: {
       findAll: async () => await db.students.toArray(),
       read: async (id: string) => await db.students.get(id),
-      findByClassGroup: async (classId: string) => 
+      findByClassGroup: async (classId: string) =>
         await db.students.where('classId').equals(classId).toArray(),
       create: async (entity: any) => {
         const id = createUuid()
@@ -235,7 +236,8 @@ export function useDatabase() {
     assessments: db.assessments,
     gradeCategories: db.gradeCategories,
     performanceEntries: db.performanceEntries,
-    exams: db.exams
+    exams: db.exams,
+    correctionEntries: db.correctionEntries
   }
 }
 
@@ -303,6 +305,78 @@ export function useExams() {
   return {
     getAll,
     getById,
+    create,
+    update,
+    remove
+  }
+}
+
+const mapRecordToCorrection = (record: CorrectionEntryRecord): ExamsTypes.CorrectionEntry => ({
+  id: record.id,
+  examId: record.examId,
+  candidateId: record.candidateId,
+  taskScores: JSON.parse(record.taskScores || '[]'),
+  totalPoints: record.totalPoints,
+  totalGrade: record.totalGrade,
+  percentageScore: record.percentageScore,
+  comments: JSON.parse(record.comments || '[]'),
+  supportTips: JSON.parse(record.supportTips || '[]'),
+  highlightedWork: record.highlightedWork ? JSON.parse(record.highlightedWork) : undefined,
+  status: record.status,
+  correctedAt: record.correctedAt,
+  lastModified: record.lastModified
+})
+
+const mapCorrectionToRecord = (entry: ExamsTypes.CorrectionEntry): CorrectionEntryRecord => ({
+  id: entry.id,
+  examId: entry.examId,
+  candidateId: entry.candidateId,
+  taskScores: JSON.stringify(entry.taskScores ?? []),
+  totalPoints: entry.totalPoints,
+  totalGrade: entry.totalGrade,
+  percentageScore: entry.percentageScore,
+  comments: JSON.stringify(entry.comments ?? []),
+  supportTips: JSON.stringify(entry.supportTips ?? []),
+  highlightedWork: entry.highlightedWork ? JSON.stringify(entry.highlightedWork) : undefined,
+  status: entry.status,
+  correctedAt: entry.correctedAt,
+  lastModified: entry.lastModified
+})
+
+/**
+ * Correction entry operations
+ */
+export function useCorrections() {
+  const { correctionEntries } = useDatabase()
+
+  const getByExam = async (examId: string): Promise<ExamsTypes.CorrectionEntry[]> => {
+    const records = await correctionEntries.where('examId').equals(examId).toArray()
+    return records.map(mapRecordToCorrection)
+  }
+
+  const getByCandidate = async (candidateId: string): Promise<ExamsTypes.CorrectionEntry[]> => {
+    const records = await correctionEntries.where('candidateId').equals(candidateId).toArray()
+    return records.map(mapRecordToCorrection)
+  }
+
+  const create = async (entry: ExamsTypes.CorrectionEntry): Promise<string> => {
+    const record = mapCorrectionToRecord(entry)
+    await correctionEntries.add(record)
+    return record.id
+  }
+
+  const update = async (entry: ExamsTypes.CorrectionEntry): Promise<void> => {
+    const record = mapCorrectionToRecord(entry)
+    await correctionEntries.update(record.id, record)
+  }
+
+  const remove = async (id: string): Promise<void> => {
+    await correctionEntries.delete(id)
+  }
+
+  return {
+    getByExam,
+    getByCandidate,
     create,
     update,
     remove
@@ -488,8 +562,4 @@ export function useAttendance() {
     remove
   }
 }
-
-
-
-
 
