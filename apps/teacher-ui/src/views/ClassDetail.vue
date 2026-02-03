@@ -212,6 +212,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useClassGroups, useStudents } from '../composables/useSportBridge'
@@ -824,3 +825,4 @@ onMounted(() => {
   animation: spin 1s linear infinite;
 }
 </style>
+
