@@ -137,7 +137,7 @@ const loadExam = async () => {
   }
   exam.value = data
   candidates.value = data.candidates
-  tasks.value = data.structure.tasks.filter(task => task.level === 1)
+  tasks.value = data.structure.tasks
   tasks.value.forEach(task => {
     taskScores.value[task.id] = 0
   })
