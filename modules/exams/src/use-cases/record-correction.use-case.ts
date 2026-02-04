@@ -44,7 +44,8 @@ export class RecordCorrectionUseCase {
       lastModified: now
     };
 
-    await this.repository.createEntry(entry);\n\n    return entry;
+    await this.repository.createEntry(entry);
+    return entry;
   }
 }
 
