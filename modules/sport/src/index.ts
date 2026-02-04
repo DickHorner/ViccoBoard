@@ -10,6 +10,8 @@ export { AttendanceRepository } from './repositories/attendance.repository';
 export { GradeSchemeRepository } from './repositories/grade-scheme.repository';
 export { GradeCategoryRepository } from './repositories/grade-category.repository';
 export { PerformanceEntryRepository } from './repositories/performance-entry.repository';
+export { SportabzeichenStandardRepository } from './repositories/sportabzeichen-standard.repository';
+export { SportabzeichenResultRepository } from './repositories/sportabzeichen-result.repository';
 
 // Use Cases
 export { CreateClassUseCase } from './use-cases/create-class.use-case';
@@ -37,5 +39,11 @@ export type {
   TimeToGradeResult,
   AdjustBoundariesInput
 } from './services/time-grading.service';
+export { SportabzeichenService } from './services/sportabzeichen.service';
+export type {
+  SportabzeichenPerformanceInput,
+  SportabzeichenReport,
+  SportabzeichenReportEntry
+} from './services/sportabzeichen.service';
 
 export const SPORT_MODULE_VERSION = '0.1.0';
