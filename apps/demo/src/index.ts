@@ -10,14 +10,14 @@
  */
 
 import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage';
-import {
+import { 
   ClassGroupRepository,
-  StudentRepository,
   AttendanceRepository,
   CreateClassUseCase,
   AddStudentUseCase,
   RecordAttendanceUseCase
 } from '@viccoboard/sport';
+import { StudentRepository } from '@viccoboard/storage';
 import { AttendanceStatus } from '@viccoboard/core';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -275,5 +275,4 @@ async function main() {
 
 // Run the demo
 main();
-
 

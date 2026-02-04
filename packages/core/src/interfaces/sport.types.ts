@@ -259,6 +259,22 @@ export interface ShuttleRunLevel {
 }
 
 // ============================================================================
+// Cooper Test Configuration
+// ============================================================================
+
+export interface CooperTestConfig {
+  id: string;
+  name: string;
+  sportType: 'running' | 'swimming';
+  distanceUnit: 'meters' | 'kilometers';
+  lapLengthMeters: number;
+  gradingTableId?: string;
+  source: 'default' | 'imported';
+  createdAt: Date;
+  lastModified: Date;
+}
+
+// ============================================================================
 // Live Tools
 // ============================================================================
 
