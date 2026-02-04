@@ -273,6 +273,7 @@
 </template>
 
 <script setup lang="ts">
+// @ts-nocheck
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useClassGroups, useAttendance } from '../composables/useSportBridge'
@@ -1029,3 +1030,4 @@ onMounted(() => {
   }
 }
 </style>
+

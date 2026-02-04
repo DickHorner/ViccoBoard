@@ -13,6 +13,10 @@
           <span class="nav-icon">📊</span>
           <span class="nav-label">Übersicht</span>
         </RouterLink>
+        <RouterLink to="/exams" class="nav-item" active-class="active">
+          <span class="nav-icon">🧾</span>
+          <span class="nav-label">Prüfungen</span>
+        </RouterLink>
         <RouterLink to="/students" class="nav-item" active-class="active">
           <span class="nav-icon">👥</span>
           <span class="nav-label">Schüler</span>
