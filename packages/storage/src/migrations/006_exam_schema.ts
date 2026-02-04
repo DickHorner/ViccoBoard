@@ -52,7 +52,8 @@ export class ExamSchemaMigration implements Migration {
         subtasks TEXT NOT NULL,
         created_at TEXT NOT NULL,
         last_modified TEXT NOT NULL,
-        FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE
+        FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+        FOREIGN KEY (parent_id) REFERENCES task_nodes(id) ON DELETE CASCADE
       )
     `);
 
