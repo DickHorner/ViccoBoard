@@ -250,7 +250,7 @@ const addCandidate = async () => {
 
 const reuseLastComment = (candidateId: string) => {
   if (!selectedTaskId.value || !lastTaskComment.value) return
-  commentMatrix.value[candidateId][selectedTaskId.value] = lastTaskComment.value
+  setComment(candidateId, selectedTaskId.value, lastTaskComment.value)
 }
 
 const buildComments = (candidateId: string): ExamsTypes.CorrectionComment[] => {
