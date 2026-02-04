@@ -157,6 +157,7 @@ const addCandidate = async () => {
   }
   candidates.value = [...candidates.value, candidate]
   exam.value.candidates = candidates.value
+  exam.value.lastModified = new Date()
   await update(exam.value)
   selectedCandidateId.value = candidate.id
   candidateFirstName.value = ''
