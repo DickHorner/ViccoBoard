@@ -10,7 +10,6 @@ export { AttendanceRepository } from './repositories/attendance.repository';
 export { GradeSchemeRepository } from './repositories/grade-scheme.repository';
 export { GradeCategoryRepository } from './repositories/grade-category.repository';
 export { PerformanceEntryRepository } from './repositories/performance-entry.repository';
-export { ShuttleRunConfigRepository } from './repositories/shuttle-run-config.repository';
 
 // Use Cases
 export { CreateClassUseCase } from './use-cases/create-class.use-case';
@@ -33,7 +32,6 @@ export type {
 
 // Services
 export { TimeGradingService } from './services/time-grading.service';
-export { ShuttleRunService } from './services/shuttle-run.service';
 export type {
   TimeToGradeInput,
   TimeToGradeResult,
