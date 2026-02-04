@@ -5,7 +5,7 @@
 
 import { AttendanceRecord, AttendanceStatus } from '@viccoboard/core';
 import { AttendanceRepository } from '../repositories/attendance.repository';
-import { StudentRepository } from '../repositories/student.repository';
+import { StudentRepository } from '@viccoboard/storage';
 
 export interface RecordAttendanceInput {
   studentId: string;
