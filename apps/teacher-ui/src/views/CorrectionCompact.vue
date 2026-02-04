@@ -169,17 +169,29 @@ const saveCorrection = async () => {
   if (!exam.value || !selectedCandidateId.value) return
 
   const now = new Date()
+  const taskScoresForEntry = tasks.value.map(task => {
+    const raw = taskScores.value[task.id]
+    const numeric = typeof raw === 'number' ? raw : 0
+    const clamped = Math.min(Math.max(numeric, 0), task.points)
+
+    return {
+      taskId: task.id,
+      points: clamped,
+      maxPoints: task.points,
+      timestamp: now
+    }
+  })
+  const totalPointsFromScores = taskScoresForEntry.reduce(
+    (sum, score) => sum + score.points,
+    0
+  )
+
   const entry: ExamsTypes.CorrectionEntry = {
     id: createUuid(),
     examId: exam.value.id,
     candidateId: selectedCandidateId.value,
-    taskScores: tasks.value.map(task => ({
-      taskId: task.id,
-      points: taskScores.value[task.id] || 0,
-      maxPoints: task.points,
-      timestamp: now
-    })),
-    totalPoints: totalPoints.value,
+    taskScores: taskScoresForEntry,
+    totalPoints: totalPointsFromScores,
     totalGrade: percentageScore.value.toFixed(1),
     percentageScore: percentageScore.value,
     comments: [],
