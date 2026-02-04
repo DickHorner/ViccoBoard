@@ -44,7 +44,7 @@ export class CriterionRepository extends AdapterRepository<Exams.Criterion> {
   async createForTask(
     examId: string,
     taskId: string,
-    criterion: Exams.Criterion
+    criterion: Omit<Exams.Criterion, 'id'>
   ): Promise<Exams.Criterion> {
     const id = uuidv4();
     const now = new Date();
