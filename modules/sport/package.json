@@ -12,6 +12,7 @@
   "dependencies": {
     "@viccoboard/core": "*",
     "@viccoboard/storage": "*",
+    "pdf-lib": "^1.17.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
