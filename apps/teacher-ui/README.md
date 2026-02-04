@@ -1,5 +1,15 @@
-# Vue 3 + TypeScript + Vite
+# ViccoBoard Teacher UI (Vue 3)
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This app is the Vue 3 + Vite front-end for ViccoBoard's teacher experience.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run preview
+```
+
+## Notes
+- Target platform: iPadOS Safari (WebKit)
+- Offline-first by default; IndexedDB storage via shared packages

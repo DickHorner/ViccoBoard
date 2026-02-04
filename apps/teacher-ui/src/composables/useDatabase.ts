@@ -5,7 +5,7 @@
 import { ref } from 'vue'
 import { db } from '../db'
 import { createUuid } from '../utils/uuid'
-import type { ClassGroup, Student, AttendanceRecord, GradeCategory, PerformanceEntry } from '../db'
+import type { ClassGroup, Student, AttendanceRecord } from '../db'
 
 export function useDatabase() {
   // Mock bridge structure for Sport module compatibility
