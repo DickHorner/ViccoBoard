@@ -71,7 +71,7 @@ export class TaskNodeRepository extends AdapterRepository<Exams.TaskNode> {
 
     await this.adapter.insert(this.tableName, row);
 
-    return { ...entity, criteria: task.criteria ?? [] };
+    return { ...entity, criteria: [] };
   }
 
   async findByExam(examId: string): Promise<Exams.TaskNode[]> {
