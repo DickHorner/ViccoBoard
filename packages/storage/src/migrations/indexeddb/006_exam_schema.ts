@@ -16,6 +16,7 @@ export class IndexedDBExamSchemaMigration implements IndexedDBMigration {
       const tasks = db.createObjectStore('task_nodes', { keyPath: 'id' });
       tasks.createIndex('exam_id', 'exam_id', { unique: false });
       tasks.createIndex('parent_id', 'parent_id', { unique: false });
+      tasks.createIndex('order_index', 'order_index', { unique: false });
     }
 
     if (!db.objectStoreNames.contains('criteria')) {
