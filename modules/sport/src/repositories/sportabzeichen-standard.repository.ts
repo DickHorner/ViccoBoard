@@ -12,6 +12,9 @@ export class SportabzeichenStandardRepository extends AdapterRepository<Sport.Sp
     super(adapter, 'sportabzeichen_standards');
   }
 
+  /**
+   * Map database row to SportabzeichenStandard entity
+   */
   mapToEntity(row: any): Sport.SportabzeichenStandard {
     return {
       id: row.id,
@@ -28,6 +31,9 @@ export class SportabzeichenStandardRepository extends AdapterRepository<Sport.Sp
     };
   }
 
+  /**
+   * Map SportabzeichenStandard entity to database row
+   */
   mapToRow(entity: Partial<Sport.SportabzeichenStandard>): any {
     const row: any = {};
 
@@ -39,7 +45,17 @@ export class SportabzeichenStandardRepository extends AdapterRepository<Sport.Sp
     if (entity.level !== undefined) row.level = entity.level;
     if (entity.comparison !== undefined) row.comparison = entity.comparison;
     if (entity.threshold !== undefined) row.threshold = entity.threshold;
-    if (entity.unit !== undefined) row.unit = entity.unit;
+
+  /**
+   * Finds all Sportabzeichen standards for a given discipline.
+   *
+   * Use this to load all age- and level-specific standards that apply to
+   * a particular discipline, for example when evaluating results or
+   * displaying available thresholds in the UI.
+   *
+   * @param disciplineId - The identifier of the discipline to filter standards by.
+   * @returns All Sportabzeichen standards associated with the given discipline.
+   */
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
 

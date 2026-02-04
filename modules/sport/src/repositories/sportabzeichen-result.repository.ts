@@ -12,6 +12,9 @@ export class SportabzeichenResultRepository extends AdapterRepository<Sport.Spor
     super(adapter, 'sportabzeichen_results');
   }
 
+  /**
+   * Map database row to SportabzeichenResult entity
+   */
   mapToEntity(row: any): Sport.SportabzeichenResult {
     return {
       id: row.id,
@@ -28,6 +31,9 @@ export class SportabzeichenResultRepository extends AdapterRepository<Sport.Spor
     };
   }
 
+  /**
+   * Map SportabzeichenResult entity to database row
+   */
   mapToRow(entity: Partial<Sport.SportabzeichenResult>): any {
     const row: any = {};
 
@@ -39,7 +45,17 @@ export class SportabzeichenResultRepository extends AdapterRepository<Sport.Spor
     if (entity.gender !== undefined) row.gender = entity.gender;
     if (entity.performanceValue !== undefined) row.performance_value = entity.performanceValue;
     if (entity.unit !== undefined) row.unit = entity.unit;
-    if (entity.achievedLevel !== undefined) row.achieved_level = entity.achievedLevel;
+
+  /**
+   * Finds all Sportabzeichen results for a given student.
+   *
+   * Use this to retrieve the complete Sportabzeichen history for a student,
+   * for example when displaying their performance overview or analyzing
+   * their progress over time.
+   *
+   * @param studentId - The identifier of the student whose results should be returned.
+   * @returns A promise resolving to all Sportabzeichen results stored for the given student.
+   */
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
 
