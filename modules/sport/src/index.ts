@@ -46,4 +46,7 @@ export type {
   SportabzeichenReportEntry
 } from './services/sportabzeichen.service';
 
+// Plugins
+export { TimerToolPlugin } from './plugins/timer.plugin';
+
 export const SPORT_MODULE_VERSION = '0.1.0';
