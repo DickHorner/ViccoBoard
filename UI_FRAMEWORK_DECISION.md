@@ -3,6 +3,7 @@
 **Date:** February 3, 2026
 **Decision:** Vue 3 + Vite (TypeScript) for Teacher UI
 
+**Source of truth:** This document is the canonical record of the UI framework decision. The "UI Framework" section in `ARCHITECTURE_DECISIONS.md` defers to this file; if there is any discrepancy, this document prevails.
 ## Why Vue
 - Existing scaffold in `apps/teacher-ui` reduces start time
 - Strong TypeScript support and small runtime
