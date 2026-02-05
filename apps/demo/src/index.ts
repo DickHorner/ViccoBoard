@@ -15,9 +15,9 @@ import {
   AttendanceRepository,
   CreateClassUseCase,
   AddStudentUseCase,
-  RecordAttendanceUseCase
+  RecordAttendanceUseCase,
+  StudentRepository
 } from '@viccoboard/sport';
-import { StudentRepository } from '@viccoboard/storage';
 import { AttendanceStatus } from '@viccoboard/core';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -65,7 +65,7 @@ async function main() {
 
     const createClassUseCase = new CreateClassUseCase(classGroupRepo);
     const addStudentUseCase = new AddStudentUseCase(studentRepo, classGroupRepo);
-    const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo, studentRepo);
+    const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo);
 
     console.log('✓ Storage adapter initialized');
     console.log('✓ Repositories initialized');
