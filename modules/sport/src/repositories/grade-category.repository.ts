@@ -23,7 +23,12 @@ export class GradeCategoryRepository extends AdapterRepository<Sport.GradeCatego
       description: row.description ?? undefined,
       type: row.type as Sport.GradeCategoryType,
       weight: row.weight,
-      configuration: safeJsonParse(row.configuration, {}, 'GradeCategory.configuration'),
+      configuration: safeJsonParse(row.configuration, {
+        type: 'criteria' as const,
+        criteria: [],
+        allowSelfAssessment: false,
+        selfAssessmentViaWOW: false
+      }, 'GradeCategory.configuration'),
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
     };

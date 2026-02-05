@@ -18,11 +18,33 @@ cd ViccoBoard
 # Install dependencies for all packages
 npm install
 
-# Build all packages
+# Build everything (packages + apps)
 npm run build
+
+# Build only the internal packages (core/modules/plugins/storage)
+npm run build:packages
+
+# Build the iPad app only (teacher UI)
+npm run build:ipad
 
 # Run tests (when available)
 npm test
+```
+
+### App Start Scripts
+
+```bash
+# Teacher UI (iPad target) - dev server
+cd apps/teacher-ui
+npm run dev
+
+# Teacher UI - production preview
+npm run build
+npm run preview
+
+# Demo CLI app (optional)
+cd apps/demo
+npm run dev
 ```
 
 ## Project Structure

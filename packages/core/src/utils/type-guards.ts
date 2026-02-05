@@ -2,12 +2,17 @@
  * Type guards for runtime type validation
  */
 
-import type { Sport } from '@viccoboard/core'
+import type { 
+  GradeCategoryType, 
+  GradeCategory, 
+  PerformanceEntry 
+} from '../interfaces/sport.types'
+import type { Student } from '../interfaces/core.types'
 
 /**
  * Grade category type guard
  */
-export function isValidGradeCategoryType(value: unknown): value is Sport.GradeCategoryType {
+export function isValidGradeCategoryType(value: unknown): value is GradeCategoryType {
   return typeof value === 'string' && [
     'criteria',
     'time',
@@ -115,7 +120,7 @@ export function isStudentEntity(value: unknown): value is { id: string; classGro
 /**
  * Grade category entity type guard
  */
-export function isGradeCategoryEntity(value: unknown): value is Sport.GradeCategory {
+export function isGradeCategoryEntity(value: unknown): value is GradeCategory {
   return (
     isObject(value) &&
     isNonEmptyString((value as any).id) &&
@@ -132,7 +137,7 @@ export function isGradeCategoryEntity(value: unknown): value is Sport.GradeCateg
 /**
  * Performance entry entity type guard
  */
-export function isPerformanceEntryEntity(value: unknown): value is Sport.PerformanceEntry {
+export function isPerformanceEntryEntity(value: unknown): value is PerformanceEntry {
   return (
     isObject(value) &&
     isNonEmptyString((value as any).id) &&

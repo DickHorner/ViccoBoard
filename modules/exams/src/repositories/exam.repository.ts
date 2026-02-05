@@ -28,7 +28,17 @@ export class ExamRepository extends AdapterRepository<Exams.Exam> {
       classGroupId: row.class_group_id ?? undefined,
       mode: row.mode,
       structure: safeJsonParse(row.structure, emptyStructure, 'Exam.structure'),
-      gradingKey: safeJsonParse(row.grading_key, { totalPoints: 0, gradeBoundaries: [] }, 'Exam.gradingKey'),
+      gradingKey: safeJsonParse(row.grading_key, {
+        id: 'default' as string,
+        name: 'Default',
+        type: 'percentage' as Exams.GradingKeyType,
+        totalPoints: 0,
+        gradeBoundaries: [] as Exams.GradeBoundary[],
+        roundingRule: { type: 'nearest' as const, decimalPlaces: 1 } as Exams.RoundingRule,
+        errorPointsToGrade: false,
+        customizable: true,
+        modifiedAfterCorrection: false
+      } as Exams.GradingKey, 'Exam.gradingKey'),
       printPresets: safeJsonParse(row.print_presets, [], 'Exam.printPresets'),
       candidates: safeJsonParse(row.candidates, [], 'Exam.candidates'),
       status: row.status,

@@ -178,6 +178,35 @@ npm run build
 npm run demo
 ```
 
+### Build Scripts
+
+```bash
+# Build everything (packages + apps)
+npm run build
+
+# Build only internal packages (core/modules/plugins/storage)
+npm run build:packages
+
+# Build the iPad app only (teacher UI)
+npm run build:ipad
+```
+
+### Run The App
+
+```bash
+# Teacher UI (iPad target) - dev server
+cd apps/teacher-ui
+npm run dev
+
+# Teacher UI - production preview
+npm run build
+npm run preview
+
+# Demo CLI app (optional)
+cd apps/demo
+npm run dev
+```
+
 The demo creates a class, enrolls students, records attendance, and shows statistics - proving the entire architecture works end-to-end!
 
 See [DEMO_COMPLETE.md](./DEMO_COMPLETE.md) for details.

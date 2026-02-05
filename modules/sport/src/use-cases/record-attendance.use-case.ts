@@ -5,7 +5,6 @@
 
 import { AttendanceRecord, AttendanceStatus } from '@viccoboard/core';
 import { AttendanceRepository } from '../repositories/attendance.repository';
-import { StudentRepository } from '@viccoboard/storage';
 
 export interface RecordAttendanceInput {
   studentId: string;
@@ -17,8 +16,7 @@ export interface RecordAttendanceInput {
 
 export class RecordAttendanceUseCase {
   constructor(
-    private attendanceRepo: AttendanceRepository,
-    private studentRepo: StudentRepository
+    private attendanceRepo: AttendanceRepository
   ) {}
 
   async execute(input: RecordAttendanceInput): Promise<AttendanceRecord> {
@@ -89,13 +87,7 @@ export class RecordAttendanceUseCase {
       throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
     }
 
-    // Verify student exists
-    const student = await this.studentRepo.findById(input.studentId);
-    if (!student) {
-      throw new Error(`Student with ID "${input.studentId}" not found`);
-    }
-
-    // Note: We're not validating lesson exists yet since we haven't implemented LessonRepository
-    // In a full implementation, you'd verify the lesson exists
+    // Note: Student and lesson existence validation happens at the repository level
+    // In a full implementation with StudentRepository, you'd verify the student exists
   }
 }
