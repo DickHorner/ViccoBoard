@@ -3,9 +3,15 @@
  */
 
 import { ref } from 'vue'
+import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { db } from '../db'
 import { createUuid } from '../utils/uuid'
-import type { ClassGroup, Student, AttendanceRecord } from '../db'
+import type {
+  ClassGroup,
+  Student,
+  AttendanceRecord,
+  ExamRecord
+} from '../db'
 
 export function useDatabase() {
   // Mock bridge structure for Sport module compatibility
@@ -228,7 +234,78 @@ export function useDatabase() {
     attendanceRecords: db.attendanceRecords,
     assessments: db.assessments,
     gradeCategories: db.gradeCategories,
-    performanceEntries: db.performanceEntries
+    performanceEntries: db.performanceEntries,
+    exams: db.exams
+  }
+}
+
+const mapRecordToExam = (record: ExamRecord): ExamsTypes.Exam => ({
+  id: record.id,
+  title: record.title,
+  description: record.description ?? undefined,
+  classGroupId: record.classGroupId ?? undefined,
+  mode: record.mode as ExamsTypes.ExamMode,
+  structure: JSON.parse(record.structure),
+  gradingKey: JSON.parse(record.gradingKey),
+  printPresets: JSON.parse(record.printPresets || '[]'),
+  candidates: JSON.parse(record.candidates || '[]'),
+  status: record.status,
+  createdAt: record.createdAt,
+  lastModified: record.updatedAt
+})
+
+const mapExamToRecord = (exam: ExamsTypes.Exam): ExamRecord => ({
+  id: exam.id,
+  title: exam.title,
+  description: exam.description,
+  classGroupId: exam.classGroupId,
+  mode: exam.mode,
+  structure: JSON.stringify(exam.structure),
+  gradingKey: JSON.stringify(exam.gradingKey),
+  printPresets: JSON.stringify(exam.printPresets ?? []),
+  candidates: JSON.stringify(exam.candidates ?? []),
+  status: exam.status,
+  createdAt: exam.createdAt,
+  updatedAt: exam.lastModified
+})
+
+/**
+ * Exam operations (KURT)
+ */
+export function useExams() {
+  const { exams } = useDatabase()
+
+  const getAll = async (): Promise<ExamsTypes.Exam[]> => {
+    const records = await exams.orderBy('createdAt').reverse().toArray()
+    return records.map(mapRecordToExam)
+  }
+
+  const getById = async (id: string): Promise<ExamsTypes.Exam | undefined> => {
+    const record = await exams.get(id)
+    return record ? mapRecordToExam(record) : undefined
+  }
+
+  const create = async (exam: ExamsTypes.Exam): Promise<string> => {
+    const record = mapExamToRecord(exam)
+    await exams.add(record)
+    return record.id
+  }
+
+  const update = async (exam: ExamsTypes.Exam): Promise<void> => {
+    const record = mapExamToRecord(exam)
+    await exams.update(record.id, record)
+  }
+
+  const remove = async (id: string): Promise<void> => {
+    await exams.delete(id)
+  }
+
+  return {
+    getAll,
+    getById,
+    create,
+    update,
+    remove
   }
 }
 
@@ -411,5 +488,8 @@ export function useAttendance() {
     remove
   }
 }
+
+
+
 
 
