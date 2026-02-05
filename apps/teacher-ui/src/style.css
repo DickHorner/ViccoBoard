@@ -1,6 +1,5 @@
-@import url('https://fonts.bunny.net/css?family=space-grotesk:400,500,600,700|urbanist:400,500,600&display=swap');
-
 :root {
+  color-scheme: light dark;
   font-family: 'Space Grotesk', 'Urbanist', 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -20,6 +19,33 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #f1f5f9;
+    background-color: #0f172a;
+
+    --page-background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 55%),
+      radial-gradient(circle at 20% 20%, rgba(251, 146, 60, 0.12), transparent 45%),
+      linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --surface-glass: rgba(15, 23, 42, 0.85);
+    --surface-soft: rgba(71, 85, 105, 0.14);
+    --color-ink: #f1f5f9;
+    --color-muted: #94a3b8;
+  }
+
+  .text-gray-900 {
+    color: #f1f5f9;
+  }
+
+  .text-gray-600 {
+    color: #94a3b8;
+  }
+
+  .bg-gray-50 {
+    background-color: #1e293b;
+  }
 }
 
 * {

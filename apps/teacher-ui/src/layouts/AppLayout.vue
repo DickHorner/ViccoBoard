@@ -1,5 +1,5 @@
 <template>
-  <div class="app-shell" :class="{ 'is-compact': isCompact }">
+  <div class="app-shell">
     <a class="skip-link" href="#main-content">Skip to content</a>
 
     <header class="app-header">
@@ -95,9 +95,17 @@ const pageTitle = computed(() => {
   return 'Dashboard'
 })
 
-const isCompact = ref(false)
-const isSidebarOpen = ref(true)
 const compactWidth = 900
+
+const getInitialLayout = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth < compactWidth
+  }
+  return false
+}
+
+const isCompact = ref(getInitialLayout())
+const isSidebarOpen = ref(!isCompact.value)
 
 const updateLayout = () => {
   const compact = window.innerWidth < compactWidth
@@ -188,6 +196,12 @@ onUnmounted(() => {
   color: var(--color-ink);
   font-weight: 600;
   cursor: pointer;
+  transition: outline 0.2s ease;
+}
+
+.menu-button:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 .brand {
@@ -242,12 +256,13 @@ onUnmounted(() => {
   font-size: 0.75rem;
   font-weight: 600;
 }
-
-.app-body {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  position: relative;
-}
+  --app-header-offset: 96px;
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  background: white;
+  height: calc(100vh - var(--app-header-offset));
+  position: sticky;
+  top: var(--app-header-offset);
 
 .app-sidebar {
   padding: 1.5rem 1.25rem;
@@ -339,7 +354,7 @@ onUnmounted(() => {
 
 .sidebar-backdrop {
   position: fixed;
-  inset: 96px 0 0 0;
+  inset: var(--app-header-offset) 0 0 0;
   background: rgba(15, 23, 42, 0.45);
   border: none;
   padding: 0;
