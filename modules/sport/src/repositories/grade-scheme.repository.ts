@@ -3,7 +3,7 @@
  * Handles persistence of grading schemes
  */
 
-import { AdapterRepository } from '@viccoboard/storage';
+import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
@@ -20,7 +20,7 @@ export class GradeSchemeRepository extends AdapterRepository<Sport.GradeScheme> 
       id: row.id,
       name: row.name,
       description: row.description || undefined,
-      grades: JSON.parse(row.grades),
+      grades: safeJsonParse(row.grades, [], 'GradeScheme.grades'),
       type: row.type as 'numeric' | 'letter' | 'points',
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
@@ -36,7 +36,7 @@ export class GradeSchemeRepository extends AdapterRepository<Sport.GradeScheme> 
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.name !== undefined) row.name = entity.name;
     if (entity.description !== undefined) row.description = entity.description;
-    if (entity.grades !== undefined) row.grades = JSON.stringify(entity.grades);
+    if (entity.grades !== undefined) row.grades = safeJsonStringify(entity.grades, 'GradeScheme.grades');
     if (entity.type !== undefined) row.type = entity.type;
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();

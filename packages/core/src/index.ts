@@ -47,5 +47,16 @@ export type { ExportOptions as PluginExportOptions } from './interfaces/plugins.
 export * as Sport from './interfaces/sport.types';
 export * as Exams from './interfaces/exam.types';
 
+// Validators
+export * from './validators/exam.validator';
+export * from './validators/student.validator';
+export * from './validators/grade-category.validator';
+export * from './validators/performance-entry.validator';
+
+// Utils
+export * from './utils/pagination';
+export * from './utils/type-guards';
+export * from './utils/retry-policy';
+
 // Version
 export const VERSION = '0.1.0';

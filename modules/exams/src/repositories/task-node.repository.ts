@@ -3,7 +3,7 @@
  * Handles persistence of task hierarchy nodes
  */
 
-import { AdapterRepository } from '@viccoboard/storage';
+import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
 import { Exams } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 import { v4 as uuidv4 } from 'uuid';
@@ -29,7 +29,7 @@ export class TaskNodeRepository extends AdapterRepository<Exams.TaskNode> {
       allowComments: !!row.allow_comments,
       allowSupportTips: !!row.allow_support_tips,
       commentBoxEnabled: !!row.comment_box_enabled,
-      subtasks: row.subtasks ? JSON.parse(row.subtasks) : []
+      subtasks: safeJsonParse(row.subtasks, [], 'TaskNode.subtasks')
     };
   }
 
@@ -51,7 +51,7 @@ export class TaskNodeRepository extends AdapterRepository<Exams.TaskNode> {
     if (entity.allowComments !== undefined) row.allow_comments = entity.allowComments ? 1 : 0;
     if (entity.allowSupportTips !== undefined) row.allow_support_tips = entity.allowSupportTips ? 1 : 0;
     if (entity.commentBoxEnabled !== undefined) row.comment_box_enabled = entity.commentBoxEnabled ? 1 : 0;
-    if (entity.subtasks !== undefined) row.subtasks = JSON.stringify(entity.subtasks);
+    if (entity.subtasks !== undefined) row.subtasks = safeJsonStringify(entity.subtasks, 'TaskNode.subtasks');
 
     return row;
   }

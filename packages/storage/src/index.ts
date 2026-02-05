@@ -10,6 +10,7 @@ export * from './repositories/adapter.repository';
 export * from './adapters/storage-adapter.interface';
 export * from './adapters/sqlite.adapter';
 export * from './adapters/indexeddb.adapter';
+export * from './utils/safe-json';
 export * from './migrations/001_initial_schema_new';
 export * from './migrations/002_grading_schema';
 export * from './migrations/003_shuttle_run_schema';

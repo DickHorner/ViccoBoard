@@ -3,7 +3,7 @@
  * Handles persistence of grading table definitions
  */
 
-import { AdapterRepository } from '@viccoboard/storage';
+import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
@@ -19,9 +19,9 @@ export class TableDefinitionRepository extends AdapterRepository<Sport.TableDefi
       type: row.type,
       description: row.description ?? undefined,
       source: row.source,
-      dimensions: row.dimensions ? JSON.parse(row.dimensions) : [],
-      mappingRules: row.mapping_rules ? JSON.parse(row.mapping_rules) : [],
-      entries: row.entries ? JSON.parse(row.entries) : [],
+      dimensions: safeJsonParse(row.dimensions, [], 'TableDefinition.dimensions'),
+      mappingRules: safeJsonParse(row.mapping_rules, [], 'TableDefinition.mappingRules'),
+      entries: safeJsonParse(row.entries, [], 'TableDefinition.entries'),
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
     };
@@ -35,9 +35,9 @@ export class TableDefinitionRepository extends AdapterRepository<Sport.TableDefi
     if (entity.type !== undefined) row.type = entity.type;
     if (entity.description !== undefined) row.description = entity.description;
     if (entity.source !== undefined) row.source = entity.source;
-    if (entity.dimensions !== undefined) row.dimensions = JSON.stringify(entity.dimensions);
-    if (entity.mappingRules !== undefined) row.mapping_rules = JSON.stringify(entity.mappingRules);
-    if (entity.entries !== undefined) row.entries = JSON.stringify(entity.entries);
+    if (entity.dimensions !== undefined) row.dimensions = safeJsonStringify(entity.dimensions, 'TableDefinition.dimensions');
+    if (entity.mappingRules !== undefined) row.mapping_rules = safeJsonStringify(entity.mappingRules, 'TableDefinition.mappingRules');
+    if (entity.entries !== undefined) row.entries = safeJsonStringify(entity.entries, 'TableDefinition.entries');
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
 

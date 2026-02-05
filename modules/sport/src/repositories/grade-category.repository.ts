@@ -3,7 +3,7 @@
  * Handles persistence of grade categories
  */
 
-import { AdapterRepository } from '@viccoboard/storage';
+import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
@@ -23,7 +23,7 @@ export class GradeCategoryRepository extends AdapterRepository<Sport.GradeCatego
       description: row.description ?? undefined,
       type: row.type as Sport.GradeCategoryType,
       weight: row.weight,
-      configuration: JSON.parse(row.configuration),
+      configuration: safeJsonParse(row.configuration, {}, 'GradeCategory.configuration'),
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
     };
@@ -41,7 +41,7 @@ export class GradeCategoryRepository extends AdapterRepository<Sport.GradeCatego
     if (entity.description !== undefined) row.description = entity.description;
     if (entity.type !== undefined) row.type = entity.type;
     if (entity.weight !== undefined) row.weight = entity.weight;
-    if (entity.configuration !== undefined) row.configuration = JSON.stringify(entity.configuration);
+    if (entity.configuration !== undefined) row.configuration = safeJsonStringify(entity.configuration, 'GradeCategory.configuration');
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
 

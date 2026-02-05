@@ -49,15 +49,29 @@ export class SQLiteStorage implements Storage {
 
     // Initialize adapter
     this.adapter = new SQLiteAdapter(this.db);
-    // Enable encryption (using SQLCipher pragma if available)
+    
+    // Enable encryption (using SQLCipher pragma)
     // Note: better-sqlite3 doesn't include SQLCipher by default
-    // For production, use @journeyapps/sqlcipher or similar
+    // For production, use @journeyapps/sqlcipher or install SQLCipher separately
+    // 
+    // ⚠️ SECURITY: This implementation hard-fails if encryption is unavailable
+    // to prevent accidental plaintext database storage
     try {
       this.db.pragma(`key = '${password}'`);
+      
+      // Verify encryption is actually working by trying to access the database
+      // If SQLCipher is not installed, this will fail
+      this.db.pragma('cipher_version');
     } catch (error) {
-      // If SQLCipher is not available, continue without encryption
-      // This is acceptable for development but NOT for production
-      console.warn('SQLCipher not available, database will not be encrypted');
+      this.db.close();
+      this.db = null;
+      this.adapter = null;
+      throw new Error(
+        'SQLCipher encryption library not available. ' +
+        'Cannot initialize encrypted storage. ' +
+        'Install SQLCipher or use IndexedDBStorage for browser environments. ' +
+        `Original error: ${error instanceof Error ? error.message : 'Unknown'}`
+      );
     }
 
     // Enable foreign keys

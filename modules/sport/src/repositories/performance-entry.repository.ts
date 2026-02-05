@@ -3,7 +3,7 @@
  * Handles persistence of grade/performance entries
  */
 
-import { AdapterRepository } from '@viccoboard/storage';
+import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
@@ -20,12 +20,12 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
       id: row.id,
       studentId: row.student_id,
       categoryId: row.category_id,
-      measurements: JSON.parse(row.measurements || '{}'),
+      measurements: safeJsonParse(row.measurements, {}, 'PerformanceEntry.measurements'),
       calculatedGrade: row.calculated_grade ?? undefined,
       timestamp: new Date(row.timestamp),
       deviceInfo: row.device_info ?? undefined,
       comment: row.comment ?? undefined,
-      metadata: row.metadata ? JSON.parse(row.metadata) : undefined,
+      metadata: row.metadata ? safeJsonParse(row.metadata, undefined, 'PerformanceEntry.metadata') : undefined,
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
     };
@@ -40,12 +40,12 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.studentId !== undefined) row.student_id = entity.studentId;
     if (entity.categoryId !== undefined) row.category_id = entity.categoryId;
-    if (entity.measurements !== undefined) row.measurements = JSON.stringify(entity.measurements);
+    if (entity.measurements !== undefined) row.measurements = safeJsonStringify(entity.measurements, 'PerformanceEntry.measurements');
     if (entity.calculatedGrade !== undefined) row.calculated_grade = entity.calculatedGrade;
     if (entity.timestamp !== undefined) row.timestamp = entity.timestamp.toISOString();
     if (entity.deviceInfo !== undefined) row.device_info = entity.deviceInfo;
     if (entity.comment !== undefined) row.comment = entity.comment;
-    if (entity.metadata !== undefined) row.metadata = JSON.stringify(entity.metadata);
+    if (entity.metadata !== undefined) row.metadata = safeJsonStringify(entity.metadata, 'PerformanceEntry.metadata');
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
 

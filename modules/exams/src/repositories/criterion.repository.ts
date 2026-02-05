@@ -3,7 +3,7 @@
  * Handles persistence of task criteria
  */
 
-import { AdapterRepository } from '@viccoboard/storage';
+import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
 import { Exams } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,9 +17,9 @@ export class CriterionRepository extends AdapterRepository<Exams.Criterion> {
     return {
       id: row.id,
       text: row.text,
-      formatting: row.formatting ? JSON.parse(row.formatting) : {},
+      formatting: safeJsonParse(row.formatting, {}, 'Criterion.formatting'),
       points: row.points,
-      subCriteria: row.sub_criteria ? JSON.parse(row.sub_criteria) : undefined,
+      subCriteria: row.sub_criteria ? safeJsonParse(row.sub_criteria, undefined, 'Criterion.subCriteria') : undefined,
       aspectBased: !!row.aspect_based
     };
   }
@@ -29,9 +29,9 @@ export class CriterionRepository extends AdapterRepository<Exams.Criterion> {
 
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.text !== undefined) row.text = entity.text;
-    if (entity.formatting !== undefined) row.formatting = JSON.stringify(entity.formatting);
+    if (entity.formatting !== undefined) row.formatting = safeJsonStringify(entity.formatting, 'Criterion.formatting');
     if (entity.points !== undefined) row.points = entity.points;
-    if (entity.subCriteria !== undefined) row.sub_criteria = JSON.stringify(entity.subCriteria);
+    if (entity.subCriteria !== undefined) row.sub_criteria = safeJsonStringify(entity.subCriteria, 'Criterion.subCriteria');
     if (entity.aspectBased !== undefined) row.aspect_based = entity.aspectBased ? 1 : 0;
 
     if (entity.examId !== undefined) row.exam_id = entity.examId;

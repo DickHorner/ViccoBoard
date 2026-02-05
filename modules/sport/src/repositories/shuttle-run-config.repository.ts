@@ -3,7 +3,7 @@
  * Handles persistence of Shuttle Run configuration tables
  */
 
-import { AdapterRepository } from '@viccoboard/storage';
+import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
@@ -16,7 +16,7 @@ export class ShuttleRunConfigRepository extends AdapterRepository<Sport.ShuttleR
     return {
       id: row.id,
       name: row.name,
-      levels: row.levels ? JSON.parse(row.levels) : [],
+      levels: safeJsonParse(row.levels, [], 'ShuttleRunConfig.levels'),
       audioSignalsEnabled: !!row.audio_signals_enabled,
       source: row.source || 'default',
       createdAt: new Date(row.created_at),
@@ -29,7 +29,7 @@ export class ShuttleRunConfigRepository extends AdapterRepository<Sport.ShuttleR
 
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.name !== undefined) row.name = entity.name;
-    if (entity.levels !== undefined) row.levels = JSON.stringify(entity.levels);
+    if (entity.levels !== undefined) row.levels = safeJsonStringify(entity.levels, 'ShuttleRunConfig.levels');
     if (entity.audioSignalsEnabled !== undefined) {
       row.audio_signals_enabled = entity.audioSignalsEnabled ? 1 : 0;
     }
