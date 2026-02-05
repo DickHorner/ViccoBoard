@@ -268,11 +268,13 @@ Implement UI for entering grades.
 **Description:**
 Implement complete Shuttle Run test workflow.
 
+**Status (Feb 3, 2026):** Backend repo/service/migrations/tests done; UI + audio + result storage pending. (PR #41)
+
 **Tasks:**
-- [ ] ShuttleRunConfig repository
+- [x] ShuttleRunConfig repository
 - [ ] Shuttle Run timer UI
 - [ ] Result collection and validation
-- [ ] Auto-calculation with table lookup
+- [x] Auto-calculation with table lookup
 - [ ] Audio signal integration
 
 **Acceptance Criteria:**
@@ -291,12 +293,14 @@ Implement complete Shuttle Run test workflow.
 **Description:**
 Implement Cooper Test (running/swimming) workflow.
 
+**Status (Feb 3, 2026):** Backend repo/service/migrations/tests done; result storage + UI pending. (PR #43)
+
 **Tasks:**
-- [ ] Track rounds/distance
-- [ ] Support running and swimming modes
-- [ ] Auto-calculate grades from table
+- [x] Track rounds/distance
+- [x] Support running and swimming modes
+- [x] Auto-calculate grades from table
 - [ ] Result storage
-- [ ] Sportart configuration
+- [x] Sportart configuration
 
 **Acceptance Criteria:**
 - Can select sport mode
@@ -314,12 +318,14 @@ Implement Cooper Test (running/swimming) workflow.
 **Description:**
 Implement age-dependent sports badge evaluation.
 
+**Status (Feb 3, 2026):** Standards + results + PDF export implemented with tests. (PR #44)
+
 **Tasks:**
-- [ ] Age calculation from birth year
-- [ ] Age-based performance standards
-- [ ] Badge achievement tracking
-- [ ] PDF export for overview
-- [ ] Results archive
+- [x] Age calculation from birth year
+- [x] Age-based performance standards
+- [x] Badge achievement tracking
+- [x] PDF export for overview
+- [x] Results archive
 
 **Acceptance Criteria:**
 - Age-based standards applied
@@ -337,10 +343,12 @@ Implement age-dependent sports badge evaluation.
 **Description:**
 Implement Timer tool plugin.
 
+**Status (Feb 3, 2026):** Core Timer plugin logic implemented; UI + persistence pending. (PR #42)
+
 **Tasks:**
-- [ ] Timer plugin implementation
+- [x] Timer plugin implementation
 - [ ] UI for timer controls
-- [ ] Support countdown/stopwatch/intervals
+- [x] Support countdown/stopwatch/intervals
 - [ ] Audio notifications
 - [ ] Store timer results
 
@@ -362,12 +370,14 @@ Implement Timer tool plugin.
 **Description:**
 Implement persistence layer for exams.
 
+**Status (Feb 3, 2026):** Repos + migrations + tests implemented. (PR #45)
+
 **Tasks:**
-- [ ] Exam repository (CRUD + queries)
-- [ ] TaskNode repository (3-level hierarchy)
-- [ ] Criterion repository
-- [ ] Add schema migrations
-- [ ] Unit tests
+- [x] Exam repository (CRUD + queries)
+- [x] TaskNode repository (3-level hierarchy)
+- [x] Criterion repository
+- [x] Add schema migrations
+- [x] Unit tests
 
 **Acceptance Criteria:**
 - CRUD operations functional
@@ -531,4 +541,4 @@ Implement comment system and table-based correction view.
 
 ---
 
-**Next Step:** Move to Task 2 (Update ROADMAP.md & STATUS.md)
+**Next Step:** Update Phase 2 UI decision (P2-1) and proceed to P5-2 after UI shell is ready

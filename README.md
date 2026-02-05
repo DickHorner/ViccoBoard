@@ -8,6 +8,10 @@ A single application that provides the full functionality of:
 - **SportZens**: Class organization, grading, live classroom tools, WOW workouts, and statistics
 - **KURT**: Exam structuring, correction, feedback, support tips, long-term tracking, and email distribution
 
+## Implementation Status Note
+
+The feature lists below describe the full target scope. Current implementation progress is tracked in `STATUS.md` and `ISSUES_TRACKER.md`.
+
 ## 🏗️ Architecture
 
 ### Monorepo Structure

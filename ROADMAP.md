@@ -1,8 +1,8 @@
 # ViccoBoard Development Roadmap
 
-**Last Updated:** January 16, 2026  
-**Current Progress:** 44/176 features (25%)  
-**Status:** Phase 1 Complete - Phase 2 Starting
+**Last Updated:** February 3, 2026  
+**Current Progress:** 44/176 features (baseline) + backend additions (P4-1..P5-1)  
+**Status:** Phase 2 pending; backend work started in Phases 4-5
 
 ---
 
@@ -116,6 +116,11 @@ ViccoBoard combines **SportZens** (PE class management) and **KURT** (exam/asses
 - Implement specialized test workflows (Shuttle Run, Cooper, Sportabzeichen)
 - Build timer and measurement tools
 - Create result tracking and PDF export
+
+### Progress Update (Feb 3, 2026)
+- Backend repositories/services/migrations/tests implemented for P4-1..P4-4
+- UI wiring, result persistence, and audio playback still pending
+- PRs: #41 (Shuttle Run), #43 (Cooper), #44 (Sportabzeichen), #42 (Timer plugin)
 
 ### Key Issues
 | ID | Title | Effort | Priority |
@@ -429,5 +434,5 @@ TOTAL:    26 weeks (Phase 2-12)
 
 ---
 
-**Next Review:** After Phase 2 completion  
+**Next Review:** After Phase 2 UI decision + P5-2 progress  
 **Baseline Commit:** d8875dd
