@@ -9,6 +9,24 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Dashboard' }
   },
   {
+    path: '/exams',
+    name: 'exams',
+    component: () => import('../views/ExamsOverview.vue'),
+    meta: { title: 'Exams' }
+  },
+  {
+    path: '/exams/new',
+    name: 'exam-new',
+    component: () => import('../views/ExamBuilder.vue'),
+    meta: { title: 'New Exam' }
+  },
+  {
+    path: '/exams/:id',
+    name: 'exam-edit',
+    component: () => import('../views/ExamBuilder.vue'),
+    meta: { title: 'Exam Builder' }
+  },
+  {
     path: '/classes/:id',
     name: 'class-detail',
     component: () => import('../views/ClassDetail.vue'),
@@ -76,3 +94,4 @@ const router = createRouter({
 })
 
 export default router
+
