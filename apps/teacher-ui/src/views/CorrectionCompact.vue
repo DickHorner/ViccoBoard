@@ -129,7 +129,7 @@ const useAlternativeGrading = ref(false)
 const alternativeGrades = ref<Record<string, ExamsTypes.AlternativeGrading['type']>>({})
 const alternativeOptions: ExamsTypes.AlternativeGrading['type'][] = ['++', '+', '0', '-', '--']
 
-const alternativeToPoints = (task: ExamsTypes.TaskNode, option: ExamsTypes.AlternativeGrading['type']) => {
+const alternativeToPoints = (task: ExamsTypes.TaskNode, option: ExamsTypes.AlternativeGrading['type']): number => {
   const max = task.points || 0
   switch (option) {
     case '++':
@@ -147,7 +147,10 @@ const alternativeToPoints = (task: ExamsTypes.TaskNode, option: ExamsTypes.Alter
   }
 }
 
-const setAlternative = (task: ExamsTypes.TaskNode, option: ExamsTypes.AlternativeGrading['type']) => {
+const setAlternative = (
+  task: ExamsTypes.TaskNode,
+  option: ExamsTypes.AlternativeGrading['type'],
+): void => {
   alternativeGrades.value[task.id] = option
   taskScores.value[task.id] = Number(alternativeToPoints(task, option).toFixed(1))
 }
@@ -401,6 +404,44 @@ onMounted(() => {
 
 .muted {
   color: #94a3b8;
+}
+
+.choice-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.choice-toggle input {
+  cursor: pointer;
+}
+
+
+}
+
+.alt-button {
+  background: transparent;
+  border: 2px solid rgba(15, 23, 42, 0.2);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 36px;
+  transition: all 0.2s ease;
+}
+
+.alt-button:hover {
+  border-color: rgba(15, 23, 42, 0.4);
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.alt-button.active {
+  background: #0f172a;
+  color: white;
+  border-color: #0f172a;
 }
 
 @media (max-width: 640px) {
