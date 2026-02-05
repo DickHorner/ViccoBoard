@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
@@ -18,6 +19,11 @@
     "baseUrl": ".",
     "paths": {
       "@viccoboard/core": ["../../packages/core/src"],
+      "@viccoboard/core/*": ["../../packages/core/src/*"],
+      "@viccoboard/storage": ["../../packages/storage/src"],
+      "@viccoboard/storage/*": ["../../packages/storage/src/*"],
+      "@viccoboard/plugins": ["../../packages/plugins/src"],
+      "@viccoboard/plugins/*": ["../../packages/plugins/src/*"],
       "@/*": ["./src/*"]
     },
     "types": ["vite/client"],
@@ -27,7 +33,23 @@
     "noFallthroughCasesInSwitch": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/storage" },
+    { "path": "../../packages/plugins" },
+    { "path": "../../modules/sport" },
+    { "path": "../../modules/exams" }
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "../../packages/core/src/**/*",
+    "../../packages/storage/src/**/*",
+    "../../packages/plugins/src/**/*",
+    "../../modules/sport/src/**/*",
+    "../../modules/exams/src/**/*"
+  ],
   "exclude": ["node_modules", "src/views-wip/**"]
 }
 
