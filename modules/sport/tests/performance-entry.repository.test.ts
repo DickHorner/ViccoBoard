@@ -4,7 +4,7 @@
 
 import { PerformanceEntryRepository } from '../src/repositories/performance-entry.repository';
 import { GradeCategoryRepository } from '../src/repositories/grade-category.repository';
-import { StudentRepository } from '../src/repositories/student.repository';
+import { StudentRepository } from '@viccoboard/storage';
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
 import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage';
 import { Sport } from '@viccoboard/core';
