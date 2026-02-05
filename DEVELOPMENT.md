@@ -66,7 +66,8 @@ ViccoBoard/
 ├── Plan.md              # Feature specification
 ├── agents.md            # Agent guidelines
 ├── README.md            # Project overview
-└── STATUS.md            # Development status
+├── INDEX.md             # Documentation index
+└── docs/                # Planning, reviews, QA, status, demo docs
 ```
 
 ## Development Workflow
@@ -497,7 +498,7 @@ if (DEBUG) {
 
 1. Check [Plan.md](./Plan.md) for feature specifications
 2. Check [agents.md](./agents.md) for development guidelines
-3. Review [STATUS.md](./STATUS.md) for current progress
+3. Review [docs/status/STATUS.md](./docs/status/STATUS.md) for current progress
 4. Read package READMEs for specific documentation
 
 ---

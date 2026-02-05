@@ -209,7 +209,7 @@ npm run dev
 
 The demo creates a class, enrolls students, records attendance, and shows statistics - proving the entire architecture works end-to-end!
 
-See [DEMO_COMPLETE.md](./DEMO_COMPLETE.md) for details.
+See [docs/demo/DEMO_COMPLETE.md](./docs/demo/DEMO_COMPLETE.md) for details.
 
 ### Development
 
@@ -227,6 +227,8 @@ npm test
 ## 📖 Documentation
 
 For detailed documentation, see:
+- [INDEX.md](./INDEX.md) - Documentation index
+- [docs/README.md](./docs/README.md) - Docs landing page
 - [Plan.md](./Plan.md) - Complete feature specification
 - [agents.md](./agents.md) - Agent setup and development guidelines
 

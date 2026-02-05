@@ -353,12 +353,12 @@ Will need:
 
 ## 📖 Resources
 
-- [Plan.md](./Plan.md) - Complete feature specification (371 lines)
-- [agents.md](./agents.md) - Agent guidelines (162 lines)
-- [README.md](./README.md) - Project overview
-- [packages/core/](./packages/core/) - Type definitions
-- [packages/plugins/](./packages/plugins/) - Plugin system
-- [packages/storage/](./packages/storage/) - Storage implementation
+- [Plan.md](../../Plan.md) - Complete feature specification (371 lines)
+- [agents.md](../../agents.md) - Agent guidelines (162 lines)
+- [README.md](../../README.md) - Project overview
+- [packages/core/](../../packages/core/) - Type definitions
+- [packages/plugins/](../../packages/plugins/) - Plugin system
+- [packages/storage/](../../packages/storage/) - Storage implementation
 
 ---
 
