@@ -2,6 +2,7 @@
   "name": "@viccoboard/plugins",
   "version": "0.1.0",
   "description": "Plugin registry and contracts for ViccoBoard extensibility",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

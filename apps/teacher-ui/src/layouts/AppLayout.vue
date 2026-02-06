@@ -37,11 +37,7 @@
         <nav class="nav-menu">
           <RouterLink
             v-for="item in navItems"
-                <RouterLink to="/exams" class="nav-item" active-class="active">
-          <span class="nav-icon">🧾</span>
-          <span class="nav-label">Prüfungen</span>
-        </RouterLink>
-    :key="item.to"
+            :key="item.to"
             :to="item.to"
             class="nav-item"
             active-class="active"

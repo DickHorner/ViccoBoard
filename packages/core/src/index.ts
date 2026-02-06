@@ -57,6 +57,7 @@ export * from './validators/performance-entry.validator';
 export * from './utils/pagination';
 export * from './utils/type-guards';
 export * from './utils/retry-policy';
+export * from './utils/safe-json';
 
 // Version
 export const VERSION = '0.1.0';

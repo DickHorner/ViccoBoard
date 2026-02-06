@@ -3,8 +3,7 @@
  * Handles all exam-related database operations for KURT module
  */
 
-import { Exams, normalizePaginationOptions, createPaginatedResult, type PaginationOptions, type PaginatedResult } from '@viccoboard/core'
-import { safeJsonParse, safeJsonStringify } from '@viccoboard/storage'
+import { Exams, normalizePaginationOptions, createPaginatedResult, type PaginationOptions, type PaginatedResult, safeJsonParse, safeJsonStringify } from '@viccoboard/core'
 import { db } from '../db'
 import type { ExamRecord } from '../db'
 

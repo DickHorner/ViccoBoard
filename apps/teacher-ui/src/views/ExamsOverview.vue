@@ -52,7 +52,8 @@ const loading = ref(true)
 
 const loadExams = async () => {
   loading.value = true
-  exams.value = await getAll()
+  const result = await getAll()
+  exams.value = result.items
   loading.value = false
 }
 

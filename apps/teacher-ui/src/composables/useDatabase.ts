@@ -5,8 +5,7 @@
  */
 
 import { ref } from 'vue'
-import { Sport } from '@viccoboard/core'
-import { safeJsonParse, safeJsonStringify } from '@viccoboard/storage'
+import { Sport, safeJsonParse, safeJsonStringify } from '@viccoboard/core'
 import { db } from '../db'
 import { createUuid } from '../utils/uuid'
 
