@@ -3,7 +3,7 @@
  * Validates exam entity data before creation/update
  */
 
-import type { Exam, ExamStructure, GradingKey } from '../interfaces/exam.types';
+import type { Exam, ExamStructure, GradingKey } from '../interfaces/exam.types.js';
 
 export interface ValidationResult {
   isValid: boolean;

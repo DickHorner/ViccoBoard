@@ -1,4 +1,4 @@
-import type { IndexedDBMigration } from './indexeddb-migration';
+import type { IndexedDBMigration } from './indexeddb-migration.js';
 
 export const correctionSchemaMigration: IndexedDBMigration = {
   storage: 'indexeddb',

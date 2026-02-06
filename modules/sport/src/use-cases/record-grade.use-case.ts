@@ -4,7 +4,7 @@
  */
 
 import { Sport } from '@viccoboard/core';
-import type { PerformanceEntryRepository } from '../repositories/performance-entry.repository';
+import type { PerformanceEntryRepository } from '../repositories/performance-entry.repository.js';
 
 export interface RecordGradeInput {
   studentId: string;

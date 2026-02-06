@@ -1,4 +1,4 @@
-import { IndexedDBMigration } from './indexeddb-migration';
+import { IndexedDBMigration } from './indexeddb-migration.js';
 
 export class IndexedDBSportabzeichenSchemaMigration implements IndexedDBMigration {
   storage: 'indexeddb' = 'indexeddb';

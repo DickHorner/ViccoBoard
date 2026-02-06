@@ -4,7 +4,7 @@
  */
 
 import { ClassGroup } from '@viccoboard/core';
-import { ClassGroupRepository } from '../repositories/class-group.repository';
+import { ClassGroupRepository } from '../repositories/class-group.repository.js';
 
 export interface CreateClassInput {
   name: string;

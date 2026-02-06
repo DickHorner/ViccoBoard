@@ -3,7 +3,7 @@
  * Validates student entity data before creation/update
  */
 
-import type { Student, ContactInfo } from '../interfaces/core.types';
+import type { Student, ContactInfo } from '../interfaces/core.types.js';
 
 export interface ValidationResult {
   isValid: boolean;

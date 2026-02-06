@@ -3,7 +3,7 @@
  * All types specific to exam creation, correction, and assessment
  */
 
-import { Student } from './core.types';
+import { Student } from './core.types.js';
 
 // ============================================================================
 // Exam Structure

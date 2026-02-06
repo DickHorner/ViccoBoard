@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Demo CLI application showing ViccoBoard functionality",
   "private": true,
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

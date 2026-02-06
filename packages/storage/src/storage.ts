@@ -5,8 +5,8 @@
 
 import Database from 'better-sqlite3';
 import { Storage, Migration } from '@viccoboard/core';
-import { StorageAdapter } from './adapters/storage-adapter.interface';
-import { SQLiteAdapter } from './adapters/sqlite.adapter';
+import { StorageAdapter } from './adapters/storage-adapter.interface.js';
+import { SQLiteAdapter } from './adapters/sqlite.adapter.js';
 import * as path from 'path';
 import * as fs from 'fs';
 

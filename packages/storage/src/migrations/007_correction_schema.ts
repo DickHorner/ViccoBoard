@@ -4,7 +4,7 @@
  */
 
 import { Migration } from '@viccoboard/core';
-import { SQLiteStorage } from '../storage';
+import { SQLiteStorage } from '../storage.js';
 
 export class CorrectionSchemaMigration implements Migration {
   version = 7;

@@ -4,7 +4,7 @@
  * Following the modular architecture principle: Core knows only interfaces, never implementations
  */
 
-import { Student } from './core.types';
+import { Student } from './core.types.js';
 
 // ============================================================================
 // Base Plugin Interface

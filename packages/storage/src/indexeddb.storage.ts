@@ -1,7 +1,7 @@
 import { Storage, Migration } from '@viccoboard/core';
-import { IndexedDBAdapter } from './adapters/indexeddb.adapter';
-import { StorageAdapter } from './adapters/storage-adapter.interface';
-import type { IndexedDBMigration } from './migrations/indexeddb/indexeddb-migration';
+import { IndexedDBAdapter } from './adapters/indexeddb.adapter.js';
+import { StorageAdapter } from './adapters/storage-adapter.interface.js';
+import type { IndexedDBMigration } from './migrations/indexeddb/indexeddb-migration.js';
 
 export interface IndexedDBStorageConfig {
   databaseName: string;

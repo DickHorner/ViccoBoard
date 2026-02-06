@@ -4,8 +4,8 @@
  */
 
 import { Student } from '@viccoboard/core';
-import { StudentRepository } from '../repositories/student.repository';
-import { ClassGroupRepository } from '../repositories/class-group.repository';
+import { StudentRepository } from '../repositories/student.repository.js';
+import { ClassGroupRepository } from '../repositories/class-group.repository.js';
 
 export interface AddStudentInput {
   firstName: string;

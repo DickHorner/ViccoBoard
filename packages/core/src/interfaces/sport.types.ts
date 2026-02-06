@@ -3,7 +3,7 @@
  * All types specific to physical education/sports assessment
  */
 
-import { Student, ClassGroup } from './core.types';
+import { Student, ClassGroup } from './core.types.js';
 
 // ============================================================================
 // Grading Schemes & Categories

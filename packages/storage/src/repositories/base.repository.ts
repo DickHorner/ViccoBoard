@@ -4,7 +4,7 @@
  */
 
 import { Repository, QueryOptions, QueryCriteria } from '@viccoboard/core';
-import { SQLiteStorage } from '../storage';
+import { SQLiteStorage } from '../storage.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export abstract class BaseRepository<T> implements Repository<T> {

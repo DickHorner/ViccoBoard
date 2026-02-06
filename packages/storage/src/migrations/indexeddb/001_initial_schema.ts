@@ -1,4 +1,4 @@
-import { IndexedDBMigration } from './indexeddb-migration';
+import { IndexedDBMigration } from './indexeddb-migration.js';
 
 export class IndexedDBInitialSchemaMigration implements IndexedDBMigration {
   storage: 'indexeddb' = 'indexeddb';

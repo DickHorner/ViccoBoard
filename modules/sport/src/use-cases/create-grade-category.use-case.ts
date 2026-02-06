@@ -4,7 +4,7 @@
  */
 
 import { Sport } from '@viccoboard/core';
-import type { GradeCategoryRepository } from '../repositories/grade-category.repository';
+import type { GradeCategoryRepository } from '../repositories/grade-category.repository.js';
 
 export interface CreateGradeCategoryInput {
   classGroupId: string;

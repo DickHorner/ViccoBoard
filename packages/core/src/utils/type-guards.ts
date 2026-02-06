@@ -6,8 +6,8 @@ import type {
   GradeCategoryType, 
   GradeCategory, 
   PerformanceEntry 
-} from '../interfaces/sport.types'
-import type { Student } from '../interfaces/core.types'
+} from '../interfaces/sport.types.js'
+import type { Student } from '../interfaces/core.types.js'
 
 /**
  * Grade category type guard

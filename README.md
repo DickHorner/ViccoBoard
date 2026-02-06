@@ -264,3 +264,5 @@ UNLICENSED - Private project
 ---
 
 **Note**: This is a comprehensive educational software project combining physical education management (SportZens) with exam/assessment management (KURT) into a unified teacher toolkit.
+
+demo-password-2024

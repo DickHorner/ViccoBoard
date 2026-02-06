@@ -1,7 +1,7 @@
 import { Exams } from '@viccoboard/core';
 import { v4 as uuidv4 } from 'uuid';
-import { CorrectionEntryRepository } from '../repositories/correction-entry.repository';
-import { CalculateGradeUseCase } from './calculate-grade.use-case';
+import { CorrectionEntryRepository } from '../repositories/correction-entry.repository.js';
+import { CalculateGradeUseCase } from './calculate-grade.use-case.js';
 
 export interface RecordCorrectionInput {
   examId: string;

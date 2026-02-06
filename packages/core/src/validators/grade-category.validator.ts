@@ -3,7 +3,7 @@
  * Validates grade category entity data before creation/update
  */
 
-import type { GradeCategory, GradeCategoryType } from '../interfaces/sport.types';
+import type { GradeCategory, GradeCategoryType } from '../interfaces/sport.types.js';
 
 export interface ValidationResult {
   isValid: boolean;

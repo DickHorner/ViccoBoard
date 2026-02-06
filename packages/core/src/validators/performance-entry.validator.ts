@@ -3,7 +3,7 @@
  * Validates performance entry entity data before creation/update
  */
 
-import type { PerformanceEntry } from '../interfaces/sport.types';
+import type { PerformanceEntry } from '../interfaces/sport.types.js';
 
 export interface ValidationResult {
   isValid: boolean;

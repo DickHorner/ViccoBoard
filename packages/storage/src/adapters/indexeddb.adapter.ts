@@ -3,7 +3,7 @@
  * Wraps IndexedDB operations in the common StorageAdapter interface
  */
 
-import { StorageAdapter, TableSchema } from './storage-adapter.interface';
+import { StorageAdapter, TableSchema } from './storage-adapter.interface.js';
 
 export class IndexedDBAdapter implements StorageAdapter {
   private activeTransaction: IDBTransaction | null = null;

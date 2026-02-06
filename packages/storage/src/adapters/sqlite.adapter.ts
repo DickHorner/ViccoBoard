@@ -5,7 +5,7 @@
  */
 
 import Database from 'better-sqlite3';
-import { StorageAdapter, TableSchema } from './storage-adapter.interface';
+import { StorageAdapter, TableSchema } from './storage-adapter.interface.js';
 
 export class SQLiteAdapter implements StorageAdapter {
   // Valid SQL identifier pattern: starts with letter or underscore, contains alphanumeric or underscores

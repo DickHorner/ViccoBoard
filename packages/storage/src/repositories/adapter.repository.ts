@@ -4,7 +4,7 @@
  */
 
 import { Repository, QueryOptions, QueryCriteria } from '@viccoboard/core';
-import { StorageAdapter } from '../adapters/storage-adapter.interface';
+import { StorageAdapter } from '../adapters/storage-adapter.interface.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export abstract class AdapterRepository<T> implements Repository<T> {

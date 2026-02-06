@@ -4,9 +4,9 @@
  */
 
 // Core types
-export * from './interfaces/core.types';
-export * from './interfaces/storage.types';
-export * from './interfaces/crypto.types';
+export * from './interfaces/core.types.js';
+export * from './interfaces/storage.types.js';
+export * from './interfaces/crypto.types.js';
 
 // Plugin interfaces (explicit to avoid name collisions)
 export type {
@@ -40,24 +40,24 @@ export type {
   IntegrationResult,
   IntegrationUIConfig,
   IntegrationField
-} from './interfaces/plugins.types';
-export type { ExportOptions as PluginExportOptions } from './interfaces/plugins.types';
+} from './interfaces/plugins.types.js';
+export type { ExportOptions as PluginExportOptions } from './interfaces/plugins.types.js';
 
 // Domain-specific types under namespaces to avoid collisions
-export * as Sport from './interfaces/sport.types';
-export * as Exams from './interfaces/exam.types';
+export * as Sport from './interfaces/sport.types.js';
+export * as Exams from './interfaces/exam.types.js';
 
 // Validators
-export * from './validators/exam.validator';
-export * from './validators/student.validator';
-export * from './validators/grade-category.validator';
-export * from './validators/performance-entry.validator';
+export * from './validators/exam.validator.js';
+export * from './validators/student.validator.js';
+export * from './validators/grade-category.validator.js';
+export * from './validators/performance-entry.validator.js';
 
 // Utils
-export * from './utils/pagination';
-export * from './utils/type-guards';
-export * from './utils/retry-policy';
-export * from './utils/safe-json';
+export * from './utils/pagination.js';
+export * from './utils/type-guards.js';
+export * from './utils/retry-policy.js';
+export * from './utils/safe-json.js';
 
 // Version
 export const VERSION = '0.1.0';
