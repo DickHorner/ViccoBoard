@@ -3,8 +3,8 @@
  * Handles persistence of grade categories
  */
 
-import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
-import { Sport } from '@viccoboard/core';
+import { AdapterRepository } from '@viccoboard/storage';
+import { Sport, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class GradeCategoryRepository extends AdapterRepository<Sport.GradeCategory> {

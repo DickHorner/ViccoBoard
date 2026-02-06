@@ -3,8 +3,8 @@
  * Handles persistence of class/course groups
  */
 
-import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
-import { ClassGroup } from '@viccoboard/core';
+import { AdapterRepository } from '@viccoboard/storage';
+import { ClassGroup, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class ClassGroupRepository extends AdapterRepository<ClassGroup> {

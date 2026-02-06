@@ -3,8 +3,8 @@
  * Handles persistence of grading table definitions
  */
 
-import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
-import { Sport } from '@viccoboard/core';
+import { AdapterRepository } from '@viccoboard/storage';
+import { Sport, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class TableDefinitionRepository extends AdapterRepository<Sport.TableDefinition> {

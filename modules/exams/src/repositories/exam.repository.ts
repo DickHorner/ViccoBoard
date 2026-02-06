@@ -3,8 +3,8 @@
  * Handles persistence of exams
  */
 
-import { AdapterRepository, safeJsonParse, safeJsonStringify } from '@viccoboard/storage';
-import { Exams } from '@viccoboard/core';
+import { AdapterRepository } from '@viccoboard/storage';
+import { Exams, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 const emptyStructure: Exams.ExamStructure = {
