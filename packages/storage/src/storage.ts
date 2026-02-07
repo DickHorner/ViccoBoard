@@ -8,27 +8,16 @@
  * @see IndexedDBStorage for browser/web environments
  */
 
-// ✅ Conditional imports: Only imported if running in Node.js
-// In browser environments, attempting to import this module will fail with a clear error
-let Database: any;
-let path: any;
-let fs: any;
-
-try {
-  // These imports will succeed in Node.js environments and fail gracefully in browsers
-  Database = require('better-sqlite3');
-  path = require('path');
-  fs = require('fs');
-} catch (error) {
-  // If imports fail, we're likely in a browser environment
-  // Store the error for later reporting if someone tries to use SQLiteStorage
-  // This prevents TypeScript/Vite from including the modules in browser bundles
-  (globalThis as any).__sqliteLoadError = error;
-}
-
 import { Storage, Migration } from '@viccoboard/core';
 import { StorageAdapter } from './adapters/storage-adapter.interface.js';
 import { SQLiteAdapter } from './adapters/sqlite.adapter.js';
+
+// ✅ Dynamic imports for Node.js modules
+// These will be loaded dynamically when SQLiteStorage is constructed
+let Database: any = null;
+let path: any = null;
+let fs: any = null;
+let sqliteLoadError: Error | null = null;
 
 export interface StorageConfig {
   databasePath: string;
@@ -42,23 +31,42 @@ export class SQLiteStorage implements Storage {
   private config: StorageConfig;
   private migrations: Migration[] = [];
   private initialized: boolean = false;
+  private modulesLoaded: boolean = false;
 
   constructor(config: StorageConfig) {
-    if (!Database || !path || !fs) {
+    this.config = config;
+  }
+
+  private async loadNodeModules(): Promise<void> {
+    if (this.modulesLoaded) return;
+    
+    try {
+      // Dynamically import Node.js modules using ESM dynamic import
+      const betterSqlite3 = await import('better-sqlite3');
+      const pathModule = await import('path');
+      const fsModule = await import('fs');
+      
+      Database = betterSqlite3.default;
+      path = pathModule;
+      fs = fsModule;
+      this.modulesLoaded = true;
+    } catch (error) {
+      sqliteLoadError = error as Error;
       throw new Error(
         'SQLiteStorage requires Node.js environment. ' +
         'For browser/web environments, use IndexedDBStorage instead. ' +
-        'Error: ' +
-        ((globalThis as any).__sqliteLoadError?.message || 'better-sqlite3 not available')
+        'Error: ' + (error as Error).message
       );
     }
-    this.config = config;
   }
 
   async initialize(password: string): Promise<void> {
     if (this.initialized) {
       throw new Error('Storage is already initialized');
     }
+
+    // Load Node.js modules dynamically
+    await this.loadNodeModules();
 
     if (!Database || !path || !fs) {
       throw new Error('SQLiteStorage requires Node.js and better-sqlite3');

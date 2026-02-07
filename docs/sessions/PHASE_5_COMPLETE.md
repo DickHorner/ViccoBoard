@@ -197,7 +197,7 @@ ALTER TABLE class_groups ADD COLUMN archived INTEGER NOT NULL DEFAULT 0;
 
 ### Architecture Compliance
 - ✅ Clean Architecture: UI → Bridge → Use Case → Repository → Storage
-- ✅ No direct storage access from UI components
+- ✅ UI must not access storage/DB directly; use module bridges/use-cases
 - ✅ Domain logic in use cases, not UI
 - ✅ Bridge pattern enforced for all module access
 

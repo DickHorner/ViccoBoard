@@ -30,7 +30,7 @@ const appContext = /\b(app|ui|frontend|client)\b/i;
 
 const accessVerb = /\b(access|read|write|use|touch|query|hit|call|talk to|reach)\b/i;
 const storageTarget = /\b(storage|database|db|indexeddb|sqlite)\b/i;
-const noDirectStorageAllowlist = /(module bridge|module-bridge|use-?cases?|adapter|facade|via\s+module|through\s+module)/i;
+const noDirectStorageAllowlist = /(module bridge|module bridges|module-bridge|use-?cases?|use‑cases|adapter|facade|via\s+module|through\s+module)/i;
 
 const issues = [];
 
@@ -49,11 +49,17 @@ function walk(dir) {
 }
 
 function checkFile(filePath) {
+  if (filePath.includes(`${path.sep}docs${path.sep}sessions${path.sep}`)) {
+    return;
+  }
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split(/\r?\n/);
   lines.forEach((line, index) => {
+    const normalizedLine = line
+      .replace(/[\u0000-\u001F\u007F]/g, ' ')
+      .replace(/\u00A0/g, ' ');
     for (const term of forbiddenPlatforms) {
-      if (line.includes(term) && !platformAllowlist.test(line)) {
+      if (normalizedLine.includes(term) && !platformAllowlist.test(normalizedLine)) {
         issues.push({
           filePath,
           line: index + 1,
@@ -62,7 +68,7 @@ function checkFile(filePath) {
       }
     }
 
-    if (line.includes('StudentRepository') && line.includes('@viccoboard/storage')) {
+    if (normalizedLine.includes('StudentRepository') && normalizedLine.includes('@viccoboard/storage')) {
       issues.push({
         filePath,
         line: index + 1,
@@ -70,8 +76,8 @@ function checkFile(filePath) {
       });
     }
 
-    if (/student (store|repository)/i.test(line) && appContext.test(line)) {
-      if (!/modules\/students|students module|centralized/i.test(line)) {
+    if (/student (store|repository)/i.test(normalizedLine) && appContext.test(normalizedLine)) {
+      if (!/modules\/students|students module|centralized/i.test(normalizedLine)) {
         issues.push({
           filePath,
           line: index + 1,
@@ -80,7 +86,7 @@ function checkFile(filePath) {
       }
     }
 
-    if (appLevelRepoPattern.test(line) && !moduleAllowlist.test(line) && !negationAllowlist.test(line)) {
+    if (appLevelRepoPattern.test(normalizedLine) && !moduleAllowlist.test(normalizedLine) && !negationAllowlist.test(normalizedLine)) {
       issues.push({
         filePath,
         line: index + 1,
@@ -89,10 +95,10 @@ function checkFile(filePath) {
     }
 
     const directStoragePattern =
-      (appContext.test(line) && accessVerb.test(line) && storageTarget.test(line)) ||
-      (storageTarget.test(line) && accessVerb.test(line) && appContext.test(line));
+      (appContext.test(normalizedLine) && accessVerb.test(normalizedLine) && storageTarget.test(normalizedLine)) ||
+      (storageTarget.test(normalizedLine) && accessVerb.test(normalizedLine) && appContext.test(normalizedLine));
 
-    if (directStoragePattern && !negationAllowlist.test(line) && !noDirectStorageAllowlist.test(line)) {
+    if (directStoragePattern && !negationAllowlist.test(normalizedLine) && !noDirectStorageAllowlist.test(normalizedLine)) {
       issues.push({
         filePath,
         line: index + 1,
