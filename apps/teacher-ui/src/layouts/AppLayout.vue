@@ -151,6 +151,7 @@ onUnmounted(() => {
   min-height: 100vh;
   background: var(--page-background);
   color: var(--color-ink);
+  --app-header-offset: 96px;
 }
 
 .skip-link {
@@ -256,21 +257,14 @@ onUnmounted(() => {
   font-size: 0.75rem;
   font-weight: 600;
 }
-  --app-header-offset: 96px;
+
+.app-sidebar {
   padding: 1.5rem 1.25rem;
   border-right: 1px solid rgba(15, 23, 42, 0.08);
   background: white;
   height: calc(100vh - var(--app-header-offset));
   position: sticky;
   top: var(--app-header-offset);
-
-.app-sidebar {
-  padding: 1.5rem 1.25rem;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
-  background: white;
-  height: calc(100vh - 96px);
-  position: sticky;
-  top: 96px;
   overflow-y: auto;
   transition: transform 0.3s ease;
 }
@@ -349,7 +343,7 @@ onUnmounted(() => {
 
 .app-content {
   padding: 2rem 2.5rem 3rem;
-  min-height: calc(100vh - 96px);
+  min-height: calc(100vh - var(--app-header-offset));
 }
 
 .sidebar-backdrop {
@@ -391,7 +385,7 @@ onUnmounted(() => {
 
   .app-sidebar {
     position: fixed;
-    top: 96px;
+    top: var(--app-header-offset);
     bottom: 0;
     left: 0;
     height: auto;

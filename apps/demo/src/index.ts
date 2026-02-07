@@ -21,6 +21,7 @@ import {
 import { AttendanceStatus } from '@viccoboard/core';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 
 async function main() {
   console.log('🎓 ViccoBoard Demo - SportZens & KURT Unified Suite\n');
@@ -31,7 +32,9 @@ async function main() {
     console.log('\n📦 Step 1: Initialize Encrypted Storage');
     console.log('─'.repeat(60));
     
-    const dataDir = path.join(process.cwd(), 'demo-data');
+    const dataDir = process.env.VICCOBOARD_DEMO_DATA_DIR
+      ? path.resolve(process.env.VICCOBOARD_DEMO_DATA_DIR)
+      : path.join(os.tmpdir(), 'viccoboard-demo');
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
