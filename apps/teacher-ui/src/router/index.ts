@@ -87,6 +87,24 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Shuttle Grading' }
   },
   {
+    path: '/grading/mittelstrecke/:id',
+    name: 'mittelstrecke-grading',
+    component: () => import('../views/MittelstreckeGradingEntry.vue'),
+    meta: { title: 'Mittelstrecke Grading' }
+  },
+  {
+    path: '/grading/sportabzeichen/:id',
+    name: 'sportabzeichen-grading',
+    component: () => import('../views/SportabzeichenGradingEntry.vue'),
+    meta: { title: 'Sportabzeichen' }
+  },
+  {
+    path: '/grading/bjs/:id',
+    name: 'bjs-grading',
+    component: () => import('../views/BJSGradingEntry.vue'),
+    meta: { title: 'Bundesjugendspiele' }
+  },
+  {
     path: '/grading/history/:id',
     name: 'grade-history',
     component: () => import('../views/GradeHistory.vue'),
@@ -109,6 +127,30 @@ const routes: RouteRecordRaw[] = [
     name: 'scoreboard',
     component: () => import('../views/Scoreboard.vue'),
     meta: { title: 'Scoreboard' }
+  },
+  {
+    path: '/tools/teams',
+    name: 'teams',
+    component: () => import('../views/TeamBuilder.vue'),
+    meta: { title: 'Teams' }
+  },
+  {
+    path: '/tools/tournaments',
+    name: 'tournaments',
+    component: () => import('../views/Tournaments.vue'),
+    meta: { title: 'Tournaments' }
+  },
+  {
+    path: '/tools/tactics',
+    name: 'tactics',
+    component: () => import('../views/TacticsBoard.vue'),
+    meta: { title: 'Tactics' }
+  },
+  {
+    path: '/tools/feedback',
+    name: 'feedback',
+    component: () => import('../views/FeedbackTool.vue'),
+    meta: { title: 'Feedback' }
   }
 ]
 

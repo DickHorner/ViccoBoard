@@ -171,6 +171,9 @@
                 <option value="time">Zeitbasiert</option>
                 <option value="cooper">Cooper-Test</option>
                 <option value="shuttle">Shuttle-Run</option>
+                <option value="mittelstrecke">Mittelstrecke</option>
+                <option value="sportabzeichen">Sportabzeichen</option>
+                <option value="bjs">Bundesjugendspiele</option>
                 <option value="verbal">Verbal</option>
               </select>
             </div>
@@ -276,6 +279,7 @@ function getCategoryTypeLabel(type: GradeCategoryType): string {
     time: 'Zeitbasiert',
     cooper: 'Cooper-Test',
     shuttle: 'Shuttle-Run',
+    mittelstrecke: 'Mittelstrecke',
     sportabzeichen: 'Sportabzeichen',
     bjs: 'Bundesjugendspiele',
     verbal: 'Verbal'
@@ -304,6 +308,12 @@ function openGradingEntry(category: GradeCategory) {
     router.push(`/grading/cooper/${category.id}`);
   } else if (category.type === 'shuttle') {
     router.push(`/grading/shuttle/${category.id}`);
+  } else if (category.type === 'mittelstrecke') {
+    router.push(`/grading/mittelstrecke/${category.id}`);
+  } else if (category.type === 'sportabzeichen') {
+    router.push(`/grading/sportabzeichen/${category.id}`);
+  } else if (category.type === 'bjs') {
+    router.push(`/grading/bjs/${category.id}`);
   } else {
     toast.info('Dieser Bewertungstyp wird noch nicht unterstützt.');
   }
@@ -348,6 +358,25 @@ async function createCategory() {
       configuration = {
         type: 'shuttle',
         autoEvaluation: true
+      };
+    } else if (newCategory.value.type === 'mittelstrecke') {
+      configuration = {
+        type: 'mittelstrecke',
+        autoEvaluation: true
+      };
+    } else if (newCategory.value.type === 'sportabzeichen') {
+      configuration = {
+        type: 'sportabzeichen',
+        requiresBirthYear: true,
+        ageDependent: true,
+        disciplines: [],
+        pdfExportEnabled: true
+      };
+    } else if (newCategory.value.type === 'bjs') {
+      configuration = {
+        type: 'bjs',
+        disciplines: [],
+        autoGrading: true
       };
     } else if (newCategory.value.type === 'verbal') {
       configuration = {

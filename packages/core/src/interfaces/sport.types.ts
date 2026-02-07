@@ -44,6 +44,7 @@ export enum GradeCategoryType {
   Time = 'time',
   Cooper = 'cooper',
   Shuttle = 'shuttle',
+  Mittelstrecke = 'mittelstrecke',
   Sportabzeichen = 'sportabzeichen',
   BJS = 'bjs',
   Verbal = 'verbal'
@@ -54,6 +55,7 @@ export type GradeCategoryConfig =
   | TimeGradingConfig
   | CooperGradingConfig
   | ShuttleGradingConfig
+  | MittelstreckeGradingConfig
   | SportabzeichenConfig
   | BJSConfig
   | VerbalAssessmentConfig;
@@ -104,6 +106,13 @@ export interface ShuttleGradingConfig {
   type: 'shuttle';
   gradingTable?: string; // reference to table
   configId?: string; // reference to shuttle run config
+  autoEvaluation: boolean;
+}
+
+// Mittelstrecke (Middle Distance)
+export interface MittelstreckeGradingConfig {
+  type: 'mittelstrecke';
+  gradingTable?: string; // reference to table
   autoEvaluation: boolean;
 }
 

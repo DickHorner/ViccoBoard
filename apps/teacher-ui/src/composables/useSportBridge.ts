@@ -16,6 +16,8 @@ import {
   TableDefinitionRepository,
   CooperTestConfigRepository,
   ShuttleRunConfigRepository,
+  SportabzeichenStandardRepository,
+  SportabzeichenResultRepository,
   CreateClassUseCase,
   CreateLessonUseCase,
   RecordAttendanceUseCase,
@@ -25,6 +27,7 @@ import {
   TimeGradingService,
   CooperTestService,
   ShuttleRunService,
+  SportabzeichenService,
   type CreateClassInput,
   type CreateLessonInput,
   type RecordAttendanceInput,
@@ -48,6 +51,8 @@ interface SportBridge {
   tableDefinitionRepository: TableDefinitionRepository
   cooperTestConfigRepository: CooperTestConfigRepository
   shuttleRunConfigRepository: ShuttleRunConfigRepository
+  sportabzeichenStandardRepository: SportabzeichenStandardRepository
+  sportabzeichenResultRepository: SportabzeichenResultRepository
 
   // Use Cases
   createClassUseCase: CreateClassUseCase
@@ -61,6 +66,7 @@ interface SportBridge {
   timeGradingService: TimeGradingService
   cooperTestService: CooperTestService
   shuttleRunService: ShuttleRunService
+  sportabzeichenService: SportabzeichenService
 }
 
 /**
@@ -83,6 +89,8 @@ export function initializeSportBridge(): SportBridge {
   const tableDefinitionRepo = new TableDefinitionRepository(adapter)
   const cooperTestConfigRepo = new CooperTestConfigRepository(adapter)
   const shuttleRunConfigRepo = new ShuttleRunConfigRepository(adapter)
+  const sportabzeichenStandardRepo = new SportabzeichenStandardRepository(adapter)
+  const sportabzeichenResultRepo = new SportabzeichenResultRepository(adapter)
 
   // Initialize use cases with repositories
   const createClassUseCase = new CreateClassUseCase(classGroupRepo)
@@ -96,6 +104,7 @@ export function initializeSportBridge(): SportBridge {
   const timeGradingService = new TimeGradingService()
   const cooperTestService = new CooperTestService()
   const shuttleRunService = new ShuttleRunService()
+  const sportabzeichenService = new SportabzeichenService()
 
   sportBridgeInstance = {
     // Repositories
@@ -107,6 +116,8 @@ export function initializeSportBridge(): SportBridge {
     tableDefinitionRepository: tableDefinitionRepo,
     cooperTestConfigRepository: cooperTestConfigRepo,
     shuttleRunConfigRepository: shuttleRunConfigRepo,
+    sportabzeichenStandardRepository: sportabzeichenStandardRepo,
+    sportabzeichenResultRepository: sportabzeichenResultRepo,
 
     // Use Cases
     createClassUseCase,
@@ -119,7 +130,8 @@ export function initializeSportBridge(): SportBridge {
     criteriaGradingEngine,
     timeGradingService,
     cooperTestService,
-    shuttleRunService
+    shuttleRunService,
+    sportabzeichenService
   }
 
   return sportBridgeInstance

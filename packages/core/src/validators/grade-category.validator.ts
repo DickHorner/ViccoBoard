@@ -57,8 +57,8 @@ export class GradeCategoryValidator {
     // Type validation
     if (!data.type) {
       errors.push('Type is required');
-    } else if (!['criteria', 'time', 'cooper', 'shuttle', 'sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
-      errors.push('Type must be one of: criteria, time, cooper, shuttle, sportabzeichen, bjs, verbal');
+    } else if (!['criteria', 'time', 'cooper', 'shuttle', 'mittelstrecke', 'sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
+      errors.push('Type must be one of: criteria, time, cooper, shuttle, mittelstrecke, sportabzeichen, bjs, verbal');
     }
 
     // Weight validation
@@ -119,6 +119,12 @@ export class GradeCategoryValidator {
       case 'shuttle':
         if (config.configId && typeof config.configId !== 'string') {
           errors.push('Shuttle config ID must be a string');
+        }
+        break;
+
+      case 'mittelstrecke':
+        if (config.gradingTable && typeof config.gradingTable !== 'string') {
+          errors.push('Mittelstrecke grading table must be a string');
         }
         break;
 

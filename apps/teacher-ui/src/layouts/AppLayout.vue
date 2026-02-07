@@ -88,7 +88,11 @@ const navItems = [
   { to: '/grading', label: 'Grading', hint: 'Entries and history' },
   { to: '/tools/timer', label: 'Timer', hint: 'Tools' },
   { to: '/tools/multistop', label: 'Multistop', hint: 'Tools' },
-  { to: '/tools/scoreboard', label: 'Scoreboard', hint: 'Tools' }
+  { to: '/tools/scoreboard', label: 'Scoreboard', hint: 'Tools' },
+  { to: '/tools/teams', label: 'Teams', hint: 'Tools' },
+  { to: '/tools/tournaments', label: 'Tournaments', hint: 'Tools' },
+  { to: '/tools/tactics', label: 'Tactics', hint: 'Tools' },
+  { to: '/tools/feedback', label: 'Feedback', hint: 'Tools' }
 ]
 
 const pageTitle = computed(() => {
