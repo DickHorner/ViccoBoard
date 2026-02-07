@@ -16,12 +16,20 @@
         
         <!-- Search/Filter -->
         <div class="search-bar" v-if="classes.length > 0">
-          <input 
-            v-model="searchQuery"
-            type="text"
-            placeholder="Klassen durchsuchen..."
-            class="search-input"
-          />
+          <div class="search-controls">
+            <input 
+              v-model="searchQuery"
+              type="text"
+              placeholder="Klassen durchsuchen..."
+              class="search-input"
+            />
+            <select v-model="filterSchoolYear" class="filter-select">
+              <option value="">Alle Schuljahre</option>
+              <option v-for="year in schoolYears" :key="year" :value="year">
+                {{ year }}
+              </option>
+            </select>
+          </div>
         </div>
         
         <div class="card-content">
@@ -285,6 +293,7 @@ const recentActivity = ref<AttendanceRecord[]>([])
 const loading = ref(true)
 const loadError = ref('')
 const searchQuery = ref('')
+const filterSchoolYear = ref('')
 const showCreateModal = ref(false)
 const creating = ref(false)
 const error = ref('')
@@ -311,15 +320,20 @@ const classGroups = useClassGroups()
 const attendance = useAttendance()
 
 // Computed
+const schoolYears = computed(() => {
+  const years = new Set(classes.value.map((cls: ClassGroup) => cls.schoolYear))
+  return Array.from(years).sort().reverse()
+})
+
 const filteredClasses = computed(() => {
-  if (!searchQuery.value) {
-    return classes.value
-  }
-  const query = searchQuery.value.toLowerCase()
-  return classes.value.filter((cls: ClassGroup) => 
-    cls.name.toLowerCase().includes(query) ||
-    cls.schoolYear.toLowerCase().includes(query)
-  )
+  const query = searchQuery.value.trim().toLowerCase()
+  return classes.value.filter((cls: ClassGroup) => {
+    const matchesQuery = !query
+      || cls.name.toLowerCase().includes(query)
+      || cls.schoolYear.toLowerCase().includes(query)
+    const matchesYear = !filterSchoolYear.value || cls.schoolYear === filterSchoolYear.value
+    return matchesQuery && matchesYear
+  })
 })
 
 // Methods
@@ -557,6 +571,12 @@ onMounted(() => {
   margin-bottom: 0.5rem;
 }
 
+.search-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -564,6 +584,15 @@ onMounted(() => {
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s ease;
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  min-width: 160px;
 }
 
 .search-input:focus {

@@ -1078,6 +1078,25 @@
       "importing": "importing",
       "imported": "imported",
       "skipped": "skipped"
+    },
+    "SCHUELER": {
+      "schueleruebersicht": "Student overview",
+      "schueler": "Students",
+      "schueler-hinzu": "Add student",
+      "schueler-bearbeiten": "Edit student",
+      "csv-import": "CSV import",
+      "name": "First name",
+      "nachname": "Last name",
+      "klasse": "Class",
+      "geschlecht": "Gender",
+      "maennlich": "Male",
+      "weiblich": "Female",
+      "geburtsjahr": "Birth year",
+      "geburt-hinweis": "Required for table grading by age (Cooper and Shuttle Run up to upper grades).",
+      "email": "Email",
+      "parent-email": "Parent email",
+      "phone": "Phone",
+      "speichern": "Save"
     }
   }
 }
