@@ -69,7 +69,10 @@
                 class="class-card"
               >
                 <div class="class-info">
-                  <h4>{{ cls.name }}</h4>
+                  <div class="class-title">
+                    <span class="class-color" :style="getClassColorStyle(cls.color)"></span>
+                    <h4>{{ cls.name }}</h4>
+                  </div>
                   <p class="class-meta">{{ cls.schoolYear }}</p>
                 </div>
                 <div class="class-arrow">→</div>
@@ -184,6 +187,25 @@
             />
             <small class="form-hint">Format: YYYY/YYYY</small>
           </div>
+
+          <div class="form-group">
+            <label for="gradingScheme">Notenschema</label>
+            <select id="gradingScheme" v-model="newClass.gradingScheme" class="form-input">
+              <option v-for="(label, key) in gradingSchemes" :key="key" :value="key">
+                {{ label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="classColor">Klassenfarbe</label>
+            <select id="classColor" v-model="newClass.color" class="form-input">
+              <option value="">Keine</option>
+              <option v-for="color in classColorOptions" :key="color.value" :value="color.value">
+                {{ color.label }}
+              </option>
+            </select>
+          </div>
           
           <div v-if="error" class="error-message">
             {{ error }}
@@ -232,6 +254,25 @@
               class="form-input"
             />
             <small class="form-hint">Format: YYYY/YYYY</small>
+          </div>
+
+          <div class="form-group">
+            <label for="editGradingScheme">Notenschema</label>
+            <select id="editGradingScheme" v-model="editClassData.gradingScheme" class="form-input">
+              <option v-for="(label, key) in gradingSchemes" :key="key" :value="key">
+                {{ label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editClassColor">Klassenfarbe</label>
+            <select id="editClassColor" v-model="editClassData.color" class="form-input">
+              <option value="">Keine</option>
+              <option v-for="color in classColorOptions" :key="color.value" :value="color.value">
+                {{ color.label }}
+              </option>
+            </select>
           </div>
           
           <div v-if="editError" class="error-message">
@@ -285,6 +326,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useClassGroups, useAttendance } from '../composables/useSportBridge'
+import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading'
 import type { ClassGroup, AttendanceRecord } from '../db'
 
 // State
@@ -300,12 +342,14 @@ const error = ref('')
 
 const newClass = ref({
   name: '',
-  schoolYear: ''
+  schoolYear: '',
+  gradingScheme: DEFAULT_GRADING_SCHEME,
+  color: ''
 })
 
 // Edit state
 const showEditModal = ref(false)
-const editClassData = ref({ id: '', name: '', schoolYear: '' })
+const editClassData = ref({ id: '', name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' })
 const editError = ref('')
 const updating = ref(false)
 
@@ -318,6 +362,16 @@ const deleting = ref(false)
 // Composables
 const classGroups = useClassGroups()
 const attendance = useAttendance()
+const gradingSchemes = GRADING_SCHEMES
+const classColorOptions = [
+  { value: 'white', label: 'Weiß' },
+  { value: 'green', label: 'Grün' },
+  { value: 'red', label: 'Rot' },
+  { value: 'blue', label: 'Blau' },
+  { value: 'orange', label: 'Orange' },
+  { value: 'yellow', label: 'Gelb' },
+  { value: 'grey', label: 'Grau' }
+]
 
 // Computed
 const schoolYears = computed(() => {
@@ -358,14 +412,16 @@ const handleCreateClass = async () => {
   try {
     await classGroups.create({
       name: newClass.value.name.trim(),
-      schoolYear: newClass.value.schoolYear.trim()
+      schoolYear: newClass.value.schoolYear.trim(),
+      gradingScheme: newClass.value.gradingScheme,
+      color: newClass.value.color || undefined
     })
     
     // Reload classes
     await loadData()
     
     // Reset form and close modal
-    newClass.value = { name: '', schoolYear: '' }
+    newClass.value = { name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' }
     showCreateModal.value = false
   } catch (err) {
     console.error('Failed to create class:', err)
@@ -391,14 +447,16 @@ const handleCreateClass = async () => {
 const closeModal = () => {
   showCreateModal.value = false
   error.value = ''
-  newClass.value = { name: '', schoolYear: '' }
+  newClass.value = { name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' }
 }
 
 const editClass = (cls: ClassGroup) => {
   editClassData.value = {
     id: cls.id,
     name: cls.name,
-    schoolYear: cls.schoolYear
+    schoolYear: cls.schoolYear,
+    gradingScheme: cls.gradingScheme || DEFAULT_GRADING_SCHEME,
+    color: cls.color || ''
   }
   showEditModal.value = true
 }
@@ -410,7 +468,9 @@ const handleUpdateClass = async () => {
   try {
     await classGroups.update(editClassData.value.id, {
       name: editClassData.value.name.trim(),
-      schoolYear: editClassData.value.schoolYear.trim()
+      schoolYear: editClassData.value.schoolYear.trim(),
+      gradingScheme: editClassData.value.gradingScheme,
+      color: editClassData.value.color || undefined
     })
     
     // Reload classes
@@ -429,7 +489,23 @@ const handleUpdateClass = async () => {
 const closeEditModal = () => {
   showEditModal.value = false
   editError.value = ''
-  editClassData.value = { id: '', name: '', schoolYear: '' }
+  editClassData.value = { id: '', name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' }
+}
+
+const getClassColorStyle = (color?: string) => {
+  if (!color) {
+    return { backgroundColor: '#e0e0e0' }
+  }
+  const colorMap: Record<string, string> = {
+    white: '#f8f9fa',
+    green: '#7ed957',
+    red: '#ff6b6b',
+    blue: '#4dabf7',
+    orange: '#ffa94d',
+    yellow: '#ffd43b',
+    grey: '#adb5bd'
+  }
+  return { backgroundColor: colorMap[color] || '#e0e0e0' }
 }
 
 const confirmDeleteClass = (cls: ClassGroup) => {
@@ -684,6 +760,20 @@ onMounted(() => {
   color: #333;
   transition: all 0.2s ease;
   min-height: 44px;
+}
+
+.class-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.class-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: inline-block;
 }
 
 .class-card:hover {

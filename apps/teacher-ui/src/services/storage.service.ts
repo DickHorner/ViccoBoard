@@ -6,7 +6,17 @@
  * ARCHITECTURE: Provides shared storage instance to all composables/bridges
  */
 
-import { IndexedDBStorage } from '@viccoboard/storage';
+import {
+  IndexedDBStorage,
+  IndexedDBInitialSchemaMigration,
+  IndexedDBGradingSchemaMigration,
+  IndexedDBShuttleRunSchemaMigration,
+  IndexedDBCooperTestSchemaMigration,
+  IndexedDBSportabzeichenSchemaMigration,
+  IndexedDBExamSchemaMigration,
+  correctionSchemaMigration,
+  IndexedDBClassGroupColorMigration
+} from '@viccoboard/storage';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 let storageInstance: IndexedDBStorage | null = null;
@@ -26,10 +36,15 @@ export async function initializeStorage(): Promise<StorageAdapter> {
     version: 1
   });
 
-  // Register migrations here (when implemented)
-  // storage.registerMigration(migration001);
-  // storage.registerMigration(migration002);
-  // etc.
+  // Register IndexedDB migrations (keeps schema aligned with package migrations)
+  storage.registerMigration(new IndexedDBInitialSchemaMigration());
+  storage.registerMigration(new IndexedDBGradingSchemaMigration());
+  storage.registerMigration(new IndexedDBShuttleRunSchemaMigration());
+  storage.registerMigration(new IndexedDBCooperTestSchemaMigration());
+  storage.registerMigration(new IndexedDBSportabzeichenSchemaMigration());
+  storage.registerMigration(new IndexedDBExamSchemaMigration());
+  storage.registerMigration(correctionSchemaMigration);
+  storage.registerMigration(new IndexedDBClassGroupColorMigration());
 
   // Initialize with empty password (no encryption yet)
   // TODO: Implement proper encryption/password in Phase X

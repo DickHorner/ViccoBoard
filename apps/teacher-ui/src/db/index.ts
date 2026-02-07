@@ -5,6 +5,7 @@ export interface ClassGroup {
   id: string
   name: string
   schoolYear: string
+  color?: string
   createdAt: Date
   updatedAt: Date
 }

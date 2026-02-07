@@ -38,6 +38,7 @@ export class InitialSchemaMigration implements Migration {
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         school_year TEXT NOT NULL,
+        color TEXT,
         state TEXT,
         holiday_calendar_ref TEXT,
         grading_scheme TEXT,

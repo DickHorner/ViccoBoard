@@ -4,7 +4,10 @@
       <button class="back-button" @click="$router.back()">← Zurück</button>
       <div class="header-content">
         <div>
-          <h2>{{ classGroup?.name || 'Wird geladen...' }}</h2>
+          <div class="class-title">
+            <span class="class-color" :style="getClassColorStyle(classGroup?.color)"></span>
+            <h2>{{ classGroup?.name || 'Wird geladen...' }}</h2>
+          </div>
           <p class="page-description">Verwalten Sie Klasseninformationen, Schüler und Stunden.</p>
         </div>
         <button v-if="classGroup" class="btn-primary" @click="showEditModal = true">
@@ -215,8 +218,9 @@
 // @ts-nocheck
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useClassGroups, useStudents } from '../composables/useSportBridge'
-import type { ClassGroup, Student } from '../db'
+import { initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
+import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
+import type { ClassGroup, Student } from '@viccoboard/core'
 
 const route = useRoute()
 
@@ -246,9 +250,12 @@ const newStudent = ref({
   email: ''
 })
 
+initializeSportBridge()
+initializeStudentsBridge()
+
 // Composables
 const classGroups = useClassGroups()
-const studentsComposable = useStudents()
+const studentsBridge = getStudentsBridge()
 
 // Methods
 const loadData = async () => {
@@ -257,7 +264,7 @@ const loadData = async () => {
   
   try {
     // Load class details
-    classGroup.value = await classGroups.getById(classId)
+    classGroup.value = await classGroups.findById(classId)
     
     if (!classGroup.value) {
       error.value = 'Klasse nicht gefunden'
@@ -265,7 +272,7 @@ const loadData = async () => {
     }
     
     // Load students for this class
-    students.value = await studentsComposable.getByClassId(classId)
+    students.value = await studentsBridge.studentRepository.findByClassGroup(classId)
   } catch (err) {
     console.error('Failed to load class:', err)
     error.value = 'Fehler beim Laden der Klasse. Bitte versuchen Sie es erneut.'
@@ -279,7 +286,7 @@ const handleAddStudent = async () => {
   addingStudent.value = true
   
   try {
-    await studentsComposable.create({
+    await studentsBridge.addStudentUseCase.execute({
       firstName: newStudent.value.firstName.trim(),
       lastName: newStudent.value.lastName.trim(),
       classGroupId: classId,
@@ -289,7 +296,7 @@ const handleAddStudent = async () => {
     })
     
     // Reload students
-    students.value = await studentsComposable.getByClassId(classId)
+    students.value = await studentsBridge.studentRepository.findByClassGroup(classId)
     
     // Reset form and close modal
     closeAddStudentModal()
@@ -319,6 +326,22 @@ const getGradingSchemeDisplay = (): string => {
   return classGroup.value?.gradingScheme || 'Standard'
 }
 
+const getClassColorStyle = (color?: string) => {
+  if (!color) {
+    return { backgroundColor: '#e0e0e0' }
+  }
+  const colorMap: Record<string, string> = {
+    white: '#f8f9fa',
+    green: '#7ed957',
+    red: '#ff6b6b',
+    blue: '#4dabf7',
+    orange: '#ffa94d',
+    yellow: '#ffd43b',
+    grey: '#adb5bd'
+  }
+  return { backgroundColor: colorMap[color] || '#e0e0e0' }
+}
+
 const getInitials = (firstName: string, lastName: string): string => {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
 }
@@ -339,6 +362,20 @@ onMounted(() => {
 
 .page-header {
   margin-bottom: 2rem;
+}
+
+.class-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.class-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: inline-block;
 }
 
 .header-content {

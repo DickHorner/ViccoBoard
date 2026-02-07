@@ -50,6 +50,7 @@ export interface ClassGroup {
   id: string;
   name: string;
   schoolYear: string;
+  color?: string;
   state?: string; // Bundesland
   holidayCalendarRef?: string;
   gradingScheme?: string;
