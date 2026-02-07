@@ -7,7 +7,6 @@
  */
 
 import { ref, computed } from 'vue';
-import { getStorageAdapter } from '../services/storage.service';
 
 /**
  * Singleton exams bridge instance
@@ -29,9 +28,8 @@ export function initializeExamsBridge(): ExamsBridge {
     return examsBridgeInstance;
   }
 
-  const adapter = getStorageAdapter();
-
   // TODO: Initialize exam repositories and use cases from @viccoboard/exams
+  // const adapter = getStorageAdapter();
   // const examRepo = new ExamRepository(adapter);
   // const createExamUseCase = new CreateExamUseCase(examRepo);
   // etc.

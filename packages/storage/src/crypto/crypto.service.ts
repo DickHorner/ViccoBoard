@@ -2,11 +2,13 @@
  * Crypto Service Implementation
  * Provides encryption, hashing, and secure key management
  * Uses Web Crypto API for secure encryption with proper key derivation
+ * 
+ * ✅ Browser-Compatible: Uses only standard Web Crypto APIs available in all modern browsers
+ * ✅ Node.js Compatible: Same APIs work in Node.js 15+
  */
 
 import * as bcrypt from 'bcryptjs';
 import { CryptoService, SecureStorage } from '@viccoboard/core';
-import { randomBytes, createHash, webcrypto } from 'crypto';
 
 const SALT_ROUNDS = 10;
 const DEFAULT_TOKEN_LENGTH = 32;
@@ -14,8 +16,11 @@ const PBKDF2_ITERATIONS = 100000;
 const SALT_LENGTH = 32;
 
 // Fixed salt for key derivation (in production, store this securely or generate per-database)
-const DERIVATION_SALT = Buffer.from('ViccoBoard-v1-salt-fixed-2026'); // 28 bytes, pad to 32
-const PADDED_SALT = Buffer.concat([DERIVATION_SALT, Buffer.alloc(4)]);
+// Use Web Crypto API for salt generation - works in both browsers and Node.js
+const DERIVATION_SALT_STRING = 'ViccoBoard-v1-salt-fixed-2026';
+const PADDED_SALT = new TextEncoder().encode(
+  (DERIVATION_SALT_STRING + '\x00'.repeat(32)).substring(0, 32)
+);
 
 export class CryptoServiceImpl implements CryptoService {
   async hashPassword(password: string): Promise<string> {
@@ -26,8 +31,13 @@ export class CryptoServiceImpl implements CryptoService {
     return bcrypt.compare(password, hash);
   }
 
+  /**
+   * Generate a cryptographically secure random key
+   * Uses Web Crypto API getRandomValues() available in Node.js 15+ and all modern browsers
+   */
   async generateKey(): Promise<string> {
-    return randomBytes(32).toString('hex');
+    const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+    return Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   /**
@@ -37,11 +47,11 @@ export class CryptoServiceImpl implements CryptoService {
   async encrypt(data: string, password: string): Promise<string> {
     try {
       const key = await this.deriveKey(password);
-      const iv = webcrypto.getRandomValues(new Uint8Array(12)); // 12 bytes for GCM
+      const iv = crypto.getRandomValues(new Uint8Array(12)); // 12 bytes for GCM
       const encoder = new TextEncoder();
       const dataBuffer = encoder.encode(data);
 
-      const encrypted = await webcrypto.subtle.encrypt(
+      const encrypted = await crypto.subtle.encrypt(
         { name: 'AES-GCM', iv },
         key,
         dataBuffer
@@ -52,7 +62,8 @@ export class CryptoServiceImpl implements CryptoService {
       combined.set(iv, 0);
       combined.set(new Uint8Array(encrypted), iv.length);
 
-      return Buffer.from(combined).toString('base64');
+      // Convert to base64 using Web-standard approach (works in both Node.js and browser)
+      return btoa(String.fromCharCode.apply(null, Array.from(combined) as any));
     } catch (error) {
       throw new Error(`Encryption failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -64,16 +75,22 @@ export class CryptoServiceImpl implements CryptoService {
   async decrypt(encryptedData: string, password: string): Promise<string> {
     try {
       const key = await this.deriveKey(password);
-      const combined = Buffer.from(encryptedData, 'base64');
+      
+      // Decode base64 using Web-standard approach
+      const binaryString = atob(encryptedData);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
 
-      if (combined.length < 12) {
+      if (bytes.length < 12) {
         throw new Error('Invalid encrypted data: too short');
       }
 
-      const iv = combined.subarray(0, 12);
-      const ciphertext = combined.subarray(12);
+      const iv = bytes.subarray(0, 12);
+      const ciphertext = bytes.subarray(12);
 
-      const decrypted = await webcrypto.subtle.decrypt(
+      const decrypted = await crypto.subtle.decrypt(
         { name: 'AES-GCM', iv },
         key,
         ciphertext
@@ -88,12 +105,13 @@ export class CryptoServiceImpl implements CryptoService {
 
   /**
    * Derive AES-256 key from password using PBKDF2
+   * Uses Web Crypto API SubtleCrypto - available in Node.js 15+ and all modern browsers
    */
-  private async deriveKey(password: string): Promise<webcrypto.CryptoKey> {
+  private async deriveKey(password: string): Promise<CryptoKey> {
     const encoder = new TextEncoder();
     const passwordBuffer = encoder.encode(password);
 
-    const keyMaterial = await webcrypto.subtle.importKey(
+    const keyMaterial = await crypto.subtle.importKey(
       'raw',
       passwordBuffer,
       { name: 'PBKDF2' },
@@ -101,7 +119,7 @@ export class CryptoServiceImpl implements CryptoService {
       ['deriveBits', 'deriveKey']
     );
 
-    return webcrypto.subtle.deriveKey(
+    return crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
         salt: PADDED_SALT,
@@ -115,12 +133,26 @@ export class CryptoServiceImpl implements CryptoService {
     );
   }
 
+  /**
+   * Generate a secure random token in hex format
+   */
   async generateToken(length: number = DEFAULT_TOKEN_LENGTH): Promise<string> {
-    return randomBytes(length).toString('hex');
+    const randomBytes = crypto.getRandomValues(new Uint8Array(length));
+    return Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  /**
+   * Hash data using SHA-256
+   * Uses Web Crypto API SubtleCrypto - available in Node.js 15+ and all modern browsers
+   */
   async hash(data: string): Promise<string> {
-    return createHash('sha256').update(data).digest('hex');
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    
+    // Convert to hex string
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 }
 

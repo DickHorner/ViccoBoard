@@ -1,0 +1,249 @@
+# ViccoBoard Scope v2 — RESTLIST (Open Items) — 2026-02-07
+
+## QUICK SUMMARY
+
+Total Open Items: ~239+ (expected before Phases 4-10 execution)
+- SportZens: ~170+ items (mostly i18n keys + UI workflows)
+- KURT: 69 checkboxes (spread across Phases 6-8)
+
+Progress: ~80 items done / ~939+ total ≈ 8.5%
+
+---
+
+## SPORTZENS OPEN ITEMS
+
+### i18n Keys (Not Yet Displayed in UI)
+
+Category: ENCRYPTION (20+ keys)
+- ENCRYPTION.setup-title
+- ENCRYPTION.setup-description
+- ENCRYPTION.enter-pin … (18 more)
+
+Category: MENU (12+ keys)
+- MENU.lock
+- MENU.theme
+- MENU.tables … (9 more)
+
+Category: KLASSEN (German Class Management, 20+ keys)
+Category: CLASSES (English Class Management, 20+ keys)
+Category: SCHUELER (German Student, 15+ keys)
+Category: STUDENTS (English Student, 15+ keys)
+Category: GRADES (Grading, 30+ keys)
+Category: COOPER, SHUTTLE, MITTELSTRECKE (Exercise, 25+ keys)
+Category: TIMER, TOURNAMENTS, TEAM (Tools, 15+ keys)
+Category: ANWESENHEIT, STUNDEN, TABLES, CALENDAR (Org, 20+ keys)
+Category: SPORTABZEICHEN, BUNDESJUGENDSPIELE, KAISER (Special Tests, 25+ keys)
+Category: FEEDBACK, TRACKING, ANALYTICS (Meta, 10+ keys)
+Category: SETTINGS, INFOS, LICENSES (Admin, 20+ keys)
+Category: WOW (Workout, 60+ keys) — EXCLUDED_BY_SCOPE_V2
+
+**Subtotal:** ~850-950 i18n keys (Phase 3 completed loading; Phase 4+ integrates into UI)
+
+### Schema Fields (Optional/Advanced)
+
+- class.color (optional)
+- class.grade_scheme (optional)
+- class.settings (optional)
+- class.stats (optional)
+- student.public_code (optional)
+- student.settings (optional)
+- student.stats (optional)
+- grade.year (required, but not mapped yet in all contexts)
+- grade.criterias (optional nest)
+- grade.total_points (optional computed)
+
+**Subtotal:** ~10 schema fields
+
+### UI Workflows (Major Gaps)
+
+- [ ] Class Management Screen (+ CRUD)
+- [ ] Student Management Screen (+ CRUD, import CSV)
+- [ ] Attendance Management (per lesson, with status)
+- [ ] Grading Stream (Criteria Grading, Time Grading, Cooper, Shuttle Run)
+- [ ] Sportabzeichen Assessment & PDF Export
+- [ ] Bundesjugendspiele Scoring
+- [ ] Team Creation & Display
+- [ ] Tournament Planning & Execution
+- [ ] Scoreboard Display & Input
+- [ ] Timer Tool
+- [ ] Tactics Board
+- [ ] Dice Tool (with logging)
+- [ ] Table Management (create, download, import)
+- [ ] Feedback Methods (TBD details from Plan §8)
+- [ ] Analytics Dashboard
+- [ ] Lesson Planning & Attendance
+- [ ] Quick Navigation (Shortcuts within Class view)
+
+**Subtotal:** ~15-20 major workflows
+
+---
+
+## KURT OPEN ITEMS
+
+All 69 checkboxes are currently NOT IMPLEMENTED:
+
+### §6.9 Exam Creation (7 checkboxes) — Phase 6
+
+- [ ] 6.9.1: Complex tasks with 3-level nesting
+- [ ] 6.9.2: Simple vs Complex exam modes
+- [ ] 6.9.3: Sub-task count per task
+- [ ] 6.9.4: Criterion definition & formatting
+- [ ] 6.9.5: Task-level comment/tip behavior
+- [ ] 6.9.6: Exam parts definition
+- [ ] 6.9.7: Choice tasks (3a/3b)
+
+### §6.10 Grading/GradeKey (7 checkboxes) — Phase 7
+
+- [ ] 6.10.1: Grade key templates
+- [ ] 6.10.2: Retroactive adjustment without loss
+- [ ] 6.10.3: Percent-based boundaries
+- [ ] 6.10.4: Auto-calc points from %
+- [ ] 6.10.5: Grade presets + override
+- [ ] 6.10.6: Rounding options
+- [ ] 6.10.7: Error points → Task grade (optional)
+
+### §6.11 Correction Flows (11 checkboxes) — Phase 7
+
+- [ ] 6.11.1: Compact correction mask (auto total/grade)
+- [ ] 6.11.2: Points to next grade tier display
+- [ ] 6.11.3: Tab navigation in point fields
+- [ ] 6.11.4: Task-wise correction (table + AWK mode)
+- [ ] 6.11.5: Task comments (capture + print)
+- [ ] 6.11.6: Part points/grades (auto + optional print)
+- [ ] 6.11.7: Choice task representation (3a/3b)
+- [ ] 6.11.8: Comment boxes per task level
+- [ ] 6.11.9: Alternative scaling (++/+/0/-/--)
+- [ ] 6.11.10: 3-level hierarchy in UI (complex mode)
+- [ ] 6.11.11: Fast examinee switching
+
+### §6.12 Support Tips DB (9 checkboxes) — Phase 8
+
+- [ ] 6.12.1: Task-specific or general tips DB
+- [ ] 6.12.2: Usage overview (who/when/where)
+- [ ] 6.12.3: Title/description/categories
+- [ ] 6.12.4: Up to 3 links per tip + QR generation
+- [ ] 6.12.5: Search/select/add in correction mask
+- [ ] 6.12.6: Tip weighting + PDF display
+- [ ] 6.12.7: Dropdown preview (smart sort)
+- [ ] 6.12.8: Per-level enable/disable
+- [ ] 6.12.9: Weight adjustment during analysis
+
+### §6.13 Analysis & Adjustment (4 checkboxes) — Phase 8
+
+- [ ] 6.13.1: Difficulty analysis (spreads, corridors)
+- [ ] 6.13.2: Point weight adjustment assistant
+- [ ] 6.13.3: Retroactive grade key adjustment (cascade)
+- [ ] 6.13.4: Sortable result tables (multi-dimensional)
+
+### §6.14 Long-term Overview & Notes (3 checkboxes) — Phase 8
+
+- [ ] 6.14.1: School-year competency development view
+- [ ] 6.14.2: Internal notes for support focus
+- [ ] 6.14.3: Per-examinee comment/tip summary
+
+### §6.15 Feedback/Comments (3 checkboxes) — Phase 8
+
+- [ ] 6.15.1: Task-specific or general comments
+- [ ] 6.15.2: Comment persistence post-return
+- [ ] 6.15.3: Comment reuse across examinees
+
+### §6.16 PDF Export & Print (7 checkboxes) — Phase 8
+
+- [ ] 6.16.1: PDF feedback sheets (parts, comments, tips, signature, logo)
+- [ ] 6.16.2: One-click batch PDF generation
+- [ ] 6.16.3: Four print layouts
+- [ ] 6.16.4: Header customization via presets
+- [ ] 6.16.5: Print scope (current/all)
+- [ ] 6.16.6: Criteria formatting + percent display
+- [ ] 6.16.7: Signature options (image/hand-drawn/blank)
+
+### §6.17 Special Performance Marking (3 checkboxes) — Phase 8
+
+- [ ] 6.17.1: Mark during correction (image + text)
+- [ ] 6.17.2: Gallery view by task/category
+- [ ] 6.17.3: Name anonymization
+
+### §6.18 Email Sending (2 checkboxes) — Phase 8
+
+- [ ] 6.18.1: Send to student + parent
+- [ ] 6.18.2: Auto-fill grade/task results in email body
+
+### §6.19 Group Correction & Splitscreen (3 checkboxes) — Phase 8
+
+- [ ] 6.19.1: Splitscreen correction mode
+- [ ] 6.19.2: Fullscreen up to 4 examinees side-by-side
+- [ ] 6.19.3: Topic field (for presentations/oral)
+
+### §6.20 Collaboration & Compatibility (4 checkboxes) — Phase 8
+
+- [ ] 6.20.1: WebUntis import (optional)
+- [ ] 6.20.2: Grade app clipboard copy + summary
+- [ ] 6.20.3: Share exam drafts/tips with users (SharePackage)
+- [ ] 6.20.4: Grade column copy (Excel/grade programs)
+
+### §6.21 Assessment Format Support (1 checkbox) — Phase 8
+
+- [ ] 6.21.1: Multi-format support (portfolios, presentations, papers, tests, oral exams, etc.)
+
+### §6.22 Oberstufe EWH Workflow (5 checkboxes) — Phase 6–8
+
+- [ ] 6.22.1: Task aspects/sub-criteria (finer description)
+- [ ] 6.22.2: Criterion formatting (bold, etc.)
+- [ ] 6.22.3: Word paste with format preservation (best effort)
+- [ ] 6.22.4: Blank EWH export template
+- [ ] 6.22.5: 0–15 point scale + complex structures
+
+---
+
+## PRIORITY SEQUENCING RECOMMENDATION
+
+### Immediate (Phase 4-5, if continuing)
+
+1. **Phase 4:** Schema roundtrip tests (ensure no data loss on export/import)
+2. **Phase 5:** Class + Student management UI (foundation for all else)
+   - Classroom CRUD
+   - Student roster + attributes
+   - Attendances
+
+### Short-term (Phase 6)
+
+3. **Phase 6a:** Exam builder data layer + UI (simple mode)
+   - Exam repo + migrations
+   - Simple exam creation UI
+   - Candidate list
+
+4. **Phase 6b:** Basic table structure
+   - GradingTable repo
+   - CSV/table import
+   - Shuttle-run config
+
+### Medium-term (Phase 7)
+
+5. **Phase 7:** Correction UI + GradeKey engine
+   - CorrectionEntry repo
+   - Compact correction mask
+   - GradeKey presets + percent boundaries
+
+### Longer-term (Phase 8)
+
+6. **Phase 8a:** Fördertipps DB + QR
+7. **Phase 8b:** PDF export (4 layouts)
+8. **Phase 8c:** Email templates + placeholders
+9. **Phase 8d:** Analysis & difficulty report
+10. **Phase 8e:** Group correction + splitscreen
+
+---
+
+## Notes for Next Agent
+
+- **SportZens i18n keys are loaded** (Phase 3 ✅) but not yet displayed in UI components
+- **WOW is definitively excluded** — no ambiguity, spec preserved but not implemented
+- **Builds pass** with both packages and iPad targets
+- **All type definitions exist** (ClassGroup, Student, GradeCategory, etc.) — UI just needs to wire them
+- **Use the parity matrices for 1:1 mapping** of plan.md checkboxes to code locations
+
+---
+
+**Generated:** 2026-02-07  
+**Scope:** ViccoBoard v2 (SportZens without WOW + full KURT)  
+**Status:** Phases 0-3 complete; Phases 4-10 remaining (expected ~80-100 person-hours for typical dev)

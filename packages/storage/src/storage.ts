@@ -1,14 +1,34 @@
 /**
  * SQLite Storage Implementation with Encryption
  * Provides encrypted local database storage
+ * 
+ * ⚠️ NODE.JS ONLY: This module uses Node.js modules (fs, path, better-sqlite3)
+ * BROWSER: Use IndexedDBStorage instead
+ * 
+ * @see IndexedDBStorage for browser/web environments
  */
 
-import Database from 'better-sqlite3';
+// ✅ Conditional imports: Only imported if running in Node.js
+// In browser environments, attempting to import this module will fail with a clear error
+let Database: any;
+let path: any;
+let fs: any;
+
+try {
+  // These imports will succeed in Node.js environments and fail gracefully in browsers
+  Database = require('better-sqlite3');
+  path = require('path');
+  fs = require('fs');
+} catch (error) {
+  // If imports fail, we're likely in a browser environment
+  // Store the error for later reporting if someone tries to use SQLiteStorage
+  // This prevents TypeScript/Vite from including the modules in browser bundles
+  (globalThis as any).__sqliteLoadError = error;
+}
+
 import { Storage, Migration } from '@viccoboard/core';
 import { StorageAdapter } from './adapters/storage-adapter.interface.js';
 import { SQLiteAdapter } from './adapters/sqlite.adapter.js';
-import * as path from 'path';
-import * as fs from 'fs';
 
 export interface StorageConfig {
   databasePath: string;
@@ -17,19 +37,31 @@ export interface StorageConfig {
 }
 
 export class SQLiteStorage implements Storage {
-  private db: Database.Database | null = null;
+  private db: any = null;
   private adapter: SQLiteAdapter | null = null;
   private config: StorageConfig;
   private migrations: Migration[] = [];
   private initialized: boolean = false;
 
   constructor(config: StorageConfig) {
+    if (!Database || !path || !fs) {
+      throw new Error(
+        'SQLiteStorage requires Node.js environment. ' +
+        'For browser/web environments, use IndexedDBStorage instead. ' +
+        'Error: ' +
+        ((globalThis as any).__sqliteLoadError?.message || 'better-sqlite3 not available')
+      );
+    }
     this.config = config;
   }
 
   async initialize(password: string): Promise<void> {
     if (this.initialized) {
       throw new Error('Storage is already initialized');
+    }
+
+    if (!Database || !path || !fs) {
+      throw new Error('SQLiteStorage requires Node.js and better-sqlite3');
     }
 
     // Ensure directory exists
@@ -101,7 +133,7 @@ export class SQLiteStorage implements Storage {
     return this.initialized;
   }
 
-  getDatabase(): Database.Database {
+  getDatabase() {
     if (!this.db) {
       throw new Error('Storage not initialized');
     }
@@ -186,7 +218,7 @@ export class SQLiteStorage implements Storage {
   /**
    * Prepare a SQL statement
    */
-  prepare(sql: string): Database.Statement {
+  prepare(sql: string) {
     if (!this.db) {
       throw new Error('Storage not initialized');
     }

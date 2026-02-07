@@ -99,6 +99,33 @@ export function getSportBridge(): SportBridge {
 }
 
 /**
+ * Vue composable for class groups access
+ */
+export function useClassGroups() {
+  const bridge = getSportBridge()
+  return bridge.classGroupRepository
+}
+
+/**
+ * Vue composable for attendance access
+ */
+export function useAttendance() {
+  const bridge = getSportBridge()
+  return bridge.attendanceRepository
+}
+
+/**
+ * Vue composable for students access
+ * Note: Students module should be initialized separately through StudentsBridge
+ * For now, this is a placeholder that returns null if not available
+ */
+export function useStudents() {
+  // This will need to come from a StudentsBridge similar to SportBridge
+  // For now, return null - this should be refactored
+  return null
+}
+
+/**
  * Vue composable for sport module access
  * Provides reactive access to sport bridge
  */

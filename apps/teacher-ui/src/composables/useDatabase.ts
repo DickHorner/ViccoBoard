@@ -313,4 +313,4 @@ export function useDatabase() {
  */
 export { useExams } from './useExams'
 export { useCorrections } from './useCorrections'
-export { useClassGroups, useStudents, useAttendance, useSportModule } from './useSportBridge'
+export { useSportBridge, initializeSportBridge, getSportBridge } from './useSportBridge'
