@@ -57,8 +57,8 @@ export class GradeCategoryValidator {
     // Type validation
     if (!data.type) {
       errors.push('Type is required');
-    } else if (!['criteria', 'time', 'cooper', 'sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
-      errors.push('Type must be one of: criteria, time, cooper, sportabzeichen, bjs, verbal');
+    } else if (!['criteria', 'time', 'cooper', 'shuttle', 'sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
+      errors.push('Type must be one of: criteria, time, cooper, shuttle, sportabzeichen, bjs, verbal');
     }
 
     // Weight validation
@@ -113,6 +113,12 @@ export class GradeCategoryValidator {
       case 'cooper':
         if (config.distanceInMeters && (typeof config.distanceInMeters !== 'number' || config.distanceInMeters <= 0)) {
           errors.push('Cooper test distance must be a positive number');
+        }
+        break;
+
+      case 'shuttle':
+        if (config.configId && typeof config.configId !== 'string') {
+          errors.push('Shuttle config ID must be a string');
         }
         break;
 

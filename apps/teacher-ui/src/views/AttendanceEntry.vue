@@ -1,24 +1,24 @@
 <template>
   <div class="attendance-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
-      <h2>Anwesenheit erfassen</h2>
-      <p class="page-description">Erfassen Sie die Schüleranwesenheit für heutige Stunde.</p>
+      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <h2>{{ t('ANWESENHEIT.title') }}</h2>
+      <p class="page-description">{{ t('ANWESENHEIT.status') }}</p>
     </div>
     
     <div class="attendance-form">
       <section class="card">
-        <h3>Anwesenheit für: {{ currentDate }}</h3>
+        <h3>{{ t('ANWESENHEIT.liste') }} {{ currentDate }}</h3>
         
         <div class="form-section">
-          <label for="class-select" class="form-label">Klasse auswählen:</label>
+          <label for="class-select" class="form-label">{{ t('KLASSEN.klasse') }}</label>
           <select 
             id="class-select" 
             v-model="selectedClassId" 
             class="form-select"
             @change="onClassChange"
           >
-            <option value="">Klasse auswählen...</option>
+            <option value="">{{ t('KLASSEN.klasse') }}...</option>
             <option 
               v-for="cls in classes" 
               :key="cls.id" 
@@ -30,38 +30,38 @@
         </div>
         
         <div class="card-content" v-if="!selectedClassId">
-          <p class="empty-state">Wählen Sie eine Klasse, um mit der Erfassung zu beginnen.</p>
+          <p class="empty-state">{{ t('KLASSEN.klasse') }}...</p>
         </div>
 
         <div v-else-if="loading" class="loading-state">
           <div class="spinner"></div>
-          <p>Schüler werden geladen...</p>
+          <p>{{ t('COMMON.loading') }}</p>
         </div>
         
         <div v-else-if="selectedClassId && students.length === 0" class="empty-state">
-          <p>Keine Schüler in dieser Klasse. Fügen Sie zunächst Schüler hinzu.</p>
+          <p>{{ t('KLASSEN.keine-schueler') }}</p>
         </div>
 
         <div v-else-if="students.length > 0" class="card-content">
           <div class="status-summary">
             <div class="status-item status-present">
-              <span class="status-label">Anwesend</span>
+              <span class="status-label">{{ t('ANWESENHEIT.present') }}</span>
               <span class="status-count">{{ countByStatus(AttendanceStatus.Present) }}</span>
             </div>
             <div class="status-item status-absent">
-              <span class="status-label">Abwesend</span>
+              <span class="status-label">{{ t('ANWESENHEIT.absent') }}</span>
               <span class="status-count">{{ countByStatus(AttendanceStatus.Absent) }}</span>
             </div>
             <div class="status-item status-late">
-              <span class="status-label">Verspätet</span>
+              <span class="status-label">{{ t('ANWESENHEIT.verspaetet') }}</span>
               <span class="status-count">{{ countByStatus(AttendanceStatus.Late) }}</span>
             </div>
             <div class="status-item status-excused">
-              <span class="status-label">Entschuldigt</span>
+              <span class="status-label">{{ t('ANWESENHEIT.selbst') }}</span>
               <span class="status-count">{{ countByStatus(AttendanceStatus.Excused) }}</span>
             </div>
             <div class="status-item status-passive">
-              <span class="status-label">Passiv</span>
+              <span class="status-label">{{ t('ANWESENHEIT.passive') }}</span>
               <span class="status-count">{{ countByStatus(AttendanceStatus.Passive) }}</span>
             </div>
           </div>
@@ -72,7 +72,7 @@
               @click="markAllPresent"
               :disabled="saving"
             >
-              Alle als anwesend markieren
+              Alle {{ t('ANWESENHEIT.present') }}
             </button>
           </div>
           
@@ -80,9 +80,9 @@
             <table class="attendance-table">
               <thead>
                 <tr>
-                  <th class="student-name-col">Schüler</th>
-                  <th class="status-col">Status</th>
-                  <th class="reason-col">Grund</th>
+                  <th class="student-name-col">{{ t('SCHUELER.schueler') }}</th>
+                  <th class="status-col">{{ t('ANWESENHEIT.status') }}</th>
+                  <th class="reason-col">{{ t('ANWESENHEIT.reason') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -108,11 +108,11 @@
                   </td>
                   <td class="reason-cell">
                     <input 
-                      v-if="attendance[student.id] && ['absent', 'excused'].includes(attendance[student.id].status)"
+                      v-if="attendance[student.id] && [AttendanceStatus.Absent, AttendanceStatus.Excused].includes(attendance[student.id].status)"
                       v-model="attendance[student.id].reason"
                       type="text"
                       class="reason-input"
-                      placeholder="Grund eingeben..."
+                      :placeholder="`${t('ANWESENHEIT.reason')}...`"
                       :disabled="saving"
                     />
                   </td>
@@ -127,14 +127,14 @@
               @click="handleSaveAttendance"
               :disabled="!hasAnyAttendance || saving"
             >
-              {{ saving ? 'Wird gespeichert...' : 'Anwesenheit speichern' }}
+              {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
             </button>
             <button 
               class="btn-secondary" 
               @click="clearAttendance"
               :disabled="!hasAnyAttendance || saving"
             >
-              Alles löschen
+              {{ t('COMMON.delete') }}
             </button>
           </div>
           
@@ -154,20 +154,22 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge } from '../composables/useStudentsBridge'
 import { AttendanceStatus } from '@viccoboard/core'
 import type { ClassGroup, Student } from '@viccoboard/core'
 
 const route = useRoute()
+const { t } = useI18n()
 
 // Status options for quick selection
 const statusOptions: Array<{ value: AttendanceStatus; label: string; short: string }> = [
-  { value: AttendanceStatus.Present, label: 'Anwesend', short: 'A' },
-  { value: AttendanceStatus.Absent, label: 'Abwesend', short: 'Ab' },
-  { value: AttendanceStatus.Late, label: 'Verspätet', short: 'V' },
-  { value: AttendanceStatus.Excused, label: 'Entschuldigt', short: 'E' },
-  { value: AttendanceStatus.Passive, label: 'Passiv', short: 'P' }
+  { value: AttendanceStatus.Present, label: t('ANWESENHEIT.present'), short: 'A' },
+  { value: AttendanceStatus.Absent, label: t('ANWESENHEIT.absent'), short: 'Ab' },
+  { value: AttendanceStatus.Late, label: t('ANWESENHEIT.verspaetet'), short: 'V' },
+  { value: AttendanceStatus.Excused, label: t('ANWESENHEIT.selbst'), short: 'E' },
+  { value: AttendanceStatus.Passive, label: t('ANWESENHEIT.passive'), short: 'P' }
 ]
 
 // State
@@ -217,7 +219,7 @@ const setStatus = (studentId: string, status: AttendanceStatus) => {
   }
   
   // Clear reason if not absent/excused
-  if (!['absent', 'excused'].includes(status)) {
+  if (![AttendanceStatus.Absent, AttendanceStatus.Excused].includes(status)) {
     delete attendance.value[studentId].reason
   }
 }
@@ -250,7 +252,7 @@ const onClassChange = async () => {
     attendance.value = {}
   } catch (err) {
     console.error('Failed to load students:', err)
-    saveError.value = 'Fehler beim Laden der Schüler'
+    saveError.value = t('COMMON.error')
   } finally {
     loading.value = false
   }
@@ -285,7 +287,7 @@ const handleSaveAttendance = async () => {
     await sportBridge.recordAttendanceUseCase.executeBatch(records)
     
     const savedCount = records.length
-    saveSuccess.value = `Anwesenheit für ${savedCount} Schüler erfolgreich gespeichert`
+    saveSuccess.value = `${t('COMMON.success')} (${savedCount})`
     
     // Reset attendance after brief display
     setTimeout(() => {
@@ -299,7 +301,7 @@ const handleSaveAttendance = async () => {
     if (err instanceof Error) {
       saveError.value = err.message
     } else {
-      saveError.value = 'Fehler beim Speichern der Anwesenheit. Bitte versuchen Sie es erneut.'
+      saveError.value = t('COMMON.error')
     }
   } finally {
     saving.value = false
@@ -319,7 +321,7 @@ onMounted(async () => {
     }
   } catch (err) {
     console.error('Failed to load classes:', err)
-    saveError.value = 'Fehler beim Laden der Klassen'
+    saveError.value = t('COMMON.error')
   }
 })
 </script>

@@ -170,6 +170,7 @@
                 <option value="criteria">Kriterienbasiert</option>
                 <option value="time">Zeitbasiert</option>
                 <option value="cooper">Cooper-Test</option>
+                <option value="shuttle">Shuttle-Run</option>
                 <option value="verbal">Verbal</option>
               </select>
             </div>
@@ -274,6 +275,7 @@ function getCategoryTypeLabel(type: GradeCategoryType): string {
     criteria: 'Kriterienbasiert',
     time: 'Zeitbasiert',
     cooper: 'Cooper-Test',
+    shuttle: 'Shuttle-Run',
     sportabzeichen: 'Sportabzeichen',
     bjs: 'Bundesjugendspiele',
     verbal: 'Verbal'
@@ -298,6 +300,10 @@ function openGradingEntry(category: GradeCategory) {
     router.push(`/grading/criteria/${category.id}`);
   } else if (category.type === 'time') {
     router.push(`/grading/time/${category.id}`);
+  } else if (category.type === 'cooper') {
+    router.push(`/grading/cooper/${category.id}`);
+  } else if (category.type === 'shuttle') {
+    router.push(`/grading/shuttle/${category.id}`);
   } else {
     toast.info('Dieser Bewertungstyp wird noch nicht unterstützt.');
   }
@@ -336,6 +342,11 @@ async function createCategory() {
         type: 'cooper',
         sportType: 'running',
         distanceUnit: 'meters',
+        autoEvaluation: true
+      };
+    } else if (newCategory.value.type === 'shuttle') {
+      configuration = {
+        type: 'shuttle',
         autoEvaluation: true
       };
     } else if (newCategory.value.type === 'verbal') {

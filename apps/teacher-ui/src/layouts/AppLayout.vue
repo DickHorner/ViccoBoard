@@ -85,7 +85,10 @@ const navItems = [
   { to: '/students', label: 'Students', hint: 'Roster and profiles' },
   { to: '/lessons', label: 'Lessons', hint: 'Schedule and history' },
   { to: '/attendance', label: 'Attendance', hint: 'Daily check-in' },
-  { to: '/grading', label: 'Grading', hint: 'Entries and history' }
+  { to: '/grading', label: 'Grading', hint: 'Entries and history' },
+  { to: '/tools/timer', label: 'Timer', hint: 'Tools' },
+  { to: '/tools/multistop', label: 'Multistop', hint: 'Tools' },
+  { to: '/tools/scoreboard', label: 'Scoreboard', hint: 'Tools' }
 ]
 
 const pageTitle = computed(() => {

@@ -13,6 +13,9 @@ import {
   GradeCategoryRepository,
   PerformanceEntryRepository,
   AttendanceRepository,
+  TableDefinitionRepository,
+  CooperTestConfigRepository,
+  ShuttleRunConfigRepository,
   CreateClassUseCase,
   CreateLessonUseCase,
   RecordAttendanceUseCase,
@@ -20,6 +23,8 @@ import {
   RecordGradeUseCase,
   CriteriaGradingEngine,
   TimeGradingService,
+  CooperTestService,
+  ShuttleRunService,
   type CreateClassInput,
   type CreateLessonInput,
   type RecordAttendanceInput,
@@ -40,6 +45,9 @@ interface SportBridge {
   gradeCategoryRepository: GradeCategoryRepository
   performanceEntryRepository: PerformanceEntryRepository
   attendanceRepository: AttendanceRepository
+  tableDefinitionRepository: TableDefinitionRepository
+  cooperTestConfigRepository: CooperTestConfigRepository
+  shuttleRunConfigRepository: ShuttleRunConfigRepository
 
   // Use Cases
   createClassUseCase: CreateClassUseCase
@@ -51,6 +59,8 @@ interface SportBridge {
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
   timeGradingService: TimeGradingService
+  cooperTestService: CooperTestService
+  shuttleRunService: ShuttleRunService
 }
 
 /**
@@ -70,6 +80,9 @@ export function initializeSportBridge(): SportBridge {
   const gradeCategoryRepo = new GradeCategoryRepository(adapter)
   const performanceEntryRepo = new PerformanceEntryRepository(adapter)
   const attendanceRepo = new AttendanceRepository(adapter)
+  const tableDefinitionRepo = new TableDefinitionRepository(adapter)
+  const cooperTestConfigRepo = new CooperTestConfigRepository(adapter)
+  const shuttleRunConfigRepo = new ShuttleRunConfigRepository(adapter)
 
   // Initialize use cases with repositories
   const createClassUseCase = new CreateClassUseCase(classGroupRepo)
@@ -81,6 +94,8 @@ export function initializeSportBridge(): SportBridge {
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
   const timeGradingService = new TimeGradingService()
+  const cooperTestService = new CooperTestService()
+  const shuttleRunService = new ShuttleRunService()
 
   sportBridgeInstance = {
     // Repositories
@@ -89,6 +104,9 @@ export function initializeSportBridge(): SportBridge {
     gradeCategoryRepository: gradeCategoryRepo,
     performanceEntryRepository: performanceEntryRepo,
     attendanceRepository: attendanceRepo,
+    tableDefinitionRepository: tableDefinitionRepo,
+    cooperTestConfigRepository: cooperTestConfigRepo,
+    shuttleRunConfigRepository: shuttleRunConfigRepo,
 
     // Use Cases
     createClassUseCase,
@@ -99,7 +117,9 @@ export function initializeSportBridge(): SportBridge {
 
     // Services
     criteriaGradingEngine,
-    timeGradingService
+    timeGradingService,
+    cooperTestService,
+    shuttleRunService
   }
 
   return sportBridgeInstance
@@ -171,6 +191,7 @@ export function useSportBridge() {
     gradeCategories: computed(() => bridge.value?.gradeCategoryRepository),
     performanceEntries: computed(() => bridge.value?.performanceEntryRepository),
     attendance: computed(() => bridge.value?.attendanceRepository),
+    tableDefinitions: computed(() => bridge.value?.tableDefinitionRepository),
 
     // Use case accessors
     useCreateClass: computed(() => bridge.value?.createClassUseCase),
@@ -179,7 +200,9 @@ export function useSportBridge() {
 
     // Service accessors
     useCriteriaGrading: computed(() => bridge.value?.criteriaGradingEngine),
-    useTimeGrading: computed(() => bridge.value?.timeGradingService)
+    useTimeGrading: computed(() => bridge.value?.timeGradingService),
+    useCooperTest: computed(() => bridge.value?.cooperTestService),
+    useShuttleRun: computed(() => bridge.value?.shuttleRunService)
   }
 }
 

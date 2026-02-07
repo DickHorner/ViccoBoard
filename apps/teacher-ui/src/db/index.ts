@@ -56,7 +56,7 @@ export interface GradeCategory {
   classGroupId: string
   name: string
   description?: string
-  type: 'criteria' | 'time' | 'cooper' | 'sportabzeichen' | 'bjs' | 'verbal'
+  type: 'criteria' | 'time' | 'cooper' | 'shuttle' | 'sportabzeichen' | 'bjs' | 'verbal'
   weight: number
   configuration: string // JSON string of GradeCategoryConfig
   createdAt: Date

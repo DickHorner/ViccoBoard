@@ -17,6 +17,7 @@ export function isValidGradeCategoryType(value: unknown): value is GradeCategory
     'criteria',
     'time',
     'cooper',
+    'shuttle',
     'sportabzeichen',
     'bjs',
     'verbal'

@@ -43,6 +43,7 @@ export enum GradeCategoryType {
   Criteria = 'criteria',
   Time = 'time',
   Cooper = 'cooper',
+  Shuttle = 'shuttle',
   Sportabzeichen = 'sportabzeichen',
   BJS = 'bjs',
   Verbal = 'verbal'
@@ -52,6 +53,7 @@ export type GradeCategoryConfig =
   | CriteriaGradingConfig
   | TimeGradingConfig
   | CooperGradingConfig
+  | ShuttleGradingConfig
   | SportabzeichenConfig
   | BJSConfig
   | VerbalAssessmentConfig;
@@ -94,6 +96,14 @@ export interface CooperGradingConfig {
   sportType: 'running' | 'swimming';
   distanceUnit: 'meters' | 'kilometers';
   gradingTable?: string; // reference to table
+  autoEvaluation: boolean;
+}
+
+// Shuttle Run
+export interface ShuttleGradingConfig {
+  type: 'shuttle';
+  gradingTable?: string; // reference to table
+  configId?: string; // reference to shuttle run config
   autoEvaluation: boolean;
 }
 

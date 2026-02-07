@@ -75,6 +75,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Time-Based Grading' }
   },
   {
+    path: '/grading/cooper/:id',
+    name: 'cooper-grading',
+    component: () => import('../views/CooperGradingEntry.vue'),
+    meta: { title: 'Cooper Grading' }
+  },
+  {
+    path: '/grading/shuttle/:id',
+    name: 'shuttle-grading',
+    component: () => import('../views/ShuttleGradingEntry.vue'),
+    meta: { title: 'Shuttle Grading' }
+  },
+  {
     path: '/grading/history/:id',
     name: 'grade-history',
     component: () => import('../views/GradeHistory.vue'),
@@ -91,6 +103,12 @@ const routes: RouteRecordRaw[] = [
     name: 'multistop',
     component: () => import('../views/Multistop.vue'),
     meta: { title: 'Multistop' }
+  },
+  {
+    path: '/tools/scoreboard',
+    name: 'scoreboard',
+    component: () => import('../views/Scoreboard.vue'),
+    meta: { title: 'Scoreboard' }
   }
 ]
 
