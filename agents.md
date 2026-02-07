@@ -18,6 +18,7 @@ Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle F
 9. **Privacy by default:** Keine Telemetrie/Tracki
 10. **Safari-Kompatibilität ist Pflicht:** Keine Nutzung von nicht unterstützten APIs (z. B. `showOpenFilePicker`/`showSaveFilePicker`, File System Access API). Wenn eine neue Browser-API eingesetzt wird, muss die iPadOS-Unterstützung dokumentiert sein.
 ng ohne expliziten Plan-Abschnitt + Opt-in.
+11. **Zentralisierte Schülerverwaltung:** `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/sport`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Sport-Modul/Bridge zu.
 
 ---
 

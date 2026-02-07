@@ -1,5 +1,12 @@
 # ViccoBoard Development Guide
 
+## Hard Constraints (Non-Negotiable)
+
+- **Web-only deployment:** static assets, iPadOS Safari target. No Electron, no React Native, no Flutter.
+- **Local-first:** offline by default; no runtime servers.
+- **Modularity:** domain logic in `modules/*`, interfaces in `packages/core`, storage adapters in `packages/storage`.
+- **Centralized student management:** `Student`/`StudentRepository` live in `modules/sport`. No app-level or storage-level student repos/stores.
+
 ## Getting Started
 
 ### Prerequisites
@@ -55,14 +62,14 @@ ViccoBoard/
 │   ├── core/             # Type definitions and interfaces
 │   ├── plugins/          # Plugin registry
 │   └── storage/          # Storage implementation
-├── modules/              # Domain modules (to be created)
+├── modules/              # Domain modules
 │   ├── sport/           # SportZens functionality
 │   ├── exams/           # KURT functionality
 │   ├── export/          # PDF/CSV exports
 │   └── integrations/    # External integrations
-├── apps/                 # Applications (to be created)
-│   ├── teacher/         # Main teacher app
-│   └── wow-web/         # WOW web interface
+├── apps/                 # Applications
+│   ├── teacher-ui/      # Main teacher app (Vue 3, web-only)
+│   └── demo/            # CLI demo (Node-only)
 ├── Plan.md              # Feature specification
 ├── agents.md            # Agent guidelines
 ├── README.md            # Project overview
@@ -101,8 +108,15 @@ cat > package.json << EOF
   "name": "@viccoboard/my-package",
   "version": "0.1.0",
   "description": "Description",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest"
@@ -122,9 +136,10 @@ cat > tsconfig.json << EOF
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
+    "module": "ES2020",
     "lib": ["ES2020"],
     "declaration": true,
+    "composite": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
@@ -132,7 +147,7 @@ cat > tsconfig.json << EOF
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
@@ -146,6 +161,8 @@ echo "export const VERSION = '0.1.0';" > src/index.ts
 npm install
 npm run build
 ```
+
+Note: For ESM compatibility, relative imports in TS should include `.js` extensions (e.g., `import { foo } from './foo.js'`).
 
 ### 3. Creating a Module
 
@@ -166,13 +183,13 @@ Example: Class Group Repository
 
 ```typescript
 // modules/sport/src/repositories/class-group.repository.ts
-import { BaseRepository } from '@viccoboard/storage';
+import { AdapterRepository } from '@viccoboard/storage';
 import { ClassGroup } from '@viccoboard/core';
-import { SQLiteStorage } from '@viccoboard/storage';
+import type { StorageAdapter } from '@viccoboard/storage';
 
-export class ClassGroupRepository extends BaseRepository<ClassGroup> {
-  constructor(storage: SQLiteStorage) {
-    super(storage, 'class_groups');
+export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
+  constructor(adapter: StorageAdapter) {
+    super(adapter, 'class_groups');
   }
 
   mapToEntity(row: any): ClassGroup {
@@ -208,6 +225,7 @@ export class ClassGroupRepository extends BaseRepository<ClassGroup> {
   }
 }
 ```
+Repositories live in domain modules (e.g., `modules/sport`). Apps should never define their own repositories or access storage directly.
 
 ### 5. Implementing a Use Case
 
@@ -373,6 +391,14 @@ describe('ClassGroupRepository', () => {
 });
 ```
 
+### Documentation Guardrails
+
+```bash
+npm run lint:docs
+```
+
+This checks documentation for forbidden platform drift (Electron/React Native/Flutter) and app-level student repo patterns.
+
 ## Code Style
 
 ### TypeScript Guidelines
@@ -396,8 +422,8 @@ describe('ClassGroupRepository', () => {
 ```typescript
 // 1. Imports (grouped by external, internal, types)
 import { ClassGroup } from '@viccoboard/core';
-import { BaseRepository } from '@viccoboard/storage';
-import type { SQLiteStorage } from '@viccoboard/storage';
+import { AdapterRepository } from '@viccoboard/storage';
+import type { StorageAdapter } from '@viccoboard/storage';
 
 // 2. Types and interfaces
 interface LocalType {
@@ -467,7 +493,7 @@ if (DEBUG) {
 
 1. Define type in `packages/core/src/interfaces/*.types.ts`
 2. Create migration in `packages/storage/src/migrations/`
-3. Create repository extending `BaseRepository`
+3. Create repository extending `AdapterRepository`
 4. Create use cases for business logic
 5. Register with dependency injection (when implemented)
 
@@ -483,7 +509,7 @@ if (DEBUG) {
 
 1. Define screen in app navigation
 2. Create screen component
-3. Connect to use cases/repositories
+3. Connect to use cases via module bridges (no direct DB/repo access in UI)
 4. Add state management
 5. Add navigation logic
 

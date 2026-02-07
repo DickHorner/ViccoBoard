@@ -1,0 +1,174 @@
+parity_item_type,id,required,scope,implemented,location,tests
+i18n_key,HELLO,yes,in_scope_v2,no,N/A,N/A
+i18n_key,ENCRYPTION.setup-title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,ENCRYPTION.setup-description,yes,in_scope_v2,no,N/A,N/A
+i18n_key,ENCRYPTION.enter-pin,yes,in_scope_v2,no,N/A,N/A
+i18n_key,ENCRYPTION.pin-description,yes,in_scope_v2,no,N/A,N/A
+i18n_key,ENCRYPTION.confirm-pin,yes,in_scope_v2,no,N/A,N/A
+i18n_key,ENCRYPTION.unlock-title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.lock,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.theme,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.tables,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.analytics,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.tournaments,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.scoreboard,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.tacticboard,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.timer,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MENU.settings,yes,in_scope_v2,no,N/A,N/A
+i18n_key,KLASSEN.title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,KLASSEN.hinzu,yes,in_scope_v2,no,N/A,N/A
+i18n_key,KLASSEN.bezeichnung,yes,in_scope_v2,no,N/A,N/A
+i18n_key,KLASSEN.notenschema,yes,in_scope_v2,no,N/A,N/A
+i18n_key,KLASSEN.schuljahr,yes,in_scope_v2,no,N/A,N/A
+i18n_key,CLASSES.class,yes,in_scope_v2,no,N/A,N/A
+i18n_key,CLASSES.add,yes,in_scope_v2,no,N/A,N/A
+i18n_key,CLASSES.name,yes,in_scope_v2,no,N/A,N/A
+i18n_key,SCHUELER.schueler-hinzu,yes,in_scope_v2,no,N/A,N/A
+i18n_key,SCHUELER.name,yes,in_scope_v2,no,N/A,N/A
+i18n_key,SCHUELER.nachname,yes,in_scope_v2,no,N/A,N/A
+i18n_key,SCHUELER.geschlecht,yes,in_scope_v2,no,N/A,N/A
+i18n_key,STUDENTS.pupil,yes,in_scope_v2,no,N/A,N/A
+i18n_key,STUDENTS.first-name,yes,in_scope_v2,no,N/A,N/A
+i18n_key,STUDENTS.last-name,yes,in_scope_v2,no,N/A,N/A
+i18n_key,STUDENTS.gender,yes,in_scope_v2,no,N/A,N/A
+i18n_key,GRADES.main-category,yes,in_scope_v2,no,N/A,N/A
+i18n_key,GRADES.criteria-title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,GRADES.cooper-test,yes,in_scope_v2,no,N/A,N/A
+i18n_key,GRADES.shuttle-run,yes,in_scope_v2,no,N/A,N/A
+i18n_key,GRADES.multistop,yes,in_scope_v2,no,N/A,N/A
+i18n_key,GRADES.sportabzeichen,yes,in_scope_v2,no,N/A,N/A
+i18n_key,GRADES.bundesjugendspiele,yes,in_scope_v2,no,N/A,N/A
+i18n_key,COOPER.bewerte-cooper,yes,in_scope_v2,no,N/A,N/A
+i18n_key,SHUTTLE.bewerte-shuttle,yes,in_scope_v2,no,N/A,N/A
+i18n_key,MULTISTOP.bewerte,yes,in_scope_v2,no,N/A,N/A
+i18n_key,SPORTABZEICHEN.title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,BUNDESJUGENDSPIELE.sprint,yes,in_scope_v2,no,N/A,N/A
+i18n_key,TEAM.team-erstellen,yes,in_scope_v2,no,N/A,N/A
+i18n_key,TOURNAMENTS.title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,ANWESENHEIT.liste,yes,in_scope_v2,no,N/A,N/A
+i18n_key,STUNDEN.stunde-hinzu,yes,in_scope_v2,no,N/A,N/A
+i18n_key,TABLES.title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,TIMER.set,yes,in_scope_v2,no,N/A,N/A
+i18n_key,KAISER.bewerte-kaiser11,yes,in_scope_v2,no,N/A,N/A
+i18n_key,FEEDBACK.feedback,yes,in_scope_v2,no,N/A,N/A
+i18n_key,KALENDER.title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,SETTINGS.title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,TRACKING.pushups.title,yes,in_scope_v2,no,N/A,N/A
+i18n_key,WOW.no-wow-title,yes,excluded_by_scope_v2,no,N/A,N/A
+i18n_key,WOW.add-wow,yes,excluded_by_scope_v2,no,N/A,N/A
+i18n_key,WOW.hochladen,yes,excluded_by_scope_v2,no,N/A,N/A
+i18n_key,WOW.types.fight,yes,excluded_by_scope_v2,no,N/A,N/A
+schema_field,class.id,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts ClassGroup.id,N/A
+schema_field,class.name,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts ClassGroup.name,N/A
+schema_field,class.school_year,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts ClassGroup.schoolYear,N/A
+schema_field,class.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts ClassGroup.teacherId,N/A
+schema_field,class.color,no,in_scope_v2,no,N/A,N/A
+schema_field,class.grade_scheme,no,in_scope_v2,no,N/A,N/A
+schema_field,class.settings,no,in_scope_v2,no,N/A,N/A
+schema_field,class.stats,no,in_scope_v2,no,N/A,N/A
+schema_field,student.id,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.id,N/A
+schema_field,student.class_id,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.classGroupId,N/A
+schema_field,student.first_name,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.firstName,N/A
+schema_field,student.last_name,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.lastName,N/A
+schema_field,student.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.teacherId,N/A
+schema_field,student.gender,no,in_scope_v2,yes,modules/sport/src/types/student.ts Student.gender,N/A
+schema_field,student.public_code,no,in_scope_v2,no,N/A,N/A
+schema_field,student.settings,no,in_scope_v2,no,N/A,N/A
+schema_field,student.stats,no,in_scope_v2,no,N/A,N/A
+schema_field,grade.id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.id,N/A
+schema_field,grade.category_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.categoryId,N/A
+schema_field,grade.class_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.classGroupId,N/A
+schema_field,grade.student_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.studentId,N/A
+schema_field,grade.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.teacherId,N/A
+schema_field,grade.type,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.type,N/A
+schema_field,grade.year,yes,in_scope_v2,no,N/A,N/A
+schema_field,grade.grade,no,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.value,N/A
+schema_field,grade.criterias,no,in_scope_v2,no,N/A,N/A
+schema_field,grade.total_points,no,in_scope_v2,no,N/A,N/A
+schema_field,category.id,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.id,N/A
+schema_field,category.class_id,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.classGroupId,N/A
+schema_field,category.name,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.name,N/A
+schema_field,category.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.teacherId,N/A
+schema_field,category.type,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.assessmentType,N/A
+schema_field,category.weight,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.weight,N/A
+schema_field,category.year,yes,in_scope_v2,no,N/A,N/A
+schema_field,category.categories,no,in_scope_v2,no,N/A,N/A
+schema_field,category.settings,no,in_scope_v2,no,N/A,N/A
+schema_field,category.max_value,no,in_scope_v2,no,N/A,N/A
+schema_field,table.id,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.id,N/A
+schema_field,table.name,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.name,N/A
+schema_field,table.grade_scheme,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.gradeScheme,N/A
+schema_field,table.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.teacherId,N/A
+schema_field,table.grade_scheme_direction,no,in_scope_v2,no,N/A,N/A
+schema_field,table.school,no,in_scope_v2,no,N/A,N/A
+schema_field,gradeWeighting.attendance,yes,in_scope_v2,no,N/A,N/A
+schema_field,gradeWeighting.grades,yes,in_scope_v2,no,N/A,N/A
+schema_field,gradeWeighting.remarks,yes,in_scope_v2,no,N/A,N/A
+schema_field,gradeWeighting.wow,yes,excluded_by_scope_v2,no,N/A,N/A
+schema_field,userData.id,yes,in_scope_v2,yes,packages/core/src/types/user.ts User.id,N/A
+schema_field,userData.email,yes,in_scope_v2,yes,packages/core/src/types/user.ts User.email,N/A
+schema_field,userData.role,yes,in_scope_v2,no,N/A,N/A
+schema_field,userData.first_name,no,in_scope_v2,no,N/A,N/A
+schema_field,userData.last_name,no,in_scope_v2,no,N/A,N/A
+schema_field,userData.settings,no,in_scope_v2,no,N/A,N/A
+schema_field,newDayData.date,yes,in_scope_v2,no,N/A,N/A
+schema_field,newDayData.exercises,no,in_scope_v2,no,N/A,N/A
+schema_field,newDayData.additionalExercises,no,in_scope_v2,no,N/A,N/A
+schema_field,wow.name,yes,excluded_by_scope_v2,no,N/A,N/A
+schema_field,wow.wowtyp,yes,excluded_by_scope_v2,no,N/A,N/A
+schema_field,wow.wowtimer,no,excluded_by_scope_v2,no,N/A,N/A
+workflow,class_create,yes,in_scope_v2,no,N/A,N/A
+workflow,class_edit,yes,in_scope_v2,no,N/A,N/A
+workflow,class_delete,yes,in_scope_v2,no,N/A,N/A
+workflow,student_create,yes,in_scope_v2,no,N/A,N/A
+workflow,student_csv_import,yes,in_scope_v2,no,N/A,N/A
+workflow,student_edit,yes,in_scope_v2,no,N/A,N/A
+workflow,student_delete,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_criteria_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_time_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_cooper_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_shuttle_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_multistop_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_middle_distance_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_sportabzeichen,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_bundesjugendspiele,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_king_tournament,yes,in_scope_v2,no,N/A,N/A
+workflow,category_create,yes,in_scope_v2,no,N/A,N/A
+workflow,category_edit,yes,in_scope_v2,no,N/A,N/A
+workflow,category_delete,yes,in_scope_v2,no,N/A,N/A
+workflow,table_import,yes,in_scope_v2,no,N/A,N/A
+workflow,table_create,yes,in_scope_v2,no,N/A,N/A
+workflow,table_delete,yes,in_scope_v2,no,N/A,N/A
+workflow,team_create,yes,in_scope_v2,no,N/A,N/A
+workflow,tournament_create,yes,in_scope_v2,no,N/A,N/A
+workflow,tournament_manage_matches,yes,in_scope_v2,no,N/A,N/A
+workflow,attendance_mark,yes,in_scope_v2,no,N/A,N/A
+workflow,lesson_create,yes,in_scope_v2,no,N/A,N/A
+workflow,lesson_edit,yes,in_scope_v2,no,N/A,N/A
+workflow,feedback_collect,yes,in_scope_v2,no,N/A,N/A
+workflow,calendar_event_create,yes,in_scope_v2,no,N/A,N/A
+workflow,timer_tool,yes,in_scope_v2,no,N/A,N/A
+workflow,scoreboard_tool,yes,in_scope_v2,no,N/A,N/A
+workflow,tactics_board_tool,yes,in_scope_v2,no,N/A,N/A
+workflow,video_delay_tool,yes,in_scope_v2,no,N/A,N/A
+workflow,tracking_pushups,yes,in_scope_v2,no,N/A,N/A
+workflow,export_csv,yes,in_scope_v2,no,N/A,N/A
+workflow,backup_create,yes,in_scope_v2,no,N/A,N/A
+workflow,backup_restore,yes,in_scope_v2,no,N/A,N/A
+workflow,wow_create,yes,excluded_by_scope_v2,no,N/A,N/A
+workflow,wow_student_tracking,yes,excluded_by_scope_v2,no,N/A,N/A
+route,/,yes,in_scope_v2,yes,apps/teacher-ui/src/router/index.ts,N/A
+route,/classes,yes,in_scope_v2,yes,apps/teacher-ui/src/router/index.ts,N/A
+route,/classes/:id,yes,in_scope_v2,yes,apps/teacher-ui/src/router/index.ts,N/A
+route,/students,yes,in_scope_v2,no,N/A,N/A
+route,/students/:id,yes,in_scope_v2,no,N/A,N/A
+route,/grades,yes,in_scope_v2,no,N/A,N/A
+route,/tables,yes,in_scope_v2,no,N/A,N/A
+route,/tournaments,yes,in_scope_v2,no,N/A,N/A
+route,/timer,yes,in_scope_v2,no,N/A,N/A
+route,/scoreboard,yes,in_scope_v2,no,N/A,N/A
+route,/tacticboard,yes,in_scope_v2,no,N/A,N/A
+route,/calendar,yes,in_scope_v2,no,N/A,N/A
+route,/settings,yes,in_scope_v2,no,N/A,N/A
+route,/exams,yes,in_scope_v2,yes,apps/teacher-ui/src/router/index.ts,N/A
+route,/wow,yes,excluded_by_scope_v2,no,N/A,N/A

@@ -100,6 +100,7 @@ Complete implementation of SportZens core functionality:
 - **ClassGroupRepository** - Class/course management with queries
 - **StudentRepository** - Student profiles with search capabilities
 - **AttendanceRepository** - Attendance tracking with statistics
+Student management is centralized in `modules/sport` (no app-level or storage-level student repos).
 
 #### Use Cases (Business Logic Layer)
 - **CreateClassUseCase** - Class creation with validation
@@ -194,19 +195,7 @@ Create concrete plugin implementations:
    - Grade app exporters
 
 ### Priority 3: User Interface
-Choose and implement the UI framework:
-
-**Options:**
-1. **React Native with Expo** (recommended for this environment)
-   - Cross-platform (iOS/Android)
-   - Good TypeScript support
-   - Large ecosystem
-   - Hot reload for development
-
-2. **Electron + React** (if desktop-first)
-   - Cross-platform desktop
-   - Web technologies
-   - Good for complex UIs
+Use Vue 3 in `apps/teacher-ui` only (static web, iPadOS Safari). No Electron/React Native/Flutter.
 
 **UI Components Needed:**
 - Dashboard
@@ -285,25 +274,24 @@ The foundation is now proven with a fully functional end-to-end demo proving:
 **Task 4: Document Architecture Decisions** ⏳ NEXT
 - Will document monorepo rationale
 - Storage approach and offline-first principles
-- UI framework decision matrix
+- UI framework decision (Vue 3 web-only)
 - Plugin system design
 
 **Task 3: Start Phase 2 - UI Framework Selection** ⏳ FINAL
-- Evaluate Vue 3 (scaffold exists), React Native, Flutter
-- Recommend and commit to choice
+- Confirm Vue 3 (scaffold exists, web-only)
 - Begin UI scaffolding
 - Wire to existing Sport module
 
 ### Next Actions (in order)
 
 1. **Document Architecture Decisions** (current focus)
-2. **Evaluate UI Frameworks** - make recommendation for Phase 2
+2. **Confirm UI Framework** - Vue 3 (web-only)
 3. **Initialize Teacher-UI** - finalize framework choice and build core navigation
 4. **Complete Phase 2 Issues P2-1 through P2-7**
 
 ## 🎯 Immediate Next Actions
 
-1. **Choose UI Framework**: Decide between React Native or Electron based on deployment target
+1. **Choose UI Framework**: Vue 3 web-only (static assets, no Electron/React Native)
 2. **Install Dependencies**: Run `npm install` in all packages
 3. **Create Example App**: Build a simple example demonstrating:
    - Storage initialization
@@ -344,12 +332,12 @@ Current package dependencies:
 - uuid
 
 Will need:
-- React Native OR Electron (UI)
+- Vue 3 UI in `apps/teacher-ui` (web-only)
 - Jest (testing)
 - ESLint + Prettier (code quality)
-- PDF generation library (e.g., pdfkit, jspdf)
+- PDF generation library (e.g., pdf-lib, jspdf)
 - QR code generation (e.g., qrcode)
-- Email sending (e.g., nodemailer)
+- Email export via `mailto:` or `.eml` generation (no SMTP)
 
 ## 📖 Resources
 

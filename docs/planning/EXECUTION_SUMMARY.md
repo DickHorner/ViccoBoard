@@ -56,7 +56,7 @@
 10. **Testing Strategy:** Unit, integration, UI, offline tests
 11. **Data Migrations:** Version-tracked schema evolution
 12. **Risks & Mitigation:** 7 major risks with mitigation strategies
-13. **Deployment & Distribution:** Static web, Electron, mobile options
+13. **Deployment & Distribution:** Static web only (no Electron/mobile)
 
 **Why Each Decision:**
 - Rationale explained

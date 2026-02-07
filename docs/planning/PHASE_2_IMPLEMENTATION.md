@@ -76,97 +76,10 @@ npm run dev  # Start dev server (Vite)
 
 ---
 
-### Option B: React Native + Expo
+### Non-Options (Out of Scope)
 
-**Current State:** None (would need to create new app)
-
-**Installation:** ~3 days (project setup, learning, initial screens)
-
-**Advantages:**
-1. **Cross-Platform:** Same code → iOS, Android, web
-2. **Native Feel:** Uses native components (better on iPad)
-3. **Offline:** Excellent offline-first libraries (React Query, SQLite)
-4. **Ecosystem:** Massive (everything is a library)
-5. **Mobile-First:** Designed for touch from day one
-
-**Disadvantages:**
-1. **Learning Curve:** React patterns different from Vue (Hooks, functional components)
-2. **Setup Time:** Expo CLI, emulator/device setup takes time
-3. **Build Complexity:** More moving parts (Metro bundler, native modules)
-4. **Deployment:** App Store/Google Play process
-5. **Bundle Size:** Larger than web (70-100MB compiled app)
-
-**Ecosystem:**
-- Routing: React Navigation
-- State: Redux or Zustand
-- HTTP: Fetch API or axios
-- Storage: React Native AsyncStorage or SQLite
-
-**Getting Started:**
-```bash
-npx create-expo-app viccoboard-rn
-cd viccoboard-rn
-expo run:ios  # Run on simulator
-```
-
-**When to Choose:** Phase 10+ (after web version proves features)
-
----
-
-### Option C: Flutter
-
-**Current State:** None (would need to completely rewrite)
-
-**Installation:** ~5 days (Dart learning, project setup)
-
-**Advantages:**
-1. **Best iPad Support:** Native animations, responsive design
-2. **Hot Reload:** Fastest iteration
-3. **Single Codebase:** iOS, Android, web from one language
-4. **Performance:** Compiled to native (blazing fast)
-5. **Offline:** Excellent offline support via Hive/Drift
-
-**Disadvantages:**
-1. **Dart Language:** Not TypeScript (lose type skills, new learning)
-2. **Unfamiliar to Team:** No existing Dart expertise
-3. **Ecosystem Smaller:** Fewer libraries than React/Vue
-4. **Build Process:** Complex Dart/native compilation
-5. **Skill Transfer:** Can't use learned skills elsewhere
-
-**When to Choose:** Only if you want "the best" iPad experience and have Dart expertise
-
----
-
-## Recommendation Analysis
-
-### Scoring Framework (100 points)
-
-| Criterion | Weight | Vue 3 | React Native | Flutter |
-|-----------|--------|-------|--------------|---------|
-| Existing Scaffold | 20 pts | 20 | 0 | 0 |
-| Team TypeScript Skills | 15 pts | 15 | 12 | 0 |
-| Time to First Screen | 15 pts | 15 | 10 | 5 |
-| iPad/Safari Support | 20 pts | 14 | 16 | 20 |
-| Offline-First Capability | 15 pts | 13 | 15 | 15 |
-| Deployment Simplicity | 15 pts | 15 | 8 | 5 |
-| **TOTAL** | **100** | **92** | **61** | **45** |
-
-### Recommendation: Vue 3 ✅
-
-**Score: 92/100** — Best overall for Phase 2-9
-
-**Decision Rationale:**
-1. Existing scaffold is 3-day advantage
-2. Team can learn Vue + TypeScript simultaneously
-3. Web deployment validates features quickly
-4. Offline works natively with IndexedDB
-5. Can iterate on features fast
-6. Optional React Native port in Phase 10
-
-**Alternative Path:**
-- Phase 2-9: Build feature-complete Vue web app
-- Phase 10: Evaluate React Native port for native mobile
-- Choose based on teacher feedback and budget
+React Native, Flutter, and Electron are not allowed under the current constraints.
+All UI work stays in `apps/teacher-ui` (Vue 3, static web).
 
 ---
 
@@ -308,6 +221,7 @@ async function createClass(name: string) {
 5. Quick link to attendance entry
 
 **Implementation:**
+Note: `studentRepository` is provided by the Sport module bridge. Do not create app-level student stores or repositories.
 ```vue
 <script setup lang="ts">
 const route = useRoute();

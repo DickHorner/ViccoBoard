@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`i18n - SportZens Locale Parity 6. Snapshot Tests (Sample Sections) should have stable AUTH keys snapshot (EN) 1`] = `
+{
+  "password": "Password",
+  "resetPassword": "Reset Password",
+  "signin": "Sign In",
+}
+`;
+
+exports[`i18n - SportZens Locale Parity 6. Snapshot Tests (Sample Sections) should have stable ENCRYPTION keys snapshot (DE) 1`] = `
+{
+  "setupTitle": "Verschlüsselung einrichten",
+  "skipWarning": "WARNUNG: Ohne Verschlüsselung werden Schülernamen ungeschützt gespeichert. Dies ist nicht datenschutzkonform!",
+  "unlockTitle": "Entsperren",
+}
+`;
+
+exports[`i18n - SportZens Locale Parity 6. Snapshot Tests (Sample Sections) should have stable GRADES keys snapshot (DE) 1`] = `
+{
+  "cooper": "Cooper-Test",
+  "criteria": "Bewerte Kriterien",
+  "mainCategory": "Oberkategorie",
+  "shuttle": "Shuttle-Run",
+}
+`;
+
+exports[`i18n - SportZens Locale Parity 6. Snapshot Tests (Sample Sections) should have stable MENU keys snapshot (DE) 1`] = `
+{
+  "lock": "Sperren",
+  "settings": "Einstellungen",
+  "tables": "Tabellen",
+  "timer": "Timer",
+}
+`;

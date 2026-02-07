@@ -80,8 +80,7 @@
 **Deliverable:** [docs/planning/PHASE_2_IMPLEMENTATION.md](../planning/PHASE_2_IMPLEMENTATION.md) (400+ lines)
 
 **Completed:**
-- [x] Framework comparison matrix (Vue 3 vs React Native vs Flutter)
-- [x] Recommendation: Vue 3 (92/100 score)
+- [x] Vue 3 web-only decision documented (static assets, iPadOS Safari)
 - [x] Rationale documented (scaffold exists, TypeScript, faster start)
 - [x] 7-milestone implementation plan:
   - [x] P2-1: Vue Setup & Navigation (2 days)
@@ -94,7 +93,7 @@
 - [x] Code examples for each screen
 - [x] Success criteria for Phase 2
 - [x] Day-by-day timeline (14 days total)
-- [x] Deployment options documented
+- [x] Deployment documented (static web only)
 - [x] Risk mitigation for UI layer
 
 **Time Effort:** ~3 hours

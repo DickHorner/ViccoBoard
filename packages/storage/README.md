@@ -58,86 +58,21 @@ const decrypted = await cryptoService.decrypt(encrypted, 'encryption-key');
 const token = await cryptoService.generateToken(32);
 ```
 
-### Creating a Repository
+### Using Domain Repositories (Preferred)
+
+Student management and other domain repositories live in their respective modules
+(e.g., `@viccoboard/sport`). The storage package provides adapters and base
+infrastructure only.
 
 ```typescript
-import { BaseRepository } from '@viccoboard/storage';
-import { Student } from '@viccoboard/core';
+import { SQLiteStorage } from '@viccoboard/storage';
+import { StudentRepository } from '@viccoboard/sport';
 
-class StudentRepository extends BaseRepository<Student> {
-  constructor(storage: SQLiteStorage) {
-    super(storage, 'students');
-  }
+const storage = new SQLiteStorage({ databasePath: './data/viccoboard.db' });
+await storage.initialize('your-secure-password');
 
-  mapToEntity(row: any): Student {
-    return {
-      id: row.id,
-      firstName: row.first_name,
-      lastName: row.last_name,
-      birthYear: row.birth_year,
-      gender: row.gender,
-      photoUri: row.photo_uri,
-      contactInfo: {
-        email: row.email,
-        parentEmail: row.parent_email,
-        phone: row.phone
-      },
-      classGroupId: row.class_group_id,
-      createdAt: new Date(row.created_at),
-      lastModified: new Date(row.last_modified)
-    };
-  }
-
-  mapToRow(entity: Partial<Student>): any {
-    const row: any = {};
-    
-    if (entity.id) row.id = entity.id;
-    if (entity.firstName) row.first_name = entity.firstName;
-    if (entity.lastName) row.last_name = entity.lastName;
-    if (entity.birthYear !== undefined) row.birth_year = entity.birthYear;
-    if (entity.gender) row.gender = entity.gender;
-    if (entity.photoUri) row.photo_uri = entity.photoUri;
-    if (entity.contactInfo?.email) row.email = entity.contactInfo.email;
-    if (entity.contactInfo?.parentEmail) row.parent_email = entity.contactInfo.parentEmail;
-    if (entity.contactInfo?.phone) row.phone = entity.contactInfo.phone;
-    if (entity.classGroupId) row.class_group_id = entity.classGroupId;
-    if (entity.createdAt) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified) row.last_modified = entity.lastModified.toISOString();
-    
-    return row;
-  }
-
-  // Custom query methods
-  async findByClassGroup(classGroupId: string): Promise<Student[]> {
-    return this.find({ class_group_id: classGroupId });
-  }
-}
-
-// Usage
-const studentRepo = new StudentRepository(storage);
-
-// Create a student
-const student = await studentRepo.create({
-  firstName: 'John',
-  lastName: 'Doe',
-  birthYear: 2010,
-  gender: 'male',
-  classGroupId: 'class-123'
-});
-
-// Find by ID
-const found = await studentRepo.findById(student.id);
-
-// Find by class
+const studentRepo = new StudentRepository(storage.getAdapter());
 const classStudents = await studentRepo.findByClassGroup('class-123');
-
-// Update
-await studentRepo.update(student.id, {
-  birthYear: 2011
-});
-
-// Delete
-await studentRepo.delete(student.id);
 ```
 
 ### Transactions

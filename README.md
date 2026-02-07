@@ -37,7 +37,7 @@ ViccoBoard/
 ### Technology Stack
 
 - **Language**: TypeScript
-- **Mobile Framework**: React Native / Flutter (TBD based on environment)
+- **Mobile Framework**: None. Web-only (iPadOS Safari) per constraints.
 - **Storage**: Encrypted IndexedDB (browser-first, Safari/WebKit compatible) — SQLite adapter available for Node/dev and testing (SQLCipher ready); exports/imports via download/file-picker (no File System Access API)
 - **Architecture**: Clean Architecture + Domain-Driven Design
 - **Plugin System**: Interface-based extensibility

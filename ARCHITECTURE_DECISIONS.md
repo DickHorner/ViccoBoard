@@ -430,100 +430,17 @@ UI → Use Cases → Repositories → Domain Types
 
 ---
 
-## 5. UI Framework Selection (DECISION PENDING)
+## 5. UI Framework Selection (DECIDED: Vue 3 Web-Only)
 
-### Evaluation Criteria
-| Criterion | Weight | Vue 3 | React Native | Flutter |
-|---|---|---|---|---|
-| TypeScript support | 25% | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| iPad/Safari support | 25% | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Learning curve | 20% | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| Hot reload | 15% | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| Offline capability | 15% | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+**Decision:** Vue 3 in `apps/teacher-ui`, built as static web assets for iPadOS Safari.
 
-### Option A: Vue 3 (Current Scaffold)
-```typescript
-// Scaffold already exists in apps/teacher-ui
-import { createApp } from 'vue';
-import App from './App.vue';
-
-const app = createApp(App);
-app.mount('#app');
-```
-
-**Pros:**
-- Scaffold already created (faster start)
-- Excellent TypeScript support
-- Reactive system matches offline data model
-- Simpler learning curve for agents
-- Single-language development (TypeScript/Vue)
-
-**Cons:**
-- Web-only (no native iOS/Android)
-- Build step required for deployment
-- Safari/iPad issues possible (file API, storage)
-- PDF generation more complex
-
-**Best for:** Desktop or web-based deployment, single-platform
-
-### Option B: React Native + Expo
-```typescript
-// CLI-driven development
-npx create-expo-app viccoboard
-expo run:ios  // Run on simulator or device
-```
-
-**Pros:**
-- True native iOS/Android apps
-- Excellent iPad support
-- Expo streamlines development
-- Code sharing between platforms
-- Better offline capability with native storage
-
-**Cons:**
-- Steeper learning curve for Vue developers
-- React patterns different from Vue composition API
-- Larger bundle size
-- PDF generation requires native library
-
-**Best for:** Native mobile deployment (iPad, iPhone, Android)
-
-### Option C: Flutter
-```dart
-// Dart language (not TypeScript)
-flutter create viccoboard
-flutter run -d ipad
-```
-
-**Pros:**
-- Best iPad/iOS support natively
-- Hot reload excellent
-- High-performance UI
-- Single codebase → iOS/Android/web
-
-**Cons:**
-- Must use Dart language (lose TypeScript skills)
-- Agents unfamiliar with Dart
-- Type system different from TypeScript
-- Ecosystem smaller than React/Vue
-
-**Best for:** Maximum native performance, true cross-platform
-
-### Recommendation for Phase 2
-**→ Vue 3 (web-first) + plan for React Native later**
+**Non-options:** React Native, Flutter, and Electron are out of scope under current constraints.
 
 **Rationale:**
-1. Scaffold exists → faster Phase 2 completion
-2. Can iterate quickly on functionality
-3. Offline-first data model proven in demo
-4. Web version deployable immediately
-5. Can port to React Native in Phase 10 (lower priority)
-6. Teachers can use on iPad via browser (no App Store needed)
-
-**Plan:**
-- Phase 2-9: Build complete Vue web app
-- Phase 10: (optional) Evaluate React Native port
-- Deployment: Static HTML/CSS/JS deployable anywhere
+1. Matches the no-install, web-only deployment requirement
+2. Existing scaffold accelerates delivery
+3. Offline-first works with IndexedDB in Safari
+4. Keeps the architecture modular and TypeScript-first
 
 ---
 
@@ -560,7 +477,7 @@ interface StorageAdapter {
 
 #### SQLiteAdapter
 ```typescript
-// Node.js and Electron
+// Node.js CLI/demo
 const adapter = new SQLiteAdapter({ filePath: 'app.db' });
 await adapter.initialize('user-password');
 ```
@@ -896,13 +813,13 @@ export async function runMigrations(adapter: StorageAdapter) {
 - Plan for optional email service (Phase 10)
 - Fallback: teacher copies data manually
 
-### Risk 6: UI Framework Switch Later
-**Risk:** Invest in Vue, then need React Native for app.  
-**Impact:** LOW (can iterate on existing features)  
+### Risk 6: UI Scope Creep
+**Risk:** Pressure to introduce non-web UI targets (Electron/React Native/Flutter) despite constraints.  
+**Impact:** HIGH (breaks deployment model and modularity focus)  
 **Mitigation:**
-- Use case and domain logic independent of UI
-- Build shared "business logic" package
-- UI is replaceable (took ~4 weeks to build first time)
+- Enforce web-only guardrails in docs and reviews
+- Keep UI isolated in `apps/teacher-ui`
+- Reject non-web PRs unless constraints are formally changed
 
 ### Risk 7: WOW Online Dependency
 **Risk:** WOW feature requires online connection.  
@@ -935,27 +852,9 @@ npm run build:ui
 - Can run offline on any device
 - Deploy to private school network
 
-### Option B: Electron App (If Desktop Needed)
-```bash
-npm run build:electron
-# Outputs: teacher-app.dmg (macOS), teacher-app.exe (Windows)
-```
-
-**Advantages:**
-- Desktop app feel
-- Better file system access (for imports/exports)
-- Native installation
-
-### Option C: Native Mobile (Phase 10+)
-```bash
-npx react-native run-ios
-# Build iOS app from same codebase
-```
-
-**Advantages:**
-- App Store distribution
-- Native performance
-- Mobile-first UX
+### Non-Options (Out of Scope)
+Electron and native mobile apps are not part of the deployment model.
+All deployments must be static web assets.
 
 ### Version Management
 - Semantic versioning: MAJOR.MINOR.PATCH

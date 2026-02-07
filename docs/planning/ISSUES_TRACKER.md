@@ -13,10 +13,8 @@
 **Description:**
 Decide on UI framework and set up initial project structure.
 
-**Options to evaluate:**
-- [ ] Vue 3 (scaffold already exists, type-safe, lightweight)
-- [ ] React Native (broader mobile support, iOS/Android native)
-- [ ] Flutter (excellent iPad support, non-TypeScript)
+**Framework constraint:**
+Vue 3 only (web-first, static assets; no Electron/React Native/Flutter).
 
 **Acceptance Criteria:**
 - Framework chosen and justified

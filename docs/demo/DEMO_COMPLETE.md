@@ -168,10 +168,10 @@ You'll see:
 Now that the foundation is proven, you can:
 
 ### Option A: Build UI (Recommended)
-- Add React Native with Expo
+- Continue in `apps/teacher-ui` (Vue 3, static web)
 - Create navigation structure
-- Build class/student management screens
-- Wire to existing use cases
+- Build class/student management screens via `modules/sport` repositories/use-cases
+- Wire to existing use cases (no app-level repos)
 
 ### Option B: Expand Business Logic
 - Add LessonRepository

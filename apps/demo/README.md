@@ -184,6 +184,8 @@ Storage Layer (SQLite + Encryption)
     └── SQLiteStorage with migrations
 ```
 
+Student management is centralized in `modules/sport` (`StudentRepository`) and must not be reimplemented in apps or `packages/storage`.
+
 ## 📦 Packages Used
 
 - **@viccoboard/core** - Type definitions and interfaces
@@ -203,7 +205,7 @@ Storage Layer (SQLite + Encryption)
 
 Now that the foundation is proven, you can:
 
-1. **Add UI Framework** - React Native or Electron
+1. **Continue Web UI** - Build on `apps/teacher-ui` (Vue 3, static web)
 2. **Implement More Features** - From the 176 items in Plan.md
 3. **Add Testing** - Unit and integration tests
 4. **Create Plugins** - Assessment types, tools, exporters

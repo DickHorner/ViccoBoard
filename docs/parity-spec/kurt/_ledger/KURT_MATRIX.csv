@@ -1,0 +1,70 @@
+checkbox_id,section,text_short,priority,scope,implemented,location,tests
+6.9.1,Prüfungen anlegen,Prüfungen mit Unteraufgaben/Bausteinen,P0,in_scope_v2,no,N/A,N/A
+6.9.2,Prüfungen anlegen,Einfacher Modus (Standard),P0,in_scope_v2,no,N/A,N/A
+6.9.3,Prüfungen anlegen,Komplex: 3 Ebenen/Aufgabennoten,P1,in_scope_v2,no,N/A,N/A
+6.9.4,Prüfungen anlegen,Anzahl Unteraufgaben definierbar,P0,in_scope_v2,no,N/A,N/A
+6.9.5,Prüfungen anlegen,Kriterien formatieren (Fett),P1,in_scope_v2,no,N/A,N/A
+6.9.6,Prüfungen anlegen,Aufgabenkommentare/Fördertipps togglebar,P1,in_scope_v2,no,N/A,N/A
+6.9.7,Prüfungen anlegen,Prüfungsteile (Teilpunkte/Teilnoten),P1,in_scope_v2,no,N/A,N/A
+6.10.1,Notenschlüssel,Notenschlüssel schnell einsetzbar,P0,in_scope_v2,no,N/A,N/A
+6.10.2,Notenschlüssel,Notenschlüssel nachträglich änderbar,P0,in_scope_v2,no,N/A,N/A
+6.10.3,Notenschlüssel,Notengrenzen per Prozentwerten,P0,in_scope_v2,no,N/A,N/A
+6.10.4,Notenschlüssel,Punktegrenzen aus Prozent berechnen,P0,in_scope_v2,no,N/A,N/A
+6.10.5,Notenschlüssel,Noten-Presets auswählbar,P1,in_scope_v2,no,N/A,N/A
+6.10.6,Notenschlüssel,Finetuning (Rundungslogik),P1,in_scope_v2,no,N/A,N/A
+6.10.7,Notenschlüssel,Optional: Fehlerpunkte → Aufgabennote,P2,in_scope_v2,no,N/A,N/A
+6.11.1,Korrigieren,Kompakte Maske (Auto-Gesamtpunkte/Note),P0,in_scope_v2,no,N/A,N/A
+6.11.2,Korrigieren,Punkte bis nächste Notenstufe anzeigen,P1,in_scope_v2,no,N/A,N/A
+6.11.3,Korrigieren,Tab-Navigation in Punktefelder,P1,in_scope_v2,no,N/A,N/A
+6.11.4,Korrigieren,Aufgabenweise (Tabellenmodus + AWK),P0,in_scope_v2,no,N/A,N/A
+6.11.5,Korrigieren,Aufgabenkommentare erfassen + drucken,P0,in_scope_v2,no,N/A,N/A
+6.11.6,Korrigieren,Teilpunkte/Teilnoten auto berechnen,P1,in_scope_v2,no,N/A,N/A
+6.11.7,Korrigieren,Wahlaufgaben (z.B. 3a/3b),P1,in_scope_v2,no,N/A,N/A
+6.11.8,Korrigieren,Kommentarboxen pro Aufgabenebene,P1,in_scope_v2,no,N/A,N/A
+6.11.9,Korrigieren,Alternative Bepunktung (++/+/0/-/--),P2,in_scope_v2,no,N/A,N/A
+6.11.10,Korrigieren,Komplex: 3 Aufgabenebenen UI,P1,in_scope_v2,no,N/A,N/A
+6.11.11,Korrigieren,Schneller Prüflingswechsel,P1,in_scope_v2,no,N/A,N/A
+6.12.1,Fördertipps,Persönliche Fördertipps-DB,P0,in_scope_v2,no,N/A,N/A
+6.12.2,Fördertipps,Überblick: wem/wann/wo Tipps vergeben,P1,in_scope_v2,no,N/A,N/A
+6.12.3,Fördertipps,Titel/Kurzbeschreibung/Kategorien,P0,in_scope_v2,no,N/A,N/A
+6.12.4,Fördertipps,Bis zu 3 Links hinterlegen,P0,in_scope_v2,no,N/A,N/A
+6.12.5,Fördertipps,QR-Codes erzeugen,P1,in_scope_v2,no,N/A,N/A
+6.12.6,Fördertipps,In Korrekturmaske suchen/auswählen,P0,in_scope_v2,no,N/A,N/A
+6.12.7,Fördertipps,Gewichtung/Priorisierung,P1,in_scope_v2,no,N/A,N/A
+6.12.8,Fördertipps,Dropdown-Vorschau (Name/Beschr./Anzahl),P1,in_scope_v2,no,N/A,N/A
+6.12.9,Fördertipps,Pro Aufgabenebene aktivierbar,P1,in_scope_v2,no,N/A,N/A
+6.13.1,Auswertung,Schwierigkeitsanalyse (Aufgaben/Kriterien),P1,in_scope_v2,no,N/A,N/A
+6.13.2,Auswertung,Punkteänderungsassistent,P1,in_scope_v2,no,N/A,N/A
+6.13.3,Auswertung,Notenschlüssel nachträglich anpassen,P0,in_scope_v2,no,N/A,N/A
+6.13.4,Auswertung,Ergebnistabellen sortierbar,P1,in_scope_v2,no,N/A,N/A
+6.14.1,Langzeit,Schuljahres-Überblick Kompetenzen,P1,in_scope_v2,no,N/A,N/A
+6.14.2,Langzeit,Interne Notizen (Entwicklungen/Förder),P1,in_scope_v2,no,N/A,N/A
+6.14.3,Langzeit,Pro Prüfling Überblick (Kommentare/Tipps),P1,in_scope_v2,no,N/A,N/A
+6.15.1,Kommentare,Aufgabenbezogene/allgemeine Kommentare,P0,in_scope_v2,no,N/A,N/A
+6.15.2,Kommentare,Kommentare nach Rückgabe verfügbar,P0,in_scope_v2,no,N/A,N/A
+6.15.3,Kommentare,Kommentare anderer SuS wiederverwenden,P1,in_scope_v2,no,N/A,N/A
+6.16.1,PDF Export,PDF-Rückmeldebögen (umfassend),P0,in_scope_v2,no,N/A,N/A
+6.16.2,PDF Export,Alle PDFs mit einem Klick,P1,in_scope_v2,no,N/A,N/A
+6.16.3,PDF Export,4 Drucklayouts,P1,in_scope_v2,no,N/A,N/A
+6.16.4,PDF Export,Headerbereich/Presets anpassbar,P1,in_scope_v2,no,N/A,N/A
+6.16.5,PDF Export,Kriterien formatiert drucken + Prozent,P1,in_scope_v2,no,N/A,N/A
+6.16.6,PDF Export,Punktabzüge toggle,P2,in_scope_v2,no,N/A,N/A
+6.16.7,PDF Export,Unterschrift (Bild/malen/leer),P1,in_scope_v2,no,N/A,N/A
+6.17.1,Besondere Leistungen,Während Korrektur markieren,P2,in_scope_v2,no,N/A,N/A
+6.17.2,Besondere Leistungen,Übersicht nach Aufgabe/Kategorie,P2,in_scope_v2,no,N/A,N/A
+6.17.3,Besondere Leistungen,Anonymisierung (Namen ausblendbar),P2,in_scope_v2,no,N/A,N/A
+6.18.1,E-Mail,Ergebnisse per E-Mail versenden,P1,in_scope_v2,no,N/A,N/A
+6.18.2,E-Mail,Platzhalter automatisch befüllen,P1,in_scope_v2,no,N/A,N/A
+6.19.1,Gruppenkorrektur,Splitscreenmodus (Referate/mündlich),P2,in_scope_v2,no,N/A,N/A
+6.19.2,Gruppenkorrektur,Vollbildmodus (bis 4 Prüflinge),P2,in_scope_v2,no,N/A,N/A
+6.19.3,Gruppenkorrektur,Thema für Referate festlegen,P2,in_scope_v2,no,N/A,N/A
+6.20.1,Zusammenarbeit,Lerngruppen aus WebUntis importieren,P2,in_scope_v2,no,N/A,N/A
+6.20.2,Zusammenarbeit,Notenspiegel kopieren (Notenapp),P2,in_scope_v2,no,N/A,N/A
+6.20.3,Zusammenarbeit,Prüfungsentwürfe teilen,P2,in_scope_v2,no,N/A,N/A
+6.20.4,Zusammenarbeit,Notenspalte kopieren (Excel),P2,in_scope_v2,no,N/A,N/A
+6.21.1,Bewertungsformate,Mappen/Portfolios/Referate/Tests/etc.,P1,in_scope_v2,no,N/A,N/A
+6.22.1,Oberstufe EWH,Aufgabenaspekte/Unterkriterien feiner,P1,in_scope_v2,no,N/A,N/A
+6.22.2,Oberstufe EWH,Kriterien formatierbar,P1,in_scope_v2,no,N/A,N/A
+6.22.3,Oberstufe EWH,Copy & Paste aus Word (Formatierung),P2,in_scope_v2,no,N/A,N/A
+6.22.4,Oberstufe EWH,Alternative Blanko-EWH-Workflow,P2,in_scope_v2,no,N/A,N/A
+6.22.5,Oberstufe EWH,0-15 Punkte/Wahlaufgaben/Teilkriterien,P1,in_scope_v2,no,N/A,N/A
