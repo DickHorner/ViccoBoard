@@ -184,13 +184,14 @@ Storage Layer (SQLite + Encryption)
     └── SQLiteStorage with migrations
 ```
 
-Student management is centralized in `modules/sport` (`StudentRepository`) and must not be reimplemented in apps or `packages/storage`.
+Student management is centralized in `modules/students` (`StudentRepository`) and must not be reimplemented in apps or `packages/storage`.
 
 ## 📦 Packages Used
 
 - **@viccoboard/core** - Type definitions and interfaces
 - **@viccoboard/storage** - Encrypted SQLite storage
 - **@viccoboard/sport** - SportZens domain logic
+- **@viccoboard/students** - Central student management
 
 ## ✅ What This Proves
 
@@ -225,6 +226,7 @@ npm run build
 # Check TypeScript compilation
 cd packages/core && npm run build
 cd packages/storage && npm run build
+cd modules/students && npm run build
 cd modules/sport && npm run build
 cd apps/demo && npm run build
 ```
@@ -232,15 +234,20 @@ cd apps/demo && npm run build
 ## 📝 Files Created
 
 ```
+modules/students/
+├── src/
+│   ├── repositories/
+│   │   └── student.repository.ts
+│   └── use-cases/
+│       └── add-student.use-case.ts
+
 modules/sport/
 ├── src/
 │   ├── repositories/
 │   │   ├── class-group.repository.ts
-│   │   ├── student.repository.ts
 │   │   └── attendance.repository.ts
 │   ├── use-cases/
 │   │   ├── create-class.use-case.ts
-│   │   ├── add-student.use-case.ts
 │   │   └── record-attendance.use-case.ts
 │   └── index.ts
 ├── package.json

@@ -18,7 +18,7 @@ Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle F
 9. **Privacy by default:** Keine Telemetrie/Tracki
 10. **Safari-Kompatibilität ist Pflicht:** Keine Nutzung von nicht unterstützten APIs (z. B. `showOpenFilePicker`/`showSaveFilePicker`, File System Access API). Wenn eine neue Browser-API eingesetzt wird, muss die iPadOS-Unterstützung dokumentiert sein.
 ng ohne expliziten Plan-Abschnitt + Opt-in.
-11. **Zentralisierte Schülerverwaltung:** `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/sport`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Sport-Modul/Bridge zu.
+11. **Zentralisierte Schülerverwaltung:** `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/students`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Students-Modul/Bridge zu.
 
 ---
 
@@ -26,6 +26,7 @@ ng ohne expliziten Plan-Abschnitt + Opt-in.
 ## 2) Empfohlene Repo-Struktur (stack-agnostisch)
 - `packages/core/` — Domain-Modelle, Use-Cases, Interfaces, Migrationen, Crypto-Abstraktionen
 - `packages/plugins/` — Plugin-Registry + Contracts (`AssessmentType`, `ToolPlugin`, `Exporter`, `Integration`)
+- `modules/students/` — Zentrale Schülerverwaltung (Quelle der Wahrheit)
 - `modules/sport/` — SportZens-Domäne (Klassen/Stunden/Tools/WOW)
 - `modules/exams/` — KURT-Domäne (Prüfungen/Korrektur/Fördertipps)
 - `modules/export/` — PDF/CSV/Share-Packages/E-Mail

@@ -399,4 +399,10 @@ Damit wir nichts erfinden, aber trotzdem 100% implementieren können, brauchen d
 1. **Verbalbeurteilungen**: Felder/Skalen/Exportformat (SportZens nennt es als Funktionspunkt, Details fehlen).
 2. **Turnierplanung/Scoreboard**: genaue Turnierformate, Regeln, Spielplan-Algorithmen (SportZens nennt den Funktionspunkt, Details sind knapp).
 3. **WebUntis-Import**: gewünschter Importweg (CSV-Export vs API) und Feld-Mapping.
-4. **E-Mail-Versand**: Welche Platzhalter genau? (KURT sagt „Platzhalter automatisch korrekt befüllt“, ohne Liste).
+4. **E-Mail-Versand**: Welche Platzhalter genau? (KURT sagt „Platzhalter automatisch korrekt befüllt“, ohne Liste).5. **[CRITICAL] Storage Architecture Migration (Phase 4)**: teacher-ui currently uses custom Dexie (IndexedDB) instance directly, violating modular boundaries. Must be refactored to:
+   - Use `@viccoboard/storage` package's `IndexedDBStorage` instead of custom Dexie
+   - Access domain repositories through proper bridges (see `modules/sport/src/repositories/` and `modules/students/src/repositories/`)
+   - Remove all inline repository logic from `apps/teacher-ui/src/composables/useDatabase.ts`
+   - Ensure UI has NO direct DB access; all data flows through module boundaries
+   - Migration strategy for existing Dexie data → IndexedDBStorage schema
+   - See: `agents.md` Rule 11 (centralized student management), Rule 2 (modularität)

@@ -5,7 +5,7 @@
 - **Web-only deployment:** static assets, iPadOS Safari target. No Electron, no React Native, no Flutter.
 - **Local-first:** offline by default; no runtime servers.
 - **Modularity:** domain logic in `modules/*`, interfaces in `packages/core`, storage adapters in `packages/storage`.
-- **Centralized student management:** `Student`/`StudentRepository` live in `modules/sport`. No app-level or storage-level student repos/stores.
+- **Centralized student management:** `Student`/`StudentRepository` live in `modules/students`. No app-level or storage-level student repos/stores.
 
 ## Getting Started
 
@@ -65,6 +65,7 @@ ViccoBoard/
 ├── modules/              # Domain modules
 │   ├── sport/           # SportZens functionality
 │   ├── exams/           # KURT functionality
+│   ├── students/        # Central student management
 │   ├── export/          # PDF/CSV exports
 │   └── integrations/    # External integrations
 ├── apps/                 # Applications

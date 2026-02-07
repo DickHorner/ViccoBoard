@@ -7,7 +7,7 @@ B) KURT: Am Ende vollständig implementiert, d. h. alle KURT-Checkboxen aus Plan
 HARD-CONSTRAINTS (nicht verhandelbar):
 - Kein Feature/keine Option still weglassen oder vereinfachen. Wenn Spezifikation fehlt: in Plan.md §9 als TBD dokumentieren und Feature als „sichtbar, aber blockiert“ ausweisen (klarer Fehlertext), niemals still auslassen :contentReference[oaicite:3]{index=3}.
 - Modularität erzwingen: Core nur Interfaces/Policies; Implementierung in Modulen/Plugins (Clean Architecture).
-- Zentralisierte Schülerverwaltung: `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/sport`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über Sport-Modul/Bridge zu.
+- Zentralisierte Schülerverwaltung: `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/students`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Students-Modul/Bridge zu.
 - Zielplattform iPadOS Safari (WebKit): keine File System Access API; Export via Download, Import via <input type="file"> :contentReference[oaicite:4]{index=4}.
 - Offline-first: Kernflows offline nutzbar; Online nur optional/Feature-Flag (standardmäßig aus) :contentReference[oaicite:5]{index=5}.
 - Traceability: Jede Änderung ist auf Plan.md Checkboxen und/oder Parity-Ledger referenzierbar :contentReference[oaicite:6]{index=6}.

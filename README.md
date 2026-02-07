@@ -20,6 +20,7 @@ ViccoBoard/
 ├── modules/          # Domain modules
 │   ├── sport/        # SportZens functionality
 │   ├── exams/        # KURT functionality
+│   ├── students/     # Central student management
 │   ├── export/       # PDF/CSV/Email exports
 │   └── integrations/ # WebUntis, grade apps, sharing
 └── apps/             # Applications

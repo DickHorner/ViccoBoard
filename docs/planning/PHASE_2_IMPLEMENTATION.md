@@ -221,7 +221,7 @@ async function createClass(name: string) {
 5. Quick link to attendance entry
 
 **Implementation:**
-Note: `studentRepository` is provided by the Sport module bridge. Do not create app-level student stores or repositories.
+Note: `studentRepository` is provided by the Students module bridge. Do not create app-level student stores or repositories.
 ```vue
 <script setup lang="ts">
 const route = useRoute();

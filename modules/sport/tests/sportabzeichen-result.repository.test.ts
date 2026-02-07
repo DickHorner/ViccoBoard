@@ -6,7 +6,7 @@ import {
 } from '@viccoboard/storage';
 import { SportabzeichenResultRepository } from '../src/repositories/sportabzeichen-result.repository';
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
-import { StudentRepository } from '../src/repositories/student.repository';
+import { StudentRepository } from '@viccoboard/students';
 
 describe('SportabzeichenResultRepository', () => {
   let storage: SQLiteStorage;

@@ -100,7 +100,7 @@ Complete implementation of SportZens core functionality:
 - **ClassGroupRepository** - Class/course management with queries
 - **StudentRepository** - Student profiles with search capabilities
 - **AttendanceRepository** - Attendance tracking with statistics
-Student management is centralized in `modules/sport` (no app-level or storage-level student repos).
+Student management is centralized in `modules/students` (no app-level or storage-level student repos).
 
 #### Use Cases (Business Logic Layer)
 - **CreateClassUseCase** - Class creation with validation

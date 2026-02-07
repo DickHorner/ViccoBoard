@@ -4,6 +4,9 @@
     "module": "ES2020",
     "lib": ["ES2020"],
     "declaration": true,
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -11,12 +14,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler"
   },
-  "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/plugins" },
-    { "path": "./packages/storage" },
-    { "path": "./modules/students" },
-    { "path": "./modules/sport" },
-    { "path": "./modules/exams" }
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

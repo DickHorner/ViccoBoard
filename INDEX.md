@@ -37,7 +37,7 @@
 ## Guardrails (Quick Reminder)
 - Web-only deployment (iPadOS Safari). No Electron/React Native/Flutter.
 - Domain logic stays in `modules/*`; interfaces in `packages/core`.
-- Student management is centralized in `modules/sport` (no app-level repos).
+- Student management is centralized in `modules/students` (no app-level repos).
 
 ---
 

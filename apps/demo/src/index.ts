@@ -14,10 +14,12 @@ import {
   ClassGroupRepository,
   AttendanceRepository,
   CreateClassUseCase,
-  AddStudentUseCase,
-  RecordAttendanceUseCase,
-  StudentRepository
+  RecordAttendanceUseCase
 } from '@viccoboard/sport';
+import {
+  AddStudentUseCase,
+  StudentRepository
+} from '@viccoboard/students';
 import { AttendanceStatus } from '@viccoboard/core';
 import * as fs from 'fs';
 import * as path from 'path';

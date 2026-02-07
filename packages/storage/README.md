@@ -61,12 +61,12 @@ const token = await cryptoService.generateToken(32);
 ### Using Domain Repositories (Preferred)
 
 Student management and other domain repositories live in their respective modules
-(e.g., `@viccoboard/sport`). The storage package provides adapters and base
+(e.g., `@viccoboard/students`). The storage package provides adapters and base
 infrastructure only.
 
 ```typescript
 import { SQLiteStorage } from '@viccoboard/storage';
-import { StudentRepository } from '@viccoboard/sport';
+import { StudentRepository } from '@viccoboard/students';
 
 const storage = new SQLiteStorage({ databasePath: './data/viccoboard.db' });
 await storage.initialize('your-secure-password');

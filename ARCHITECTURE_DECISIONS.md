@@ -645,11 +645,11 @@ expect(created.id).toBeDefined();
 // test: CreateClass → AddStudent → RecordAttendance workflow
 const storage = await createTestStorage();
 const classRepo = new ClassGroupRepository(storage.adapter);
-const studentRepo = new StudentRepository(storage.adapter);
+const studentRepo = new StudentRepository(storage.adapter); // from @viccoboard/students
 const attendanceRepo = new AttendanceRepository(storage.adapter);
 
 const classGroup = await new CreateClassUseCase(classRepo).execute({ name: 'Class 10a' });
-const student = await new AddStudentUseCase(studentRepo).execute({ ... });
+const student = await new AddStudentUseCase(studentRepo, classRepo).execute({ ... });
 const record = await new RecordAttendanceUseCase(attendanceRepo).execute({ ... });
 
 expect(record.class_id).toBe(classGroup.id);

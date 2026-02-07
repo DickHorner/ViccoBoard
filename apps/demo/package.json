@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@viccoboard/core": "*",
+    "@viccoboard/students": "*",
     "@viccoboard/sport": "*",
     "@viccoboard/storage": "*"
   },

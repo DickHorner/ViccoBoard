@@ -5,7 +5,7 @@
 import { RecordGradeUseCase } from '../src/use-cases/record-grade.use-case';
 import { PerformanceEntryRepository } from '../src/repositories/performance-entry.repository';
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
-import { StudentRepository } from '../src/repositories/student.repository';
+import { StudentRepository } from '@viccoboard/students';
 import { GradeCategoryRepository } from '../src/repositories/grade-category.repository';
 import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage';
 import { Sport } from '@viccoboard/core';

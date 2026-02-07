@@ -71,11 +71,11 @@ function checkFile(filePath) {
     }
 
     if (/student (store|repository)/i.test(line) && appContext.test(line)) {
-      if (!/modules\/sport|sport module|centralized/i.test(line)) {
+      if (!/modules\/students|students module|centralized/i.test(line)) {
         issues.push({
           filePath,
           line: index + 1,
-          message: 'Student management must stay centralized in modules/sport; avoid app-level stores/repos.'
+          message: 'Student management must stay centralized in modules/students; avoid app-level stores/repos.'
         });
       }
     }

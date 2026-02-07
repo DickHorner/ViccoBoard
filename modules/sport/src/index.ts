@@ -5,7 +5,6 @@
 
 // Repositories
 export { ClassGroupRepository } from './repositories/class-group.repository.js';
-export { StudentRepository } from './repositories/student.repository.js';
 export { AttendanceRepository } from './repositories/attendance.repository.js';
 export { GradeSchemeRepository } from './repositories/grade-scheme.repository.js';
 export { GradeCategoryRepository } from './repositories/grade-category.repository.js';
@@ -16,9 +15,6 @@ export { SportabzeichenResultRepository } from './repositories/sportabzeichen-re
 // Use Cases
 export { CreateClassUseCase } from './use-cases/create-class.use-case.js';
 export type { CreateClassInput } from './use-cases/create-class.use-case.js';
-
-export { AddStudentUseCase } from './use-cases/add-student.use-case.js';
-export type { AddStudentInput } from './use-cases/add-student.use-case.js';
 
 export { RecordAttendanceUseCase } from './use-cases/record-attendance.use-case.js';
 export type { RecordAttendanceInput } from './use-cases/record-attendance.use-case.js';

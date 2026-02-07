@@ -11,7 +11,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build:all",
-    "build:packages": "npm run build --workspace=@viccoboard/core --workspace=@viccoboard/plugins --workspace=@viccoboard/storage --workspace=@viccoboard/exams --workspace=@viccoboard/sport",
+    "build:packages": "npm run build --workspace=@viccoboard/core --workspace=@viccoboard/plugins --workspace=@viccoboard/storage --workspace=@viccoboard/students --workspace=@viccoboard/exams --workspace=@viccoboard/sport",
     "build:all": "npm run build:packages && npm run build --workspace=@viccoboard/demo --workspace=teacher-ui",
     "build:ipad": "npm run build:packages && npm run build --workspace=teacher-ui",
     "demo": "npm run build:packages && cd apps/demo && npm run dev",

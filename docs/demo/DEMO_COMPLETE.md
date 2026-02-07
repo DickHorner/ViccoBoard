@@ -83,6 +83,7 @@ Build scripts:
 cd packages/core && npm install && cd ../..
 cd packages/plugins && npm install && cd ../..
 cd packages/storage && npm install && cd ../..
+cd modules/students && npm install && cd ../..
 cd modules/sport && npm install && cd ../..
 cd apps/demo && npm install && cd ../..
 
@@ -90,6 +91,7 @@ cd apps/demo && npm install && cd ../..
 cd packages/core && npm run build && cd ../..
 cd packages/plugins && npm run build && cd ../..
 cd packages/storage && npm run build && cd ../..
+cd modules/students && npm run build && cd ../..
 cd modules/sport && npm run build && cd ../..
 cd apps/demo && npm run build && cd ../..
 
@@ -170,7 +172,7 @@ Now that the foundation is proven, you can:
 ### Option A: Build UI (Recommended)
 - Continue in `apps/teacher-ui` (Vue 3, static web)
 - Create navigation structure
-- Build class/student management screens via `modules/sport` repositories/use-cases
+- Build class management via `modules/sport` and student management via `modules/students` repositories/use-cases
 - Wire to existing use cases (no app-level repos)
 
 ### Option B: Expand Business Logic
