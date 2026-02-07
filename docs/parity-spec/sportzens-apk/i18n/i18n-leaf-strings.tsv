@@ -1,0 +1,1620 @@
+key	de	en	status
+ABSENCES.save	Speichern		MISSING_IN_EN
+ABSENCES.title	Anwesenheit		MISSING_IN_EN
+ALERT.attention	Achtung!		MISSING_IN_EN
+ALERT.cancel	Abbrechen		MISSING_IN_EN
+ALERT.check-email	Bitte überprüfe deine Email		MISSING_IN_EN
+ALERT.confirm-email	Bitte bestätige deine Email-Adresse		MISSING_IN_EN
+ALERT.delete	Löschen		MISSING_IN_EN
+ALERT.failed	Da ging leider etwas schief.		MISSING_IN_EN
+ALERT.insert-email	Bitte gib deine Email-Adresse ein:		MISSING_IN_EN
+ALERT.new-version	Update verfügbar. Neu laden, um die neueste Version zu erhalten?		MISSING_IN_EN
+ALERT.receive-new-password	Neues Passwort erhalten		MISSING_IN_EN
+ALERT.reset-password	Passwort zurücksetzen		MISSING_IN_EN
+ALERT.signup-failed	Registrierung fehlgeschlagen		MISSING_IN_EN
+ALERT.signup-success	Registrierung erfolgreich		MISSING_IN_EN
+ALERT.success	Hervorragend!		MISSING_IN_EN
+ANALYTICS.attendance	Anwesenheit	Attendance	OK
+ANALYTICS.attendance-absent	Abwesend	Absent	OK
+ANALYTICS.attendance-passive	Passiv anwesend	Passive present	OK
+ANALYTICS.attendance-present	Anwesend	Present	OK
+ANALYTICS.avg-grade	Durchschnittsnote	Average grade	OK
+ANALYTICS.avg-team-size	Ø Teamgröße	Avg. team size	OK
+ANALYTICS.by-class	Nach Klasse	By class	OK
+ANALYTICS.note-beta	Dieses Dashboard ist in Beta und wird erweitert.	This dashboard is in beta and will be expanded.	OK
+ANALYTICS.team-sets	Team-Sets	Team sets	OK
+ANALYTICS.teams	Teams	Teams	OK
+ANALYTICS.total-classes	Klassen	Classes	OK
+ANALYTICS.total-grades	Noten	Grades	OK
+ANALYTICS.total-lessons	Stunden	Lessons	OK
+ANALYTICS.total-students	Schüler	Students	OK
+ANALYTICS.total-teams	Gesamt Teams	Total teams	OK
+ANALYTICS.total-wow-results	WOW-Ergebnisse	WOW results	OK
+ANALYTICS.total-wows	Anzahl WOWs	Total WOWs	OK
+ANALYTICS.upgrade-text	Bitte upgrade auf Pro oder Supporter in den Einstellungen, um alle Analysen freizuschalten.	Please upgrade to Pro or Supporter in Settings to unlock full analytics.	OK
+ANALYTICS.upgrade-title	Analytics sind im Free-Account deaktiviert	Analytics are disabled on Free	OK
+ANALYTICS.wow-completion	WOW Abschlussquote	WOW completion rate	OK
+ANALYTICS.wows	WOWs	WOWs	OK
+ANWESENHEIT.absent	abwesend		MISSING_IN_EN
+ANWESENHEIT.absents	abwesend		MISSING_IN_EN
+ANWESENHEIT.active	aktiv		MISSING_IN_EN
+ANWESENHEIT.active-present	aktiv anwesend		MISSING_IN_EN
+ANWESENHEIT.anwesend		present	EXTRA_IN_EN
+ANWESENHEIT.attest		medical certificate	EXTRA_IN_EN
+ANWESENHEIT.date	Datum		MISSING_IN_EN
+ANWESENHEIT.forgot_sportswear	Sportsachen vergessen		MISSING_IN_EN
+ANWESENHEIT.grund		Reason	EXTRA_IN_EN
+ANWESENHEIT.krank		ill	EXTRA_IN_EN
+ANWESENHEIT.late	Verspätung		MISSING_IN_EN
+ANWESENHEIT.liste	Anwesenheitsliste vom	List of presence from	OK
+ANWESENHEIT.medical_certificate	ärztliches Attest		MISSING_IN_EN
+ANWESENHEIT.menstruation	Menstruation	menstruation	OK
+ANWESENHEIT.minuten		minutes	EXTRA_IN_EN
+ANWESENHEIT.minutes	Min.		MISSING_IN_EN
+ANWESENHEIT.notes	Bemerkungen		MISSING_IN_EN
+ANWESENHEIT.other	Sonstiges		MISSING_IN_EN
+ANWESENHEIT.passiv		passive	EXTRA_IN_EN
+ANWESENHEIT.passive	passiv		MISSING_IN_EN
+ANWESENHEIT.passive-present	passiv anwesend		MISSING_IN_EN
+ANWESENHEIT.present	anwesend		MISSING_IN_EN
+ANWESENHEIT.presents	anwesend		MISSING_IN_EN
+ANWESENHEIT.reason	Grund		MISSING_IN_EN
+ANWESENHEIT.selbst	selbst entschuldigt	self-excused	OK
+ANWESENHEIT.sick	krank		MISSING_IN_EN
+ANWESENHEIT.sonstiges		others	EXTRA_IN_EN
+ANWESENHEIT.status	Status		MISSING_IN_EN
+ANWESENHEIT.unentschuldigt		unexcused	EXTRA_IN_EN
+ANWESENHEIT.unexcused	unentschuldigt		MISSING_IN_EN
+ANWESENHEIT.vergessen		no sport stuff	EXTRA_IN_EN
+ANWESENHEIT.verspaetet	verspätet	too late	OK
+ANWESENHEIT.von	von	of	OK
+BACK	Zurück	Back	OK
+BEMERKUNGEN	Bemerkungen	comments	OK
+BEWERTUNGSHILFE.beurteilung	Beurteilungstendenzen	Assessment tendencies	OK
+BEWERTUNGSHILFE.beurteilung-text	Lehrer beurteilen verschieden streng, aber lassen sich durch persönliche Tendenzen zu Fehleinschätzungen leiten. Es gibt jene, die zu streng oder zu milde bewerten, jedoch auch einige die Extremnoten vermeiden und eine Tendenz zu einem Notenmittelmaß suchen.	Teachers have varying degrees of rigor, but personal tendencies can lead to misjudgements. There are those who judge too harshly or too leniently, but there are also some who avoid extreme grades and seek a tendency towards a grade average.	OK
+BEWERTUNGSHILFE.bewertungshilfen	Bewertungshilfen	Evaluation tools	OK
+BEWERTUNGSHILFE.halo	Halo-Effekt	Halo effect	OK
+BEWERTUNGSHILFE.halo-text	Beim Halo-Effekt werden Teilleistungen der Schüler aufgrund eines allgemeinen Eindrucks (Auftreten, Kleidung, Sprache etc.) beurteilt. Schüler die einen guten Eindruck hinterlassen bekommen demnach eine bessere Bewertung als diejenigen,welche einen schlechten Eindruck hinterlassen, obwohl dieser nicht im Zusammenhang mit der erbrachten Leistung steht.	In the Halo effect, students' partial achievements are assessed based on a general impression (appearance, clothing, language, etc.). Students who make a good impression are therefore given a better score than those who make a bad impression, even though it is not related to the performance.	OK
+BEWERTUNGSHILFE.intro1	Bewertungsfehler sind nahezu unumgänglich, doch das wissen um sie kann zumindest dabei helfen sie so gering als möglich zu halten!	Evaluation errors are almost unavoidable, but knowing them can at least help to keep them as small as possible!	OK
+BEWERTUNGSHILFE.intro2	Daher hier noch einmal die Wichtigsten:	Therefore here once again the most important ones:	OK
+BEWERTUNGSHILFE.logisch	Logische Fehler	Logical errors	OK
+BEWERTUNGSHILFE.logisch-text	Der Lehrer versucht ausgehend von einem Merkmal auf andere zu schließen. Allerdings ist beispielsweise ein guter Handballer nicht automatisch ein guter Turner.	The teacher tries to deduce from one characteristic to another. However, a good handball player is not automatically a good gymnast.	OK
+BEWERTUNGSHILFE.perseveration	Perseveration		MISSING_IN_EN
+BEWERTUNGSHILFE.perseveration-text	Der Lehrer hält starr ein einem einmal gefälltem Urteil fest (z.B. Note).		MISSING_IN_EN
+BEWERTUNGSHILFE.projektion	Projektionsfehler	Projection errors	OK
+BEWERTUNGSHILFE.projektion-text	Ein Lehrer überträgt eigene Wünsche, Motive, Fehler und Problemeauf die Schüler und glaubt sie an ihnen wahrzunehmen.	A teacher transfers own wishes, motives, mistakes and problems to the students and believes to perceive them.	OK
+BEWERTUNGSHILFE.reihung	Reihungseffekt	Ranking effect	OK
+BEWERTUNGSHILFE.reihung-text	Ein Reihungseffekt ergibt sich aus vorangegangenen Bewertungen. Korrigiert ein Lehrer eine schlechte Arbeit nach einer sehr guten Arbeit, so kommt ihm diese aufgrund des Kontrasteffekts wesentlich schlechter vor. Auch widerstrebt es dem Lehrer mehrere unmittelbar aufeinanderfolgende Leistungen mit ‚sehr gut‘ zu beurteilen, da dies in der Regel selten vorkommt.	A ranking effect results from previous evaluations. If a teacher corrects a bad work after a very good work, the work will appear much worse due to the contrast effect. The teacher is also reluctant to give a 'very good' mark to several immediately consecutive pieces of work, as this is usually rare.	OK
+BEWERTUNGSHILFE.wissen	‚Wissen-um-die-Folgen-Fehler‘	‚Know-the-consequences-errors‘	OK
+BEWERTUNGSHILFE.wissen-text	Die Beurteilung des Lehrers fällt milder aus, da er sich bewusst ist, dass von seinem Urteil die Zukunft des Schülers (z.B. Versetzung) abhängig ist.	The teacher's assessment is milder because he is aware that the student's future (e.g. transfer) depends on his judgment.	OK
+BUNDESJUGENDSPIELE.ausdauer	Ausdauer		MISSING_IN_EN
+BUNDESJUGENDSPIELE.disziplinen-einzeln	Disziplinen einzeln		MISSING_IN_EN
+BUNDESJUGENDSPIELE.ehrenurkunde	Ehrenurkunde		MISSING_IN_EN
+BUNDESJUGENDSPIELE.info-titel	Infos zu den Bundesjugendspielen		MISSING_IN_EN
+BUNDESJUGENDSPIELE.info1	Jede Schülerin und jeder Schüler tritt bei den Bundesjugendspielen in vier Disziplinen an und bekommt für seine Leistungen Punkte.		MISSING_IN_EN
+BUNDESJUGENDSPIELE.info2	Diese Punkte werden zu einer Gesamtpunktzahl aufaddiert, die dann zu einer Teilnahme-, Siger- oder sogar Ehrenurkunde führt.		MISSING_IN_EN
+BUNDESJUGENDSPIELE.link	Nähere Infos unter www.bundesjugendspiele.de		MISSING_IN_EN
+BUNDESJUGENDSPIELE.punkte	Punkte		MISSING_IN_EN
+BUNDESJUGENDSPIELE.siegerurkunde	Siegerurkunde		MISSING_IN_EN
+BUNDESJUGENDSPIELE.sprint	Sprint		MISSING_IN_EN
+BUNDESJUGENDSPIELE.sprung	Sprung		MISSING_IN_EN
+BUNDESJUGENDSPIELE.teilnahmeurkunde	Teilnahmeurkunde		MISSING_IN_EN
+BUNDESJUGENDSPIELE.wurf	Wurf/Stoß		MISSING_IN_EN
+CALENDAR.add-event	Ereignis hinzufügen		MISSING_IN_EN
+CALENDAR.all-day	Ganztägig		MISSING_IN_EN
+CALENDAR.calendar	Kalender		MISSING_IN_EN
+CALENDAR.cancel	Abbrechen		MISSING_IN_EN
+CALENDAR.day	Tag		MISSING_IN_EN
+CALENDAR.delete	Löschen		MISSING_IN_EN
+CALENDAR.description	Beschreibung		MISSING_IN_EN
+CALENDAR.edit-event	Ereignis bearbeiten		MISSING_IN_EN
+CALENDAR.end	Ende		MISSING_IN_EN
+CALENDAR.lesson	Stunde		MISSING_IN_EN
+CALENDAR.list-month	Liste (Monat)		MISSING_IN_EN
+CALENDAR.list-week	Liste (Woche)		MISSING_IN_EN
+CALENDAR.list-year	Liste (Jahr)		MISSING_IN_EN
+CALENDAR.month	Monat		MISSING_IN_EN
+CALENDAR.save	Speichern		MISSING_IN_EN
+CALENDAR.show-lessons	Stunden anzeigen		MISSING_IN_EN
+CALENDAR.start	Start		MISSING_IN_EN
+CALENDAR.title	Titel		MISSING_IN_EN
+CALENDAR.view	Ansicht		MISSING_IN_EN
+CALENDAR.week	Woche		MISSING_IN_EN
+CANCEL	Abbrechen	Cancel	OK
+CATEGORIES.add-category	Notenkategorie hinzufügen		MISSING_IN_EN
+CATEGORIES.add-main-category	Oberkategorie hinzufügen		MISSING_IN_EN
+CATEGORIES.cooper	Cooper-Test		MISSING_IN_EN
+CATEGORIES.criteria	Kriterium		MISSING_IN_EN
+CATEGORIES.criteria-name	Kriteriumsname		MISSING_IN_EN
+CATEGORIES.criteria-weight	Einzelgewichtung		MISSING_IN_EN
+CATEGORIES.criterias	Kriterien		MISSING_IN_EN
+CATEGORIES.delete-category	Notenkategorie löschen		MISSING_IN_EN
+CATEGORIES.delete-main-category	Oberkategorie löschen		MISSING_IN_EN
+CATEGORIES.edit-category	Notenkategorie bearbeiten		MISSING_IN_EN
+CATEGORIES.edit-main-category	Oberkategorie bearbeiten		MISSING_IN_EN
+CATEGORIES.gender-split	Geschlechtertrennung		MISSING_IN_EN
+CATEGORIES.grading-table	Notentabelle		MISSING_IN_EN
+CATEGORIES.grading-table-description-multistop	Wähle die Notentabelle, die für die Bewertung der gemessenen Zeiten verwendet werden soll.		MISSING_IN_EN
+CATEGORIES.main-category	Oberkategorie		MISSING_IN_EN
+CATEGORIES.max-points	Maximalpunktzahl		MISSING_IN_EN
+CATEGORIES.max-value	Maximalwert		MISSING_IN_EN
+CATEGORIES.middle-distance	Mittelstrecke		MISSING_IN_EN
+CATEGORIES.name	Name		MISSING_IN_EN
+CATEGORIES.number-of-criterias	Anzahl an Kriterien		MISSING_IN_EN
+CATEGORIES.select-grading-table	Notentabelle auswählen		MISSING_IN_EN
+CATEGORIES.shuttle	Shuttle-Run		MISSING_IN_EN
+CATEGORIES.table	Tabelle		MISSING_IN_EN
+CATEGORIES.time	Zeit		MISSING_IN_EN
+CATEGORIES.title	Notenkategorien		MISSING_IN_EN
+CATEGORIES.type	Typ		MISSING_IN_EN
+CATEGORIES.type-cooper	Cooper-Test		MISSING_IN_EN
+CATEGORIES.type-criteria	nach Kriterien		MISSING_IN_EN
+CATEGORIES.type-king	Kaiserturnier		MISSING_IN_EN
+CATEGORIES.type-middle-distance	Mittelstrecke		MISSING_IN_EN
+CATEGORIES.type-multistop	Multistop		MISSING_IN_EN
+CATEGORIES.type-relativ	Relativleistung		MISSING_IN_EN
+CATEGORIES.type-shuttle	Shuttle-Run		MISSING_IN_EN
+CATEGORIES.type-sportabzeichen	Sportabzeichen		MISSING_IN_EN
+CATEGORIES.type-table	nach Tabelle		MISSING_IN_EN
+CATEGORIES.type-time	nach Zeit		MISSING_IN_EN
+CATEGORIES.type-verbal	Verbalbeurteilung		MISSING_IN_EN
+CATEGORIES.weight	Gewichtung		MISSING_IN_EN
+CLASSES.access_list	Zugriff verwalten		MISSING_IN_EN
+CLASSES.add	Klasse hinzufügen		MISSING_IN_EN
+CLASSES.class	Klasse		MISSING_IN_EN
+CLASSES.delete	Klasse löschen		MISSING_IN_EN
+CLASSES.edit	Klasse bearbeiten		MISSING_IN_EN
+CLASSES.general	Allgemein		MISSING_IN_EN
+CLASSES.generate-lessons	Stunden anlegen		MISSING_IN_EN
+CLASSES.grade-scheme	Notenschema		MISSING_IN_EN
+CLASSES.name	Name		MISSING_IN_EN
+CLASSES.no-pupils	Es gibt noch keine Schüler in dieser Klasse		MISSING_IN_EN
+CLASSES.readonly-shared	Geteilte Klasse: Du hast nur Leserechte		MISSING_IN_EN
+CLASSES.save	Speichern		MISSING_IN_EN
+CLASSES.school-year	Schuljahr		MISSING_IN_EN
+CLASSES.select-state	Bundesland auswählen		MISSING_IN_EN
+CLASSES.share_with_others	Share class with other teachers		MISSING_IN_EN
+CLASSES.sort	Anzeigenreihenfolge		MISSING_IN_EN
+CLASSES.weekdays	Wochentage		MISSING_IN_EN
+COLORS.black	schwarz		MISSING_IN_EN
+COLORS.blue	blau		MISSING_IN_EN
+COLORS.cyan	cyan		MISSING_IN_EN
+COLORS.green	grün		MISSING_IN_EN
+COLORS.grey	grau		MISSING_IN_EN
+COLORS.lightgrey	hellgrau		MISSING_IN_EN
+COLORS.magenta	magenta		MISSING_IN_EN
+COLORS.orange	orange		MISSING_IN_EN
+COLORS.red	rot		MISSING_IN_EN
+COLORS.white	weiß		MISSING_IN_EN
+COLORS.yellow	gelb		MISSING_IN_EN
+COMMON.back	Zurück		MISSING_IN_EN
+COMMON.delete	Löschen	Delete	OK
+COMMON.error	Fehler	Error	OK
+COMMON.fehlt	fehlt		MISSING_IN_EN
+COMMON.fill_all_fields	Bitte alle Felder ausfüllen	Please fill all fields	OK
+COMMON.info	Info	Info	OK
+COMMON.loading	Laden...	Loading...	OK
+COMMON.open	Öffnen	Open	OK
+COMMON.save	Speichern		MISSING_IN_EN
+COMMON.success	Erfolgreich	Success	OK
+COMMON.syncing	Synchronisiere...	Syncing...	OK
+CONFIRM.attention	Achtung		MISSING_IN_EN
+CONFIRM.cancel	Abbrechen		MISSING_IN_EN
+CONFIRM.delete-category	Möchtest du diese Kategorie wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-class	Möchtest du diese Klasse wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-event	Möchtest du dieses Event wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-feedback	Möchtest du dieses Feedback wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-grade	Möchtest du diese Note wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-lesson	Möchtest du diese Stunde wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-main-category	Möchtest du diese Oberkategorie wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-student	Möchtest du diesen Schüler wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-table	Möchtest du diese Tabelle wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-team	Möchtest du dieses Team wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-tournament	Möchtest du dieses Turnier wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-uebung	Möchtest du diese Übung wirklich löschen?		MISSING_IN_EN
+CONFIRM.delete-wow	Möchtest du dieses WOW wirklich löschen?		MISSING_IN_EN
+CONFIRM.ok	OK		MISSING_IN_EN
+COOPER.alle-schueler	Alle Schüler	All students	OK
+COOPER.bahn	Bahn	Lane	OK
+COOPER.bahnen	Bahnen	Lanes	OK
+COOPER.bewerte-cooper	Bewerte Cooper-Test vom	Grade Cooper-Test from	OK
+COOPER.gesamt	Gesamt	Total	OK
+COOPER.meter	m	m	OK
+COOPER.note	Note	Mark	OK
+COOPER.noten-neu	Noten neu berechnen	Recalculate marks	OK
+COOPER.runde	Runde	Round	OK
+COOPER.runden	Runden	Rounds	OK
+COOPER.tabelle	Tabelle	Table	OK
+DATENSCHUTZERKLAERUNG	Datenschutzerklärung	Privacy	OK
+DELAY.delay	Verzögerung in Sek.		MISSING_IN_EN
+DELAY.seconds	Sek.		MISSING_IN_EN
+DELAY.title	Video Delay		MISSING_IN_EN
+EMAIL.add	Email hinzufügen		MISSING_IN_EN
+EMAIL.enter_email	Email eingeben		MISSING_IN_EN
+EMAIL.invalid_email	Ungültige Email		MISSING_IN_EN
+ENCRYPTION.confirm-description	Gib deine PIN zur Bestätigung erneut ein	Enter your PIN again to confirm	OK
+ENCRYPTION.confirm-pin	PIN bestätigen	Confirm PIN	OK
+ENCRYPTION.encryption-unlock-notice	Verschlüsselungs-Entsperrung	Encryption Unlock	OK
+ENCRYPTION.enter-pin	PIN eingeben	Enter PIN	OK
+ENCRYPTION.error	Fehler	Error	OK
+ENCRYPTION.note-privacy	Alle Schülernamen werden verschlüsselt gespeichert - niemals im Klartext	All student names are stored encrypted - never in plain text	OK
+ENCRYPTION.note-security	Deine PIN wird zur Ver- und Entschlüsselung mit modernster Kryptografie verwendet	Your PIN is used for key derivation with state-of-the-art cryptography	OK
+ENCRYPTION.note-sharing	Du kannst verschlüsselte Klassen sicher mit anderen Lehrern teilen	You can securely share encrypted classes with other teachers	OK
+ENCRYPTION.pin-description	Wähle eine 4-stellige PIN für die Verschlüsselung	Choose a 4-digit PIN for encryption	OK
+ENCRYPTION.pin-mismatch	Die eingegebenen PINs stimmen nicht überein. Bitte versuche es erneut.	The entered PINs do not match. Please try again.	OK
+ENCRYPTION.recipient_missing_public_key	Empfänger hat noch keinen öffentlichen Schlüssel hinterlegt. Teilen ist erst möglich, wenn der Empfänger die Verschlüsselung einrichtet.		MISSING_IN_EN
+ENCRYPTION.setting-up	Verschlüsselung wird eingerichtet...	Setting up encryption...	OK
+ENCRYPTION.setup-complete	Verschlüsselung wurde erfolgreich eingerichtet. Ihre Schülernamen werden ab sofort sicher verschlüsselt.	Encryption has been successfully set up. Your student names will now be securely encrypted.	OK
+ENCRYPTION.setup-description	Schütze die Schülerdaten mit einer sicheren PIN-Verschlüsselung. Diese PIN wird auf allen Ihren Geräten verwendet.	Protect your student data with secure PIN-based encryption. This PIN will be used across all your devices.	OK
+ENCRYPTION.setup-failed	Die Verschlüsselung konnte nicht eingerichtet werden. Bitte versuche es erneut.	Encryption could not be set up. Please try again.	OK
+ENCRYPTION.setup-title	Verschlüsselung einrichten	Setup Encryption	OK
+ENCRYPTION.skip	Überspringen (Nicht empfohlen)	Skip (Not recommended)	OK
+ENCRYPTION.skip-anyway	Trotzdem überspringen	Skip anyway	OK
+ENCRYPTION.skip-warning	WARNUNG: Ohne Verschlüsselung werden Schülernamen ungeschützt gespeichert. Dies ist nicht datenschutzkonform!	WARNING: Without encryption, student names will be stored unprotected. This is not privacy compliant!	OK
+ENCRYPTION.success	Erfolgreich!	Success!	OK
+ENCRYPTION.unlock-description	Gib deine PIN ein, um die App zu entsperren	Enter your PIN to access encrypted data	OK
+ENCRYPTION.unlock-failed	Verschlüsselung konnte nicht entsperrt werden. Überprüfe deine PIN.	Failed to unlock encryption. Please check your PIN.	OK
+ENCRYPTION.unlock-title	Entsperren	Unlock	OK
+ENCRYPTION.unlocking	Verschlüsselung wird entsperrt...	Unlocking encryption...	OK
+EXPORT.achtung1	Achtung: CSV Dateien werden	Attention: CSV files are	OK
+EXPORT.achtung2	nicht verschlüsselt!	not encrypted!	OK
+EXPORT.fehlzeiten	alle Fehlzeiten	all absence times	OK
+EXPORT.schueler-alles		all students with marks	EXTRA_IN_EN
+EXPORT.schueler-noten	alle Schüler mit Noten		MISSING_IN_EN
+EXPORT.schueler-noten-leistungen	alle Schüler mit Noten und Leistungen		MISSING_IN_EN
+EXPORT.stunden-alles	alle Stunden	all lessons	OK
+EXPORT.toast-erfolgreich	Export erfolgreich.	Export succesful.	OK
+FARBEN.aqua		aqua	EXTRA_IN_EN
+FARBEN.blau		blue	EXTRA_IN_EN
+FARBEN.fuchsia		fuchsia	EXTRA_IN_EN
+FARBEN.grau		gray	EXTRA_IN_EN
+FARBEN.gruen		green	EXTRA_IN_EN
+FARBEN.hellblau		lightblue	EXTRA_IN_EN
+FARBEN.hellgrau		lightgray	EXTRA_IN_EN
+FARBEN.hellgruen		lightgreen	EXTRA_IN_EN
+FARBEN.lime		lime	EXTRA_IN_EN
+FARBEN.orange		orange	EXTRA_IN_EN
+FARBEN.rot		red	EXTRA_IN_EN
+FARBEN.weiss		white	EXTRA_IN_EN
+FEEDBACK.anzahl	Anzahl		MISSING_IN_EN
+FEEDBACK.durchschnitt	Durchschnitt		MISSING_IN_EN
+FEEDBACK.feedback	Feedback		MISSING_IN_EN
+FEEDBACK.gut	gut		MISSING_IN_EN
+FEEDBACK.neutral	neutral		MISSING_IN_EN
+FEEDBACK.schlecht	schlecht		MISSING_IN_EN
+FEEDBACK.vom	Feedback vom		MISSING_IN_EN
+GRADES.absolute-hoehe	absolute Sprunghöhe		MISSING_IN_EN
+GRADES.achtung-kategorien	Achtung: Die Anzahl der Kriterien kann im Nachhinein nicht verändert werden.		MISSING_IN_EN
+GRADES.add-category	Notenkategorie hinzufügen		MISSING_IN_EN
+GRADES.add-performance	Hinzufügen		MISSING_IN_EN
+GRADES.anzahl-kategorien	Anzahl Kriterien		MISSING_IN_EN
+GRADES.art-relativleistung	Art der Relativleistung		MISSING_IN_EN
+GRADES.ausdauer	Ausdauer		MISSING_IN_EN
+GRADES.bearbeiten	bearbeiten		MISSING_IN_EN
+GRADES.bemerkungen	Bemerkungen		MISSING_IN_EN
+GRADES.best-m	Beste Note M		MISSING_IN_EN
+GRADES.best-w	Beste Note W		MISSING_IN_EN
+GRADES.bewertung-achtung-punkte	Achtung: Egal welches Notenschema werden pro Kriterium Punkte und nicht Noten vergeben.		MISSING_IN_EN
+GRADES.bewertung-loeschen	Bewertung löschen		MISSING_IN_EN
+GRADES.bewertungshilfen	Bewertungshilfen		MISSING_IN_EN
+GRADES.bezeichnung	Bezeichnung		MISSING_IN_EN
+GRADES.bronze	bronze		MISSING_IN_EN
+GRADES.bundesjugendspiele	Bundesjugendspiele		MISSING_IN_EN
+GRADES.by-criteria	nach Kriterien		MISSING_IN_EN
+GRADES.by-einfacher-tabelle	nach einfacher Tabelle		MISSING_IN_EN
+GRADES.by-tabelle	nach Tabelle		MISSING_IN_EN
+GRADES.by-time	auf Zeit		MISSING_IN_EN
+GRADES.categories	Notenkategorien		MISSING_IN_EN
+GRADES.category	Notenkategorie		MISSING_IN_EN
+GRADES.cooper	Cooper-Test		MISSING_IN_EN
+GRADES.cooper-test	Cooper-Test		MISSING_IN_EN
+GRADES.criteria-title	Bewerte Kriterien		MISSING_IN_EN
+GRADES.current-grade	Aktuelle Note		MISSING_IN_EN
+GRADES.demo-fragebogen	Demo-Fragebogen verwenden		MISSING_IN_EN
+GRADES.do-grade	Bewerte		MISSING_IN_EN
+GRADES.einfache-tabelle	einfache Tabelle		MISSING_IN_EN
+GRADES.enter-performance	Leistung eingeben		MISSING_IN_EN
+GRADES.fragebogen	Fragebogen		MISSING_IN_EN
+GRADES.gewicht	Kugelstoßen: Körpergewicht		MISSING_IN_EN
+GRADES.gewichtung	Gewichtung		MISSING_IN_EN
+GRADES.gold	gold		MISSING_IN_EN
+GRADES.grade-distribution	Notenverteilung		MISSING_IN_EN
+GRADES.grading	Bewertung		MISSING_IN_EN
+GRADES.groesse	Kugelstoßen: Körpergröße		MISSING_IN_EN
+GRADES.hinzu	Hinzufügen		MISSING_IN_EN
+GRADES.kaiser11	Kaiserturnier 1:1		MISSING_IN_EN
+GRADES.kaiserturnier-info	Wichtig: Vorher hier die Schüler sortieren und gegebenenfalls entfernen. Mit dem Start beginnen die bepunkteten Runden!		MISSING_IN_EN
+GRADES.kategorie	Kriterium		MISSING_IN_EN
+GRADES.kategorie-kopieren	Notenkategorie kopieren		MISSING_IN_EN
+GRADES.kategorie-kopieren-titel	Notenkategorie zu anderer Klasse kopieren		MISSING_IN_EN
+GRADES.kategorien-einzeln	Kriterien einzeln		MISSING_IN_EN
+GRADES.koordination	Koordination		MISSING_IN_EN
+GRADES.kopfnoten	Kopfnoten		MISSING_IN_EN
+GRADES.kopfnoten-vorbelegen-mit	Kopfnoten bei Bedarf vorbelegen mit Note:		MISSING_IN_EN
+GRADES.kraft	Kraft		MISSING_IN_EN
+GRADES.loeschen	Löschen		MISSING_IN_EN
+GRADES.main-category	Oberkategorie		MISSING_IN_EN
+GRADES.max-punktzahl	Maximalpunktzahl pro Kriterium		MISSING_IN_EN
+GRADES.mittelstrecke	Mittelstrecke		MISSING_IN_EN
+GRADES.multistop	Zeiten stoppen (Multistop)		MISSING_IN_EN
+GRADES.multistop-text	Multistop		MISSING_IN_EN
+GRADES.no-performances	Keine Leistungen		MISSING_IN_EN
+GRADES.noten-hochladen	Selbsteinschätzungen hochladen		MISSING_IN_EN
+GRADES.noten-runterladen	Selbsteinschätzungen herunterladen		MISSING_IN_EN
+GRADES.notentabelle	Notentabelle		MISSING_IN_EN
+GRADES.notenuebersicht	Notenübersicht		MISSING_IN_EN
+GRADES.notes	Bemerkungen		MISSING_IN_EN
+GRADES.performance-entry	Leistung erfassen		MISSING_IN_EN
+GRADES.performances	Leistungen		MISSING_IN_EN
+GRADES.points	Punkte		MISSING_IN_EN
+GRADES.reichhoehe	Reichhöhe zu Sprunghöhe		MISSING_IN_EN
+GRADES.relationsnoten	Relationsnoten (beste und schlechteste Note vorgeben)		MISSING_IN_EN
+GRADES.relationsnoten-nach-zeit	kleinster Wert ist beste Note (nach Zeit)		MISSING_IN_EN
+GRADES.relativ	Relativleistung		MISSING_IN_EN
+GRADES.relative-hoehe	relative Sprunghöhe		MISSING_IN_EN
+GRADES.relativleistung	Relativleistung		MISSING_IN_EN
+GRADES.schnelligkeit	Schnelligkeit		MISSING_IN_EN
+GRADES.schueler	Schüler		MISSING_IN_EN
+GRADES.schueler-waehlen	Schüler wählen		MISSING_IN_EN
+GRADES.schuelerbewertung-uebernehmen	Schülerbewertung übernehmen		MISSING_IN_EN
+GRADES.shuttle	Shuttle-Run		MISSING_IN_EN
+GRADES.shuttle-run	Shuttle-Run		MISSING_IN_EN
+GRADES.silber	silber		MISSING_IN_EN
+GRADES.speichern	Speichern		MISSING_IN_EN
+GRADES.sportabzeichen	Sportabzeichen		MISSING_IN_EN
+GRADES.standard-tests	Standard-Tests		MISSING_IN_EN
+GRADES.tabelle	Tabelle		MISSING_IN_EN
+GRADES.time	Zeit-Bewertung		MISSING_IN_EN
+GRADES.verbal-notiz	Die Verbalbeurteilungen müssen als Tabelle importiert werden und sind dann zusätzlich zur numerischen Note.		MISSING_IN_EN
+GRADES.verbal-tabelle	Verbalbeurteilungen-Tabelle		MISSING_IN_EN
+GRADES.verbalbeurteilung	Verbalbeurteilung		MISSING_IN_EN
+GRADES.verbaltabelle	Verbaltabelle		MISSING_IN_EN
+GRADES.verteilung	Notenverteilung		MISSING_IN_EN
+GRADES.verteilung-dbk	DBK-Formel		MISSING_IN_EN
+GRADES.verteilung-linear	schlicht linear		MISSING_IN_EN
+GRADES.verteilung-sockel	mit Sockel		MISSING_IN_EN
+GRADES.warteposition	Warteposition bei		MISSING_IN_EN
+GRADES.warteposition-info-schwach	Die Warteposition ist immer unten auf dem Display, sodass die Leistungsstarken nun oben erscheinen.		MISSING_IN_EN
+GRADES.warteposition-info-stark	Die Warteposition ist immer unten auf dem Display, sodass die Leistungsschwachen nun oben erscheinen.		MISSING_IN_EN
+GRADES.warteposition-schwach	leistungsschwach		MISSING_IN_EN
+GRADES.warteposition-stark	leistungsstark		MISSING_IN_EN
+GRADES.worst-m	Schlechteste Note M		MISSING_IN_EN
+GRADES.worst-w	Schlechteste Note W		MISSING_IN_EN
+GRADES.zeiten	Zeiten		MISSING_IN_EN
+GRADES.zu-tabellen	zu den Tabellen		MISSING_IN_EN
+GRADESCHEME.abi	Abi: 0-15		MISSING_IN_EN
+GRADESCHEME.drittel16	Drittelnoten: 1-6		MISSING_IN_EN
+GRADESCHEME.ganz15	Österreich ganze Noten: 1-5		MISSING_IN_EN
+GRADESCHEME.ganz16	Bayern ganze Noten: 1-6		MISSING_IN_EN
+GRADESCHEME.hundert	0-100		MISSING_IN_EN
+GRADESCHEME.viertel16	Viertelnoten: 1-6		MISSING_IN_EN
+GRADESCHEME.viertel61	Schweiz Viertelnoten: 6-1		MISSING_IN_EN
+GRADESCHEME.zehntel16	Zehntel: 1-6		MISSING_IN_EN
+HELLO	Willkommen	Welcome	OK
+HOME.pupil-count	Schüler		MISSING_IN_EN
+INFOS.1	Bei Anregungen, Ideen, Feature-Vorschlägen, Kritik oder sonstigen Wünschen bitte melden!	Please contact me in case of any wishes or questions!	OK
+INFOS.app-features	App-Funktionen	App Features	OK
+INFOS.app-groesse	App-Größe	App Size	OK
+INFOS.berichte-erstellen	Berichte erstellen	Create Reports	OK
+INFOS.codezeilen	Codezeilen	Lines of Code	OK
+INFOS.community	Community	Community	OK
+INFOS.community-text	Tausche dich mit anderen Trainern aus	Connect with other coaches	OK
+INFOS.danke	Vielen Dank für die Nutzung von SportZens!	Thanks for using SportZens!	OK
+INFOS.dateien	Dateien	Files	OK
+INFOS.durchschnitt	Durchschnitt	Average	OK
+INFOS.email-support	E-Mail Support	Email Support	OK
+INFOS.entwicklungsaufwand	Entwicklungsaufwand	Development Effort	OK
+INFOS.entwicklungsstunden	Entwicklungsstunden	Development Hours	OK
+INFOS.features	Features	Features	OK
+INFOS.feedbacks-erhalten	Feedbacks erhalten, davon	Feedbacks received, of which	OK
+INFOS.gut	gut	good	OK
+INFOS.handbuch	Erklärungen findest du im Handbuch unter www.sportzens.de/handbuch	You can find some instructions under www.sportzens.de/handbuch	OK
+INFOS.handbuch-link	Zum Handbuch	Go to Manual	OK
+INFOS.impressum	Impressum	Impress	OK
+INFOS.klassen-verwalten	Klassen verwalten	Manage Classes	OK
+INFOS.letzte-sicherung	Letzte Sicherung	Last Backup	OK
+INFOS.monate	Monate	Months	OK
+INFOS.monate-entwicklung	Monate Entwicklung	Months Development	OK
+INFOS.neutral-und	neutral und	neutral and	OK
+INFOS.newsletter	Newsletter	Newsletter	OK
+INFOS.noten-erfassen	Noten erfassen	Record Grades	OK
+INFOS.noten-vergeben	Noten vergeben	assigned	OK
+INFOS.notenkategorien-erstellt	Notenkategorien erstellt	grade categories created	OK
+INFOS.schlecht	schlecht	bad	OK
+INFOS.schueler-organisieren	Schüler organisieren	Organize Students	OK
+INFOS.seit	Seit	Since	OK
+INFOS.social-media	Soziale Medien	Social Media	OK
+INFOS.speicherplatz	Speicherplatz verwendet	Storage Used	OK
+INFOS.stunden-gehalten	Stunden gehalten	lessons held	OK
+INFOS.support	Support & Hilfe	Support & Help	OK
+INFOS.support-text	Brauchst du Hilfe? Kontaktiere uns!	Need help? Contact us!	OK
+INFOS.system-info	System-Informationen	System Information	OK
+INFOS.technologien	Technologien	Technologies	OK
+INFOS.tipp-1	Regelmäßige Datensicherung nicht vergessen!	Don't forget regular data backups!	OK
+INFOS.tipp-2	Nutze die verschiedenen Bewertungssysteme für unterschiedliche Sportarten	Use different grading systems for different sports	OK
+INFOS.tipp-3	Mit der Timer-Funktion optimale Trainingszeiten einhalten	Use the timer function to maintain optimal training times	OK
+INFOS.title	Infos	Info	OK
+INFOS.trainer-tipps	Trainer-Tipps	Coach Tips	OK
+INFOS.training-planen	Training planen	Plan Training	OK
+INFOS.turniere-verwalten	Turniere verwalten	Manage Tournaments	OK
+INFOS.updates	Updates	Updates	OK
+INFOS.versionen	Versionen	Versions	OK
+KAISER.bewerte-kaiser11	Bewerte Kaiserturnier 1:1		MISSING_IN_EN
+KAISER.ende	Ende		MISSING_IN_EN
+KAISER.next-runde	Nächste Runde		MISSING_IN_EN
+KAISER.start	Kaiserturnier starten		MISSING_IN_EN
+KALENDER.add-event	Termin hinzufügen		MISSING_IN_EN
+KALENDER.add-title	Termin hinzufügen		MISSING_IN_EN
+KALENDER.all-day	ganztägig?		MISSING_IN_EN
+KALENDER.day	Tag		MISSING_IN_EN
+KALENDER.end	Ende		MISSING_IN_EN
+KALENDER.event-notes	Beschreibung		MISSING_IN_EN
+KALENDER.event-title	Name		MISSING_IN_EN
+KALENDER.month	Monat		MISSING_IN_EN
+KALENDER.no-events	Keine Termine		MISSING_IN_EN
+KALENDER.start	Anfang		MISSING_IN_EN
+KALENDER.title	Kalender		MISSING_IN_EN
+KALENDER.today	Heute		MISSING_IN_EN
+KALENDER.week	Woche		MISSING_IN_EN
+KING.end	Ende		MISSING_IN_EN
+KING.gender-note	Hinweis: Beim Kaiserturnier wird nicht nach m/w unterschieden.		MISSING_IN_EN
+KING.info.finish.item1	‚Ende‘ zeigt Ranking mit Punkten und berechneter Note.		MISSING_IN_EN
+KING.info.finish.item2	Noten sind editierbar und speicherbar.		MISSING_IN_EN
+KING.info.finish.item3	Beim erneuten Öffnen landest du wieder im Ranking.		MISSING_IN_EN
+KING.info.finish.title	4) Abschluss & Noten		MISSING_IN_EN
+KING.info.heading	Kurz-Anleitung		MISSING_IN_EN
+KING.info.points.item1	Punkte je nach Feldposition; Warteposition steuert Bias.		MISSING_IN_EN
+KING.info.points.item2	Gewinner rücken nach oben, Verlierer nach unten.		MISSING_IN_EN
+KING.info.points.title	3) Punkte & Rotation		MISSING_IN_EN
+KING.info.prep.item1	Warteposition wählen: leistungsstark/leistungsschwach.		MISSING_IN_EN
+KING.info.prep.item2	Schüler per Drag&Drop vorsortieren, Teilnehmer auswählen.		MISSING_IN_EN
+KING.info.prep.title	1) Vorbereitung		MISSING_IN_EN
+KING.info.rounds.item1	Pro Feld Gewinner antippen (links/rechts).		MISSING_IN_EN
+KING.info.rounds.item2	Mit ‚Seiten tauschen‘ Plätze wechseln.		MISSING_IN_EN
+KING.info.rounds.item3	‚Nächste Runde‘ erst, wenn alle Felder entschieden sind.		MISSING_IN_EN
+KING.info.rounds.title	2) Runden spielen		MISSING_IN_EN
+KING.info.title	Info: Kaiserturnier		MISSING_IN_EN
+KING.next-round	Nächste Runde		MISSING_IN_EN
+KING.save-grades	Noten speichern		MISSING_IN_EN
+KING.start	Start		MISSING_IN_EN
+KING.swap	Seiten tauschen		MISSING_IN_EN
+KING.swap-sides	Seiten tauschen		MISSING_IN_EN
+KING.title	Kaiserturnier		MISSING_IN_EN
+KING.wait-position	Warteposition		MISSING_IN_EN
+KING.wait-strong	Stark wartet		MISSING_IN_EN
+KING.wait-weak	Schwach wartet		MISSING_IN_EN
+KLASSEN.bearbeiten	bearbeiten	Edit	OK
+KLASSEN.bemerkungen	Bemerkungen	Notes	OK
+KLASSEN.bezeichnung	Bezeichnung	Title	OK
+KLASSEN.bundesland	Bundesland	german county	OK
+KLASSEN.button-hinzufuegen	Hinzufügen	Add	OK
+KLASSEN.demo-klasse	Demo-Klasse	Demo-Class	OK
+KLASSEN.eigene-datei	eigene CSV benutzen	Use own .csv	OK
+KLASSEN.ende	Ende	End	OK
+KLASSEN.ferien	nach Ferien	Regard to holidays	OK
+KLASSEN.ferien-eigene	Ferien CSV	Holiday csv	OK
+KLASSEN.ferien-import	Datei wählen	Choose file	OK
+KLASSEN.hinzu	Klasse hinzufügen	Add class	OK
+KLASSEN.jeden	jeden	every	OK
+KLASSEN.keine-schueler	Noch keine Schüler!	No students yet	OK
+KLASSEN.klasse	Klasse	Class	OK
+KLASSEN.loeschen	Löschen	Delete	OK
+KLASSEN.modus	Modus	Mode	OK
+KLASSEN.name	Name	Name	OK
+KLASSEN.notenkategorien	Notenkategorien	Grade category	OK
+KLASSEN.notenschema	Notenschema	Grade scheme	OK
+KLASSEN.schueler	Schüler	Students	OK
+KLASSEN.schueler-hinzu	Schüler hinzufügen		MISSING_IN_EN
+KLASSEN.schuljahr	Schuljahr	Year	OK
+KLASSEN.sortierung	Sortierung	Sorting	OK
+KLASSEN.speichern	Speichern	Save	OK
+KLASSEN.start	Start	Start	OK
+KLASSEN.stunden-anlegen	Stunden anlegen	Add lessons	OK
+KLASSEN.termine-woche	Termine pro Woche	Times per week	OK
+KLASSEN.title	Klassen	Classes	OK
+KLASSEN.unterrichtsstunden	Unterrichtsstunden	lessons	OK
+KLASSEN.zeitraum-waehlen	Zeitraum wählen	Choose period	OK
+LESSONS.absences	Abwesenheiten		MISSING_IN_EN
+LESSONS.absent	Abwesend		MISSING_IN_EN
+LESSONS.absentees	Abwesende		MISSING_IN_EN
+LESSONS.add	Stunde hinzufügen		MISSING_IN_EN
+LESSONS.attendees	Anwesende		MISSING_IN_EN
+LESSONS.content	Inhalt		MISSING_IN_EN
+LESSONS.date	Datum		MISSING_IN_EN
+LESSONS.delete	Stunde löschen		MISSING_IN_EN
+LESSONS.edit	Stunde bearbeiten		MISSING_IN_EN
+LESSONS.end	Ende		MISSING_IN_EN
+LESSONS.lesson	Stunde		MISSING_IN_EN
+LESSONS.lesson-length	Stunden		MISSING_IN_EN
+LESSONS.no-lessons	Es gibt noch keine Stunden in diesem Stundenplan		MISSING_IN_EN
+LESSONS.participants	Teilnehmer		MISSING_IN_EN
+LESSONS.present	Anwesenheit		MISSING_IN_EN
+LESSONS.room	Raum		MISSING_IN_EN
+LESSONS.save	Speichern		MISSING_IN_EN
+LESSONS.start	Start		MISSING_IN_EN
+LESSONS.subject	Fach		MISSING_IN_EN
+LESSONS.title	Stundenübersicht		MISSING_IN_EN
+LESSONS.topic	Thema		MISSING_IN_EN
+LICENSES.active	Aktiv		MISSING_IN_EN
+LICENSES.days	Tage		MISSING_IN_EN
+LICENSES.end	Gültig bis		MISSING_IN_EN
+LICENSES.free	Free		MISSING_IN_EN
+LICENSES.free-desc	Basisfunktionen kostenlos		MISSING_IN_EN
+LICENSES.not-active	Nicht aktiv		MISSING_IN_EN
+LICENSES.pro	Pro		MISSING_IN_EN
+LICENSES.remaining-days	Verbleibende Tage		MISSING_IN_EN
+LICENSES.sportzens-all	SportZens 365		MISSING_IN_EN
+LICENSES.start	Startdatum		MISSING_IN_EN
+LICENSES.supporter	Supporter		MISSING_IN_EN
+LOCK.pin-required	Bitte zuerst eine PIN in den Einstellungen festlegen.	Please set a PIN in Settings first.	OK
+LOCK.sperren	Sperren	Lock	OK
+LOGIN.create-account	Account erstellen	Create Account	OK
+LOGIN.email	Email	Email	OK
+LOGIN.failed	Login fehlgeschlagen	Login failed	OK
+LOGIN.forgot-password	Passwort vergessen?	Forgot password?	OK
+LOGIN.invalid-credentials	Ungültige Zugangsdaten.	Invalid credentials.	OK
+LOGIN.password	Passwort	Password	OK
+LOGIN.pin	PIN für Bildschirm-Sperre	Screen lock PIN	OK
+LOGIN.please-insert-email	Bitte Email-Adresse eingeben.	Please insert email address.	OK
+LOGIN.please-pin	Bitte gib deine PIN ein	Please enter your PIN	OK
+LOGIN.register	Registrieren	Register	OK
+LOGIN.reset-password	Passwort zurücksetzen	Reset Password	OK
+LOGIN.screen-lock-notice	Bildschirm-Sperre	Screen Lock	OK
+LOGIN.signin	Login	Sign In	OK
+LOGIN.unlock-description	Gib deine PIN ein, um die App zu entsperren	Enter your PIN to unlock the app	OK
+LOGIN.unlock-title	Entsperren	Unlock	OK
+LOGIN.valid-email	Bitte eine gültige Email-Adresse eingeben.	Please enter a valid email address.	OK
+LOGOUT.confirm_button	Abmelden	Sign Out	OK
+LOGOUT.confirm_message	Bist du sicher, dass du dich abmelden möchtest? Alle nicht synchronisierten Daten werden dabei gelöscht.	Are you sure you want to sign out? All unsynchronized data will be deleted.	OK
+LOGOUT.confirm_title	Abmelden?	Sign Out?	OK
+MENU.admin-dashboard	Admin-Dashboard	Admin Dashboard	OK
+MENU.analytics	Analytics	Analytics	OK
+MENU.calendar	Kalender		MISSING_IN_EN
+MENU.calendar-events	Kalenderereignisse		MISSING_IN_EN
+MENU.einstellungen		Settings	EXTRA_IN_EN
+MENU.help	Hilfe		MISSING_IN_EN
+MENU.infos	Infos	Info	OK
+MENU.lock	Sperren	Lock	OK
+MENU.logout	Abmelden	Logout	OK
+MENU.scoreboard	Scoreboard	Scoreboard	OK
+MENU.settings	Einstellungen	Settings	OK
+MENU.stundenplan		Schedule	EXTRA_IN_EN
+MENU.tables	Tabellen	Tables	OK
+MENU.tacticboard	Taktikboard	Tacticboard	OK
+MENU.taktikboard		Tacticboard	EXTRA_IN_EN
+MENU.theme	Theme	Theme	OK
+MENU.timer	Timer	Timer	OK
+MENU.timetable	Stundenplan		MISSING_IN_EN
+MENU.toolbox	Tools	Toolbox	OK
+MENU.tournaments	Turniere	Tournaments	OK
+MENU.tracking	Tracking	Exercise Tracking	OK
+MENU.tracking-basketball	Basketball Trefferquote	Basketball Shot Tracking	OK
+MENU.tracking-pushups	Liegestütze Tracking	Push-up Tracking	OK
+MENU.uebungen	Übungen	Exercises	OK
+MENU.users	Benutzer	Users	OK
+MENU.video	Video-Tracking		MISSING_IN_EN
+MENU.video-delay	Video Delay	Video Delay	OK
+MITTELSTRECKE.alle-schueler	Alle Schüler	All students	OK
+MITTELSTRECKE.bahn	Bahn	Lane	OK
+MITTELSTRECKE.bahnen	Bahnen	Lanes	OK
+MITTELSTRECKE.bewerte	Bewerte Mittelstrecke vom	Grade middle distance from	OK
+MITTELSTRECKE.gesamt	Zeit	Time	OK
+MITTELSTRECKE.meter	Meter	Meter	OK
+MITTELSTRECKE.note	Note	Mark	OK
+MITTELSTRECKE.noten-neu	Noten neu berechnen	Recalculate marks	OK
+MITTELSTRECKE.runde	Runde	Round	OK
+MITTELSTRECKE.runden	Runden	Rounds	OK
+MITTELSTRECKE.tabelle	Tabelle	Table	OK
+MULTISTOP.adjust-times	Zeiten anpassen	Adjust times	OK
+MULTISTOP.assigned-at	Zugewiesen am	Assigned at	OK
+MULTISTOP.best-time	Beste Zeit	Best time	OK
+MULTISTOP.bewerte	Bewerte	Evaluate	OK
+MULTISTOP.capture-time	Zeit aufzeichnen	Capture time	OK
+MULTISTOP.captured-times	Aufgezeichnete Zeiten	Captured times	OK
+MULTISTOP.enable-video	Video-Aufzeichnung aktivieren	Enable video recording	OK
+MULTISTOP.from	aus	from	OK
+MULTISTOP.recording	Aufzeichnung	Recording	OK
+MULTISTOP.schueler	Schüler	student	OK
+MULTISTOP.schueler-anzahl	Anzahl an Schülern	Count of students	OK
+MULTISTOP.select-student-hint	Wähle einen Schüler aus, um Zeiten zuzuweisen	Select a student to assign times	OK
+MULTISTOP.set-time	Zeit setzen	Set time	OK
+MULTISTOP.speed	Geschwindigkeit	Speed	OK
+MULTISTOP.speichern	Speichern	save	OK
+MULTISTOP.student-history	Schüler-Historie	Student history	OK
+MULTISTOP.tabelle	Tabelle	Table	OK
+MULTISTOP.time	Zeit	Time	OK
+MULTISTOP.timer	Timer	Timer	OK
+MULTISTOP.times	Versuchen	attempts	OK
+MULTISTOP.video-description	Zeichnet den Lauf auf, um Zeiten später präzise anzupassen. Timer hängt zu Beginn kurz, Zeit wird aber richtig erfasst.	Records the run to precisely adjust times later	OK
+MULTISTOP.video-review	Video-Überprüfung	Video review	OK
+NOTEN.absolute-hoehe		absolute jump height	EXTRA_IN_EN
+NOTEN.achtung-kategorien		Attention: The count of the criterias will be fixed.	EXTRA_IN_EN
+NOTEN.anzahl-kategorien		Count of criterias	EXTRA_IN_EN
+NOTEN.art-relativleistung		kind of relative	EXTRA_IN_EN
+NOTEN.auf-zeit		On time	EXTRA_IN_EN
+NOTEN.ausdauer		Endurance	EXTRA_IN_EN
+NOTEN.bearbeiten		Edit	EXTRA_IN_EN
+NOTEN.bemerkungen		Comments	EXTRA_IN_EN
+NOTEN.beste-m		Best grade M	EXTRA_IN_EN
+NOTEN.beste-w		Best grade W	EXTRA_IN_EN
+NOTEN.bewertung		Grading	EXTRA_IN_EN
+NOTEN.bewertung-achtung-punkte			EXTRA_IN_EN
+NOTEN.bewertung-loeschen		Delete evaluation	EXTRA_IN_EN
+NOTEN.bewertungshilfen		Tipps	EXTRA_IN_EN
+NOTEN.bezeichnung		Name	EXTRA_IN_EN
+NOTEN.bronze		bronze	EXTRA_IN_EN
+NOTEN.bundesjugendspiele		Bundesjugendspiele	EXTRA_IN_EN
+NOTEN.cooper		Cooper-Test	EXTRA_IN_EN
+NOTEN.cooper-test		Cooper-Test	EXTRA_IN_EN
+NOTEN.demo-fragebogen		Use demo questionnaire	EXTRA_IN_EN
+NOTEN.einfache-tabelle		simple Table	EXTRA_IN_EN
+NOTEN.fragebogen		Questionnaire	EXTRA_IN_EN
+NOTEN.gewicht		shot-put: weight	EXTRA_IN_EN
+NOTEN.gewichtung		Weight	EXTRA_IN_EN
+NOTEN.gold		gold	EXTRA_IN_EN
+NOTEN.groesse		shot-put: height	EXTRA_IN_EN
+NOTEN.hinzu		Add	EXTRA_IN_EN
+NOTEN.kaiser11		King of the court 1:1	EXTRA_IN_EN
+NOTEN.kaiserturnier-info		Important: Sort the students here beforehand and remove them if necessary. With the start the scored rounds begin!	EXTRA_IN_EN
+NOTEN.kategorie		Criterion	EXTRA_IN_EN
+NOTEN.kategorie-hinzu		Add category	EXTRA_IN_EN
+NOTEN.kategorie-kopieren		Copy Category	EXTRA_IN_EN
+NOTEN.kategorie-kopieren-titel		Copy Category to another class	EXTRA_IN_EN
+NOTEN.kategorien		Criterias	EXTRA_IN_EN
+NOTEN.kategorien-einzeln		Categories single	EXTRA_IN_EN
+NOTEN.koordination		Coordination	EXTRA_IN_EN
+NOTEN.kopfnoten		Simple grades	EXTRA_IN_EN
+NOTEN.kopfnoten-vorbelegen-mit		Pre select grades	EXTRA_IN_EN
+NOTEN.kraft		Power	EXTRA_IN_EN
+NOTEN.loeschen		Delete	EXTRA_IN_EN
+NOTEN.max-punktzahl		max. points per category	EXTRA_IN_EN
+NOTEN.mittelstrecke		Middle distance	EXTRA_IN_EN
+NOTEN.multistop		Multistop	EXTRA_IN_EN
+NOTEN.multistop-text		Multistop	EXTRA_IN_EN
+NOTEN.nach-einfacher-tabelle		Simple table	EXTRA_IN_EN
+NOTEN.nach-kategorien		Criterias	EXTRA_IN_EN
+NOTEN.nach-tabelle		Table	EXTRA_IN_EN
+NOTEN.noten-hochladen		Upload Self-Assessments	EXTRA_IN_EN
+NOTEN.noten-runterladen		Download Self-Assessments	EXTRA_IN_EN
+NOTEN.notenkategorie		Grade category	EXTRA_IN_EN
+NOTEN.notentabelle		Grade table	EXTRA_IN_EN
+NOTEN.notenuebersicht		Overview	EXTRA_IN_EN
+NOTEN.oberkategorie		Top category	EXTRA_IN_EN
+NOTEN.points		Points	EXTRA_IN_EN
+NOTEN.reichhoehe		reach height to jump height	EXTRA_IN_EN
+NOTEN.relativ		Relative assessment	EXTRA_IN_EN
+NOTEN.relative-hoehe		relative jump height	EXTRA_IN_EN
+NOTEN.relativleistung		Relative performance	EXTRA_IN_EN
+NOTEN.schlechteste-m		Worst grade M	EXTRA_IN_EN
+NOTEN.schlechteste-w		Worst grade W	EXTRA_IN_EN
+NOTEN.schnelligkeit		Speed	EXTRA_IN_EN
+NOTEN.schueler		Student	EXTRA_IN_EN
+NOTEN.schueler-waehlen		Choose a student	EXTRA_IN_EN
+NOTEN.schuelerbewertung-uebernehmen		Take over student evaluation	EXTRA_IN_EN
+NOTEN.shuttle		Shuttle-Run	EXTRA_IN_EN
+NOTEN.shuttle-run		Shuttle-Run (beep test)	EXTRA_IN_EN
+NOTEN.silber		silver	EXTRA_IN_EN
+NOTEN.speichern		Save	EXTRA_IN_EN
+NOTEN.sportabzeichen		German Sport Badge	EXTRA_IN_EN
+NOTEN.standard-tests		Standardised tests	EXTRA_IN_EN
+NOTEN.tabelle		Table	EXTRA_IN_EN
+NOTEN.verbal-notiz		Verbal evaluation must be imported as tables.	EXTRA_IN_EN
+NOTEN.verbal-tabelle		verbal evaluation-table	EXTRA_IN_EN
+NOTEN.verbalbeurteilung		Verbal evaluation	EXTRA_IN_EN
+NOTEN.verbaltabelle		Verbaltable	EXTRA_IN_EN
+NOTEN.verteilung		Grade-Distribution	EXTRA_IN_EN
+NOTEN.verteilung-dbk		DBK-formula	EXTRA_IN_EN
+NOTEN.verteilung-linear		linear	EXTRA_IN_EN
+NOTEN.verteilung-sockel		base-step	EXTRA_IN_EN
+NOTEN.warteposition		waiting position at	EXTRA_IN_EN
+NOTEN.warteposition-info-schwach		The waiting position is always at the bottom of the display, so the high performers now appear at the top.	EXTRA_IN_EN
+NOTEN.warteposition-info-stark		The waiting position is always at the bottom of the display, so the low performers now appear at the top.	EXTRA_IN_EN
+NOTEN.warteposition-schwach		weak	EXTRA_IN_EN
+NOTEN.warteposition-stark		strong	EXTRA_IN_EN
+NOTEN.zeiten		Times	EXTRA_IN_EN
+NOTEN.zu-tabellen		To the tables	EXTRA_IN_EN
+NOTENSCHEMA.abi		Abi: 0-15	EXTRA_IN_EN
+NOTENSCHEMA.drittel16		Third marks: 1-6	EXTRA_IN_EN
+NOTENSCHEMA.ganz15		Austria whole marks: 1-5	EXTRA_IN_EN
+NOTENSCHEMA.ganz16		Bavaria whole marks: 1-6	EXTRA_IN_EN
+NOTENSCHEMA.hundert		0-100	EXTRA_IN_EN
+NOTENSCHEMA.viertel16		Quarter marks: 1-6	EXTRA_IN_EN
+NOTENSCHEMA.viertel61		Suisse Quarter marks: 6-1	EXTRA_IN_EN
+NOTENSCHEMA.zehntel		Tenth: 1-6	EXTRA_IN_EN
+PASSWORT	Passwort	Password	OK
+REGISTER.accept-privacy	Ich habe die 		MISSING_IN_EN
+REGISTER.accept-privacy2	 gelesen.		MISSING_IN_EN
+REGISTER.accept-terms	Ich akzeptiere die 		MISSING_IN_EN
+REGISTER.must-accept	Bitte AGB und Datenschutzerklärung bestätigen		MISSING_IN_EN
+REGISTER.password-minlength	Das Passwort muss mindestens 6 Zeichen haben		MISSING_IN_EN
+REGISTER.password-required	Bitte ein Passwort eingeben		MISSING_IN_EN
+REGISTER.privacy-link-text	Datenschutzerklärung		MISSING_IN_EN
+REGISTER.subtitle	Erstelle deinen kostenlosen Account		MISSING_IN_EN
+REGISTER.terms-link-text	Allgemeinen Geschäftsbedingungen (AGB)		MISSING_IN_EN
+SCHUELER.aktiv-teilgenommen	Aktiv teilgenommen	Actively participated	OK
+SCHUELER.allgemeines	Allgemeines	General	OK
+SCHUELER.bemerkungen	Bemerkungen	Notes	OK
+SCHUELER.benoetigte-zeit	Zeit	time needed	OK
+SCHUELER.csv-export	CSV-Export	CSV-export	OK
+SCHUELER.csv-import	CSV-Import	CSV-import	OK
+SCHUELER.delete-workout	Löschen	Delete	OK
+SCHUELER.doppelstunde	Doppelstunde	double lesson	OK
+SCHUELER.einzelstunde	Einzelstunde	single lesson	OK
+SCHUELER.fehlzeiten	Fehlzeiten	Attendances	OK
+SCHUELER.geburt	Geburtsjahr	year of birth	OK
+SCHUELER.geburt-hinweis	Ist für die Tabellenberechnung nach Jahrgang notwendig (Cooper-Test und Shuttle-Run bis Oberstufe).		OK
+SCHUELER.geburtsjahr	Geburtsjahr (Ist für die Tabellenberechnung nach Jahrgang notwendig (Cooper-Test und Shuttle-Run bis Oberstufe).)	Year of birth (Is necessary for the table calculation by year of birth (Cooper test and shuttle run to upper school).	OK
+SCHUELER.gesamtfehlzeit	Gesamtfehlzeit	Total missing time	OK
+SCHUELER.gesamtverspaetung	Gesamtverspätung	Total delay	OK
+SCHUELER.geschlecht	Geschlecht	gender	OK
+SCHUELER.grund	Grund	Reason	OK
+SCHUELER.hinzu	Hinzufügen	Add	OK
+SCHUELER.klasse	Klasse	class	OK
+SCHUELER.m	männlich	male	OK
+SCHUELER.maennlich	männlich	male	OK
+SCHUELER.minuten	Minuten	minutens	OK
+SCHUELER.nachname	Nachname	last name	OK
+SCHUELER.name	Vorname	first name	OK
+SCHUELER.next-schueler	nächster Schüler	Next Student	OK
+SCHUELER.note	Note		MISSING_IN_EN
+SCHUELER.noten	Noten	Grades	OK
+SCHUELER.ohne-oberkategorie	ohne Oberkategorie	without top category	OK
+SCHUELER.prev-schueler	vorheriger Schüler	Previous Student	OK
+SCHUELER.schueler	Schüler	Students	OK
+SCHUELER.schueler-bearbeiten	Schüler bearbeiten	Edit student	OK
+SCHUELER.schueler-csv-import	Schüler CSV-Import	Students CSV-import	OK
+SCHUELER.schueler-hinzu	Schüler hinzufügen	Add student	OK
+SCHUELER.schueleruebersicht	Schüler Übersicht	Students overview	OK
+SCHUELER.schulstunde	Schulstunde	lesson	OK
+SCHUELER.schulstunden	Schulstunden	lessons	OK
+SCHUELER.sortieren	Sortieren	Sort	OK
+SCHUELER.speichern	Speichern	save	OK
+SCHUELER.stunden	Stunden	Lessons	OK
+SCHUELER.teilklasse	Teilklasse	subclass	OK
+SCHUELER.termine	Termine	dates	OK
+SCHUELER.verspaetung	Verspätung	Delay	OK
+SCHUELER.von	von	of	OK
+SCHUELER.vorlagen-auf	Vorlagen auf	Presets on	OK
+SCHUELER.vorlagen-link	vorlagen	presets	OK
+SCHUELER.w	weiblich	female	OK
+SCHUELER.weiblich	weiblich	female	OK
+SCHUELER.wiederholungen	Wdh	Repetitions	OK
+SCORES.title	Scoreboard		MISSING_IN_EN
+SEARCH.placeholder	Suche...		MISSING_IN_EN
+SELECT.cancel	Abbrechen		MISSING_IN_EN
+SELECT.color	Farbe		MISSING_IN_EN
+SELECT.grade	Note auswählen		MISSING_IN_EN
+SELECT.ok	OK		MISSING_IN_EN
+SELECT.selected-color	Ausgewählte Farbe		MISSING_IN_EN
+SELECT.start	Start		MISSING_IN_EN
+SELECT.table	Tabelle auswählen		MISSING_IN_EN
+SELECT.version:	Version auswählen		MISSING_IN_EN
+SETTINGS.1	Kommandozentrale	Kommandozentrale	OK
+SETTINGS.2	Hier kannst du alle Einstellungen tätigen.	Hier können Sie alle Einstellungen tätigen.	OK
+SETTINGS.3	Bitte denke an regelmäßige Backups und sichern diese auch außerhalb Ihres Gerätes!	Bitte denken Sie an regelmäßige Backups und sichern diese auch außerhalb Ihres Gerätes!	OK
+SETTINGS.account	Account		MISSING_IN_EN
+SETTINGS.agb:	AGB		MISSING_IN_EN
+SETTINGS.auto-lock	Automatisches Sperren		MISSING_IN_EN
+SETTINGS.auto-lock-delay	Automatisches Sperren nach (in Minuten)		MISSING_IN_EN
+SETTINGS.backup-create-confirm-message	Möchtest du jetzt ein verschlüsseltes Backup erstellen?	Do you want to create an encrypted backup now?	OK
+SETTINGS.backup-create-confirm-title	Backup erstellen	Create backup	OK
+SETTINGS.backup-created	Backup erstellt	Backup created	OK
+SETTINGS.backup-erstellen	Backup erstellen	create backup	OK
+SETTINGS.backup-failed	Backup fehlgeschlagen	Backup failed	OK
+SETTINGS.backup-restore-confirm-message	Bitte Passwort eingeben, um das Backup zu entschlüsseln.	Please enter the password to decrypt the backup.	OK
+SETTINGS.backup-restore-confirm-title	Backup einspielen	Restore backup	OK
+SETTINGS.backup-restore-failed	Backup konnte nicht eingespielt werden	Backup restore failed	OK
+SETTINGS.backup-restore-hint	JSON-Backup-Datei auswählen	Select JSON backup file	OK
+SETTINGS.backup-restore-warning-message	Durch das Einspielen werden alle lokalen Daten überschrieben. Fortfahren?	Restoring will overwrite all local data. Continue?	OK
+SETTINGS.backup-restore-warning-title	Achtung	Warning	OK
+SETTINGS.backup-restored	Backup eingespielt	Backup restored	OK
+SETTINGS.backup-speicher	Das Backup heißt immer:	The backup will always be named:	OK
+SETTINGS.backup-wiederherstellen	Backup wiederherstellen	restore backup	OK
+SETTINGS.backup-zeitraum	Zeitraum nach dem an ein Backup erinnert werden soll in Tagen	Period of the backup-reminder	OK
+SETTINGS.buy-365	Weitere 365 Tage kaufen		MISSING_IN_EN
+SETTINGS.buy-year-licence	Jahreslizenz kaufen		MISSING_IN_EN
+SETTINGS.change-encryption-pin	Verschlüsselungs-PIN ändern	Change Encryption PIN	OK
+SETTINGS.change-password	Passwort ändern	Change password	OK
+SETTINGS.change-password-description	Gib dein neues Passwort ein und bestätige es.	Enter your new password and confirm it.	OK
+SETTINGS.confirm-password-placeholder	Passwort bestätigen	Confirm password	OK
+SETTINGS.danger-zone	Gefahrenzone	Danger Zone	OK
+SETTINGS.dark-mode	Dark Mode		MISSING_IN_EN
+SETTINGS.delete-account	Account endgültig löschen	Permanently Delete Account	OK
+SETTINGS.delete-account-confirm-input	Gib 'LÖSCHEN' ein, um zu bestätigen	Type 'DELETE' to confirm	OK
+SETTINGS.delete-account-confirm-message	ACHTUNG: Diese Aktion löscht deinen Account, ALLE deine Daten (Klassen, Schüler, Noten, etc.) und deinen kompletten Authentication-Eintrag dauerhaft und unwiderruflich aus der Datenbank. Du wirst ausgeloggt und kannst dich niemals wieder anmelden. Diese Aktion kann unter ABSOLUT KEINEN Umständen rückgängig gemacht werden!	WARNING: This action permanently and irreversibly deletes your account, ALL your data (classes, students, grades, etc.) and your complete authentication entry from the database. You will be logged out and can never log in again. This action cannot be undone under ABSOLUTELY NO circumstances!	OK
+SETTINGS.delete-account-confirm-title	Account wirklich und endgültig löschen?	Really and permanently delete account?	OK
+SETTINGS.delete-account-description	Löscht deinen Account und ALLE damit verbundenen Daten dauerhaft und unwiderruflich aus der Datenbank. AUCH dein Authentication-Eintrag wird vollständig entfernt. Diese Aktion kann NICHT rückgängig gemacht werden!	Permanently and irreversibly deletes your account and ALL associated data from the database. EVEN your authentication entry will be completely removed. This action CANNOT be undone!	OK
+SETTINGS.delete-account-failed	Fehler beim Löschen des Accounts	Error deleting account	OK
+SETTINGS.delete-account-success	Account und alle Daten erfolgreich gelöscht	Account and all data successfully deleted	OK
+SETTINGS.deutsch		deutsch	EXTRA_IN_EN
+SETTINGS.display-lock	Bildschirm-Sperre		MISSING_IN_EN
+SETTINGS.encryption	Verschlüsselung	Encryption	OK
+SETTINGS.encryption-description	Mit dieser PIN werden die Daten ver- und entschlüsselt. Diese PIN wird auf allen deinen Geräten verwendet.	Student names are stored encrypted	OK
+SETTINGS.encryption-not-setup	Verschlüsselung noch nicht eingerichtet	Encryption not set up yet	OK
+SETTINGS.english	english	english	OK
+SETTINGS.farbe-stunde-aktuell	Farbe der aktuellen Stunde in der Stundenübersicht	Color of the current lesson in the lesson-view	OK
+SETTINGS.fingerprint-aktuell	Aktuelles PW	current PW	OK
+SETTINGS.fingerprint-einrichten	Fingerprint-Entsperrung einrichten	Fingerprint-Unlock	OK
+SETTINGS.four-numbers	4 Ziffern		MISSING_IN_EN
+SETTINGS.general-heading	Allgemein		MISSING_IN_EN
+SETTINGS.german	deutsch		MISSING_IN_EN
+SETTINGS.hilfe	Einrichtungs-Hilfe	Help	OK
+SETTINGS.hilfe-notiz	Die Einrichtungs-Hilfe wird erneut angezeigt	Show help again	OK
+SETTINGS.imprint	Impressum		MISSING_IN_EN
+SETTINGS.in-minutes	in Minuten		MISSING_IN_EN
+SETTINGS.insert-here	Hier eingeben		MISSING_IN_EN
+SETTINGS.invoices	Rechnungen		MISSING_IN_EN
+SETTINGS.language	Sprache		MISSING_IN_EN
+SETTINGS.licences	Lizenzen		MISSING_IN_EN
+SETTINGS.local-backups	Lokale Backups	Local backups	OK
+SETTINGS.new-password-placeholder	Neues Passwort (mind. 6 Zeichen)	New password (min. 6 characters)	OK
+SETTINGS.no-classes	Keine Klassen angelegt. Unten rechts über '+' Klassen hinzufügen.	No classes yet. Use '+' to add your first class.	OK
+SETTINGS.no-invoices	Noch keine Rechnungen		MISSING_IN_EN
+SETTINGS.no-main-categories	Keine Oberkategorien angelegt. Unten rechts über '+' Oberkategorien hinzufügen.		MISSING_IN_EN
+SETTINGS.no-student	Kein Schüler vorhanden	No student	OK
+SETTINGS.no-students	Keine Schüler in dieser Klasse. Unten rechts über '+' Schüler hinzufügen.	No students in this class yet. Use '+' to add students.	OK
+SETTINGS.paid-at	Bezahlt am		MISSING_IN_EN
+SETTINGS.password-both-required	Bitte beide Passwort-Felder ausfüllen	Please fill in both password fields	OK
+SETTINGS.password-min-length	Das Passwort muss mindestens 6 Zeichen haben	Password must be at least 6 characters	OK
+SETTINGS.password-update-failed	Fehler beim Ändern des Passworts	Failed to change password	OK
+SETTINGS.password-updated	Passwort erfolgreich geändert	Password changed successfully	OK
+SETTINGS.password-updating	Passwort wird aktualisiert…	Updating password…	OK
+SETTINGS.passwords-not-equal	Passwörter stimmen nicht überein	Passwords do not match	OK
+SETTINGS.pin-notiz	mit dieser Pin kannst du die App für Schüler sperren und entsperren	lock and unlock the app for students with this pin	OK
+SETTINGS.pin-speichern	Pin speichern	save pin	OK
+SETTINGS.pin-ziffern	Ziffern	digits	OK
+SETTINGS.pw	Datenbank Passwort	Database password	OK
+SETTINGS.pw-notiz	alle Daten sind verschlüsselt gespeichert und werden mit deinem Passwort beim App-Start entschlüsselt. Hier kannst du dein Passwort ändern (4 Zeichen Länge)	password for the whole app (min. 4 signs)	OK
+SETTINGS.pw-speichern	PW speichern	save PW	OK
+SETTINGS.pw-zeichen	Zeichen	signs	OK
+SETTINGS.security	Sicherheit		MISSING_IN_EN
+SETTINGS.setup-encryption-pin	Verschlüsselungs-PIN einrichten	Setup Encryption PIN	OK
+SETTINGS.shuttle-import	Import neue Shuttle-Run-Konfiguration	Import new Shuttle-Run configuration	OK
+SETTINGS.shuttle-konfiguration	Shuttle-Run-Konfiguration	Shuttle-Run configuration	OK
+SETTINGS.speichern	speichern	save	OK
+SETTINGS.sprache		Language	EXTRA_IN_EN
+SETTINGS.sync_enabled	Synchronisation aktivieren	Enable Synchronization	OK
+SETTINGS.title	Einstellungen	Settings	OK
+SETTINGS.updated	Aktualisiert		MISSING_IN_EN
+SETTINGS.upgrade-pro	Upgrade auf Pro	Upgrade to Pro	OK
+SETTINGS.upgrade-supporter	Upgrade auf Supporter		MISSING_IN_EN
+SETTINGS.version	Version		MISSING_IN_EN
+SETTINGS.view	Öffnen		MISSING_IN_EN
+SETTINGS.vorlagen	Vorlagen auf www.sportzens.de/vorlagen	presets on www.sportzens.de/vorlagen	OK
+SHUTTLE.bahn	Bahn	Lane	OK
+SHUTTLE.bewerte-shuttle	Bewerte Shuttle-Run vom	Grade Shuttle-Run from	OK
+SHUTTLE.level	Level	Level	OK
+SHUTTLE.meter	Meter	Meter	OK
+SHUTTLE.note	Note	Mark	OK
+SHUTTLE.noten-neu	Noten neu berechnen	Recalculate marks	OK
+SHUTTLE.sound	Sound	Sound	OK
+SHUTTLE.stufe	Stufe	Step	OK
+SHUTTLE.tabelle	Tabelle	Table	OK
+SORT.geschlecht-mw	Geschlecht m-w	gender m-w	OK
+SORT.geschlecht-wm	Geschlecht w-m	gender w-m	OK
+SORT.nachname-az	Nachname A-Z	last name A-Z	OK
+SORT.nachname-za	Nachname Z-A	last name Z-A	OK
+SORT.sortierung-nach	Sortierung nach	Sort by	OK
+SORT.teilklassen	Teilklassen	subclasses	OK
+SORT.vorname-az	Vorname A-Z	first name A-Z	OK
+SORT.vorname-za	Vorname Z-A	first name Z-A	OK
+SPORTABZEICHEN.ausdauer	Ausdauer		MISSING_IN_EN
+SPORTABZEICHEN.bronze	Bronze		MISSING_IN_EN
+SPORTABZEICHEN.bronze-1	- Bronze: 1 Punkt		MISSING_IN_EN
+SPORTABZEICHEN.bronze-g	- Bronze: 4-7 Punkte		MISSING_IN_EN
+SPORTABZEICHEN.disziplin	Disziplin		MISSING_IN_EN
+SPORTABZEICHEN.disziplingruppe	Disziplingruppe		MISSING_IN_EN
+SPORTABZEICHEN.explainer	Für das Sportabzeichen musst du in einem Kalenderjahr (01.01.–31.12.) in den vier Gruppen Ausdauer, Kraft, Schnelligkeit und Koordination jeweils eine der angebotenen Übungen mindestens auf der Leistungsstufe Bronze bestehen und einen Schwimmnachweis erbringen. Die Leistungsanforderung richtet sich nach Alter, Geschlecht und ggf. Behinderung. Du findest sie hier: Materialien oder individualisiert unter sportabzeichen-digital.de. Die Leistungsanforderungen sind abgestuft in Bronze, Silber und Gold-Leistungen.		MISSING_IN_EN
+SPORTABZEICHEN.gesamtergebnis	Gesamtergebnis		MISSING_IN_EN
+SPORTABZEICHEN.gesamtpunkte	Gesamtpunkte		MISSING_IN_EN
+SPORTABZEICHEN.gold	Gold		MISSING_IN_EN
+SPORTABZEICHEN.gold-3	- Gold: 3 Punkte		MISSING_IN_EN
+SPORTABZEICHEN.gold-g	- Gold: 11-12 Punkte		MISSING_IN_EN
+SPORTABZEICHEN.importieren	Importieren		MISSING_IN_EN
+SPORTABZEICHEN.info-titel	Infos zum Sportabzeichen		MISSING_IN_EN
+SPORTABZEICHEN.info1	Beim Deutschen Sportabzeichen handelt es sich um ein Ehrenzeichen der Bundesrepublik Deutschland mit Ordenscharakter (Bundesgesetzblatt Teil I, 1958, S. 422); es darf nur getragen werden, wenn es ordnungsgemäß verliehen worden ist und der Beliehene hierfür eine Verleihungsurkunde oder ein Besitzzeugnis innehat (§ 8 des Ordensgesetzes).		MISSING_IN_EN
+SPORTABZEICHEN.info2	Die individuell erbrachten Leistungen in den einzelnen Disziplinen werden auf Grundlage des Leistungskatalogs den drei Leistungsebenen zugeordnet. Je nach Zuordnung zu einer der drei Leistungsebenen ergibt sich je Leistung und Disziplingruppe ein Punktwert:		MISSING_IN_EN
+SPORTABZEICHEN.info3	Um das Sportabzeichen zu erwerben, müssen vier Leistungen (eine Disziplin pro Disziplingruppe) mindestens in Bronze (je 1 Punkt = 4 Punkte) erbracht werden. Die erreichten Punkte werden addiert und aus dem Gesamtpunktwert ergibt sich die Verleihung in Bronze, Silber oder Gold:		MISSING_IN_EN
+SPORTABZEICHEN.koordination	Koordination		MISSING_IN_EN
+SPORTABZEICHEN.kraft	Kraft		MISSING_IN_EN
+SPORTABZEICHEN.leistung	Leistung		MISSING_IN_EN
+SPORTABZEICHEN.link	Nähere Infos unter www.deutsches-sportabzeichen.de		MISSING_IN_EN
+SPORTABZEICHEN.schnelligkeit	Schnelligkeit		MISSING_IN_EN
+SPORTABZEICHEN.schwimmfertigkeit	Der Nachweis der Schwimmfertigkeit ist notwendige Voraussetzung für den Erwerb des DSA.		MISSING_IN_EN
+SPORTABZEICHEN.silber	Silber		MISSING_IN_EN
+SPORTABZEICHEN.silber-2	- Silber: 2 Punkte		MISSING_IN_EN
+SPORTABZEICHEN.silber-g	- Silber: 8-10 Punkte		MISSING_IN_EN
+SPORTABZEICHEN.title	Sportabzeichen		MISSING_IN_EN
+SPORTABZEICHEN.werte-importieren	Werte importieren		MISSING_IN_EN
+STUDENTS.accept_all	Alle akzeptieren		MISSING_IN_EN
+STUDENTS.add	Schüler hinzufügen		MISSING_IN_EN
+STUDENTS.add-mode	Modus auswählen		MISSING_IN_EN
+STUDENTS.age	Alter		MISSING_IN_EN
+STUDENTS.birth	Geburtsdatum		MISSING_IN_EN
+STUDENTS.birth-year	Geburtsjahr		MISSING_IN_EN
+STUDENTS.check-names	Namen überprüfen		MISSING_IN_EN
+STUDENTS.csv-file-select	CSV-Datei auswählen		MISSING_IN_EN
+STUDENTS.csv-import	CSV-Import		MISSING_IN_EN
+STUDENTS.delete	Schüler löschen		MISSING_IN_EN
+STUDENTS.first-name	Vorname		MISSING_IN_EN
+STUDENTS.gender	Geschlecht		MISSING_IN_EN
+STUDENTS.general	Allgemein		MISSING_IN_EN
+STUDENTS.grades	Noten		MISSING_IN_EN
+STUDENTS.import	Schüler importieren		MISSING_IN_EN
+STUDENTS.imported	importiert		MISSING_IN_EN
+STUDENTS.importing	wird importiert		MISSING_IN_EN
+STUDENTS.incoming_students	Eingehende Registrierungen		MISSING_IN_EN
+STUDENTS.join	Beitreten		MISSING_IN_EN
+STUDENTS.join_session	Session beitreten		MISSING_IN_EN
+STUDENTS.last-name	Nachname		MISSING_IN_EN
+STUDENTS.listening	Ich höre zu...		MISSING_IN_EN
+STUDENTS.no_session_pin	Keine Session PIN gefunden		MISSING_IN_EN
+STUDENTS.paste-placeholder	"Max Muster
+Erika Elster..."		MISSING_IN_EN
+STUDENTS.photo-scan	Foto-Import (Liste abfotografieren)		MISSING_IN_EN
+STUDENTS.photo-scan-desc	Mache ein Foto von einer Namensliste. Die App versucht, die Namen automatisch zu erkennen.		MISSING_IN_EN
+STUDENTS.portfolio	Portfolio		MISSING_IN_EN
+STUDENTS.presences	Anwesenheiten		MISSING_IN_EN
+STUDENTS.preview	Vorschau		MISSING_IN_EN
+STUDENTS.pupil	Schüler		MISSING_IN_EN
+STUDENTS.register	Registrieren		MISSING_IN_EN
+STUDENTS.registration_success	Registrierung erfolgreich!		MISSING_IN_EN
+STUDENTS.remarks	Bemerkungen		MISSING_IN_EN
+STUDENTS.scan-complete	Text erkannt!		MISSING_IN_EN
+STUDENTS.scan-photo	Text erkennen		MISSING_IN_EN
+STUDENTS.scan_instruction	Scanne diesen QR-Code oder gehe auf sportzens.de/student-register		MISSING_IN_EN
+STUDENTS.scanning	Erkenne Text...		MISSING_IN_EN
+STUDENTS.self_registration	Selbst-Registrierung		MISSING_IN_EN
+STUDENTS.self_registration_desc	Lasse deine Schüler sich selbst registrieren, indem sie einen QR-Code scannen.		MISSING_IN_EN
+STUDENTS.session_pin	Session PIN		MISSING_IN_EN
+STUDENTS.single	Einzeln		MISSING_IN_EN
+STUDENTS.skipped	übersprungen		MISSING_IN_EN
+STUDENTS.smart-paste	Liste hinein kopieren (beliebiges Format aus einer deiner Schülerlisten)		MISSING_IN_EN
+STUDENTS.smart-paste-desc	Füge hier eine Liste von Namen ein (z.B. aus Excel oder Word). Wir versuchen automatisch, Vor- und Nachnamen zu trennen.		MISSING_IN_EN
+STUDENTS.smart-paste-preview-info	Bitte überprüfe die erkannten Namen. Du kannst sie hier noch korrigieren.		MISSING_IN_EN
+STUDENTS.start-recording	Aufnahme starten		MISSING_IN_EN
+STUDENTS.start_session	Session starten		MISSING_IN_EN
+STUDENTS.stop-recording	Aufnahme stoppen		MISSING_IN_EN
+STUDENTS.stop_session	Session beenden		MISSING_IN_EN
+STUDENTS.swap	Tauschen		MISSING_IN_EN
+STUDENTS.swap-all	Alle tauschen (Vor-/Nachname)		MISSING_IN_EN
+STUDENTS.take-photo	Foto aufnehmen		MISSING_IN_EN
+STUDENTS.timeline	Zeitachse		MISSING_IN_EN
+STUDENTS.total-average	Gesamtdurchschnitt		MISSING_IN_EN
+STUDENTS.voice-input	Spracheingabe (Diktieren)		MISSING_IN_EN
+STUDENTS.voice-input-desc	Diktiere die Namen einfach nacheinander. Sage 'Neue Zeile' oder mache eine kurze Pause zwischen den Namen.		MISSING_IN_EN
+STUDENTS.voice-placeholder	Namen werden hier erscheinen...		MISSING_IN_EN
+STUDENTS.wow	WOW		MISSING_IN_EN
+STUNDEN.abbrechen	Abbrechen	Cancel	OK
+STUNDEN.aktive	Aktive	active	OK
+STUNDEN.ausgefallen	ausgefallen	failed	OK
+STUNDEN.ausstehend	ausstehend	pending	OK
+STUNDEN.bemerkungen	Bemerkungen	Notes	OK
+STUNDEN.blau	blau	blue	OK
+STUNDEN.csv-export	CSV export	CSV export	OK
+STUNDEN.datum	Datum	Date	OK
+STUNDEN.doppel	Doppel	double	OK
+STUNDEN.einzel	Einzel	single	OK
+STUNDEN.farbe	Farbe	Color	OK
+STUNDEN.gehalten	gehalten	held	OK
+STUNDEN.grading-table		Grading table	EXTRA_IN_EN
+STUNDEN.grading-table-description-multistop		Select the grading table to be used for evaluating the measured times.	EXTRA_IN_EN
+STUNDEN.gruen	grün	green	OK
+STUNDEN.hinzu	Hinzufügen	Add	OK
+STUNDEN.inhalt	Inhalt	Content	OK
+STUNDEN.klasse	Klasse	Class	OK
+STUNDEN.kopieren	Stunde kopieren	copy lesson	OK
+STUNDEN.loeschen	Löschen	delete	OK
+STUNDEN.noten	Noten	Marks	OK
+STUNDEN.orange	orange	orange	OK
+STUNDEN.rot	rot	red	OK
+STUNDEN.schueler	Schüler	Students	OK
+STUNDEN.select-grading-table		Select grading table	EXTRA_IN_EN
+STUNDEN.speichern	Speichern	save	OK
+STUNDEN.sportart	Sportart	Sport	OK
+STUNDEN.stunde-bearbeiten	Stunde bearbeiten	Edit lesson	OK
+STUNDEN.stunde-hinzu	Stunde hinzufügen	Add lesson	OK
+STUNDEN.stundentitel	Stundentitel	Title	OK
+STUNDEN.stundenzahl	Stundenzahl	Count of lessons	OK
+STUNDEN.title	Stundentitel	Title	OK
+STUNDEN.weiss	weiß	white	OK
+STUNDEN.zufaelliger-schueler	Zufälliger Schüler	Random student	OK
+STUNDENPLAN.edit-zeiten	Zeiten ändern	Edit times	OK
+STUNDENPLAN.fach	Fach	Subject	OK
+STUNDENPLAN.hinzu	Speichern	Save	OK
+STUNDENPLAN.klasse	Klasse	Class	OK
+STUNDENPLAN.loeschen	Löschen	Delete	OK
+STUNDENPLAN.raum	Raum	Room	OK
+STUNDENPLAN.stunde-hinzu	Stunde hinzufügen	Add lesson	OK
+STUNDENPLAN.zeiten	Zeiten	Times	OK
+TABELLE.alter	Alter	Age	OK
+TABELLE.bewerte	Bewerte	Grade	OK
+TABELLE.leistung	Leistung	Performance	OK
+TABELLE.note	Note	Mark	OK
+TABELLE.tabelle	Tabelle	Table	OK
+TABELLE.vom	vom	from	OK
+TABELLEN.alter		Age of the students	EXTRA_IN_EN
+TABELLEN.bahnlaenge		Round length	EXTRA_IN_EN
+TABELLEN.bearbeiten		Edit table	EXTRA_IN_EN
+TABELLEN.becken		Pool-length	EXTRA_IN_EN
+TABELLEN.bemerkungen		Notes	EXTRA_IN_EN
+TABELLEN.bundesjugendspiele		Bundesjugendspiele	EXTRA_IN_EN
+TABELLEN.cooper		Cooper-Test	EXTRA_IN_EN
+TABELLEN.datei		Choose file	EXTRA_IN_EN
+TABELLEN.demo-hinzu		Insert demo-tables	EXTRA_IN_EN
+TABELLEN.demo-importieren		Import demo tables	EXTRA_IN_EN
+TABELLEN.eigene-importieren		Import own table	EXTRA_IN_EN
+TABELLEN.einfache-tabellenbewertung		simple table evaluation	EXTRA_IN_EN
+TABELLEN.fuer		Table for	EXTRA_IN_EN
+TABELLEN.laufen		running	EXTRA_IN_EN
+TABELLEN.lokale-importieren		Import local table	EXTRA_IN_EN
+TABELLEN.mittelstrecke		Middle distance	EXTRA_IN_EN
+TABELLEN.multistop		multistop	EXTRA_IN_EN
+TABELLEN.name		Name	EXTRA_IN_EN
+TABELLEN.note		Grade	EXTRA_IN_EN
+TABELLEN.notenschema		Grade scheme	EXTRA_IN_EN
+TABELLEN.relativleistung		relative	EXTRA_IN_EN
+TABELLEN.schwimmen		swimming	EXTRA_IN_EN
+TABELLEN.shuttle		Shuttle-Run (beep-test)	EXTRA_IN_EN
+TABELLEN.sportabzeichen		German Sport Badge	EXTRA_IN_EN
+TABELLEN.tabelle-hinzu		Add table	EXTRA_IN_EN
+TABELLEN.tabellen		Tables	EXTRA_IN_EN
+TABELLEN.tabellenbewertung		table evaluation	EXTRA_IN_EN
+TABELLEN.typ		Type	EXTRA_IN_EN
+TABELLEN.verbalbeurteilung		verbal	EXTRA_IN_EN
+TABLES.add	Tabelle hinzufügen		MISSING_IN_EN
+TABLES.add-row	Zeile hinzufügen		MISSING_IN_EN
+TABLES.age	Alter der Schüler		MISSING_IN_EN
+TABLES.bearbeiten	Tabelle bearbeiten		MISSING_IN_EN
+TABLES.builtin_tables	Vordefinierte Tabellen		MISSING_IN_EN
+TABLES.bundesjugendspiele	Bundesjugendspiele		MISSING_IN_EN
+TABLES.categories.andere	Andere		MISSING_IN_EN
+TABLES.categories.ausdauer	Ausdauer		MISSING_IN_EN
+TABLES.categories.cooper	Cooper		MISSING_IN_EN
+TABLES.categories.sprint	Sprint		MISSING_IN_EN
+TABLES.categories.sprung	Sprung		MISSING_IN_EN
+TABLES.category	Kategorie		MISSING_IN_EN
+TABLES.cooper	Cooper-Test		MISSING_IN_EN
+TABLES.custom_import	Eigene CSV-Datei		MISSING_IN_EN
+TABLES.delete	Tabelle löschen		MISSING_IN_EN
+TABLES.demo-hinzu	Demo-Tabellen wieder einfügen		MISSING_IN_EN
+TABLES.demo-importi	Demo-Tabelle importieren		MISSING_IN_EN
+TABLES.direction	Leistungssortierung		MISSING_IN_EN
+TABLES.direction-asc	Aufsteigend: niedrigster Wert am besten bspw. schnellste Zeit)		MISSING_IN_EN
+TABLES.direction-desc	Absteigend: höchster Wert am besten (bspw. Höhe/Weite)		MISSING_IN_EN
+TABLES.edit	Tabelle bearbeiten		MISSING_IN_EN
+TABLES.einfache-tabellenbewertung	einfache Tabellenbewertung		MISSING_IN_EN
+TABLES.file	Datei auswählen		MISSING_IN_EN
+TABLES.for	Tabelle für		MISSING_IN_EN
+TABLES.grade	Note		MISSING_IN_EN
+TABLES.grade-scheme	Notenschema		MISSING_IN_EN
+TABLES.import	Tabelle importieren		MISSING_IN_EN
+TABLES.import_table	Tabelle importieren		MISSING_IN_EN
+TABLES.local-import	lokale Tabelle importieren		MISSING_IN_EN
+TABLES.mittelstrecke	Mittelstrecke		MISSING_IN_EN
+TABLES.multistop	Multistop		MISSING_IN_EN
+TABLES.name	Tabellenname		MISSING_IN_EN
+TABLES.no-tables	Bisher sind noch keine Tabellen angelegt. Unten rechts über '+' Tabelle hinzufügen.		MISSING_IN_EN
+TABLES.no-tables-add	Bisher sind noch keine Tabellen angelegt. Bitte erst unter 'Tabellen' hinzufügen.		MISSING_IN_EN
+TABLES.notes	Bemerkungen		MISSING_IN_EN
+TABLES.own-import	Eigene Tabelle importieren		MISSING_IN_EN
+TABLES.pool-length	Beckenlänge		MISSING_IN_EN
+TABLES.relativleistung	Relativleistung		MISSING_IN_EN
+TABLES.run	laufen		MISSING_IN_EN
+TABLES.save	Speichern		MISSING_IN_EN
+TABLES.save-table	Tabelle erstellen		MISSING_IN_EN
+TABLES.selected_file	Ausgewählte Datei		MISSING_IN_EN
+TABLES.shuttle	Shuttle-Run		MISSING_IN_EN
+TABLES.sportabzeichen	Sportabzeichen		MISSING_IN_EN
+TABLES.swim	schwimmen		MISSING_IN_EN
+TABLES.tabellenbewertung	Tabellenbewertung		MISSING_IN_EN
+TABLES.table	Tabelle		MISSING_IN_EN
+TABLES.tables	Tabellen		MISSING_IN_EN
+TABLES.title	Tabellen		MISSING_IN_EN
+TABLES.track-length	Bahnlänge		MISSING_IN_EN
+TABLES.type	Typ		MISSING_IN_EN
+TABLES.type-relativ	Relativleistungen		MISSING_IN_EN
+TABLES.type-sportabzeichen	Sportabzeichen		MISSING_IN_EN
+TABLES.type-table	Bewertung nach Tabelle		MISSING_IN_EN
+TABLES.type-verbal	Verbalbeurteilung		MISSING_IN_EN
+TABLES.verbalbeurteilung	Verbalbeurteilung		MISSING_IN_EN
+TACTICS.title	Taktikboard		MISSING_IN_EN
+TAKTIK.ablauf-title		Procedure	EXTRA_IN_EN
+TAKTIK.title		Takticboard	EXTRA_IN_EN
+TEAM.anwesenheit	Aktuellste Anwesenheit beachten (Stunde als gehalten markieren!)	Note current attendance (mark lesson as held!)	OK
+TEAM.anzahl	Anzahl an Teams	Number of teams	OK
+TEAM.bearbeiten	Team bearbeiten	Edit team	OK
+TEAM.bemerkungen	Bemerkungen	Notes	OK
+TEAM.bezeichnung	Bezeichnung	Designation	OK
+TEAM.erstellen	Erstellen	Create	OK
+TEAM.gemischt	gemischt	mixed	OK
+TEAM.geschlecht	nach Geschlecht	by gender	OK
+TEAM.getrennt	getrennt	separated	OK
+TEAM.gewichtung	nach Gewichtung	by weight	OK
+TEAM.gewichtung-title	Gewichtung	Weight	OK
+TEAM.heterogen	heterogen	heterogeneous	OK
+TEAM.homogen	homogen	homogeneous	OK
+TEAM.loeschen	Löschen	delete	OK
+TEAM.noten	nach Noten	by grades	OK
+TEAM.notenkategorie	Notenkategorie	grade category	OK
+TEAM.schueler	Schüler	Students	OK
+TEAM.speichern	Speichern	Save	OK
+TEAM.speziell	spezielle Schüler nicht ins selbe Team	special students not in the same team	OK
+TEAM.team-erstellen	Teams erstellen	Create Teams	OK
+TEAM.teams-klasse	Teams der Klasse	Teams of the class	OK
+TEAM.turniere	Turniere	Tournaments	OK
+TIMER.beep	Beep-Ton	Beep tone	OK
+TIMER.countdown-sound	Countdown-Sound	Countdown sound	OK
+TIMER.enable-sounds	Sounds aktivieren	Enable sounds	OK
+TIMER.finished	Timer beendet	Timer finished	OK
+TIMER.gesamtlaenge	Gesamtlänge	Total length	OK
+TIMER.halftime-sound	Halbzeit-Sound	Halftime sound	OK
+TIMER.minutes	Minuten	Minutes	OK
+TIMER.next	Nächste Phase	Next phase	OK
+TIMER.noch	Noch	To go	OK
+TIMER.pause-sound	Pause-Sound	Pause sound	OK
+TIMER.pause-time	Pausenzeit	Rest time	OK
+TIMER.remaining-time	Verbleibende Zeit	Remaining time	OK
+TIMER.rest	Pause	Rest	OK
+TIMER.round	Runde	Round	OK
+TIMER.round-start-sound	Rundenstart-Sound	Round start sound	OK
+TIMER.rounds	Runden	Rounds	OK
+TIMER.seconds	Sekunden	Seconds	OK
+TIMER.set	Timer einstellen	Set timer	OK
+TIMER.settings	Einstellungen	Settings	OK
+TIMER.sound-names.beep-maxi.mp3	Beep Maxi	Beep Maxi	OK
+TIMER.sound-names.beep-mini.mp3	Beep Mini	Beep Mini	OK
+TIMER.sound-names.bell.mp3	Glocke	Bell	OK
+TIMER.sound-names.fanfare.mp3	Fanfare	Fanfare	OK
+TIMER.sound-names.gong.mp3	Gong	Gong	OK
+TIMER.sound-names.horn.mp3	Horn	Horn	OK
+TIMER.sound-names.none	Kein Sound	No Sound	OK
+TIMER.sound-names.tick.mp3	Tick	Tick	OK
+TIMER.sound-settings	Sound-Einstellungen	Sound Settings	OK
+TIMER.workout	Workout	Workout	OK
+TIMER.workout-time	Arbeitszeit	Work time	OK
+TOAST.account-updated	Account gespeichert		MISSING_IN_EN
+TOAST.achtung		Attention!	EXTRA_IN_EN
+TOAST.aenderungen-erfolgreich	Änderungen erfolgreich	Success	OK
+TOAST.aenderungen_erfolgreich	Änderungen erfolgreich gespeichert.	Changes successfully saved.	OK
+TOAST.attention	Achtung!		MISSING_IN_EN
+TOAST.backup-cancel	Abbrechen	Cancel	OK
+TOAST.backup-message	Vergebe ein Passwort für das Backup. ACHTUNG: Ohne dieses Passwort ist das Backup wertlos!	You need a password for the backup. ATTENTION: Without this password the backup is worthless!	OK
+TOAST.backup-passwort-placeholder	Passwort	Password	OK
+TOAST.backup-passwort-title	Backup Passwort	Backup Password	OK
+TOAST.category-added	Notenkategorie hinzugefügt		MISSING_IN_EN
+TOAST.category-deleted	Notenkategorie gelöscht		MISSING_IN_EN
+TOAST.category-updated	Notenkategorie gespeichert		MISSING_IN_EN
+TOAST.class-added	Klasse hinzugefügt		MISSING_IN_EN
+TOAST.class-deleted	Klasse gelöscht		MISSING_IN_EN
+TOAST.class-updated	Klasse gespeichert		MISSING_IN_EN
+TOAST.daten-aendern	Daten ändern	Change dates	OK
+TOAST.db-geaendert	Datenbank Passwort erfolgreich geändert: 	Database password successfully changed: 	OK
+TOAST.demo-erfolgreich	Demo-Tabellen erfolgreich hinzugefügt.	Demo-Tables successfully added.	OK
+TOAST.done	Erledigt!		MISSING_IN_EN
+TOAST.einrichtungshilfe	Die Einrichtungshilfe wird erneut angezeigt.	The setup help is displayed again.	OK
+TOAST.erfolgreich-bearbeitet	 erfolgreich bearbeitet.	 successfully edited.	OK
+TOAST.erfolgreich-geloescht	 erfolgreich gelöscht.	 successfully deleted.	OK
+TOAST.erfolgreich-hinzu	 erfolgreich hinzugefügt.	 successfully added.	OK
+TOAST.erledigt		Done!	EXTRA_IN_EN
+TOAST.falsches-passwort	Falsches Passwort	Wrong Password	OK
+TOAST.farbe-geaendert	Farbe erfolgreich geändert.	Color successfully changed.	OK
+TOAST.free-upgrade-prompt	Free: Maximal 1 Klasse. Upgrade unter Einstellungen (Pro/Supporter)	Free: Max 1 class. Please upgrade in Settings (Pro/Supporter)	OK
+TOAST.free-upgrade-prompt-share-class	Free: Klassenfreigaben sind nur mit Pro/Supporter verfügbar. Upgrade unter Einstellungen	Free: Class sharing is Pro/Supporter only. Please upgrade in Settings	OK
+TOAST.free-upgrade-prompt-sync	Free: Automatischer Sync nur mit Pro/Supporter. Upgrade unter Einstellungen	Free: Auto sync is Pro/Supporter only. Please upgrade in Settings	OK
+TOAST.free-upgrade-prompt-tables	Free: Maximal 2 Tabellen. Upgrade unter Einstellungen (Pro/Supporter)	Free: Max 2 tables. Please upgrade in Settings (Pro/Supporter)	OK
+TOAST.free-upgrade-prompt-teams	Free: Maximal 2 Team-Sets. Upgrade unter Einstellungen (Pro/Supporter)	Free: Max 2 team sets. Please upgrade in Settings (Pro/Supporter)	OK
+TOAST.free-upgrade-prompt-wows	Free: WOWs sind nur mit Pro/Supporter verfügbar. Upgrade unter Einstellungen	Free: WOWs are Pro/Supporter only. Please upgrade in Settings	OK
+TOAST.gender	Bitte vorher jedem Schüler ein Geschlecht zuweisen.		MISSING_IN_EN
+TOAST.geschlecht		Please assign a gender to each student in advance.	EXTRA_IN_EN
+TOAST.grade-added	Note hinzugefügt		MISSING_IN_EN
+TOAST.grade-deleted	Note gelöscht		MISSING_IN_EN
+TOAST.grade-updated	Note gespeichert		MISSING_IN_EN
+TOAST.home-backup-ja	Ja bitte!	Yes!	OK
+TOAST.home-backup-message	Dein Backup ist zu alt. Möchtest du zur Sicherheit ein neues erstellen?	Your backup is too old. Do you want to create a new one for security reasons?	OK
+TOAST.home-backup-nein	Nein danke.	No thanks.	OK
+TOAST.home-backup-title	Backup jetzt erstellen?	Create backup now?	OK
+TOAST.klasse	Klasse 	Class 	OK
+TOAST.laden	Laden...	Loading...	OK
+TOAST.lesson-added	Stunde hinzugefügt		MISSING_IN_EN
+TOAST.lesson-deleted	Stunde gelöscht		MISSING_IN_EN
+TOAST.lesson-updated	Stunde gespeichert		MISSING_IN_EN
+TOAST.loading	Laden...		MISSING_IN_EN
+TOAST.main-category-deleted	Oberkategorie gelöscht		MISSING_IN_EN
+TOAST.minus-tag	Alle Daten um einen Tag zurück schieben?		MISSING_IN_EN
+TOAST.notenkategorie	Notenkategorie 	Grade category 	OK
+TOAST.ohne-oberkategorie	ohne Oberkategorie	without top category	OK
+TOAST.perfect	Perfekt!		MISSING_IN_EN
+TOAST.perfekt		Perfect!	EXTRA_IN_EN
+TOAST.pin-geaendert	Pin erfolgreich geändert. - App-Neustart erforderlich.	Pin successfully changed. - App restart required.	OK
+TOAST.plus-tag	Alle Daten um einen Tag weiter schieben?		MISSING_IN_EN
+TOAST.schueler	Schüler 	Student 	OK
+TOAST.schueler-geschlecht	Bitte vorher jedem Schüler ein Geschlecht zuweisen.	Please assign a gender to each student in advance.	OK
+TOAST.schueler-wow-deleted	WOW online gelöscht	WOW deleted online	OK
+TOAST.student-added	Schüler hinzugefügt		MISSING_IN_EN
+TOAST.student-deleted	Schüler gelöscht		MISSING_IN_EN
+TOAST.student-updated	Schüler gespeichert		MISSING_IN_EN
+TOAST.stunde	Stunde 	Lesson 	OK
+TOAST.tabelle	Tabelle 	Table 	OK
+TOAST.tabelle-eingelesen	Tabelle eingelesen.	Table imported.	OK
+TOAST.tabelle-erfolgreich	Tabelle erfolgreich hinzugefügt.	Table successfully added.	OK
+TOAST.tabellen	Keine passende Tabelle importiert. Bitte im Menü unter 'Tabellen' mit dem entsprechenden Notenschema eine Tabelle hochladen oder eine Demo-Tabelle einfügen.	No matching table imported. Please upload a table or insert a demo table in the menu under 'Tables' with the corresponding note scheme.	OK
+TOAST.table-added	Tabelle hinzugefügt		MISSING_IN_EN
+TOAST.table-deleted	Tabelle gelöscht		MISSING_IN_EN
+TOAST.table-updated	Tabelle gespeichert		MISSING_IN_EN
+TOAST.tage-message		Postpone all data by one day?	EXTRA_IN_EN
+TOAST.tage_geaendert	 Tage geändert.	 days changed.	OK
+TOAST.team	Team 	Team 	OK
+TOAST.turnier	Turnier 	Tournament 	OK
+TOAST.turnier-erfolgreich	Turnier erfolgreich erstellt.	Tournament successfully created.	OK
+TOAST.uebung-hinzu	Übung erfolgreich hinzugefügt.	Exercise successfully added.	OK
+TOAST.verarbeiten	Verarbeiten...	Loading...	OK
+TOAST.wow-deleted	WOW gelöscht		MISSING_IN_EN
+TOAST.wow-saved	WOW gespeichert		MISSING_IN_EN
+TOAST.zeitraum-erfolgreich	Zeitraum erfolgreich auf 	Period successfully set to 	OK
+TOURNAMENT.break	Pause	break	OK
+TOURNAMENT.estimated_duration	Dauer (geschätzt)	Estimated duration	OK
+TOURNAMENT.explain.round_def	Runde: Ein Spieltag. Alle Paarungen dieser Runde sollen gespielt werden.	Round: A match day. All pairings of this round are to be played.	OK
+TOURNAMENT.explain.slot_def	Slot: Eine Welle innerhalb einer Runde, wenn mehr Spiele als Felder vorhanden sind. Pro Slot laufen parallel so viele Spiele wie Felder.	Slot: A wave within a round when there are more matches than fields. Each slot runs as many matches in parallel as there are fields.	OK
+TOURNAMENT.field	Feld	Field	OK
+TOURNAMENT.fields	Felder	Fields	OK
+TOURNAMENT.filter.all	Alle	All	OK
+TOURNAMENT.filter.finished	Fertig	Finished	OK
+TOURNAMENT.filter.pending	Offen	Pending	OK
+TOURNAMENT.filter.running	Laufend	Running	OK
+TOURNAMENT.generate_schedule	Spielplan erzeugen	Generate schedule	OK
+TOURNAMENT.home_away	Hin- & Rückspiel	Home & Away	OK
+TOURNAMENT.live_table	Blitztabelle	Live table	OK
+TOURNAMENT.match	Spiel	match	OK
+TOURNAMENT.matches	Spiele	Matches	OK
+TOURNAMENT.next_up	Als Nächstes	Up next	OK
+TOURNAMENT.no_matches	Keine Spiele für dieses Team	No matches for this team	OK
+TOURNAMENT.overview	Übersicht	Overview	OK
+TOURNAMENT.round	Runde	Round	OK
+TOURNAMENT.rounds	Runden	Rounds	OK
+TOURNAMENT.slot	Slot	Slot	OK
+TOURNAMENT.slots_per_round	Slots pro Runde	Slots per round	OK
+TOURNAMENT.students	Schüler		MISSING_IN_EN
+TOURNAMENT.students_per_team	Schüler pro Team		MISSING_IN_EN
+TOURNAMENT.table	Tabelle	Table	OK
+TOURNAMENT.table_cols.draws	U	D	OK
+TOURNAMENT.table_cols.goals	Tore	Goals	OK
+TOURNAMENT.table_cols.losses	N	L	OK
+TOURNAMENT.table_cols.played	Sp	P	OK
+TOURNAMENT.table_cols.points	Pkt	Pts	OK
+TOURNAMENT.table_cols.student	Schüler	Student	OK
+TOURNAMENT.table_cols.team	Team	Team	OK
+TOURNAMENT.table_cols.wins	S	W	OK
+TOURNAMENT.team	Team	Team	OK
+TOURNAMENT.team_schedule	Spielplan nach Team	Schedule by team	OK
+TOURNAMENT.teams	Teams	Teams	OK
+TOURNAMENT.title	Turnier	Tournament	OK
+TOURNAMENTS.empty	Keine Turniere. Tippe auf + um ein Turnier zu erstellen.	No tournaments yet. Tap + to create one.	OK
+TOURNAMENTS.fields	Felder	Fields	OK
+TOURNAMENTS.mode.fields_bracket	Felder → Finale	Fields → Finals	OK
+TOURNAMENTS.mode.groups_playoff	Gruppen + Playoffs	Groups + Playoffs	OK
+TOURNAMENTS.mode.knockout	K.-o.-System	Knockout	OK
+TOURNAMENTS.mode.random_students	Zufällige Teams	Random Teams	OK
+TOURNAMENTS.mode.round_robin	Jeder gegen Jeden	Round robin	OK
+TOURNAMENTS.mode_info.fields_bracket	Felder → Finale: Phase 1: Auf jedem Feld werden in Mini-Brackets die Siegermannschaften ermittelt. Phase 2: Die Feld-Sieger spielen den Gesamtsieger aus, die Feld-Verlierer spielen Platzierungen aus.	Fields → Finals: Phase 1: On each field, mini-brackets determine field winners. Phase 2: Field winners play the overall winner; field losers play placement matches.	OK
+TOURNAMENTS.mode_info.groups_playoff	Gruppen + Playoffs: Vorrunde in Gruppen (Jeder gegen Jeden), die besten Teams ziehen in K.-o.-Runde ein.	Groups + Playoffs: Group stage (round robin) followed by knockout for top teams.	OK
+TOURNAMENTS.mode_info.knockout	K.-o.-System: Verlierer scheiden aus, Gewinner kommen weiter. Optional kleines Finale um Platz 3.	Knockout: Losers are eliminated, winners advance. Optional third-place match.	OK
+TOURNAMENTS.mode_info.random_students	Zufällige Teams: Jede Runde werden die Schüler zufällig in Teams aufgeteilt. Individuelle Schüler-Punkte werden vergeben, basierend auf Team-Ergebnissen.	Random Teams: Each round, students are randomly assigned to teams. Individual student points are awarded based on team results.	OK
+TOURNAMENTS.mode_info.round_robin	Jeder gegen Jeden: Alle Teams spielen einmal gegeneinander (optional Hin- und Rückspiel). Die Tabelle entscheidet.	Round robin: All teams play each other once (optional home & away). Final table decides.	OK
+TOURNAMENTS.mode_info.title	Modi erklärt:	Modes explained:	OK
+TOURNAMENTS.teams	Teams	Teams	OK
+TOURNAMENTS.title	Turniere	Tournaments	OK
+TRACKING.pushups.controls.reset	Zähler zurücksetzen	Reset counter	OK
+TRACKING.pushups.controls.start	Tracking starten	Start tracking	OK
+TRACKING.pushups.controls.stop	Tracking stoppen	Stop tracking	OK
+TRACKING.pushups.error-title	Fehler	Error	OK
+TRACKING.pushups.fps-label	FPS:	FPS:	OK
+TRACKING.pushups.loading	Tracking-Modul wird geladen...	Loading tracking module...	OK
+TRACKING.pushups.persons-label	Max. Personen:	Max. Persons:	OK
+TRACKING.pushups.quality.bad	Schlecht	Bad	OK
+TRACKING.pushups.quality.good	Gut	Good	OK
+TRACKING.pushups.quality.partial	Teilweise	Partial	OK
+TRACKING.pushups.retry	Erneut versuchen	Try again	OK
+TRACKING.pushups.stats.average	Durchschnitt	Average	OK
+TRACKING.pushups.stats.fps	FPS	FPS	OK
+TRACKING.pushups.stats.total-reps	Gesamt-Wiederholungen	Total Reps	OK
+TRACKING.pushups.status.ready	"Drücke ""Start"" um das Tracking zu beginnen"	"Press ""Start"" to begin tracking"	OK
+TRACKING.pushups.title	Liegestütze Tracking	Push-up Tracking	OK
+TRACKING.upgrade-text	Bitte upgrade auf Pro oder Supporter in den Einstellungen, um alle Tracking-Funktionen freizuschalten.	Please upgrade to Pro or Supporter in Settings to unlock all tracking features.	OK
+TRACKING.upgrade-title	Tracking ist im Free-Account deaktiviert	Tracking is disabled on Free account	OK
+TURNIER.anzahl-mannschaften	Anzahl Mannschaften	quantity of teams	OK
+TURNIER.dauer	Spieldauer	Duration	OK
+TURNIER.diff	Diff.	Diff.	OK
+TURNIER.endrunde	Endrunde mit Halbfinale und Finale	finals with half final	OK
+TURNIER.gruppe	Gruppe	group	OK
+TURNIER.gruppen	Gruppen	groups	OK
+TURNIER.hin-rueck	Hin- und Rückrunde	first and second leg	OK
+TURNIER.name	Name	Name	OK
+TURNIER.notes	Bemerkungen	Notes	OK
+TURNIER.pause	Pausenlänge in Minuten	pause in minutes	OK
+TURNIER.pl	Pl.	Pl.	OK
+TURNIER.punkte	Punkte	Points	OK
+TURNIER.punkte-sieg	Punkte für Sieg	points per win	OK
+TURNIER.punkte-unentschieden	Punkte für unentschieden	points per draw	OK
+TURNIER.sp	Sp.	Ga.	OK
+TURNIER.spiel	Spiel	game	OK
+TURNIER.spiele	Spiele	games	OK
+TURNIER.spiellaenge	Spiellänge in Minuten	duration in minutes	OK
+TURNIER.spielplan	Spielplan	Schedule	OK
+TURNIER.spielzeit	Spielzeit	Play-Duration	OK
+TURNIER.tabelle	Tabelle	Table	OK
+TURNIER.title	Turniere	Tournaments	OK
+TURNIER.tore	Tore	Goals	OK
+TURNIER.turnier-erstellen	Turnier erstellen	Create tournament	OK
+UEBUNGEN.anfaenger	Anfänger		MISSING_IN_EN
+UEBUNGEN.beschreibung	Beschreibung	Beschreibung	OK
+UEBUNGEN.dauer	Dauer in Min.	Dauer	OK
+UEBUNGEN.effekt	Effekt	Effekt	OK
+UEBUNGEN.erwaermung	Erwärmung		MISSING_IN_EN
+UEBUNGEN.fortgeschrittene	Fortgeschrittene		MISSING_IN_EN
+UEBUNGEN.hauptteil	Hauptteil		MISSING_IN_EN
+UEBUNGEN.material	Material	Material	OK
+UEBUNGEN.name	Name	Name	OK
+UEBUNGEN.phase	Phase	Phase	OK
+UEBUNGEN.profis	Profis		MISSING_IN_EN
+UEBUNGEN.schluss	Schluss		MISSING_IN_EN
+UEBUNGEN.sportart	Sportart	Sportart	OK
+UEBUNGEN.stufe	Stufe	Stufe	OK
+UEBUNGEN.subthema	Unterthema	Unterthema	OK
+UEBUNGEN.thema	Thema	Thema	OK
+UEBUNGEN.typ	Typ	Typ	OK
+UEBUNGEN.uebung-hinzu	Übung hinzufügen	Add exercises	OK
+UEBUNGEN.uebungen	Übungen	Exercises	OK
+UEBUNGEN.variation	Variation	Variation	OK
+UEBUNGEN.wichtig	Wichtig	Wichtig	OK
+UEBUNGEN.ziel	Ziel	Ziel	OK
+USERS.IMPERSONATION.DATA_LOADED	Benutzerdaten erfolgreich geladen		MISSING_IN_EN
+USERS.IMPERSONATION.DATA_LOAD_ERROR	Fehler beim Laden der Benutzerdaten		MISSING_IN_EN
+USERS.IMPERSONATION.ERROR	Fehler beim Einloggen als Benutzer		MISSING_IN_EN
+USERS.IMPERSONATION.STOPPED	Impersonation beendet		MISSING_IN_EN
+USERS.IMPERSONATION.STOP_ERROR	Fehler beim Beenden der Impersonation		MISSING_IN_EN
+USERS.IMPERSONATION.SUCCESS	Als Benutzer eingeloggt		MISSING_IN_EN
+USERS.LICENSE.FREE	Free	Free	OK
+USERS.LICENSE.PRO	Pro	Pro	OK
+USERS.LICENSE.SUPPORTER	Supporter	Supporter	OK
+USER_PROFILE.ADDONS	Erweiterungen		MISSING_IN_EN
+USER_PROFILE.ADD_CLASSES	Klassen hinzufügen		MISSING_IN_EN
+USER_PROFILE.ADD_TABLES	Tabellen hinzufügen		MISSING_IN_EN
+USER_PROFILE.AUTO_LOCK	Automatische Sperre		MISSING_IN_EN
+USER_PROFILE.AUTO_LOCK_DELAY	Automatische Sperre Verzögerung (Minuten)		MISSING_IN_EN
+USER_PROFILE.BASIC_INFO	Grundlegende Informationen		MISSING_IN_EN
+USER_PROFILE.DARK_MODE	Dunkelmodus		MISSING_IN_EN
+USER_PROFILE.DATE	Datum		MISSING_IN_EN
+USER_PROFILE.EMAIL	E-Mail		MISSING_IN_EN
+USER_PROFILE.EXPIRY_DATE	Ablaufdatum		MISSING_IN_EN
+USER_PROFILE.FIRST_NAME	Vorname		MISSING_IN_EN
+USER_PROFILE.LANGUAGE	Sprache		MISSING_IN_EN
+USER_PROFILE.LAST_NAME	Nachname		MISSING_IN_EN
+USER_PROFILE.LICENSES	Lizenzen		MISSING_IN_EN
+USER_PROFILE.NAME	Name		MISSING_IN_EN
+USER_PROFILE.PIN	PIN-Code		MISSING_IN_EN
+USER_PROFILE.PURCHASE_DATE	Kaufdatum		MISSING_IN_EN
+USER_PROFILE.ROLE	Rolle		MISSING_IN_EN
+USER_PROFILE.SAVE	Speichern		MISSING_IN_EN
+USER_PROFILE.SETTINGS	Einstellungen		MISSING_IN_EN
+USER_PROFILE.SORT_CLASSES_BY	Sortieren nach Klassen		MISSING_IN_EN
+USER_PROFILE.SORT_STUDENTS_BY	Sortieren nach Schülern		MISSING_IN_EN
+USER_PROFILE.STATUS	Status		MISSING_IN_EN
+WALKTHROUGH.1	Wähle zum Start ein Passwort, um die App und alle Schülerdaten zu sichern.		MISSING_IN_EN
+WALKTHROUGH.2	Achtung: Du kannst das Passwort ändern, aber es gibt keine Möglichkeit ein verloren gegangenes Passwort wieder zu bekommen!		MISSING_IN_EN
+WALKTHROUGH.willkommen	Willkommen!		MISSING_IN_EN
+WARNING	Warnung	Warning	OK
+WEEK.dienstag	Dienstag	tuesday	OK
+WEEK.donnerstag	Donnerstag	thursday	OK
+WEEK.freitag	Freitag	friday	OK
+WEEK.mittwoch	Mittwoch	wednesday	OK
+WEEK.montag	Montag	monday	OK
+WEEK.samstag	Samstag	saturday	OK
+WEEK.sonntag	Sonntag	sunday	OK
+WOW.BUNDESJUGENDSPIELE.ausdauer		Endurance	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.disziplinen-einzeln		single disciplines	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.ehrenurkunde		Ehrenurkunde	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.info-titel		Certificate of Honour	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.info1		Each student competes in four disciplines at the Federal Youth Games and receives points for their performance.	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.info2		These points are added up to a total score, which then leads to a participation, winner or even honorary certificate.	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.link		Furhter information under www.bundesjugendspiele.de	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.punkte		Points	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.siegerurkunde		Winner's certificate	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.sprint		Sprint	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.sprung		Jump	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.teilnahmeurkunde		Certificate of participation	EXTRA_IN_EN
+WOW.BUNDESJUGENDSPIELE.wurf		Throw	EXTRA_IN_EN
+WOW.FEEDBACK.anzahl		Quantity	EXTRA_IN_EN
+WOW.FEEDBACK.durchschnitt		Average	EXTRA_IN_EN
+WOW.FEEDBACK.feedback		Feedback	EXTRA_IN_EN
+WOW.FEEDBACK.gut		good	EXTRA_IN_EN
+WOW.FEEDBACK.neutral		neutral	EXTRA_IN_EN
+WOW.FEEDBACK.schlecht		bad	EXTRA_IN_EN
+WOW.FEEDBACK.vom		Feedback from	EXTRA_IN_EN
+WOW.LICENSES.active		Active	EXTRA_IN_EN
+WOW.LICENSES.days		days	EXTRA_IN_EN
+WOW.LICENSES.end		Valid until	EXTRA_IN_EN
+WOW.LICENSES.free		Free	EXTRA_IN_EN
+WOW.LICENSES.free-desc		Basic features for free	EXTRA_IN_EN
+WOW.LICENSES.not-active		Not active	EXTRA_IN_EN
+WOW.LICENSES.pro		Pro	EXTRA_IN_EN
+WOW.LICENSES.remaining-days		Remaining days	EXTRA_IN_EN
+WOW.LICENSES.sportzens-all		SportZens 365	EXTRA_IN_EN
+WOW.LICENSES.start		Start date	EXTRA_IN_EN
+WOW.LICENSES.supporter		Supporter	EXTRA_IN_EN
+WOW.REGISTER.accept-privacy		I have read the 	EXTRA_IN_EN
+WOW.REGISTER.accept-privacy2		 .	EXTRA_IN_EN
+WOW.REGISTER.accept-terms		I accept the 	EXTRA_IN_EN
+WOW.REGISTER.must-accept		Please confirm Terms and Privacy Policy	EXTRA_IN_EN
+WOW.REGISTER.password-minlength		Password must be at least 6 characters	EXTRA_IN_EN
+WOW.REGISTER.password-required		Please enter a password	EXTRA_IN_EN
+WOW.REGISTER.privacy-link-text		Privacy Policy	EXTRA_IN_EN
+WOW.REGISTER.subtitle		Create your free account	EXTRA_IN_EN
+WOW.REGISTER.terms-link-text		Terms & Conditions	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.bronze-1		- Bronze: 1 point	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.bronze-g		- Bronze: 4-7 points	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.disziplingruppe		Discipline-Group	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.gold-3		- Gold: 3 points	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.gold-g		- Gold: 11-12 points	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.importieren		Import	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.info-titel		Info about the German Sport Badge	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.info1		The German Sports Badge is a decoration of the Federal Republic of Germany with order character (Federal Law Gazette Part I, 1958, p. 422); it may only be worn if it has been properly awarded and the person awarded holds a certificate of bestowal or a certificate of possession (§ 8 of the Order Law).	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.info2		The individually provided services in the individual disciplines are assigned to the three service levels on the basis of the service catalog. Depending on the assignment to one of the three service levels, a point value results for each service and discipline group:	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.info3		In order to acquire the German Sports Badge, four performances (one discipline per discipline group) must be achieved at least in bronze (1 point = 4 points each). The achieved points are added up and the total points value results in the award in bronze, silver or gold:	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.link		More information under www.deutsches-sportabzeichen.de	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.schwimmfertigkeit		The proof of the swimming ability is necessary condition for the acquisition of the German Sports Badge.	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.silber-2		- Silver: 2 points	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.silber-g		- Silver: 8-10 points	EXTRA_IN_EN
+WOW.SPORTABZEICHEN.werte-importieren		Import data	EXTRA_IN_EN
+WOW.STUDENTS.accept_all		Accept All	EXTRA_IN_EN
+WOW.STUDENTS.add		Add Student	EXTRA_IN_EN
+WOW.STUDENTS.add-mode		Select Mode	EXTRA_IN_EN
+WOW.STUDENTS.age		Age	EXTRA_IN_EN
+WOW.STUDENTS.birth		Birth Date	EXTRA_IN_EN
+WOW.STUDENTS.birth-year		Birth Year	EXTRA_IN_EN
+WOW.STUDENTS.check-names		Check Names	EXTRA_IN_EN
+WOW.STUDENTS.csv-file-select		Select CSV File	EXTRA_IN_EN
+WOW.STUDENTS.csv-import		CSV Import	EXTRA_IN_EN
+WOW.STUDENTS.delete		Delete Student	EXTRA_IN_EN
+WOW.STUDENTS.first-name		First Name	EXTRA_IN_EN
+WOW.STUDENTS.gender		Gender	EXTRA_IN_EN
+WOW.STUDENTS.general		General	EXTRA_IN_EN
+WOW.STUDENTS.grades		Grades	EXTRA_IN_EN
+WOW.STUDENTS.import		Import Students	EXTRA_IN_EN
+WOW.STUDENTS.imported		imported	EXTRA_IN_EN
+WOW.STUDENTS.importing		importing	EXTRA_IN_EN
+WOW.STUDENTS.incoming_students		Incoming Registrations	EXTRA_IN_EN
+WOW.STUDENTS.join		Join	EXTRA_IN_EN
+WOW.STUDENTS.join_session		Join Session	EXTRA_IN_EN
+WOW.STUDENTS.last-name		Last Name	EXTRA_IN_EN
+WOW.STUDENTS.listening		Listening...	EXTRA_IN_EN
+WOW.STUDENTS.no_session_pin		No Session PIN found	EXTRA_IN_EN
+WOW.STUDENTS.paste-placeholder		"John Doe
+Jane Doe..."	EXTRA_IN_EN
+WOW.STUDENTS.photo-scan		Photo Scan (OCR)	EXTRA_IN_EN
+WOW.STUDENTS.photo-scan-desc		Take a photo of a name list. The app tries to automatically recognize the names.	EXTRA_IN_EN
+WOW.STUDENTS.portfolio		Portfolio	EXTRA_IN_EN
+WOW.STUDENTS.presences		Presences	EXTRA_IN_EN
+WOW.STUDENTS.preview		Preview	EXTRA_IN_EN
+WOW.STUDENTS.pupil		Student	EXTRA_IN_EN
+WOW.STUDENTS.register		Register	EXTRA_IN_EN
+WOW.STUDENTS.registration_success		Registration successful!	EXTRA_IN_EN
+WOW.STUDENTS.remarks		Remarks	EXTRA_IN_EN
+WOW.STUDENTS.scan-complete		Text recognized!	EXTRA_IN_EN
+WOW.STUDENTS.scan-photo		Scan Text	EXTRA_IN_EN
+WOW.STUDENTS.scan_instruction		Scan this QR code or go to sportzens.de/student-register	EXTRA_IN_EN
+WOW.STUDENTS.scanning		Scanning...	EXTRA_IN_EN
+WOW.STUDENTS.self_registration		Self-Registration	EXTRA_IN_EN
+WOW.STUDENTS.self_registration_desc		Let your students register themselves by scanning a QR code.	EXTRA_IN_EN
+WOW.STUDENTS.session_pin		Session PIN	EXTRA_IN_EN
+WOW.STUDENTS.single		Single	EXTRA_IN_EN
+WOW.STUDENTS.skipped		skipped	EXTRA_IN_EN
+WOW.STUDENTS.smart-paste		Smart Paste	EXTRA_IN_EN
+WOW.STUDENTS.smart-paste-desc		Paste a list of names here (e.g. from Excel or Word). We try to automatically separate first and last names.	EXTRA_IN_EN
+WOW.STUDENTS.smart-paste-preview-info		Please check the recognized names. You can correct them here.	EXTRA_IN_EN
+WOW.STUDENTS.start-recording		Start Recording	EXTRA_IN_EN
+WOW.STUDENTS.start_session		Start Session	EXTRA_IN_EN
+WOW.STUDENTS.stop-recording		Stop Recording	EXTRA_IN_EN
+WOW.STUDENTS.stop_session		Stop Session	EXTRA_IN_EN
+WOW.STUDENTS.swap		Swap	EXTRA_IN_EN
+WOW.STUDENTS.swap-all		Swap All (First/Last Name)	EXTRA_IN_EN
+WOW.STUDENTS.take-photo		Take Photo	EXTRA_IN_EN
+WOW.STUDENTS.timeline		Timeline	EXTRA_IN_EN
+WOW.STUDENTS.total-average		Total Average	EXTRA_IN_EN
+WOW.STUDENTS.voice-input		Voice Input	EXTRA_IN_EN
+WOW.STUDENTS.voice-input-desc		Dictate names one by one. Say 'New Line' or pause briefly between names.	EXTRA_IN_EN
+WOW.STUDENTS.voice-placeholder		Names will appear here...	EXTRA_IN_EN
+WOW.STUDENTS.wait_for_teacher		Please wait for your teacher to accept you.	EXTRA_IN_EN
+WOW.STUDENTS.wow		WOW	EXTRA_IN_EN
+WOW.add-wow	WOW hinzufügen	Add WOW	OK
+WOW.amrap	AMRAP (maximale Wiederholungszahl in der vorgegebenen Zeit)	AMRAP (maximum number of repetitions in the given time)	OK
+WOW.amrap-beschreibung	AMRAP: As Many Reps As Possible - In der vorgegebenen Zeit werden so viele Wiederholungen gemacht wie möglich	AMRAP: As many reps as possible in the given time.	OK
+WOW.anfang-sek	Anfang in Sek.	begin in s	OK
+WOW.anfang-wdh	Anfang in Wdh.	begin in rep.	OK
+WOW.befinden	Befinden	health status	OK
+WOW.belastungszeit	Belastungszeit		MISSING_IN_EN
+WOW.bemerkungen	Bemerkungen		MISSING_IN_EN
+WOW.bereich	Bereich	Area	OK
+WOW.bereiche	Bereiche zur Eingliederung der Schüler (diese bekommen dann Badges entsprechend ihres Bereiches)	areas for the integration of the students (they will receive badges according to their area)	OK
+WOW.circuit	Zirkeltraining		MISSING_IN_EN
+WOW.circuit-beschreibung	Ein klassisches Zirkeltraining, bei dem du vorher alle Parameter wie Rundenzahl und -länge sowie Belastungs- und Pausenzeiten wählst.	Circuit training with configurable rounds and work/rest times.	OK
+WOW.click-to-start	Klicke zum Starten		MISSING_IN_EN
+WOW.cooper	Cooper-Test-Vorbereitung	Cooper-Test-Preparation	OK
+WOW.cooper-beschreibung	Zur Vorbereitung eines Cooper-Tests	Preparation for a Cooper test.	OK
+WOW.daten-abrufen	Daten abrufen	get data	OK
+WOW.daten-geladen	Daten geladen	data loaded	OK
+WOW.dauer	Dauer	Duration	OK
+WOW.eigene-schueler-wows	Eigene Schüler-WOWs	Own Student-WOWs	OK
+WOW.emom	EMOM (Start jede volle Minute)	EMOM (Start every minute)	OK
+WOW.emom-beschreibung	EMOM: („Every minute on the minute“) jede volle Minute wechselt die Übung und das Ziel ist es, innerhalb dieser Minute die angegebene Wiederholungsanzahl zu schaffen und den Rest der Zeit zu pausieren.	EMOM: Every minute on the minute complete the target reps, rest the remainder.	OK
+WOW.ende-sek	Ende in Sek.	end in s	OK
+WOW.ende-wdh	Ende in Wdh.	end in rep.	OK
+WOW.erholungszeit	Erholungszeit		MISSING_IN_EN
+WOW.expected-reps	Erwartete Wiederholungen		MISSING_IN_EN
+WOW.expected-time	Erwartete Durchschnittszeit		MISSING_IN_EN
+WOW.fight-beschreibung	For time: Die vorgegebenen Wierderholungen werden in möglichst kurze Zeit absolviert	For time: Complete the given repetitions as fast as possible.	OK
+WOW.for-time	For time (möglichst kurze Zeit)	For time (as short as possible)	OK
+WOW.free	Frei	Free	OK
+WOW.free-beschreibung	Freie Beschreibung, Link zu einer Datei, ...	Free description, link to a file, ...	OK
+WOW.gemacht	Gemacht	Done	OK
+WOW.guter-bereich	Guter Bereich	good area	OK
+WOW.hochladen	Wow zusammenstellen und hochladen	WOW compiling and uploading	OK
+WOW.hold	Hold		MISSING_IN_EN
+WOW.hold-beschreibung	Die ausgewählte Übung muss als statische Halteübung maximal lang gehalten werden.	Hold the selected exercise as a static hold for as long as possible.	OK
+WOW.kopieren	WOW kopieren	Copy WOW	OK
+WOW.level.0	Nicht bestanden		MISSING_IN_EN
+WOW.level.1	Ungenügend		MISSING_IN_EN
+WOW.level.2	Mangelhaft		MISSING_IN_EN
+WOW.level.3	Ausreichend		MISSING_IN_EN
+WOW.level.4	Befriedigend		MISSING_IN_EN
+WOW.level.5	Gut		MISSING_IN_EN
+WOW.level.6	Sehr gut		MISSING_IN_EN
+WOW.load-wows	Lade WOWs…		MISSING_IN_EN
+WOW.mittlerer-bereich	Mittlerer Bereich	middle area	OK
+WOW.no-wow-subtitle	Lege dein erstes WOW an, um zu starten.	Create your first WOW to get started.	OK
+WOW.no-wow-title	Noch keine WOWs	No WOWs yet	OK
+WOW.pause-zwischen-runden	Pausenlänge zwischen den Runden		MISSING_IN_EN
+WOW.previous-attempts	frühere Versuche		MISSING_IN_EN
+WOW.ranges	Bereiche		MISSING_IN_EN
+WOW.repeat	Wiederholen		MISSING_IN_EN
+WOW.runchallenge	Lauf-Challenge		MISSING_IN_EN
+WOW.runchallenge-beschreibung	Lauf-Challenge: Alle Schüler tragen Streckenlängen ihrer Läufe in dem Workout zusammen und können sehen wie sich in der Klassenrangliste schlagen.	Run challenge: Students collect distances and compare in a class ranking.	OK
+WOW.runden	Runden	Rounds	OK
+WOW.rundenzahl	Anzahl Runden		MISSING_IN_EN
+WOW.schlechter-bereich	Schlechter Bereich	bad area	OK
+WOW.setup	Einrichten		MISSING_IN_EN
+WOW.status.cancelled	Abgebrochen		MISSING_IN_EN
+WOW.status.completed	Abgeschlossen		MISSING_IN_EN
+WOW.status.in-progress	In Bearbeitung		MISSING_IN_EN
+WOW.status.not-started	Nicht gestartet		MISSING_IN_EN
+WOW.status.open	Offen		MISSING_IN_EN
+WOW.status.paused	Pausiert		MISSING_IN_EN
+WOW.status.pending	Offen		MISSING_IN_EN
+WOW.tabata	Tabata (8 Runden a 20s Belastung und 10s Erholung)	Tabata (8 rounds with 20s load and 10s recovery)	OK
+WOW.tabata-beschreibung	Tabata (8 Runden a 20s Belastung und 10s Erholung)	Tabata: 8 rounds with 20s work and 10s rest.	OK
+WOW.typ	Typ	Type	OK
+WOW.types.amrap	AMRAP	AMRAP	OK
+WOW.types.challenge	Challenge		MISSING_IN_EN
+WOW.types.circuit	Zirkel	Circuit	OK
+WOW.types.cooper	Cooper	Cooper	OK
+WOW.types.emom	EMOM	EMOM	OK
+WOW.types.fight	For Time	For Time	OK
+WOW.types.free	Frei	Free	OK
+WOW.types.grade	Selbsteinschätzung		MISSING_IN_EN
+WOW.types.hold	Hold	Hold	OK
+WOW.types.runchallenge	Lauf	Run	OK
+WOW.types.tabata	Tabata	Tabata	OK
+WOW.types.traininglog	Trainingstagebuch	Training Log	OK
+WOW.uebung	Übung	Exercise	OK
+WOW.uebungen-pro-runde	Anzahl Übungen pro Runde		MISSING_IN_EN
+WOW.uebungsbeschreibung	Übungsbeschreibung	Exercise description	OK
+WOW.uebungsname	Übungsname	Exercise name	OK
+WOW.uebungsvorschlaege	Übungsvorschläge	Exercise suggestions	OK
+WOW.video-ansehen	Video ansehen	Watch Video	OK
+WOW.wdh	Wdh.	Rep.	OK
+WOW.wiederholungen	Wiederholungen	Repetitions	OK
+WOW.workout-ansehen	Workout ansehen	view Workout	OK
+WOW.workout-dauer	Workout-Dauer	Workout duration	OK
+WOW.workout-hochladen	Workout hochladen	upload Workout	OK
+WOW.workout-laenge	Workout-Länge in Minuten	Workout-length in minutes	OK
+WOW.workout-name	Workout-Name	Workout-Name	OK

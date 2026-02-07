@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "grade (SportZens APK shape)",
+  "type": "object",
+  "description": "Extracted from compiled SportZens APK JS bundles by scanning `this.grade = {...}` object literals. Key union across 1 observed shapes.",
+  "properties": {
+    "category_id": {
+      "type": "string"
+    },
+    "class_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "criterias": {
+      "type": "object"
+    },
+    "deleted": {
+      "type": "number"
+    },
+    "grade": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "is_dirty": {
+      "type": "number"
+    },
+    "main_category_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "student_id": {
+      "type": "string"
+    },
+    "teacher_id": {
+      "type": "string"
+    },
+    "total_points": {
+      "type": "number"
+    },
+    "type": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0
+    },
+    "year": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "category_id",
+    "class_id",
+    "id",
+    "student_id",
+    "teacher_id",
+    "type",
+    "year"
+  ],
+  "additionalProperties": true
+}

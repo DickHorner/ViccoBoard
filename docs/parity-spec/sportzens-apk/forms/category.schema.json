@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "category (SportZens APK shape)",
+  "type": "object",
+  "description": "Extracted from compiled SportZens APK JS bundles by scanning `this.category = {...}` object literals. Key union across 3 observed shapes.",
+  "properties": {
+    "categories": {
+      "type": "object"
+    },
+    "class_id": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deleted": {
+      "type": "number"
+    },
+    "id": {
+      "type": "string"
+    },
+    "is_dirty": {
+      "type": "number"
+    },
+    "main_category_id": {
+      "type": "string"
+    },
+    "max_value": {
+      "type": "number"
+    },
+    "min_value": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "object"
+    },
+    "stats": {
+      "type": "object"
+    },
+    "teacher_id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0
+    },
+    "year": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "class_id",
+    "id",
+    "name",
+    "teacher_id",
+    "type",
+    "weight",
+    "year"
+  ],
+  "additionalProperties": true
+}

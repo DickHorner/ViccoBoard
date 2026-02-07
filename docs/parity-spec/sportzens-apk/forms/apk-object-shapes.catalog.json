@@ -1,0 +1,388 @@
+{
+  "table": {
+    "varname": "table",
+    "key_sets": [
+      [
+        "color",
+        "created_at",
+        "grade_scheme",
+        "grade_scheme_direction",
+        "id",
+        "is_dirty",
+        "name",
+        "school",
+        "teacher_id",
+        "updated_at",
+        "version",
+        "visibility"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "1016.9490b98e138efe3e.js",
+        "hash": "14b8539b05",
+        "size": 263
+      }
+    ]
+  },
+  "gradeWeighting": {
+    "varname": "gradeWeighting",
+    "key_sets": [
+      [
+        "attendance",
+        "grades",
+        "remarks",
+        "wow"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "1764.8b57d1fc902aeb74.js",
+        "hash": "7730c2d94c",
+        "size": 43
+      },
+      {
+        "file": "1764.8b57d1fc902aeb74.js",
+        "hash": "7730c2d94c",
+        "size": 43
+      }
+    ]
+  },
+  "student": {
+    "varname": "student",
+    "key_sets": [
+      [
+        "class_id",
+        "first_name",
+        "gender",
+        "id",
+        "is_dirty",
+        "last_name",
+        "public_code",
+        "settings",
+        "stats",
+        "teacher_id",
+        "version"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "1921.fee5b72842ddc564.js",
+        "hash": "f0f931e917",
+        "size": 267
+      }
+    ]
+  },
+  "class": {
+    "varname": "class",
+    "key_sets": [
+      [
+        "color",
+        "grade_category_count",
+        "id",
+        "is_dirty",
+        "name",
+        "school_year",
+        "settings",
+        "stats",
+        "student_count",
+        "teacher_id"
+      ],
+      [
+        "color",
+        "created_at",
+        "grade_category_count",
+        "grade_scheme",
+        "id",
+        "is_dirty",
+        "name",
+        "school_year",
+        "settings",
+        "sort",
+        "stats",
+        "student_count",
+        "teacher_id",
+        "updated_at",
+        "version"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "2009.bfd979a57ea476c6.js",
+        "hash": "c3396bf1ea",
+        "size": 184
+      },
+      {
+        "file": "3465.855f973f6b9678f2.js",
+        "hash": "ce8474b0de",
+        "size": 280
+      },
+      {
+        "file": "3873.0a523b1ceb68f6e8.js",
+        "hash": "c03437b06d",
+        "size": 223
+      },
+      {
+        "file": "4568.5f54aa643b57a5d1.js",
+        "hash": "c3396bf1ea",
+        "size": 184
+      },
+      {
+        "file": "5256.c573c68a21259428.js",
+        "hash": "c03437b06d",
+        "size": 223
+      },
+      {
+        "file": "6886.c224bdf433c9f76e.js",
+        "hash": "fac80f17a8",
+        "size": 184
+      },
+      {
+        "file": "796.3d1c7a5b76826697.js",
+        "hash": "c03437b06d",
+        "size": 223
+      },
+      {
+        "file": "8361.df6b5923f84b00f8.js",
+        "hash": "c03437b06d",
+        "size": 223
+      },
+      {
+        "file": "9509.4c2d6b4f11f1ec19.js",
+        "hash": "c03437b06d",
+        "size": 223
+      }
+    ]
+  },
+  "userData": {
+    "varname": "userData",
+    "key_sets": [
+      [
+        "addons",
+        "email",
+        "first_name",
+        "id",
+        "last_name",
+        "role",
+        "settings"
+      ],
+      [
+        "addons",
+        "email",
+        "first_name",
+        "id",
+        "invoices",
+        "last_name",
+        "role",
+        "settings"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "2069.29ed37d0fc2e98c0.js",
+        "hash": "bff61339f3",
+        "size": 299
+      },
+      {
+        "file": "5256.c573c68a21259428.js",
+        "hash": "bff61339f3",
+        "size": 299
+      },
+      {
+        "file": "5371.4cf37b4003a16615.js",
+        "hash": "dbe2c1a09c",
+        "size": 217
+      },
+      {
+        "file": "5716.2b117f977ea5c6d2.js",
+        "hash": "92ba65518e",
+        "size": 299
+      },
+      {
+        "file": "6886.c224bdf433c9f76e.js",
+        "hash": "bff61339f3",
+        "size": 299
+      },
+      {
+        "file": "8361.df6b5923f84b00f8.js",
+        "hash": "bff61339f3",
+        "size": 299
+      },
+      {
+        "file": "main.93eb6dc60e93413e.js",
+        "hash": "4f685738d6",
+        "size": 311
+      },
+      {
+        "file": "main.93eb6dc60e93413e.js",
+        "hash": "bff61339f3",
+        "size": 299
+      },
+      {
+        "file": "main.93eb6dc60e93413e.js",
+        "hash": "ac6d817191",
+        "size": 175
+      }
+    ]
+  },
+  "category": {
+    "varname": "category",
+    "key_sets": [
+      [
+        "categories",
+        "class_id",
+        "color",
+        "id",
+        "name",
+        "weight",
+        "year"
+      ],
+      [
+        "class_id",
+        "color",
+        "id",
+        "main_category_id",
+        "max_value",
+        "min_value",
+        "name",
+        "stats",
+        "teacher_id",
+        "type",
+        "weight",
+        "year"
+      ],
+      [
+        "class_id",
+        "color",
+        "created_at",
+        "deleted",
+        "id",
+        "is_dirty",
+        "main_category_id",
+        "max_value",
+        "min_value",
+        "name",
+        "settings",
+        "stats",
+        "teacher_id",
+        "type",
+        "updated_at",
+        "weight",
+        "year"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "3873.0a523b1ceb68f6e8.js",
+        "hash": "e9fec7e074",
+        "size": 189
+      },
+      {
+        "file": "5256.c573c68a21259428.js",
+        "hash": "b5b2450687",
+        "size": 199
+      },
+      {
+        "file": "5737.4408c8aad143b64b.js",
+        "hash": "d78c36401c",
+        "size": 189
+      },
+      {
+        "file": "796.3d1c7a5b76826697.js",
+        "hash": "e9fec7e074",
+        "size": 189
+      },
+      {
+        "file": "8361.df6b5923f84b00f8.js",
+        "hash": "e9fec7e074",
+        "size": 189
+      },
+      {
+        "file": "9509.4c2d6b4f11f1ec19.js",
+        "hash": "e9fec7e074",
+        "size": 189
+      },
+      {
+        "file": "9695.c6d1651276e8340a.js",
+        "hash": "6622bd42b2",
+        "size": 284
+      },
+      {
+        "file": "common.7fedbcbf39aca3e6.js",
+        "hash": "8f3f7a7872",
+        "size": 68
+      }
+    ]
+  },
+  "newDayData": {
+    "varname": "newDayData",
+    "key_sets": [
+      [
+        "additionalExercises",
+        "date",
+        "exercises",
+        "notes"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "7079.ba06463f61b183d5.js",
+        "hash": "9d871284eb",
+        "size": 90
+      },
+      {
+        "file": "7079.ba06463f61b183d5.js",
+        "hash": "9d871284eb",
+        "size": 90
+      }
+    ]
+  },
+  "grade": {
+    "varname": "grade",
+    "key_sets": [
+      [
+        "category_id",
+        "class_id",
+        "created_at",
+        "criterias",
+        "deleted",
+        "grade",
+        "id",
+        "is_dirty",
+        "main_category_id",
+        "name",
+        "student_id",
+        "teacher_id",
+        "total_points",
+        "type",
+        "updated_at",
+        "weight",
+        "year"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "8361.df6b5923f84b00f8.js",
+        "hash": "6a3f5fbe12",
+        "size": 663
+      }
+    ]
+  },
+  "wow": {
+    "varname": "wow",
+    "key_sets": [
+      [
+        "name",
+        "wowtimer",
+        "wowtyp"
+      ]
+    ],
+    "occurrences": [
+      {
+        "file": "9933.c05d1e5fa0445ecd.js",
+        "hash": "24557ed115",
+        "size": 35
+      }
+    ]
+  }
+}

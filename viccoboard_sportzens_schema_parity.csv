@@ -1,0 +1,10 @@
+schema,mapped_to,apk_field_count,vicco_field_count,missing_in_vicco_count,missing_in_vicco_fields
+category.schema.json,GradeCategory (apps/teacher-ui DB + core sport types),18,9,14,categories;class_id;color;created_at;deleted;is_dirty;main_category_id;max_value;min_value;settings;stats;teacher_id;updated_at;year
+class.schema.json,ClassGroup (apps/teacher-ui DB + core.types),15,5,13,color;created_at;grade_category_count;grade_scheme;is_dirty;school_year;settings;sort;stats;student_count;teacher_id;updated_at;version
+grade.schema.json,PerformanceEntry / Grade (apps/teacher-ui DB),17,8,16,category_id;class_id;created_at;criterias;deleted;grade;is_dirty;main_category_id;name;student_id;teacher_id;total_points;type;updated_at;weight;year
+gradeWeighting.schema.json,Gewichtungs-/Notenschema (aktuell nur teilweise in GradeCategory.configuration?),4,0,4,attendance;grades;remarks;wow
+newDayData.schema.json,Tagesdaten/„Neuer Tag“-Flow (kein Pendant in teacher-ui DB sichtbar),4,0,4,additionalExercises;date;exercises;notes
+student.schema.json,Student (apps/teacher-ui DB + core.types),11,9,10,class_id;first_name;gender;is_dirty;last_name;public_code;settings;stats;teacher_id;version
+table.schema.json,Sportabzeichen-/BJS-Tabellen (kein eigenes Persistenzmodell in teacher-ui DB sichtbar),12,0,12,color;created_at;grade_scheme;grade_scheme_direction;id;is_dirty;name;school;teacher_id;updated_at;version;visibility
+userData.schema.json,User/Teacher-Einstellungen (SecuritySettings/TeacherAccount?),8,0,8,addons;email;first_name;id;invoices;last_name;role;settings
+wow.schema.json,WOW Workouts (kein Persistenzmodell in teacher-ui DB sichtbar),3,0,3,name;wowtimer;wowtyp
