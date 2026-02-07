@@ -51,6 +51,7 @@ export interface ClassGroup {
   name: string;
   schoolYear: string;
   color?: string;
+  archived?: boolean;
   state?: string; // Bundesland
   holidayCalendarRef?: string;
   gradingScheme?: string;

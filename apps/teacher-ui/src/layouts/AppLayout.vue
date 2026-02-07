@@ -83,6 +83,7 @@ const route = useRoute()
 const navItems = [
   { to: '/', label: 'Dashboard', hint: 'Classes and activity' },
   { to: '/students', label: 'Students', hint: 'Roster and profiles' },
+  { to: '/lessons', label: 'Lessons', hint: 'Schedule and history' },
   { to: '/attendance', label: 'Attendance', hint: 'Daily check-in' },
   { to: '/grading', label: 'Grading', hint: 'Entries and history' }
 ]

@@ -23,7 +23,8 @@ export class IndexedDBInitialSchemaMigration implements IndexedDBMigration {
 
     createStore('class_groups', [
       { name: 'school_year', keyPath: 'school_year' },
-      { name: 'state', keyPath: 'state' }
+      { name: 'state', keyPath: 'state' },
+      { name: 'archived', keyPath: 'archived' }
     ]);
 
     createStore('students', [

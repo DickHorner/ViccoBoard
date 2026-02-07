@@ -6,6 +6,7 @@ export interface ClassGroup {
   name: string
   schoolYear: string
   color?: string
+  archived?: boolean
   createdAt: Date
   updatedAt: Date
 }

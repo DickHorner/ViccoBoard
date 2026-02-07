@@ -16,11 +16,14 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
    * Map database row to ClassGroup entity
    */
   mapToEntity(row: any): ClassGroup {
+    const archived = row.archived === 1 || row.archived === true;
+
     return {
       id: row.id,
       name: row.name,
       schoolYear: row.school_year,
       color: row.color || undefined,
+      archived,
       state: row.state || undefined,
       holidayCalendarRef: row.holiday_calendar_ref || undefined,
       gradingScheme: row.grading_scheme || 'default',
@@ -40,6 +43,7 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
     if (entity.name !== undefined) row.name = entity.name;
     if (entity.schoolYear !== undefined) row.school_year = entity.schoolYear;
     if (entity.color !== undefined) row.color = entity.color;
+    if (entity.archived !== undefined) row.archived = entity.archived ? 1 : 0;
     if (entity.state !== undefined) row.state = entity.state;
     if (entity.holidayCalendarRef !== undefined) row.holiday_calendar_ref = entity.holidayCalendarRef;
     if (entity.gradingScheme !== undefined) row.grading_scheme = entity.gradingScheme;
@@ -70,6 +74,8 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
   async findActive(): Promise<ClassGroup[]> {
     const currentYear = new Date().getFullYear();
     const schoolYear = `${currentYear}/${currentYear + 1}`;
-    return this.findBySchoolYear(schoolYear);
+    const classes = await this.findBySchoolYear(schoolYear);
+    return classes.filter((cls) => !cls.archived);
   }
 }
+

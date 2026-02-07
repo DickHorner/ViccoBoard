@@ -50,6 +50,10 @@
             <span>{{ getGradingSchemeDisplay() }}</span>
           </div>
           <div class="info-item">
+            <label>Status:</label>
+            <span>{{ classGroup.archived ? 'Archiviert' : 'Aktiv' }}</span>
+          </div>
+          <div class="info-item">
             <label>Erstellt:</label>
             <span>{{ formatDate(classGroup.createdAt) }}</span>
           </div>
@@ -82,7 +86,7 @@
               <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
               <div class="student-info">
                 <h4>{{ student.firstName }} {{ student.lastName }}</h4>
-                <p v-if="student.dateOfBirth">Geb.: {{ student.dateOfBirth.getFullYear() }}</p>
+                <p v-if="student.birthYear">Geb.: {{ student.birthYear }}</p>
               </div>
               <div class="student-arrow">→</div>
             </RouterLink>

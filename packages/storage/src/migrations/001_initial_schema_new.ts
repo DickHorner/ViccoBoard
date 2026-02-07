@@ -39,6 +39,7 @@ export class InitialSchemaMigration implements Migration {
         name TEXT NOT NULL,
         school_year TEXT NOT NULL,
         color TEXT,
+        archived INTEGER NOT NULL DEFAULT 0,
         state TEXT,
         holiday_calendar_ref TEXT,
         grading_scheme TEXT,

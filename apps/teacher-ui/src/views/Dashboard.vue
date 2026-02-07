@@ -30,15 +30,19 @@
               </option>
             </select>
           </div>
+          <label class="archive-toggle">
+            <input type="checkbox" v-model="showArchived" />
+            Archivierte anzeigen
+          </label>
         </div>
-        
+
         <div class="card-content">
           <!-- Loading State -->
           <div v-if="loading" class="loading-state">
             <div class="spinner"></div>
             <p>Klassen werden geladen...</p>
           </div>
-          
+
           <!-- Error State -->
           <div v-else-if="loadError" class="error-state">
             <p>{{ loadError }}</p>
@@ -46,7 +50,7 @@
               Erneut versuchen
             </button>
           </div>
-          
+
           <!-- Empty State -->
           <div v-else-if="filteredClasses.length === 0 && searchQuery === ''" class="empty-state">
             <p>Noch keine Klassen. Erstellen Sie Ihre erste Klasse zum Starten.</p>
@@ -85,6 +89,14 @@
                   :aria-label="`Edit class ${cls.name}`"
                 >
                   ✏️
+                </button>
+                <button 
+                  @click.stop="toggleArchiveClass(cls)" 
+                  class="action-btn"
+                  :title="cls.archived ? `Unarchive class ${cls.name}` : `Archive class ${cls.name}`"
+                  :aria-label="cls.archived ? `Unarchive class ${cls.name}` : `Archive class ${cls.name}`"
+                >
+                  {{ cls.archived ? '📤' : '📥' }}
                 </button>
                 <button 
                   @click.stop="confirmDeleteClass(cls)" 
@@ -336,6 +348,7 @@ const loading = ref(true)
 const loadError = ref('')
 const searchQuery = ref('')
 const filterSchoolYear = ref('')
+const showArchived = ref(false)
 const showCreateModal = ref(false)
 const creating = ref(false)
 const error = ref('')
@@ -386,7 +399,8 @@ const filteredClasses = computed(() => {
       || cls.name.toLowerCase().includes(query)
       || cls.schoolYear.toLowerCase().includes(query)
     const matchesYear = !filterSchoolYear.value || cls.schoolYear === filterSchoolYear.value
-    return matchesQuery && matchesYear
+    const matchesArchive = showArchived.value ? true : !cls.archived
+    return matchesQuery && matchesYear && matchesArchive
   })
 })
 
@@ -536,6 +550,15 @@ const handleDeleteClass = async () => {
   }
 }
 
+const toggleArchiveClass = async (cls: ClassGroup) => {
+  try {
+    await classGroups.update(cls.id, { archived: !cls.archived })
+    await loadData()
+  } catch (err) {
+    console.error('Failed to toggle archive:', err)
+  }
+}
+
 const closeDeleteModal = () => {
   showDeleteModal.value = false
   deleteError.value = ''
@@ -651,6 +674,14 @@ onMounted(() => {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+}
+
+.archive-toggle {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .search-input {

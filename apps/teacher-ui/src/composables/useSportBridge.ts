@@ -9,15 +9,22 @@
 import { ref, computed } from 'vue'
 import {
   ClassGroupRepository,
+  LessonRepository,
   GradeCategoryRepository,
   PerformanceEntryRepository,
   AttendanceRepository,
   CreateClassUseCase,
+  CreateLessonUseCase,
   RecordAttendanceUseCase,
+  CreateGradeCategoryUseCase,
+  RecordGradeUseCase,
   CriteriaGradingEngine,
   TimeGradingService,
   type CreateClassInput,
-  type RecordAttendanceInput
+  type CreateLessonInput,
+  type RecordAttendanceInput,
+  type CreateGradeCategoryInput,
+  type RecordGradeInput
 } from '@viccoboard/sport'
 import { getStorageAdapter } from '../services/storage.service'
 
@@ -29,13 +36,17 @@ let sportBridgeInstance: SportBridge | null = null
 interface SportBridge {
   // Repositories
   classGroupRepository: ClassGroupRepository
+  lessonRepository: LessonRepository
   gradeCategoryRepository: GradeCategoryRepository
   performanceEntryRepository: PerformanceEntryRepository
   attendanceRepository: AttendanceRepository
 
   // Use Cases
   createClassUseCase: CreateClassUseCase
+  createLessonUseCase: CreateLessonUseCase
   recordAttendanceUseCase: RecordAttendanceUseCase
+  createGradeCategoryUseCase: CreateGradeCategoryUseCase
+  recordGradeUseCase: RecordGradeUseCase
 
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
@@ -55,13 +66,17 @@ export function initializeSportBridge(): SportBridge {
 
   // Initialize repositories with storage adapter
   const classGroupRepo = new ClassGroupRepository(adapter)
+  const lessonRepo = new LessonRepository(adapter)
   const gradeCategoryRepo = new GradeCategoryRepository(adapter)
   const performanceEntryRepo = new PerformanceEntryRepository(adapter)
   const attendanceRepo = new AttendanceRepository(adapter)
 
   // Initialize use cases with repositories
   const createClassUseCase = new CreateClassUseCase(classGroupRepo)
+  const createLessonUseCase = new CreateLessonUseCase(lessonRepo)
   const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo)
+  const createGradeCategoryUseCase = new CreateGradeCategoryUseCase(gradeCategoryRepo)
+  const recordGradeUseCase = new RecordGradeUseCase(performanceEntryRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -70,13 +85,17 @@ export function initializeSportBridge(): SportBridge {
   sportBridgeInstance = {
     // Repositories
     classGroupRepository: classGroupRepo,
+    lessonRepository: lessonRepo,
     gradeCategoryRepository: gradeCategoryRepo,
     performanceEntryRepository: performanceEntryRepo,
     attendanceRepository: attendanceRepo,
 
     // Use Cases
     createClassUseCase,
+    createLessonUseCase,
     recordAttendanceUseCase,
+    createGradeCategoryUseCase,
+    recordGradeUseCase,
 
     // Services
     criteriaGradingEngine,
@@ -104,6 +123,14 @@ export function getSportBridge(): SportBridge {
 export function useClassGroups() {
   const bridge = getSportBridge()
   return bridge.classGroupRepository
+}
+
+/**
+ * Vue composable for lessons access
+ */
+export function useLessons() {
+  const bridge = getSportBridge()
+  return bridge.lessonRepository
 }
 
 /**
@@ -140,12 +167,14 @@ export function useSportBridge() {
 
     // Convenience accessors
     classGroups: computed(() => bridge.value?.classGroupRepository),
+    lessons: computed(() => bridge.value?.lessonRepository),
     gradeCategories: computed(() => bridge.value?.gradeCategoryRepository),
     performanceEntries: computed(() => bridge.value?.performanceEntryRepository),
     attendance: computed(() => bridge.value?.attendanceRepository),
 
     // Use case accessors
     useCreateClass: computed(() => bridge.value?.createClassUseCase),
+    useCreateLesson: computed(() => bridge.value?.createLessonUseCase),
     useRecordAttendance: computed(() => bridge.value?.recordAttendanceUseCase),
 
     // Service accessors
@@ -157,13 +186,23 @@ export function useSportBridge() {
 // Re-exports for convenience
 export {
   ClassGroupRepository,
+  LessonRepository,
   GradeCategoryRepository,
   PerformanceEntryRepository,
   AttendanceRepository,
   CreateClassUseCase,
+  CreateLessonUseCase,
   RecordAttendanceUseCase,
+  CreateGradeCategoryUseCase,
+  RecordGradeUseCase,
   CriteriaGradingEngine,
   TimeGradingService
 }
-export type { CreateClassInput, RecordAttendanceInput }
+export type { 
+  CreateClassInput, 
+  CreateLessonInput, 
+  RecordAttendanceInput,
+  CreateGradeCategoryInput,
+  RecordGradeInput
+}
 
