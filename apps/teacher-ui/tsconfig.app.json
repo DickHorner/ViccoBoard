@@ -24,6 +24,12 @@
       "@viccoboard/storage/*": ["../../packages/storage/src/*"],
       "@viccoboard/plugins": ["../../packages/plugins/src"],
       "@viccoboard/plugins/*": ["../../packages/plugins/src/*"],
+      "@viccoboard/students": ["../../modules/students/src"],
+      "@viccoboard/students/*": ["../../modules/students/src/*"],
+      "@viccoboard/sport": ["../../modules/sport/src"],
+      "@viccoboard/sport/*": ["../../modules/sport/src/*"],
+      "@viccoboard/exams": ["../../modules/exams/src"],
+      "@viccoboard/exams/*": ["../../modules/exams/src/*"],
       "@/*": ["./src/*"]
     },
     "types": ["vite/client"],
@@ -37,6 +43,7 @@
     { "path": "../../packages/core" },
     { "path": "../../packages/storage" },
     { "path": "../../packages/plugins" },
+    { "path": "../../modules/students" },
     { "path": "../../modules/sport" },
     { "path": "../../modules/exams" }
   ],
@@ -47,6 +54,7 @@
     "../../packages/core/src/**/*",
     "../../packages/storage/src/**/*",
     "../../packages/plugins/src/**/*",
+    "../../modules/students/src/**/*",
     "../../modules/sport/src/**/*",
     "../../modules/exams/src/**/*"
   ],
