@@ -2,32 +2,21 @@
 .SYNOPSIS
   Clean build artifacts created by `npm run build` in the ViccoBoard monorepo.
 
-.DESCRIPTION
-  Removes:
-   - dist/ folders in workspaces: packages/*, modules/*, apps/*
-   - TypeScript incremental build info (*.tsbuildinfo) outside node_modules
-   - teacher-ui TS build info in apps/teacher-ui/node_modules/.tmp (and optionally Vite cache)
-
-  Safe by default: does NOT delete node_modules (except generated caches inside teacher-ui when -Deep is used).
-
 .USAGE
-  # Dry-run (recommended first)
+  # Dry-run
   .\scripts\clean-build.ps1 -WhatIf
 
   # Actually delete
   .\scripts\clean-build.ps1
 
-  # Include teacher-ui caches (node_modules/.vite) too
+  # Deep clean (also teacher-ui vite cache)
   .\scripts\clean-build.ps1 -Deep
-
-  # Ask confirmation for every delete
-  .\scripts\clean-build.ps1 -Confirm
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 param(
   [Parameter(Mandatory = $false)]
-  [string] $RepoRoot = (Resolve-Path ".").Path,
+  [string] $RepoRoot,
 
   [Parameter(Mandatory = $false)]
   [switch] $Deep
@@ -36,12 +25,20 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-function Resolve-AbsPath([string] $Path) {
-  return (Resolve-Path -LiteralPath $Path).Path
+function Find-RepoRoot([string] $StartPath) {
+  $p = (Resolve-Path -LiteralPath $StartPath).Path
+  while ($true) {
+    $candidate = Join-Path $p "package.json"
+    if (Test-Path -LiteralPath $candidate) { return $p }
+
+    $parent = Split-Path -Parent $p
+    if ([string]::IsNullOrWhiteSpace($parent) -or $parent -eq $p) { break }
+    $p = $parent
+  }
+  return $null
 }
 
 function Is-UnderNodeModules([string] $FullPath) {
-  # Normalize slashes for simple contains checks
   $p = $FullPath -replace '/', '\'
   return $p -match '\\node_modules\\'
 }
@@ -64,12 +61,22 @@ function Remove-Target([string] $TargetPath) {
   return $false
 }
 
-# --- Validate repo root ---
-$RepoRoot = Resolve-AbsPath $RepoRoot
+# --- Determine RepoRoot automatically if not provided ---
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+  # Prefer script location (so it works even if called from elsewhere)
+  $start = if ($PSScriptRoot) { $PSScriptRoot } else { "." }
+  $RepoRoot = Find-RepoRoot $start
+} else {
+  $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+
+if (-not $RepoRoot) {
+  throw "RepoRoot konnte nicht gefunden werden. Bitte -RepoRoot angeben oder das Skript im Repo ausführen."
+}
 
 $packageJson = Join-Path $RepoRoot "package.json"
 if (-not (Test-Path -LiteralPath $packageJson)) {
-  throw "Kein package.json im RepoRoot gefunden: $RepoRoot (Bitte im ViccoBoard-Root ausführen.)"
+  throw "Kein package.json im RepoRoot gefunden: $RepoRoot"
 }
 
 Write-Host "RepoRoot: $RepoRoot"
@@ -102,7 +109,7 @@ Get-ChildItem -LiteralPath $RepoRoot -Recurse -Force -File -Filter "*.tsbuildinf
   if ($ok) { $deleted.Add($_.FullName) } else { $failed.Add($_.FullName) }
 }
 
-# --- 3) Teacher-UI generated TS build info in node_modules/.tmp (configured tsBuildInfoFile) ---
+# --- 3) Teacher-UI generated TS build info in node_modules/.tmp ---
 $teacherUiTmp = Join-Path $RepoRoot "apps\teacher-ui\node_modules\.tmp"
 if (Test-Path -LiteralPath $teacherUiTmp) {
   Get-ChildItem -LiteralPath $teacherUiTmp -Force -File -Filter "*.tsbuildinfo" | ForEach-Object {
@@ -110,7 +117,6 @@ if (Test-Path -LiteralPath $teacherUiTmp) {
     if ($ok) { $deleted.Add($_.FullName) } else { $failed.Add($_.FullName) }
   }
 
-  # Remove the folder if it became empty (nice-to-have)
   $remaining = Get-ChildItem -LiteralPath $teacherUiTmp -Force -ErrorAction SilentlyContinue
   if (-not $remaining) {
     $ok = Remove-Target $teacherUiTmp
