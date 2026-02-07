@@ -1,16 +1,16 @@
 <template>
   <div class="dashboard-view">
     <div class="page-header">
-      <h2>Übersicht</h2>
-      <p class="page-description">Willkommen bei ViccoBoard! Verwalten Sie Ihre Klassen, Schüler und Anwesenheit.</p>
+      <h2>{{ t('TOURNAMENT.overview') }}</h2>
+      <p class="page-description">{{ t('HELLO') }}! {{ t('KLASSEN.klassen-verwalten') }}</p>
     </div>
     
     <div class="dashboard-grid">
       <section class="card classes-card">
         <div class="card-header">
-          <h3>Meine Klassen</h3>
+          <h3>{{ t('KLASSEN.title') }}</h3>
           <button class="btn-primary btn-small" @click="showCreateModal = true">
-            + Neue Klasse
+            + {{ t('KLASSEN.hinzu') }}
           </button>
         </div>
         
@@ -20,11 +20,11 @@
             <input 
               v-model="searchQuery"
               type="text"
-              placeholder="Klassen durchsuchen..."
+              :placeholder="t('SEARCH.placeholder')"
               class="search-input"
             />
             <select v-model="filterSchoolYear" class="filter-select">
-              <option value="">Alle Schuljahre</option>
+              <option value="">{{ t('KLASSEN.schuljahr') }}: {{ t('COMMON.alle') || 'Alle' }}</option>
               <option v-for="year in schoolYears" :key="year" :value="year">
                 {{ year }}
               </option>
@@ -32,7 +32,7 @@
           </div>
           <label class="archive-toggle">
             <input type="checkbox" v-model="showArchived" />
-            Archivierte anzeigen
+            {{ t('COMMON.archivierte-anzeigen') || 'Archivierte anzeigen' }}
           </label>
         </div>
 
@@ -40,25 +40,25 @@
           <!-- Loading State -->
           <div v-if="loading" class="loading-state">
             <div class="spinner"></div>
-            <p>Klassen werden geladen...</p>
+            <p>{{ t('COMMON.loading') }}</p>
           </div>
 
           <!-- Error State -->
           <div v-else-if="loadError" class="error-state">
             <p>{{ loadError }}</p>
             <button class="btn-primary btn-small" @click="loadData">
-              Erneut versuchen
+              {{ t('COMMON.retry') || 'Erneut versuchen' }}
             </button>
           </div>
 
           <!-- Empty State -->
           <div v-else-if="filteredClasses.length === 0 && searchQuery === ''" class="empty-state">
-            <p>Noch keine Klassen. Erstellen Sie Ihre erste Klasse zum Starten.</p>
+            <p>{{ t('KLASSEN.no-classes') }}</p>
           </div>
           
           <!-- No Results State -->
           <div v-else-if="filteredClasses.length === 0" class="empty-state">
-            <p>Keine Klassen gefunden, die "{{ searchQuery }}" entsprechen</p>
+            <p>{{ t('COMMON.no-results') || `Keine Klassen gefunden für "${searchQuery}"` }}</p>
           </div>
           
           <!-- Classes List -->
@@ -85,16 +85,16 @@
                 <button 
                   @click.stop="editClass(cls)" 
                   class="action-btn"
-                  :title="`Edit class ${cls.name}`"
-                  :aria-label="`Edit class ${cls.name}`"
+                  :title="t('CLASSES.edit')"
+                  :aria-label="t('CLASSES.edit')"
                 >
                   ✏️
                 </button>
                 <button 
                   @click.stop="toggleArchiveClass(cls)" 
                   class="action-btn"
-                  :title="cls.archived ? `Unarchive class ${cls.name}` : `Archive class ${cls.name}`"
-                  :aria-label="cls.archived ? `Unarchive class ${cls.name}` : `Archive class ${cls.name}`"
+                  :title="cls.archived ? t('COMMON.unarchive') || 'Wiederherstellen' : t('COMMON.archive') || 'Archivieren'"
+                  :aria-label="cls.archived ? t('COMMON.unarchive') || 'Wiederherstellen' : t('COMMON.archive') || 'Archivieren'"
                 >
                   {{ cls.archived ? '📤' : '📥' }}
                 </button>
@@ -169,7 +169,7 @@
     <div v-if="showCreateModal" class="modal-overlay" @click="closeModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Neue Klasse erstellen</h3>
+          <h3>{{ t('KLASSEN.hinzu') }}</h3>
           <button class="modal-close" @click="closeModal">✕</button>
         </div>
         
@@ -201,7 +201,7 @@
           </div>
 
           <div class="form-group">
-            <label for="gradingScheme">Notenschema</label>
+            <label for="gradingScheme">{{ t('KLASSEN.notenschema') }}</label>
             <select id="gradingScheme" v-model="newClass.gradingScheme" class="form-input">
               <option v-for="(label, key) in gradingSchemes" :key="key" :value="key">
                 {{ label }}
@@ -210,9 +210,9 @@
           </div>
 
           <div class="form-group">
-            <label for="classColor">Klassenfarbe</label>
+            <label for="classColor">{{ t('KLASSEN.color') || 'Klassenfarbe' }}</label>
             <select id="classColor" v-model="newClass.color" class="form-input">
-              <option value="">Keine</option>
+              <option value="">{{ t('COMMON.none') || 'Keine' }}</option>
               <option v-for="color in classColorOptions" :key="color.value" :value="color.value">
                 {{ color.label }}
               </option>
@@ -225,10 +225,10 @@
           
           <div class="modal-actions">
             <button type="button" @click="closeModal" class="btn-secondary">
-              Abbrechen
+              {{ t('COMMON.cancel') || t('CANCEL') }}
             </button>
             <button type="submit" :disabled="creating" class="btn-primary">
-              {{ creating ? 'Wird erstellt...' : 'Klasse erstellen' }}
+              {{ creating ? t('COMMON.loading') : t('KLASSEN.button-hinzufuegen') }}
             </button>
           </div>
         </form>
@@ -337,9 +337,13 @@
 // @ts-nocheck
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useClassGroups, useAttendance } from '../composables/useSportBridge'
 import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading'
 import type { ClassGroup, AttendanceRecord } from '../db'
+
+// i18n
+const { t } = useI18n()
 
 // State
 const classes = ref<ClassGroup[]>([])

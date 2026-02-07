@@ -79,6 +79,18 @@ const routes: RouteRecordRaw[] = [
     name: 'grade-history',
     component: () => import('../views/GradeHistory.vue'),
     meta: { title: 'Grade History' }
+  },
+  {
+    path: '/tools/timer',
+    name: 'timer',
+    component: () => import('../views/Timer.vue'),
+    meta: { title: 'Timer' }
+  },
+  {
+    path: '/tools/multistop',
+    name: 'multistop',
+    component: () => import('../views/Multistop.vue'),
+    meta: { title: 'Multistop' }
   }
 ]
 
