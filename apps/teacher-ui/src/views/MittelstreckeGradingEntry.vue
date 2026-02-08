@@ -79,25 +79,26 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { Student } from '@viccoboard/core';
+import type { Sport } from '@viccoboard/core';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-const { sportBridge, studentsBridge } = useDatabase();
+const { sportBridge } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const categoryId = route.params.id as string;
 const categoryName = ref('');
 const loading = ref(true);
 const saving = ref(false);
-const students = ref<Student[]>([]);
+const students = ref<any[]>([]);
 const tables = ref<any[]>([]);
 const selectedTableId = ref<string>('');
 const times = ref<Record<string, string>>({});
@@ -113,7 +114,7 @@ async function loadData() {
   loading.value = true;
   try {
     // Load category
-    const category = await sportBridge.value.gradeCategoryRepository.findById(categoryId);
+    const category = await sportBridge.value?.gradeCategoryRepository.findById(categoryId) ?? null;
     if (!category) {
       toast.error('Kategorie nicht gefunden');
       router.back();
@@ -122,13 +123,13 @@ async function loadData() {
     categoryName.value = category.name;
 
     // Load students
-    students.value = await studentsBridge.value.studentRepository.findByClassGroup(category.classGroupId);
+    students.value = await studentRepository.value?.findByClassGroup(category.classGroupId) ?? [];
 
     // Load tables
-    tables.value = await sportBridge.value.tableDefinitionRepository.findAll();
+    tables.value = await sportBridge.value?.tableDefinitionRepository.findAll() ?? [];
 
     // Load existing performance entries
-    const entries = await sportBridge.value.performanceEntryRepository.findByCategory(categoryId);
+    const entries = await sportBridge.value?.performanceEntryRepository.findByCategory(categoryId) ?? [];
     entries.forEach((entry) => {
       existingEntries.value[entry.studentId] = entry;
       if (entry.measurements?.timeInSeconds) {
@@ -233,7 +234,7 @@ async function saveAll() {
       };
       
       savePromises.push(
-        sportBridge.value.recordGradeUseCase.execute({
+        sportBridge.value?.recordGradeUseCase.execute({
           studentId: student.id,
           categoryId: categoryId,
           measurements,

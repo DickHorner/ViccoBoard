@@ -48,44 +48,22 @@ Systematic migration of 9 views from direct database access (`useDatabase()`) to
 
 ## In Progress 🔄
 
-### 4. GradeHistory.vue
-- **Status:** Partially migrated, requires refactoring
-- **Work Done:**
-  - Bridge imports added (useSportBridge, useStudents)
-  - useDatabase import removed
-- **Remaining Work:**
-  - Refactor all `sportBridge.` calls to use bridge accessors
-  - Add type annotations to callbacks
-  - Update variable references
+### Phase 2: Systematic View Refactoring (Starting Now)
 
-### 5. GradingOverview.vue
-- **Status:** Partially migrated, requires refactoring
-- **Work Done:**
-  - Bridge imports added
-  - useDatabase import removed
-- **Remaining Work:**
-  - Similar refactoring to GradeHistory
-  - Map component access patterns
+**Approach:** Complete one view fully before moving to next (avoid cascading partial migrations)
 
-### 6. MittelstreckeGradingEntry.vue
-- **Status:** Imports updated, method calls still need refactoring
+**Priority Order:**
+1. ⏳ TimeGradingEntry.vue - Simple sport grading view
+2. ⏳ GradeHistory.vue - Sport history view
+3. ⏳ GradingOverview.vue - Sport overview view
+4. ⏳ MittelstreckeGradingEntry.vue - Sport-specific view
+5. ⏳ SportabzeichenGradingEntry.vue - Sport-specific view
+6. ⏳ ExamsOverview.vue - Exams view (requires examRepository)
+7. ⏳ CorrectionCompact.vue - Exams correction view (requires use case calls)
 
-### 7. SportabzeichenGradingEntry.vue
-- **Status:** Imports updated, method calls still need refactoring
-
-### 8. TimeGradingEntry.vue
-- **Status:** Imports updated, method calls still need refactoring
-
-### 9. ExamsOverview.vue
-- **Status:** Bridge import added, old composable calls need updating
-- **Change:** `useExams().getAll()` → `examRepository.findAll()`
-
-### 10. CorrectionCompact.vue
-- **Status:** Bridge import added, method calls need refactoring
-- **Changes Needed:**
-  - `getById()` → `examRepository.findById()`
-  - `update()` → `examRepository.update()`
-  - `create()` → `recordCorrectionUseCase.execute()`
+### Current Status of Remaining Views
+All 7 views currently in original state with `// @ts-nocheck` and `useDatabase()` imports.
+Ready for systematic migration applying proven BJSGradingEntry/CriteriaGradingEntry pattern.
 
 ---
 

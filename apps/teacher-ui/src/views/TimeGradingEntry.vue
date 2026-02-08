@@ -167,20 +167,21 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { GradeCategory, Student, TimeGradingConfig } from '@viccoboard/core';
+import type { Sport } from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge } = useDatabase();
+const { sportBridge, gradeCategories, performanceEntries } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const categoryId = route.params.id as string;
-const category = ref<GradeCategory | null>(null);
-const students = ref<Student[]>([]);
+const category = ref<Sport.GradeCategory | null>(null);
+const students = ref<any[]>([]);
 const timeEntries = ref<Map<string, string>>(new Map());
 const comments = ref<Map<string, string>>(new Map());
 const loading = ref(true);
@@ -195,7 +196,7 @@ const currentComment = ref('');
 
 const config = computed(() => {
   if (!category.value) return null;
-  return category.value.configuration as TimeGradingConfig;
+  return category.value.configuration as any;
 });
 
 onMounted(async () => {
@@ -208,7 +209,7 @@ async function loadData() {
   
   try {
     // Load category
-    category.value = await sportBridge.value.gradeCategoryRepository.read(categoryId);
+    category.value = await gradeCategories.value?.findById(categoryId) ?? null;
     
     if (!category.value) {
       error.value = 'Kategorie nicht gefunden';
@@ -216,14 +217,14 @@ async function loadData() {
     }
     
     // Load students
-    students.value = await sportBridge.value.studentRepository.findByClassGroup(
+    students.value = await studentRepository.value?.findByClassGroup(
       category.value.classGroupId
-    );
+    ) ?? [];
     
     // Load existing times
     for (const student of students.value) {
-      const entries = await sportBridge.value.performanceEntryRepository
-        .findByStudentAndCategory(student.id, categoryId);
+      const entries = await performanceEntries.value
+        ?.findByStudentAndCategory(student.id, categoryId) ?? [];
       
       if (entries.length > 0) {
         const latestEntry = entries[entries.length - 1];
@@ -380,7 +381,7 @@ async function saveStudentTime(studentId: string) {
   
   saving.value = true;
   try {
-    await sportBridge.value.recordGradeUseCase.execute({
+    await sportBridge.value?.recordGradeUseCase.execute({
       studentId,
       categoryId,
       measurements: { time: seconds },

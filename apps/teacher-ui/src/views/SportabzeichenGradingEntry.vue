@@ -156,25 +156,26 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { Student } from '@viccoboard/core';
+import type { Sport } from '@viccoboard/core';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-const { sportBridge, studentsBridge } = useDatabase();
+const { sportBridge } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const categoryId = route.params.id as string;
 const loading = ref(true);
 const saving = ref(false);
 const exporting = ref(false);
-const students = ref<Student[]>([]);
+const students = ref<any[]>([]);
 const disciplineCategories = ['ausdauer', 'kraft', 'schnelligkeit', 'koordination'];
 const selectedCategory = ref('ausdauer');
 
@@ -201,14 +202,14 @@ onMounted(async () => {
 async function loadData() {
   loading.value = true;
   try {
-    const category = await sportBridge.value.gradeCategoryRepository.findById(categoryId);
+    const category = await sportBridge.value?.gradeCategoryRepository.findById(categoryId) ?? null;
     if (!category) {
       toast.error('Kategorie nicht gefunden');
       router.back();
       return;
     }
 
-    students.value = await studentsBridge.value.studentRepository.findByClassGroup(category.classGroupId);
+    students.value = await studentRepository.value?.findByClassGroup(category.classGroupId) ?? [];
 
     // Load existing results
     for (const student of students.value) {

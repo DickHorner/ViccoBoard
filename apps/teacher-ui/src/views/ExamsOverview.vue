@@ -42,18 +42,18 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useExams } from '../composables/useDatabase'
+import { useExamsBridge } from '../composables/useExamsBridge'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 
 const router = useRouter()
-const { getAll } = useExams()
+const { examRepository } = useExamsBridge()
 const exams = ref<ExamsTypes.Exam[]>([])
 const loading = ref(true)
 
 const loadExams = async () => {
   loading.value = true
-  const result = await getAll()
-  exams.value = result.items
+  const result = await examRepository?.findAll() ?? []
+  exams.value = result
   loading.value = false
 }
 

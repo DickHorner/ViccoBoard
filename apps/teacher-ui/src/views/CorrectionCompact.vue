@@ -107,13 +107,12 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { createUuid } from '../utils/uuid'
-import { useExams, useCorrections } from '../composables/useDatabase'
+import { useExamsBridge } from '../composables/useExamsBridge'
 import { useToast } from '../composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
-const { getById, update } = useExams()
-const { create } = useCorrections()
+const { examRepository, recordCorrectionUseCase } = useExamsBridge()
 const { success, error } = useToast()
 
 const exam = ref<ExamsTypes.Exam | null>(null)
@@ -179,7 +178,7 @@ const canSave = computed(() => Boolean(exam.value && selectedCandidateId.value))
 
 const loadExam = async () => {
   const examId = route.params.examId as string
-  const data = await getById(examId)
+  const data = await examRepository?.findById(examId) ?? null
   if (!data) {
     error('Exam not found.')
     router.push('/exams')

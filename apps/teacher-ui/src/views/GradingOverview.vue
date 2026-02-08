@@ -207,22 +207,23 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { ClassGroup, Student, GradeCategory, PerformanceEntry, GradeCategoryType } from '@viccoboard/core';
+import type { Sport } from '@viccoboard/core';
 
 const router = useRouter();
-const { sportBridge } = useDatabase();
+const { sportBridge } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
-const classes = ref<ClassGroup[]>([]);
+const classes = ref<any[]>([]);
 const selectedClassId = ref<string>('');
-const categories = ref<GradeCategory[]>([]);
-const students = ref<Student[]>([]);
-const performanceEntries = ref<PerformanceEntry[]>([]);
+const categories = ref<Sport.GradeCategory[]>([]);
+const students = ref<any[]>([]);
+const performanceEntries = ref<any[]>([]);
 const loading = ref(false);
 const saving = ref(false);
 const showCreateCategoryModal = ref(false);
@@ -230,7 +231,7 @@ const showCreateCategoryModal = ref(false);
 const newCategory = ref({
   name: '',
   description: '',
-  type: '' as GradeCategoryType | '',
+  type: '' as any,
   weight: 0
 });
 
@@ -240,7 +241,7 @@ onMounted(async () => {
 
 async function loadClasses() {
   try {
-    classes.value = await sportBridge.value.classGroupRepository.findAll();
+    classes.value = await sportBridge.value?.classGroupRepository.findAll() ?? [];
   } catch (error) {
     console.error('Failed to load classes:', error);
   }
@@ -257,12 +258,12 @@ async function onClassChange() {
   loading.value = true;
   try {
     // Load categories, students, and performance entries
-    categories.value = await sportBridge.value.gradeCategoryRepository.findByClassGroup(selectedClassId.value);
-    students.value = await sportBridge.value.studentRepository.findByClassGroup(selectedClassId.value);
+    categories.value = await sportBridge.value?.gradeCategoryRepository.findByClassGroup(selectedClassId.value) ?? [];
+    students.value = await studentRepository.value?.findByClassGroup(selectedClassId.value) ?? [];
     
     // Load all performance entries for students in this class in parallel
     const entryPromises = students.value.map((student) =>
-      sportBridge.value.performanceEntryRepository.findByStudent(student.id)
+      sportBridge.value?.performanceEntryRepository.findByStudent(student.id) ?? Promise.resolve([])
     );
     const entriesPerStudent = await Promise.all(entryPromises);
     performanceEntries.value = entriesPerStudent.flat();
@@ -273,8 +274,8 @@ async function onClassChange() {
   }
 }
 
-function getCategoryTypeLabel(type: GradeCategoryType): string {
-  const labels: Record<GradeCategoryType, string> = {
+function getCategoryTypeLabel(type: any): string {
+  const labels: Record<any, string> = {
     criteria: 'Kriterienbasiert',
     time: 'Zeitbasiert',
     cooper: 'Cooper-Test',
@@ -299,7 +300,7 @@ function formatGrade(grade: string | number | null): string {
   return String(grade);
 }
 
-function openGradingEntry(category: GradeCategory) {
+function openGradingEntry(category: Sport.GradeCategory) {
   if (category.type === 'criteria') {
     router.push(`/grading/criteria/${category.id}`);
   } else if (category.type === 'time') {
@@ -319,7 +320,7 @@ function openGradingEntry(category: GradeCategory) {
   }
 }
 
-function viewHistory(category: GradeCategory) {
+function viewHistory(category: Sport.GradeCategory) {
   router.push(`/grading/history/${category.id}`);
 }
 
@@ -389,11 +390,11 @@ async function createCategory() {
       throw new Error('Unsupported category type');
     }
     
-    await sportBridge.value.createGradeCategoryUseCase.execute({
+    await sportBridge.value?.createGradeCategoryUseCase.execute({
       classGroupId: selectedClassId.value,
       name: newCategory.value.name,
       description: newCategory.value.description || undefined,
-      type: newCategory.value.type as GradeCategoryType,
+      type: newCategory.value.type as any,
       weight: newCategory.value.weight,
       configuration
     });

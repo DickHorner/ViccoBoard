@@ -143,21 +143,22 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { GradeCategory, Student, PerformanceEntry } from '@viccoboard/core';
+import type { Sport } from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge } = useDatabase();
+const { gradeCategories, performanceEntries } = useSportBridge()
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const categoryId = route.params.id as string;
-const category = ref<GradeCategory | null>(null);
-const students = ref<Student[]>([]);
-const entries = ref<PerformanceEntry[]>([]);
+const category = ref<Sport.GradeCategory | null>(null);
+const students = ref<any[]>([]);
+const entries = ref<any[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
@@ -175,7 +176,7 @@ async function loadData() {
   
   try {
     // Load category
-    category.value = await sportBridge.value.gradeCategoryRepository.read(categoryId);
+    category.value = await gradeCategories.value?.findById(categoryId) ?? null;
     
     if (!category.value) {
       error.value = 'Kategorie nicht gefunden';
@@ -183,12 +184,12 @@ async function loadData() {
     }
     
     // Load students
-    students.value = await sportBridge.value.studentRepository.findByClassGroup(
+    students.value = await studentRepository.value?.findByClassGroup(
       category.value.classGroupId
-    );
+    ) ?? [];
     
     // Load all performance entries for this category
-    entries.value = await sportBridge.value.performanceEntryRepository.findByCategory(categoryId);
+    entries.value = await performanceEntries.value?.findByCategory(categoryId) ?? [];
     
     // Sort by timestamp descending (newest first)
     entries.value.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
