@@ -130,10 +130,22 @@ export class SQLiteStorage implements Storage {
 
   async close(): Promise<void> {
     if (this.db) {
-      this.db.close();
+      try {
+        // Ensure all prepared statements are finalized
+        this.db.close();
+      } catch (error) {
+        // Ignore errors during close - resource may already be released
+        console.debug('Note during storage close:', error instanceof Error ? error.message : 'Unknown');
+      }
       this.db = null;
       this.adapter = null;
       this.initialized = false;
+      
+      // Clear all module references to allow garbage collection
+      Database = null;
+      path = null;
+      fs = null;
+      this.modulesLoaded = false;
     }
   }
 

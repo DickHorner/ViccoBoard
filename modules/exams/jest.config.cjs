@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  forceExit: true,
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
