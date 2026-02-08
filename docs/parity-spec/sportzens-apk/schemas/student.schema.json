@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "student (SportZens APK shape)",
+  "type": "object",
+  "description": "Extracted from compiled SportZens APK JS bundles by scanning `this.student = {...}` object literals. Key union across 1 observed shapes.",
+  "properties": {
+    "class_id": {
+      "type": "string"
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "gender": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "is_dirty": {
+      "type": "number"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "public_code": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "object"
+    },
+    "stats": {
+      "type": "object"
+    },
+    "teacher_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "class_id",
+    "first_name",
+    "id",
+    "last_name",
+    "teacher_id"
+  ],
+  "additionalProperties": true
+}

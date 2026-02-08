@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "gradeWeighting (SportZens APK shape)",
+  "type": "object",
+  "description": "Extracted from compiled SportZens APK JS bundles by scanning `this.gradeWeighting = {...}` object literals. Key union across 1 observed shapes.",
+  "properties": {
+    "attendance": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "grades": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "remarks": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "wow": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    }
+  },
+  "required": [
+    "attendance",
+    "grades",
+    "remarks",
+    "wow"
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "class (SportZens APK shape)",
+  "type": "object",
+  "description": "Extracted from compiled SportZens APK JS bundles by scanning `this.class = {...}` object literals. Key union across 2 observed shapes.",
+  "properties": {
+    "color": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "grade_category_count": {
+      "type": "number",
+      "minimum": 0
+    },
+    "grade_scheme": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "is_dirty": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    },
+    "school_year": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "object"
+    },
+    "sort": {
+      "type": "string"
+    },
+    "stats": {
+      "type": "object"
+    },
+    "student_count": {
+      "type": "number",
+      "minimum": 0
+    },
+    "teacher_id": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "version": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "school_year",
+    "teacher_id"
+  ],
+  "additionalProperties": true
+}
