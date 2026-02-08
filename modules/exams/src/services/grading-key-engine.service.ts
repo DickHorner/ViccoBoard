@@ -56,8 +56,7 @@ export class GradingKeyEngine {
       roundingRule,
       errorPointsToGrade: false,
       customizable: true,
-      modifiedAfterCorrection: false,
-      createdAt: new Date()
+      modifiedAfterCorrection: false
     };
   }
 
@@ -92,8 +91,7 @@ export class GradingKeyEngine {
     const modifiedKey: Exams.GradingKey = {
       ...oldKey,
       gradeBoundaries: newBoundaries,
-      modifiedAfterCorrection: true,
-      lastModified: new Date()
+      modifiedAfterCorrection: true
     };
 
     // Record change
@@ -239,7 +237,7 @@ export class GradingKeyEngine {
   static createPreset(
     name: string,
     description: string,
-    system: string,
+    system: Exams.GradingPreset['system'],
     boundaries: Exams.GradeBoundary[],
     defaultRounding: Exams.RoundingRule
   ): Exams.GradingPreset {
@@ -264,8 +262,7 @@ export class GradingKeyEngine {
       ...sourceKey,
       ...modifications,
       id: uuidv4(),
-      modifiedAfterCorrection: false,
-      createdAt: new Date()
+      modifiedAfterCorrection: false
     };
   }
 

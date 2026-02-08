@@ -107,11 +107,11 @@
                     v-for="grade in alternativeGrades"
                     :key="grade.type"
                     :class="['grade-btn', { active: taskAlternativeGrades[task.id] === grade.type }]"
-                    :style="{ backgroundColor: grade.color }"
-                    :title="grade.description"
+                    :style="{ backgroundColor: grade.backgroundColor }"
+                    :title="grade.title"
                     @click="setAlternativeGrade(task.id, grade.type)"
                   >
-                    {{ grade.emoji }}
+                    {{ grade.label }}
                   </button>
                 </div>
                 <div v-if="taskAlternativeGrades[task.id]" class="selected-grade-info">
@@ -265,7 +265,6 @@ import {
   AlternativeGradingUIHelper,
   STANDARD_ALTERNATIVE_SCALE,
   type AlternativeGradeType,
-  type AlternativeGradingConfig
 } from '@viccoboard/exams';
 
 const router = useRouter();

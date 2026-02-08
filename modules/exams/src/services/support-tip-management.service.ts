@@ -77,11 +77,8 @@ export class SupportTipManagementService {
     }
 
     const newLink: Exams.SupportTipLink = {
-      id: uuidv4(),
       title,
-      url,
-      type: linkType,
-      createdAt: new Date()
+      url
     };
 
     return {
@@ -97,7 +94,7 @@ export class SupportTipManagementService {
   static removeLink(tip: Exams.SupportTip, linkId: string): Exams.SupportTip {
     return {
       ...tip,
-      links: tip.links.filter(l => l.id !== linkId),
+      links: tip.links.filter(l => l.url !== linkId && l.title !== linkId),
       lastModified: new Date()
     };
   }

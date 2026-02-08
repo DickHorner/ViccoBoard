@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
+// @ts-ignore - test file import resolution handled by test runner
 import { SupportTipManagementService, SupportTipUIHelper } from '../services/support-tip-management.service';
 import { Exams } from '@viccoboard/core';
 
@@ -133,7 +134,7 @@ describe('SupportTipManagementService', () => {
         'Test Link',
         'https://example.com'
       );
-      const linkId = updated.links[0].id;
+      const linkId = updated.links[0].url;
 
       updated = SupportTipManagementService.removeLink(updated, linkId);
       expect(updated.links.length).toBe(0);
@@ -151,14 +152,14 @@ describe('SupportTipManagementService', () => {
       const invalid = { ...testTip, title: '' };
       const result = SupportTipManagementService.validateSupportTip(invalid);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('Title'))).toBe(true);
+      expect(result.errors.some((e: string) => e.includes('Title'))).toBe(true);
     });
 
     it('should reject empty description', () => {
       const invalid = { ...testTip, shortDescription: '' };
       const result = SupportTipManagementService.validateSupportTip(invalid);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('description'))).toBe(true);
+      expect(result.errors.some((e: string) => e.includes('description'))).toBe(true);
     });
 
     it('should reject invalid URLs', () => {
@@ -166,17 +167,14 @@ describe('SupportTipManagementService', () => {
         ...testTip,
         links: [
           {
-            id: 'link1',
             title: 'Bad Link',
-            url: 'not-a-url',
-            type: 'article' as const,
-            createdAt: new Date()
+            url: 'not-a-url'
           }
         ]
       };
       const result = SupportTipManagementService.validateSupportTip(invalid);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('URL'))).toBe(true);
+      expect(result.errors.some((e: string) => e.includes('URL'))).toBe(true);
     });
   });
 

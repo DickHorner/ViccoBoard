@@ -147,7 +147,7 @@ export class AlternativeGradingService {
     const percentage = points / maxPoints;
 
     // Find closest match by percentage
-    let closest: AlternativeGradeConfig = scale.grades[0];
+    let closest: AlternativeGradingConfig = scale.grades[0];
     let minDiff = Math.abs(percentage - closest.pointsMultiplier);
 
     for (const grade of scale.grades) {

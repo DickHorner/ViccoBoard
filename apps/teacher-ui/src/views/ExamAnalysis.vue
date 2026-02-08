@@ -301,9 +301,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
 import { Exams } from '@viccoboard/core';
-import { ExamAnalysisService, AnalysisUIHelper } from '@viccoboard/exams';
+import {
+  ExamAnalysisService,
+  AnalysisUIHelper,
+  type DifficultyAnalysis,
+  type ExamStatistics,
+  type PointAdjustmentSuggestion
+} from '@viccoboard/exams';
 
 interface Props {
   exam: Exams.Exam;
@@ -312,14 +317,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const route = useRoute();
-
 const tabs = ['statistics', 'difficulty', 'adjustment', 'risk', 'variance'];
 const selectedTab = ref<typeof tabs[number]>('statistics');
 
-const analysis = ref<Exams.ExamStatistics | null>(null);
-const outliers = ref<{ veryDifficult: Exams.DifficultyAnalysis[]; veryEasy: Exams.DifficultyAnalysis[] } | null>(null);
-const adjustmentSuggestion = ref<Exams.PointAdjustmentSuggestion | null>(null);
+const analysis = ref<ExamStatistics | null>(null);
+const outliers = ref<{ veryDifficult: DifficultyAnalysis[]; veryEasy: DifficultyAnalysis[] } | null>(null);
+const adjustmentSuggestion = ref<PointAdjustmentSuggestion | null>(null);
 const studentsAtRisk = ref<Array<{ candidateId: string; score: number; percentage: number; riskLevel: 'critical' | 'warning' | 'ok' }>>([]);
 const taskVariance = ref<Map<string, number>>(new Map());
 
@@ -476,7 +479,26 @@ const formatRiskLevel = (level: string): string => {
 };
 
 const getCandidateName = (candidateId: string): string => {
-  return props.candidates?.find(c => c.id === candidateId)?.name || 'Unknown';
+  const candidate = props.candidates?.find(c => c.id === candidateId);
+  if (!candidate) return 'Unknown';
+  return `${candidate.firstName} ${candidate.lastName}`.trim();
+};
+
+const getTabLabel = (tab: string): string => {
+  switch (tab) {
+    case 'statistics':
+      return 'Statistics';
+    case 'difficulty':
+      return 'Difficulty';
+    case 'adjustment':
+      return 'Adjustments';
+    case 'risk':
+      return 'At Risk';
+    case 'variance':
+      return 'Variance';
+    default:
+      return tab;
+  }
 };
 
 const getTaskTitle = (taskId: string): string => {
