@@ -12,17 +12,12 @@ module.exports = {
     '^@viccoboard/students$': '<rootDir>/../../modules/students/src/index.ts',
     '^@viccoboard/sport$': '<rootDir>/../../modules/sport/src/index.ts'
   },
-  globals: {
-    'ts-jest': {
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
       useESM: true,
       tsconfig: {
         module: 'ESNext'
       }
-    }
-  },
-  transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      useESM: true
     }]
   },
   testMatch: ['**/tests/**/*.test.ts'],

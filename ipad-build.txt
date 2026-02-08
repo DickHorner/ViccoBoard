@@ -1,0 +1,104 @@
+
+> viccoboard@0.1.0 build:ipad
+> npm run build:packages && npm run build --workspace=teacher-ui
+
+
+> viccoboard@0.1.0 build:packages
+> npm run build --workspace=@viccoboard/core --workspace=@viccoboard/plugins --workspace=@viccoboard/storage --workspace=@viccoboard/students --workspace=@viccoboard/exams --workspace=@viccoboard/sport
+
+
+> @viccoboard/core@0.1.0 build
+> tsc
+
+
+> @viccoboard/plugins@0.1.0 build
+> tsc
+
+
+> @viccoboard/storage@0.1.0 build
+> tsc
+
+
+> @viccoboard/students@0.1.0 build
+> tsc
+
+
+> @viccoboard/exams@0.1.0 build
+> tsc
+
+
+> @viccoboard/sport@0.1.0 build
+> tsc
+
+
+> teacher-ui@0.0.0 build
+> vue-tsc -b && vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 461 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                                      [39m[1m[2m  0.48 kB[22m[1m[22m[2m Ôöé gzip:   0.31 kB[22m
+[2mdist/[22m[35massets/StudentProfile-CEbUodOW.css              [39m[1m[2m  0.04 kB[22m[1m[22m[2m Ôöé gzip:   0.06 kB[22m
+[2mdist/[22m[35massets/TacticsBoard-5_nbf_rz.css                [39m[1m[2m  0.37 kB[22m[1m[22m[2m Ôöé gzip:   0.23 kB[22m
+[2mdist/[22m[35massets/FeedbackTool-CqEYn2iW.css                [39m[1m[2m  0.37 kB[22m[1m[22m[2m Ôöé gzip:   0.23 kB[22m
+[2mdist/[22m[35massets/Tournaments-BK3UaINn.css                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m Ôöé gzip:   0.23 kB[22m
+[2mdist/[22m[35massets/Scoreboard-_f9OZ2et.css                  [39m[1m[2m  1.47 kB[22m[1m[22m[2m Ôöé gzip:   0.55 kB[22m
+[2mdist/[22m[35massets/ExamsOverview-BKzQbeIk.css               [39m[1m[2m  1.62 kB[22m[1m[22m[2m Ôöé gzip:   0.58 kB[22m
+[2mdist/[22m[35massets/modal-cItT6sFh.css                       [39m[1m[2m  1.64 kB[22m[1m[22m[2m Ôöé gzip:   0.65 kB[22m
+[2mdist/[22m[35massets/TeamBuilder-BV66ycuC.css                 [39m[1m[2m  1.66 kB[22m[1m[22m[2m Ôöé gzip:   0.59 kB[22m
+[2mdist/[22m[35massets/CooperGradingEntry-BroIkzpi.css          [39m[1m[2m  2.21 kB[22m[1m[22m[2m Ôöé gzip:   0.79 kB[22m
+[2mdist/[22m[35massets/ShuttleGradingEntry-Cy37KSEA.css         [39m[1m[2m  2.21 kB[22m[1m[22m[2m Ôöé gzip:   0.79 kB[22m
+[2mdist/[22m[35massets/Multistop-Cmt6Qdtq.css                   [39m[1m[2m  2.90 kB[22m[1m[22m[2m Ôöé gzip:   0.94 kB[22m
+[2mdist/[22m[35massets/BJSGradingEntry-DOk9Fact.css             [39m[1m[2m  3.09 kB[22m[1m[22m[2m Ôöé gzip:   1.02 kB[22m
+[2mdist/[22m[35massets/MittelstreckeGradingEntry-DjSNtoMp.css   [39m[1m[2m  3.24 kB[22m[1m[22m[2m Ôöé gzip:   1.03 kB[22m
+[2mdist/[22m[35massets/Timer-BbPEc_oB.css                       [39m[1m[2m  3.45 kB[22m[1m[22m[2m Ôöé gzip:   0.95 kB[22m
+[2mdist/[22m[35massets/SportabzeichenGradingEntry-7Tilxhh4.css  [39m[1m[2m  3.62 kB[22m[1m[22m[2m Ôöé gzip:   1.10 kB[22m
+[2mdist/[22m[35massets/GradeHistory-DztEICBX.css                [39m[1m[2m  3.83 kB[22m[1m[22m[2m Ôöé gzip:   1.13 kB[22m
+[2mdist/[22m[35massets/TimeGradingEntry-aDnA9-Je.css            [39m[1m[2m  4.66 kB[22m[1m[22m[2m Ôöé gzip:   1.35 kB[22m
+[2mdist/[22m[35massets/StudentList-Dl6JYGjr.css                 [39m[1m[2m  5.29 kB[22m[1m[22m[2m Ôöé gzip:   1.41 kB[22m
+[2mdist/[22m[35massets/GradingOverview-D6c4QaSB.css             [39m[1m[2m  5.49 kB[22m[1m[22m[2m Ôöé gzip:   1.39 kB[22m
+[2mdist/[22m[35massets/KURTExamBuilder-l3WMNpAH.css             [39m[1m[2m  5.53 kB[22m[1m[22m[2m Ôöé gzip:   1.23 kB[22m
+[2mdist/[22m[35massets/CriteriaGradingEntry-zOa_ivCW.css        [39m[1m[2m  6.19 kB[22m[1m[22m[2m Ôöé gzip:   1.60 kB[22m
+[2mdist/[22m[35massets/LessonList-CLnsa-d8.css                  [39m[1m[2m  6.38 kB[22m[1m[22m[2m Ôöé gzip:   1.53 kB[22m
+[2mdist/[22m[35massets/AttendanceEntry-BZsqUHhn.css             [39m[1m[2m  7.18 kB[22m[1m[22m[2m Ôöé gzip:   1.70 kB[22m
+[2mdist/[22m[35massets/ClassDetail-BfvK7vfY.css                 [39m[1m[2m  7.27 kB[22m[1m[22m[2m Ôöé gzip:   1.67 kB[22m
+[2mdist/[22m[35massets/Dashboard-BhDUEmLF.css                   [39m[1m[2m  8.33 kB[22m[1m[22m[2m Ôöé gzip:   1.81 kB[22m
+[2mdist/[22m[35massets/CorrectionCompactUI-DzD6rfbH.css         [39m[1m[2m  8.54 kB[22m[1m[22m[2m Ôöé gzip:   1.83 kB[22m
+[2mdist/[22m[35massets/index-C8SeO-Fv.css                       [39m[1m[2m 10.14 kB[22m[1m[22m[2m Ôöé gzip:   2.81 kB[22m
+[2mdist/[22m[36massets/StudentProfile-BgJL_z5f.js               [39m[1m[2m  0.37 kB[22m[1m[22m[2m Ôöé gzip:   0.29 kB[22m
+[2mdist/[22m[36massets/TacticsBoard-DEAyUOfk.js                 [39m[1m[2m  0.74 kB[22m[1m[22m[2m Ôöé gzip:   0.47 kB[22m
+[2mdist/[22m[36massets/FeedbackTool-2DKu6x0_.js                 [39m[1m[2m  0.78 kB[22m[1m[22m[2m Ôöé gzip:   0.48 kB[22m
+[2mdist/[22m[36massets/Tournaments-D_ql_ONO.js                  [39m[1m[2m  0.80 kB[22m[1m[22m[2m Ôöé gzip:   0.50 kB[22m
+[2mdist/[22m[36massets/v4-CtRu48qb.js                           [39m[1m[2m  0.81 kB[22m[1m[22m[2m Ôöé gzip:   0.43 kB[22m
+[2mdist/[22m[36massets/safe-json-DWK0bRdb.js                    [39m[1m[2m  0.83 kB[22m[1m[22m[2m Ôöé gzip:   0.47 kB[22m
+[2mdist/[22m[36massets/ExamsOverview-Bb_FT5jX.js                [39m[1m[2m  2.18 kB[22m[1m[22m[2m Ôöé gzip:   1.11 kB[22m
+[2mdist/[22m[36massets/Scoreboard-CZ8-LQzf.js                   [39m[1m[2m  2.33 kB[22m[1m[22m[2m Ôöé gzip:   0.82 kB[22m
+[2mdist/[22m[36massets/useStudentsBridge-DX516-49.js            [39m[1m[2m  2.95 kB[22m[1m[22m[2m Ôöé gzip:   1.10 kB[22m
+[2mdist/[22m[36massets/TeamBuilder-BKUJ65ql.js                  [39m[1m[2m  4.54 kB[22m[1m[22m[2m Ôöé gzip:   1.86 kB[22m
+[2mdist/[22m[36massets/MittelstreckeGradingEntry-CWaUsYq2.js    [39m[1m[2m  4.77 kB[22m[1m[22m[2m Ôöé gzip:   2.19 kB[22m
+[2mdist/[22m[36massets/BJSGradingEntry-COo-bzNf.js              [39m[1m[2m  5.94 kB[22m[1m[22m[2m Ôöé gzip:   2.25 kB[22m
+[2mdist/[22m[36massets/SportabzeichenGradingEntry-2gBid2Yo.js   [39m[1m[2m  5.96 kB[22m[1m[22m[2m Ôöé gzip:   2.39 kB[22m
+[2mdist/[22m[36massets/CooperGradingEntry-DoejDKKc.js           [39m[1m[2m  6.09 kB[22m[1m[22m[2m Ôöé gzip:   2.39 kB[22m
+[2mdist/[22m[36massets/useDatabase-1T5SEEmp.js                  [39m[1m[2m  6.19 kB[22m[1m[22m[2m Ôöé gzip:   1.49 kB[22m
+[2mdist/[22m[36massets/ShuttleGradingEntry-CBI_xm6w.js          [39m[1m[2m  6.25 kB[22m[1m[22m[2m Ôöé gzip:   2.34 kB[22m
+[2mdist/[22m[36massets/AttendanceEntry-iDieiJQw.js              [39m[1m[2m  6.63 kB[22m[1m[22m[2m Ôöé gzip:   2.52 kB[22m
+[2mdist/[22m[36massets/GradeHistory-CvqSfiJU.js                 [39m[1m[2m  6.77 kB[22m[1m[22m[2m Ôöé gzip:   2.82 kB[22m
+[2mdist/[22m[36massets/Multistop-DLObZTVT.js                    [39m[1m[2m  7.41 kB[22m[1m[22m[2m Ôöé gzip:   2.87 kB[22m
+[2mdist/[22m[36massets/Timer-C1NfOBrZ.js                        [39m[1m[2m  7.63 kB[22m[1m[22m[2m Ôöé gzip:   2.23 kB[22m
+[2mdist/[22m[36massets/TimeGradingEntry-CHz_Ty-F.js             [39m[1m[2m  7.80 kB[22m[1m[22m[2m Ôöé gzip:   3.27 kB[22m
+[2mdist/[22m[36massets/LessonList-BLmEzKWE.js                   [39m[1m[2m  7.96 kB[22m[1m[22m[2m Ôöé gzip:   2.98 kB[22m
+[2mdist/[22m[36massets/ClassDetail-BNaxsP0X.js                  [39m[1m[2m  8.74 kB[22m[1m[22m[2m Ôöé gzip:   3.28 kB[22m
+[2mdist/[22m[36massets/GradingOverview-CnV6by2q.js              [39m[1m[2m  9.17 kB[22m[1m[22m[2m Ôöé gzip:   3.39 kB[22m
+[2mdist/[22m[36massets/performance-entry.validator-Dq3Iz5dC.js  [39m[1m[2m 10.78 kB[22m[1m[22m[2m Ôöé gzip:   2.78 kB[22m
+[2mdist/[22m[36massets/CorrectionCompactUI-BrG-Sk-j.js          [39m[1m[2m 10.96 kB[22m[1m[22m[2m Ôöé gzip:   3.93 kB[22m
+[2mdist/[22m[36massets/KURTExamBuilder-CUOnG3tX.js              [39m[1m[2m 11.19 kB[22m[1m[22m[2m Ôöé gzip:   3.32 kB[22m
+[2mdist/[22m[36massets/CriteriaGradingEntry-Bi7klEL_.js         [39m[1m[2m 12.60 kB[22m[1m[22m[2m Ôöé gzip:   4.48 kB[22m
+[2mdist/[22m[36massets/Dashboard-Ba_W9o4X.js                    [39m[1m[2m 13.99 kB[22m[1m[22m[2m Ôöé gzip:   4.64 kB[22m
+[2mdist/[22m[36massets/StudentList-CH4qblwW.js                  [39m[1m[2m 14.17 kB[22m[1m[22m[2m Ôöé gzip:   4.65 kB[22m
+[2mdist/[22m[36massets/useSportBridge-mzoFCM6j.js               [39m[1m[2m 24.18 kB[22m[1m[22m[2m Ôöé gzip:   6.31 kB[22m
+[2mdist/[22m[36massets/useExams-kG829tyD.js                     [39m[1m[2m 98.10 kB[22m[1m[22m[2m Ôöé gzip:  33.06 kB[22m
+[2mdist/[22m[36massets/index-DIDPztF5.js                        [39m[1m[2m296.09 kB[22m[1m[22m[2m Ôöé gzip: 107.69 kB[22m
+[2mdist/[22m[36massets/PDFButton-CnEb_flH.js                    [39m[1m[2m431.07 kB[22m[1m[22m[2m Ôöé gzip: 178.43 kB[22m
+[32mÔ£ô built in 3.48s[39m
