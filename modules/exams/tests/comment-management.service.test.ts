@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { CommentManagementService, CorrectionCommentUseCase, type CommentTemplate } from '../services/comment-management.service';
+import { CommentManagementService, CorrectionCommentUseCase, type CommentTemplate } from '../src/services/comment-management.service';
 import { Exams } from '@viccoboard/core';
 
 describe('CommentManagementService', () => {

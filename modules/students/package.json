@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "dev": "tsc --watch"
   },
   "dependencies": {

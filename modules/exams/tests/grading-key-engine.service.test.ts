@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { GradingKeyEngine, GradingKeyUIHelper } from '../services/grading-key-engine.service';
-import { GradingKeyService, GERMAN_1_6_PRESET } from '../services/grading-key.service';
+import { GradingKeyEngine, GradingKeyUIHelper } from '../src/services/grading-key-engine.service';
+import { GradingKeyService, GERMAN_1_6_PRESET } from '../src/services/grading-key.service';
 import { Exams } from '@viccoboard/core';
 
 describe('GradingKeyEngine', () => {

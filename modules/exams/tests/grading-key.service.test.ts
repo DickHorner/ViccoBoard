@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from '@jest/globals';
 import { Exams } from '@viccoboard/core';
-import { GradingKeyService, GERMAN_1_6_PRESET, GERMAN_0_15_PRESET } from '../services/grading-key.service';
+import { GradingKeyService, GERMAN_1_6_PRESET, GERMAN_0_15_PRESET } from '../src/services/grading-key.service';
 
 describe('GradingKeyService', () => {
   describe('calculateGrade', () => {

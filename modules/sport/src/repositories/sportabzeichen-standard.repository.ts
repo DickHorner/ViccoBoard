@@ -45,6 +45,12 @@ export class SportabzeichenStandardRepository extends AdapterRepository<Sport.Sp
     if (entity.level !== undefined) row.level = entity.level;
     if (entity.comparison !== undefined) row.comparison = entity.comparison;
     if (entity.threshold !== undefined) row.threshold = entity.threshold;
+    if (entity.unit !== undefined) row.unit = entity.unit;
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+
+    return row;
+  }
 
   /**
    * Finds all Sportabzeichen standards for a given discipline.
@@ -56,11 +62,6 @@ export class SportabzeichenStandardRepository extends AdapterRepository<Sport.Sp
    * @param disciplineId - The identifier of the discipline to filter standards by.
    * @returns All Sportabzeichen standards associated with the given discipline.
    */
-    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
-
-    return row;
-  }
 
   async findByDiscipline(disciplineId: string): Promise<Sport.SportabzeichenStandard[]> {
     return this.find({ discipline_id: disciplineId });

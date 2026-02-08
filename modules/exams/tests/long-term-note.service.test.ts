@@ -7,7 +7,7 @@ import {
   LongTermNoteUIHelper,
   CompetencyProgress,
   StudentGrowthAnalysis
-} from '../services/long-term-note.service';
+} from '../src/services/long-term-note.service';
 import type { StudentLongTermNote, DevelopmentNote, CompetencyArea } from '../repositories/student-long-term-note.repository';
 
 describe('LongTermNoteManagementService', () => {

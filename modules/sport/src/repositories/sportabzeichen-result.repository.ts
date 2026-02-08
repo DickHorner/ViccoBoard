@@ -45,6 +45,12 @@ export class SportabzeichenResultRepository extends AdapterRepository<Sport.Spor
     if (entity.gender !== undefined) row.gender = entity.gender;
     if (entity.performanceValue !== undefined) row.performance_value = entity.performanceValue;
     if (entity.unit !== undefined) row.unit = entity.unit;
+    if (entity.achievedLevel !== undefined) row.achieved_level = entity.achievedLevel;
+    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
+    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
+
+    return row;
+  }
 
   /**
    * Finds all Sportabzeichen results for a given student.
@@ -56,11 +62,6 @@ export class SportabzeichenResultRepository extends AdapterRepository<Sport.Spor
    * @param studentId - The identifier of the student whose results should be returned.
    * @returns A promise resolving to all Sportabzeichen results stored for the given student.
    */
-    if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
-    if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
-
-    return row;
-  }
 
   async findByStudent(studentId: string): Promise<Sport.SportabzeichenResult[]> {
     return this.find({ student_id: studentId });

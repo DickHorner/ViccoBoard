@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 // @ts-ignore - test file import resolution handled by test runner
-import { SupportTipManagementService, SupportTipUIHelper } from '../services/support-tip-management.service';
+import { SupportTipManagementService, SupportTipUIHelper } from '../src/services/support-tip-management.service';
 import { Exams } from '@viccoboard/core';
 
 describe('SupportTipManagementService', () => {

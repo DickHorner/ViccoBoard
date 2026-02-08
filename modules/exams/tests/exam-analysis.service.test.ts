@@ -8,7 +8,7 @@ import {
   DifficultyAnalysis,
   ExamStatistics,
   PointAdjustmentSuggestion
-} from '../services/exam-analysis.service';
+} from '../src/services/exam-analysis.service';
 import { Exams } from '@viccoboard/core';
 
 describe('ExamAnalysisService', () => {
