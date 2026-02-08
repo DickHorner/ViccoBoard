@@ -81,7 +81,6 @@ describe('CriterionRepository', () => {
     });
 
     const created = await repository.createForTask(exam.id, task.id, {
-      id: 'temp',
       text: 'Show your work',
       formatting: { bold: true },
       points: 5,

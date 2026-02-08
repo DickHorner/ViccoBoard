@@ -28,8 +28,7 @@ describe('GradingKeyEngine', () => {
       roundingRule: { type: 'nearest', decimalPlaces: 1 },
       errorPointsToGrade: false,
       customizable: true,
-      modifiedAfterCorrection: false,
-      createdAt: new Date()
+      modifiedAfterCorrection: false
     };
 
     testCorrection = {
@@ -281,6 +280,7 @@ describe('GradingKeyEngine', () => {
     });
 
     it('should return all changes for a key', () => {
+      const uniqueKey = { ...testKey, id: `key-${Date.now()}-changes` };
       const newBoundaries1 = [
         { grade: 1, minPercentage: 85, displayValue: '1' },
         { grade: 2, minPercentage: 0, displayValue: '2' }
@@ -290,10 +290,10 @@ describe('GradingKeyEngine', () => {
         { grade: 2, minPercentage: 0, displayValue: '2' }
       ];
 
-      GradingKeyEngine.modifyGradingKeyAfterCorrection(testKey, newBoundaries1);
-      GradingKeyEngine.modifyGradingKeyAfterCorrection(testKey, newBoundaries2);
+      GradingKeyEngine.modifyGradingKeyAfterCorrection(uniqueKey, newBoundaries1);
+      GradingKeyEngine.modifyGradingKeyAfterCorrection(uniqueKey, newBoundaries2);
 
-      const history = GradingKeyEngine.getChangeHistory(testKey.id);
+      const history = GradingKeyEngine.getChangeHistory(uniqueKey.id);
       expect(history.length).toBe(2);
     });
   });

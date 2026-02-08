@@ -8,7 +8,7 @@ import {
   CompetencyProgress,
   StudentGrowthAnalysis
 } from '../src/services/long-term-note.service';
-import type { StudentLongTermNote, DevelopmentNote, CompetencyArea } from '../repositories/student-long-term-note.repository';
+import type { StudentLongTermNote, DevelopmentNote, CompetencyArea } from '../src/repositories/student-long-term-note.repository';
 
 describe('LongTermNoteManagementService', () => {
   let mockNote: StudentLongTermNote;

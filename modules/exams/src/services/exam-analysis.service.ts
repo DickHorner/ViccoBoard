@@ -78,7 +78,7 @@ export class ExamAnalysisService {
     const median = this.calculateMedian(scores);
     const stdDev = this.calculateStandardDeviation(scores, average);
     const difficultyIndex = average / maxPoints; // 0=very difficult (low avg), 1=very easy (high avg)
-    const criticalCount = scores.filter(s => s < (maxPoints * 0.5)).length;
+    const criticalCount = scores.filter(s => s <= (maxPoints * 0.5)).length;
     const excellentCount = scores.filter(s => s > (maxPoints * 0.8)).length;
 
     return {
