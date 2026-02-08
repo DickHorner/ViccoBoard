@@ -2,7 +2,7 @@
 
 Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle Funktionen und Optionen** aus SportZens und KURT umgesetzt werden, ohne „Feature-Schwund“.
 
-**Pflichtlektüre für jeden Agenten, vor jeder Änderung:** `Plan.md` (insb. Abschnitt 6 „Vollständige Feature-Checkliste“).
+**Pflichtlektüre für jeden Agenten, vor jeder Änderung:** `Plan.md` (insb. Abschnitt 6 „Vollständige Feature-Checkliste“) **und** `docs/agents/SPORTZENS_PARITY_v2.md` (verbindliche Parity-Ausführungsanweisung).
 
 ---
 
@@ -19,6 +19,7 @@ Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle F
 10. **Safari-Kompatibilität ist Pflicht:** Keine Nutzung von nicht unterstützten APIs (z. B. `showOpenFilePicker`/`showSaveFilePicker`, File System Access API). Wenn eine neue Browser-API eingesetzt wird, muss die iPadOS-Unterstützung dokumentiert sein.
 ng ohne expliziten Plan-Abschnitt + Opt-in.
 11. **Zentralisierte Schülerverwaltung:** `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/students`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Students-Modul/Bridge zu.
+12. **`SPORTZENS_PARITY_v2.md` ist verbindlich:** Bei allen Parity-/Umsetzungsarbeiten ist `docs/agents/SPORTZENS_PARITY_v2.md` als Pflicht-Instruktionsdatei zu lesen und einzuhalten (inkl. Gates, Scope und Ledger-Disziplin).
 
 ---
 

@@ -1,127 +1,71 @@
-# ViccoBoard Copilot Instructions
+# ViccoBoard Tight-Leash Execution Protocol
 
-This repository contains ViccoBoard, a unified teacher application combining SportZens (physical education management) and KURT (exam creation and grading) into a single TypeScript monorepo.
+## 0) Mission
+Continue parity implementation without architecture drift.
+No bloat, no duplicate data paths, no hidden shortcuts.
 
-## Project Structure
+## 1) Hard Rules (non-negotiable)
+1. Never add direct UI access to `../db`, Dexie tables, or storage adapters.
+2. Never add/restore app-layer repositories/use-cases in `apps/teacher-ui`.
+3. Student data is centralized only via `modules/students` + bridge.
+4. Sport logic goes through `modules/sport` + sport bridge.
+5. Exams logic goes through `modules/exams` + exams bridge.
+6. No feature removal/simplification; unknown spec -> `Plan.md §9` TBD entry.
+7. No `@ts-nocheck` additions. Remove existing ones when touching a file.
+8. No placeholder logic in production paths (“TODO placeholder”, fake calculations, mock persistence).
+9. `docs/agents/SPORTZENS_PARITY_v2.md` is a mandatory instruction file for parity work and must be followed as binding scope/gate guidance.
 
-This is an npm workspaces monorepo with three main directories:
-- `packages/` - Core shared packages (core types, plugins, storage)
-- `modules/` - Domain-specific modules (sport, exams)
-- `apps/` - Applications (demo, teacher-ui; wow-web planned)
+## 2) Forbidden Changes
+1. No new `useDatabase` usage in views/stores/composables.
+2. No imports of `../db` outside approved storage/bootstrap internals.
+3. No parallel student stores/repos in apps or storage package.
+4. No bypassing module boundaries “just to make tests pass”.
 
-## Architecture Principles
+## 3) Allowed Work Unit Size
+1. One PR = max 1–3 checkbox IDs from `Plan.md §6` or parity ledger items.
+2. Keep diffs narrow and traceable.
+3. If scope grows, stop and split into follow-up PRs.
 
-1. **Clean Architecture + Domain-Driven Design**: Core knows only interfaces, never implementations. Each module is self-contained.
-2. **Local-First/Offline-First**: All core functionality works without network. Data stays local with encrypted storage.
-3. **Modular Plugin System**: New features can be added as plugins without changing core code.
-4. **iPadOS Safari-first**: Target browser environment with IndexedDB for production; SQLite adapter for Node/testing only.
+## 4) Mandatory Pre-Edit Checks
+1. Read `AGENTS.md`.
+2. Read `docs/agents/SPORTZENS_PARITY_v2.md`.
+3. Read `Plan.md` relevant checkbox section.
+4. Read parity ledger rows being touched.
+5. State exact target IDs before coding.
 
-## Code Style and Conventions
+## 5) Mandatory Post-Edit Gates
+Run all and require green:
+1. `npm run lint:docs`
+2. `npm run build:packages`
+3. `npm run build:ipad`
+4. `npm test`
+5. `npm run test --workspace=@viccoboard/exams`
+6. `npm run test --workspace=@viccoboard/sport`
+7. `npm run test --workspace=teacher-ui`
+8. `npm run test --workspace=@viccoboard/students`
 
-### TypeScript Standards
-- Always use strict mode (`"strict": true`)
-- Explicitly specify return types for all functions
-- Prefer interfaces over type aliases for object shapes
-- Use async/await instead of raw promises
-- Always handle errors explicitly
+## 6) Parity Ledger Discipline
+For every item moved to done:
+1. Update `implemented` from `no` -> `yes`.
+2. Fill `location` with exact file+symbol.
+3. Fill `tests` with exact test file+name.
+4. Never leave new completed items as `N/A`.
 
-### Naming Conventions
-- **Files**: kebab-case (e.g., `class-group.repository.ts`, `create-class.use-case.ts`)
-- **Classes**: PascalCase (e.g., `ClassGroupRepository`, `CreateClassUseCase`)
-- **Interfaces**: PascalCase (e.g., `ClassGroup`, `ToolPlugin`)
-- **Functions/Methods**: camelCase (e.g., `findBySchoolYear`, `initialize`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `DEFAULT_TIMEOUT`, `MAX_STUDENTS`)
+## 7) Required Output Format (every run)
+1. Target IDs worked on.
+2. Files changed + why.
+3. Gate command results (pass/fail).
+4. Ledger rows updated.
+5. Remaining blockers + next smallest actionable step.
 
-### Code Organization in Files
-1. Imports (grouped: external libraries, internal packages, types)
-2. Types and interfaces
-3. Constants
-4. Class/function implementation (private fields, constructor, public methods, private methods)
-5. Exports
+## 8) Stop Conditions (must halt and report)
+1. Need to violate a hard rule to proceed.
+2. Spec ambiguity that could change behavior.
+3. Cross-module refactor required beyond current 1–3 IDs.
+4. Unexpected unrelated file changes appear.
 
-### Storage Notes
-- Default target is **IndexedDB** for browser/runtime (encrypted storage with migrations)
-- SQLite adapter is Node-only for local development and demos
-- iPadOS Safari can evict local storage after inactivity: always surface backup status/reminders
-- Support export/import via download + file picker (no File System Access API)
-
-## Building and Testing
-
-### Build Commands
-```bash
-# Build all packages
-npm run build
-
-# Build and run demo
-npm run demo
-
-# Install all dependencies
-npm install --workspaces
-```
-
-### Testing
-- Test files use `.test.ts` extension
-- Located in `tests/` directories within each package/module
-- Run tests with `npm test` (when configured)
-- Always create tests for new use cases and repositories
-
-## Package Development
-
-### Creating a New Package
-1. Create directory structure: `packages/my-package/src`
-2. Add `package.json` with `@viccoboard/` namespace
-3. Add `tsconfig.json` extending root config
-4. Define exports in `src/index.ts`
-5. Build with `npm run build`
-
-### Creating a New Module
-1. Create in `modules/` directory
-2. Add dependencies on `@viccoboard/core` and `@viccoboard/storage`
-3. Organize as: `src/{use-cases,repositories,plugins}`
-4. Implement domain-specific logic following Clean Architecture
-
-### Implementing Repositories
-- Extend `BaseRepository<T>` from `@viccoboard/storage`
-- Implement `mapToEntity()` and `mapToRow()` methods
-- Use snake_case for database column names, camelCase for TypeScript properties
-- Add domain-specific query methods
-
-### Implementing Use Cases
-- Pure business logic, no infrastructure concerns
-- Accept repositories via constructor dependency injection
-- Validate inputs and throw clear error messages
-- Return domain entities, not database rows
-
-### Implementing Plugins
-- Implement appropriate plugin interface from `@viccoboard/core`
-- Follow plugin contract strictly (id, name, version, enabled, type)
-- Register with PluginRegistry
-- Keep plugins stateless when possible
-
-## Important Files to Review
-
-- `README.md` - Project overview and feature list
-- `DEVELOPMENT.md` - Detailed development workflow
-- `ARCHITECTURE_DECISIONS.md` - Key architectural decisions and rationale
-- `Plan.md` - Complete feature specification
-- `agents.md` - Agent roles and responsibilities (for AI development)
-
-## Security Considerations
-
-- Always encrypt sensitive data before storage
-- Support app lock (PIN/Password/Biometric)
-- Never commit secrets or sensitive data
-- Implement session timeout for security
-- Support encrypted backup/restore
-
-## Feature Completeness
-
-All features from both SportZens and KURT must be implemented. No features should be left behind. Refer to `Plan.md` for the complete feature list.
-
-## Dependencies
-
-When adding new dependencies:
-- Prefer existing libraries over new ones
-- Only add new libraries if absolutely necessary
-- Ensure compatibility with browser environments (especially Safari)
-- Check for TypeScript type definitions
+## 9) Priority Queue (always in this order)
+1. Architecture compliance regressions.
+2. Failing tests/builds.
+3. Parity gaps with existing infrastructure.
+4. New feature work.
