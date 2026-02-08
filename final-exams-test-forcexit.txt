@@ -1,0 +1,150 @@
+
+> @viccoboard/exams@0.1.0 test
+> jest
+
+PASS tests/support-tip-management.service.test.ts
+PASS tests/alternative-grading.service.test.ts
+PASS tests/comment-management.service.test.ts
+PASS tests/grading-key-engine.service.test.ts
+PASS tests/grading-key.service.test.ts
+PASS tests/calculate-grade.use-case.test.ts
+PASS tests/create-exam.use-case.test.ts
+PASS tests/exam.repository.test.ts
+  ÔùÅ Console
+
+    console.log
+      Applying migration 1: initial_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 1 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 2: grading_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 2 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 6: exam_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 6 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 1: initial_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 1 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 2: grading_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 2 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 6: exam_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 6 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+PASS tests/task-node.repository.test.ts
+  ÔùÅ Console
+
+    console.log
+      Applying migration 1: initial_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 1 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 2: grading_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 2 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 6: exam_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 6 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+PASS tests/long-term-note.service.test.ts
+PASS tests/exam-analysis.service.test.ts
+PASS tests/criterion.repository.test.ts
+  ÔùÅ Console
+
+    console.log
+      Applying migration 1: initial_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 1 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 2: grading_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 2 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+    console.log
+      Applying migration 6: exam_schema
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:192:17)
+
+    console.log
+      Ô£ô Migration 6 completed
+
+      at SQLiteStorage.migrate (../../packages/storage/src/storage.ts:203:19)
+
+A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown. Try running with --detectOpenHandles to find leaks. Active timers can also cause this, ensure that .unref() was called on them.
+
+Test Suites: 12 passed, 12 total
+Tests:       227 passed, 227 total
+Snapshots:   0 total
+Time:        6.018 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

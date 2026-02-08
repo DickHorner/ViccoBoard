@@ -1,0 +1,8 @@
+
+> viccoboard@0.1.0 test
+> npm run test --workspace=@viccoboard/students --workspace=@viccoboard/exams --workspace=@viccoboard/sport --workspace=teacher-ui
+
+
+> @viccoboard/students@0.1.0 test
+> jest --passWithNoTests
+
