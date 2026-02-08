@@ -85,7 +85,6 @@ import { useI18n } from 'vue-i18n';
 import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { Sport } from '@viccoboard/core';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -233,15 +232,16 @@ async function saveAll() {
         timeFormatted: timeStr
       };
       
-      savePromises.push(
-        sportBridge.value?.recordGradeUseCase.execute({
-          studentId: student.id,
-          categoryId: categoryId,
-          measurements,
-          calculatedGrade: grade,
-          timestamp: new Date()
-        })
-      );
+      if (sportBridge.value) {
+        savePromises.push(
+          sportBridge.value.recordGradeUseCase.execute({
+            studentId: student.id,
+            categoryId: categoryId,
+            measurements,
+            calculatedGrade: grade
+          })
+        );
+      }
     }
     
     await Promise.all(savePromises);
