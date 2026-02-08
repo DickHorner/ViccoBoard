@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { createUuid } from '../utils/uuid'
-import { useExams } from '../composables/useDatabase'
+import { useExamsBridge } from '../composables/useExamsBridge'
 import { useToast } from '../composables/useToast'
 import { useRouter } from 'vue-router'
 
@@ -218,7 +218,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
 
   const saveExam = async (): Promise<void> => {
     const router = useRouter()
-    const { create: createExam, update: updateExam } = useExams()
+    const { examRepository } = useExamsBridge()
     const { success, error: showError } = useToast()
 
     if (!canSave.value) {
@@ -227,51 +227,78 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     }
 
     const exam = buildExam()
-    if (isEditing.value) {
-      await updateExam(exam)
-      success('Exam updated.')
-    } else {
-      await createExam(exam)
-      success('Exam saved.')
+    try {
+      if (isEditing.value && examId.value) {
+        await examRepository?.update(examId.value, exam)
+        success('Exam updated.')
+      } else {
+        const created = await examRepository?.create?.(exam)
+        if (created) {
+          examId.value = created.id
+        }
+        success('Exam saved.')
+      }
+      router.push('/exams')
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Failed to save exam.')
     }
-    router.push('/exams')
   }
 
   const loadExam = async (id: string): Promise<void> => {
     const router = useRouter()
-    const { getById } = useExams()
+    const { examRepository } = useExamsBridge()
     const { error: showError } = useToast()
 
-    const exam = await getById(id)
-    if (!exam) {
-      showError('Exam not found.')
-      router.push('/exams')
-      return
-    }
+    try {
+      const exam = await examRepository?.findById(id)
+      if (!exam) {
+        showError('Exam not found.')
+        router.push('/exams')
+        return
+      }
 
-    examId.value = id
-    isEditing.value = true
-    createdAt.value = exam.createdAt
-    title.value = exam.title
-    description.value = exam.description ?? ''
-    classGroupId.value = exam.classGroupId ?? ''
-    mode.value = exam.mode
-    parts.value = exam.structure.parts.map((part, index) => ({
-      id: part.id,
-      name: part.name,
-      description: part.description ?? '',
-      taskIds: part.taskIds,
-      calculateSubScore: part.calculateSubScore,
-      scoreType: part.scoreType,
-      printable: part.printable,
-      order: index + 1
-    }))
+      examId.value = id
+      isEditing.value = true
+      createdAt.value = exam.createdAt
+      title.value = exam.title
+      description.value = exam.description ?? ''
+      classGroupId.value = exam.classGroupId ?? ''
+      mode.value = exam.mode
+      parts.value = exam.structure.parts.map((part, index) => ({
+        id: part.id,
+        name: part.name,
+        description: part.description ?? '',
+        taskIds: part.taskIds,
+        calculateSubScore: part.calculateSubScore,
+        scoreType: part.scoreType,
+        printable: part.printable,
+        order: index + 1
+      }))
 
-    if (exam.mode === 'simple') {
-      tasks.value = exam.structure.tasks
-        .filter(task => task.level === 1)
-        .sort((a, b) => a.order - b.order)
-        .map(task => ({
+      if (exam.mode === 'simple') {
+        tasks.value = exam.structure.tasks
+          .filter(task => task.level === 1)
+          .sort((a, b) => a.order - b.order)
+          .map(task => ({
+            id: task.id,
+            title: task.title,
+            points: task.points,
+            bonusPoints: task.bonusPoints ?? 0,
+            isChoice: task.isChoice,
+            choiceGroup: task.choiceGroup ?? '',
+            criteria: task.criteria.map(criterion => ({
+              id: criterion.id,
+              text: criterion.text,
+              points: criterion.points
+            })),
+            subtasks: []
+          }))
+        return
+      }
+
+      const byId = new Map<string, TaskDraft>()
+      exam.structure.tasks.forEach(task => {
+        byId.set(task.id, {
           id: task.id,
           title: task.title,
           points: task.points,
@@ -284,45 +311,30 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
             points: criterion.points
           })),
           subtasks: []
-        }))
-      return
-    }
-
-    const byId = new Map<string, TaskDraft>()
-    exam.structure.tasks.forEach(task => {
-      byId.set(task.id, {
-        id: task.id,
-        title: task.title,
-        points: task.points,
-        bonusPoints: task.bonusPoints ?? 0,
-        isChoice: task.isChoice,
-        choiceGroup: task.choiceGroup ?? '',
-        criteria: task.criteria.map(criterion => ({
-          id: criterion.id,
-          text: criterion.text,
-          points: criterion.points
-        })),
-        subtasks: []
+        })
       })
-    })
 
-    const root: TaskDraft[] = []
-    exam.structure.tasks
-      .sort((a, b) => a.order - b.order)
-      .forEach(task => {
-        const draft = byId.get(task.id)
-        if (!draft) return
-        if (!task.parentId) {
-          root.push(draft)
-        } else {
-          const parent = byId.get(task.parentId)
-          if (parent) {
-            parent.subtasks.push(draft)
+      const root: TaskDraft[] = []
+      exam.structure.tasks
+        .sort((a, b) => a.order - b.order)
+        .forEach(task => {
+          const draft = byId.get(task.id)
+          if (!draft) return
+          if (!task.parentId) {
+            root.push(draft)
+          } else {
+            const parent = byId.get(task.parentId)
+            if (parent) {
+              parent.subtasks.push(draft)
+            }
           }
-        }
-      })
+        })
 
-    tasks.value = root
+      tasks.value = root
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Failed to load exam.')
+      router.push('/exams')
+    }
   }
 
   const reset = (): void => {

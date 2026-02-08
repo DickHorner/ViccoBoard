@@ -216,11 +216,11 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Exams } from '@viccoboard/core';
 import { v4 as uuidv4 } from 'uuid';
-import { useExams } from '../composables/useExams';
+import { useExamsBridge } from '../composables/useExamsBridge';
 
 const router = useRouter();
 const route = useRoute();
-const { create, update, getById } = useExams();
+const { examRepository } = useExamsBridge();
 
 const exam = ref<Exams.Exam | null>(null);
 const isEditing = computed(() => !!route.params.id);
@@ -326,9 +326,9 @@ const saveExam = async () => {
   if (!exam.value || !canSave.value) return;
   try {
     if (isEditing.value) {
-      await update(exam.value);
+      await examRepository?.update(exam.value.id, exam.value);
     } else {
-      await create(exam.value);
+      await examRepository?.create(exam.value);
     }
     router.push('/exams');
   } catch (error) {
@@ -344,7 +344,7 @@ onMounted(async () => {
   if (isEditing.value) {
     // Load existing exam
     const id = route.params.id as string;
-    const loaded = await getById(id);
+    const loaded = await examRepository?.findById(id);
     if (loaded) {
       exam.value = loaded;
     }
