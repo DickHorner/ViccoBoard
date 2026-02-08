@@ -9,7 +9,7 @@ import {
   STANDARD_ALTERNATIVE_SCALE,
   SIMPLIFIED_ALTERNATIVE_SCALE,
   type AlternativeGradeType
-} from '../services/alternative-grading.service';
+} from '../src/services/alternative-grading.service';
 
 describe('AlternativeGradingService', () => {
   describe('toNumericPoints', () => {
@@ -224,8 +224,8 @@ describe('AlternativeGradingService', () => {
     it('should return available scales', () => {
       const scales = AlternativeGradingService.getAvailableScales();
       expect(scales.length).toBeGreaterThanOrEqual(2);
-      expect(scales.some(s => s.name === 'Standard (German)')).toBe(true);
-      expect(scales.some(s => s.name === 'Simplified')).toBe(true);
+      expect(scales.some((s: { name: string }) => s.name === 'Standard (German)')).toBe(true);
+      expect(scales.some((s: { name: string }) => s.name === 'Simplified')).toBe(true);
     });
   });
 });
