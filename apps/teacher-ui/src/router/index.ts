@@ -17,14 +17,20 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/exams/new',
     name: 'exam-new',
-    component: () => import('../views/ExamBuilder.vue'),
+    component: () => import('../views/KURTExamBuilder.vue'),
     meta: { title: 'New Exam' }
   },
   {
     path: '/exams/:id',
     name: 'exam-edit',
-    component: () => import('../views/ExamBuilder.vue'),
+    component: () => import('../views/KURTExamBuilder.vue'),
     meta: { title: 'Exam Builder' }
+  },
+  {
+    path: '/exams/:id/correct',
+    name: 'exam-correct',
+    component: () => import('../views/CorrectionCompactUI.vue'),
+    meta: { title: 'Exam Correction' }
   },
   {
     path: '/classes/:id',
