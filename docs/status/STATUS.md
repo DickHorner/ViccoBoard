@@ -154,50 +154,129 @@ npm run demo
   - Duplicate prevention
   - Edge cases
 
-## 🚧 Next Steps
+### 8. Teacher UI Application (@viccoboard/teacher-ui) - IN PROGRESS 🔄
+Vue 3 application for iPadOS Safari:
 
-### Priority 1: Domain Logic Implementation
-The foundation is complete. The next phase is implementing business logic:
+#### Current Status
+- ✅ Vue 3 + TypeScript + Vite setup complete
+- ✅ Router configured with main sections
+- ✅ i18n infrastructure with vue-i18n
+- ✅ IndexedDB storage adapter (browser-compatible)
+- ✅ Module bridges implemented:
+  - `useSportBridge()` - Sport module access
+  - `useStudentsBridge()` - Students module access
+  - `useExamsBridge()` - Exams module access (NEW!)
+- ✅ Bridge initialization in main.ts
+- ✅ Build pipeline working (build:ipad)
+- ✅ Test infrastructure (49 tests passing)
 
-1. **Create concrete repositories** for each entity type
-2. **Implement use cases** (application layer) for:
-   - Class management
-   - Student management
-   - Lesson planning
-   - Attendance tracking
-   - Grading calculations
+#### Components Implemented
+- Sport grading entries (Cooper, Time, Criteria, BJS, Sportabzeichen, Mittelstrecke, Shuttle)
+- Class management views
+- Student list and detail views
+- Lesson list view
+- Grading overview
+- Exams overview (basic)
+- Correction UI (compact mode)
 
-### Priority 2: Plugin Implementations
-Create concrete plugin implementations:
+#### Architecture Refactoring (In Progress)
+**Goal:** Eliminate direct database access from UI layer
 
-1. **Assessment Type Plugins**:
-   - Criteria-based grading
-   - Time-based grading
-   - Cooper test
-   - Sportabzeichen
-   - Bundesjugendspiele
+**Current State:**
+- ✅ Bridges fully implemented and initialized
+- 🔄 9 views still using `useDatabase()` directly
+- 🔄 Need to migrate to proper module bridges
 
-2. **Tool Plugins**:
-   - Timer
-   - Scoreboard
-   - Tactics board
-   - Dice roller
-   - Team division
-   - Tournament planner
+**Target Architecture:** UI → Bridge → UseCase → Repository → Storage
 
-3. **Exporter Plugins**:
-   - PDF generator
-   - CSV exporter
-   - Share package creator
+### 9. Exams Module (@viccoboard/exams) - COMPLETE ✅
+Full KURT implementation with all features:
 
-4. **Integration Plugins**:
-   - WebUntis importer
-   - Grade app exporters
+#### Repositories
+- ExamRepository, TaskNodeRepository, CriterionRepository
+- CorrectionEntryRepository, SupportTipRepository
+- StudentLongTermNoteRepository
 
-### Priority 3: User Interface
-Use Vue 3 in `apps/teacher-ui` only (static web, iPadOS Safari). No Electron/React Native/Flutter.
+#### Use Cases
+- createExamPayload (exam creation)
+- RecordCorrectionUseCase (correction recording)
+- CalculateGradeUseCase (grade calculation)
 
-**UI Components Needed:**
+#### Services
+- **GradingKeyService** - Grading key management with presets
+- **GradingKeyEngine** - Key modification, change tracking, batch recalculation
+- **AlternativeGradingService** - ++/+/0/-/-- grading with customizable scales
+- **CommentManagementService** - Comment templates and reuse
+- **SupportTipManagementService** - Fördertipps with QR codes
+- **ExamAnalysisService** - Difficulty analysis, adjustments, distribution
+- **LongTermNoteManagementService** - Student development tracking
+
+#### Test Coverage
+- ✅ 12 test suites, 227 tests passing
+- ✅ All repositories tested
+- ✅ All services tested
+- ✅ Use cases tested
+
+## 🚧 Current Focus
+
+### Architecture Compliance (In Progress)
+Per SPORTZENS_PARITY_v2.md and agents.md constraints:
+
+**Immediate Tasks:**
+1. 🔄 Migrate 9 views from `useDatabase()` to proper bridges
+2. ⏳ Refactor `useExams.ts` to use exams bridge
+3. ⏳ Refactor `useCorrections.ts` to use exams bridge
+4. ⏳ Deprecate `useDatabase.ts` direct DB access
+5. ⏳ Audit for remaining `../db` imports
+
+### Parity Implementation (Next)
+After architecture compliance is complete:
+1. SportZens parity ledger implementation (excluding WOW)
+2. KURT feature completion per Plan.md checkboxes
+3. Export/Import roundtrip testing
+4. iPad UX optimization
+
+## 📊 Build & Test Status
+
+### Hard Acceptance Gates
+| Gate | Status | Details |
+|------|--------|---------|
+| `npm run build:packages` | ✅ PASS | All 6 packages compile |
+| `npm run build:ipad` | ✅ PASS | UI builds without warnings |
+| `npm run lint:docs` | ✅ PASS | Doc guardrails pass |
+| `npm test` | ✅ PASS | 442 tests across 32 suites |
+
+### Test Coverage by Module
+| Module | Suites | Tests | Status |
+|--------|--------|-------|--------|
+| @viccoboard/exams | 12 | 227 | ✅ |
+| @viccoboard/sport | 18 | 166 | ✅ |
+| teacher-ui | 2 | 49 | ✅ |
+| **Total** | **32** | **442** | **✅** |
+
+## 🎯 Next Steps
+
+### Priority 1: Architecture Compliance
+Complete the bridge migration to enforce clean architecture:
+- Migrate remaining views to use bridges exclusively
+- Remove all direct database access from UI layer
+- Deprecate legacy `useDatabase` composable
+
+### Priority 2: SportZens Parity (Without WOW)
+Implement all SportZens APK features (WOW explicitly excluded per scope v2):
+- i18n string parity
+- Schema roundtrip testing
+- Workflow/UI parity verification
+
+### Priority 3: KURT Feature Completion
+Ensure all Plan.md KURT checkboxes are implemented:
+- Exam builder (simple/complex modes)
+- Correction workflows
+- Fördertipps integration
+- PDF export with 4 layouts
+- E-mail templates
+
+### Priority 4: User Interface Enhancement
 - Dashboard
 - Class management screens
 - Student profiles

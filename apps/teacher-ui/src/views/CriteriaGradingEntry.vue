@@ -147,7 +147,7 @@
                       :max="criterion.maxValue"
                       :step="0.5"
                       :value="getGradeValue(student.id, criterion.id)"
-                      @input="onGradeChange(student.id, criterion.id, $event.target.value)"
+                      @input="onGradeChange(student.id, criterion.id, ($event.target as HTMLInputElement)?.value)"
                       @blur="saveStudentGrade(student.id)"
                       class="grade-input"
                       :disabled="saving"
@@ -301,21 +301,22 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import { v4 as uuidv4 } from 'uuid';
-import type { GradeCategory, Student, Criterion, CriteriaGradingConfig } from '@viccoboard/core';
+import type { Sport } from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge } = useDatabase();
+const { sportBridge, gradeCategories, performanceEntries } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const categoryId = route.params.id as string;
-const category = ref<GradeCategory | null>(null);
-const students = ref<Student[]>([]);
+const category = ref<Sport.GradeCategory | null>(null);
+const students = ref<any[]>([]);
 const gradeEntries = ref<Map<string, Map<string, number>>>(new Map());
 const comments = ref<Map<string, string>>(new Map());
 const loading = ref(true);
@@ -340,12 +341,12 @@ const newCriterion = ref({
 
 const criteria = computed(() => {
   if (!category.value) return [];
-  const config = category.value.configuration as CriteriaGradingConfig;
+  const config = category.value.configuration as any;
   return config.criteria || [];
 });
 
 const remainingWeight = computed(() => {
-  const totalWeight = criteria.value.reduce((sum, c) => sum + c.weight, 0);
+  const totalWeight = criteria.value.reduce((sum: number, c: any) => sum + c.weight, 0);
   return Math.max(0, 100 - totalWeight);
 });
 
@@ -359,7 +360,7 @@ async function loadData() {
   
   try {
     // Load category
-    category.value = await sportBridge.value.gradeCategoryRepository.read(categoryId);
+    category.value = await gradeCategories.value?.findById(categoryId) ?? null;
     
     if (!category.value) {
       error.value = 'Kategorie nicht gefunden';
@@ -367,14 +368,14 @@ async function loadData() {
     }
     
     // Load students
-    students.value = await sportBridge.value.studentRepository.findByClassGroup(
+    students.value = await studentRepository.value?.findByClassGroup(
       category.value.classGroupId
-    );
+    ) ?? [];
     
     // Load existing grades
     for (const student of students.value) {
-      const entries = await sportBridge.value.performanceEntryRepository
-        .findByStudentAndCategory(student.id, categoryId);
+      const entries = await performanceEntries.value
+        ?.findByStudentAndCategory(student.id, categoryId) ?? [];
       
       if (entries.length > 0) {
         const latestEntry = entries[entries.length - 1];
@@ -478,7 +479,7 @@ function calculateGrade(studentId: string): string {
   
   // Determine the maximum possible weighted score based on criteria
   const maxPossible = criteria.value.reduce(
-    (sum, c) => sum + (c.maxValue * (c.weight / 100)),
+    (sum: number, c: any) => sum + (c.maxValue * (c.weight / 100)),
     0
   );
   
@@ -517,7 +518,7 @@ async function saveStudentGrade(studentId: string) {
       measurements[criterionId] = value;
     });
     
-    await sportBridge.value.recordGradeUseCase.execute({
+    await sportBridge.value?.recordGradeUseCase.execute({
       studentId,
       categoryId,
       measurements,
@@ -568,7 +569,7 @@ async function addCriterion() {
   
   saving.value = true;
   try {
-    const config = category.value.configuration as CriteriaGradingConfig;
+    const config = category.value.configuration as any;
     const updatedCriteria = [
       ...config.criteria,
       {
@@ -578,10 +579,10 @@ async function addCriterion() {
         weight: newCriterion.value.weight,
         minValue: newCriterion.value.minValue,
         maxValue: newCriterion.value.maxValue
-      } as Criterion
+      }
     ];
     
-    const updatedConfig: CriteriaGradingConfig = {
+    const updatedConfig: any = {
       ...config,
       criteria: updatedCriteria
     };
@@ -592,7 +593,7 @@ async function addCriterion() {
       lastModified: new Date()
     };
     
-    await sportBridge.value.gradeCategoryRepository.update(
+    await gradeCategories.value?.update(
       category.value.id,
       updatedCategory
     );
@@ -622,10 +623,10 @@ async function removeCriterion(index: number) {
   
   saving.value = true;
   try {
-    const config = category.value.configuration as CriteriaGradingConfig;
-    const updatedCriteria = config.criteria.filter((_, i) => i !== index);
+    const config = category.value.configuration as any;
+    const updatedCriteria = config.criteria.filter((_: any, i: number) => i !== index);
     
-    const updatedConfig: CriteriaGradingConfig = {
+    const updatedConfig: any = {
       ...config,
       criteria: updatedCriteria
     };
@@ -636,7 +637,7 @@ async function removeCriterion(index: number) {
       lastModified: new Date()
     };
     
-    await sportBridge.value.gradeCategoryRepository.update(
+    await gradeCategories.value?.update(
       category.value.id,
       updatedCategory
     );

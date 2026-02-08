@@ -23,8 +23,7 @@ import {
   LongTermNoteManagementService,
   createExamPayload,
   RecordCorrectionUseCase,
-  CalculateGradeUseCase,
-  type RecordCorrectionInput
+  CalculateGradeUseCase
 } from '@viccoboard/exams';
 import { getStorageAdapter } from '../services/storage.service';
 

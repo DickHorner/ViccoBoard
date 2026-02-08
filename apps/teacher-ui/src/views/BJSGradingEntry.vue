@@ -132,18 +132,19 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import type { Student } from '@viccoboard/core';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-const { sportBridge, studentsBridge } = useDatabase();
+const { sportBridge, gradeCategories, performanceEntries } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const categoryId = route.params.id as string;
@@ -160,14 +161,14 @@ onMounted(async () => {
 async function loadData() {
   loading.value = true;
   try {
-    const category = await sportBridge.value.gradeCategoryRepository.findById(categoryId);
+    const category = await gradeCategories.value?.findById(categoryId);
     if (!category) {
       toast.error('Kategorie nicht gefunden');
       router.back();
       return;
     }
 
-    students.value = await studentsBridge.value.studentRepository.findByClassGroup(category.classGroupId);
+    students.value = await studentRepository.value?.findByClassGroup(category.classGroupId) ?? [];
 
     // Initialize performance objects
     students.value.forEach(student => {
@@ -181,7 +182,7 @@ async function loadData() {
     });
 
     // Load existing entries (if any)
-    const entries = await sportBridge.value.performanceEntryRepository.findByCategory(categoryId);
+    const entries = await performanceEntries.value?.findByCategory(categoryId) ?? [];
     entries.forEach(entry => {
       if (entry.measurements) {
         performances[entry.studentId] = {
@@ -241,7 +242,8 @@ function getCertificateType(studentId: string): string | null {
   return null;
 }
 
-function getCertificateLabel(type: string): string {
+function getCertificateLabel(type: string | null): string {
+  if (!type) return '';
   const labels: Record<string, string> = {
     ehrenurkunde: t('BUNDESJUGENDSPIELE.ehrenurkunde'),
     siegerurkunde: t('BUNDESJUGENDSPIELE.siegerurkunde'),
@@ -264,7 +266,7 @@ async function saveAll() {
       const points = totalPoints[student.id];
       const certType = getCertificateType(student.id);
       
-      if (!perf || points === 0) continue;
+      if (!perf || points === 0 || !certType) continue;
       
       const measurements = {
         sprint: perf.sprint,
@@ -276,13 +278,13 @@ async function saveAll() {
       };
       
       savePromises.push(
-        sportBridge.value.recordGradeUseCase.execute({
+        sportBridge.value?.recordGradeUseCase.execute({
           studentId: student.id,
           categoryId: categoryId,
           measurements,
           calculatedGrade: certType,
-          timestamp: new Date()
-        })
+          metadata: { timestamp: new Date().toISOString() }
+        }) ?? Promise.resolve()
       );
     }
     
