@@ -39,6 +39,98 @@ i18n_key,GRADES.multistop,yes,in_scope_v2,no,N/A,N/A
 i18n_key,GRADES.sportabzeichen,yes,in_scope_v2,no,N/A,N/A
 i18n_key,GRADES.bundesjugendspiele,yes,in_scope_v2,no,N/A,N/A
 i18n_key,COOPER.bewerte-cooper,yes,in_scope_v2,no,N/A,N/A
+schema_field,class.color,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.created_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.grade_category_count,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.grade_scheme,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.is_dirty,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.name,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.school_year,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.settings,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.sort,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.stats,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.student_count,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.teacher_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.updated_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.version,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.class_id,yes,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.first_name,yes,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.gender,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.id,yes,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.is_dirty,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.last_name,yes,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.public_code,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.settings,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.stats,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.teacher_id,yes,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.version,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.category_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.class_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.created_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.criterias,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.deleted,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.grade,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.is_dirty,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.main_category_id,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.name,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.student_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.teacher_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.total_points,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.type,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.updated_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.weight,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.year,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.categories,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.class_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.color,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.created_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.deleted,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.is_dirty,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.main_category_id,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.max_value,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.min_value,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.name,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.settings,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.stats,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.teacher_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.type,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.updated_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.weight,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.year,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.color,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.created_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.grade_scheme,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.grade_scheme_direction,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.is_dirty,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.name,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.school,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.teacher_id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.updated_at,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.version,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.visibility,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,gradeWeighting.attendance,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade-weighting.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,gradeWeighting.grades,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade-weighting.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,gradeWeighting.remarks,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade-weighting.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,gradeWeighting.wow,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade-weighting.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,newDayData.additionalExercises,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-new-day-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,newDayData.date,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-new-day-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,newDayData.exercises,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-new-day-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,newDayData.notes,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-new-day-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.addons,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.email,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.first_name,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.id,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.invoices,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.last_name,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.role,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.settings,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,wow.name,yes,excluded_by_scope_v2,no,N/A,N/A
+schema_field,wow.wowtimer,no,excluded_by_scope_v2,no,N/A,N/A
+schema_field,wow.wowtyp,yes,excluded_by_scope_v2,no,N/A,N/A
 i18n_key,SHUTTLE.bewerte-shuttle,yes,in_scope_v2,no,N/A,N/A
 i18n_key,MULTISTOP.bewerte,yes,in_scope_v2,no,N/A,N/A
 i18n_key,SPORTABZEICHEN.title,yes,in_scope_v2,no,N/A,N/A
@@ -62,58 +154,58 @@ schema_field,class.id,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts
 schema_field,class.name,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts ClassGroup.name,N/A
 schema_field,class.school_year,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts ClassGroup.schoolYear,N/A
 schema_field,class.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/class-group.ts ClassGroup.teacherId,N/A
-schema_field,class.color,no,in_scope_v2,no,N/A,N/A
-schema_field,class.grade_scheme,no,in_scope_v2,no,N/A,N/A
-schema_field,class.settings,no,in_scope_v2,no,N/A,N/A
-schema_field,class.stats,no,in_scope_v2,no,N/A,N/A
+schema_field,class.color,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.grade_scheme,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.settings,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,class.stats,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-class.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
 schema_field,student.id,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.id,N/A
 schema_field,student.class_id,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.classGroupId,N/A
 schema_field,student.first_name,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.firstName,N/A
 schema_field,student.last_name,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.lastName,N/A
 schema_field,student.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/student.ts Student.teacherId,N/A
 schema_field,student.gender,no,in_scope_v2,yes,modules/sport/src/types/student.ts Student.gender,N/A
-schema_field,student.public_code,no,in_scope_v2,no,N/A,N/A
-schema_field,student.settings,no,in_scope_v2,no,N/A,N/A
-schema_field,student.stats,no,in_scope_v2,no,N/A,N/A
+schema_field,student.public_code,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.settings,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,student.stats,no,in_scope_v2,yes,modules/students/src/repositories/sportzens-student.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
 schema_field,grade.id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.id,N/A
 schema_field,grade.category_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.categoryId,N/A
 schema_field,grade.class_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.classGroupId,N/A
 schema_field,grade.student_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.studentId,N/A
 schema_field,grade.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.teacherId,N/A
 schema_field,grade.type,yes,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.type,N/A
-schema_field,grade.year,yes,in_scope_v2,no,N/A,N/A
+schema_field,grade.year,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
 schema_field,grade.grade,no,in_scope_v2,yes,modules/sport/src/types/grade.ts GradeEntry.value,N/A
-schema_field,grade.criterias,no,in_scope_v2,no,N/A,N/A
-schema_field,grade.total_points,no,in_scope_v2,no,N/A,N/A
+schema_field,grade.criterias,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,grade.total_points,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
 schema_field,category.id,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.id,N/A
 schema_field,category.class_id,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.classGroupId,N/A
 schema_field,category.name,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.name,N/A
 schema_field,category.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.teacherId,N/A
 schema_field,category.type,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.assessmentType,N/A
 schema_field,category.weight,yes,in_scope_v2,yes,modules/sport/src/types/grade-category.ts GradeCategory.weight,N/A
-schema_field,category.year,yes,in_scope_v2,no,N/A,N/A
-schema_field,category.categories,no,in_scope_v2,no,N/A,N/A
-schema_field,category.settings,no,in_scope_v2,no,N/A,N/A
-schema_field,category.max_value,no,in_scope_v2,no,N/A,N/A
+schema_field,category.year,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.categories,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.settings,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,category.max_value,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-category.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
 schema_field,table.id,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.id,N/A
 schema_field,table.name,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.name,N/A
 schema_field,table.grade_scheme,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.gradeScheme,N/A
 schema_field,table.teacher_id,yes,in_scope_v2,yes,modules/sport/src/types/grading-table.ts GradingTable.teacherId,N/A
-schema_field,table.grade_scheme_direction,no,in_scope_v2,no,N/A,N/A
-schema_field,table.school,no,in_scope_v2,no,N/A,N/A
-schema_field,gradeWeighting.attendance,yes,in_scope_v2,no,N/A,N/A
-schema_field,gradeWeighting.grades,yes,in_scope_v2,no,N/A,N/A
-schema_field,gradeWeighting.remarks,yes,in_scope_v2,no,N/A,N/A
+schema_field,table.grade_scheme_direction,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,table.school,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-table.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,gradeWeighting.attendance,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade-weighting.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,gradeWeighting.grades,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade-weighting.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,gradeWeighting.remarks,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-grade-weighting.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
 schema_field,gradeWeighting.wow,yes,excluded_by_scope_v2,no,N/A,N/A
 schema_field,userData.id,yes,in_scope_v2,yes,packages/core/src/types/user.ts User.id,N/A
 schema_field,userData.email,yes,in_scope_v2,yes,packages/core/src/types/user.ts User.email,N/A
-schema_field,userData.role,yes,in_scope_v2,no,N/A,N/A
-schema_field,userData.first_name,no,in_scope_v2,no,N/A,N/A
-schema_field,userData.last_name,no,in_scope_v2,no,N/A,N/A
-schema_field,userData.settings,no,in_scope_v2,no,N/A,N/A
-schema_field,newDayData.date,yes,in_scope_v2,no,N/A,N/A
-schema_field,newDayData.exercises,no,in_scope_v2,no,N/A,N/A
-schema_field,newDayData.additionalExercises,no,in_scope_v2,no,N/A,N/A
+schema_field,userData.role,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.first_name,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.last_name,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,userData.settings,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-user-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,newDayData.date,yes,in_scope_v2,yes,modules/sport/src/repositories/sportzens-new-day-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,newDayData.exercises,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-new-day-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
+schema_field,newDayData.additionalExercises,no,in_scope_v2,yes,modules/sport/src/repositories/sportzens-new-day-data.repository.ts,modules/sport/tests/sportzens-schema-roundtrip.test.ts
 schema_field,wow.name,yes,excluded_by_scope_v2,no,N/A,N/A
 schema_field,wow.wowtyp,yes,excluded_by_scope_v2,no,N/A,N/A
 schema_field,wow.wowtimer,no,excluded_by_scope_v2,no,N/A,N/A

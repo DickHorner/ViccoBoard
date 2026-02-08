@@ -15,6 +15,13 @@ export { CooperTestConfigRepository } from './repositories/cooper-test-config.re
 export { ShuttleRunConfigRepository } from './repositories/shuttle-run-config.repository.js';
 export { SportabzeichenStandardRepository } from './repositories/sportabzeichen-standard.repository.js';
 export { SportabzeichenResultRepository } from './repositories/sportabzeichen-result.repository.js';
+export { SportZensClassRepository } from './repositories/sportzens-class.repository.js';
+export { SportZensCategoryRepository } from './repositories/sportzens-category.repository.js';
+export { SportZensGradeRepository } from './repositories/sportzens-grade.repository.js';
+export { SportZensTableRepository } from './repositories/sportzens-table.repository.js';
+export { SportZensGradeWeightingRepository } from './repositories/sportzens-grade-weighting.repository.js';
+export { SportZensNewDayDataRepository } from './repositories/sportzens-new-day-data.repository.js';
+export { SportZensUserDataRepository } from './repositories/sportzens-user-data.repository.js';
 
 // Use Cases
 export { CreateClassUseCase } from './use-cases/create-class.use-case.js';
@@ -31,6 +38,13 @@ export type { CreateGradeCategoryInput } from './use-cases/create-grade-category
 
 export { RecordGradeUseCase } from './use-cases/record-grade.use-case.js';
 export type { RecordGradeInput } from './use-cases/record-grade.use-case.js';
+export { SaveSportZensClassUseCase } from './use-cases/save-sportzens-class.use-case.js';
+export { SaveSportZensCategoryUseCase } from './use-cases/save-sportzens-category.use-case.js';
+export { SaveSportZensGradeUseCase } from './use-cases/save-sportzens-grade.use-case.js';
+export { SaveSportZensTableUseCase } from './use-cases/save-sportzens-table.use-case.js';
+export { SaveSportZensGradeWeightingUseCase } from './use-cases/save-sportzens-grade-weighting.use-case.js';
+export { SaveSportZensNewDayDataUseCase } from './use-cases/save-sportzens-new-day-data.use-case.js';
+export { SaveSportZensUserDataUseCase } from './use-cases/save-sportzens-user-data.use-case.js';
 
 // Grading Engine
 export { CriteriaGradingEngine } from './grading/criteria-grading.engine.js';

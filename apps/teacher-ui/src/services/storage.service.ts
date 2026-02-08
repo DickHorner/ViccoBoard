@@ -16,7 +16,8 @@ import {
   IndexedDBExamSchemaMigration,
   correctionSchemaMigration,
   IndexedDBClassGroupColorMigration,
-  IndexedDBClassGroupArchiveMigration
+  IndexedDBClassGroupArchiveMigration,
+  IndexedDBSportZensSchemaMigration
 } from '@viccoboard/storage';
 import type { StorageAdapter } from '@viccoboard/storage';
 
@@ -47,6 +48,7 @@ export async function initializeStorage(): Promise<StorageAdapter> {
   storage.registerMigration(correctionSchemaMigration);
   storage.registerMigration(new IndexedDBClassGroupColorMigration());
   storage.registerMigration(new IndexedDBClassGroupArchiveMigration());
+  storage.registerMigration(new IndexedDBSportZensSchemaMigration());
 
   // Initialize with empty password (no encryption yet)
   // TODO: Implement proper encryption/password in Phase X

@@ -92,26 +92,26 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 ## 2. Schema Inventory
 
 ### Schema Files Location
-`docs/parity-spec/sportzens-apk/forms/*.schema.json`
+`docs/parity-spec/sportzens-apk/schemas/*.schema.json`
 
 ### Schema List with Field Counts
 
 | Schema | File | Field Count | Required Fields | Scope |
 |--------|------|-------------|-----------------|-------|
-| **class** | class.schema.json | 14 | 4 (id, name, school_year, teacher_id) | in_scope_v2 |
+| **class** | class.schema.json | 15 | 4 (id, name, school_year, teacher_id) | in_scope_v2 |
 | **student** | student.schema.json | 11 | 5 (class_id, first_name, id, last_name, teacher_id) | in_scope_v2 |
-| **grade** | grade.schema.json | 16 | 7 (category_id, class_id, id, student_id, teacher_id, type, year) | in_scope_v2 |
-| **category** | category.schema.json | 17 | 7 (class_id, id, name, teacher_id, type, weight, year) | in_scope_v2 |
-| **table** | table.schema.json | 11 | 4 (grade_scheme, id, name, teacher_id) | in_scope_v2 |
-| **gradeWeighting** | gradeWeighting.schema.json | 4 | 4 (attendance, grades, remarks, wow) | in_scope_v2 (wow field = 0 for v2) |
-| **userData** | userData.schema.json | 8 | 3 (email, id, role) | in_scope_v2 |
+| **grade** | grade.schema.json | 17 | 7 (category_id, class_id, id, student_id, teacher_id, type, year) | in_scope_v2 |
+| **category** | category.schema.json | 18 | 7 (class_id, id, name, teacher_id, type, weight, year) | in_scope_v2 |
+| **table** | table.schema.json | 12 | 4 (grade_scheme, id, name, teacher_id) | in_scope_v2 |
+| **gradeWeighting** | gradeWeighting.schema.json | 4 | 4 (attendance, grades, remarks, wow) | in_scope_v2 (wow field retained, set to 0) |
 | **newDayData** | newDayData.schema.json | 4 | 1 (date) | in_scope_v2 |
+| **userData** | userData.schema.json | 8 | 3 (email, id, role) | in_scope_v2 |
 | **wow** | wow.schema.json | 3 | 2 (name, wowtyp) | **excluded_by_scope_v2** |
 
 ### Total Schemas
 - **Total:** 9 schemas
 - **In-scope:** 8 schemas (wow excluded)
-- **Total fields in-scope:** ~90 fields
+- **Total fields in-scope:** 89 fields
 
 ---
 
@@ -121,19 +121,19 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 
 | SportZens Schema | ViccoBoard Entity/Type | Location | Status |
 |------------------|------------------------|----------|--------|
-| **class** | `ClassGroup` | `modules/sport/src/types/class-group.ts` | ✅ Exists |
-| **student** | `Student` | `modules/sport/src/types/student.ts` | ✅ Exists |
-| **grade** | `GradeEntry` | `modules/sport/src/types/grade.ts` | ✅ Exists |
-| **category** | `GradeCategory` | `modules/sport/src/types/grade-category.ts` | ✅ Exists |
-| **table** | `GradingTable` | `modules/sport/src/types/grading-table.ts` | ✅ Exists |
-| **userData** | User (app-level) | `packages/core/src/types/user.ts` | ✅ Exists |
+| **class** | `ClassGroup` | `packages/core/src/interfaces/core.types.ts` + `modules/sport/src/repositories/class-group.repository.ts` | ✅ Exists |
+| **student** | `Student` | `packages/core/src/interfaces/core.types.ts` + `modules/students/src/repositories/student.repository.ts` | ✅ Exists |
+| **grade** | `PerformanceEntry` | `packages/core/src/interfaces/sport.types.ts` + `modules/sport/src/repositories/performance-entry.repository.ts` | ✅ Exists |
+| **category** | `GradeCategory` | `packages/core/src/interfaces/sport.types.ts` + `modules/sport/src/repositories/grade-category.repository.ts` | ✅ Exists |
+| **table** | `TableDefinition` | `packages/core/src/interfaces/sport.types.ts` + `modules/sport/src/repositories/table-definition.repository.ts` | ✅ Exists |
+| **userData** | `TeacherAccount` | `packages/core/src/interfaces/core.types.ts` | ✅ Exists |
 
 ### Priority 2: SportZens-Specific (Needs Field Parity Check)
 
 | SportZens Schema | ViccoBoard Mapping | Status |
 |------------------|-------------------|--------|
-| **gradeWeighting** | Class/Student settings | 🟡 Partial (needs field check) |
-| **newDayData** | Lesson/Event | 🟡 Partial (needs field check) |
+| **gradeWeighting** | Grade scheme weighting settings | 🟡 Partial (needs field check) |
+| **newDayData** | `Lesson` | `packages/core/src/interfaces/core.types.ts` + `modules/sport/src/repositories/lesson.repository.ts` (field check) |
 
 ### Priority 3: Excluded
 
