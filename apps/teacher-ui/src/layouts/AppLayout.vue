@@ -195,6 +195,13 @@ onUnmounted(() => {
   z-index: 5;
 }
 
+.app-body {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  flex: 1;
+  position: relative;
+}
+
 .menu-button {
   display: none;
   align-items: center;

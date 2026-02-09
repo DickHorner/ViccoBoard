@@ -9,13 +9,5 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  },
-  ssr: {
-    external: ['fs', 'path', 'crypto', 'better-sqlite3', 'sql.js']
-  },
-  build: {
-    rollupOptions: {
-      external: ['fs', 'path', 'crypto', 'better-sqlite3', 'sql.js']
-    }
   }
 })
