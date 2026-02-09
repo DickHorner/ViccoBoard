@@ -1,4 +1,3 @@
-"use strict";
 /**
  * ViccoBoard Demo Application
  *
@@ -9,45 +8,13 @@
  * 4. Record attendance
  * 5. View statistics
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-const storage_1 = require("@viccoboard/storage");
-const sport_1 = require("@viccoboard/sport");
-const core_1 = require("@viccoboard/core");
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
+import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage';
+import { ClassGroupRepository, AttendanceRepository, CreateClassUseCase, RecordAttendanceUseCase } from '@viccoboard/sport';
+import { AddStudentUseCase, StudentRepository } from '@viccoboard/students';
+import { AttendanceStatus } from '@viccoboard/core';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 async function main() {
     console.log('🎓 ViccoBoard Demo - SportZens & KURT Unified Suite\n');
     console.log('═'.repeat(60));
@@ -55,12 +22,14 @@ async function main() {
         // Step 1: Initialize Storage
         console.log('\n📦 Step 1: Initialize Encrypted Storage');
         console.log('─'.repeat(60));
-        const dataDir = path.join(process.cwd(), 'demo-data');
+        const dataDir = process.env.VICCOBOARD_DEMO_DATA_DIR
+            ? path.resolve(process.env.VICCOBOARD_DEMO_DATA_DIR)
+            : path.join(os.tmpdir(), 'viccoboard-demo');
         if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir, { recursive: true });
         }
         const dbPath = path.join(dataDir, 'viccoboard-demo.db');
-        const storage = new storage_1.SQLiteStorage({
+        const storage = new SQLiteStorage({
             databasePath: dbPath,
             verbose: true
         });
@@ -69,7 +38,7 @@ async function main() {
         console.log('✓ Storage initialized with encryption');
         console.log(`  Database: ${dbPath}`);
         // Run migrations
-        storage.registerMigration(new storage_1.InitialSchemaMigration(storage));
+        storage.registerMigration(new InitialSchemaMigration(storage));
         await storage.migrate();
         console.log('✓ Database schema migrated');
         // Step 2: Initialize Repositories
@@ -77,12 +46,12 @@ async function main() {
         console.log('─'.repeat(60));
         // Get the adapter from storage
         const adapter = storage.getAdapter();
-        const classGroupRepo = new sport_1.ClassGroupRepository(adapter);
-        const studentRepo = new sport_1.StudentRepository(adapter);
-        const attendanceRepo = new sport_1.AttendanceRepository(adapter);
-        const createClassUseCase = new sport_1.CreateClassUseCase(classGroupRepo);
-        const addStudentUseCase = new sport_1.AddStudentUseCase(studentRepo, classGroupRepo);
-        const recordAttendanceUseCase = new sport_1.RecordAttendanceUseCase(attendanceRepo, studentRepo);
+        const classGroupRepo = new ClassGroupRepository(adapter);
+        const studentRepo = new StudentRepository(adapter);
+        const attendanceRepo = new AttendanceRepository(adapter);
+        const createClassUseCase = new CreateClassUseCase(classGroupRepo);
+        const addStudentUseCase = new AddStudentUseCase(studentRepo, classGroupRepo);
+        const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo);
         console.log('✓ Storage adapter initialized');
         console.log('✓ Repositories initialized');
         console.log('✓ Use cases ready');
@@ -90,13 +59,25 @@ async function main() {
         console.log('\n📚 Step 3: Create a Class');
         console.log('─'.repeat(60));
         const schoolYear = '2023/2024';
-        const classGroup = await createClassUseCase.execute({
-            name: '10a Sport',
-            schoolYear: schoolYear,
-            state: 'Bayern',
-            gradingScheme: 'default'
-        });
-        console.log('✓ Class created:');
+        let classGroup;
+        try {
+            classGroup = await createClassUseCase.execute({
+                name: '10a Sport',
+                schoolYear: schoolYear,
+                state: 'Bayern',
+                gradingScheme: 'default'
+            });
+            console.log('✓ Class created:');
+        }
+        catch (error) {
+            // Class already exists, find it
+            const existingClasses = await classGroupRepo.findBySchoolYear(schoolYear);
+            classGroup = existingClasses.find(c => c.name === '10a Sport');
+            if (!classGroup) {
+                throw error; // Re-throw if it's not the "already exists" error
+            }
+            console.log('✓ Using existing class:');
+        }
         console.log(`  Name: ${classGroup.name}`);
         console.log(`  School Year: ${classGroup.schoolYear}`);
         console.log(`  State: ${classGroup.state}`);
@@ -104,7 +85,7 @@ async function main() {
         // Step 4: Add Students
         console.log('\n👥 Step 4: Add Students to Class');
         console.log('─'.repeat(60));
-        const students = [
+        const studentsData = [
             {
                 firstName: 'Max',
                 lastName: 'Mustermann',
@@ -134,46 +115,67 @@ async function main() {
                 parentEmail: 'familie.mueller@example.com'
             }
         ];
-        const createdStudents = [];
-        for (const studentData of students) {
-            const student = await addStudentUseCase.execute({
-                ...studentData,
-                classGroupId: classGroup.id
-            });
-            createdStudents.push(student);
-            console.log(`✓ Added: ${student.firstName} ${student.lastName} (${student.birthYear})`);
+        // Check if students already exist
+        let createdStudents = await studentRepo.findByClassGroup(classGroup.id);
+        if (createdStudents.length === 0) {
+            // No students exist, create them
+            for (const studentData of studentsData) {
+                const student = await addStudentUseCase.execute({
+                    ...studentData,
+                    classGroupId: classGroup.id
+                });
+                createdStudents.push(student);
+                console.log(`✓ Added: ${student.firstName} ${student.lastName} (${student.birthYear})`);
+            }
         }
-        // Step 5: Record Attendance (Simulated Lesson)
-        console.log('\n📝 Step 5: Record Attendance for Lesson');
-        console.log('─'.repeat(60));
-        // Create a dummy lesson ID (in real app, this would come from LessonRepository)
+        else {
+            console.log(`✓ Using ${createdStudents.length} existing student(s):`);
+            for (const student of createdStudents) {
+                console.log(`  - ${student.firstName} ${student.lastName} (${student.birthYear})`);
+            }
+        }
+        // Step 5: Create a Lesson
+        console.log('\n Step 5: Create a Lesson');
+        console.log(''.repeat(60));
+        // Create a lesson (in real app, this would use LessonRepository)
         const lessonId = 'lesson-2024-01-13-001';
+        const lessonDate = new Date('2024-01-13');
+        await adapter.insert('lessons', {
+            id: lessonId,
+            class_group_id: classGroup.id,
+            date: lessonDate.toISOString(),
+            created_at: new Date().toISOString(),
+            last_modified: new Date().toISOString()
+        });
+        console.log(` Lesson created for ${lessonDate.toLocaleDateString()}`);
+        console.log(`  ID: ${lessonId}`);
+        // Step 6: Record Attendance
+        console.log('\n Step 6: Record Attendance');
+        console.log('─'.repeat(60));
         console.log(`Lesson ID: ${lessonId}`);
-        console.log();
-        // Record attendance for each student
         await recordAttendanceUseCase.execute({
             studentId: createdStudents[0].id,
             lessonId: lessonId,
-            status: core_1.AttendanceStatus.Present
+            status: AttendanceStatus.Present
         });
         console.log(`✓ ${createdStudents[0].firstName} ${createdStudents[0].lastName}: Present`);
         await recordAttendanceUseCase.execute({
             studentId: createdStudents[1].id,
             lessonId: lessonId,
-            status: core_1.AttendanceStatus.Present
+            status: AttendanceStatus.Present
         });
         console.log(`✓ ${createdStudents[1].firstName} ${createdStudents[1].lastName}: Present`);
         await recordAttendanceUseCase.execute({
             studentId: createdStudents[2].id,
             lessonId: lessonId,
-            status: core_1.AttendanceStatus.Absent,
+            status: AttendanceStatus.Absent,
             reason: 'Sick'
         });
         console.log(`✓ ${createdStudents[2].firstName} ${createdStudents[2].lastName}: Absent (Sick)`);
         await recordAttendanceUseCase.execute({
             studentId: createdStudents[3].id,
             lessonId: lessonId,
-            status: core_1.AttendanceStatus.Passive,
+            status: AttendanceStatus.Passive,
             reason: 'Injury'
         });
         console.log(`✓ ${createdStudents[3].firstName} ${createdStudents[3].lastName}: Passive (Injury)`);
@@ -183,7 +185,6 @@ async function main() {
         const classStudents = await studentRepo.findByClassGroup(classGroup.id);
         console.log(`\nClass: ${classGroup.name}`);
         console.log(`Total Students: ${classStudents.length}`);
-        console.log();
         for (const student of classStudents) {
             const summary = await attendanceRepo.getAttendanceSummary(student.id);
             console.log(`${student.firstName} ${student.lastName}:`);
@@ -192,7 +193,6 @@ async function main() {
             console.log(`  Absent: ${summary.absent}`);
             console.log(`  Passive: ${summary.passive}`);
             console.log(`  Attendance Rate: ${summary.percentage.toFixed(1)}%`);
-            console.log();
         }
         // Step 7: Query Examples
         console.log('🔍 Step 7: Query Examples');

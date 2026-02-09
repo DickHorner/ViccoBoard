@@ -7,6 +7,7 @@
 export * from './interfaces/core.types.js';
 export * from './interfaces/storage.types.js';
 export * from './interfaces/crypto.types.js';
+export * from './interfaces/catalog-types.js';
 
 // Plugin interfaces (explicit to avoid name collisions)
 export type {

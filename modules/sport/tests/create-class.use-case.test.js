@@ -1,26 +1,24 @@
-"use strict";
 /**
  * CreateClassUseCase Tests
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const create_class_use_case_1 = require("../src/use-cases/create-class.use-case");
-const class_group_repository_1 = require("../src/repositories/class-group.repository");
-const storage_1 = require("@viccoboard/storage");
+import { CreateClassUseCase } from '../src/use-cases/create-class.use-case';
+import { ClassGroupRepository } from '../src/repositories/class-group.repository';
+import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage';
 describe('CreateClassUseCase', () => {
     let storage;
     let repository;
     let useCase;
     beforeEach(async () => {
         // Use in-memory database for tests
-        storage = new storage_1.SQLiteStorage({
+        storage = new SQLiteStorage({
             databasePath: ':memory:',
             memory: true
         });
         await storage.initialize('test-password');
-        storage.registerMigration(new storage_1.InitialSchemaMigration(storage));
+        storage.registerMigration(new InitialSchemaMigration(storage));
         await storage.migrate();
-        repository = new class_group_repository_1.ClassGroupRepository(storage.getAdapter());
-        useCase = new create_class_use_case_1.CreateClassUseCase(repository);
+        repository = new ClassGroupRepository(storage.getAdapter());
+        useCase = new CreateClassUseCase(repository);
     });
     afterEach(async () => {
         await storage.close();

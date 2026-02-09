@@ -2,6 +2,22 @@
 
 ## ✅ Completed
 
+### 0. Configurable Status/Criteria Catalogs (P2-6, P2-8) - NEW! ✨
+**Mission:** Implement configurable status and criteria catalogs for attendance and grading
+- ✅ **StatusCatalog domain types** with StatusOption (name, code, color, icon, active, order)
+- ✅ **CriteriaCatalog domain types** with CriterionOption (reusable across sections)
+- ✅ **StatusCatalogRepository** in modules/students with full CRUD + ordering
+- ✅ **Use-Cases:** AddStatusUseCase, UpdateStatusUseCase, ReorderStatusUseCase (validation + business logic)
+- ✅ **Students bridge extended** with catalog access (useStudents() returns catalog methods)
+- ✅ **Comprehensive tests:** 15+ repository tests, 8+ use-case tests (all passing)
+- ✅ **Default attendance statuses:** Present, Absent, Excused, Late, Passive
+- ✅ **Soft-delete support:** Mark statuses inactive without breaking historical data
+- ✅ **All gates passing:** lint:docs ✓, build:packages ✓, tests ✓ (166 tests)
+
+**Architecture:** UI → Bridge (useStudents) → UseCase → Repository → Storage
+**Reusability:** CriteriaCatalog framework ready for other grading sections
+**Next:** AttendanceEntry.vue UI integration + status management interface
+
 ### 1. Project Foundation
 - **Monorepo structure** established with packages, modules, and apps directories
 - **TypeScript configuration** for type safety across all packages

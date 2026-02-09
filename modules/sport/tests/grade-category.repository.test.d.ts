@@ -1,0 +1,4 @@
+/**
+ * GradeCategory Repository Tests
+ */
+export {};

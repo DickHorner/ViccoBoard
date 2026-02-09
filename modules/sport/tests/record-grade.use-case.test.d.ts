@@ -1,0 +1,4 @@
+/**
+ * RecordGradeUseCase Tests
+ */
+export {};

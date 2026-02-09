@@ -7,8 +7,16 @@
  */
 
 import { ref, computed } from 'vue';
-import { StudentRepository, AddStudentUseCase } from '@viccoboard/students';
+import {
+  StudentRepository,
+  AddStudentUseCase,
+  StatusCatalogRepository,
+  AddStatusUseCase,
+  UpdateStatusUseCase,
+  ReorderStatusUseCase
+} from '@viccoboard/students';
 import type { AddStudentInput } from '@viccoboard/students';
+import type { AddStatusInput, UpdateStatusInput, ReorderStatusInput } from '@viccoboard/students';
 import { getStorageAdapter } from '../services/storage.service';
 
 /**
@@ -19,6 +27,10 @@ let studentsBridgeInstance: StudentsBridge | null = null;
 interface StudentsBridge {
   studentRepository: StudentRepository;
   addStudentUseCase: AddStudentUseCase;
+  statusCatalogRepository: StatusCatalogRepository;
+  addStatusUseCase: AddStatusUseCase;
+  updateStatusUseCase: UpdateStatusUseCase;
+  reorderStatusUseCase: ReorderStatusUseCase;
 }
 
 /**
@@ -32,15 +44,23 @@ export function initializeStudentsBridge(): StudentsBridge {
 
   const adapter = getStorageAdapter();
 
-  // Initialize repository with storage adapter
+  // Initialize repositories
   const studentRepo = new StudentRepository(adapter);
+  const statusCatalogRepo = new StatusCatalogRepository(adapter);
 
-  // Initialize use case with repository
+  // Initialize use cases
   const addStudentUseCase = new AddStudentUseCase(studentRepo);
+  const addStatusUseCase = new AddStatusUseCase(statusCatalogRepo);
+  const updateStatusUseCase = new UpdateStatusUseCase(statusCatalogRepo);
+  const reorderStatusUseCase = new ReorderStatusUseCase(statusCatalogRepo);
 
   studentsBridgeInstance = {
     studentRepository: studentRepo,
-    addStudentUseCase
+    addStudentUseCase,
+    statusCatalogRepository: statusCatalogRepo,
+    addStatusUseCase,
+    updateStatusUseCase,
+    reorderStatusUseCase
   };
 
   return studentsBridgeInstance;
@@ -73,10 +93,15 @@ export function useStudents() {
 
     // Convenience accessors
     repository: computed(() => bridge.value?.studentRepository),
-    addStudentUseCase: computed(() => bridge.value?.addStudentUseCase)
+    addStudentUseCase: computed(() => bridge.value?.addStudentUseCase),
+    statusCatalogRepository: computed(() => bridge.value?.statusCatalogRepository),
+    addStatusUseCase: computed(() => bridge.value?.addStatusUseCase),
+    updateStatusUseCase: computed(() => bridge.value?.updateStatusUseCase),
+    reorderStatusUseCase: computed(() => bridge.value?.reorderStatusUseCase)
   };
 }
 
 // Re-exports for convenience
-export { StudentRepository, AddStudentUseCase };
-export type { AddStudentInput };
+export { StudentRepository, AddStudentUseCase, StatusCatalogRepository };
+export { AddStatusUseCase, UpdateStatusUseCase, ReorderStatusUseCase };
+export type { AddStudentInput, AddStatusInput, UpdateStatusInput, ReorderStatusInput };

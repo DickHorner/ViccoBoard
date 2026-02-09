@@ -1,0 +1,4 @@
+/**
+ * CreateGradeCategoryUseCase Tests
+ */
+export {};

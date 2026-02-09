@@ -1,0 +1,4 @@
+/**
+ * GradeScheme Repository Tests
+ */
+export {};
