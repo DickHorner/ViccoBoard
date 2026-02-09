@@ -257,7 +257,7 @@ Gate 4: npm test                    ✅ 49 tests, 2 suites (teacher-ui)
 Gate 5: npm test @viccoboard/exams  ✅ 227 tests, 12 suites
 Gate 6: npm test @viccoboard/sport  ✅ 166 tests, 18 suites
 Gate 7: npm test @viccoboard/students ✅ passWithNoTests (0 tests)
-Gate 8: All workspace tests         ✅ 459+ tests passing
+Gate 8: All workspace tests         ✅ 442+ tests passing
 ```
 
 ### Architecture Compliance (COMPLETE ✅)
@@ -295,169 +295,36 @@ After workflow verification:
 | teacher-ui | 2 | 49 | ✅ |
 | **Total** | **32** | **442** | **✅** |
 
-## 🎯 Next Steps
+## ✅ Next Actions (Phase 3 Verification)
 
-### Priority 1: Architecture Compliance
-Complete the bridge migration to enforce clean architecture:
-- Migrate remaining views to use module bridges exclusively
-- All UI views now access data via module bridges and use-cases
-- COMPLETE: Module bridge architecture enforced in all UI views
+### Priority 1: Exam Save/Load Workflow Testing (CRITICAL)
+- Validate exam creation uses `examRepository.create()`
+- Save exam, navigate away, reload, and confirm `examRepository.findById()` returns data
+- Update an existing exam and confirm `examRepository.update()` persists
 
-### Priority 2: SportZens Parity (Without WOW)
-Implement all SportZens APK features (WOW explicitly excluded per scope v2):
-- i18n string parity
-- Schema roundtrip testing
-- Workflow/UI parity verification
+### Priority 2: End-to-End Feature Verification
+- PDF export pipeline (all 4 layout variants)
+- Email template rendering and `mailto:` launch
+- Sport grading workflow (lesson → entry → grade → table)
+- KURT correction workflow (exam → correct → update grade → analyze)
 
-### Priority 3: KURT Feature Completion
-Ensure all Plan.md KURT checkboxes are implemented:
-- Exam builder (simple/complex modes)
-- Correction workflows
-- Fördertipps integration
-- PDF export with 4 layouts
-- E-mail templates
+### Priority 3: Parity Matrix Scan
+- SportZens APK feature checklist vs implementation
+- KURT feature checklist vs implementation
+- Record any gaps in Plan.md §9 (TBD) with concrete acceptance criteria
 
-### Priority 4: User Interface Enhancement
-- Dashboard
-- Class management screens
-- Student profiles
-- Lesson planner
-- Grading interfaces
-- Tool screens
-- Settings screens
-- Exam builder (KURT)
-- Correction interface (KURT)
+## 📊 Progress Summary (Updated)
 
-### Priority 4: WOW Web Interface
-Separate web application for student workout submissions:
-- Express.js or Next.js backend
-- Simple React frontend
-- Token-based access (no registration)
-- REST API for workout data
+**Architecture Status:** Phase 2 migration complete, all UI data access through module bridges.
 
-### Priority 5: Testing & Quality
-- Unit tests for business logic
-- Integration tests for workflows
-- E2E tests for critical paths
-- Security testing
-- Performance optimization
+**Build/Test Health:**
+- `npm run build:ipad` ✅ (3.75s, zero errors)
+- `npm run lint:docs` ✅
+- `npm run build:packages` ✅
+- `npm test` ✅ (teacher-ui: 49 tests)
+- Exams/Sport/Students workspaces ✅ (442+ tests across 32 suites)
 
-## 📊 Progress Summary
-
-**Overall Progress: 44/176 features (25%)**
-
-### Completed by Component
-- ✅ Architecture & Planning: 100%
-- ✅ Type System: 100% (all 176 feature types defined)
-- ✅ Plugin System: 100% (Registry & contracts ready)
-- ✅ Storage Layer: 100% (IndexedDB + SQLite, encrypted, migrations)
-- ✅ Sport Module Core: 30% (3 repositories + 3 use cases)
-  - ClassGroupRepository ✅
-  - StudentRepository ✅
-  - AttendanceRepository ✅
-  - CreateClassUseCase ✅
-  - AddStudentUseCase ✅
-  - RecordAttendanceUseCase ✅
-- ✅ Demo Application: 100% (end-to-end proof of concept)
-- ✅ Testing Infrastructure: 20% (Jest configured, example tests)
-- ⏳ Teacher UI: 5% (Vue scaffold only, needs framework decision)
-- ⏳ KURT Module: 0% (scaffolded only)
-- 🚧 Grading Engine: 0% (repos and logic not started)
-- 🚧 Plugin Implementations: 0%
-- 🚧 WOW Web Interface: 0%
-- 🚧 Export/PDF: 0%
-- 🚧 Integrations: 0%
-
-### ✅ COMPLETED: Working Demo (Jan 16, 2026)
-The foundation is now proven with a fully functional end-to-end demo proving:
-- ✅ Clean Architecture works in practice
-- ✅ Type system covers all domain entities
-- ✅ Storage encryption is functional
-- ✅ Offline-first capability validated
-- ✅ Can create classes, enroll students, record attendance
-- ✅ Statistics calculated correctly
-- ✅ All packages build without errors
-- ✅ Demo runs idempotently (lesson ID generation fixed with randomUUID)
-
-### Execution Plan: Phase 2-6 (Starting Now)
-
-**Task 1: Create Formal Issues** ✅ DONE
-- Created ISSUES_TRACKER.md with 20 issues across Phases 2-6
-- Each issue has: priority, effort estimate, acceptance criteria
-- Linked to Plan.md specifications
-
-**Task 2: Finalize Roadmap & Status** 🔄 IN PROGRESS
-- Created comprehensive ROADMAP.md (12 phases, 26 weeks total)
-- Phases 2-6 detailed with timelines and dependencies
-- Updated STATUS.md with current metrics
-
-**Task 4: Document Architecture Decisions** ⏳ NEXT
-- Will document monorepo rationale
-- Storage approach and offline-first principles
-- UI framework decision (Vue 3 web-only)
-- Plugin system design
-
-**Task 3: Start Phase 2 - UI Framework Selection** ⏳ FINAL
-- Confirm Vue 3 (scaffold exists, web-only)
-- Begin UI scaffolding
-- Wire to existing Sport module
-
-### Next Actions (in order)
-
-1. **Document Architecture Decisions** (current focus)
-2. **Confirm UI Framework** - Vue 3 (web-only)
-3. **Initialize Teacher-UI** - finalize framework choice and build core navigation
-4. **Complete Phase 2 Issues P2-1 through P2-7**
-
-## 🎯 Immediate Next Actions
-
-1. **Choose UI Framework**: Vue 3 web-only (static assets, no Electron/React Native)
-2. **Install Dependencies**: Run `npm install` in all packages
-3. **Create Example App**: Build a simple example demonstrating:
-   - Storage initialization
-   - Creating a class and students
-   - Recording attendance
-   - Plugin registration
-4. **Implement First Use Case**: Class creation and student management
-5. **Build First Screen**: Dashboard showing classes
-
-## 📝 Notes
-
-### Strengths of Current Implementation
-1. **Type-safe**: Full TypeScript coverage ensures compile-time safety
-2. **Modular**: Clear separation of concerns with packages and plugins
-3. **Extensible**: Plugin system allows adding features without core changes
-4. **Documented**: Each package has comprehensive documentation
-5. **Secure**: Encryption and security built-in from the start
-6. **Complete**: All domain types from Plan.md are represented
-
-### Considerations
-1. **Database Encryption**: Production deployment needs SQLCipher
-2. **Secure Storage**: Platform-specific implementations needed (Keychain/Keystore)
-3. **UI Framework*Demo Implementation Complete (January 13, 2026)
-**Next Milestone**: Choose between UI development or expanding business logic
-**Demo Status**: ✅ Working! Run `npm run demo` to see it in action.ss logic
-5. **Deployment**: Need to plan mobile app distribution strategy
-
-### Technical Debt
-- None yet! Starting fresh with clean architecture
-
-## 🔗 Dependencies
-
-Current package dependencies:
-- TypeScript 5.0+
-- better-sqlite3 (or @journeyapps/sqlcipher for production)
-- bcrypt
-- crypto-js
-- uuid
-
-Will need:
-- Vue 3 UI in `apps/teacher-ui` (web-only)
-- Jest (testing)
-- ESLint + Prettier (code quality)
-- PDF generation library (e.g., pdf-lib, jspdf)
-- QR code generation (e.g., qrcode)
-- Email export via `mailto:` or `.eml` generation (no SMTP)
+**Current Focus:** End-to-end verification and parity validation, not new feature scaffolding.
 
 ## 📖 Resources
 

@@ -413,8 +413,12 @@ const loadData = async () => {
   loading.value = true
   loadError.value = ''
   try {
-    classes.value = await classGroups.getAll()
-    recentActivity.value = await attendance.getRecent(5)
+    classes.value = await classGroups.findAll()
+    recentActivity.value = await attendance.findAll({
+      orderBy: 'timestamp',
+      orderDirection: 'desc',
+      limit: 5
+    })
   } catch (err) {
     console.error('Failed to load data:', err)
     loadError.value = 'Fehler beim Laden der Übersichtsdaten. Bitte aktualisieren Sie die Seite.'
