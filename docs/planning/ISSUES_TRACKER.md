@@ -126,7 +126,7 @@ Implement quick attendance entry UI.
 
 **Tasks:**
 - [ ] Create attendance entry form
-- [ ] Support quick status selection (present/absent/passive)
+- [ ] Support quick status selection (default + custom statuses from status catalog)
 - [ ] Add reason field for absence
 - [ ] Bulk attendance entry
 - [ ] Summary display
@@ -134,6 +134,7 @@ Implement quick attendance entry UI.
 **Acceptance Criteria:**
 - Can record attendance for all students
 - Status options clear and quick to select
+- Status options come from configurable catalog (not hardcoded only)
 - Form validates correctly
 - Changes save to storage
 
@@ -161,6 +162,30 @@ Wire UI screens to existing Sport module repositories and use cases.
 - All data persists via storage layer
 
 **Relates to:** modules/sport use cases
+
+---
+
+### Issue P2-8: Custom Status & Criteria Catalog Foundation
+**Priority:** CRITICAL | **Effort:** 3 days
+
+**Description:**
+Implement configurable catalogs for status and criteria options as shared foundation for multiple sections.
+
+**Tasks:**
+- [ ] Add StatusCatalog domain model/repository/use-case (add, rename, disable, reorder)
+- [ ] Add CriteriaCatalog domain model/repository/use-case (add, rename, disable, reorder)
+- [ ] Wire attendance UI to StatusCatalog (class/context specific)
+- [ ] Persist catalog metadata (e.g. code/color/active/order)
+- [ ] Add export/import coverage for catalogs
+- [ ] Add unit/integration tests for catalog CRUD + usage
+
+**Acceptance Criteria:**
+- Users can define extra attendance statuses without code changes
+- Catalog changes are reflected in entry forms, statistics, and exports
+- Catalogs persist offline and survive reload/restore
+- Tests cover CRUD, ordering, activation, and consumer integration
+
+**Relates to:** Plan.md §6.2, §6.3 (custom criteria/status options)
 
 ---
 

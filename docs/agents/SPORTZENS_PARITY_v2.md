@@ -8,6 +8,7 @@ HARD-CONSTRAINTS (nicht verhandelbar):
 - Kein Feature/keine Option still weglassen oder vereinfachen. Wenn Spezifikation fehlt: in Plan.md §9 als TBD dokumentieren und Feature als „sichtbar, aber blockiert“ ausweisen (klarer Fehlertext), niemals still auslassen :contentReference[oaicite:3]{index=3}.
 - Modularität erzwingen: Core nur Interfaces/Policies; Implementierung in Modulen/Plugins (Clean Architecture).
 - Zentralisierte Schülerverwaltung: `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/students`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Students-Modul/Bridge zu.
+- Konfigurierbarkeit erzwingen: Kriterien/Statusoptionen (z. B. Anwesenheit) sind als benutzerdefinierbare Kataloge zu implementieren (hinzufügen/umbenennen/deaktivieren/sortieren), nicht als starre Hartkodierung.
 - Zielplattform iPadOS Safari (WebKit): keine File System Access API; Export via Download, Import via <input type="file"> :contentReference[oaicite:4]{index=4}.
 - Offline-first: Kernflows offline nutzbar; Online nur optional/Feature-Flag (standardmäßig aus) :contentReference[oaicite:5]{index=5}.
 - Traceability: Jede Änderung ist auf Plan.md Checkboxen und/oder Parity-Ledger referenzierbar :contentReference[oaicite:6]{index=6}.
@@ -135,6 +136,7 @@ PHASE 5 — SPORTZENS WORKFLOWS/UI (APK-PARITY, OHNE WOW)
 Ziel: Alles, was die SportZens-APK (ohne WOW) kann, ist in ViccoBoard UI erreichbar und identisch bedienbar.
 - Arbeite entlang PARITY_MATRIX: route/workflow Items von no→yes.
 - Nutze ToolPlugin/AssessmentType/ExporterPlugin Konzepte.
+- Implementiere konfigurierbare Status-/Kriterienkataloge in allen betroffenen Workflows (mind. Anwesenheit; gleiche Kataloge müssen in Eingabe, Statistik, Export konsistent sein).
 - iPad UX: Touch targets ≥44px, Split View, Offline.
 
 Achte auf Roadmap/Issues für Sport (Phase 2–4) als Struktur, wenn hilfreich.

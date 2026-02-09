@@ -14,6 +14,7 @@ No bloat, no duplicate data paths, no hidden shortcuts.
 7. No `@ts-nocheck` additions. Remove existing ones when touching a file.
 8. No placeholder logic in production paths (“TODO placeholder”, fake calculations, mock persistence).
 9. `docs/agents/SPORTZENS_PARITY_v2.md` is a mandatory instruction file for parity work and must be followed as binding scope/gate guidance.
+10. Criteria/status options in relevant areas (at least attendance) must be configurable catalogs, not hardcoded-only enums.
 
 ## 2) Forbidden Changes
 1. No new `useDatabase` usage in views/stores/composables.

@@ -20,6 +20,7 @@ Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle F
 ng ohne expliziten Plan-Abschnitt + Opt-in.
 11. **Zentralisierte Schülerverwaltung:** `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/students`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Students-Modul/Bridge zu.
 12. **`SPORTZENS_PARITY_v2.md` ist verbindlich:** Bei allen Parity-/Umsetzungsarbeiten ist `docs/agents/SPORTZENS_PARITY_v2.md` als Pflicht-Instruktionsdatei zu lesen und einzuhalten (inkl. Gates, Scope und Ledger-Disziplin).
+13. **Kriterien/Status müssen konfigurierbar sein:** In relevanten Bereichen (mind. Anwesenheit) dürfen Status- und Kriterienoptionen nicht nur fest verdrahtet sein; Nutzer müssen Optionen hinzufügen/umbenennen/deaktivieren/sortieren können.
 
 ---
 

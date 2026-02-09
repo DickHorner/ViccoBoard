@@ -14,6 +14,7 @@ in einem konsistenten System vereint.
 4. **LocalDB = IndexedDB (Default):** verschlüsselte Speicherung im Browser (inkl. Migrationen), jederzeitiger Export/Backup/Restore.
 5. **Online/Integrationen nur optional:** iServ/Notion/Sync sind **Feature-Flags** und standardmäßig **aus**. Die App muss ohne diese Integrationen vollständig nutzbar sein.
 6. **Sicherheitsmodell:** App-Sperre (PIN/Passwort), Lock-Policy/Timeout, sichere Schlüsselableitung, saubere Backups/Restore (kein Datenverlust durch Updates).
+7. **Konfigurierbarkeit statt Hartkodierung:** Kriterien und Statusoptionen müssen in den relevanten Bereichen (z. B. Anwesenheit) als benutzerdefinierbare Kataloge pflegbar sein (hinzufügen/umbenennen/deaktivieren/sortieren), ohne Codeänderung.
 
 
 ### 1.1 Zielplattform: iPad (10. Gen) / iPadOS Safari (WebKit)
@@ -110,6 +111,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - **Student**: Stammdaten inkl. Geburtsjahr, Geschlecht (für Import), Foto; Kontaktinfos (für KURT-Mailversand optional).
 - **Lesson**: Datum, Stundenteile-Doku, Shortcuts/Verknüpfungen, Zufallsschüler-Auswahl-Seed/History.
 - **AttendanceRecord**: Status (anwesend/fehlend/passiv/etc.), Begründung optional; Export-Flags.
+- **StatusCatalog / CriteriaCatalog**: benutzerdefinierbare Status- und Kriterienkataloge pro Kontext (z. B. Anwesenheit, Mitarbeit), inkl. Sortierung, Aktiv-Flag, Anzeige-Metadaten.
 
 ### 4.2 Assessment-Entitäten (SportZens)
 - **GradeScheme (Sport)**: pro Klasse.
@@ -173,6 +175,8 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Schüler: **Fehlzeiten/Anwesenheiten überwachen**.
 - [ ] Schüler: **WOW-Übersicht pro Schüler**.
 - [ ] Fehlzeiten: **digital dokumentieren** (verschiedene Formen).
+- [ ] Fehlzeiten: **Statuskatalog konfigurierbar** (eigene Statusoptionen hinzufügen, umbenennen, deaktivieren, sortieren).
+- [ ] Fehlzeiten: **Status-Metadaten** (z. B. Kürzel/Farbe) wirken konsistent in Eingabe, Statistik und Export.
 - [ ] Fehlzeiten: **prozentuale Anwesenheit**.
 - [ ] Fehlzeiten: **Export**.
 - [ ] Stunden: **Stundenübersicht** (Schuljahr/Ferien).
@@ -196,6 +200,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
   - [ ] Runden zählen
   - [ ] Sofort-Auswertung bei hinterlegter Tabelle
 - [ ] **Verbalbeurteilungen** (eigener Funktionspunkt; Detail-Spezifikation TBD, aber Feature muss existieren).
+- [ ] **Kriterienkataloge bereichsübergreifend**: eigene Kriterien in verschiedenen Bereichen definierbar (u. a. Anwesenheit/Verhalten/Mitarbeit), inkl. Wiederverwendung pro Klasse.
 
 ### 6.4 SportZens — Tabellen & CSV (Import/Export)
 - [ ] Unterscheidung **„einfache Tabellen“ vs „Tabellen“**.
@@ -361,9 +366,11 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 
 ### Schritt 3 — SportZens Core (Klassen/Schüler/Stunden/Fehlzeiten)
 - UI + Domain-Model + Export.
+- Konfigurierbare Statuskataloge für Anwesenheit (add/rename/disable/reorder) als Pflichtbestandteil.
 
 ### Schritt 4 — Sport Tools + Assessments + Tabellen
 - Assessment Engine (Kriterien/Zeit/Cooper) + Tabellen-Auswertung.
+- Konfigurierbare Kriterienkataloge bereichsübergreifend (wiederverwendbar pro Klasse/Kontext).
 - Shuttle-Run/Cooper/Mittelstrecke/Sportabzeichen/BJS.
 - Tools: Teams, Turnier, Scoreboard, Timer, Taktikboard, Würfeln.
 

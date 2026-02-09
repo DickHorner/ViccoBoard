@@ -110,13 +110,14 @@ Student management is centralized in `modules/students` (no app-level or storage
 #### Features Implemented
 - ✅ Class creation with school year validation
 - ✅ Student enrollment with birth year tracking
-- ✅ Attendance recording (present/absent/excused/passive/late)
+- ✅ Attendance recording with default statuses (present/absent/excused/passive/late)
 - ✅ Attendance percentage calculations
 - ✅ Student search by name
 - ✅ Query by class, lesson, or student
 - ✅ Duplicate prevention
 - ✅ Comprehensive error handling
 - ✅ Full TypeScript type safety
+- ⚠️ Next mandatory parity step: configurable status/criteria catalogs across sections (attendance first)
 
 ### 6. Demo Application (@viccoboard/demo) - NEW! ✨
 A working CLI demonstration that proves the entire stack:
@@ -229,19 +230,24 @@ Full KURT implementation with all features:
 
 ### Immediate Priorities (This Week)
 
-1. **Exam Save/Load Workflow Testing** (CRITICAL)
+1. **Custom Catalogs for Status & Criteria** (CRITICAL)
+   - Implement configurable status catalog for attendance (add/rename/disable/reorder)
+   - Ensure catalog options are used consistently in forms, stats, and exports
+   - Add reusable criteria catalog pattern for other sections
+   - Verify persistence through reload + backup/restore
+
+2. **Exam Save/Load Workflow Testing**
    - Verify exam creation works with fixed examBuilderStore
    - Test exam save → navigate away → reload → load exam
    - Validate data preservation through bridge layer
-   - Expected: Should work if examRepository fixes are correct
 
-2. **End-to-End Feature Verification**
+3. **End-to-End Feature Verification**
    - PDF export pipeline (4 layout variants)
    - Email template rendering and mailto: launch
    - Sport grading complete workflow (lesson → entry → grade → table)
    - KURT correction workflow (exam → correct → update grade → analyze)
 
-3. **Parity Matrix Scan**
+4. **Parity Matrix Scan**
    - SportZens APK feature checklist vs implementation
    - KURT feature checklist vs implementation
    - Identify missing UI/logic features

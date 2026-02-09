@@ -104,7 +104,7 @@ Updated 4 documentation files to clarify that Phase 2 architecture migration is 
 - Changed: "Deprecate `useDatabase`" → "COMPLETE: Module bridge architecture enforced"
 
 ### 4. PHASE2_COMPLETE_PHASE3_READY.md
-- Removed phrase: "direct database access from UI layer"
+- Removed phrase: "UI must not access database directly"
 - Updated: "All data access goes through module bridges"
 - Clarified: "All UI communication with data must go through module bridges"
 
