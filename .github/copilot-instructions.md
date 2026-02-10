@@ -111,3 +111,17 @@ For every item moved to done:
 2. Failing tests/builds.
 3. Parity gaps with existing infrastructure.
 4. New feature work.
+
+## 10) GitHub Issue Handling Protocol
+1. Every implementation run must declare exactly one primary issue ID (`[P*-*]`), with at most two secondary IDs.
+2. Before coding, verify the issue is open and its acceptance criteria are listed in the run plan.
+3. If the issue is closed but tracker tasks are still open, reopen the issue before coding.
+4. If tracker tasks exist without a GitHub issue, create one with matching ID/title from `docs/planning/ISSUES_TRACKER.md`.
+5. Keep issue scope strict: do not implement unrelated tracker IDs in the same run.
+6. Do not mark tracker checkboxes or close the issue until all mandatory gates are green.
+7. On completion, post a concise issue update containing:
+   - changed files
+   - gate command results
+   - linked Plan.md checkbox IDs
+   - remaining blockers (if any)
+8. Close an issue only when all listed tasks and acceptance criteria are satisfied with evidence from tests/builds.
