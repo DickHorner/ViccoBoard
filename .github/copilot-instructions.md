@@ -35,10 +35,37 @@ Required outputs:
 2. “What I verified vs what I did not verify” section.
 3. Commands executed and exact results.
 4. Updated parity ledger files and references.
-5. Only after that: prioritized fix plan.
+5. Coverage summary:
+   - total checkboxes in scope
+   - count VERIFIED / GAP / NOT VERIFIED
+6. Only after that: prioritized fix plan.
 
 Hard fail condition:
 If any claim lacks concrete evidence, mark it as NOT VERIFIED, not VERIFIED.
+
+## 0.2) Execution Mode Declaration (Mandatory)
+Every run must start by declaring one mode:
+1. `AUDIT`: verify scope, collect evidence, report gaps. No implementation claims.
+2. `IMPLEMENTATION`: code changes for declared issue IDs, then gate validation.
+
+Rules:
+1. Never mix modes implicitly.
+2. If asked a verification question, default to `AUDIT`.
+3. In `AUDIT`, never state or imply “done/compliant” unless each scoped checkbox is VERIFIED.
+4. In `IMPLEMENTATION`, never claim parity completion without post-edit gates and evidence.
+
+## 0.3) Truthfulness Protocol
+1. Distinguish clearly between:
+   - what was verified
+   - what was inferred
+   - what was not verified
+2. Prohibited completion wording without proof:
+   - “fully implemented”
+   - “meets all criteria”
+   - “parity achieved”
+3. If any scoped item is unverified, explicitly state:
+   - “NOT VERIFIED” and why
+   - exact next verification step
 
 
 ## 1) Hard Rules (non-negotiable)
@@ -106,8 +133,9 @@ For every item moved to done:
 1. Target IDs worked on.
 2. Files changed + why.
 3. Gate command results (pass/fail).
-4. Ledger rows updated.
-5. Remaining blockers + next smallest actionable step.
+4. Verification evidence summary (what is VERIFIED vs GAP vs NOT VERIFIED).
+5. Ledger rows updated.
+6. Remaining blockers + next smallest actionable step.
 
 ## 8) Stop Conditions (must halt and report)
 1. Need to violate a hard rule to proceed.
