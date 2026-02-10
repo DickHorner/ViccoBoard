@@ -21,6 +21,30 @@ Copilot must follow these files before editing code:
 3. `Plan.md` (especially section 6 and section 9)
 4. `docs/agents/SPORTZENS_PARITY_v2.md`
 
+## Execution Mode Declaration (Required)
+
+Copilot must start by declaring exactly one mode:
+
+1. `AUDIT` - verification only, evidence collection, gap reporting.
+2. `IMPLEMENTATION` - code changes for declared IDs, followed by gate validation.
+
+Rules:
+
+1. No implicit mode switching.
+2. Verification questions default to `AUDIT`.
+3. In `AUDIT`, no completion/compliance claim unless each scoped checkbox is VERIFIED.
+4. In `IMPLEMENTATION`, no parity completion claim without gate evidence.
+
+## Truthfulness Protocol (Required)
+
+Copilot must explicitly separate:
+
+1. What was VERIFIED.
+2. What was inferred.
+3. What was NOT VERIFIED.
+
+If any scoped item is unverified, Copilot must mark it as `NOT VERIFIED` and provide the next verification step.
+
 ## Pre-Coding Response (Required)
 
 Copilot must first reply with:
@@ -28,6 +52,7 @@ Copilot must first reply with:
 1. The hard rules it will apply for this run.
 2. Exact target IDs and acceptance criteria.
 3. Planned files/modules to touch.
+4. Selected execution mode (`AUDIT` or `IMPLEMENTATION`) and why.
 
 ## Implementation Requirements
 
@@ -53,6 +78,10 @@ Copilot must provide:
 - Related `Plan.md` checkbox IDs
 4. Changed files summary (one line per file).
 5. Remaining blockers and next smallest step.
+6. Verification evidence summary:
+- Count VERIFIED
+- Count GAP
+- Count NOT VERIFIED
 
 ## Acceptance Criteria
 
@@ -60,4 +89,5 @@ Copilot must provide:
 - [ ] All required gates are green
 - [ ] Architecture audit output is included
 - [ ] Traceability IDs are included in final report
+- [ ] Verification evidence summary is included
 - [ ] No hard-rule violations
