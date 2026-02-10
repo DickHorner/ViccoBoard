@@ -1,4 +1,9 @@
 /**
+ * @deprecated MIGRATION DEBT — Do not use in new code.
+ * This composable accesses Dexie directly, violating modular architecture.
+ * Use useSportBridge, useExamsBridge, or useStudentsBridge instead.
+ * Tracked in: Plan.md §9 item 5, copilot-instructions.md §2.1
+ *
  * Database composable for managing Dexie database and repositories
  * This is a minimal wrapper that provides access to the database
  * and re-exports specialized composables for better organization.

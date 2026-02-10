@@ -1,4 +1,9 @@
 /**
+ * @deprecated MIGRATION DEBT — Do not use in new code.
+ * This composable accesses Dexie directly, violating modular architecture.
+ * Use useExamsBridge instead.
+ * Tracked in: Plan.md §9 item 5, copilot-instructions.md §2.1
+ *
  * Exam Composable
  * Handles all exam-related database operations for KURT module
  */

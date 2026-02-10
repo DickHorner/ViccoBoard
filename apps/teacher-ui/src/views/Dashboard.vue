@@ -157,7 +157,7 @@
               <span class="activity-icon">{{ getActivityIcon(activity.status) }}</span>
               <div class="activity-details">
                 <p class="activity-text">Anwesenheit erfasst</p>
-                <p class="activity-time">{{ formatDate(activity.date) }}</p>
+                <p class="activity-time">{{ formatDate(activity.timestamp) }}</p>
               </div>
             </div>
           </div>
@@ -334,13 +334,12 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useClassGroups, useAttendance } from '../composables/useSportBridge'
 import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading'
-import type { ClassGroup, AttendanceRecord } from '../db'
+import type { ClassGroup, AttendanceRecord } from '@viccoboard/core'
 
 // i18n
 const { t } = useI18n()
@@ -542,7 +541,7 @@ const handleDeleteClass = async () => {
   deleting.value = true
   
   try {
-    await classGroups.remove(classToDelete.value.id)
+    await classGroups.delete(classToDelete.value.id)
     
     // Reload classes
     await loadData()
