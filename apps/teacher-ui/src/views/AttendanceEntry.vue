@@ -43,26 +43,15 @@
         </div>
 
         <div v-else-if="students.length > 0" class="card-content">
-          <div class="status-summary">
-            <div class="status-item status-present">
-              <span class="status-label">{{ t('ANWESENHEIT.present') }}</span>
-              <span class="status-count">{{ countByStatus(AttendanceStatus.Present) }}</span>
-            </div>
-            <div class="status-item status-absent">
-              <span class="status-label">{{ t('ANWESENHEIT.absent') }}</span>
-              <span class="status-count">{{ countByStatus(AttendanceStatus.Absent) }}</span>
-            </div>
-            <div class="status-item status-late">
-              <span class="status-label">{{ t('ANWESENHEIT.verspaetet') }}</span>
-              <span class="status-count">{{ countByStatus(AttendanceStatus.Late) }}</span>
-            </div>
-            <div class="status-item status-excused">
-              <span class="status-label">{{ t('ANWESENHEIT.selbst') }}</span>
-              <span class="status-count">{{ countByStatus(AttendanceStatus.Excused) }}</span>
-            </div>
-            <div class="status-item status-passive">
-              <span class="status-label">{{ t('ANWESENHEIT.passive') }}</span>
-              <span class="status-count">{{ countByStatus(AttendanceStatus.Passive) }}</span>
+          <div class="status-summary" v-if="statusOptions.length > 0">
+            <div 
+              v-for="status in statusOptions" 
+              :key="status.value"
+              class="status-item"
+              :style="{ borderLeftColor: status.color || '#ccc' }"
+            >
+              <span class="status-label">{{ status.label }}</span>
+              <span class="status-count">{{ countByStatus(status.value) }}</span>
             </div>
           </div>
 
@@ -91,19 +80,26 @@
                     {{ student.firstName }} {{ student.lastName }}
                   </td>
                   <td class="status-buttons-cell">
-                    <div class="status-buttons">
+                    <div class="status-buttons" v-if="statusOptions.length > 0">
                       <button 
                         v-for="status in statusOptions" 
                         :key="status.value"
                         @click="setStudentStatus(student.id, status.value)"
-                        :class="['status-btn', `status-btn-${status.value}`, { 
+                        :class="['status-btn', `status-btn-${status.value.toLowerCase()}`, { 
                           'active': attendance[student.id]?.status === status.value 
                         }]"
-                        :disabled="saving"
+                        :style="attendance[student.id]?.status === status.value ? { 
+                          borderColor: status.color || '#667eea',
+                          backgroundColor: status.color ? status.color + '22' : '#f0f0f0'
+                        } : {}"
+                        :disabled="saving || catalogLoading"
                         :title="status.label"
                       >
-                        {{ status.short }}
+                        {{ status.icon || status.short }}
                       </button>
+                    </div>
+                    <div v-else class="status-buttons">
+                      <span class="text-muted">{{ t('COMMON.loading') }}...</span>
                     </div>
                   </td>
                   <td class="reason-cell">
@@ -158,19 +154,10 @@ import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge } from '../composables/useStudentsBridge'
 import { AttendanceStatus } from '@viccoboard/core'
-import type { ClassGroup, Student } from '@viccoboard/core'
+import type { ClassGroup, Student, StatusOption } from '@viccoboard/core'
 
 const route = useRoute()
 const { t } = useI18n()
-
-// Status options for quick selection
-const statusOptions: Array<{ value: AttendanceStatus; label: string; short: string }> = [
-  { value: AttendanceStatus.Present, label: t('ANWESENHEIT.present'), short: 'A' },
-  { value: AttendanceStatus.Absent, label: t('ANWESENHEIT.absent'), short: 'Ab' },
-  { value: AttendanceStatus.Late, label: t('ANWESENHEIT.verspaetet'), short: 'V' },
-  { value: AttendanceStatus.Excused, label: t('ANWESENHEIT.selbst'), short: 'E' },
-  { value: AttendanceStatus.Passive, label: t('ANWESENHEIT.passive'), short: 'P' }
-]
 
 // State
 const classes = ref<ClassGroup[]>([])
@@ -180,6 +167,8 @@ const loading = ref(false)
 const saving = ref(false)
 const saveError = ref('')
 const saveSuccess = ref('')
+const statusCatalog = ref<StatusOption[]>([])
+const catalogLoading = ref(false)
 
 interface AttendanceEntry {
   status: AttendanceStatus
@@ -204,6 +193,50 @@ const currentDate = computed(() => {
 
 const hasAnyAttendance = computed(() => {
   return Object.keys(attendance.value).length > 0
+})
+
+// Status options derived from catalog
+// Maps catalog StatusOption to UI format compatible with existing AttendanceStatus enum
+const statusOptions = computed(() => {
+  return statusCatalog.value
+    .filter(status => status.active)
+    .sort((a, b) => a.order - b.order)
+    .map(status => {
+      // Map common codes to AttendanceStatus enum values for backward compatibility
+      let enumValue: AttendanceStatus
+      const code = status.code.toUpperCase()
+      
+      switch (code) {
+        case 'P':
+          enumValue = AttendanceStatus.Present
+          break
+        case 'A':
+        case 'AB':
+          enumValue = AttendanceStatus.Absent
+          break
+        case 'E':
+          enumValue = AttendanceStatus.Excused
+          break
+        case 'L':
+        case 'V':
+          enumValue = AttendanceStatus.Late
+          break
+        case 'PA':
+          enumValue = AttendanceStatus.Passive
+          break
+        default:
+          // For custom statuses, use Present as fallback (or could extend enum)
+          enumValue = AttendanceStatus.Present
+      }
+      
+      return {
+        value: enumValue,
+        label: status.name,
+        short: status.code,
+        color: status.color,
+        icon: status.icon
+      }
+    })
 })
 
 // Methods
@@ -243,18 +276,31 @@ const onClassChange = async () => {
   if (!selectedClassId.value) {
     students.value = []
     attendance.value = {}
+    statusCatalog.value = []
     return
   }
   
   loading.value = true
+  catalogLoading.value = true
   try {
-    students.value = await studentsBridge.studentRepository.findByClassGroup(selectedClassId.value)
+    // Load students and status catalog in parallel
+    const [studentsResult, catalog] = await Promise.all([
+      studentsBridge.studentRepository.findByClassGroup(selectedClassId.value),
+      studentsBridge.statusCatalogRepository.getOrCreateForClassGroup(
+        selectedClassId.value,
+        'attendance'
+      )
+    ])
+    
+    students.value = studentsResult
+    statusCatalog.value = catalog.statuses
     attendance.value = {}
   } catch (err) {
-    console.error('Failed to load students:', err)
+    console.error('Failed to load students or status catalog:', err)
     saveError.value = t('COMMON.error')
   } finally {
     loading.value = false
+    catalogLoading.value = false
   }
 }
 
@@ -464,26 +510,7 @@ onMounted(async () => {
   padding: 0.875rem;
   border-radius: 8px;
   background: #f8f9fa;
-}
-
-.status-present {
-  border-left: 4px solid #4caf50;
-}
-
-.status-absent {
-  border-left: 4px solid #f44336;
-}
-
-.status-late {
-  border-left: 4px solid #ff9800;
-}
-
-.status-excused {
-  border-left: 4px solid #2196f3;
-}
-
-.status-passive {
-  border-left: 4px solid #9c27b0;
+  border-left: 4px solid #ccc; /* Default color, will be overridden by inline style */
 }
 
 .status-label {
@@ -619,31 +646,7 @@ onMounted(async () => {
 .status-btn.active {
   border-width: 3px;
   transform: scale(1.05);
-}
-
-.status-btn-present.active {
-  border-color: #4caf50;
-  background: #e8f5e9;
-}
-
-.status-btn-absent.active {
-  border-color: #f44336;
-  background: #ffebee;
-}
-
-.status-btn-late.active {
-  border-color: #ff9800;
-  background: #fff3e0;
-}
-
-.status-btn-excused.active {
-  border-color: #2196f3;
-  background: #e3f2fd;
-}
-
-.status-btn-passive.active {
-  border-color: #9c27b0;
-  background: #f3e5f5;
+  /* Color will be set via inline style from catalog */
 }
 
 .reason-cell {
@@ -744,6 +747,11 @@ onMounted(async () => {
   background: #e8f5e9;
   color: #2e7d32;
   border: 1px solid #4caf50;
+}
+
+.text-muted {
+  color: #999;
+  font-style: italic;
 }
 
 /* Responsive adjustments */
