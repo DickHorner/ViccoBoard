@@ -10,6 +10,7 @@ export * from './repositories/adapter.repository.js';
 export * from './adapters/storage-adapter.interface.js';
 export * from './adapters/sqlite.adapter.js';
 export * from './adapters/indexeddb.adapter.js';
+export * from './adapters/in-memory.adapter.js';
 export * from './migrations/001_initial_schema_new.js';
 export * from './migrations/002_grading_schema.js';
 export * from './migrations/003_shuttle_run_schema.js';

@@ -2,17 +2,19 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   forceExit: true,
-  extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
+    '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
+    '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        useESM: true,
+        useESM: false,
         tsconfig: {
-          module: 'ESNext'
+          allowSyntheticDefaultImports: true,
+          esModuleInterop: true
         }
       }
     ]

@@ -356,7 +356,7 @@ const showCreateModal = ref(false)
 const creating = ref(false)
 const error = ref('')
 
-const newClass = ref({
+const newClass = ref<{ name: string; schoolYear: string; gradingScheme: string; color: string }>({
   name: '',
   schoolYear: '',
   gradingScheme: DEFAULT_GRADING_SCHEME,
@@ -365,7 +365,7 @@ const newClass = ref({
 
 // Edit state
 const showEditModal = ref(false)
-const editClassData = ref({ id: '', name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' })
+const editClassData = ref<{ id: string; name: string; schoolYear: string; gradingScheme: string; color: string }>({ id: '', name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' })
 const editError = ref('')
 const updating = ref(false)
 
