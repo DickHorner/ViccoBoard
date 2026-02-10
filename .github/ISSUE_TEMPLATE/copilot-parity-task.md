@@ -34,6 +34,7 @@ Copilot must first reply with:
 1. Keep scope strictly within declared IDs.
 2. No architecture drift (no direct app-layer DB access, no module boundary bypass).
 3. No completion claim without test/build evidence.
+4. Treat app-layer Dexie imports/composables as migration debt: migrate active consumers to bridges/use-cases.
 
 ## Post-Coding Report (Required)
 
@@ -44,15 +45,19 @@ Copilot must provide:
 - `npm run build:packages`
 - `npm run build:ipad`
 - `npm test`
-2. Traceability IDs:
+2. Architecture audit results:
+- `Get-ChildItem apps/teacher-ui/src -Recurse -File | Select-String -Pattern "from '../db'" -SimpleMatch`
+- `Get-ChildItem apps/teacher-ui/src -Recurse -File | Select-String -Pattern "useDatabase(" -SimpleMatch`
+3. Traceability IDs:
 - Primary issue ID
 - Related `Plan.md` checkbox IDs
-3. Changed files summary (one line per file).
-4. Remaining blockers and next smallest step.
+4. Changed files summary (one line per file).
+5. Remaining blockers and next smallest step.
 
 ## Acceptance Criteria
 
 - [ ] Scope implemented for the declared IDs only
 - [ ] All required gates are green
+- [ ] Architecture audit output is included
 - [ ] Traceability IDs are included in final report
 - [ ] No hard-rule violations

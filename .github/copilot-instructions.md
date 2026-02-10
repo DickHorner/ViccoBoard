@@ -62,6 +62,16 @@ Final report format (mandatory):
 2. No imports of `../db` outside approved storage/bootstrap internals.
 3. No parallel student stores/repos in apps or storage package.
 4. No bypassing module boundaries “just to make tests pass”.
+5. Do not keep direct Dexie-path composables (`useDatabase.ts`, `useExams.ts`, `useCorrections.ts`) as active production paths.
+
+## 2.1) Dexie Migration Enforcement (Current Priority)
+1. Existing app-layer Dexie access is treated as migration debt, not acceptable steady-state architecture.
+2. Migrate active consumers to bridges/use-cases first (`useSportBridge`, `useExamsBridge`, `useStudentsBridge`).
+3. Only after active consumers are migrated and gates are green may legacy files be removed or reduced to explicit deprecation stubs.
+4. Never claim completion while active code still imports `../db` from app-layer composables/views/stores.
+5. Mandatory evidence in final report:
+   - search results for `from '../db'` and `useDatabase(` in `apps/teacher-ui/src`
+   - list of remaining legacy files (if any) with justification and follow-up issue ID
 
 ## 3) Allowed Work Unit Size
 1. One PR = max 1–3 checkbox IDs from `Plan.md §6` or parity ledger items.
@@ -85,6 +95,9 @@ Run all and require green:
 6. `npm run test --workspace=@viccoboard/sport`
 7. `npm run test --workspace=teacher-ui`
 8. `npm run test --workspace=@viccoboard/students`
+9. Architecture audit commands (must be included in report):
+   - `Get-ChildItem apps/teacher-ui/src -Recurse -File | Select-String -Pattern "from '../db'" -SimpleMatch`
+   - `Get-ChildItem apps/teacher-ui/src -Recurse -File | Select-String -Pattern "useDatabase(" -SimpleMatch`
 
 ## 6) Parity Ledger Discipline
 For every item moved to done:
