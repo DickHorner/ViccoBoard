@@ -5,44 +5,40 @@ Continue parity implementation without architecture drift.
 No bloat, no duplicate data paths, no hidden shortcuts.
 
 ## 0.1) preamble
-You are in STRICT COMPLIANCE mode for ViccoBoard.
+You are in ZERO-TRUST PARITY AUDIT mode for ViccoBoard.
 
-Mandatory reading before edits:
-- `agents.md`
-- `Plan.md` (especially §6 and §9)
-- `docs/agents/SPORTZENS_PARITY_v2.md` (binding)
-- `docs/planning/ISSUES_TRACKER.md`
-- `docs/status/STATUS.md`
-- `.github/copilot-instructions.md`
+Read first (mandatory):
+- agents.md
+- Plan.md (especially §6 and §9)
+- docs/agents/SPORTZENS_PARITY_v2.md
+- docs/planning/ISSUES_TRACKER.md
+- docs/status/STATUS.md
+- .github/copilot-instructions.md
 
-Hard rules:
-1. No direct DB access in UI/composables (`../db`, Dexie tables, app-layer repositories).
-2. No hardcoded status/criteria lists where catalogs are required.
-3. Student management remains centralized (`packages/core` + `modules/students`), never duplicated.
-4. Do not mark issue tasks done unless code + tests + gates are actually green.
-5. If uncertain, stop and report blocker with file + line.
+Non-negotiable rules:
+1. Never claim “implemented/compliant” without file+line evidence.
+2. Never infer parity from “tests pass”.
+3. Every Plan.md checkbox must be classified as:
+   - VERIFIED (with proof)
+   - GAP (missing/incorrect)
+   - NOT VERIFIED (not yet tested)
+4. If UI is required, verify actual UI control type (example: slider must be `<input type="range">`).
+5. If required parity ledger artifacts are missing, create them before any completion claim.
+6. Do not close issues unless all relevant checkboxes are VERIFIED with proof.
 
-Scope for this run:
-- Work only on: [INSERT ISSUE ID, e.g. P2-6]
-- Do not touch unrelated modules.
+Required outputs:
+1. Verification matrix (one row per checkbox in scope):
+   - Checkbox ID
+   - Status (VERIFIED/GAP/NOT VERIFIED)
+   - Evidence: file path + line
+   - If GAP: exact remediation step
+2. “What I verified vs what I did not verify” section.
+3. Commands executed and exact results.
+4. Updated parity ledger files and references.
+5. Only after that: prioritized fix plan.
 
-Required deliverables:
-1. Implementation
-2. Tests
-3. Gate verification
-
-Run and report:
-- `npm run lint:docs`
-- `npm run build:packages`
-- `npm run build:ipad`
-- `npm test`
-
-Final report format (mandatory):
-1. Changed files with one-line reason each
-2. Traceability to issue + Plan checkbox IDs
-3. Architecture compliance checklist (pass/fail per rule)
-4. Gate results with exact status
-5. Remaining blockers (if any), with next concrete action
+Hard fail condition:
+If any claim lacks concrete evidence, mark it as NOT VERIFIED, not VERIFIED.
 
 
 ## 1) Hard Rules (non-negotiable)
