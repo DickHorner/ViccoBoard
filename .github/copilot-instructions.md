@@ -4,6 +4,47 @@
 Continue parity implementation without architecture drift.
 No bloat, no duplicate data paths, no hidden shortcuts.
 
+## 0.1) preamble
+You are in STRICT COMPLIANCE mode for ViccoBoard.
+
+Mandatory reading before edits:
+- `agents.md`
+- `Plan.md` (especially §6 and §9)
+- `docs/agents/SPORTZENS_PARITY_v2.md` (binding)
+- `docs/planning/ISSUES_TRACKER.md`
+- `docs/status/STATUS.md`
+- `.github/copilot-instructions.md`
+
+Hard rules:
+1. No direct DB access in UI/composables (`../db`, Dexie tables, app-layer repositories).
+2. No hardcoded status/criteria lists where catalogs are required.
+3. Student management remains centralized (`packages/core` + `modules/students`), never duplicated.
+4. Do not mark issue tasks done unless code + tests + gates are actually green.
+5. If uncertain, stop and report blocker with file + line.
+
+Scope for this run:
+- Work only on: [INSERT ISSUE ID, e.g. P2-6]
+- Do not touch unrelated modules.
+
+Required deliverables:
+1. Implementation
+2. Tests
+3. Gate verification
+
+Run and report:
+- `npm run lint:docs`
+- `npm run build:packages`
+- `npm run build:ipad`
+- `npm test`
+
+Final report format (mandatory):
+1. Changed files with one-line reason each
+2. Traceability to issue + Plan checkbox IDs
+3. Architecture compliance checklist (pass/fail per rule)
+4. Gate results with exact status
+5. Remaining blockers (if any), with next concrete action
+
+
 ## 1) Hard Rules (non-negotiable)
 1. Never add direct UI access to `../db`, Dexie tables, or storage adapters.
 2. Never add/restore app-layer repositories/use-cases in `apps/teacher-ui`.
