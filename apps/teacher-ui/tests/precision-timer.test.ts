@@ -1,17 +1,16 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { PrecisionTimer, formatTime, formatTimeSimple, secondsToMs, msToSeconds } from '../utils/precision-timer';
+import { PrecisionTimer, formatTime, formatTimeSimple, secondsToMs, msToSeconds } from '../src/utils/precision-timer';
 
 describe('PrecisionTimer', () => {
   let timer: PrecisionTimer;
 
   beforeEach(() => {
     timer = new PrecisionTimer();
-    vi.useFakeTimers();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
     timer.dispose();
-    vi.restoreAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('should initialize with zero elapsed time', () => {
@@ -35,7 +34,7 @@ describe('PrecisionTimer', () => {
 
   it('should resume from paused state', () => {
     timer.start();
-    vi.advanceTimersByTime(1000);
+    jest.advanceTimersByTime(1000);
     
     timer.pause();
     const pausedTime = timer.getElapsed();
@@ -47,7 +46,7 @@ describe('PrecisionTimer', () => {
 
   it('should stop and reset timer', () => {
     timer.start();
-    vi.advanceTimersByTime(1000);
+    jest.advanceTimersByTime(1000);
     
     timer.stop();
     
@@ -56,10 +55,10 @@ describe('PrecisionTimer', () => {
   });
 
   it('should call callback with elapsed time', () => {
-    const callback = vi.fn();
+    const callback = jest.fn();
     
     timer.start(callback);
-    vi.advanceTimersByTime(100);
+    jest.advanceTimersByTime(100);
     
     // Callback should be called with elapsed time
     expect(callback).toHaveBeenCalled();

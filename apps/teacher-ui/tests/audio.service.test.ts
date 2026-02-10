@@ -1,5 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { AudioService, getAudioService, resetAudioService } from '../services/audio.service';
+import { AudioService, getAudioService, resetAudioService } from '../src/services/audio.service';
 
 // Mock AudioContext
 class MockAudioContext {
@@ -19,16 +18,16 @@ class MockAudioContext {
     return {
       frequency: { value: 0 },
       type: 'sine',
-      connect: vi.fn(),
-      start: vi.fn(),
-      stop: vi.fn()
+      connect: jest.fn(),
+      start: jest.fn(),
+      stop: jest.fn()
     };
   }
 
   createGain() {
     return {
       gain: { value: 0 },
-      connect: vi.fn()
+      connect: jest.fn()
     };
   }
 }
