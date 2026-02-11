@@ -24,6 +24,7 @@ import { AttendanceStatus } from '@viccoboard/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { v4 as uuidv4 } from 'uuid';
 
 async function main() {
   console.log('🎓 ViccoBoard Demo - SportZens & KURT Unified Suite\n');
@@ -163,18 +164,30 @@ async function main() {
     // Step 5: Create a Lesson
     console.log('\n Step 5: Create a Lesson');
     console.log(''.repeat(60));
-    
-    // Create a lesson (in real app, this would use LessonRepository)
-    const lessonId = 'lesson-2024-01-13-001';
+
+    // Create or reuse a lesson for the same class/date to keep the demo idempotent
     const lessonDate = new Date('2024-01-13');
-    await adapter.insert('lessons', {
-      id: lessonId,
+    const lessonDateIso = lessonDate.toISOString();
+    const existingLessons = await adapter.getAll('lessons', {
       class_group_id: classGroup.id,
-      date: lessonDate.toISOString(),
-      created_at: new Date().toISOString(),
-      last_modified: new Date().toISOString()
+      date: lessonDateIso
     });
-    console.log(` Lesson created for ${lessonDate.toLocaleDateString()}`);
+
+    let lessonId: string;
+    if (existingLessons.length > 0) {
+      lessonId = existingLessons[0].id;
+      console.log(` Using existing lesson for ${lessonDate.toLocaleDateString()}`);
+    } else {
+      lessonId = `lesson-${uuidv4()}`;
+      await adapter.insert('lessons', {
+        id: lessonId,
+        class_group_id: classGroup.id,
+        date: lessonDateIso,
+        created_at: new Date().toISOString(),
+        last_modified: new Date().toISOString()
+      });
+      console.log(` Lesson created for ${lessonDate.toLocaleDateString()}`);
+    }
     console.log(`  ID: ${lessonId}`);
 
     // Step 6: Record Attendance
