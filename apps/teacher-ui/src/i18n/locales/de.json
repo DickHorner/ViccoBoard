@@ -711,7 +711,11 @@
 		"bahnen": "Bahnen",
 		"meter": "m",
 		"gesamt": "Gesamt",
-		"note": "Note"
+		"note": "Note",
+		"sportart": "Sportart",
+		"running": "Laufen",
+		"swimming": "Schwimmen",
+		"config": "Konfiguration"
 	},
 	"SHUTTLE": {
 		"bewerte-shuttle": "Bewerte Shuttle-Run vom",

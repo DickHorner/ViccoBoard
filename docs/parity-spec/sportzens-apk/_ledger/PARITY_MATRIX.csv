@@ -218,7 +218,7 @@ workflow,student_edit,yes,in_scope_v2,no,N/A,N/A
 workflow,student_delete,yes,in_scope_v2,no,N/A,N/A
 workflow,grade_criteria_entry,yes,in_scope_v2,no,N/A,N/A
 workflow,grade_time_entry,yes,in_scope_v2,no,N/A,N/A
-workflow,grade_cooper_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_cooper_entry,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/CooperGradingEntry.vue (sport type+config+save); modules/sport/src/use-cases/RecordCooperTestResultUseCase.ts",docs/evidence/P4-2-evidence.md;modules/sport/tests/ (24 passing tests)
 workflow,grade_shuttle_entry,yes,in_scope_v2,no,apps/teacher-ui/src/views/ShuttleGradingEntry.vue (timer+save),docs/evidence/p4-1/workflow-checklist.md;docs/evidence/p4-1/persistence-proof.md;docs/evidence/p4-1/timer-audio-proof.md
 workflow,grade_multistop_entry,yes,in_scope_v2,no,N/A,N/A
 workflow,grade_middle_distance_entry,yes,in_scope_v2,no,N/A,N/A

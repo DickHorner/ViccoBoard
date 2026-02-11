@@ -622,7 +622,11 @@
     "bahnen": "Lanes",
     "meter": "m",
     "gesamt": "Total",
-    "note": "Mark"
+    "note": "Mark",
+    "sportart": "Sport Type",
+    "running": "Running",
+    "swimming": "Swimming",
+    "config": "Configuration"
   },
   "SHUTTLE": {
     "bewerte-shuttle": "Grade Shuttle-Run from",
