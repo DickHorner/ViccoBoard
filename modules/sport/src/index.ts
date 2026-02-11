@@ -38,6 +38,13 @@ export type { CreateGradeCategoryInput } from './use-cases/create-grade-category
 
 export { RecordGradeUseCase } from './use-cases/record-grade.use-case.js';
 export type { RecordGradeInput } from './use-cases/record-grade.use-case.js';
+
+export { RecordShuttleRunResultUseCase } from './use-cases/record-shuttle-run-result.use-case.js';
+export type { RecordShuttleRunResultInput } from './use-cases/record-shuttle-run-result.use-case.js';
+
+export { RecordCooperTestResultUseCase } from './use-cases/record-cooper-test-result.use-case.js';
+export type { RecordCooperTestResultInput } from './use-cases/record-cooper-test-result.use-case.js';
+
 export { SaveSportZensClassUseCase } from './use-cases/save-sportzens-class.use-case.js';
 export { SaveSportZensCategoryUseCase } from './use-cases/save-sportzens-category.use-case.js';
 export { SaveSportZensGradeUseCase } from './use-cases/save-sportzens-grade.use-case.js';
