@@ -16,6 +16,22 @@
     <section v-else-if="category" class="card">
       <div class="config-row">
         <div class="form-group">
+          <label>{{ t('COOPER.sportart') }}</label>
+          <select v-model="selectedSportType" class="form-input" @change="handleSportTypeChange">
+            <option value="running">{{ t('COOPER.running') }}</option>
+            <option value="swimming">{{ t('COOPER.swimming') }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ t('COOPER.config') }}</label>
+          <select v-model="selectedConfigId" class="form-input" @change="handleConfigChange">
+            <option value="">{{ t('COOPER.config') }}...</option>
+            <option v-for="config in configs" :key="config.id" :value="config.id">
+              {{ config.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>{{ t('COOPER.tabelle') }}</label>
           <select v-model="selectedTableId" class="form-input" @change="handleTableChange">
             <option value="">{{ t('COOPER.tabelle') }}...</option>
@@ -30,7 +46,11 @@
         </div>
       </div>
 
-      <div v-if="!selectedTableId" class="warning-banner">
+      <div v-if="!selectedConfigId" class="warning-banner">
+        {{ t('COOPER.config') }}: {{ t('COMMON.error') }}
+      </div>
+
+      <div v-else-if="!selectedTableId" class="warning-banner">
         {{ t('COOPER.tabelle') }}: {{ t('COMMON.error') }}
       </div>
 
@@ -77,7 +97,7 @@
         <button class="btn-secondary" @click="resetAll" :disabled="saving">
           {{ t('COOPER.noten-neu') }}
         </button>
-        <button class="btn-primary" @click="saveAll" :disabled="saving || !selectedTableId">
+        <button class="btn-primary" @click="saveAll" :disabled="saving || !selectedTableId || !selectedConfigId">
           {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
         </button>
       </div>
@@ -112,6 +132,9 @@ const studentsBridge = getStudentsBridge()
 const category = ref<Sport.GradeCategory | null>(null)
 const students = ref<Student[]>([])
 const tables = ref<Sport.TableDefinition[]>([])
+const configs = ref<Sport.CooperTestConfig[]>([])
+const selectedSportType = ref<Sport.CooperTestConfig['sportType']>('running')
+const selectedConfigId = ref('')
 const selectedTableId = ref('')
 const lapLengthMeters = ref(400)
 const loading = ref(true)
@@ -141,6 +164,10 @@ const selectedTable = computed(() =>
   tables.value.find(table => table.id === selectedTableId.value) || null
 )
 
+const selectedConfig = computed(() =>
+  configs.value.find(config => config.id === selectedConfigId.value) || null
+)
+
 function buildContext(student: Student): Record<string, unknown> {
   const genderShort = student.gender === 'male' ? 'm' : student.gender === 'female' ? 'w' : 'd'
   const age = student.birthYear ? new Date().getFullYear() - student.birthYear : undefined
@@ -149,7 +176,8 @@ function buildContext(student: Student): Record<string, unknown> {
     gender: genderShort,
     genderLong: student.gender,
     age,
-    birthYear: student.birthYear
+    birthYear: student.birthYear,
+    sportType: selectedSportType.value
   }
 }
 
@@ -212,7 +240,7 @@ function resetAll() {
 }
 
 async function saveAll() {
-  if (!category.value || !selectedTableId.value) return
+  if (!category.value || !selectedTableId.value || !selectedConfigId.value) return
 
   saving.value = true
   errorMessage.value = ''
@@ -223,16 +251,16 @@ async function saveAll() {
       const entry = results.value[student.id]
       if (!entry || entry.distanceMeters <= 0) return null
 
-      return sportBridge.recordGradeUseCase.execute({
+      return sportBridge.recordCooperTestResultUseCase.execute({
         studentId: student.id,
         categoryId: category.value!.id,
-        measurements: {
-          rounds: entry.rounds,
-          extraMeters: entry.extraMeters,
-          distanceMeters: entry.distanceMeters,
-          lapLengthMeters: lapLengthMeters.value
-        },
-        calculatedGrade: entry.grade
+        configId: selectedConfigId.value,
+        sportType: selectedSportType.value,
+        rounds: entry.rounds,
+        lapLengthMeters: lapLengthMeters.value,
+        extraMeters: entry.extraMeters,
+        calculatedGrade: entry.grade,
+        tableId: selectedTableId.value
       })
     }).filter(Boolean) as Promise<any>[]
 
@@ -266,6 +294,58 @@ async function handleTableChange() {
   students.value.forEach(student => recalculate(student.id))
 }
 
+async function handleSportTypeChange() {
+  if (!category.value) return
+  const config = category.value.configuration as Sport.CooperGradingConfig
+
+  if (config.sportType !== selectedSportType.value) {
+    await sportBridge.gradeCategoryRepository.update(category.value.id, {
+      configuration: {
+        ...config,
+        sportType: selectedSportType.value
+      }
+    })
+  }
+
+  await loadConfigs(selectedSportType.value)
+  students.value.forEach(student => recalculate(student.id))
+}
+
+async function handleConfigChange() {
+  const config = selectedConfig.value
+  if (!config) return
+
+  if (Number.isFinite(config.lapLengthMeters)) {
+    lapLengthMeters.value = config.lapLengthMeters
+  }
+
+  if (!selectedTableId.value && config.gradingTableId) {
+    selectedTableId.value = config.gradingTableId
+  }
+
+  students.value.forEach(student => recalculate(student.id))
+}
+
+async function loadConfigs(sportType: Sport.CooperTestConfig['sportType']) {
+  configs.value = await sportBridge.cooperTestConfigRepository.findBySportType(sportType)
+
+  if (selectedConfigId.value) {
+    const stillAvailable = configs.value.some(config => config.id === selectedConfigId.value)
+    if (!stillAvailable) {
+      selectedConfigId.value = ''
+    }
+  }
+
+  if (!selectedConfigId.value && configs.value.length > 0) {
+    selectedConfigId.value = configs.value[0].id
+  }
+
+  const activeConfig = configs.value.find(config => config.id === selectedConfigId.value)
+  if (activeConfig && Number.isFinite(activeConfig.lapLengthMeters)) {
+    lapLengthMeters.value = activeConfig.lapLengthMeters
+  }
+}
+
 onMounted(async () => {
   try {
     const categoryId = route.params.id as string
@@ -283,6 +363,9 @@ onMounted(async () => {
 
     const config = category.value.configuration as Sport.CooperGradingConfig
     selectedTableId.value = config.gradingTable ?? ''
+    selectedSportType.value = config.sportType ?? 'running'
+
+    await loadConfigs(selectedSportType.value)
 
     const lapLengthFromEntry = existingEntries.find(entry => entry.measurements?.lapLengthMeters)?.measurements?.lapLengthMeters
     if (lapLengthFromEntry) {

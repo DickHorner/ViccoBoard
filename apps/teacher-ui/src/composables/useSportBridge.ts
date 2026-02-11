@@ -23,6 +23,7 @@ import {
   RecordAttendanceUseCase,
   CreateGradeCategoryUseCase,
   RecordGradeUseCase,
+  RecordCooperTestResultUseCase,
   RecordShuttleRunResultUseCase,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -61,6 +62,7 @@ interface SportBridge {
   recordAttendanceUseCase: RecordAttendanceUseCase
   createGradeCategoryUseCase: CreateGradeCategoryUseCase
   recordGradeUseCase: RecordGradeUseCase
+  recordCooperTestResultUseCase: RecordCooperTestResultUseCase
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
 
   // Services
@@ -100,6 +102,11 @@ export function initializeSportBridge(): SportBridge {
   const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo)
   const createGradeCategoryUseCase = new CreateGradeCategoryUseCase(gradeCategoryRepo)
   const recordGradeUseCase = new RecordGradeUseCase(performanceEntryRepo)
+  const recordCooperTestResultUseCase = new RecordCooperTestResultUseCase(
+    performanceEntryRepo,
+    cooperTestConfigRepo,
+    tableDefinitionRepo
+  )
   const recordShuttleRunResultUseCase = new RecordShuttleRunResultUseCase(
     performanceEntryRepo,
     shuttleRunConfigRepo
@@ -131,6 +138,7 @@ export function initializeSportBridge(): SportBridge {
     recordAttendanceUseCase,
     createGradeCategoryUseCase,
     recordGradeUseCase,
+    recordCooperTestResultUseCase,
     recordShuttleRunResultUseCase,
 
     // Services
