@@ -162,6 +162,8 @@ import { useI18n } from 'vue-i18n';
 import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
+import type { Sport } from '@viccoboard/core';
+import type { SportabzeichenReportEntry } from '@viccoboard/sport';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -178,20 +180,21 @@ const students = ref<any[]>([]);
 const disciplineCategories = ['ausdauer', 'kraft', 'schnelligkeit', 'koordination'];
 const selectedCategory = ref('ausdauer');
 
-// Simplified discipline structure (in production, load from database)
-const disciplines = ref<any[]>([
-  { id: 'd1', name: '3000m Lauf', category: 'ausdauer' },
-  { id: 'd2', name: 'Schwimmen 200m', category: 'ausdauer' },
-  { id: 'd3', name: 'Standweitsprung', category: 'kraft' },
-  { id: 'd4', name: 'Kugelstoßen', category: 'kraft' },
-  { id: 'd5', name: 'Sprint 100m', category: 'schnelligkeit' },
-  { id: 'd6', name: 'Seilspringen', category: 'koordination' }
+// Simplified discipline structure (in production, could load from config)
+const disciplines = ref<Sport.SportabzeichenDiscipline[]>([
+  { id: 'd1', name: '3000m Lauf', category: 'endurance', measurementUnit: 'seconds' },
+  { id: 'd2', name: 'Schwimmen 200m', category: 'endurance', measurementUnit: 'seconds' },
+  { id: 'd3', name: 'Standweitsprung', category: 'strength', measurementUnit: 'cm' },
+  { id: 'd4', name: 'Kugelstoßen', category: 'strength', measurementUnit: 'meters' },
+  { id: 'd5', name: 'Sprint 100m', category: 'speed', measurementUnit: 'seconds' },
+  { id: 'd6', name: 'Seilspringen', category: 'coordination', measurementUnit: 'count' }
 ]);
 
 const disciplineSelections = ref<Record<string, string>>({});
 const performances = ref<Record<string, number>>({});
-const levels = ref<Record<string, string>>({});
-const studentResults = ref<Record<string, any[]>>({});
+const levels = ref<Record<string, Sport.SportabzeichenLevel>>({});
+const studentResults = ref<Record<string, Sport.SportabzeichenResult[]>>({});
+const allStandards = ref<Sport.SportabzeichenStandard[]>([]);
 const hasChanges = ref(false);
 
 onMounted(async () => {
@@ -210,10 +213,13 @@ async function loadData() {
 
     students.value = await studentRepository.value?.findByClassGroup(category.classGroupId) ?? [];
 
-    // Load existing results
+    // Load all sportabzeichen standards
+    allStandards.value = await sportBridge.value?.sportabzeichenStandardRepository.findAll() ?? [];
+
+    // Load existing results for each student
     for (const student of students.value) {
-      studentResults.value[student.id] = [];
-      // In production: load from sportabzeichenResultRepository
+      const results = await sportBridge.value?.sportabzeichenResultRepository.findByStudent(student.id) ?? [];
+      studentResults.value[student.id] = results;
     }
   } catch (error) {
     console.error('Failed to load data:', error);
@@ -224,7 +230,15 @@ async function loadData() {
 }
 
 function getFilteredDisciplines(category: string) {
-  return disciplines.value.filter(d => d.category === category);
+  // Map UI category names to Sport type category names
+  const categoryMap: Record<string, Sport.SportabzeichenDiscipline['category']> = {
+    'ausdauer': 'endurance',
+    'kraft': 'strength',
+    'schnelligkeit': 'speed',
+    'koordination': 'coordination'
+  };
+  const mappedCategory = categoryMap[category];
+  return disciplines.value.filter(d => d.category === mappedCategory);
 }
 
 function onDisciplineChange(studentId: string) {
@@ -232,60 +246,106 @@ function onDisciplineChange(studentId: string) {
   onPerformanceChange(studentId);
 }
 
-function onPerformanceChange(studentId: string) {
+async function onPerformanceChange(studentId: string) {
   hasChanges.value = true;
   
   const disciplineId = disciplineSelections.value[studentId];
   const performance = performances.value[studentId];
   
-  if (!disciplineId || !performance) {
+  if (!disciplineId || performance === undefined || performance === null) {
     levels.value[studentId] = 'none';
     return;
   }
-  
-  // Simplified level calculation (in production, use SportabzeichenService.evaluatePerformance)
-  // This is a placeholder
-  if (performance > 0) {
-    levels.value[studentId] = 'bronze';
-    if (performance > 50) levels.value[studentId] = 'silver';
-    if (performance > 80) levels.value[studentId] = 'gold';
-  } else {
+
+  const student = students.value.find(s => s.id === studentId);
+  if (!student || !student.birthYear) {
+    // If no birth year, cannot calculate age-based level
     levels.value[studentId] = 'none';
+    return;
   }
+
+  // Calculate age using service
+  const service = sportBridge.value?.sportabzeichenService;
+  if (!service) {
+    levels.value[studentId] = 'none';
+    return;
+  }
+
+  const age = service.calculateAgeFromBirthYear(student.birthYear, new Date());
+  const gender: Sport.SportabzeichenGender = student.gender || 'diverse';
+
+  // Evaluate performance using service with all standards
+  const achievedLevel = service.evaluatePerformance(allStandards.value, {
+    disciplineId,
+    gender,
+    age,
+    performanceValue: performance
+  });
+
+  levels.value[studentId] = achievedLevel;
 }
 
-function getOverallLevel(studentId: string): string {
+function getOverallLevel(studentId: string): Sport.SportabzeichenLevel {
   const results = studentResults.value[studentId] || [];
-  if (results.length < 4) return 'none';
+  if (results.length === 0) return 'none';
   
-  // Overall level is determined by weakest discipline
-  const levels = results.map(r => r.level);
-  if (levels.every(l => l === 'gold')) return 'gold';
-  if (levels.every(l => l === 'silver' || l === 'gold')) return 'silver';
-  if (levels.every(l => l !== 'none')) return 'bronze';
-  return 'none';
+  const service = sportBridge.value?.sportabzeichenService;
+  if (!service) return 'none';
+  
+  return service.calculateOverallLevel(results);
 }
 
 async function saveAll() {
   saving.value = true;
   try {
+    const useCase = sportBridge.value?.recordSportabzeichenResultUseCase;
+    if (!useCase) {
+      throw new Error('RecordSportabzeichenResultUseCase not available');
+    }
+
     for (const student of students.value) {
       const disciplineId = disciplineSelections.value[student.id];
       const performance = performances.value[student.id];
       const level = levels.value[student.id];
       
-      if (!disciplineId || !performance || level === 'none') continue;
-      
-      // Save result (in production, use sportabzeichenResultRepository)
-      // Placeholder: just store in memory
+      if (!disciplineId || performance === undefined || performance === null || level === 'none') {
+        continue;
+      }
+
+      if (!student.birthYear) {
+        console.warn(`Student ${student.id} has no birth year, skipping`);
+        continue;
+      }
+
+      const discipline = disciplines.value.find(d => d.id === disciplineId);
+      if (!discipline) {
+        console.warn(`Discipline ${disciplineId} not found, skipping`);
+        continue;
+      }
+
+      const gender: Sport.SportabzeichenGender = student.gender || 'diverse';
+
+      // Save result using use case
+      const result = await useCase.execute({
+        studentId: student.id,
+        disciplineId,
+        birthYear: student.birthYear,
+        gender,
+        performanceValue: performance,
+        unit: discipline.measurementUnit,
+        testDate: new Date()
+      });
+
+      // Update local results
       if (!studentResults.value[student.id]) {
         studentResults.value[student.id] = [];
       }
-      studentResults.value[student.id].push({
-        disciplineId,
-        performance,
-        level
-      });
+      const existingIndex = studentResults.value[student.id].findIndex(r => r.disciplineId === disciplineId);
+      if (existingIndex >= 0) {
+        studentResults.value[student.id][existingIndex] = result;
+      } else {
+        studentResults.value[student.id].push(result);
+      }
     }
     
     hasChanges.value = false;
@@ -301,8 +361,52 @@ async function saveAll() {
 async function exportPdf() {
   exporting.value = true;
   try {
-    // Use SportabzeichenService.generateOverviewPdf in production
-    toast.info('PDF Export wird in Kürze verfügbar sein');
+    const service = sportBridge.value?.sportabzeichenService;
+    if (!service) {
+      throw new Error('SportabzeichenService not available');
+    }
+
+    // Build report data
+    const entries: SportabzeichenReportEntry[] = students.value.map(student => {
+      const results = studentResults.value[student.id] || [];
+      const age = student.birthYear ? service.calculateAgeFromBirthYear(student.birthYear) : 0;
+      const gender: Sport.SportabzeichenGender = student.gender || 'diverse';
+      const overallLevel = getOverallLevel(student.id);
+
+      return {
+        studentName: `${student.firstName} ${student.lastName}`,
+        age,
+        gender,
+        overallLevel,
+        results: results.map(r => {
+          const discipline = disciplines.value.find(d => d.id === r.disciplineId);
+          return {
+            disciplineName: discipline?.name || r.disciplineId,
+            performance: `${r.performanceValue} ${r.unit}`,
+            level: r.achievedLevel
+          };
+        })
+      };
+    });
+
+    const pdfBytes = await service.generateOverviewPdf({
+      title: t('SPORTABZEICHEN.title'),
+      generatedAt: new Date(),
+      entries
+    });
+
+    // Trigger download
+    const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sportabzeichen-${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast.success('PDF erfolgreich erstellt');
   } catch (error) {
     console.error('Failed to export PDF:', error);
     toast.error('Fehler beim Exportieren');

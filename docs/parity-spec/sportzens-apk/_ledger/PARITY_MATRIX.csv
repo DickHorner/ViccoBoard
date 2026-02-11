@@ -222,7 +222,7 @@ workflow,grade_cooper_entry,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/Coope
 workflow,grade_shuttle_entry,yes,in_scope_v2,no,apps/teacher-ui/src/views/ShuttleGradingEntry.vue (timer+save),docs/evidence/p4-1/workflow-checklist.md;docs/evidence/p4-1/persistence-proof.md;docs/evidence/p4-1/timer-audio-proof.md
 workflow,grade_multistop_entry,yes,in_scope_v2,no,N/A,N/A
 workflow,grade_middle_distance_entry,yes,in_scope_v2,no,N/A,N/A
-workflow,grade_sportabzeichen,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_sportabzeichen,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/SportabzeichenGradingEntry.vue (age calc+standards+PDF); modules/sport/src/use-cases/RecordSportabzeichenResultUseCase.ts; modules/sport/src/services/sportabzeichen.service.ts (age+eval+overall+PDF)",docs/evidence/P4-3-evidence.md;modules/sport/tests/ (190 passing tests)
 workflow,grade_bundesjugendspiele,yes,in_scope_v2,no,N/A,N/A
 workflow,grade_king_tournament,yes,in_scope_v2,no,N/A,N/A
 workflow,category_create,yes,in_scope_v2,no,N/A,N/A
