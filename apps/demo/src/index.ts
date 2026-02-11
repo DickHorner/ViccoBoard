@@ -280,6 +280,7 @@ async function main() {
 
     // Close storage
     await storage.close();
+    process.exit(0);
 
   } catch (error) {
     console.error('\n❌ Error:', error instanceof Error ? error.message : error);
