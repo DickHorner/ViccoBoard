@@ -35,6 +35,44 @@
         </div>
       </div>
 
+      <div class="timer-panel" v-if="selectedConfig">
+        <div class="timer-status">
+          <div class="status-item">
+            <span class="status-label">{{ t('SHUTTLE.elapsed') }}</span>
+            <span class="status-value">{{ formatTime(elapsedMs) }}</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">{{ t('SHUTTLE.current-level') }}</span>
+            <span class="status-value">{{ currentLevel || '—' }}</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">{{ t('SHUTTLE.current-lane') }}</span>
+            <span class="status-value">{{ currentLane || '—' }}</span>
+          </div>
+        </div>
+        <div class="timer-controls">
+          <button class="btn-primary" @click="startTest" :disabled="isRunning || !selectedConfig">
+            {{ t('SHUTTLE.start') }}
+          </button>
+          <button class="btn-secondary" @click="pauseTest" :disabled="!isRunning">
+            {{ t('SHUTTLE.pause') }}
+          </button>
+          <button class="btn-secondary" @click="resumeTest" :disabled="!isPaused">
+            {{ t('SHUTTLE.resume') }}
+          </button>
+          <button class="btn-secondary" @click="finishTest" :disabled="!isRunning && !isPaused">
+            {{ t('SHUTTLE.finish') }}
+          </button>
+          <button class="btn-secondary" @click="resetTimerState" :disabled="isRunning">
+            {{ t('SHUTTLE.reset') }}
+          </button>
+        </div>
+        <label class="sound-toggle">
+          <input type="checkbox" v-model="soundEnabled" />
+          {{ t('SHUTTLE.sound-enabled') }}
+        </label>
+      </div>
+
       <div v-if="!selectedTableId || !selectedConfigId" class="warning-banner">
         {{ t('COMMON.error') }}
       </div>
@@ -47,6 +85,7 @@
               <th>{{ t('SHUTTLE.level') }}</th>
               <th>{{ t('SHUTTLE.bahn') }}</th>
               <th>{{ t('SHUTTLE.note') }}</th>
+              <th>{{ t('SHUTTLE.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -79,6 +118,22 @@
                 </select>
               </td>
               <td class="grade-cell">{{ results[student.id].grade ?? '—' }}</td>
+              <td class="action-cell">
+                <button
+                  class="btn-secondary btn-stop"
+                  @click="stopStudent(student.id)"
+                  :disabled="!isRunning || !currentSegment"
+                >
+                  {{ t('SHUTTLE.stop') }}
+                </button>
+                <button
+                  class="btn-secondary btn-clear"
+                  @click="clearStudent(student.id)"
+                  :disabled="isRunning"
+                >
+                  {{ t('SHUTTLE.clear') }}
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -104,12 +159,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import type { Student, Sport } from '@viccoboard/core'
+import { buildShuttleRunSchedule, getCurrentShuttleSegment } from '../utils/shuttle-run-schedule'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -135,6 +191,7 @@ interface ShuttleResult {
   level: number | ''
   lane: number | ''
   grade?: string | number
+  stopped?: boolean
 }
 
 const results = ref<Record<string, ShuttleResult>>({})
@@ -148,6 +205,15 @@ const currentDate = computed(() => {
   })
 })
 
+const isRunning = ref(false)
+const isPaused = ref(false)
+const elapsedMs = ref(0)
+const soundEnabled = ref(true)
+let intervalId: number | null = null
+let lastSegmentIndex = -1
+let startEpoch = 0
+let accumulatedMs = 0
+
 const selectedTable = computed(() =>
   tables.value.find(table => table.id === selectedTableId.value) || null
 )
@@ -155,6 +221,23 @@ const selectedTable = computed(() =>
 const selectedConfig = computed(() =>
   configs.value.find(config => config.id === selectedConfigId.value) || null
 )
+
+const runSchedule = computed(() => {
+  if (!selectedConfig.value) return []
+  return buildShuttleRunSchedule(selectedConfig.value.levels)
+})
+
+const totalDurationMs = computed(() => {
+  if (runSchedule.value.length === 0) return 0
+  return runSchedule.value[runSchedule.value.length - 1].endMs
+})
+
+const currentSegment = computed(() =>
+  getCurrentShuttleSegment(runSchedule.value, elapsedMs.value)
+)
+
+const currentLevel = computed(() => currentSegment.value?.level ?? '')
+const currentLane = computed(() => currentSegment.value?.lane ?? '')
 
 const availableLevels = computed(() => {
   if (!selectedConfig.value) return []
@@ -179,10 +262,114 @@ function initResults(existingEntries: Sport.PerformanceEntry[] = []) {
     initial[student.id] = {
       level: Number(measurements.level) || '',
       lane: Number(measurements.lane) || '',
-      grade: entry?.calculatedGrade
+      grade: entry?.calculatedGrade,
+      stopped: false
     }
   })
   results.value = initial
+}
+
+function formatTime(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  const pad = (value: number) => value.toString().padStart(2, '0')
+  return `${pad(minutes)}:${pad(seconds)}`
+}
+
+function playBeep() {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+
+    oscillator.frequency.value = 800
+    oscillator.type = 'sine'
+    gainNode.gain.value = 0.3
+
+    oscillator.start(audioContext.currentTime)
+    oscillator.stop(audioContext.currentTime + 0.2)
+  } catch (error) {
+    console.warn('Audio not available:', error)
+  }
+}
+
+function tick() {
+  if (!isRunning.value) return
+  elapsedMs.value = accumulatedMs + (Date.now() - startEpoch)
+
+  if (totalDurationMs.value > 0 && elapsedMs.value >= totalDurationMs.value) {
+    elapsedMs.value = totalDurationMs.value
+    finishTest()
+    return
+  }
+
+  const segment = getCurrentShuttleSegment(runSchedule.value, elapsedMs.value)
+  const index = segment ? runSchedule.value.indexOf(segment) : -1
+  if (index !== lastSegmentIndex && index !== -1) {
+    if (lastSegmentIndex !== -1 && soundEnabled.value) {
+      playBeep()
+    }
+    lastSegmentIndex = index
+  }
+}
+
+function startTest() {
+  if (!selectedConfig.value || runSchedule.value.length === 0) return
+  resetTimerState()
+  isRunning.value = true
+  startEpoch = Date.now()
+  intervalId = window.setInterval(tick, 100)
+  if (soundEnabled.value) {
+    playBeep()
+  }
+}
+
+function pauseTest() {
+  if (!isRunning.value) return
+  isRunning.value = false
+  isPaused.value = true
+  accumulatedMs = elapsedMs.value
+  if (intervalId !== null) {
+    clearInterval(intervalId)
+    intervalId = null
+  }
+}
+
+function resumeTest() {
+  if (!isPaused.value) return
+  isPaused.value = false
+  isRunning.value = true
+  startEpoch = Date.now()
+  intervalId = window.setInterval(tick, 100)
+}
+
+function finishTest() {
+  isRunning.value = false
+  isPaused.value = false
+  if (intervalId !== null) {
+    clearInterval(intervalId)
+    intervalId = null
+  }
+  if (soundEnabled.value && elapsedMs.value >= totalDurationMs.value) {
+    playBeep()
+  }
+}
+
+function resetTimerState() {
+  isRunning.value = false
+  isPaused.value = false
+  elapsedMs.value = 0
+  accumulatedMs = 0
+  startEpoch = 0
+  lastSegmentIndex = -1
+  if (intervalId !== null) {
+    clearInterval(intervalId)
+    intervalId = null
+  }
 }
 
 function recalculate(studentId: string) {
@@ -210,7 +397,25 @@ function resetAll() {
     results.value[student.id].level = ''
     results.value[student.id].lane = ''
     results.value[student.id].grade = undefined
+    results.value[student.id].stopped = false
   })
+}
+
+function stopStudent(studentId: string) {
+  const segment = currentSegment.value
+  if (!segment) return
+
+  results.value[studentId].level = segment.level
+  results.value[studentId].lane = segment.lane
+  results.value[studentId].stopped = true
+  recalculate(studentId)
+}
+
+function clearStudent(studentId: string) {
+  results.value[studentId].level = ''
+  results.value[studentId].lane = ''
+  results.value[studentId].grade = undefined
+  results.value[studentId].stopped = false
 }
 
 async function saveAll() {
@@ -225,15 +430,12 @@ async function saveAll() {
       const entry = results.value[student.id]
       if (!entry || entry.level === '' || entry.lane === '') return null
 
-      return sportBridge.recordGradeUseCase.execute({
+      return sportBridge.recordShuttleRunResultUseCase.execute({
         studentId: student.id,
         categoryId: category.value!.id,
-        measurements: {
-          level: entry.level,
-          lane: entry.lane,
-          configId: selectedConfigId.value,
-          gradingTable: selectedTableId.value
-        },
+        configId: selectedConfigId.value,
+        level: Number(entry.level),
+        lane: Number(entry.lane),
         calculatedGrade: entry.grade
       })
     }).filter(Boolean) as Promise<any>[]
@@ -264,8 +466,14 @@ async function handleConfigChange() {
     }
   })
 
+  resetTimerState()
   students.value.forEach(student => recalculate(student.id))
 }
+
+watch(selectedConfig, (config) => {
+  resetTimerState()
+  soundEnabled.value = config?.audioSignalsEnabled ?? true
+})
 
 onMounted(async () => {
   try {
@@ -351,6 +559,51 @@ onMounted(async () => {
   margin-bottom: 1rem;
 }
 
+.timer-panel {
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timer-status {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.status-label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.status-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.timer-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
 .table-wrapper {
   overflow-x: auto;
 }
@@ -381,6 +634,16 @@ onMounted(async () => {
 
 .grade-cell {
   font-weight: 700;
+}
+
+.action-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-stop,
+.btn-clear {
+  padding: 0.5rem 0.75rem;
 }
 
 .form-actions {
