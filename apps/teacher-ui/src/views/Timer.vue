@@ -456,7 +456,6 @@ async function saveTimerResult() {
 
     const _result = await useCase.execute({
       sessionId: sessionId.value,
-      categoryId: 'timer-tool',
       mode: mode.value,
       elapsedMs,
       durationMs,

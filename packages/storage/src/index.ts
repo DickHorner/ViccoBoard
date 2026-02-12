@@ -21,6 +21,7 @@ export * from './migrations/007_correction_schema.js';
 export * from './migrations/008_class_group_color.js';
 export * from './migrations/009_class_group_archive.js';
 export * from './migrations/013_sportzens_schema.js';
+export * from './migrations/014_tool_sessions_schema.js';
 export * from './migrations/indexeddb/indexeddb-migration.js';
 export * from './migrations/indexeddb/001_initial_schema.js';
 export * from './migrations/indexeddb/002_grading_schema.js';
@@ -32,6 +33,7 @@ export * from './migrations/indexeddb/007_correction_schema.js';
 export * from './migrations/indexeddb/008_class_group_color.js';
 export * from './migrations/indexeddb/009_class_group_archive.js';
 export * from './migrations/indexeddb/013_sportzens_schema.js';
+export * from './migrations/indexeddb/014_tool_sessions_schema.js';
 export * from './indexeddb.storage.js';
 
 // Version

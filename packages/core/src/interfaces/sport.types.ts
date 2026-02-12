@@ -225,6 +225,27 @@ export interface PerformanceEntry {
 }
 
 // ============================================================================
+// Tool Sessions (Live Tools Usage Logs)
+// ============================================================================
+
+/**
+ * Tool Session
+ * Represents a usage session for live tools (Timer, Scoreboard, Tournaments, etc.)
+ * Separates tool logs from student performance entries
+ */
+export interface ToolSession {
+  id: string;
+  toolType: string; // 'timer' | 'scoreboard' | 'tournament' | 'multistop' | etc.
+  classGroupId?: string; // Optional: if tool was used in context of a class
+  lessonId?: string; // Optional: if tool was used during a specific lesson
+  sessionMetadata: Record<string, any>; // Tool-specific data (mode, duration, scores, etc.)
+  startedAt: Date;
+  endedAt?: Date; // Optional: if tool session was explicitly ended
+  createdAt: Date;
+  lastModified: Date;
+}
+
+// ============================================================================
 // Table Definitions
 // ============================================================================
 

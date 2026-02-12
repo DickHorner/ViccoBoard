@@ -5,10 +5,10 @@
 | Criterion | Status | Evidence | Notes |
 |-----------|--------|----------|-------|
 | Timer modes supported (countdown, stopwatch, interval) | VERIFIED | [Timer.vue#L88-L100](../../../apps/teacher-ui/src/views/Timer.vue#L88-L100) | All 3 modes with reactive refs |
-| Session persistence | VERIFIED | [RecordTimerResultUseCase.ts#L1-L75](../../../modules/sport/src/use-cases/record-timer-result.use-case.ts#L1-L75) | Persists via PerformanceEntryRepository |
+| Session persistence | VERIFIED | [RecordTimerResultUseCase.ts#L1-L75](../../../modules/sport/src/use-cases/record-timer-result.use-case.ts#L1-L75) | Persists to `tool_sessions` via sport module persistence |
 | Elapsed time calculation | VERIFIED | [Timer.vue#L406-L428](../../../apps/teacher-ui/src/views/Timer.vue#L406-L428) | Mode-specific calculation: countdown uses duration-remaining, stopwatch uses elapsedTime, interval uses round totals |
 | Audio mute support | VERIFIED | [Timer.vue#L167](../../../apps/teacher-ui/src/views/Timer.vue#L167) | soundEnabled checkbox at L167; audioEnabled passed to use case L422 |
-| Sport bridge integration | VERIFIED | [useSportBridge.ts#L119-L122](../../../apps/teacher-ui/src/composables/useSportBridge.ts#L119-L122) | RecordTimerResultUseCase instantiated with performanceEntryRepo, exposed at L152 |
+| Sport bridge integration | VERIFIED | [useSportBridge.ts#L119-L122](../../../apps/teacher-ui/src/composables/useSportBridge.ts#L119-L122) | RecordTimerResultUseCase instantiated with tool-session persistence dependency and exposed in the bridge |
 | No direct DB access | VERIFIED | Timer.vue grep for `from '../db'` | Timer.vue uses bridge exclusively; no useDatabase, no direct db imports |
 | Unique session tracking | VERIFIED | [Timer.vue#L175](../../../apps/teacher-ui/src/views/Timer.vue#L175) | sessionId = uuidv4() on component init, reset after save (L454) |
 | Save button in UI | VERIFIED | [Timer.vue#L526-L533](../../../apps/teacher-ui/src/views/Timer.vue#L526-L533) | Save button with disabled state when no timer run |
@@ -21,15 +21,13 @@
 - **File**: `modules/sport/src/use-cases/record-timer-result.use-case.ts`
 - **Lines 1-75**: Complete implementation
 - **Key Features**:
-  - Lines 16-49: Input validation (sessionId, categoryId, mode, elapsedMs, audioEnabled)
-  - Lines 52+ Input error checking (categoryId required, elapsedMs must be ≥0)
-  - Line 60: Creates PerformanceEntry object
-  - Lines 62-71: Measurements object includes mode, elapsedMs, durationMs, intervalMs, intervalCount, audioEnabled, lapTimes (stopwatch-only)
-  - Line 73: Persists via repository.create()
+  - Lines 16-49: Input validation (sessionId, mode, elapsedMs, audioEnabled)
+  - Creates `Sport.ToolSession` payload with class/lesson context + session metadata
+  - Persists timer sessions into the dedicated `tool_sessions` table
 
-#### Repository Integration
-- **Location**: [PerformanceEntryRepository.ts](../../../modules/sport/src/repositories/performance-entry.repository.ts)
-- **Usage**: `recordTimerResultUseCase` calls `repository.create()` at line 73 of use case
+#### Persistence Integration
+- **Location**: [tool-session.repository.ts](../../../modules/sport/src/repositories/tool-session.repository.ts)
+- **Usage**: `recordTimerResultUseCase` calls `create()` to write timer tool-session records
 - **Storage**: SQLite-backed persistence via storage adapter
 
 ### Frontend Components
@@ -74,7 +72,7 @@
 - **File**: [useSportBridge.ts](../../../apps/teacher-ui/src/composables/useSportBridge.ts)
 - **Lines 24-27**: Imports RecordTimerResultUseCase
 - **Line 65**: recordTimerResultUseCase added to interface
-- **Lines 119-122**: Instantiation with performanceEntryRepo dependency
+- **Lines 119-122**: Instantiation with tool-session persistence dependency
 - **Line 152**: Exposed in bridge instance
 
 ### Module Exports
@@ -85,12 +83,12 @@
 
 ### Bridge Pattern Verified
 ✅ Composable uses **useSportBridge** exclusively (no direct db access)
-✅ Use case dependency-injected via bridge with PerformanceEntryRepository
+✅ Use case dependency-injected via bridge with tool-session persistence
 ✅ Timer.vue never imports `from '../db'`
 
 ### Module Boundaries Verified
 ✅ Logic encapsulated in sport module use case
-✅ Persistence via centralized PerformanceEntryRepository
+✅ Persistence via dedicated tool-session storage path
 ✅ No parallel data paths created
 
 ### Data Flow
@@ -98,7 +96,7 @@
 2. Audio mute toggle controls audioEnabled flag
 3. Save button calls saveTimerResult()
 4. Function calculates elapsedMs based on mode
-5. Use case validates and creates PerformanceEntry
+5. Use case validates and creates ToolSession data
 6. Entry persisted via repository (SQLite)
 7. Session ID reset; new session starts
 

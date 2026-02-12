@@ -18,6 +18,7 @@ import {
   ShuttleRunConfigRepository,
   SportabzeichenStandardRepository,
   SportabzeichenResultRepository,
+  ToolSessionRepository,
   CreateClassUseCase,
   CreateLessonUseCase,
   RecordAttendanceUseCase,
@@ -99,6 +100,7 @@ export function initializeSportBridge(): SportBridge {
   const shuttleRunConfigRepo = new ShuttleRunConfigRepository(adapter)
   const sportabzeichenStandardRepo = new SportabzeichenStandardRepository(adapter)
   const sportabzeichenResultRepo = new SportabzeichenResultRepository(adapter)
+  const toolSessionRepo = new ToolSessionRepository(adapter)
 
   // Initialize use cases with repositories
   const createClassUseCase = new CreateClassUseCase(classGroupRepo)
@@ -119,7 +121,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenResultRepo,
     sportabzeichenStandardRepo
   )
-  const recordTimerResultUseCase = new RecordTimerResultUseCase(performanceEntryRepo)
+  const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()

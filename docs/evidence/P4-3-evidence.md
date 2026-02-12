@@ -7,7 +7,7 @@
 | Age-based standards applied | VERIFIED | [SportabzeichenService.ts#L41-L56](../../../modules/sport/src/services/sportabzeichen.service.ts#L41-L56) | calculateAgeFromBirthYear() used in UI |
 | Badge achievements accurate | VERIFIED | [SportabzeichenService.ts#L70-L92](../../../modules/sport/src/services/sportabzeichen.service.ts#L70-L92) | evaluatePerformance() validates against age/gender-specific standards |
 | PDF shows all students | VERIFIED | [SportabzeichenService.ts#L158-L186](../../../modules/sport/src/services/sportabzeichen.service.ts#L158-L186) | generateOverviewPdf() creates multi-student report |
-| Historical data available | VERIFIED | [SportabzeichenGradingEntry.vue#L217-L223](../../../apps/teacher-ui/src/views/SportabzeichenGradingEntry.vue#L217-L223) | Results loaded from repository on mount |
+| Historical data available | VERIFIED | [SportabzeichenGradingEntry.vue#L217-L223](../../../apps/teacher-ui/src/views/SportabzeichenGradingEntry.vue#L217-L223) | Results loaded via sport bridge on mount |
 
 ## Implementation Summary
 

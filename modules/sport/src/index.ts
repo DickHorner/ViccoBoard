@@ -10,6 +10,7 @@ export { AttendanceRepository } from './repositories/attendance.repository.js';
 export { GradeSchemeRepository } from './repositories/grade-scheme.repository.js';
 export { GradeCategoryRepository } from './repositories/grade-category.repository.js';
 export { PerformanceEntryRepository } from './repositories/performance-entry.repository.js';
+export { ToolSessionRepository } from './repositories/tool-session.repository.js';
 export { TableDefinitionRepository } from './repositories/table-definition.repository.js';
 export { CooperTestConfigRepository } from './repositories/cooper-test-config.repository.js';
 export { ShuttleRunConfigRepository } from './repositories/shuttle-run-config.repository.js';
