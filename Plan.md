@@ -237,7 +237,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] **Teams einteilen** (digital, schnell, fair).
 - [ ] **Turnierplanung** (planen & durchführen).
 - [ ] **Scoreboard** (Spielstände erfassen).
-- [ ] **Timer** (Zeiten stoppen).
+- [x] **Timer** (Zeiten stoppen). ✅ P4-4 COMPLETE
 - [ ] **Taktikboard**: Top-Down-Ansicht + sportartspezifische Annotation/Markierungen.
 - [ ] **Würfeln**: Zahlenbereich wählen + Ergebnisse loggen.
 

@@ -355,25 +355,27 @@ Implement age-dependent sports badge evaluation.
 ---
 
 ### Issue P4-4: Live Tools - Timer Plugin
-**Priority:** HIGH | **Effort:** 2 days
+**Priority:** HIGH | **Effort:** 2 days | **Status:** COMPLETE ✅
 
 **Description:**
 Implement Timer tool plugin.
 
 **Tasks:**
-- [ ] Timer plugin implementation
-- [ ] UI for timer controls
-- [ ] Support countdown/stopwatch/intervals
-- [ ] Audio notifications
-- [ ] Store timer results
+- [x] Timer plugin implementation
+- [x] UI for timer controls
+- [x] Support countdown/stopwatch/intervals
+- [x] Audio notifications
+- [x] Store timer results
 
 **Acceptance Criteria:**
-- Timer starts/stops/resets correctly
-- All modes functional
-- Results saved to database
-- No audio on mute works
+- [x] Timer starts/stops/resets correctly
+- [x] All modes functional
+- [x] Results saved to database
+- [x] No audio on mute works
 
 **Relates to:** Plan.md §6.6 (Tools)
+
+**Implementation:** [RecordTimerResultUseCase.ts](../../modules/sport/src/use-cases/record-timer-result.use-case.ts) + [Timer.vue](../../apps/teacher-ui/src/views/Timer.vue) + [useSportBridge.ts](../../apps/teacher-ui/src/composables/useSportBridge.ts)
 
 ---
 
