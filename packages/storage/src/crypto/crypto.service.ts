@@ -182,7 +182,12 @@ export class SessionSecureStorage implements SecureStorage {
 
   constructor() {
     // Auto-cleanup expired entries every minute
-    this.cleanupInterval =setInterval(() => this.cleanup(), 60 * 1000);
+    this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000);
+    // Prevent this housekeeping timer from keeping Node.js test processes alive.
+    const timer = this.cleanupInterval as unknown as { unref?: () => void };
+    if (typeof timer.unref === 'function') {
+      timer.unref();
+    }
   }
 
   async set(key: string, value: string): Promise<void> {
@@ -254,6 +259,10 @@ export class SessionSecureStorage implements SecureStorage {
   }
 }
 
-// Singleton instances
-export const cryptoService = new CryptoServiceImpl();
-export const secureStorage = new SessionSecureStorage();
+export function createCryptoService(): CryptoServiceImpl {
+  return new CryptoServiceImpl();
+}
+
+export function createSecureStorage(): SessionSecureStorage {
+  return new SessionSecureStorage();
+}

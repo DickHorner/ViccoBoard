@@ -19,8 +19,8 @@ import {
   IndexedDBClassGroupArchiveMigration,
   IndexedDBSportZensSchemaMigration,
   IndexedDBToolSessionsSchemaMigration
-} from '@viccoboard/storage';
-import type { StorageAdapter } from '@viccoboard/storage';
+} from '@viccoboard/storage/browser';
+import type { StorageAdapter } from '@viccoboard/storage/browser';
 
 let storageInstance: IndexedDBStorage | null = null;
 let storageInitialized = false;

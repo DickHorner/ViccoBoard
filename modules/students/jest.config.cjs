@@ -1,7 +1,6 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  forceExit: true,
   moduleNameMapper: {
     '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
     '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',

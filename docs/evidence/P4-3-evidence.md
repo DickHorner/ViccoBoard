@@ -93,7 +93,7 @@ All mandatory gates passed:
 | `npm run lint:docs` | ✅ PASS | No guardrail violations |
 | `npm run build:packages` | ✅ PASS | All 6 packages compiled cleanly |
 | `npm run build:ipad` | ✅ PASS | Vue3 app built (SportabzeichenGradingEntry.js: 7.79 kB) |
-| `npm test` | ✅ PASS | 241 tests (190 packages + 51 teacher-ui) |
+| `npm test` | ✅ PASS | Workspace test gate passes |
 | Architecture audit | ✅ PASS | No legacy DB access detected |
 
 ## Runtime Verification Procedure
@@ -142,12 +142,12 @@ All mandatory gates passed:
 - Use case integration: **VERIFIED** (proper repository usage, service orchestration)
 - UI integration: **VERIFIED** (bridge usage, service calls, PDF download logic)
 - Runtime behavior: **NOT VERIFIED** (requires manual UI execution)
-- PDF generation: **NOT VERIFIED** (requires manual PDF inspection)
+- PDF generation (service): **VERIFIED** (`modules/sport/tests/sportabzeichen.service.test.ts#L117-L130`); UI download / manual PDF inspection: **NOT VERIFIED**
 - Results persistence: **NOT VERIFIED** (requires runtime database interaction)
 
 ## Remaining Blockers
 
-None. Implementation complete pending runtime verification.
+Runtime/manual verification is still pending for UI flow and downloaded PDF inspection.
 
 ## Next Steps
 

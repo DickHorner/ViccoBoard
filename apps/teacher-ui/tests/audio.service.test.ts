@@ -33,14 +33,18 @@ class MockAudioContext {
 }
 
 describe('AudioService', () => {
+  let consoleWarnSpy: jest.SpyInstance;
+
   beforeEach(() => {
     // Mock window.AudioContext
     global.AudioContext = MockAudioContext as any;
     (global as any).webkitAudioContext = MockAudioContext;
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     resetAudioService();
   });
 
   afterEach(() => {
+    consoleWarnSpy.mockRestore();
     resetAudioService();
   });
 

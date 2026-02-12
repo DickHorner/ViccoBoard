@@ -5,18 +5,18 @@
 | Criterion | Status | Evidence | Notes |
 |-----------|--------|----------|-------|
 | Can select sport mode | VERIFIED | [CooperGradingEntry.vue#L20-L25](../../../apps/teacher-ui/src/views/CooperGradingEntry.vue#L20-L25) | Sport type dropdown with running/swimming options |
-| Results calculated correctly | VERIFIED | [RecordCooperTestResultUseCase.ts#L25-L50](../../../modules/sport/src/use-cases/RecordCooperTestResultUseCase.ts#L25-L50) | Table-based grade calculation via GradingService |
+| Results calculated correctly | VERIFIED | [record-cooper-test-result.use-case.ts#L35-L85](../../../modules/sport/src/use-cases/record-cooper-test-result.use-case.ts#L35-L85) | Table-based grade calculation via CooperTestService |
 | Works with custom tables | VERIFIED | [CooperGradingEntry.vue#L26-L33](../../../apps/teacher-ui/src/views/CooperGradingEntry.vue#L26-L33) | Config selection loads custom tables per sport type |
-| Data persists | VERIFIED | [CooperGradingEntry.vue#L175-L199](../../../apps/teacher-ui/src/views/CooperGradingEntry.vue#L175-L199) | saveAll() calls recordCooperTestResultUseCase.execute() |
+| Data persists | NOT VERIFIED (runtime) | `modules/sport/src/use-cases/record-cooper-test-result.use-case.ts` and `modules/sport/tests/record-cooper-test-result.use-case.simplified.test.ts` | Persistence is implemented in the use case and covered by unit tests; runtime UI persistence (IndexedDB/browser) has not been manually or end-to-end verified |
 
 ## Implementation Summary
 
 ### Backend Components
-- **Use Case**: `modules/sport/src/use-cases/RecordCooperTestResultUseCase.ts`
-  - Lines 1-65: Full implementation with cooper-specific context building
-  - Lines 25-50: Grade calculation using table lookup via GradingService
-  - Line 60: Persistence via GradeRepository.save()
-  - Tests: 24 passing tests in `modules/sport/tests/` covering all scenarios
+- **Use Case**: `modules/sport/src/use-cases/record-cooper-test-result.use-case.ts`
+  - Validates required input, loads config, verifies sport-type match
+  - Calculates Cooper distance and optional grade via table lookup
+  - Persists through `performanceEntryRepository.create(...)`
+  - Tests: `modules/sport/tests/record-cooper-test-result.use-case.simplified.test.ts`
 
 ### UI Components  
 - **View**: `apps/teacher-ui/src/views/CooperGradingEntry.vue`
@@ -50,7 +50,7 @@
 - [x] Track rounds/distance - Implemented in CooperGradingEntry.vue with lap counter
 - [x] Support running and swimming modes - Sport type dropdown with both options
 - [x] Auto-calculate grades from table - RecordCooperTestResultUseCase uses GradingService table lookup
-- [x] Result storage - Persists via GradeRepository through use case
+- [x] Result storage - Persists via PerformanceEntryRepository through the use case
 - [x] Sportart configuration - Config selection UI with dynamic loading by sport type
 
 ## Architecture Compliance
@@ -77,7 +77,7 @@ All mandatory gates passed:
 | `npm run lint:docs` | ✅ PASS | No guardrail violations |
 | `npm run build:packages` | ✅ PASS | All 6 packages compiled |
 | `npm run build:ipad` | ✅ PASS | Vue3 app built successfully |
-| `npm test` | ✅ PASS | 241 tests (190 packages + 51 teacher-ui) |
+| `npm test` | ✅ PASS | Workspace test gate passes |
 | Architecture audit | ✅ PASS | No legacy DB access detected |
 
 ## Runtime Verification Procedure

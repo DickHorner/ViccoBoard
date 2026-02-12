@@ -239,7 +239,7 @@ workflow,lesson_create,yes,in_scope_v2,no,N/A,N/A
 workflow,lesson_edit,yes,in_scope_v2,no,N/A,N/A
 workflow,feedback_collect,yes,in_scope_v2,no,N/A,N/A
 workflow,calendar_event_create,yes,in_scope_v2,no,N/A,N/A
-workflow,timer_tool,yes,in_scope_v2,no,N/A,N/A
+workflow,timer_tool,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/Timer.vue (UI controls + save); modules/sport/src/use-cases/record-timer-result.use-case.ts (persistence)","docs/evidence/P4-4-evidence.md;modules/sport/tests/record-timer-result.use-case.test.ts"
 workflow,scoreboard_tool,yes,in_scope_v2,no,N/A,N/A
 workflow,tactics_board_tool,yes,in_scope_v2,no,N/A,N/A
 workflow,video_delay_tool,yes,in_scope_v2,no,N/A,N/A

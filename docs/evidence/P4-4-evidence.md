@@ -28,7 +28,7 @@
 #### Persistence Integration
 - **Location**: [tool-session.repository.ts](../../../modules/sport/src/repositories/tool-session.repository.ts)
 - **Usage**: `recordTimerResultUseCase` calls `create()` to write timer tool-session records
-- **Storage**: SQLite-backed persistence via storage adapter
+- **Storage**: Adapter-backed persistence (`tool_sessions`) for Node + browser adapters
 
 ### Frontend Components
 
@@ -39,24 +39,9 @@
 - **Lines 106-111**: Three timer modes with reactive refs (countdown, stopwatch, interval)
 - **Lines 406-428**: saveTimerResult() async function:
   ```typescript
-  // Mode-specific elapsed time calculation
-  let elapsedMs = 0
-  switch (mode.value) {
-    case 'countdown':
-      elapsedMs = durationMs - parseInt(timeRemaining.value)
-      break
-    case 'stopwatch':
-      elapsedMs = parseInt(elapsedTime.value) * 1000
-      break
-    case 'interval':
-      // Calculate from rounds
-      break
-  }
-  
-  // Persist via use case
+  // Persist via use case (timer tool-session)
   await useCase.execute({
     sessionId: sessionId.value,
-    categoryId: 'timer-tool',
     mode: mode.value,
     elapsedMs,
     durationMs,
@@ -102,9 +87,9 @@
 
 ## Test Coverage
 
-**Unit Tests**: RecordTimerResultUseCase validation coverage included in [npm test suite](../../../)
-**Integration**: PerformanceEntryRepository roundtrip persistence tested
-**Manual**: Save workflow verified with 3 timer modes (countdown, stopwatch, interval)
+**Unit Tests**: `modules/sport/tests/record-timer-result.use-case.test.ts` covers use-case validation and persistence
+**Integration**: `modules/sport/tests/tool-session.repository.test.ts` covers `tool_sessions` repository roundtrip behavior
+**Manual / Runtime**: **NOT VERIFIED** — UI/manual save workflow (browser/IndexedDB) has not been manually confirmed; use-case persistence is covered by tests
 
 ## Gate Status
 
@@ -112,11 +97,11 @@
 |------|--------|-------|
 | npm run build:packages | ✅ PASS | Modules compile cleanly |
 | npm run build:ipad | ✅ PASS | Vue TypeScript (vue-tsc) compiles; Vite bundles successfully |
-| npm test | ✅ PASS | 51 tests pass (no new failures) |
-| lint:docs | ⚠️ PRE-EXISTING ISSUE | P4-3 evidence has unrelated note about repositories in docs (not caused by P4-4) |
+| npm test | ✅ PASS | Workspace test gate passes |
+| lint:docs | ✅ PASS | No guardrail violations |
 | Architecture audit | ✅ VERIFIED | Zero `from '../db'` in new code; legacy paths in views-wip/* are out-of-scope |
 
 ## Remaining Items
 
-- **Evidence Status**: All P4-4 acceptance criteria VERIFIED with file/line references
-- **Parity Ledger**: Awaits manual update to mark timer workflow as implemented (pending user decision)
+- **Evidence Status**: Code/test evidence verified; manual runtime verification still pending
+- **Parity Ledger**: `workflow,timer_tool` marked implemented with references in `PARITY_MATRIX.csv`
