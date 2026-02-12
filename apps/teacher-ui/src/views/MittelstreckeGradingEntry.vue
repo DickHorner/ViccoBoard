@@ -85,6 +85,7 @@ import { useI18n } from 'vue-i18n';
 import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
+import { MittelstreckeGradingService } from '@viccoboard/sport';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -92,6 +93,7 @@ const router = useRouter();
 const { sportBridge } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
+const mittelstreckeService = new MittelstreckeGradingService();
 
 const categoryId = route.params.id as string;
 const categoryName = ref('');
@@ -184,33 +186,30 @@ function onTimeChange(studentId: string) {
   
   if (timeInSeconds !== null && selectedTableId.value) {
     // Calculate grade from table
-    const grade = calculateGradeFromTable(studentId, timeInSeconds);
+    const grade = calculateGradeFromTable(timeInSeconds);
     grades.value[studentId] = grade;
   } else {
     grades.value[studentId] = '';
   }
 }
 
-function calculateGradeFromTable(studentId: string, timeInSeconds: number): string | number {
+function calculateGradeFromTable(timeInSeconds: number): string | number {
   if (!selectedTableId.value) return '';
   
   const table = tables.value.find(t => t.id === selectedTableId.value);
   if (!table || !table.entries) return '';
   
-  const student = students.value.find(s => s.id === studentId);
-  if (!student) return '';
-  
-  // Find matching entry (typically based on time ranges)
-  // For now, use simple lookup - in production, use proper table lookup service
-  // This is a placeholder for actual table-based grade calculation
-  
-  // Simple example: faster time = better grade
-  // This should be replaced with actual table lookup logic
-  if (timeInSeconds < 60) return '1.0';
-  if (timeInSeconds < 90) return '2.0';
-  if (timeInSeconds < 120) return '3.0';
-  if (timeInSeconds < 180) return '4.0';
-  return '5.0';
+  try {
+    const result = mittelstreckeService.calculateGradeFromTime({
+      timeInSeconds,
+      table,
+      context: {} // Could add gender/age context if available on the student
+    });
+    return result.grade;
+  } catch (error) {
+    console.error('Failed to calculate grade from table:', error);
+    return '';
+  }
 }
 
 async function saveAll() {

@@ -77,6 +77,17 @@ export type {
 } from './services/time-grading.service.js';
 export { CooperTestService } from './services/cooper-test.service.js';
 export { ShuttleRunService } from './services/shuttle-run.service.js';
+export { MittelstreckeGradingService } from './services/mittelstrecke-grading.service.js';
+export type {
+  MittelstreckeGradingInput,
+  MittelstreckeGradingResult
+} from './services/mittelstrecke-grading.service.js';
+export { BJSGradingService } from './services/bjs-grading.service.js';
+export type {
+  BJSGradingInput,
+  BJSGradingResult,
+  BJSDisciplineResult
+} from './services/bjs-grading.service.js';
 export { SportabzeichenService } from './services/sportabzeichen.service.js';
 export type {
   SportabzeichenPerformanceInput,

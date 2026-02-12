@@ -139,6 +139,7 @@ import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import type { Student } from '@viccoboard/core';
+import { BJSGradingService } from '@viccoboard/sport';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -146,6 +147,7 @@ const router = useRouter();
 const { sportBridge, gradeCategories, performanceEntries } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
+const bjsService = new BJSGradingService();
 
 const categoryId = route.params.id as string;
 const loading = ref(true);
@@ -153,6 +155,8 @@ const saving = ref(false);
 const students = ref<Student[]>([]);
 const performances = reactive<Record<string, any>>({});
 const totalPoints = reactive<Record<string, number>>({});
+const gradingTable = ref<any>(null);
+const bjsConfig = ref<any>(null);
 
 onMounted(async () => {
   await loadData();
@@ -168,7 +172,17 @@ async function loadData() {
       return;
     }
 
+    bjsConfig.value = category.configuration;
+
     students.value = await studentRepository.value?.findByClassGroup(category.classGroupId) ?? [];
+
+    // Load grading table if referenced in config
+    if (bjsConfig.value?.gradingTable) {
+      gradingTable.value = await sportBridge.value?.tableDefinitionRepository.findById(bjsConfig.value.gradingTable);
+      if (!gradingTable.value) {
+        console.warn(`BJS grading table not found: ${bjsConfig.value.gradingTable}`);
+      }
+    }
 
     // Initialize performance objects
     students.value.forEach(student => {
@@ -205,30 +219,45 @@ async function loadData() {
 function calculatePoints(studentId: string) {
   const perf = performances[studentId];
   if (!perf) return;
-  
-  // Simplified point calculation - in production, use official BJS tables
+
+  // If we have a grading table, use proper BJS scoring via the service
+  if (gradingTable.value && bjsConfig.value?.disciplines) {
+    try {
+      const result = bjsService.calculateScore({
+        disciplines: bjsConfig.value.disciplines,
+        performances: perf,
+        table: gradingTable.value,
+        context: {}
+      });
+
+      totalPoints[studentId] = result.totalPoints;
+      return;
+    } catch (error) {
+      console.warn(`Failed to calculate BJS points for student ${studentId}:`, error);
+      // Fall back to simplified calculation if table lookup fails
+    }
+  }
+
+  // Fallback: simplified point calculation (if no table available)
+  // This should be replaced with actual table lookup
   let points = 0;
-  
-  // Sprint: faster = more points (placeholder formula)
+
   if (perf.sprint > 0) {
     points += Math.max(0, Math.round(200 - perf.sprint * 10));
   }
-  
-  // Sprung: further = more points
+
   if (perf.sprung > 0) {
     points += Math.round(perf.sprung * 50);
   }
-  
-  // Wurf: further = more points
+
   if (perf.wurf > 0) {
     points += Math.round(perf.wurf * 30);
   }
-  
-  // Ausdauer: faster = more points (time in minutes)
+
   if (perf.ausdauer > 0) {
     points += Math.max(0, Math.round(300 - perf.ausdauer * 20));
   }
-  
+
   totalPoints[studentId] = points;
 }
 
