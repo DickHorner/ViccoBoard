@@ -199,20 +199,38 @@
         </label>
       </div>
     </div>
+
+    <!-- Save Result -->
+    <div class="card">
+      <button 
+        class="btn-primary btn-large"
+        @click="saveTimerResult"
+        :disabled="saving || (!isRunning && elapsedTime === 0 && timeRemaining === 0)"
+      >
+        {{ saving ? t('COMMON.syncing') : '💾 ' + t('COMMON.save') }}
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useSportBridge } from '../composables/useSportBridge'
+import { useToast } from '../composables/useToast'
+import { v4 as uuidv4 } from 'uuid'
 
 const { t } = useI18n()
+const { sportBridge } = useSportBridge()
+const toast = useToast()
 
 // State
 const mode = ref<'countdown' | 'stopwatch' | 'interval'>('countdown')
 const isRunning = ref(false)
 const isPaused = ref(false)
 const soundEnabled = ref(true)
+const saving = ref(false)
+const sessionId = ref(uuidv4())
 
 // Countdown state
 const countdownMinutes = ref(5)
@@ -408,6 +426,56 @@ function playBeep() {
     oscillator.stop(audioContext.currentTime + 0.2)
   } catch (e) {
     console.warn('Audio not available:', e)
+  }
+}
+
+async function saveTimerResult() {
+  saving.value = true
+  try {
+    const useCase = sportBridge.value?.recordTimerResultUseCase
+    if (!useCase) {
+      throw new Error('RecordTimerResultUseCase not available')
+    }
+
+    let elapsedMs = 0
+    let durationMs: number | undefined = undefined
+    let intervalMs: number | undefined = undefined
+    let intervalCount: number | undefined = undefined
+
+    if (mode.value === 'countdown') {
+      elapsedMs = (countdownMinutes.value * 60 + countdownSeconds.value) * 1000 - timeRemaining.value
+      durationMs = (countdownMinutes.value * 60 + countdownSeconds.value) * 1000
+    } else if (mode.value === 'stopwatch') {
+      elapsedMs = elapsedTime.value
+    } else if (mode.value === 'interval') {
+      elapsedMs = (currentRound.value - 1) * (workTime.value + restTime.value) * 1000 + 
+                  (currentPhase.value === 'rest' ? restTime.value * 1000 : workTime.value * 1000)
+      intervalMs = (workTime.value + restTime.value) * 1000
+      intervalCount = currentRound.value
+    }
+
+    const _result = await useCase.execute({
+      sessionId: sessionId.value,
+      categoryId: 'timer-tool',
+      mode: mode.value,
+      elapsedMs,
+      durationMs,
+      intervalMs,
+      intervalCount,
+      audioEnabled: soundEnabled.value,
+      metadata: {
+        timestamp: new Date(),
+        lapTimes: mode.value === 'stopwatch' ? lapTimes.value : undefined
+      }
+    })
+    
+    void _result
+    sessionId.value = uuidv4()
+  } catch (error) {
+    console.error('Failed to save timer result:', error)
+    toast.error('Fehler beim Speichern')
+  } finally {
+    saving.value = false
   }
 }
 </script>

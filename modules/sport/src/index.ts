@@ -48,6 +48,9 @@ export type { RecordCooperTestResultInput } from './use-cases/record-cooper-test
 export { RecordSportabzeichenResultUseCase } from './use-cases/record-sportabzeichen-result.use-case.js';
 export type { RecordSportabzeichenResultInput } from './use-cases/record-sportabzeichen-result.use-case.js';
 
+export { RecordTimerResultUseCase } from './use-cases/record-timer-result.use-case.js';
+export type { RecordTimerResultInput } from './use-cases/record-timer-result.use-case.js';
+
 export { SaveSportZensClassUseCase } from './use-cases/save-sportzens-class.use-case.js';
 export { SaveSportZensCategoryUseCase } from './use-cases/save-sportzens-category.use-case.js';
 export { SaveSportZensGradeUseCase } from './use-cases/save-sportzens-grade.use-case.js';
