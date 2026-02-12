@@ -9,7 +9,7 @@
  * 5. View statistics
  */
 
-import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage/node';
 import { 
   ClassGroupRepository,
   AttendanceRepository,

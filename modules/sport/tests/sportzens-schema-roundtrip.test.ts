@@ -8,7 +8,7 @@ import {
   InitialSchemaMigration,
   GradingSchemaMigration,
   SportZensSchemaMigration
-} from '@viccoboard/storage';
+} from '@viccoboard/storage/node';
 import {
   SportZensClassRepository,
   SportZensCategoryRepository,

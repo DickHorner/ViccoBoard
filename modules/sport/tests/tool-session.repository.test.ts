@@ -5,11 +5,11 @@
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { ToolSessionRepository } from '../src/repositories/tool-session.repository';
-import { SQLiteStorage } from '@viccoboard/storage';
-import { InitialSchemaMigration } from '@viccoboard/storage';
-import { GradingSchemaMigration } from '@viccoboard/storage';
-import { ToolSessionsSchemaMigration } from '@viccoboard/storage';
-import type { StorageAdapter } from '@viccoboard/storage';
+import { SQLiteStorage } from '@viccoboard/storage/node';
+import { InitialSchemaMigration } from '@viccoboard/storage/node';
+import { GradingSchemaMigration } from '@viccoboard/storage/node';
+import { ToolSessionsSchemaMigration } from '@viccoboard/storage/node';
+import type { StorageAdapter } from '@viccoboard/storage/node';
 import { Sport } from '@viccoboard/core';
 import path from 'path';
 import os from 'os';

@@ -7,7 +7,7 @@ import { PerformanceEntryRepository } from '../src/repositories/performance-entr
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
 import { StudentRepository } from '@viccoboard/students';
 import { GradeCategoryRepository } from '../src/repositories/grade-category.repository';
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage/node';
 import { Sport } from '@viccoboard/core';
 
 describe('RecordGradeUseCase', () => {

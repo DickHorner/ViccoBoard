@@ -3,7 +3,7 @@
  */
 import { CreateClassUseCase } from '../src/use-cases/create-class.use-case';
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
-import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage/node';
 describe('CreateClassUseCase', () => {
     let storage;
     let repository;

@@ -1,4 +1,4 @@
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, CooperTestSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, CooperTestSchemaMigration } from '@viccoboard/storage/node';
 import { CooperTestConfigRepository } from '../src/repositories/cooper-test-config.repository';
 describe('CooperTestConfigRepository', () => {
     let storage;

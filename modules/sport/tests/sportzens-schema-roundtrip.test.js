@@ -1,7 +1,7 @@
 /**
  * SportZens schema roundtrip tests
  */
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, SportZensSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, SportZensSchemaMigration } from '@viccoboard/storage/node';
 import { SportZensClassRepository, SportZensCategoryRepository, SportZensGradeRepository, SportZensTableRepository, SportZensGradeWeightingRepository, SportZensNewDayDataRepository, SportZensUserDataRepository } from '../src/index.js';
 import { SportZensStudentRepository } from '@viccoboard/students';
 describe('SportZens schema roundtrip', () => {

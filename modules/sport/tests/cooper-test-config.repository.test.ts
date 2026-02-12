@@ -3,7 +3,7 @@ import {
   InitialSchemaMigration,
   GradingSchemaMigration,
   CooperTestSchemaMigration
-} from '@viccoboard/storage';
+} from '@viccoboard/storage/node';
 import { CooperTestConfigRepository } from '../src/repositories/cooper-test-config.repository';
 
 describe('CooperTestConfigRepository', () => {

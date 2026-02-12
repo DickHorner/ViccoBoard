@@ -205,12 +205,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import type { ClassGroup, Student, GradeCategory, PerformanceEntry, GradeCategoryType } from '@viccoboard/core';
 
 const router = useRouter();
-const { sportBridge } = useDatabase();
+const { sportBridge } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const classes = ref<ClassGroup[]>([]);
@@ -253,7 +255,7 @@ async function onClassChange() {
   try {
     // Load categories, students, and performance entries
     categories.value = await sportBridge.value.gradeCategoryRepository.findByClassGroup(selectedClassId.value);
-    students.value = await sportBridge.value.studentRepository.findByClassGroup(selectedClassId.value);
+    students.value = await studentRepository.value?.findByClassGroup(selectedClassId.value) ?? [];
     
     // Load all performance entries for students in this class in parallel
     const entryPromises = students.value.map((student) =>

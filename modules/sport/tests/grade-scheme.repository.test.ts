@@ -3,7 +3,7 @@
  */
 
 import { GradeSchemeRepository } from '../src/repositories/grade-scheme.repository';
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage/node';
 import { Sport } from '@viccoboard/core';
 
 describe('GradeSchemeRepository', () => {

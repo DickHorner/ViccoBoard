@@ -3,7 +3,7 @@ import {
   InitialSchemaMigration,
   GradingSchemaMigration,
   ExamSchemaMigration
-} from '@viccoboard/storage';
+} from '@viccoboard/storage/node';
 import { CriterionRepository } from '../src/repositories/criterion.repository';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import { TaskNodeRepository } from '../src/repositories/task-node.repository';

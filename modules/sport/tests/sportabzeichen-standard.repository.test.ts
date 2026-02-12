@@ -3,7 +3,7 @@ import {
   InitialSchemaMigration,
   GradingSchemaMigration,
   SportabzeichenSchemaMigration
-} from '@viccoboard/storage';
+} from '@viccoboard/storage/node';
 import { SportabzeichenStandardRepository } from '../src/repositories/sportabzeichen-standard.repository';
 
 describe('SportabzeichenStandardRepository', () => {

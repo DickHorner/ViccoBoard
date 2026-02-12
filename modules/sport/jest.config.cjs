@@ -11,6 +11,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
+    '^@viccoboard/storage/node$': '<rootDir>/../../packages/storage/src/node.ts',
     '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',
     '^@viccoboard/plugins$': '<rootDir>/../../packages/plugins/src',
     '^@viccoboard/students$': '<rootDir>/../../modules/students/src',

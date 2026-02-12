@@ -8,7 +8,7 @@
  * 4. Record attendance
  * 5. View statistics
  */
-import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage/node';
 import { ClassGroupRepository, AttendanceRepository, CreateClassUseCase, RecordAttendanceUseCase } from '@viccoboard/sport';
 import { AddStudentUseCase, StudentRepository } from '@viccoboard/students';
 import { AttendanceStatus } from '@viccoboard/core';

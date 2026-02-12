@@ -6,9 +6,9 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { RecordTimerResultUseCase } from '../src/use-cases/record-timer-result.use-case';
 import { ToolSessionRepository } from '../src/repositories/tool-session.repository';
-import { SQLiteStorage } from '@viccoboard/storage';
-import { InitialSchemaMigration, GradingSchemaMigration, ToolSessionsSchemaMigration } from '@viccoboard/storage';
-import type { StorageAdapter } from '@viccoboard/storage';
+import { SQLiteStorage } from '@viccoboard/storage/node';
+import { InitialSchemaMigration, GradingSchemaMigration, ToolSessionsSchemaMigration } from '@viccoboard/storage/node';
+import type { StorageAdapter } from '@viccoboard/storage/node';
 
 describe('RecordTimerResultUseCase', () => {
   let storage: SQLiteStorage;

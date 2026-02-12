@@ -1,4 +1,4 @@
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, ExamSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, ExamSchemaMigration } from '@viccoboard/storage/node';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import { Exams } from '@viccoboard/core';
 import { v4 as uuidv4 } from 'uuid';

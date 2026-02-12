@@ -1,4 +1,4 @@
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, SportabzeichenSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, SportabzeichenSchemaMigration } from '@viccoboard/storage/node';
 import { SportabzeichenStandardRepository } from '../src/repositories/sportabzeichen-standard.repository';
 describe('SportabzeichenStandardRepository', () => {
     let storage;

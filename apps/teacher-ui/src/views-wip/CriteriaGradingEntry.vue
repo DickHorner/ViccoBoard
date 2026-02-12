@@ -303,13 +303,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useDatabase } from '../composables/useDatabase';
+import { useSportBridge } from '../composables/useSportBridge';
+import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import { v4 as uuidv4 } from 'uuid';
 import type { GradeCategory, Student, Criterion, CriteriaGradingConfig } from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge } = useDatabase();
+const { sportBridge } = useSportBridge();
+const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
 const categoryId = route.params.id as string;
@@ -366,9 +368,9 @@ async function loadData() {
     }
     
     // Load students
-    students.value = await sportBridge.value.studentRepository.findByClassGroup(
+    students.value = await studentRepository.value?.findByClassGroup(
       category.value.classGroupId
-    );
+    ) ?? [];
     
     // Load existing grades
     for (const student of students.value) {

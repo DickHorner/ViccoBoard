@@ -5,8 +5,8 @@
  *
  * ARCHITECTURE: Provides shared storage instance to all composables/bridges
  */
-import { IndexedDBStorage } from '@viccoboard/storage';
-import type { StorageAdapter } from '@viccoboard/storage';
+import { IndexedDBStorage } from '@viccoboard/storage/browser';
+import type { StorageAdapter } from '@viccoboard/storage/browser';
 /**
  * Initialize storage (should be called in main.ts or App.vue setup)
  */

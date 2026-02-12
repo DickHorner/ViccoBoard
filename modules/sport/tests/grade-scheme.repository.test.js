@@ -2,7 +2,7 @@
  * GradeScheme Repository Tests
  */
 import { GradeSchemeRepository } from '../src/repositories/grade-scheme.repository';
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage/node';
 describe('GradeSchemeRepository', () => {
     let storage;
     let repository;

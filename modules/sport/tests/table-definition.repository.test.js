@@ -1,4 +1,4 @@
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, CooperTestSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, CooperTestSchemaMigration } from '@viccoboard/storage/node';
 import { TableDefinitionRepository } from '../src/repositories/table-definition.repository';
 describe('TableDefinitionRepository', () => {
     let storage;

@@ -67,8 +67,8 @@
       >
         <div class="student-avatar">
           <img
-            v-if="student.photo"
-            :src="student.photo"
+            v-if="student.photoUri"
+            :src="student.photoUri"
             :alt="student.firstName + ' ' + student.lastName"
           />
           <span v-else>
@@ -77,7 +77,7 @@
         </div>
         <div class="student-info">
           <h3>{{ student.firstName }} {{ student.lastName }}</h3>
-          <p class="student-class">{{ getClassName(student.classId) }}</p>
+          <p class="student-class">{{ getClassName(student.classGroupId) }}</p>
           <p class="student-id" :title="`Full ID: ${student.id}`">ID: {{ student.id.substring(0, 8) }}</p>
         </div>
         <div class="student-arrow">→</div>
@@ -179,10 +179,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useStudents, useClassGroups } from '../composables/useDatabase'
+import { useSportBridge } from '../composables/useSportBridge'
+import { useStudents } from '../composables/useStudentsBridge'
 import { useModal } from '../composables/useModal'
 import { getInitials, getTodayDateString, debounce } from '../utils/student'
-import type { Student, ClassGroup } from '../db'
+import type { Student, ClassGroup } from '@viccoboard/core'
 
 // State
 const students = ref<Student[]>([])
@@ -203,8 +204,8 @@ const newStudent = ref({
 })
 
 // Composables
-const studentsDb = useStudents()
-const classGroupsDb = useClassGroups()
+const { sportBridge } = useSportBridge()
+const { repository: studentRepository, addStudentUseCase } = useStudents()
 
 // Debounced search for performance
 const debouncedSearchQuery = ref('')
@@ -237,8 +238,13 @@ const loadStudents = async () => {
   loading.value = true
   loadError.value = ''
   try {
-    students.value = await studentsDb.getAll()
-    classes.value = await classGroupsDb.getAll()
+    const studentRepo = studentRepository.value
+    const classGroupRepo = sportBridge.value?.classGroupRepository
+    if (!studentRepo || !classGroupRepo) {
+      throw new Error('Bridges are not initialized')
+    }
+    students.value = await studentRepo.findAll()
+    classes.value = await classGroupRepo.findAll()
   } catch (err) {
     console.error('Failed to load students:', err)
     loadError.value = 'Fehler beim Laden der Schüler. Bitte versuchen Sie es erneut.'
@@ -252,11 +258,18 @@ const handleAddStudent = async () => {
   creating.value = true
   
   try {
-    await studentsDb.create({
+    const useCase = addStudentUseCase.value
+    if (!useCase) {
+      throw new Error('AddStudentUseCase not available')
+    }
+    const birthYear = newStudent.value.dateOfBirth
+      ? new Date(newStudent.value.dateOfBirth).getFullYear()
+      : undefined
+    await useCase.execute({
       firstName: newStudent.value.firstName.trim(),
       lastName: newStudent.value.lastName.trim(),
-      classId: newStudent.value.classId,
-      dateOfBirth: newStudent.value.dateOfBirth ? new Date(newStudent.value.dateOfBirth) : undefined,
+      classGroupId: newStudent.value.classId,
+      birthYear,
       email: newStudent.value.email || undefined
     })
     

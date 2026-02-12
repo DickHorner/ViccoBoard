@@ -1,5 +1,5 @@
 import { ShuttleRunConfigRepository } from '../src/repositories/shuttle-run-config.repository';
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, ShuttleRunSchemaMigration } from '@viccoboard/storage';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, ShuttleRunSchemaMigration } from '@viccoboard/storage/node';
 
 describe('ShuttleRunConfigRepository', () => {
   let storage: SQLiteStorage;
