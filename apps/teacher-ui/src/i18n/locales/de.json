@@ -738,7 +738,11 @@
 		"current-level": "Aktuelles Level",
 		"current-lane": "Aktuelle Bahn",
 		"note": "Note",
-		"meter": "Meter"
+		"meter": "Meter",
+		"start": "Start",
+		"stop": "Stopp",
+		"individual-stops": "Einzelne Stopps",
+		"audio-unlock-required": "Tippen Sie auf 'Start', um Audiosignale zu aktivieren (von Safari erforderlich)"
 	},
 	"MITTELSTRECKE": {
 		"bewerte": "Bewerte Mittelstrecke vom",

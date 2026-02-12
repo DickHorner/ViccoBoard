@@ -649,7 +649,11 @@
     "current-level": "Current level",
     "current-lane": "Current lane",
     "note": "Mark",
-    "meter": "Meter"
+    "meter": "Meter",
+    "start": "Start",
+    "stop": "Stop",
+    "individual-stops": "Individual Stops",
+    "audio-unlock-required": "Tap 'Start' to enable audio signals (required by Safari)"
   },
   "MITTELSTRECKE": {
     "bewerte": "Grade middle distance from",
