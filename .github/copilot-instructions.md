@@ -162,3 +162,14 @@ For every item moved to done:
    - linked Plan.md checkbox IDs
    - remaining blockers (if any)
 8. Close an issue only when all listed tasks and acceptance criteria are satisfied with evidence from tests/builds.
+9. No stacked PRs:
+   - Always branch from `origin/main` after `git fetch` + `git pull --ff-only`.
+   - PR base branch must always be `main`.
+   - Never open a PR whose branch depends on another unmerged feature branch.
+10. One PR closes one issue:
+   - PR body must contain exactly one closing keyword line for the primary issue: `Closes #<issue_number>`.
+   - For any secondary references use non-closing links only (`Refs #<issue_number>`).
+11. Completion report must include anti-stack proof:
+   - output of `gh pr list --state open --json number,title,headRefName,baseRefName`
+   - PR URL
+   - final issue URL + state `closed`

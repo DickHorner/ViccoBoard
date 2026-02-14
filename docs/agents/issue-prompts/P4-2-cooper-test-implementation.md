@@ -53,11 +53,39 @@ You are in STRICT COMPLIANCE mode for ViccoBoard.
 - Criteria and status options must stay configurable catalogs where applicable.
 - No feature deletion or simplification; ambiguous specs go to `Plan.md` section 9 as TBD.
 
+## GitHub Workflow (mandatory, no stacked PRs)
+1. Resolve the GitHub issue number for `P4-2` before coding.
+   - Run: `gh issue list --state open --search "P4-2 in:title"`
+2. Sync from `main` and branch only from `origin/main`.
+   - Run in order:
+     - `git fetch origin`
+     - `git checkout main`
+     - `git pull --ff-only origin main`
+     - `git checkout -b copilot/p4-2-<short-slug>`
+3. Do not create stacked PRs.
+   - Branch must not be based on another feature branch.
+   - PR base must always be `main`.
+   - If any existing open PR is based on a non-`main` base or your branch is behind an unmerged feature branch, stop and restack onto `main`.
+4. One PR closes one issue.
+   - Include exactly one closing keyword for the primary issue: `Closes #<issue_number>`.
+   - Do not add additional `Closes/Fixes/Resolves` lines for other issues; use `Refs #<issue_number>` for non-primary links.
+5. Implement only this issue scope, then run all required gates.
+6. Commit with a traceable message that includes `P4-2`.
+7. Push branch and open a PR to `main`.
+   - PR title starts with `[P4-2] ...`
+   - PR body must include: `Closes #<issue_number>` (primary issue only)
+8. After merge, verify the linked issue is actually closed.
+   - If not closed, run: `gh issue close <issue_number> --comment "Closed via merged PR for P4-2."`
+9. Never report completion until PR URL exists and the issue state is `closed`.
+
+
 ## Mandatory Output Structure
 1. Pre-edit declaration:
    - mode
    - exact files to touch
    - risks/dependencies
+   - GitHub issue number resolved for `P4-2`
+   - branch name to use
 2. Implementation summary with file references.
 3. Verification matrix (VERIFIED/GAP/NOT VERIFIED) for each acceptance criterion.
 4. Gate command results:
@@ -66,5 +94,13 @@ You are in STRICT COMPLIANCE mode for ViccoBoard.
    - `npm run build:ipad`
    - `npm test`
 5. Architecture audit output:
-   - `rg -n "from '../db'|from './db'|Dexie|useDatabase\(" apps/teacher-ui/src`
-6. Explicit list of remaining blockers and the next smallest step.
+   - Prefer: `rg -n "from '../db'|from './db'|Dexie|useDatabase\(" apps/teacher-ui/src`
+   - Fallback if `rg` is unavailable: `Get-ChildItem apps/teacher-ui/src -Recurse -Include *.ts,*.vue,*.js | Select-String -Pattern "from '../db'|from './db'|Dexie|useDatabase\("`
+6. PR and issue closure proof:
+   - branch name
+   - commit SHA(s)
+   - PR URL
+   - explicit line showing `Closes #<issue_number>` in PR body
+   - issue URL and final state (`closed`)
+   - open PR list snapshot proving no stacking: `gh pr list --state open --json number,title,headRefName,baseRefName`
+7. Explicit list of remaining blockers and the next smallest step.

@@ -5,7 +5,9 @@ Per-issue Copilot prompts for currently open GitHub parity issues.
 ## Usage
 1. Open the issue-specific file below.
 2. Paste the prompt into Copilot chat for that issue.
-3. Require strict evidence output and gate results.
+3. Require strict evidence output, gate results, and PR proof.
+4. Enforce no stacked PRs: branch from `origin/main` only, PR base must be `main`.
+5. Require issue closure proof (`Closes #<issue_number>` in PR body + final issue state `closed`).
 
 ## Generated Prompts
 - [P4-1 Shuttle Run Implementation](P4-1-shuttle-run-implementation.md)
