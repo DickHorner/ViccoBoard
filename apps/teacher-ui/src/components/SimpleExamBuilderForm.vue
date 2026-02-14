@@ -103,7 +103,11 @@
                 min="0"
                 step="1"
                 class="form-input points-input"
+                @blur="validateTaskBonusPoints(taskIndex)"
               />
+              <p v-if="errors.tasks?.[taskIndex]?.bonusPoints" class="error-message">
+                {{ errors.tasks[taskIndex].bonusPoints }}
+              </p>
             </div>
 
             <div class="form-group checkbox">
@@ -284,7 +288,7 @@ const formData = reactive<{
 
 const errors = reactive<{
   title?: string;
-  tasks?: Array<{ points?: string; title?: string }>;
+  tasks?: Array<{ points?: string; title?: string; bonusPoints?: string }>;
 }>({});
 
 const isSaving = ref(false);
@@ -345,11 +349,15 @@ const createNewCriterion = (): CriterionDraft => ({
 });
 
 onMounted(async () => {
-  // If editing, load existing exam
   if (isEditing.value && route.params.id) {
     try {
+      if (!examRepository) {
+        console.error('Exam repository is not available');
+        errorMessage.value = 'Unable to load exam for editing. Please try again later.';
+        return;
+      }
       const examId = route.params.id as string;
-      const exam = await examRepository?.findById(examId);
+      const exam = await examRepository.findById(examId);
       if (exam && exam.mode === 'simple') {
         formData.title = exam.title;
         formData.description = exam.description || '';
@@ -436,6 +444,18 @@ const validateTaskPoints = (index: number) => {
   }
 };
 
+const validateTaskBonusPoints = (index: number) => {
+  if (!errors.tasks) errors.tasks = [];
+  if (!errors.tasks[index]) errors.tasks[index] = {};
+
+  const task = formData.tasks[index];
+  if (task.bonusPoints < 0) {
+    errors.tasks[index]!.bonusPoints = 'Bonus points cannot be negative';
+  } else {
+    errors.tasks[index]!.bonusPoints = undefined;
+  }
+};
+
 const validateCriterion = (taskIndex: number, criterionIndex: number) => {
   const criterion = formData.tasks[taskIndex]?.criteria[criterionIndex];
   if (criterion && criterion.points < 0) {
@@ -448,11 +468,16 @@ const validateCriterion = (taskIndex: number, criterionIndex: number) => {
 // Methods - Save & Cancel
 // ============================================================================
 const saveExam = async () => {
+  // Clear previous messages
+  errorMessage.value = '';
+  successMessage.value = '';
+
   // Validate before save
   validateTitle();
   formData.tasks.forEach((_, index) => {
     validateTaskTitle(index);
     validateTaskPoints(index);
+    validateTaskBonusPoints(index);
   });
 
   if (!canSave.value) {
@@ -489,11 +514,15 @@ const saveExam = async () => {
       description: formData.description.trim() || undefined,
       mode: 'simple' as Exams.ExamMode,
       structure: {
-        parts: [],
-        tasks,
-        allowsComments: false,
-        allowsSupportTips: false,
-        totalPoints: totalPoints.value
+    if (!examRepository) {
+      throw new Error('Exam repository is not initialized');
+    }
+
+    if (isEditing.value) {
+      await examRepository.update(exam.id, exam);
+      successMessage.value = 'Exam updated successfully!';
+    } else {
+      await examRepository.create(exam);
       },
       gradingKey: {
         id: uuidv4(),
