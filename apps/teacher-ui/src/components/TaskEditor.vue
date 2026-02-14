@@ -1,6 +1,16 @@
 <template>
-  <div class="task-card" :class="{ nested: level > 1 }">
+  <div
+    class="task-card"
+    :class="{ nested: level > 1, dragging: isDragging, dragover: isDragOver }"
+    :draggable="true"
+    @dragstart="handleDragStart"
+    @dragover="handleDragOver"
+    @drop="handleDrop"
+    @dragleave="isDragOver = false"
+    @dragend="handleDragEnd"
+  >
     <div class="task-header">
+      <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
       <component :is="headerTag">Task {{ taskNumber }}</component>
       <div class="task-actions">
         <button
@@ -8,19 +18,21 @@
           class="ghost"
           type="button"
           @click="$emit('moveUp')"
+          title="Move up"
         >
-          Up
+          ↑
         </button>
         <button
           v-if="!isLast"
           class="ghost"
           type="button"
           @click="$emit('moveDown')"
+          title="Move down"
         >
-          Down
+          ↓
         </button>
-        <button class="ghost" type="button" @click="$emit('remove')">
-          Remove
+        <button class="ghost" type="button" @click="$emit('remove')" title="Remove task">
+          ✕
         </button>
       </div>
     </div>
@@ -127,6 +139,7 @@
         :level="nextLevel"
         :mode="mode"
         :parent-index="index"
+        :parent-task="task"
         :is-last="subIndex === task.subtasks.length - 1"
         @remove="store.removeNestedTask(task, subtask.id)"
         @moveUp="store.moveTask(task.subtasks, subIndex, -1)"
@@ -137,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useExamBuilderStore, type TaskDraft } from '../stores/examBuilderStore'
 
 interface Props {
@@ -147,6 +160,7 @@ interface Props {
   mode: 'simple' | 'complex'
   parentIndex?: number
   isLast?: boolean
+  parentTask?: TaskDraft
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -161,6 +175,8 @@ defineEmits<{
 }>()
 
 const store = useExamBuilderStore()
+const isDragging = ref(false)
+const isDragOver = ref(false)
 
 const canAddSubtasks = computed(() => props.mode === 'complex' && props.level < 3)
 const nextLevel = computed(() => (props.level + 1) as 2 | 3)
@@ -192,17 +208,88 @@ const subtasksLevel = computed(() => {
   if (props.level === 1) return '(level 2)'
   return '(level 3)'
 })
+
+// Drag-and-drop handlers
+const handleDragStart = (event: DragEvent) => {
+  isDragging.value = true
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', JSON.stringify({
+      taskId: props.task.id,
+      level: props.level,
+      index: props.index,
+      parentId: props.parentTask?.id || null
+    }))
+  }
+}
+
+const handleDragOver = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = true
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
+}
+
+const handleDrop = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = false
+
+  if (!event.dataTransfer) return
+
+  try {
+    const data = JSON.parse(event.dataTransfer.getData('text/plain'))
+    const { taskId, level: fromLevel } = data
+
+    // Only allow drops within same level for safety
+    if (fromLevel !== props.level) {
+      console.warn('Cannot move tasks between different hierarchy levels')
+      return
+    }
+
+    // Same task, no-op
+    if (taskId === props.task.id) return
+
+    // Attempt reordering based on context
+    if (props.level === 1 && fromLevel === 1) {
+      // Root level reorder
+      const fromPos = store.tasks.findIndex(t => t.id === taskId)
+      if (fromPos !== -1) {
+        store.moveTask(store.tasks, fromPos, props.index - fromPos)
+      }
+    } else if (props.level > 1 && props.parentTask) {
+      // Nested level reorder within same parent
+      const fromPos = props.parentTask.subtasks.findIndex(t => t.id === taskId)
+      if (fromPos !== -1) {
+        store.moveTask(props.parentTask.subtasks, fromPos, props.index - fromPos)
+      }
+    }
+  } catch (err) {
+    console.error('Error processing drop:', err)
+  }
+}
+
+const handleDragEnd = () => {
+  isDragging.value = false
+  isDragOver.value = false
+}
 </script>
 
 <style scoped>
 .task-card {
   padding: 1.5rem;
-  border: 1px solid var(--color-border, #ddd);
+  border: 2px solid var(--color-border, #ddd);
   border-radius: 8px;
   background: var(--color-background, #fff);
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  cursor: grab;
+  transition: all 0.2s;
+}
+
+.task-card:active {
+  cursor: grabbing;
 }
 
 .task-card.nested {
@@ -210,22 +297,48 @@ const subtasksLevel = computed(() => {
   background: var(--color-background-subtle, #f9f9f9);
 }
 
+.task-card.dragging {
+  opacity: 0.5;
+  background: var(--color-border, #ddd);
+  border-color: var(--color-warning, #f39c12);
+}
+
+.task-card.dragover {
+  border-color: var(--color-primary, #3498db);
+  border-style: dashed;
+  background: var(--color-primary-light, #e3f2fd);
+}
+
 .task-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--color-text-muted, #999);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 .task-header h3,
 .task-header h4,
 .task-header h5 {
   margin: 0;
+  flex: 1;
 }
 
 .task-actions {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .field {
