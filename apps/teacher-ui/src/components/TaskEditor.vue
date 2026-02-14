@@ -2,15 +2,20 @@
   <div
     class="task-card"
     :class="{ nested: level > 1, dragging: isDragging, dragover: isDragOver }"
-    :draggable="true"
-    @dragstart="handleDragStart"
     @dragover="handleDragOver"
     @drop="handleDrop"
     @dragleave="isDragOver = false"
-    @dragend="handleDragEnd"
   >
     <div class="task-header">
-      <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
+      <div
+        class="drag-handle"
+        title="Drag to reorder"
+        @dragstart="handleDragStart"
+        @dragend="handleDragEnd"
+        aria-hidden="true"
+      >
+        ⋮⋮
+      </div>
       <component :is="headerTag">Task {{ taskNumber }}</component>
       <div class="task-actions">
         <button
@@ -259,6 +264,11 @@ const handleDrop = (event: DragEvent) => {
       }
     } else if (props.level > 1 && props.parentTask) {
       // Nested level reorder within same parent
+      // Validate that dragged task belongs to the same parent
+      if (data.parentId !== props.parentTask.id) {
+        console.warn('Cannot move tasks between different parent subtask lists')
+        return
+      }
       const fromPos = props.parentTask.subtasks.findIndex(t => t.id === taskId)
       if (fromPos !== -1) {
         store.moveTask(props.parentTask.subtasks, fromPos, props.index - fromPos)
