@@ -21,6 +21,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'New Exam' }
   },
   {
+    path: '/exams/simple/new',
+    name: 'simple-exam-new',
+    component: () => import('../views/SimpleExamBuilder.vue'),
+    meta: { title: 'Create Simple Exam' }
+  },
+  {
+    path: '/exams/simple/:id',
+    name: 'simple-exam-edit',
+    component: () => import('../views/SimpleExamBuilder.vue'),
+    meta: { title: 'Edit Simple Exam' }
+  },
+  {
     path: '/exams/:id',
     name: 'exam-edit',
     component: () => import('../views/KURTExamBuilder.vue'),
