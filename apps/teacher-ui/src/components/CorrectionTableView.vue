@@ -351,23 +351,29 @@ defineExpose({
 });
 
 const saveComment = () => {
-  if (selectedCandidate.value && editingComment.value.text.trim()) {
+  const trimmedText = editingComment.value.text.trim();
+
+  if (selectedCandidate.value && trimmedText) {
+    const commentPayload = {
+      taskId: commentTaskId.value,
+      level: commentTaskId.value ? 'task' : 'exam',
+      text: trimmedText,
+      printable: editingComment.value.printable,
+      availableAfterReturn: editingComment.value.availableAfterReturn
+    };
+
     emit('save-comment', {
       candidateId: selectedCandidate.value.id,
-      comment: {
-        taskId: commentTaskId.value,
-        level: commentTaskId.value ? 'task' : 'exam',
-        text: editingComment.value.text.trim(),
-        printable: editingComment.value.printable,
-        availableAfterReturn: editingComment.value.availableAfterReturn
-      }
+      comment: commentPayload
     });
-  }
-  if (copyTargetIds.value.length > 0 && selectedCandidate.value) {
-    emit('copy-comments', {
-      sourceCandidateId: selectedCandidate.value.id,
-      targetCandidateIds: copyTargetIds.value
-    });
+
+    if (copyTargetIds.value.length > 0) {
+      emit('copy-comments', {
+        sourceCandidateId: selectedCandidate.value.id,
+        targetCandidateIds: copyTargetIds.value,
+        comment: commentPayload
+      });
+    }
   }
   showCommentsModal.value = false;
 };
