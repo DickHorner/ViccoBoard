@@ -27,7 +27,7 @@ const routes = [
     {
         path: '/exams/:id/correct',
         name: 'exam-correct',
-        component: () => import('../views/CorrectionCompactUI.vue'),
+        component: () => import('../views/CorrectionCompactUI_v2.vue'),
         meta: { title: 'Exam Correction' }
     },
     {
