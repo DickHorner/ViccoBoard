@@ -217,13 +217,11 @@ export class CommentManagementService {
     }));
 
     // Merge without duplicating by text+taskId+level
-    const existingKeys = new Set(
-      target.comments.map(c => `${c.level}::${c.taskId ?? ''}::${c.text}`)
-    );
-    const fresh = copies.filter(
-      c => !existingKeys.has(`${c.level}::${c.taskId ?? ''}::${c.text}`)
-    );
+    const makeKey = (comment: Exams.CorrectionComment): string =>
+      JSON.stringify([comment.level, comment.taskId ?? null, comment.text]);
 
+    const existingKeys = new Set(target.comments.map(c => makeKey(c)));
+    const fresh = copies.filter(c => !existingKeys.has(makeKey(c)));
     return {
       ...target,
       comments: [...target.comments, ...fresh],
