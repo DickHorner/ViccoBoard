@@ -191,6 +191,47 @@ export class CommentManagementService {
   }
 
   /**
+   * Copy selected comments from one correction entry to another.
+   * New IDs are generated for the copies so both entries remain independent.
+   *
+   * Deduplication: a comment is skipped if a comment with the same
+   * `level` + `taskId` + `text` already exists in the target.
+   *
+   * @param source - The source correction entry to copy comments from.
+   * @param target - The target correction entry to copy comments to.
+   * @param commentIds - Optional list of comment IDs to copy. If omitted, all comments are copied.
+   */
+  static copyCommentsToCandidate(
+    source: Exams.CorrectionEntry,
+    target: Exams.CorrectionEntry,
+    commentIds?: string[]
+  ): Exams.CorrectionEntry {
+    const toCopy = commentIds
+      ? source.comments.filter(c => commentIds.includes(c.id))
+      : source.comments;
+
+    const copies: Exams.CorrectionComment[] = toCopy.map(c => ({
+      ...c,
+      id: uuidv4(),
+      timestamp: new Date()
+    }));
+
+    // Merge without duplicating by text+taskId+level
+    const existingKeys = new Set(
+      target.comments.map(c => `${c.level}::${c.taskId ?? ''}::${c.text}`)
+    );
+    const fresh = copies.filter(
+      c => !existingKeys.has(`${c.level}::${c.taskId ?? ''}::${c.text}`)
+    );
+
+    return {
+      ...target,
+      comments: [...target.comments, ...fresh],
+      lastModified: new Date()
+    };
+  }
+
+  /**
    * Validate comment before saving
    */
   static validateComment(comment: Exams.CorrectionComment): { valid: boolean; errors: string[] } {

@@ -20,6 +20,9 @@
             <option value="total">Sort by Total Points</option>
             <option value="percentage">Sort by Percentage</option>
             <option value="grade">Sort by Grade</option>
+            <option v-for="task in exam.structure.tasks" :key="`sort-task-${task.id}`" :value="`task:${task.id}`">
+              Sort by Task: {{ task.title }}
+            </option>
           </select>
         </div>
         <div class="view-toggle">
@@ -150,11 +153,11 @@
     <!-- Comments Management Modal -->
     <div v-if="showCommentsModal" class="modal-overlay" @click.self="showCommentsModal = false">
       <div class="modal-content">
-        <h3>Manage Comments for {{ selectedCandidate?.firstName }} {{ selectedCandidate?.lastName }}</h3>
+        <h3>Manage Comments for {{ selectedCandidate?.firstName }} {{ selectedCandidate?.lastName }}<span v-if="commentTaskId"> — {{ exam.structure.tasks.find(t => t.id === commentTaskId)?.title }}</span></h3>
         <div class="comments-editor">
           <div class="comment-item">
             <label>
-              <input v-model="editingComment.text" type="text" class="comment-text-input" />
+              <input v-model="editingComment.text" type="text" class="comment-text-input" placeholder="Enter comment..." />
             </label>
             <div class="comment-options">
               <label class="checkbox-label">
@@ -166,6 +169,24 @@
                 Available after return
               </label>
             </div>
+          </div>
+        </div>
+        <!-- Copy to other candidates -->
+        <div v-if="candidates.length > 1" class="copy-section">
+          <p class="copy-label">Copy this comment to:</p>
+          <div class="copy-candidates">
+            <label
+              v-for="c in candidates.filter(c => c.id !== selectedCandidate?.id)"
+              :key="c.id"
+              class="checkbox-label"
+            >
+              <input
+                type="checkbox"
+                :value="c.id"
+                v-model="copyTargetIds"
+              />
+              {{ c.firstName }} {{ c.lastName }}
+            </label>
           </div>
         </div>
         <div class="modal-buttons">
@@ -189,15 +210,21 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<{
+  (e: 'save-comment', payload: { candidateId: string; comment: Omit<Exams.CorrectionComment, 'id' | 'timestamp'> }): void;
+  (e: 'copy-comments', payload: { sourceCandidateId: string; targetCandidateIds: string[]; commentIds?: string[] }): void;
+}>();
 
 // View state
 const viewMode = ref<'table' | 'compact' | 'awk'>('table');
 const searchQuery = ref('');
-const sortBy = ref<'name' | 'total' | 'percentage' | 'grade'>('name');
+const sortBy = ref<'name' | 'total' | 'percentage' | 'grade' | `task:${string}`>('name');
 const currentTaskId = ref('');
 const showCommentsModal = ref(false);
 const selectedCandidate = ref<Exams.Candidate | null>(null);
+const commentTaskId = ref<string | undefined>(undefined);
 const editingComment = ref({ text: '', printable: true, availableAfterReturn: true });
+const copyTargetIds = ref<string[]>([]);
 
 // Computed properties
 const filteredAndSortedCandidates = computed(() => {
@@ -206,6 +233,10 @@ const filteredAndSortedCandidates = computed(() => {
   );
 
   return filtered.sort((a, b) => {
+    if (sortBy.value.startsWith('task:')) {
+      const taskId = sortBy.value.slice(5);
+      return getTaskScore(b.id, taskId) - getTaskScore(a.id, taskId);
+    }
     switch (sortBy.value) {
       case 'name':
         return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
@@ -275,8 +306,9 @@ const getCorrectionStatus = (candidateId: string): string | null => {
 
 const hasComment = (candidateId: string, taskId: string): boolean => {
   const correction = props.corrections.get(candidateId);
-  const taskScore = correction?.taskScores.find(ts => ts.taskId === taskId);
-  return !!taskScore?.comment;
+  const hasTaskScoreComment = !!correction?.taskScores.find(ts => ts.taskId === taskId)?.comment;
+  const hasEntryComment = correction?.comments.some(c => c.taskId === taskId) ?? false;
+  return hasTaskScoreComment || hasEntryComment;
 };
 
 const isTaskCompleted = (candidateId: string, taskId: string): boolean => {
@@ -297,15 +329,19 @@ const jumpToTaskForCandidate = (candidate: Exams.Candidate, taskId: string) => {
   }
 };
 
-const openCommentsModal = (candidate: Exams.Candidate) => {
+const openCommentsModal = (candidate: Exams.Candidate, taskId?: string) => {
   selectedCandidate.value = candidate;
+  commentTaskId.value = taskId;
   const correction = props.corrections.get(candidate.id);
-  const existingComment = correction?.comments[0];
+  const existingComment = taskId
+    ? correction?.comments.find(c => c.taskId === taskId)
+    : correction?.comments.find(c => c.level === 'exam');
   editingComment.value = {
     text: existingComment?.text || '',
     printable: existingComment?.printable ?? true,
     availableAfterReturn: existingComment?.availableAfterReturn ?? true
   };
+  copyTargetIds.value = [];
   showCommentsModal.value = true;
 };
 
@@ -315,8 +351,24 @@ defineExpose({
 });
 
 const saveComment = () => {
-  // This would update the correction entry
-  console.log('Saving comment:', editingComment.value);
+  if (selectedCandidate.value && editingComment.value.text.trim()) {
+    emit('save-comment', {
+      candidateId: selectedCandidate.value.id,
+      comment: {
+        taskId: commentTaskId.value,
+        level: commentTaskId.value ? 'task' : 'exam',
+        text: editingComment.value.text.trim(),
+        printable: editingComment.value.printable,
+        availableAfterReturn: editingComment.value.availableAfterReturn
+      }
+    });
+  }
+  if (copyTargetIds.value.length > 0 && selectedCandidate.value) {
+    emit('copy-comments', {
+      sourceCandidateId: selectedCandidate.value.id,
+      targetCandidateIds: copyTargetIds.value
+    });
+  }
   showCommentsModal.value = false;
 };
 </script>
@@ -713,5 +765,27 @@ const saveComment = () => {
 
 .btn-secondary:hover {
   background: #5a6268;
+}
+
+.copy-section {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.copy-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0 0 0.5rem;
+}
+
+.copy-candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 0.25rem 0;
 }
 </style>
