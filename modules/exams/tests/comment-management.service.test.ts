@@ -412,3 +412,70 @@ describe('CorrectionCommentUseCase', () => {
     });
   });
 });
+
+describe('CommentManagementService.copyCommentsToCandidate', () => {
+  const makeEntry = (id: string, comments: Exams.CorrectionComment[]): Exams.CorrectionEntry => ({
+    id,
+    examId: 'exam-1',
+    candidateId: id,
+    taskScores: [],
+    totalPoints: 0,
+    totalGrade: 'N/A',
+    percentageScore: 0,
+    comments,
+    supportTips: [],
+    status: 'in-progress',
+    lastModified: new Date()
+  });
+
+  const baseComment = (id: string, text: string, taskId?: string): Exams.CorrectionComment => ({
+    id,
+    taskId,
+    level: 'task',
+    text,
+    printable: true,
+    availableAfterReturn: true,
+    timestamp: new Date()
+  });
+
+  it('should copy all comments when no ids specified', () => {
+    const source = makeEntry('src', [baseComment('c1', 'Good work', 'task-1')]);
+    const target = makeEntry('tgt', []);
+    const result = CommentManagementService.copyCommentsToCandidate(source, target);
+    expect(result.comments.length).toBe(1);
+    expect(result.comments[0].text).toBe('Good work');
+  });
+
+  it('should assign new ids to copied comments', () => {
+    const source = makeEntry('src', [baseComment('c1', 'Good work', 'task-1')]);
+    const target = makeEntry('tgt', []);
+    const result = CommentManagementService.copyCommentsToCandidate(source, target);
+    expect(result.comments[0].id).not.toBe('c1');
+  });
+
+  it('should copy only specified comment ids', () => {
+    const source = makeEntry('src', [
+      baseComment('c1', 'Comment A', 'task-1'),
+      baseComment('c2', 'Comment B', 'task-2')
+    ]);
+    const target = makeEntry('tgt', []);
+    const result = CommentManagementService.copyCommentsToCandidate(source, target, ['c1']);
+    expect(result.comments.length).toBe(1);
+    expect(result.comments[0].text).toBe('Comment A');
+  });
+
+  it('should not duplicate comments already present in target', () => {
+    const comment = baseComment('c1', 'Good work', 'task-1');
+    const source = makeEntry('src', [comment]);
+    const target = makeEntry('tgt', [{ ...comment, id: 'c2' }]);
+    const result = CommentManagementService.copyCommentsToCandidate(source, target);
+    expect(result.comments.length).toBe(1);
+  });
+
+  it('should not modify source entry', () => {
+    const source = makeEntry('src', [baseComment('c1', 'Good work', 'task-1')]);
+    const target = makeEntry('tgt', []);
+    CommentManagementService.copyCommentsToCandidate(source, target);
+    expect(source.comments.length).toBe(1);
+  });
+});
