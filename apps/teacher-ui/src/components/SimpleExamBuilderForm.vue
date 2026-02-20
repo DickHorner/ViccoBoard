@@ -514,15 +514,11 @@ const saveExam = async () => {
       description: formData.description.trim() || undefined,
       mode: 'simple' as Exams.ExamMode,
       structure: {
-    if (!examRepository) {
-      throw new Error('Exam repository is not initialized');
-    }
-
-    if (isEditing.value) {
-      await examRepository.update(exam.id, exam);
-      successMessage.value = 'Exam updated successfully!';
-    } else {
-      await examRepository.create(exam);
+        parts: [],
+        tasks,
+        allowsComments: false,
+        allowsSupportTips: false,
+        totalPoints: totalPoints.value
       },
       gradingKey: {
         id: uuidv4(),
