@@ -508,21 +508,21 @@ const saveExam = async () => {
       subtasks: []
     }));
 
+    if (!examRepository) {
+      throw new Error('Exam repository is not initialized');
+    }
+
     const exam: Exams.Exam = {
       id: isEditing.value ? (route.params.id as string) : uuidv4(),
       title: formData.title.trim(),
       description: formData.description.trim() || undefined,
       mode: 'simple' as Exams.ExamMode,
       structure: {
-    if (!examRepository) {
-      throw new Error('Exam repository is not initialized');
-    }
-
-    if (isEditing.value) {
-      await examRepository.update(exam.id, exam);
-      successMessage.value = 'Exam updated successfully!';
-    } else {
-      await examRepository.create(exam);
+        parts: [],
+        tasks: tasks,
+        allowsComments: false,
+        allowsSupportTips: false,
+        totalPoints: totalPoints.value
       },
       gradingKey: {
         id: uuidv4(),
@@ -544,10 +544,10 @@ const saveExam = async () => {
 
     // Save via repository
     if (isEditing.value) {
-      await examRepository?.update(exam.id, exam);
+      await examRepository.update(exam.id, exam);
       successMessage.value = 'Exam updated successfully!';
     } else {
-      await examRepository?.create(exam);
+      await examRepository.create(exam);
       successMessage.value = 'Exam created successfully!';
     }
 

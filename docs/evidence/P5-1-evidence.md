@@ -4,9 +4,9 @@
 
 - **Issue ID:** P5-1 / #19
 - **Scope:** Exam persistence layer implementation
-- **Date:** 2026-02-14
+- **Date:** 2026-02-20
 - **Executor:** GitHub Copilot
-- **Mode:** `AUDIT`
+- **Mode:** `IMPLEMENTATION`
 
 ---
 

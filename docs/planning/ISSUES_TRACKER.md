@@ -388,11 +388,11 @@ Implement Timer tool plugin.
 Implement persistence layer for exams.
 
 **Tasks:**
-- [ ] Exam repository (CRUD + queries)
-- [ ] TaskNode repository (3-level hierarchy)
-- [ ] Criterion repository
-- [ ] Add schema migrations
-- [ ] Unit tests
+- [x] Exam repository (CRUD + queries)
+- [x] TaskNode repository (3-level hierarchy)
+- [x] Criterion repository
+- [x] Add schema migrations
+- [x] Unit tests
 
 **Acceptance Criteria:**
 - CRUD operations functional
