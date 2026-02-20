@@ -334,7 +334,7 @@ const openCommentsModal = (candidate: Exams.Candidate, taskId?: string) => {
   commentTaskId.value = taskId;
   const correction = props.corrections.get(candidate.id);
   const existingComment = taskId
-    ? correction?.comments.find(c => c.taskId === taskId)
+    ? correction?.comments.find(c => c.taskId === taskId && c.level === 'task')
     : correction?.comments.find(c => c.level === 'exam');
   editingComment.value = {
     text: existingComment?.text || '',
