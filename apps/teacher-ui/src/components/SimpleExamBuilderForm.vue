@@ -519,7 +519,7 @@ const saveExam = async () => {
       mode: 'simple' as Exams.ExamMode,
       structure: {
         parts: [],
-        tasks: tasks,
+        tasks,
         allowsComments: false,
         allowsSupportTips: false,
         totalPoints: totalPoints.value
