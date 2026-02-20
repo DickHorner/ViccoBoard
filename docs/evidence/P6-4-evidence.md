@@ -12,7 +12,7 @@
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| Comments save and display | VERIFIED | `modules/exams/src/services/comment-management.service.ts`: `createComment`, `CorrectionCommentUseCase.addCommentToCorrection`; `CorrectionTableView.vue`: `saveComment` emits `save-comment` event |
+| Comments save and display | GAP | UI emits `save-comment` in `CorrectionTableView.vue`, but parent persistence wiring and display verification are pending (see "Remaining Gaps / Next Smallest Step") |
 | Table view shows all data | VERIFIED | `apps/teacher-ui/src/components/CorrectionTableView.vue`: `viewMode === 'table'` renders full correction matrix with all tasks, scores, totals, percentages, grades |
 | Sorting works correctly | VERIFIED | `CorrectionTableView.vue` `filteredAndSortedCandidates` computed: sorts by name/total/percentage/grade AND by any task score via `task:<id>` values |
 | Comment reuse functional | VERIFIED | `CommentManagementService.copyCommentsToCandidate()` at `modules/exams/src/services/comment-management.service.ts`; UI: `copy-comments` emit in `CorrectionTableView.vue`; deduplicates by level+taskId+text |
