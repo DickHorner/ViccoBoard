@@ -434,11 +434,11 @@ Implement UI for creating simple exams.
 Implement UI for complex 3-level exam builder.
 
 **Tasks:**
-- [ ] Drag-and-drop task/subtask management
-- [ ] Multiple hierarchy levels
-- [ ] Choice task support
-- [ ] Bonus point configuration
-- [ ] Exam parts management
+- [x] Drag-and-drop task/subtask management
+- [x] Multiple hierarchy levels
+- [x] Choice task support
+- [x] Bonus point configuration
+- [x] Exam parts management
 
 **Acceptance Criteria:**
 - Can build 3-level hierarchy
