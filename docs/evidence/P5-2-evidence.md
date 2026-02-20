@@ -1,7 +1,7 @@
 # Evidence: [P5-2] Simple Exam Builder UI
 
 **Issue:** #17 - Simple Exam Builder UI  
-**Branch:** `copilot/p5-2-simple-exam-ui`  
+**Branch:** `copilot/implement-simple-exam-builder-ui`  
 **Status:** IMPLEMENTATION COMPLETE
 
 ---
