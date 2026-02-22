@@ -12,7 +12,7 @@
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| Can record grades per task | `VERIFIED` | `modules/exams/src/use-cases/record-correction.use-case-v2.ts:44-50` — `taskScores` array processed and totals computed; test: `record-correction.use-case.test.ts` "records a new correction as in-progress" |
+| Can record grades per task | `VERIFIED` | `modules/exams/src/use-cases/record-correction.use-case-v2.ts:48-50` — `taskScores` array processed and totals computed; test: `record-correction.use-case.test.ts` "records a new correction as in-progress" |
 | Totals calculated correctly | `VERIFIED` | `modules/exams/src/use-cases/record-correction.use-case-v2.ts:52-62` — `totalPoints` summed from taskScores; grade computed via `GradingKeyService.calculateGrade`; tests: "calculates grade correctly from grading key", "calculates totals from multiple task scores" |
 | Supports partial entry | `VERIFIED` | `modules/exams/src/use-cases/record-correction.use-case-v2.ts:36-46` — status defaults to `in-progress`, `correctedAt` not set unless `finalizeCorrection=true`; test: "records a new correction as in-progress (partial entry)" |
 | Tests comprehensive | `VERIFIED` | `modules/exams/tests/correction-entry.repository.test.ts` (5 tests), `modules/exams/tests/calculate-grade.use-case.test.ts` (2 tests), `modules/exams/tests/record-correction.use-case.test.ts` (9 tests) — 16 tests total covering all acceptance criteria |
