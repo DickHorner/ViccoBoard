@@ -13,7 +13,7 @@
 | Criterion | Status | Evidence |
 |---|---|---|
 | Alternative grading functional | `VERIFIED` | `modules/exams/src/services/alternative-grading.service.ts` — `AlternativeGradingService` with full `++/+/0/-/--` support; 33 passing tests in `modules/exams/tests/alternative-grading.service.test.ts` |
-| Conversion to points correct | `VERIFIED` | `AlternativeGradingService.toNumericPoints()` (line 93): `++ → 100%`, `+ → 85%`, `0 → 65%`, `- → 45%`, `-- → 0%`; `fromNumericPoints()` (line 113) for reverse conversion; confirmed by tests |
+| Conversion to points correct | `VERIFIED` | `modules/exams/src/services/alternative-grading.service.ts` — `AlternativeGradingService.toNumericPoints()` maps `++ → 100%`, `+ → 85%`, `0 → 65%`, `- → 45%`, `-- → 0%`; `fromNumericPoints()` provides the reverse conversion; behavior confirmed by `modules/exams/tests/alternative-grading.service.test.ts` |
 | UI intuitive | `VERIFIED` | `apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue` — radio button selector for Numeric/Alternative mode (lines 43–56); `grade-buttons` button group renders all 5 grades with color and emoji via `AlternativeGradingUIHelper.getAllGradeButtons()` (lines 71–82); active state highlighted when selected |
 | Works in correction interface | `VERIFIED` | Route `/exams/:id/correct` updated to use `CorrectionCompactUI_v2.vue` (`apps/teacher-ui/src/router/index.ts` line 44, `apps/teacher-ui/src/router/index.js` line 30); `saveCorrectionForCandidate()` populates `TaskScore.alternativeGrading` when in alternative mode; `totalPoints` computed from alternative grades via `AlternativeGradingService.toNumericPoints()` |
 
@@ -68,7 +68,7 @@ Result summary:
 - `npm run lint:docs`: `PASS` — "Doc guardrails passed with no issues."
 - `npm run build:packages`: `PASS` — All 6 packages built successfully
 - `npm run build:ipad`: `PASS` — `CorrectionCompactUI_v2-vkQ4xpyy.js` (11.64 kB) in dist
-- `npm test`: Pre-existing failures in 4 test suites due to missing `@viccoboard/storage/node` (unrelated); 223 tests pass including all 33 alternative grading tests
+- `npm test`: `FAIL` — Pre-existing failures in 4 test suites due to missing `@viccoboard/storage/node` (unrelated); 223 tests pass including all 33 alternative grading tests (including all alternative grading tests in scope)
 
 ## Files Touched
 
