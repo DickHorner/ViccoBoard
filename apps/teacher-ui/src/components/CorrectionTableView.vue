@@ -212,7 +212,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{
   (e: 'save-comment', payload: { candidateId: string; comment: Omit<Exams.CorrectionComment, 'id' | 'timestamp'> }): void;
-  (e: 'copy-comments', payload: { sourceCandidateId: string; targetCandidateIds: string[]; commentIds?: string[] }): void;
+  (e: 'copy-comments', payload: { sourceCandidateId: string; targetCandidateIds: string[]; comment: Omit<Exams.CorrectionComment, 'id' | 'timestamp'> }): void;
 }>();
 
 // View state
@@ -354,9 +354,9 @@ const saveComment = () => {
   const trimmedText = editingComment.value.text.trim();
 
   if (selectedCandidate.value && trimmedText) {
-    const commentPayload = {
+    const commentPayload: Omit<Exams.CorrectionComment, 'id' | 'timestamp'> = {
       taskId: commentTaskId.value,
-      level: commentTaskId.value ? 'task' : 'exam',
+      level: (commentTaskId.value ? 'task' : 'exam') as Exams.CorrectionComment['level'],
       text: trimmedText,
       printable: editingComment.value.printable,
       availableAfterReturn: editingComment.value.availableAfterReturn

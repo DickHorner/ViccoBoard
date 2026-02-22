@@ -12,7 +12,7 @@
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| Comments save and display | GAP | UI emits `save-comment` in `CorrectionTableView.vue`, but parent persistence wiring and display verification are pending (see "Remaining Gaps / Next Smallest Step") |
+| Comments save and display | VERIFIED | `CommentManagementService.createComment` called in `handleSaveComment` (`CorrectionCompactUI.vue`); comment stored in `corrections` map and passed to `CorrectionTableView` which shows `💬` indicator |
 | Table view shows all data | VERIFIED | `apps/teacher-ui/src/components/CorrectionTableView.vue`: `viewMode === 'table'` renders full correction matrix with all tasks, scores, totals, percentages, grades |
 | Sorting works correctly | VERIFIED | `CorrectionTableView.vue` `filteredAndSortedCandidates` computed: sorts by name/total/percentage/grade AND by any task score via `task:<id>` values |
 | Comment reuse functional | VERIFIED | `CommentManagementService.copyCommentsToCandidate()` at `modules/exams/src/services/comment-management.service.ts`; UI: `copy-comments` emit in `CorrectionTableView.vue`; deduplicates by level+taskId+text |
@@ -29,8 +29,8 @@
 ### Step 2 — Add tests for `copyCommentsToCandidate`
 - Action: Added `describe('CommentManagementService.copyCommentsToCandidate', ...)` block with 5 tests
 - Expected: Tests verify copy, ID uniqueness, partial copy, deduplication, source immutability
-- Actual: Tests written; run blocked by pre-existing TS2307 error in test suite (`Cannot find module '@viccoboard/core'`) which existed before this change
-- Result: `PASS` (tests are correctly authored; pre-existing TS diagnostic issue is unrelated)
+- Actual: Tests written; run blocked by pre-existing TS2307 error (`Cannot find module '@viccoboard/core'`) which existed before this change — tests did not compile or execute
+- Result: `FAIL` (test suite blocked by pre-existing TS2307 in ts-jest config; test code is correctly authored; unrelated to this PR)
 - Artifacts: `modules/exams/tests/comment-management.service.test.ts` lines ~322–380
 
 ### Step 3 — Fix `CorrectionTableView.vue`
@@ -64,9 +64,10 @@
 
 - `modules/exams/src/services/comment-management.service.ts`: Added `copyCommentsToCandidate` static method
 - `modules/exams/tests/comment-management.service.test.ts`: Added 5 tests for `copyCommentsToCandidate`
-- `apps/teacher-ui/src/components/CorrectionTableView.vue`: Fixed `saveComment` emit, added task sort, added copy-comments UI, improved `hasComment`
+- `apps/teacher-ui/src/components/CorrectionTableView.vue`: Fixed `saveComment` emit, added task sort, added copy-comments UI, improved `hasComment`; fixed emit type signature and level type assertion
+- `apps/teacher-ui/src/views/CorrectionCompactUI.vue`: Wired `CorrectionTableView` with view-mode toggle; added `handleSaveComment`/`handleCopyComments`/`jumpToCandidate` handlers
 
 ## Remaining Gaps / Next Smallest Step
 
 - Gap: Pre-existing `TS2307: Cannot find module '@viccoboard/core'` in ts-jest config prevents exams TS test compilation. Unrelated to P6-4; tracked separately.
-- Next step: Parent view (`CorrectionCompactUI_v2.vue` or similar) should handle `save-comment`/`copy-comments` events and call `CommentManagementService.copyCommentsToCandidate` + persist via `CorrectionEntryRepository`. This is follow-on wiring work.
+- Next step: Persistence beyond in-memory map (`corrections`) requires integrating `CorrectionEntryRepository` for real storage.
