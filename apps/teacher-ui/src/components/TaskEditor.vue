@@ -14,6 +14,8 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
         :aria-label="`Drag handle for task ${taskNumber}. Use Alt+Up or Alt+Down to reorder with keyboard.`"
         role="button"
         tabindex="0"
+        @keydown.enter.prevent="handleKeyActivate"
+        @keydown.space.prevent="handleKeyActivate"
         @dragstart="handleDragStart"
         @dragend="handleDragEnd"
         @keydown="handleKeyReorder"
@@ -307,6 +309,11 @@ const handleKeyReorder = (event: KeyboardEvent) => {
       store.moveTask(props.parentTask.subtasks, props.index, 1)
     }
   }
+}
+
+const handleKeyActivate = (event: KeyboardEvent) => {
+  if (event.repeat) return
+  toast.info('Use Alt+Up or Alt+Down to reorder tasks.')
 }
 </script>
 
