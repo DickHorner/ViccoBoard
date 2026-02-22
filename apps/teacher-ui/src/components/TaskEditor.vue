@@ -9,7 +9,7 @@
     <div class="task-header">
       <div
         class="drag-handle"
-        draggable="true"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss        draggable="true"
         :title="`Drag to reorder task ${taskNumber}`"
         :aria-label="`Drag handle for task ${taskNumber}. Use Alt+Up or Alt+Down to reorder with keyboard.`"
         role="button"
