@@ -8,6 +8,16 @@
         </p>
       </div>
       <div class="header-actions">
+        <div class="view-mode-toggle">
+          <button
+            :class="['btn-toggle', { active: correctionViewMode === 'candidate' }]"
+            @click="correctionViewMode = 'candidate'"
+          >👤 Candidate</button>
+          <button
+            :class="['btn-toggle', { active: correctionViewMode === 'table' }]"
+            @click="correctionViewMode = 'table'"
+          >📋 Table</button>
+        </div>
         <button @click="saveCorrectionBatch" class="btn-primary" :disabled="!hasChanges">
           {{ hasChanges ? 'Save All Changes' : 'All Saved' }}
         </button>
@@ -15,7 +25,18 @@
       </div>
     </div>
 
-    <div v-if="exam" class="correction-layout">
+    <!-- Table View -->
+    <CorrectionTableView
+      v-if="exam && correctionViewMode === 'table'"
+      :exam="exam"
+      :candidates="candidates"
+      :corrections="corrections"
+      :on-jump-to-candidate="jumpToCandidate"
+      @save-comment="handleSaveComment"
+      @copy-comments="handleCopyComments"
+    />
+
+    <div v-if="exam && correctionViewMode === 'candidate'" class="correction-layout">
       <!-- Candidates List (Sidebar) -->
       <div class="candidates-sidebar">
         <div class="sidebar-header">
@@ -215,7 +236,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Exams } from '@viccoboard/core';
 import { v4 as uuidv4 } from 'uuid';
-import { GradingKeyService } from '@viccoboard/exams';
+import { GradingKeyService, CommentManagementService } from '@viccoboard/exams';
+import CorrectionTableView from '../components/CorrectionTableView.vue';
 
 const router = useRouter();
 
@@ -235,6 +257,7 @@ const tipsSearchQuery = ref('');
 const selectedTipsIds = ref<string[]>([]);
 const allSupportTips = ref<Exams.SupportTip[]>([]);
 const hasChanges = ref(false);
+const correctionViewMode = ref<'candidate' | 'table'>('candidate');
 
 const filteredCandidates = computed(() => {
   const filter = candidateFilter.value.toLowerCase();
@@ -381,6 +404,38 @@ const correctionPercentage = (candidateId: string): number => {
   return totalTasks > 0 ? Math.round((scoredTasks / totalTasks) * 100) : 0;
 };
 
+const jumpToCandidate = (candidate: Exams.Candidate, _task?: Exams.TaskNode) => {
+  correctionViewMode.value = 'candidate';
+  selectCandidate(candidate);
+};
+
+const handleSaveComment = (payload: { candidateId: string; comment: Omit<Exams.CorrectionComment, 'id' | 'timestamp'> }) => {
+  const correction = corrections.value.get(payload.candidateId);
+  if (!correction) return;
+  const newComment = CommentManagementService.createComment(
+    payload.comment.text,
+    payload.comment.taskId,
+    payload.comment.level,
+    payload.comment.printable,
+    payload.comment.availableAfterReturn
+  );
+  const updated = { ...correction, comments: [...correction.comments.filter(c => c.taskId !== newComment.taskId || c.level !== newComment.level), newComment], lastModified: new Date() };
+  corrections.value.set(payload.candidateId, updated);
+  hasChanges.value = true;
+};
+
+const handleCopyComments = (payload: { sourceCandidateId: string; targetCandidateIds: string[]; comment: Omit<Exams.CorrectionComment, 'id' | 'timestamp'> }) => {
+  const sourceCorrection = corrections.value.get(payload.sourceCandidateId);
+  if (!sourceCorrection) return;
+  for (const targetId of payload.targetCandidateIds) {
+    const target = corrections.value.get(targetId);
+    if (!target) continue;
+    const updated = CommentManagementService.copyCommentsToCandidate(sourceCorrection, target);
+    corrections.value.set(targetId, updated);
+  }
+  hasChanges.value = true;
+};
+
 const goBack = () => {
   router.push('/exams');
 };
@@ -493,6 +548,27 @@ onMounted(async () => {
 .header-actions {
   display: flex;
   gap: 1rem;
+  align-items: center;
+}
+
+.view-mode-toggle {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-toggle {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-toggle.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
 }
 
 .correction-layout {
