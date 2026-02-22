@@ -83,6 +83,7 @@
               step="0.5"
               class="score-input"
               :tabindex="taskIndex + 1"
+              :aria-label="`Points for ${task.title} (max ${task.points})`"
               @focus="($event.target as HTMLInputElement).select()"
               @keydown="onScoreKeydown($event, taskIndex)"
             />
@@ -136,7 +137,9 @@ const alternativeOptions: ExamsTypes.AlternativeGrading['type'][] = ['++', '+', 
 const scoreInputEls = ref<HTMLInputElement[]>([])
 
 const registerScoreInput = (el: HTMLInputElement | null, index: number): void => {
-  if (el !== null) {
+    scoreInputEls.value[index] = el
+  } else {
+    delete scoreInputEls.value[index]
     scoreInputEls.value[index] = el
   }
 }
@@ -198,11 +201,16 @@ const pointsToNextGrade = computed(() => {
   const gradingKey = exam.value?.gradingKey
   if (!gradingKey) return 'n/a'
   const pts = gradingKeyService?.pointsToNextGrade(totalPoints.value, gradingKey)
-  if (pts === undefined) return 'n/a'
-  return pts === 0 ? '0' : pts.toFixed(1)
+  if (pts === undefined || pts === null) return 'n/a'
+  return pts.toFixed(1)
 })
 
-const canSave = computed(() => Boolean(exam.value && selectedCandidateId.value))
+  const examId = route.params.id as string
+  if (!examId) {
+    error('No exam ID provided.')
+    router.push('/exams')
+    return
+  }
 
 const loadExam = async () => {
   const examId = route.params.id as string
@@ -275,7 +283,9 @@ watch(useAlternativeGrading, (enabled) => {
     tasks.value.forEach(task => {
       if (!alternativeGrades.value[task.id]) {
         setAlternative(task, '0')
-      }
+  if (!useAlternativeGrading.value) {
+    nextTick(() => focusScoreInput(0))
+  }
     })
   }
 })

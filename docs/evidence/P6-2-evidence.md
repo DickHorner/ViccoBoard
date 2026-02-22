@@ -11,14 +11,14 @@
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| Interface compact and efficient | `VERIFIED` | `apps/teacher-ui/src/views/CorrectionCompact.vue` — single-page layout with panel-based design, task grid, summary panel (lines 1-102) |
-| Tab navigation smooth | `VERIFIED` | `CorrectionCompact.vue` lines 34-58: `registerScoreInput`, `onScoreKeydown` (Enter → next input), `@focus` auto-select, `tabindex` per task |
-| Grades update in real-time | `VERIFIED` | `CorrectionCompact.vue` computed `totalPoints`, `percentageScore`, `pointsToNextGrade` (lines 100-118) — all reactive via Vue computed |
-| Touch-friendly controls | `VERIFIED` | `CorrectionCompact.vue` CSS: `min-height: 44px` on buttons and score inputs (lines 362, 403) |
-| Candidate selector | `VERIFIED` | `CorrectionCompact.vue` lines 24-39: `<select id="candidate-select">` + quick-add form |
-| Task overview with points earned | `VERIFIED` | `CorrectionCompact.vue` lines 57-88: `task-grid` with per-task score input and max points label |
-| Show points to next grade | `VERIFIED` | `CorrectionCompact.vue` line 107: `pointsToNextGrade` computed using `GradingKeyService.pointsToNextGrade` via bridge |
-| Tab navigation between point fields | `VERIFIED` | `CorrectionCompact.vue` lines 78-92: `tabindex`, `@keydown.enter` → `onScoreKeydown`, `@focus` → `select()` |
+| Interface compact and efficient | `VERIFIED` | `apps/teacher-ui/src/views/CorrectionCompact.vue` — single-page layout with panel-based design, task grid, summary panel (lines 1-108, template section) |
+| Tab navigation smooth | `VERIFIED` | `CorrectionCompact.vue` lines 138-161: `registerScoreInput`, `focusScoreInput`, `onScoreKeydown` (script); lines 78-87: input with `@keydown`, `@focus`, `tabindex` (template) |
+| Grades update in real-time | `VERIFIED` | `CorrectionCompact.vue` computed `totalPoints`, `percentageScore`, `pointsToNextGrade` (lines 189-203) — all reactive via Vue computed |
+| Touch-friendly controls | `VERIFIED` | `CorrectionCompact.vue` CSS: `min-height: 44px` on buttons and score inputs (lines 363, 403, 414) |
+| Candidate selector | `VERIFIED` | `CorrectionCompact.vue` lines 24-40: `<select id="candidate-select">` + quick-add form |
+| Task overview with points earned | `VERIFIED` | `CorrectionCompact.vue` lines 59-90: `task-grid` with per-task score input and max points label |
+| Show points to next grade | `VERIFIED` | `CorrectionCompact.vue` lines 197-203: `pointsToNextGrade` computed using `GradingKeyService.pointsToNextGrade` via bridge |
+| Tab navigation between point fields | `VERIFIED` | `CorrectionCompact.vue` lines 78-87: `tabindex`, `@keydown.enter` → `onScoreKeydown`, `@focus` → `select()` |
 | Real-time grade calculation | `VERIFIED` | `CorrectionCompact.vue` computed properties `totalPoints`, `percentageScore` update instantly on any `taskScores` change |
 
 ## Procedure Log
@@ -28,21 +28,21 @@
 - Expected: Correct exam loaded when navigating to `/exams/:id/correct`
 - Actual: Route param matches router definition `:id`
 - Result: `PASS`
-- Artifacts: `apps/teacher-ui/src/views/CorrectionCompact.vue` line 131
+- Artifacts: `apps/teacher-ui/src/views/CorrectionCompact.vue` line 208
 
 ### Step 2 — Fix pointsToNextGrade
 - Action: Replaced inline `minPoints`-based implementation with `gradingKeyService?.pointsToNextGrade(totalPoints, gradingKey)` via bridge
 - Expected: Correct points-to-next-grade for percentage-based grading keys
 - Actual: Uses service that handles percentage → points conversion correctly
 - Result: `PASS`
-- Artifacts: `apps/teacher-ui/src/views/CorrectionCompact.vue` lines 114-120
+- Artifacts: `apps/teacher-ui/src/views/CorrectionCompact.vue` lines 197-203
 
 ### Step 3 — Add tab navigation
 - Action: Added `registerScoreInput` ref collector, `onScoreKeydown` (Enter → next input), `tabindex` on inputs, `@focus` auto-select
 - Expected: Tab/Enter moves focus through score fields in task order
 - Actual: All numeric score inputs registered, Enter advances focus
 - Result: `PASS`
-- Artifacts: `apps/teacher-ui/src/views/CorrectionCompact.vue` lines 34-58, 78-92
+- Artifacts: `apps/teacher-ui/src/views/CorrectionCompact.vue` lines 138-161 (script functions), 78-87 (template usage)
 
 ### Step 4 — Update router
 - Action: Changed `/exams/:id/correct` route to use `CorrectionCompact.vue` (bridge-based) instead of `CorrectionCompactUI.vue` (mock data)

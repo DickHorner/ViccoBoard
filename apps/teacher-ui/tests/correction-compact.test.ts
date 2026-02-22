@@ -41,6 +41,7 @@ function alternativeToPoints(maxPoints: number, option: AlternativeGradeOption):
     case '0':  return maxPoints * 0.5;
     case '-':  return maxPoints * 0.25;
     case '--': return 0;
+    default:   return 0;
   }
 }
 
