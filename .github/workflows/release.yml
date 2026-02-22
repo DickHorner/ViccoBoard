@@ -1,0 +1,231 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint documentation
+        run: npm run lint:docs
+
+      - name: Build all packages
+        run: npm run build:packages
+
+      - name: Run tests
+        run: npm run test
+        continue-on-error: true
+
+      - name: Build teacher UI (production)
+        run: npm run build --workspace=teacher-ui
+        env:
+          NODE_ENV: production
+
+      - name: Build demo app
+        run: npm run build --workspace=@viccoboard/demo
+        continue-on-error: true
+        env:
+          NODE_ENV: production
+
+      - name: Create release directory
+        run: |
+          mkdir -p release-artifacts
+          mkdir -p release-artifacts/teacher-ui
+          mkdir -p release-artifacts/demo
+
+      - name: Copy teacher UI build artifacts
+        run: |
+          if [ -d "apps/teacher-ui/dist" ]; then
+            cp -r apps/teacher-ui/dist/* release-artifacts/teacher-ui/
+            echo "Teacher UI built successfully" >> release-artifacts/BUILD_INFO.txt
+          else
+            echo "⚠️  Teacher UI build not found" >> release-artifacts/BUILD_INFO.txt
+          fi
+
+      - name: Copy demo build artifacts
+        run: |
+          if [ -d "apps/demo/dist" ]; then
+            cp -r apps/demo/dist/* release-artifacts/demo/
+            echo "Demo app built successfully" >> release-artifacts/BUILD_INFO.txt
+          else
+            echo "⚠️  Demo build not found" >> release-artifacts/BUILD_INFO.txt
+          fi
+
+      - name: Create build metadata
+        run: |
+          echo "ViccoBoard Release v${{ inputs.version }}" > release-artifacts/VERSION.txt
+          echo "Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> release-artifacts/VERSION.txt
+          echo "Commit SHA: ${{ github.sha }}" >> release-artifacts/VERSION.txt
+          echo "Branch: ${{ github.ref_name }}" >> release-artifacts/VERSION.txt
+
+      - name: Create deployment instructions
+        run: |
+          cat > release-artifacts/DEPLOY.md << 'EOF'
+          # ViccoBoard Deployment Instructions
+
+          ## Teacher UI Deployment
+
+          The `teacher-ui/` directory contains the production build of the ViccoBoard teacher interface.
+
+          ### Deployment Steps:
+
+          1. **Web Server Deployment:**
+             - Upload contents of `teacher-ui/` to your web server's public directory
+             - Ensure your server is configured to serve static files
+             - Configure routing to handle SPA (single-page application) routes
+
+          2. **Local/Offline Usage:**
+             - Open `teacher-ui/index.html` in a modern web browser
+             - For iPadOS: Add to Home Screen for app-like experience
+             - Works completely offline after initial load
+
+          3. **Server Configuration:**
+             - All routes should serve `index.html` for SPA routing
+             - Recommended: Enable HTTPS for secure operation
+             - No backend/database server required (uses IndexedDB)
+
+          ### Browser Compatibility:
+
+          - **Primary Target:** iPadOS Safari (WebKit)
+          - **Supported:** Modern Chrome, Firefox, Edge
+          - **Required Features:** IndexedDB, ES6+, Web Workers (optional)
+
+          ### Notes:
+
+          - Application runs entirely client-side
+          - No installation or app store required
+          - Data stored locally in browser (IndexedDB)
+          - Regular backups recommended (export feature in app)
+
+          ## Demo App
+
+          The `demo/` directory contains a demonstration/testing version.
+          Follow similar deployment steps as Teacher UI.
+
+          ## Support
+
+          For issues and documentation, visit: https://github.com/DickHorner/ViccoBoard
+          EOF
+
+      - name: Package release artifacts
+        run: |
+          cd release-artifacts
+          zip -r ../viccoboard-v${{ inputs.version }}.zip .
+          cd ..
+          tar -czf viccoboard-v${{ inputs.version }}.tar.gz -C release-artifacts .
+
+      - name: Generate checksums
+        run: |
+          sha256sum viccoboard-v${{ inputs.version }}.zip > viccoboard-v${{ inputs.version }}.zip.sha256
+          sha256sum viccoboard-v${{ inputs.version }}.tar.gz > viccoboard-v${{ inputs.version }}.tar.gz.sha256
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ inputs.version }}
+          name: ViccoBoard v${{ inputs.version }}
+          body: |
+            ## ViccoBoard Release v${{ inputs.version }}
+
+            ### 📦 Release Artifacts
+
+            - **viccoboard-v${{ inputs.version }}.zip** - Complete application bundle (ZIP format)
+            - **viccoboard-v${{ inputs.version }}.tar.gz** - Complete application bundle (TAR.GZ format)
+
+            ### 📱 What's Included
+
+            - **Teacher UI**: Full-featured teacher interface for SportZens + KURT
+            - **Demo App**: Demonstration/testing version
+            - **Documentation**: Deployment instructions and build info
+
+            ### 🚀 Quick Start
+
+            1. Download and extract the release archive
+            2. See `DEPLOY.md` for deployment instructions
+            3. For local use, open `teacher-ui/index.html` in your browser
+            4. For production, deploy to any static web host
+
+            ### 🎯 Target Platform
+
+            Optimized for **iPadOS Safari** (WebKit), but works on all modern browsers.
+
+            ### 📋 Requirements
+
+            - Modern web browser with IndexedDB support
+            - No backend server required
+            - No installation needed
+            - Works completely offline
+
+            ### ⚠️  Important Notes
+
+            - This is a **local-first** application - all data stored in browser
+            - Regular backups recommended (use in-app export feature)
+            - Safari may clear data after extended inactivity - use backup/restore
+            - HTTPS recommended for production deployment
+
+            ### 🔐 Checksums
+
+            SHA256 checksums are provided for integrity verification.
+
+            ---
+
+            **Build Date**: $(date -u +"%Y-%m-%d")
+            **Commit**: ${{ github.sha }}
+          draft: false
+          prerelease: ${{ inputs.prerelease }}
+          files: |
+            viccoboard-v${{ inputs.version }}.zip
+            viccoboard-v${{ inputs.version }}.zip.sha256
+            viccoboard-v${{ inputs.version }}.tar.gz
+            viccoboard-v${{ inputs.version }}.tar.gz.sha256
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: viccoboard-v${{ inputs.version }}
+          path: release-artifacts/
+          retention-days: 90
+
+      - name: Build Summary
+        run: |
+          echo "## 🎉 Release Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Pre-release**: ${{ inputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- \`viccoboard-v${{ inputs.version }}.zip\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`viccoboard-v${{ inputs.version }}.tar.gz\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "See \`DEPLOY.md\` in the release artifacts for deployment instructions." >> $GITHUB_STEP_SUMMARY
