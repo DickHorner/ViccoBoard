@@ -55,7 +55,7 @@
 
       <div v-if="tasks.length === 0" class="empty">No tasks found for this exam.</div>
       <div v-else class="task-grid">
-        <div v-for="task in tasks" :key="task.id" class="task-row">
+        <div v-for="(task, taskIndex) in tasks" :key="task.id" class="task-row">
           <div class="task-info">
             <strong>{{ task.title }}</strong>
             <span class="muted">Max {{ task.points }} pts</span>
@@ -75,12 +75,17 @@
             </div>
             <input
               v-else
+              :ref="(el) => registerScoreInput(el as HTMLInputElement | null, taskIndex)"
               v-model.number="taskScores[task.id]"
               type="number"
               min="0"
               :max="task.points"
               step="0.5"
               class="score-input"
+              :tabindex="taskIndex + 1"
+              :aria-label="`Points for ${task.title} (max ${task.points})`"
+              @focus="($event.target as HTMLInputElement).select()"
+              @keydown="onScoreKeydown($event, taskIndex)"
             />
           </div>
         </div>
@@ -103,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { createUuid } from '../utils/uuid'
@@ -112,7 +117,7 @@ import { useToast } from '../composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
-const { examRepository, recordCorrectionUseCase } = useExamsBridge()
+const { examRepository, recordCorrectionUseCase, gradingKeyService } = useExamsBridge()
 const { success, error } = useToast()
 
 const exam = ref<ExamsTypes.Exam | null>(null)
@@ -127,6 +132,36 @@ const taskScores = ref<Record<string, number>>({})
 const useAlternativeGrading = ref(false)
 const alternativeGrades = ref<Record<string, ExamsTypes.AlternativeGrading['type']>>({})
 const alternativeOptions: ExamsTypes.AlternativeGrading['type'][] = ['++', '+', '0', '-', '--']
+
+// Tab navigation: collect score input refs by index
+const scoreInputEls = ref<HTMLInputElement[]>([])
+
+const registerScoreInput = (el: HTMLInputElement | null, index: number): void => {
+    scoreInputEls.value[index] = el
+  } else {
+    delete scoreInputEls.value[index]
+    scoreInputEls.value[index] = el
+  }
+}
+
+const focusScoreInput = (index: number) => {
+  const target = scoreInputEls.value[index]
+  if (target) {
+    target.focus()
+    target.select()
+  }
+}
+
+const onScoreKeydown = (event: KeyboardEvent, index: number) => {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    const next = scoreInputEls.value[index + 1]
+    if (next) {
+      next.focus()
+      next.select()
+    }
+  }
+}
 
 const alternativeToPoints = (task: ExamsTypes.TaskNode, option: ExamsTypes.AlternativeGrading['type']): number => {
   const max = task.points || 0
@@ -164,19 +199,21 @@ const percentageScore = computed(() =>
 
 const pointsToNextGrade = computed(() => {
   const gradingKey = exam.value?.gradingKey
-  if (!gradingKey || gradingKey.gradeBoundaries.length === 0) return 'n/a'
-  const sorted = [...gradingKey.gradeBoundaries]
-    .filter(b => b.minPoints !== undefined)
-    .sort((a, b) => (a.minPoints ?? 0) - (b.minPoints ?? 0))
-  const next = sorted.find(b => (b.minPoints ?? 0) > totalPoints.value)
-  if (!next || next.minPoints === undefined) return '0'
-  return Math.max(next.minPoints - totalPoints.value, 0).toFixed(1)
+  if (!gradingKey) return 'n/a'
+  const pts = gradingKeyService?.pointsToNextGrade(totalPoints.value, gradingKey)
+  if (pts === undefined || pts === null) return 'n/a'
+  return pts.toFixed(1)
 })
 
-const canSave = computed(() => Boolean(exam.value && selectedCandidateId.value))
+  const examId = route.params.id as string
+  if (!examId) {
+    error('No exam ID provided.')
+    router.push('/exams')
+    return
+  }
 
 const loadExam = async () => {
-  const examId = route.params.examId as string
+  const examId = route.params.id as string
   const data = await examRepository?.findById(examId) ?? null
   if (!data) {
     error('Exam not found.')
@@ -246,9 +283,17 @@ watch(useAlternativeGrading, (enabled) => {
     tasks.value.forEach(task => {
       if (!alternativeGrades.value[task.id]) {
         setAlternative(task, '0')
-      }
+  if (!useAlternativeGrading.value) {
+    nextTick(() => focusScoreInput(0))
+  }
     })
   }
+})
+
+watch(tasks, () => {
+  // Clear stale refs; the upcoming render will repopulate via registerScoreInput
+  scoreInputEls.value = []
+  nextTick(() => focusScoreInput(0))
 })
 
 onMounted(() => {
