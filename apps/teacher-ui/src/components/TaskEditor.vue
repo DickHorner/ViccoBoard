@@ -9,10 +9,16 @@
     <div class="task-header">
       <div
         class="drag-handle"
-        title="Drag to reorder"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss        draggable="true"
+        :title="`Drag to reorder task ${taskNumber}`"
+        :aria-label="`Drag handle for task ${taskNumber}. Use Alt+Up or Alt+Down to reorder with keyboard.`"
+        role="button"
+        tabindex="0"
+        @keydown.enter.prevent="handleKeyActivate"
+        @keydown.space.prevent="handleKeyActivate"
         @dragstart="handleDragStart"
         @dragend="handleDragEnd"
-        aria-hidden="true"
+        @keydown="handleKeyReorder"
       >
         ⋮⋮
       </div>
@@ -157,6 +163,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useExamBuilderStore, type TaskDraft } from '../stores/examBuilderStore'
+import { useToast } from '../composables/useToast'
 
 interface Props {
   task: TaskDraft
@@ -180,6 +187,7 @@ defineEmits<{
 }>()
 
 const store = useExamBuilderStore()
+const toast = useToast()
 const isDragging = ref(false)
 const isDragOver = ref(false)
 
@@ -248,7 +256,7 @@ const handleDrop = (event: DragEvent) => {
 
     // Only allow drops within same level for safety
     if (fromLevel !== props.level) {
-      console.warn('Cannot move tasks between different hierarchy levels')
+      toast.warning('Cannot move tasks between different hierarchy levels')
       return
     }
 
@@ -266,7 +274,7 @@ const handleDrop = (event: DragEvent) => {
       // Nested level reorder within same parent
       // Validate that dragged task belongs to the same parent
       if (data.parentId !== props.parentTask.id) {
-        console.warn('Cannot move tasks between different parent subtask lists')
+        toast.warning('Cannot move tasks between different parent subtask lists')
         return
       }
       const fromPos = props.parentTask.subtasks.findIndex(t => t.id === taskId)
@@ -275,13 +283,37 @@ const handleDrop = (event: DragEvent) => {
       }
     }
   } catch (err) {
-    console.error('Error processing drop:', err)
+    toast.error('Error reordering tasks. Please try again.')
   }
 }
 
 const handleDragEnd = () => {
   isDragging.value = false
   isDragOver.value = false
+}
+
+const handleKeyReorder = (event: KeyboardEvent) => {
+  if (!event.altKey) return
+  if (event.key === 'ArrowUp') {
+    event.preventDefault()
+    if (props.level === 1) {
+      store.moveTask(store.tasks, props.index, -1)
+    } else if (props.parentTask) {
+      store.moveTask(props.parentTask.subtasks, props.index, -1)
+    }
+  } else if (event.key === 'ArrowDown') {
+    event.preventDefault()
+    if (props.level === 1) {
+      store.moveTask(store.tasks, props.index, 1)
+    } else if (props.parentTask) {
+      store.moveTask(props.parentTask.subtasks, props.index, 1)
+    }
+  }
+}
+
+const handleKeyActivate = (event: KeyboardEvent) => {
+  if (event.repeat) return
+  toast.info('Use Alt+Up or Alt+Down to reorder tasks.')
 }
 </script>
 
