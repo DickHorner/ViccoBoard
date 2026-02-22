@@ -41,7 +41,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/exams/:id/correct',
     name: 'exam-correct',
-    component: () => import('../views/CorrectionCompact.vue'),
+    component: () => import('../views/CorrectionCompactUI_v2.vue'),
     meta: { title: 'Exam Correction' }
   },
   {
