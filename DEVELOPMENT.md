@@ -7,6 +7,9 @@
 - **Modularity:** domain logic in `modules/*`, interfaces in `packages/core`, storage adapters in `packages/storage`.
 - **Centralized student management:** `Student`/`StudentRepository` live in `modules/students`. No app-level or storage-level student repos/stores.
 - **Zen-first coding:** apply Zen of Python principles globally (explicit, simple, readable, one clear way).
+- **Repo-first execution:** before edits, sample 2-3 similar in-repo implementations and follow existing patterns.
+- **Minimal-diff discipline:** keep patches local and avoid drive-by refactors in the same change.
+- **Evidence-based claims:** classify completion statements as VERIFIED / INFERRED / NOT VERIFIED.
 
 ## Getting Started
 
@@ -552,3 +555,4 @@ if (DEBUG) {
 ---
 
 Happy coding! 🚀
+
