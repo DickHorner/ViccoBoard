@@ -164,4 +164,4 @@ npm test
 npm run build:ipad
 ```
 
-All files shown above are **already in your repository** at `C:\Users\jaspe\OneDrive\Coding\ViccoBoard`.
+All files shown above are **already in your repository** (repository root).
