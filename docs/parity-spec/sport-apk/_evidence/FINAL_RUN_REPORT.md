@@ -2,16 +2,16 @@
 
 **Report Date:** 2026-02-07  
 **Git Commit:** `023a505073bbba35c2a5dc7b7e6b59d9d9630f09`  
-**Execution Scope:** SPORTZENS_PARITY_v2.md (WOW excluded)  
+**Execution Scope:** sport_parity_v2.md (WOW excluded)  
 **Agent:** GitHub Copilot (Claude Sonnet 4.5)
 
 ---
 
 ## Executive Summary
 
-This report documents the execution of SPORTZENS_PARITY_v2.md, which defines a 10-phase process to achieve 100% functional and options parity between:
-- **SportZens APK** (without WOW) → ViccoBoard
-- **KURT** (full spec from Plan.md §6.9-§6.22) → ViccoBoard
+This report documents the execution of sport_parity_v2.md, which defines a 10-phase process to achieve 100% functional and options parity between:
+- **Sport APK** (without WOW) → ViccoBoard
+- **KBR** (full spec from Plan.md §6.9-§6.22) → ViccoBoard
 
 **Phases Completed:** 0-2 (Baseline, Ledgers)  
 **Phases Remaining:** 3-9 (Implementation)  
@@ -29,10 +29,10 @@ This report documents the execution of SPORTZENS_PARITY_v2.md, which defines a 1
 **Actions Performed:**
 1. Verified repo structure and parity-spec artifacts
 2. Created ledger/evidence directories:
-   - `docs/parity-spec/sportzens-apk/_ledger/`
-   - `docs/parity-spec/sportzens-apk/_evidence/`
-   - `docs/parity-spec/kurt/_ledger/`
-   - `docs/parity-spec/kurt/_evidence/`
+   - `docs/parity-spec/sport-apk/_ledger/`
+   - `docs/parity-spec/sport-apk/_evidence/`
+   - `docs/parity-spec/KBR/_ledger/`
+   - `docs/parity-spec/KBR/_evidence/`
 3. Executed build commands:
    - `npm install` → ✅ Success
    - `npm run build:packages` → ✅ Success
@@ -50,7 +50,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ---
 
-### ✅ Phase 1: SportZens Parity-Spec Ingest + Ledger
+### ✅ Phase 1: Sport Parity-Spec Ingest + Ledger
 
 **Status:** COMPLETED  
 **Date:** 2026-02-07
@@ -73,7 +73,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
    - QA gates defined
 
 **Key Findings:**
-- SportZens i18n contains ~60 sections, ~900-1000 leaf keys
+- Sport i18n contains ~60 sections, ~900-1000 leaf keys
 - WOW has ~60 i18n keys (all excluded)
 - 9 schemas total, 8 in scope (class, student, grade, category, table, gradeWeighting, userData, newDayData)
 - Core entities (class, student, grade, category) already exist in ViccoBoard types
@@ -82,29 +82,29 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ---
 
-### ✅ Phase 2: KURT Spec Ingest + Ledger
+### ✅ Phase 2: KBR Spec Ingest + Ledger
 
 **Status:** COMPLETED  
 **Date:** 2026-02-07
 
 **Artifacts Created:**
-1. **KURT_LEDGER.md**
+1. **KBR_LEDGER.md**
    - Extracted 69 checkboxes from Plan.md §6.9-§6.22
    - Mapped to ISSUES_TRACKER phases (P5-P6 existing, P7-P18 new)
    - All checkboxes documented with priority (P0/P1/P2)
 
-2. **KURT_MATRIX.csv**
+2. **KBR_MATRIX.csv**
    - 69 rows, one per checkbox
    - All marked `implemented=no` (baseline)
    - Includes section, text_short, priority, scope
 
-3. **KURT_ASSERTIONS.md**
-   - Definition of Done for each KURT section
+3. **KBR_ASSERTIONS.md**
+   - Definition of Done for each KBR section
    - Test strategies per feature
-   - Acceptance gates defined (GATE 1-6 for KURT)
+   - Acceptance gates defined (GATE 1-6 for KBR)
 
 **Key Findings:**
-- KURT has 14 major feature sections (§6.9-§6.22)
+- KBR has 14 major feature sections (§6.9-§6.22)
 - 69 total checkboxes spanning:
   - Exam builder (7)
   - Gradekey (7)
@@ -120,7 +120,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
   - Format Support (1)
   - Oberstufe EWH (5)
 
-**GATE 2 Status:** ✅ PASS (KURT_MATRIX contains all checkboxes, nothing missing)
+**GATE 2 Status:** ✅ PASS (KBR_MATRIX contains all checkboxes, nothing missing)
 
 ---
 
@@ -132,7 +132,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 **Required Actions:**
 1. Install vue-i18n (`npm install vue-i18n@9`)
 2. Create i18n setup in `apps/teacher-ui/src/i18n/`
-3. Copy `docs/parity-spec/sportzens-apk/i18n/*.json` to `apps/teacher-ui/src/i18n/locales/`
+3. Copy `docs/parity-spec/sport-apk/i18n/*.json` to `apps/teacher-ui/src/i18n/locales/`
 4. Implement missing key marker system (`⟦MISSING:key⟧`)
 5. Write i18n coverage tests
 
@@ -140,7 +140,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ---
 
-### ⏳ Phase 4: SportZens Schema-Parität (ohne WOW)
+### ⏳ Phase 4: Sport Schema-Parität (ohne WOW)
 
 **Status:** NOT STARTED  
 **Reason:** Requires 2-3 days implementation (field mapping, roundtrip tests)
@@ -155,7 +155,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ---
 
-### ⏳ Phase 5: SportZens Workflows/UI (ohne WOW)
+### ⏳ Phase 5: Sport Workflows/UI (ohne WOW)
 
 **Status:** NOT STARTED  
 **Reason:** Requires 2-4 weeks implementation (UI screens, workflows, tests)
@@ -175,7 +175,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ---
 
-### ⏳ Phase 6: KURT Data Layer + UI Builder
+### ⏳ Phase 6: KBR Data Layer + UI Builder
 
 **Status:** NOT STARTED  
 **Reason:** Requires 1-2 weeks implementation
@@ -191,7 +191,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ---
 
-### ⏳ Phase 7: KURT Correction & Grading
+### ⏳ Phase 7: KBR Correction & Grading
 
 **Status:** NOT STARTED  
 **Reason:** Requires 2-3 weeks implementation
@@ -208,7 +208,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ---
 
-### ⏳ Phase 8: KURT Fördertipps/Export/Mail
+### ⏳ Phase 8: KBR Fördertipps/Export/Mail
 
 **Status:** NOT STARTED  
 **Reason:** Requires 2-3 weeks implementation
@@ -252,7 +252,7 @@ dist/assets/index-DEF1m9Mf.js   112.99 kB (gzip: 44.02 kB)
 
 ## Restliste (Open Items)
 
-### SportZens Parity Matrix
+### Sport Parity Matrix
 
 **Total Items:** 150+ (representative sample)  
 **Implemented:** 25 items (core types exist)  
@@ -300,7 +300,7 @@ route,/tournaments,yes,in_scope_v2,no
 
 ---
 
-### KURT Matrix
+### KBR Matrix
 
 **Total Items:** 69 checkboxes  
 **Implemented:** 0 checkboxes  
@@ -354,14 +354,14 @@ checkbox_id,section,text_short,priority,implemented
 | Phase | Description | Estimated Effort | Status |
 |-------|-------------|------------------|--------|
 | Phase 0 | Baseline + Build | 2 hours | ✅ Done |
-| Phase 1 | SportZens Ledger | 3 hours | ✅ Done |
-| Phase 2 | KURT Ledger | 2 hours | ✅ Done |
+| Phase 1 | Sport Ledger | 3 hours | ✅ Done |
+| Phase 2 | KBR Ledger | 2 hours | ✅ Done |
 | Phase 3 | i18n Infrastructure | 1-2 days | ⏳ Not started |
 | Phase 4 | Schema Parity | 2-3 days | ⏳ Not started |
-| Phase 5 | SportZens Workflows/UI | 2-4 weeks | ⏳ Not started |
-| Phase 6 | KURT Data Layer + Builder | 1-2 weeks | ⏳ Not started |
-| Phase 7 | KURT Correction + Grading | 2-3 weeks | ⏳ Not started |
-| Phase 8 | KURT Features (Tips/Export/Mail) | 2-3 weeks | ⏳ Not started |
+| Phase 5 | Sport Workflows/UI | 2-4 weeks | ⏳ Not started |
+| Phase 6 | KBR Data Layer + Builder | 1-2 weeks | ⏳ Not started |
+| Phase 7 | KBR Correction + Grading | 2-3 weeks | ⏳ Not started |
+| Phase 8 | KBR Features (Tips/Export/Mail) | 2-3 weeks | ⏳ Not started |
 | Phase 9 | Security/Backup | 3-5 days | ⏳ Not started |
 | Phase 10 | Finalization + Report | 1 day | 🔄 In progress |
 
@@ -395,7 +395,7 @@ npm run build:ipad
 
 ## Parity Gate Decision
 
-### SPORTZENS_PARITY_WITHOUT_WOW
+### SPORT_PARITY_WITHOUT_WOW
 
 **Status:** ❌ **FAIL**
 
@@ -409,18 +409,18 @@ npm run build:ipad
 
 ---
 
-### KURT_COMPLETE
+### KBR_COMPLETE
 
 **Status:** ❌ **FAIL**
 
-**Reason:** KURT_MATRIX contains 69 checkboxes with `implemented=no`
+**Reason:** KBR_MATRIX contains 69 checkboxes with `implemented=no`
 
 **Critical Gaps:**
 - Exam builder not implemented (0/7 checkboxes)
 - Gradekey engine not implemented (0/7 checkboxes)
 - Correction UI not implemented (0/11 checkboxes)
 - Fördertipps DB not implemented (0/9 checkboxes)
-- All other KURT features not implemented (0/31 remaining checkboxes)
+- All other KBR features not implemented (0/31 remaining checkboxes)
 
 ---
 
@@ -430,8 +430,8 @@ npm run build:ipad
 
 **Justification:**
 - Restlist is NOT empty
-- SportZens: ~125+ open items (of ~150 total)
-- KURT: 69 open items (of 69 total)
+- Sport: ~125+ open items (of ~150 total)
+- KBR: 69 open items (of 69 total)
 - Phases 3-9 not started (only ledgers/baseline complete)
 
 ---
@@ -449,22 +449,22 @@ npm run build:ipad
    - Write roundtrip tests
 
 ### Short-Term Actions (Month 1)
-3. **Phase 5 (SportZens Core):**
+3. **Phase 5 (Sport Core):**
    - Implement grading workflows (criteria, time, Cooper, Shuttle)
    - Build tables import/export
    - Add attendance tracking
-4. **Phase 6 (KURT Core):**
+4. **Phase 6 (KBR Core):**
    - Implement exam data layer
    - Build simple + complex exam builders
 
 ### Mid-Term Actions (Month 2-3)
-5. **Phase 7:** KURT Correction + Grading
-6. **Phase 8:** KURT Fördertipps + Export + Email
+5. **Phase 7:** KBR Correction + Grading
+6. **Phase 8:** KBR Fördertipps + Export + Email
 7. **Phase 9:** Security + Backup
 
 ### Long-Term Actions (Month 3-4)
-8. **Phase 5 (SportZens Tools):** Timer, Scoreboard, Tournaments, etc.
-9. **Phase 8 (Advanced KURT):** Group Correction, Sharing, Oberstufe EWH
+8. **Phase 5 (Sport Tools):** Timer, Scoreboard, Tournaments, etc.
+9. **Phase 8 (Advanced KBR):** Group Correction, Sharing, Oberstufe EWH
 10. **Final QA:** Manual testing on iPad Safari, Offline tests, Split View tests
 
 ---
@@ -472,28 +472,28 @@ npm run build:ipad
 ## Artifacts Generated
 
 ### Ledger Files (Phase 1-2)
-- ✅ `docs/parity-spec/sportzens-apk/_ledger/PARITY_LEDGER.md`
-- ✅ `docs/parity-spec/sportzens-apk/_ledger/PARITY_MATRIX.csv`
-- ✅ `docs/parity-spec/sportzens-apk/_ledger/PARITY_ASSERTIONS.md`
-- ✅ `docs/parity-spec/kurt/_ledger/KURT_LEDGER.md`
-- ✅ `docs/parity-spec/kurt/_ledger/KURT_MATRIX.csv`
-- ✅ `docs/parity-spec/kurt/_ledger/KURT_ASSERTIONS.md`
+- ✅ `docs/parity-spec/sport-apk/_ledger/PARITY_LEDGER.md`
+- ✅ `docs/parity-spec/sport-apk/_ledger/PARITY_MATRIX.csv`
+- ✅ `docs/parity-spec/sport-apk/_ledger/PARITY_ASSERTIONS.md`
+- ✅ `docs/parity-spec/KBR/_ledger/KBR_LEDGER.md`
+- ✅ `docs/parity-spec/KBR/_ledger/KBR_MATRIX.csv`
+- ✅ `docs/parity-spec/KBR/_ledger/KBR_ASSERTIONS.md`
 
 ### Evidence Files
-- ✅ `docs/parity-spec/sportzens-apk/_evidence/FINAL_RUN_REPORT.md` (this file)
+- ✅ `docs/parity-spec/sport-apk/_evidence/FINAL_RUN_REPORT.md` (this file)
 
 ---
 
 ## Conclusion
 
-The SPORTZENS_PARITY_v2 execution has successfully completed the **baseline and planning phases** (Phases 0-2), establishing:
-- Complete parity ledgers for SportZens and KURT
+The SPORT_PARITY_v2 execution has successfully completed the **baseline and planning phases** (Phases 0-2), establishing:
+- Complete parity ledgers for Sport and KBR
 - Build infrastructure verification
 - Test strategy definitions
 
 However, the **implementation phases (3-9) remain unstarted**, resulting in:
 - **PARITY_GATE=FAIL**
-- **~195 open items** (125+ SportZens + 69 KURT)
+- **~195 open items** (125+ Sport + 69 KBR)
 - **Estimated 10-14 weeks** of full-time development remaining
 
 **Next recommended action:** Begin Phase 3 (i18n Infrastructure) to establish string parity, followed by iterative implementation of Phases 4-9.

@@ -7,7 +7,7 @@ import { GradeCategoryRepository } from '../src/repositories/grade-category.repo
 import { StudentRepository } from '@viccoboard/students';
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
 import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage/node';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('PerformanceEntryRepository', () => {
   let storage: SQLiteStorage;

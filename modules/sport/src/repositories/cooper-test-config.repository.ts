@@ -4,7 +4,7 @@
  */
 
 import { AdapterRepository } from '@viccoboard/storage';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class CooperTestConfigRepository extends AdapterRepository<Sport.CooperTestConfig> {
@@ -16,7 +16,7 @@ export class CooperTestConfigRepository extends AdapterRepository<Sport.CooperTe
     return {
       id: row.id,
       name: row.name,
-      sportType: row.sport_type,
+      SportType: row.sport_type,
       distanceUnit: row.distance_unit,
       lapLengthMeters: row.lap_length_meters,
       gradingTableId: row.grading_table_id ?? undefined,
@@ -31,7 +31,7 @@ export class CooperTestConfigRepository extends AdapterRepository<Sport.CooperTe
 
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.name !== undefined) row.name = entity.name;
-    if (entity.sportType !== undefined) row.sport_type = entity.sportType;
+    if (entity.SportType !== undefined) row.sport_type = entity.SportType;
     if (entity.distanceUnit !== undefined) row.distance_unit = entity.distanceUnit;
     if (entity.lapLengthMeters !== undefined) row.lap_length_meters = entity.lapLengthMeters;
     if (entity.gradingTableId !== undefined) row.grading_table_id = entity.gradingTableId;
@@ -43,8 +43,8 @@ export class CooperTestConfigRepository extends AdapterRepository<Sport.CooperTe
   }
 
   async findBySportType(
-    sportType: Sport.CooperTestConfig['sportType']
+    SportType: Sport.CooperTestConfig['SportType']
   ): Promise<Sport.CooperTestConfig[]> {
-    return this.find({ sport_type: sportType });
+    return this.find({ sport_type: SportType });
   }
 }

@@ -17,7 +17,7 @@ import {
   correctionSchemaMigration,
   IndexedDBClassGroupColorMigration,
   IndexedDBClassGroupArchiveMigration,
-  IndexedDBSportZensSchemaMigration,
+  IndexedDBSportSchemaMigration,
   IndexedDBToolSessionsSchemaMigration
 } from '@viccoboard/storage/browser';
 import type { StorageAdapter } from '@viccoboard/storage/browser';
@@ -49,7 +49,7 @@ export async function initializeStorage(): Promise<StorageAdapter> {
   storage.registerMigration(correctionSchemaMigration);
   storage.registerMigration(new IndexedDBClassGroupColorMigration());
   storage.registerMigration(new IndexedDBClassGroupArchiveMigration());
-  storage.registerMigration(new IndexedDBSportZensSchemaMigration());
+  storage.registerMigration(new IndexedDBSportSchemaMigration());
   storage.registerMigration(new IndexedDBToolSessionsSchemaMigration());
 
   // Initialize with empty password (no encryption yet)

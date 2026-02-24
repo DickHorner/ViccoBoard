@@ -1,7 +1,7 @@
 {
   "name": "@viccoboard/sport",
   "version": "0.1.0",
-  "description": "SportZens domain module - sports education management",
+  "description": "Sport domain module - Sports education management",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

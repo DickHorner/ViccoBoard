@@ -1,17 +1,17 @@
 /**
- * SportZens Grade Repository
- * Stores raw SportZens grade schema fields in grades.
+ * Sport Grade Repository
+ * Stores raw Sport grade schema fields in grades.
  */
 
-import { SportZens, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
+import { SportSchema, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
-export class SportZensGradeRepository {
+export class SportGradeRepository {
   private readonly tableName = 'grades';
 
   constructor(private adapter: StorageAdapter) {}
 
-  async save(entity: SportZens.SportZensGrade): Promise<SportZens.SportZensGrade> {
+  async save(entity: SportSchema.SportGrade): Promise<SportSchema.SportGrade> {
     const existing = await this.adapter.getById(this.tableName, entity.id);
     const row = this.mapToRow(entity);
 
@@ -24,12 +24,12 @@ export class SportZensGradeRepository {
     return entity;
   }
 
-  async findById(id: string): Promise<SportZens.SportZensGrade | null> {
+  async findById(id: string): Promise<SportSchema.SportGrade | null> {
     const row = await this.adapter.getById(this.tableName, id);
     return row ? this.mapToEntity(row) : null;
   }
 
-  async findAll(): Promise<SportZens.SportZensGrade[]> {
+  async findAll(): Promise<SportSchema.SportGrade[]> {
     const rows = await this.adapter.getAll(this.tableName);
     return rows.map((row) => this.mapToEntity(row));
   }
@@ -38,7 +38,7 @@ export class SportZensGradeRepository {
     return this.adapter.delete(this.tableName, id);
   }
 
-  private mapToEntity(row: Record<string, unknown>): SportZens.SportZensGrade {
+  private mapToEntity(row: Record<string, unknown>): SportSchema.SportGrade {
     return {
       category_id: row.category_id as string,
       class_id: row.class_id as string,
@@ -48,7 +48,7 @@ export class SportZensGradeRepository {
       type: row.type as string,
       year: row.year as number,
       created_at: row.created_at as string | undefined,
-      criterias: safeJsonParse(row.criterias as string | undefined, undefined, 'SportZensGrade.criterias'),
+      criterias: safeJsonParse(row.criterias as string | undefined, undefined, 'SportGrade.criterias'),
       deleted: row.deleted as number | undefined,
       grade: row.grade as string | undefined,
       is_dirty: row.is_dirty as number | undefined,
@@ -60,7 +60,7 @@ export class SportZensGradeRepository {
     };
   }
 
-  private mapToRow(entity: SportZens.SportZensGrade): Record<string, unknown> {
+  private mapToRow(entity: SportSchema.SportGrade): Record<string, unknown> {
     return {
       id: entity.id,
       category_id: entity.category_id,
@@ -70,7 +70,7 @@ export class SportZensGradeRepository {
       type: entity.type,
       year: entity.year,
       created_at: entity.created_at,
-      criterias: entity.criterias ? safeJsonStringify(entity.criterias, 'SportZensGrade.criterias') : undefined,
+      criterias: entity.criterias ? safeJsonStringify(entity.criterias, 'SportGrade.criterias') : undefined,
       deleted: entity.deleted,
       grade: entity.grade,
       is_dirty: entity.is_dirty,

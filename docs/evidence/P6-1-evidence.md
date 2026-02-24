@@ -43,7 +43,7 @@
 ### Step 4: Run full test suite
 - Action: `npm test` from repository root
 - Expected: All tests pass
-- Actual: 241 exams tests pass, 273 sport tests pass, 74 teacher-ui tests pass, 24 students tests pass
+- Actual: 241 exams tests pass, 273 Sport tests pass, 74 teacher-ui tests pass, 24 students tests pass
 - Result: `PASS`
 
 ## Persistence Check

@@ -25,7 +25,7 @@ Completed systematic migration of ALL UI views from old composable imports to pr
    - Build verified: ✅ 3.69s success message captured
 
 2. **GradeHistory.vue** ✅
-   - Changed: Removed unused `sportBridge` reference
+   - Changed: Removed unused `SportBridge` reference
    - Cleanup: Removed TS6133 unused declaration warnings
    - Type fixes: All imports properly resolved
 
@@ -84,9 +84,9 @@ Completed systematic migration of ALL UI views from old composable imports to pr
 - **Resolution:** Reviewed AdapterRepository implementation to verify signature
 
 #### Issue D: Promise Chain Type Issues (MittelstreckeGradingEntry)
-- **Root Cause:** Optional chaining on sportBridge could return undefined Promise
+- **Root Cause:** Optional chaining on SportBridge could return undefined Promise
 - **Error:** "Argument of type 'Promise<T> | undefined' not assignable"
-- **Fix:** Wrapped entire chain in null check: `if (sportBridge.value) { push(...) }`
+- **Fix:** Wrapped entire chain in null check: `if (SportBridge.value) { push(...) }`
 
 #### Issue E: Missing Property References
 - **Problem 1:** `timestamp: new Date()` not valid in RecordGradeInput type
@@ -127,13 +127,13 @@ import { useSportBridge } from '../composables/useSportBridge'
 import { useStudents } from '../composables/useStudents'
 
 const { 
-  sportBridge,           // COMPUTED REF - use .value
+  SportBridge,           // COMPUTED REF - use .value
   gradeCategories,       // Direct getters
   performanceEntries
 } = useSportBridge()
 
 // Usage patterns:
-await sportBridge.value?.recordGradeUseCase.execute({...})    // .value needed
+await SportBridge.value?.recordGradeUseCase.execute({...})    // .value needed
 const categories = gradeCategories.value  // Might have .value depending on impl
 ```
 
@@ -185,8 +185,8 @@ const students = await studentRepository?.findAll()
   - All student access through `useStudents().repository`
   - No parallel student stores detected
 
-- ✅ Rule 5: Sport logic through `modules/sport` + sport bridge
-  - All sport operations use `useSportBridge()`
+- ✅ Rule 5: Sport logic through `modules/sport` + Sport bridge
+  - All Sport operations use `useSportBridge()`
   - Exams logic properly separated
 
 - ✅ Rule 7: No `@ts-nocheck` additions
@@ -287,7 +287,7 @@ const students = await studentRepository?.findAll()
 **Next Session:** 
 1. Run full gate suite (8 tests)
 2. Begin Phase 3: Feature implementation per `Plan.md §6` checkboxes
-3. Use `docs/agents/SPORTZENS_PARITY_v2.md` as execution guide
+3. Use `docs/agents/sport_parity_v2.md` as execution guide
 
 ---
 

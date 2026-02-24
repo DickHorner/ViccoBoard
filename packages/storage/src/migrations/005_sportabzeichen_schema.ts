@@ -8,7 +8,7 @@ import { SQLiteStorage } from '../storage.js';
 
 export class SportabzeichenSchemaMigration implements Migration {
   version = 5;
-  name = 'sportabzeichen_schema';
+  name = 'Sportabzeichen_schema';
 
   constructor(private storage: SQLiteStorage) {}
 
@@ -16,7 +16,7 @@ export class SportabzeichenSchemaMigration implements Migration {
     const db = this.storage.getDatabase();
 
     db.exec(`
-      CREATE TABLE IF NOT EXISTS sportabzeichen_standards (
+      CREATE TABLE IF NOT EXISTS Sportabzeichen_standards (
         id TEXT PRIMARY KEY,
         discipline_id TEXT NOT NULL,
         gender TEXT NOT NULL,
@@ -32,7 +32,7 @@ export class SportabzeichenSchemaMigration implements Migration {
     `);
 
     db.exec(`
-      CREATE TABLE IF NOT EXISTS sportabzeichen_results (
+      CREATE TABLE IF NOT EXISTS Sportabzeichen_results (
         id TEXT PRIMARY KEY,
         student_id TEXT NOT NULL,
         discipline_id TEXT NOT NULL,
@@ -49,11 +49,11 @@ export class SportabzeichenSchemaMigration implements Migration {
     `);
 
     db.exec(`
-      CREATE INDEX IF NOT EXISTS idx_sportabzeichen_standards_discipline ON sportabzeichen_standards(discipline_id);
-      CREATE INDEX IF NOT EXISTS idx_sportabzeichen_standards_gender ON sportabzeichen_standards(gender);
-      CREATE INDEX IF NOT EXISTS idx_sportabzeichen_standards_age ON sportabzeichen_standards(age_min, age_max);
-      CREATE INDEX IF NOT EXISTS idx_sportabzeichen_results_student ON sportabzeichen_results(student_id);
-      CREATE INDEX IF NOT EXISTS idx_sportabzeichen_results_test_date ON sportabzeichen_results(test_date);
+      CREATE INDEX IF NOT EXISTS idx_Sportabzeichen_standards_discipline ON Sportabzeichen_standards(discipline_id);
+      CREATE INDEX IF NOT EXISTS idx_Sportabzeichen_standards_gender ON Sportabzeichen_standards(gender);
+      CREATE INDEX IF NOT EXISTS idx_Sportabzeichen_standards_age ON Sportabzeichen_standards(age_min, age_max);
+      CREATE INDEX IF NOT EXISTS idx_Sportabzeichen_results_student ON Sportabzeichen_results(student_id);
+      CREATE INDEX IF NOT EXISTS idx_Sportabzeichen_results_test_date ON Sportabzeichen_results(test_date);
     `);
   }
 
@@ -61,8 +61,8 @@ export class SportabzeichenSchemaMigration implements Migration {
     const db = this.storage.getDatabase();
 
     db.exec(`
-      DROP TABLE IF EXISTS sportabzeichen_results;
-      DROP TABLE IF EXISTS sportabzeichen_standards;
+      DROP TABLE IF EXISTS Sportabzeichen_results;
+      DROP TABLE IF EXISTS Sportabzeichen_standards;
     `);
   }
 }

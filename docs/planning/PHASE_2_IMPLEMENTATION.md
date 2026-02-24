@@ -1,3 +1,5 @@
+**Historical status:** Phase 2 completed; checklist items below reflect archived completion state.
+
 # Phase 2 UI Framework Decision & Implementation Plan
 
 **Decision Date:** January 16, 2026  
@@ -152,10 +154,10 @@ All UI work stays in `apps/teacher-ui` (Vue 3, static web).
    ```
 
 **Definition of Done:**
-- [ ] Can navigate between all screens
-- [ ] Layout responsive on iPad (portrait/landscape)
-- [ ] Sidebar and header visible
-- [ ] Works offline (no network required)
+- [x] Can navigate between all screens
+- [x] Layout responsive on iPad (portrait/landscape)
+- [x] Sidebar and header visible
+- [x] Works offline (no network required)
 
 ---
 
@@ -203,11 +205,11 @@ async function createClass(name: string) {
 ```
 
 **Definition of Done:**
-- [ ] Can see all classes
-- [ ] Can create new class from button
-- [ ] Data loads from storage
-- [ ] Works offline
-- [ ] Touch targets ≥ 44px
+- [x] Can see all classes
+- [x] Can create new class from button
+- [x] Data loads from storage
+- [x] Works offline
+- [x] Touch targets ≥ 44px
 
 ---
 
@@ -262,11 +264,11 @@ onMounted(async () => {
 ```
 
 **Definition of Done:**
-- [ ] Can view class details
-- [ ] Can see list of students
-- [ ] Can navigate to student profiles
-- [ ] Can access attendance entry
-- [ ] Works offline
+- [x] Can view class details
+- [x] Can see list of students
+- [x] Can navigate to student profiles
+- [x] Can access attendance entry
+- [x] Works offline
 
 ---
 
@@ -317,11 +319,11 @@ onMounted(async () => {
 ```
 
 **Definition of Done:**
-- [ ] Can view student profile
-- [ ] Attendance history displayed
-- [ ] Can edit student info
-- [ ] Photos load correctly
-- [ ] Works offline
+- [x] Can view student profile
+- [x] Attendance history displayed
+- [x] Can edit student info
+- [x] Photos load correctly
+- [x] Works offline
 
 ---
 
@@ -424,11 +426,11 @@ async function recordAttendance() {
 ```
 
 **Definition of Done:**
-- [ ] Can record attendance for all students
-- [ ] Status buttons work correctly
-- [ ] Data saves to storage
-- [ ] Works offline
-- [ ] Touch targets ≥ 44px
+- [x] Can record attendance for all students
+- [x] Status buttons work correctly
+- [x] Data saves to storage
+- [x] Works offline
+- [x] Touch targets ≥ 44px
 
 ---
 
@@ -473,11 +475,11 @@ async function recordAttendance() {
 4. Test all workflows offline
 
 **Definition of Done:**
-- [ ] All screens wired to use cases
-- [ ] Can create class → add students → record attendance
-- [ ] All data persists offline
-- [ ] Error messages display correctly
-- [ ] No console errors
+- [x] All screens wired to use cases
+- [x] Can create class → add students → record attendance
+- [x] All data persists offline
+- [x] Error messages display correctly
+- [x] No console errors
 
 ---
 
@@ -491,12 +493,12 @@ async function recordAttendance() {
 5. Accessibility check
 
 **Checklist:**
-- [ ] Works on iPad (portrait/landscape/split)
-- [ ] Touch targets ≥ 44px
-- [ ] Works without network
-- [ ] No console errors
-- [ ] Load time < 2 seconds
-- [ ] Storage persists data correctly
+- [x] Works on iPad (portrait/landscape/split)
+- [x] Touch targets ≥ 44px
+- [x] Works without network
+- [x] No console errors
+- [x] Load time < 2 seconds
+- [x] Storage persists data correctly
 
 ---
 
@@ -635,24 +637,24 @@ npm run build
 ## Next Steps (Immediately After Decision)
 
 1. **Day 1:**
-   - [ ] Confirm Vue 3 decision with team
-   - [ ] Review existing scaffold
-   - [ ] Start Milestone P2-1 (Setup & Nav)
+   - [x] Confirm Vue 3 decision with team
+   - [x] Review existing scaffold
+   - [x] Start Milestone P2-1 (Setup & Nav)
 
 2. **Week 1:**
-   - [ ] Complete P2-1 through P2-4
-   - [ ] Daily testing on iPad
-   - [ ] Daily build verification
+   - [x] Complete P2-1 through P2-4
+   - [x] Daily testing on iPad
+   - [x] Daily build verification
 
 3. **Week 2:**
-   - [ ] Complete P2-5 through P2-7
-   - [ ] Final testing and refinement
-   - [ ] Deployment to static host
+   - [x] Complete P2-5 through P2-7
+   - [x] Final testing and refinement
+   - [x] Deployment to static host
 
 4. **Week 3:**
-   - [ ] Gather feedback
-   - [ ] Minor fixes
-   - [ ] Prepare for Phase 3 (Grading Engine)
+   - [x] Gather feedback
+   - [x] Minor fixes
+   - [x] Prepare for Phase 3 (Grading Engine)
 
 ---
 
@@ -675,3 +677,4 @@ Ready to start Phase 3 tasks:
 **Decision Made:** Vue 3 (Web-First)  
 **Status:** Ready for execution  
 **Next Action:** Begin Phase 2-1 immediately
+

@@ -12,10 +12,10 @@
 - ✅ Missing key handler with visible markers (⟦MISSING:key⟧)
 - ✅ Safari-compatible (no special APIs)
 
-### 2. SportZens Locale Loading
+### 2. Sport Locale Loading
 - ✅ German locale (`de.json`) loaded from parity-spec
 - ✅ English locale (`en.json`) loaded from parity-spec
-- ✅ No modifications to original SportZens strings
+- ✅ No modifications to original Sport strings
 - ✅ WOW keys retained but marked excluded_by_scope_v2 in PARITY_MATRIX
 
 ### 3. Test Coverage
@@ -42,8 +42,8 @@
 
 ## Prepared for Phase 4
 
-**Next Phase:** Phase 4 — SportZens Schema Roundtrip Test
-- **Objective:** Verify all 8 in-scope SportZens schemas (class, student, grade, category, table, gradeWeighting, userData, newDayData) can be exported/imported without data loss
+**Next Phase:** Phase 4 — Sport Schema Roundtrip Test
+- **Objective:** Verify all 8 in-scope Sport schemas (class, student, grade, category, table, gradeWeighting, userData, newDayData) can be exported/imported without data loss
 - **Test:** Create test data → Export → Import → Verify equality (deepEqual)
 - **Scope:** WOW schema excluded (wow.schema.json preserved but not tested)
 

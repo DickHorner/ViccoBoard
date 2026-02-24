@@ -20,7 +20,7 @@ export interface Plugin {
 }
 
 // ============================================================================
-// Assessment Type Plugin (for SportZens grading categories)
+// Assessment Type Plugin (for Sport grading categories)
 // ============================================================================
 
 export interface AssessmentType extends Plugin {
@@ -70,7 +70,7 @@ export interface GradingTable {
   id: string;
   name: string;
   type: 'simple' | 'complex';
-  dimensions?: ('age' | 'gender' | 'sport')[];
+  dimensions?: ('age' | 'gender' | 'Sport')[];
   entries: GradingTableEntry[];
 }
 

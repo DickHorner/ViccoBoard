@@ -12,7 +12,7 @@
 During this session, we discovered and fixed **two critical blockers** that were preventing exam save/load workflows from functioning:
 
 1. **examBuilderStore.ts** - Was still using deprecated `useExams()` from old composables
-2. **KURTExamBuilder.vue** - Was trying to destructure from old useExams pattern
+2. **KBRExamBuilder.vue** - Was trying to destructure from old useExams pattern
 
 Both files have been migrated to use proper `useExamsBridge` patterns. Documentation has been updated to reflect completion. All 8 mandatory gates are passing.
 
@@ -52,9 +52,9 @@ const { examRepository } = useExamsBridge()
 
 ---
 
-### Blocker #2: KURTExamBuilder.vue (CRITICAL)
+### Blocker #2: KBRExamBuilder.vue (CRITICAL)
 
-**File:** `apps/teacher-ui/src/views/KURTExamBuilder.vue`
+**File:** `apps/teacher-ui/src/views/KBRExamBuilder.vue`
 
 **Problem:**
 - Line 223: Destructuring from old `useExams()` pattern
@@ -80,7 +80,7 @@ const { examRepository } = useExamsBridge()
 - `saveExam()`: Now calls `examRepository?.update(id, exam)` and `examRepository?.create(exam)`
 - `onMounted()`: Now calls `examRepository?.findById(id)` for exam loading
 
-**Verification:** ✅ Build passes, KURTExamBuilder renders with proper bridge patterns
+**Verification:** ✅ Build passes, KBRExamBuilder renders with proper bridge patterns
 
 ---
 
@@ -117,10 +117,10 @@ Two different bridge accessor patterns exist in codebase (for future reference):
 ### Sport Bridge Pattern (useSportBridge)
 ```typescript
 import { useSportBridge } from '../composables/useSportBridge'
-const { sportBridge } = useSportBridge()
+const { SportBridge } = useSportBridge()
 
 // REQUIRES .value accessor (computed refs)
-const lessons = await sportBridge.value?.method()
+const lessons = await SportBridge.value?.method()
 ```
 
 ### Exam Bridge Pattern (useExamsBridge)
@@ -141,7 +141,7 @@ const exam = await examRepository?.method()
 - Built in 3.75s
 - Zero TypeScript errors
 - 453 modules transformed
-- Successfully compiled both blockers (examBuilderStore.ts, KURTExamBuilder.vue)
+- Successfully compiled both blockers (examBuilderStore.ts, KBRExamBuilder.vue)
 
 ### Gate 2: npm run lint:docs
 ✅ **PASSED**  
@@ -200,7 +200,7 @@ const exam = await examRepository?.method()
 - ✅ Zero direct database access in any view or store
 - ✅ All UI→Data communication goes through module bridges
 - ✅ Proper dependency injection of repositories
-- ✅ Consistent bridge pattern across exam and sport domains
+- ✅ Consistent bridge pattern across exam and Sport domains
 
 ### Build Quality
 - ✅ Zero TypeScript compilation errors
@@ -228,7 +228,7 @@ const exam = await examRepository?.method()
    - Tournaments.vue ✅ Placeholder, no DB access
    - All tool views are compliant
 
-3. **Other KURT Views Scan**
+3. **Other KBR Views Scan**
    - CorrectionCompactUI.vue variants ✅ (earlier verified)
    - All main views use proper bridges ✅
 
@@ -250,7 +250,7 @@ const exam = await examRepository?.method()
 
 - ⏳ Phase 3 Actual Work (NOT the suggested Phase 3 checklist - most already exists):
   - End-to-end workflow verification (exam save/load, PDF export, email)
-  - Parity matrix validation against SportZens APK
+  - Parity matrix validation against Sport APK
   - UI/UX polish and edge case handling
   - Complete i18n coverage for remaining ~50 keys
 
@@ -279,7 +279,7 @@ When user noted "déja-vu" about Phase 3 checklist, they were right—most of it
 
 ### Immediate (Next 30 minutes)
 1. Test exam save/load workflow manually in browser
-2. Verify no runtime errors in KURTExamBuilder view
+2. Verify no runtime errors in KBRExamBuilder view
 3. Confirm examBuilderStore functions are called correctly
 
 ### Short-term (Next 1-2 hours)
@@ -287,8 +287,8 @@ When user noted "déja-vu" about Phase 3 checklist, they were right—most of it
    - PDF export pipeline validation
    - Email template rendering
    - Sports grading workflows
-2. Spot-check remaining KURT views for bridge compliance
-3. Execute parity matrix scan against SportZens APK
+2. Spot-check remaining KBR views for bridge compliance
+3. Execute parity matrix scan against Sport APK
 
 ### Medium-term (Next session)
 1. Complete i18n coverage for remaining keys
@@ -321,7 +321,7 @@ MODIFIED CODE FILES:
 ✅ apps/teacher-ui/src/stores/examBuilderStore.ts
    - 3 critical fixes (import, saveExam, onMounted)
    
-✅ apps/teacher-ui/src/views/KURTExamBuilder.vue
+✅ apps/teacher-ui/src/views/KBRExamBuilder.vue
    - 3 critical fixes (import, saveExam, onMounted)
 
 UPDATED DOCUMENTATION:

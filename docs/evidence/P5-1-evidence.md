@@ -137,7 +137,7 @@
 | Gate | Status | Output |
 |---|---|---|
 | `npm run lint:docs` | **PASS** ✓ | Doc guardrails passed with no issues |
-| `npm run build:packages` | **PASS** ✓ | All packages built successfully (tsc: core, plugins, storage, students, exams, sport) |
+| `npm run build:packages` | **PASS** ✓ | All packages built successfully (tsc: core, plugins, storage, students, exams, Sport) |
 | `npm run build:ipad` | **PASS** ✓ | iPad build completed in 3.65s; 788MB main bundle (gzip 296.89KB) |
 | `npm test` | **PASS** ✓ | **232 tests** in modules/exams (227 base + 5 new correction-entry tests); 74 tests teacher-ui |
 | Architecture audit | **PASS** ✓ | No app-layer DB access detected |

@@ -310,7 +310,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type { GradeCategory, Student, Criterion, CriteriaGradingConfig } from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge } = useSportBridge();
+const { SportBridge } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
@@ -360,7 +360,7 @@ async function loadData() {
   
   try {
     // Load category
-    category.value = await sportBridge.value.gradeCategoryRepository.read(categoryId);
+    category.value = await SportBridge.value.gradeCategoryRepository.read(categoryId);
     
     if (!category.value) {
       error.value = 'Kategorie nicht gefunden';
@@ -374,7 +374,7 @@ async function loadData() {
     
     // Load existing grades
     for (const student of students.value) {
-      const entries = await sportBridge.value.performanceEntryRepository
+      const entries = await SportBridge.value.performanceEntryRepository
         .findByStudentAndCategory(student.id, categoryId);
       
       if (entries.length > 0) {
@@ -518,7 +518,7 @@ async function saveStudentGrade(studentId: string) {
       measurements[criterionId] = value;
     });
     
-    await sportBridge.value.recordGradeUseCase.execute({
+    await SportBridge.value.recordGradeUseCase.execute({
       studentId,
       categoryId,
       measurements,
@@ -593,7 +593,7 @@ async function addCriterion() {
       lastModified: new Date()
     };
     
-    await sportBridge.value.gradeCategoryRepository.update(
+    await SportBridge.value.gradeCategoryRepository.update(
       category.value.id,
       updatedCategory
     );
@@ -637,7 +637,7 @@ async function removeCriterion(index: number) {
       lastModified: new Date()
     };
     
-    await sportBridge.value.gradeCategoryRepository.update(
+    await SportBridge.value.gradeCategoryRepository.update(
       category.value.id,
       updatedCategory
     );

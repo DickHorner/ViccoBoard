@@ -211,7 +211,7 @@ import { useToast } from '../composables/useToast';
 import type { ClassGroup, Student, GradeCategory, PerformanceEntry, GradeCategoryType } from '@viccoboard/core';
 
 const router = useRouter();
-const { sportBridge } = useSportBridge();
+const { SportBridge } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
@@ -237,7 +237,7 @@ onMounted(async () => {
 
 async function loadClasses() {
   try {
-    classes.value = await sportBridge.value.classGroupRepository.findAll();
+    classes.value = await SportBridge.value.classGroupRepository.findAll();
   } catch (error) {
     console.error('Failed to load classes:', error);
   }
@@ -254,12 +254,12 @@ async function onClassChange() {
   loading.value = true;
   try {
     // Load categories, students, and performance entries
-    categories.value = await sportBridge.value.gradeCategoryRepository.findByClassGroup(selectedClassId.value);
+    categories.value = await SportBridge.value.gradeCategoryRepository.findByClassGroup(selectedClassId.value);
     students.value = await studentRepository.value?.findByClassGroup(selectedClassId.value) ?? [];
     
     // Load all performance entries for students in this class in parallel
     const entryPromises = students.value.map((student) =>
-      sportBridge.value.performanceEntryRepository.findByStudent(student.id)
+      SportBridge.value.performanceEntryRepository.findByStudent(student.id)
     );
     const entriesPerStudent = await Promise.all(entryPromises);
     performanceEntries.value = entriesPerStudent.flat();
@@ -275,7 +275,7 @@ function getCategoryTypeLabel(type: GradeCategoryType): string {
     criteria: 'Kriterienbasiert',
     time: 'Zeitbasiert',
     cooper: 'Cooper-Test',
-    sportabzeichen: 'Sportabzeichen',
+    Sportabzeichen: 'Sportabzeichen',
     bjs: 'Bundesjugendspiele',
     verbal: 'Verbal'
   };
@@ -335,7 +335,7 @@ async function createCategory() {
     } else if (newCategory.value.type === 'cooper') {
       configuration = {
         type: 'cooper',
-        sportType: 'running',
+        SportType: 'running',
         distanceUnit: 'meters',
         autoEvaluation: true
       };
@@ -350,7 +350,7 @@ async function createCategory() {
       throw new Error('Unsupported category type');
     }
     
-    await sportBridge.value.createGradeCategoryUseCase.execute({
+    await SportBridge.value.createGradeCategoryUseCase.execute({
       classGroupId: selectedClassId.value,
       name: newCategory.value.name,
       description: newCategory.value.description || undefined,

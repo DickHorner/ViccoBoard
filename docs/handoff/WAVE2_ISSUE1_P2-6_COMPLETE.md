@@ -148,7 +148,7 @@ Changed Lines:
 
 ### Plan.md Checkboxes Addressed
 
-**§6.2 SportZens — Kernverwaltung:**
+**§6.2 Sport — Kernverwaltung:**
 - ✅ Fehlzeiten: **Statuskatalog konfigurierbar** (eigene Statusoptionen hinzufügen, umbenennen, deaktivieren, sortieren)
 - ✅ Fehlzeiten: **Status-Metadaten** (z. B. Kürzel/Farbe) wirken konsistent in Eingabe, Statistik und Export
 
@@ -195,8 +195,8 @@ Changed Lines:
 - P2-6: Wire AttendanceEntry.vue to StatusCatalog via bridge
 
 ### Next PRs in Wave 2:
-1. **P5-3:** Complex Exam Builder verification (KURTExamBuilder.vue)
-   - Target: `apps/teacher-ui/src/views/KURTExamBuilder.vue`
+1. **P5-3:** Complex Exam Builder verification (KBRExamBuilder.vue)
+   - Target: `apps/teacher-ui/src/views/KBRExamBuilder.vue`
    - Verify: 3-level task hierarchy, choice tasks, bonus points
    
 2. **P6-4:** Comment Boxes & Task-Wise Correction (CorrectionCompactUI.vue)

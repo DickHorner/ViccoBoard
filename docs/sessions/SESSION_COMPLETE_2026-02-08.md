@@ -1,13 +1,13 @@
 # Session Complete - February 8, 2026
 
 ## Session Goal
-Update progress documentation and continue architecture migration work towards SPORTZENS_PARITY_v2.md implementation.
+Update progress documentation and continue architecture migration work towards sport_parity_v2.md implementation.
 
 ## What Was Accomplished
 
 ### ✅ Architecture Foundation Complete
 1. **useExamsBridge Implementation** - Full exams module bridge with all repos, use cases, and services
-2. **Bridge Initialization** - All 3 bridges (sport, students, exams) initialized in main.ts  
+2. **Bridge Initialization** - All 3 bridges (Sport, students, exams) initialized in main.ts  
 3. **2 Views Fully Migrated** - BJSGradingEntry.vue and CriteriaGradingEntry.vue fully compliant
 4. **Demonstrated Migration Pattern** - Proven, repeatable pattern for remaining 7 views
 
@@ -43,7 +43,7 @@ Update progress documentation and continue architecture migration work towards S
 ```typescript
 // ❌ OLD (REMOVED)
 import { useDatabase } from '../composables/useDatabase';
-const { sportBridge, studentsBridge } = useDatabase();
+const { SportBridge, studentsBridge } = useDatabase();
 
 // ✅ NEW (APPLY TO REMAINING 7 VIEWS)
 import { useSportBridge } from '../composables/useSportBridge';
@@ -69,7 +69,7 @@ Per agents.md architecture rules:
 ## Next Session Actions (Priority Order)
 
 ### Phase 2: Complete View Refactoring (4-6 hours)
-1. Apply proven pattern to GradeHistory → TimeGradingEntry (5 sport views)
+1. Apply proven pattern to GradeHistory → TimeGradingEntry (5 Sport views)
 2. Update ExamsOverview for getAll() → findAll() mapping
 3. Refactor CorrectionCompact use case calls
 4. Run `npm test` after each view completion
@@ -83,7 +83,7 @@ grep -r "from '../db'" apps/teacher-ui/src
 Expected: Zero matches
 
 ### Phase 4: Begin Parity Implementation
-Start SPORTZENS_PARITY_v2.md Phase 0 (baseline + tooling)
+Start sport_parity_v2.md Phase 0 (baseline + tooling)
 
 ## Files Modified This Session
 - **Created:** docs/sessions/../architecture/MIGRATION_PROGRESS.md

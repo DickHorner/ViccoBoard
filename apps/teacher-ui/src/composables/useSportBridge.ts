@@ -57,7 +57,9 @@ interface SportBridge {
   cooperTestConfigRepository: CooperTestConfigRepository
   shuttleRunConfigRepository: ShuttleRunConfigRepository
   sportabzeichenStandardRepository: SportabzeichenStandardRepository
+  SportabzeichenStandardRepository: SportabzeichenStandardRepository
   sportabzeichenResultRepository: SportabzeichenResultRepository
+  SportabzeichenResultRepository: SportabzeichenResultRepository
 
   // Use Cases
   createClassUseCase: CreateClassUseCase
@@ -76,6 +78,7 @@ interface SportBridge {
   cooperTestService: CooperTestService
   shuttleRunService: ShuttleRunService
   sportabzeichenService: SportabzeichenService
+  SportabzeichenService: SportabzeichenService
 }
 
 /**
@@ -141,7 +144,9 @@ export function initializeSportBridge(): SportBridge {
     cooperTestConfigRepository: cooperTestConfigRepo,
     shuttleRunConfigRepository: shuttleRunConfigRepo,
     sportabzeichenStandardRepository: sportabzeichenStandardRepo,
+    SportabzeichenStandardRepository: sportabzeichenStandardRepo,
     sportabzeichenResultRepository: sportabzeichenResultRepo,
+    SportabzeichenResultRepository: sportabzeichenResultRepo,
 
     // Use Cases
     createClassUseCase,
@@ -159,7 +164,8 @@ export function initializeSportBridge(): SportBridge {
     timeGradingService,
     cooperTestService,
     shuttleRunService,
-    sportabzeichenService
+    sportabzeichenService,
+    SportabzeichenService: sportabzeichenService
   }
 
   return sportBridgeInstance
@@ -213,6 +219,7 @@ export function useSportBridge() {
 
   return {
     sportBridge: bridge,
+    SportBridge: bridge,
     isInitialized,
 
     // Convenience accessors

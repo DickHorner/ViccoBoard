@@ -1,7 +1,7 @@
 {
   "name": "viccoboard",
   "version": "0.1.0",
-  "description": "Unified Teacher Suite - SportZens + KURT",
+  "description": "Unified Teacher Suite - Sport + KBR",
   "private": true,
   "workspaces": [
     "packages/*",
@@ -25,7 +25,7 @@
   },
   "keywords": [
     "education",
-    "sports",
+    "Sports",
     "assessment",
     "grading",
     "teacher-tools"

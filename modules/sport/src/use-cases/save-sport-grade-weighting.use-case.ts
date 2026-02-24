@@ -1,14 +1,14 @@
 /**
- * Save SportZens GradeWeighting Use Case
+ * Save Sport GradeWeighting Use Case
  */
 
-import { SportZens } from '@viccoboard/core';
-import { SportZensGradeWeightingRepository } from '../repositories/sportzens-grade-weighting.repository.js';
+import { SportSchema } from '@viccoboard/core';
+import { SportGradeWeightingRepository } from '../repositories/sport-grade-weighting.repository.js';
 
-export class SaveSportZensGradeWeightingUseCase {
-  constructor(private repository: SportZensGradeWeightingRepository) {}
+export class SaveSportGradeWeightingUseCase {
+  constructor(private repository: SportGradeWeightingRepository) {}
 
-  async execute(weighting: SportZens.SportZensGradeWeighting): Promise<SportZens.SportZensGradeWeighting> {
+  async execute(weighting: SportSchema.SportGradeWeighting): Promise<SportSchema.SportGradeWeighting> {
     return this.repository.set(weighting);
   }
 }

@@ -1,17 +1,17 @@
 /**
- * SportZens Student Repository
- * Stores raw SportZens student schema fields in students.
+ * Sport Student Repository
+ * Stores raw Sport student schema fields in students.
  */
 
-import { SportZens, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
+import { SportSchema, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
-export class SportZensStudentRepository {
+export class SportStudentRepository {
   private readonly tableName = 'students';
 
   constructor(private adapter: StorageAdapter) {}
 
-  async save(entity: SportZens.SportZensStudent): Promise<SportZens.SportZensStudent> {
+  async save(entity: SportSchema.SportStudent): Promise<SportSchema.SportStudent> {
     const existing = await this.adapter.getById(this.tableName, entity.id);
     const row = this.mapToRow(entity);
 
@@ -24,12 +24,12 @@ export class SportZensStudentRepository {
     return entity;
   }
 
-  async findById(id: string): Promise<SportZens.SportZensStudent | null> {
+  async findById(id: string): Promise<SportSchema.SportStudent | null> {
     const row = await this.adapter.getById(this.tableName, id);
     return row ? this.mapToEntity(row) : null;
   }
 
-  async findAll(): Promise<SportZens.SportZensStudent[]> {
+  async findAll(): Promise<SportSchema.SportStudent[]> {
     const rows = await this.adapter.getAll(this.tableName);
     return rows.map((row) => this.mapToEntity(row));
   }
@@ -38,7 +38,7 @@ export class SportZensStudentRepository {
     return this.adapter.delete(this.tableName, id);
   }
 
-  private mapToEntity(row: Record<string, unknown>): SportZens.SportZensStudent {
+  private mapToEntity(row: Record<string, unknown>): SportSchema.SportStudent {
     return {
       class_id: row.class_group_id as string,
       first_name: row.first_name as string,
@@ -48,13 +48,13 @@ export class SportZensStudentRepository {
       gender: row.gender as string | undefined,
       is_dirty: row.is_dirty as number | undefined,
       public_code: row.public_code as string | undefined,
-      settings: safeJsonParse(row.settings as string | undefined, undefined, 'SportZensStudent.settings'),
-      stats: safeJsonParse(row.stats as string | undefined, undefined, 'SportZensStudent.stats'),
+      settings: safeJsonParse(row.settings as string | undefined, undefined, 'SportStudent.settings'),
+      stats: safeJsonParse(row.stats as string | undefined, undefined, 'SportStudent.stats'),
       version: row.version as number | undefined
     };
   }
 
-  private mapToRow(entity: SportZens.SportZensStudent): Record<string, unknown> {
+  private mapToRow(entity: SportSchema.SportStudent): Record<string, unknown> {
     const now = new Date().toISOString();
     return {
       id: entity.id,
@@ -68,8 +68,8 @@ export class SportZensStudentRepository {
       gender: entity.gender,
       is_dirty: entity.is_dirty,
       public_code: entity.public_code,
-      settings: entity.settings ? safeJsonStringify(entity.settings, 'SportZensStudent.settings') : undefined,
-      stats: entity.stats ? safeJsonStringify(entity.stats, 'SportZensStudent.stats') : undefined,
+      settings: entity.settings ? safeJsonStringify(entity.settings, 'SportStudent.settings') : undefined,
+      stats: entity.stats ? safeJsonStringify(entity.stats, 'SportStudent.stats') : undefined,
       version: entity.version
     };
   }

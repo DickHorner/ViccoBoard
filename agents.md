@@ -1,8 +1,8 @@
 # agents.md — Agent-Setup für Codex/GitHub Copilot
 
-Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle Funktionen und Optionen** aus SportZens und KURT umgesetzt werden, ohne „Feature-Schwund“.
+Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle Funktionen und Optionen** aus Sport und KBR umgesetzt werden, ohne „Feature-Schwund“.
 
-**Pflichtlektüre für jeden Agenten, vor jeder Änderung:** `Plan.md` (insb. Abschnitt 6 „Vollständige Feature-Checkliste“) **und** `docs/agents/SPORTZENS_PARITY_v2.md` (verbindliche Parity-Ausführungsanweisung).
+**Pflichtlektüre für jeden Agenten, vor jeder Änderung:** `Plan.md` (insb. Abschnitt 6 „Vollständige Feature-Checkliste“) **und** `docs/agents/sport_parity_v2.md` (verbindliche Parity-Ausführungsanweisung).
 
 ---
 
@@ -19,7 +19,7 @@ Ziel: Codex/GitHub Copilot soll dieses Repo so bearbeiten können, dass **alle F
 10. **Safari-Kompatibilität ist Pflicht:** Keine Nutzung von nicht unterstützten APIs (z. B. `showOpenFilePicker`/`showSaveFilePicker`, File System Access API). Wenn eine neue Browser-API eingesetzt wird, muss die iPadOS-Unterstützung dokumentiert sein.
 ng ohne expliziten Plan-Abschnitt + Opt-in.
 11. **Zentralisierte Schülerverwaltung:** `Student`/`StudentRepository` liegen in `packages/core` bzw. `modules/students`. Keine parallelen Student-Stores/Repos in Apps oder `packages/storage`. UI greift nur über das Students-Modul/Bridge zu.
-12. **`SPORTZENS_PARITY_v2.md` ist verbindlich:** Bei allen Parity-/Umsetzungsarbeiten ist `docs/agents/SPORTZENS_PARITY_v2.md` als Pflicht-Instruktionsdatei zu lesen und einzuhalten (inkl. Gates, Scope und Ledger-Disziplin).
+12. **`sport_parity_v2.md` ist verbindlich:** Bei allen Parity-/Umsetzungsarbeiten ist `docs/agents/sport_parity_v2.md` als Pflicht-Instruktionsdatei zu lesen und einzuhalten (inkl. Gates, Scope und Ledger-Disziplin).
 13. **Kriterien/Status müssen konfigurierbar sein:** In relevanten Bereichen (mind. Anwesenheit) dürfen Status- und Kriterienoptionen nicht nur fest verdrahtet sein; Nutzer müssen Optionen hinzufügen/umbenennen/deaktivieren/sortieren können.
 
 ---
@@ -29,8 +29,8 @@ ng ohne expliziten Plan-Abschnitt + Opt-in.
 - `packages/core/` — Domain-Modelle, Use-Cases, Interfaces, Migrationen, Crypto-Abstraktionen
 - `packages/plugins/` — Plugin-Registry + Contracts (`AssessmentType`, `ToolPlugin`, `Exporter`, `Integration`)
 - `modules/students/` — Zentrale Schülerverwaltung (Quelle der Wahrheit)
-- `modules/sport/` — SportZens-Domäne (Klassen/Stunden/Tools/WOW)
-- `modules/exams/` — KURT-Domäne (Prüfungen/Korrektur/Fördertipps)
+- `modules/sport/` — Sport-Domäne (Klassen/Stunden/Tools/WOW)
+- `modules/exams/` — KBR-Domäne (Prüfungen/Korrektur/Fördertipps)
 - `modules/export/` — PDF/CSV/Share-Packages/E-Mail
 - `modules/integrations/` — WebUntis, Clipboard-Exports, Sharing
 - `apps/teacher/` — UI-Shell
@@ -53,7 +53,7 @@ ng ohne expliziten Plan-Abschnitt + Opt-in.
 ### Agent B — Architektur/Interfaces „Boundary Cop“
 **Mission:** Modularität/Erweiterbarkeit erzwingen.
 - Definiert Contracts: `AssessmentType`, `ToolPlugin`, `Exporter`, `Integration`.
-- Zieht harte Grenzen zwischen `core`, `sport`, `exams`.
+- Zieht harte Grenzen zwischen `core`, `Sport`, `exams`.
 - Entscheidet: „Was ist Plugin vs. Core?“
 
 **Do:** Neue Funktionalität zuerst als Interface entwerfen, dann implementieren.
@@ -70,8 +70,8 @@ ng ohne expliziten Plan-Abschnitt + Opt-in.
 - Daten sind im Dateisystem nicht im Klartext lesbar.
 - Backup → Restore reproduziert Datenbestand.
 
-### Agent D — SportZens Domäne
-**Mission:** Alle SportZens-Features umsetzen (Orga, Bewertung, Tests, Tools, Feedback, Statistiken, WOW).
+### Agent D — Sport Domäne
+**Mission:** Alle Sport-Features umsetzen (Orga, Bewertung, Tests, Tools, Feedback, Statistiken, WOW).
 - Klassen/Schüler/Stunden/Fehlzeiten/Export.
 - Notenkategorien (Kriterien/Zeit/Cooper) + Verbalbeurteilungen.
 - Tabellen/CSV + Schüler-Import.
@@ -83,13 +83,13 @@ ng ohne expliziten Plan-Abschnitt + Opt-in.
 
 **Don’t:** Keine WOW-Online-Abhängigkeit für Kernfunktionen.
 
-### Agent E — KURT Domäne (Exams)
-**Mission:** Alle KURT-Kernfeatures (Prüfungsstruktur, Notenschlüssel, Korrekturmodi).
+### Agent E — KBR Domäne (Exams)
+**Mission:** Alle KBR-Kernfeatures (Prüfungsstruktur, Notenschlüssel, Korrekturmodi).
 - Prüfung anlegen: einfach/komplex, 3 Ebenen, Wahlaufgaben, Bonuspunkte, Prüfungsteile, Kriterienformatierung.
 - Notenschlüssel: Prozentgrenzen, Presets, Rundung, nachträglich, Fehlerpunkte → Aufgabennote.
 - Korrektur: kompakte Maske, Tab-Navigation, AWK/Tabellenmodus, Kommentare, Teilnoten, Alternative Bepunktung.
 
-### Agent F — KURT Fördertipps & Diagnostik
+### Agent F — KBR Fördertipps & Diagnostik
 **Mission:** Fördertipps-DB + Auswertung + Langzeit.
 - Fördertipps-DB inkl. bis zu 3 Links, QR, Gewichtung, Suche, Dropdown-Infos.
 - Auswertung/Anpassung (Schwierigkeit, Punkteänderungsassistent, Sortierungen).
@@ -169,7 +169,7 @@ Für AI Agents, die Pull Request Reviews durchführen:
 - Halte alle Berechnungen (Noten, Tabellen) in Domain-Use-Cases.
 - Liefere: UI-Screens + Domain-Tests + 1 Demo-Datensatz.
 
-### 5.3 KURT-Core-Agent (E)
+### 5.3 KBR-Core-Agent (E)
 - Lies `Plan.md` §6.9–6.11.
 - Implementiere den Exam-Builder (einfach/komplex) + Korrekturmodi.
 - Liefere: Import/Export neutral (noch keine PDF), aber stabile Datenmodelle + Tests.

@@ -3,7 +3,7 @@
  * Records a cooper test result for a student with automatic grading
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { PerformanceEntryRepository } from '../repositories/performance-entry.repository.js';
 import type { CooperTestConfigRepository } from '../repositories/cooper-test-config.repository.js';
 import type { TableDefinitionRepository } from '../repositories/table-definition.repository.js';
@@ -13,7 +13,7 @@ export interface RecordCooperTestResultInput {
   studentId: string;
   categoryId: string;
   configId: string;
-  sportType: 'running' | 'swimming';
+  SportType: 'running' | 'swimming';
   rounds: number;
   lapLengthMeters: number;
   extraMeters?: number;
@@ -42,7 +42,7 @@ export class RecordCooperTestResultUseCase {
     if (!input.categoryId) {
       throw new Error('Category ID is required');
     }
-    if (!input.sportType) {
+    if (!input.SportType) {
       throw new Error('Sport type is required');
     }
     if (input.rounds === undefined || input.rounds === null) {
@@ -58,14 +58,14 @@ export class RecordCooperTestResultUseCase {
       throw new Error(`Cooper Test Config not found: ${input.configId}`);
     }
 
-    // Validate that sport type matches config
-    if (config.sportType !== input.sportType) {
-      throw new Error(`Sport type mismatch: config expects ${config.sportType}, got ${input.sportType}`);
+    // Validate that Sport type matches config
+    if (config.SportType !== input.SportType) {
+      throw new Error(`Sport type mismatch: config expects ${config.SportType}, got ${input.SportType}`);
     }
 
     // Build result object
     const result = this.cooperTestService.buildResult(
-      input.sportType,
+      input.SportType,
       input.rounds,
       input.lapLengthMeters,
       input.extraMeters || 0
@@ -81,7 +81,7 @@ export class RecordCooperTestResultUseCase {
           calculatedGrade = this.cooperTestService.calculateGradeFromTable(
             table,
             result.distanceMeters,
-            { sportType: input.sportType }
+            { SportType: input.SportType }
           );
         } catch (error) {
           // Log but don't fail - grade calculation is optional
@@ -97,7 +97,7 @@ export class RecordCooperTestResultUseCase {
       studentId: input.studentId,
       categoryId: input.categoryId,
       measurements: {
-        sportType: result.sportType,
+        SportType: result.SportType,
         rounds: result.rounds,
         lapLengthMeters: result.lapLengthMeters,
         extraMeters: result.extraMeters,

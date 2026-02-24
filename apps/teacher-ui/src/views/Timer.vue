@@ -221,7 +221,7 @@ import { useToast } from '../composables/useToast'
 import { v4 as uuidv4 } from 'uuid'
 
 const { t } = useI18n()
-const { sportBridge } = useSportBridge()
+const { SportBridge } = useSportBridge()
 const toast = useToast()
 
 // State
@@ -432,7 +432,7 @@ function playBeep() {
 async function saveTimerResult() {
   saving.value = true
   try {
-    const useCase = sportBridge.value?.recordTimerResultUseCase
+    const useCase = SportBridge.value?.recordTimerResultUseCase
     if (!useCase) {
       throw new Error('RecordTimerResultUseCase not available')
     }

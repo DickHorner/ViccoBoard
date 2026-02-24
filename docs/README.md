@@ -17,5 +17,5 @@ This folder is the canonical home for project documentation.
 - `qa/` quality and security checklists
 - `sessions/` implementation session logs
 - `verification/` verification reports and gap analysis
-- `parity-spec/` SportZens/KURT parity source material and reports
+- `parity-spec/` Sport/KBR parity source material and reports
 - `demo/` demo app documentation

@@ -3,7 +3,7 @@
  * Implements multi-discipline performance scoring with table-based point calculations
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 export interface BJSDisciplineResult {
   disciplineId: string;
@@ -36,7 +36,7 @@ const toNumber = (value: unknown): number | null => {
 /**
  * Bundesjugendspiele Grading Service
  * 
- * Handles scoring for multi-discipline sports competitions.
+ * Handles scoring for multi-discipline Sports competitions.
  * Each discipline performance is looked up in a table to get points.
  * Total points across all disciplines determine the certificate level.
  */

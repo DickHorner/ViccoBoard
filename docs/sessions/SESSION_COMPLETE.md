@@ -14,7 +14,7 @@
 **Completed:**
 - [x] 20 formal development issues across 5 phases
 - [x] P2-1 through P2-7 (Teacher UI Foundation)
-- [x] P3-1 through P3-4 (SportZens Grading)
+- [x] P3-1 through P3-4 (Sport Grading)
 - [x] P4-1 through P4-4 (Tests & Measurements)
 - [x] P5-1 through P5-3 (Exam Builder)
 - [x] P6-1 through P6-4 (Correction & Grading)

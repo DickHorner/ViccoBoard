@@ -188,7 +188,7 @@ import { getSportBridge } from '../composables/useSportBridge'
 import type { Lesson, ClassGroup } from '@viccoboard/core'
 
 const route = useRoute()
-const sportBridge = getSportBridge()
+const SportBridge = getSportBridge()
 
 // State
 const classes = ref<ClassGroup[]>([])
@@ -247,19 +247,19 @@ const loadData = async () => {
 
   try {
     // Load all classes
-    classes.value = await sportBridge.classGroupRepository.findAll()
+    classes.value = await SportBridge.classGroupRepository.findAll()
 
     // If classId is in route, load that class specifically
     const classIdFromRoute = route.query.classId as string
     if (classIdFromRoute) {
       selectedClassId.value = classIdFromRoute
-      classGroup.value = await sportBridge.classGroupRepository.findById(classIdFromRoute)
-      lessons.value = await sportBridge.lessonRepository.findByClassGroup(classIdFromRoute)
+      classGroup.value = await SportBridge.classGroupRepository.findById(classIdFromRoute)
+      lessons.value = await SportBridge.lessonRepository.findByClassGroup(classIdFromRoute)
     } else {
       // Load all lessons for all classes
       const allLessons: Lesson[] = []
       for (const cls of classes.value) {
-        const classLessons = await sportBridge.lessonRepository.findByClassGroup(cls.id)
+        const classLessons = await SportBridge.lessonRepository.findByClassGroup(cls.id)
         allLessons.push(...classLessons)
       }
       lessons.value = allLessons
@@ -277,12 +277,12 @@ const onClassChange = async () => {
     lessons.value = []
     const allLessons: Lesson[] = []
     for (const cls of classes.value) {
-      const classLessons = await sportBridge.lessonRepository.findByClassGroup(cls.id)
+      const classLessons = await SportBridge.lessonRepository.findByClassGroup(cls.id)
       allLessons.push(...classLessons)
     }
     lessons.value = allLessons
   } else {
-    lessons.value = await sportBridge.lessonRepository.findByClassGroup(selectedClassId.value)
+    lessons.value = await SportBridge.lessonRepository.findByClassGroup(selectedClassId.value)
   }
 }
 
@@ -306,7 +306,7 @@ const handleDeleteLesson = async (lessonId: string) => {
   }
 
   try {
-    await sportBridge.lessonRepository.delete(lessonId)
+    await SportBridge.lessonRepository.delete(lessonId)
     await loadData()
   } catch (err) {
     console.error('Failed to delete lesson:', err)
@@ -324,12 +324,12 @@ const handleSaveLesson = async () => {
 
     if (showEditLessonModal.value && lessonForm.value.id) {
       // Update existing lesson
-      await sportBridge.lessonRepository.update(lessonForm.value.id, {
+      await SportBridge.lessonRepository.update(lessonForm.value.id, {
         date: dateTime
       })
     } else {
       // Create new lesson
-      await sportBridge.createLessonUseCase.execute({
+      await SportBridge.createLessonUseCase.execute({
         classGroupId: lessonForm.value.classGroupId,
         date: dateTime
       })

@@ -7,7 +7,7 @@
 
 ## Summary
 
-Systematic migration of 9 views from direct database access (`useDatabase()`) to clean architecture bridges has begun. **2 views fully migrated and compiling successfully.** The exams and sport bridges are fully implemented and initialized.
+Systematic migration of 9 views from direct database access (`useDatabase()`) to clean architecture bridges has begun. **2 views fully migrated and compiling successfully.** The exams and Sport bridges are fully implemented and initialized.
 
 **Current Status:** Architecture foundation complete. Build gates all passing. Remaining 7 views ready for refactoring in systematic phases.
 
@@ -53,7 +53,7 @@ Systematic migration of 9 views from direct database access (`useDatabase()`) to
 **Approach:** Complete one view fully before moving to next (avoid cascading partial migrations)
 
 **Priority Order:**
-1. ⏳ TimeGradingEntry.vue - Simple sport grading view
+1. ⏳ TimeGradingEntry.vue - Simple Sport grading view
 2. ⏳ GradeHistory.vue - Sport history view
 3. ⏳ GradingOverview.vue - Sport overview view
 4. ⏳ MittelstreckeGradingEntry.vue - Sport-specific view
@@ -89,7 +89,7 @@ const { examRepository, correctionEntryRepository, ... } = useExamsBridge();
 **Old Pattern (Removed):**
 ```typescript
 // ❌ No longer allowed
-const { sportBridge, studentsBridge } = useDatabase();
+const { SportBridge, studentsBridge } = useDatabase();
 const { useExams, useCorrections } = useDatabase();
 ```
 
@@ -129,11 +129,11 @@ Follow the same pattern successfully applied to BJSGradingEntry and CriteriaGrad
 6. Update test TypeScript checks
 
 **Views to migrate:**
-- `GradeHistory.vue` - Uses sport bridge
-- `GradingOverview.vue` - Uses sport bridge
-- `MittelstreckeGradingEntry.vue` - Uses sport bridge
-- `SportabzeichenGradingEntry.vue` - Uses sport bridge  
-- `TimeGradingEntry.vue` - Uses sport bridge
+- `GradeHistory.vue` - Uses Sport bridge
+- `GradingOverview.vue` - Uses Sport bridge
+- `MittelstreckeGradingEntry.vue` - Uses Sport bridge
+- `SportabzeichenGradingEntry.vue` - Uses Sport bridge  
+- `TimeGradingEntry.vue` - Uses Sport bridge
 - `ExamsOverview.vue` - Uses exams bridge (change `useExams().getAll()` to `examRepository.findAll()`)
 - `CorrectionCompact.vue` - Uses exams bridge (update use case calls)
 
@@ -151,11 +151,11 @@ grep -r "from '../db'" apps/teacher-ui/src --include="*.vue" --include="*.ts"
 **Expected result:** Zero matches in both commands
 
 ### Phase 4: Begin Parity Implementation
-After architecture compliance verified, start SPORTZENS_PARITY_v2.md Phases 0-10:
+After architecture compliance verified, start sport_parity_v2.md Phases 0-10:
 - Phase 0: Baseline + Tooling
-- Phase 1-2: SportZens/KURT spec ingest + ledgers
-- Phase 3-5: SportZens workflows (excluding WOW)
-- Phase 6-8: KURT features + fördertipps
+- Phase 1-2: Sport/KBR spec ingest + ledgers
+- Phase 3-5: Sport workflows (excluding WOW)
+- Phase 6-8: KBR features + fördertipps
 - Phase 9-10: Security quality gate + finalization
 
 ---
@@ -209,11 +209,11 @@ After architecture compliance verified, start SPORTZENS_PARITY_v2.md Phases 0-10
 **Hard Constraints (agents.md):**
 1. ✅ No direct UI access to db
 2. ✅ No parallel student stores  
-3. ✅ Sport domain via sport bridge
+3. ✅ Sport domain via Sport bridge
 4. ✅ Exams domain via exams bridge
 5. ✅ Students centralized via students bridge
 
-**Blocking Issue:** Some views still have unrefactored sportBridge method calls
+**Blocking Issue:** Some views still have unrefactored SportBridge method calls
 
 **Unblocking Strategy:** Complete systematic refactoring of all remaining views
 
@@ -221,6 +221,6 @@ After architecture compliance verified, start SPORTZENS_PARITY_v2.md Phases 0-10
 
 ## Related Documentation
 
-- `docs/agents/SPORTZENS_PARITY_v2.md` - Parity implementation roadmap
+- `docs/agents/sport_parity_v2.md` - Parity implementation roadmap
 - `agents.md` - Agent setup and architectural guidelines  
 - `docs/status/STATUS.md` - Overall project status

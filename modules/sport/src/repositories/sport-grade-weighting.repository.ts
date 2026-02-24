@@ -1,18 +1,18 @@
 /**
- * SportZens GradeWeighting Repository
+ * Sport GradeWeighting Repository
  * Stores a single weighting record in grade_weightings.
  */
 
-import { SportZens } from '@viccoboard/core';
+import { SportSchema } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
-export class SportZensGradeWeightingRepository {
+export class SportGradeWeightingRepository {
   private readonly tableName = 'grade_weightings';
   private readonly defaultId = 'default';
 
   constructor(private adapter: StorageAdapter) {}
 
-  async set(weighting: SportZens.SportZensGradeWeighting): Promise<SportZens.SportZensGradeWeighting> {
+  async set(weighting: SportSchema.SportGradeWeighting): Promise<SportSchema.SportGradeWeighting> {
     const existing = await this.adapter.getById(this.tableName, this.defaultId);
     const row = this.mapToRow(weighting);
 
@@ -25,12 +25,12 @@ export class SportZensGradeWeightingRepository {
     return weighting;
   }
 
-  async get(): Promise<SportZens.SportZensGradeWeighting | null> {
+  async get(): Promise<SportSchema.SportGradeWeighting | null> {
     const row = await this.adapter.getById(this.tableName, this.defaultId);
     return row ? this.mapToEntity(row) : null;
   }
 
-  private mapToEntity(row: Record<string, unknown>): SportZens.SportZensGradeWeighting {
+  private mapToEntity(row: Record<string, unknown>): SportSchema.SportGradeWeighting {
     return {
       attendance: row.attendance as number,
       grades: row.grades as number,
@@ -39,7 +39,7 @@ export class SportZensGradeWeightingRepository {
     };
   }
 
-  private mapToRow(entity: SportZens.SportZensGradeWeighting): Record<string, unknown> {
+  private mapToRow(entity: SportSchema.SportGradeWeighting): Record<string, unknown> {
     return {
       attendance: entity.attendance,
       grades: entity.grades,

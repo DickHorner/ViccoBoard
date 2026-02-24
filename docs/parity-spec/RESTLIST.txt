@@ -3,14 +3,14 @@
 ## QUICK SUMMARY
 
 Total Open Items: ~239+ (expected before Phases 4-10 execution)
-- SportZens: ~170+ items (mostly i18n keys + UI workflows)
-- KURT: 69 checkboxes (spread across Phases 6-8)
+- Sport: ~170+ items (mostly i18n keys + UI workflows)
+- KBR: 69 checkboxes (spread across Phases 6-8)
 
 Progress: ~80 items done / ~939+ total ≈ 8.5%
 
 ---
 
-## SPORTZENS OPEN ITEMS
+## Sport OPEN ITEMS
 
 ### i18n Keys (Not Yet Displayed in UI)
 
@@ -32,7 +32,7 @@ Category: GRADES (Grading, 30+ keys)
 Category: COOPER, SHUTTLE, MITTELSTRECKE (Exercise, 25+ keys)
 Category: TIMER, TOURNAMENTS, TEAM (Tools, 15+ keys)
 Category: ANWESENHEIT, STUNDEN, TABLES, CALENDAR (Org, 20+ keys)
-Category: SPORTABZEICHEN, BUNDESJUGENDSPIELE, KAISER (Special Tests, 25+ keys)
+Category: SportABZEICHEN, BUNDESJUGENDSPIELE, KAISER (Special Tests, 25+ keys)
 Category: FEEDBACK, TRACKING, ANALYTICS (Meta, 10+ keys)
 Category: SETTINGS, INFOS, LICENSES (Admin, 20+ keys)
 Category: WOW (Workout, 60+ keys) — EXCLUDED_BY_SCOPE_V2
@@ -78,7 +78,7 @@ Category: WOW (Workout, 60+ keys) — EXCLUDED_BY_SCOPE_V2
 
 ---
 
-## KURT OPEN ITEMS
+## KBR OPEN ITEMS
 
 All 69 checkboxes are currently NOT IMPLEMENTED:
 
@@ -236,7 +236,7 @@ All 69 checkboxes are currently NOT IMPLEMENTED:
 
 ## Notes for Next Agent
 
-- **SportZens i18n keys are loaded** (Phase 3 ✅) but not yet displayed in UI components
+- **Sport i18n keys are loaded** (Phase 3 ✅) but not yet displayed in UI components
 - **WOW is definitively excluded** — no ambiguity, spec preserved but not implemented
 - **Builds pass** with both packages and iPad targets
 - **All type definitions exist** (ClassGroup, Student, GradeCategory, etc.) — UI just needs to wire them
@@ -245,5 +245,5 @@ All 69 checkboxes are currently NOT IMPLEMENTED:
 ---
 
 **Generated:** 2026-02-07  
-**Scope:** ViccoBoard v2 (SportZens without WOW + full KURT)  
+**Scope:** ViccoBoard v2 (Sport without WOW + full KBR)  
 **Status:** Phases 0-3 complete; Phases 4-10 remaining (expected ~80-100 person-hours for typical dev)

@@ -1,4 +1,4 @@
-# SportZens APK Parity Assertions
+# Sport APK Parity Assertions
 
 **Version:** 1.0.0  
 **Date:** 2026-02-07  
@@ -8,9 +8,9 @@
 
 ## 1. Definition of Parity
 
-**Parity** means that ViccoBoard can perform all SportZens APK functions (excluding WOW) with:
-1. **Data Equivalence:** Can store/retrieve all SportZens data fields
-2. **Functional Equivalence:** Can perform all SportZens workflows end-to-end
+**Parity** means that ViccoBoard can perform all Sport APK functions (excluding WOW) with:
+1. **Data Equivalence:** Can store/retrieve all Sport data fields
+2. **Functional Equivalence:** Can perform all Sport workflows end-to-end
 3. **Options Equivalence:** All settings/configurations are available
 4. **UI Equivalence:** All screens/flows are accessible (not visual pixel-match)
 
@@ -179,7 +179,7 @@ npm run test:routes
 ## 4. Handling Ambiguities
 
 ### TBD Items
-If a feature from SportZens APK is unclear or incomplete:
+If a feature from Sport APK is unclear or incomplete:
 1. Add entry to `Plan.md §9 TBD`
 2. Mark in PARITY_MATRIX as `implemented=no` + reason
 3. Implement placeholder UI with clear error message (e.g., "Feature pending spec: see Plan.md §9.X")
@@ -189,7 +189,7 @@ If a feature from SportZens APK is unclear or incomplete:
 ```markdown
 ## Plan.md §9.3 TBD: Cooper Test Audio Cues
 
-**Issue:** SportZens APK plays audio signals during Cooper test. Exact timing/format unclear.
+**Issue:** Sport APK plays audio signals during Cooper test. Exact timing/format unclear.
 
 **Workaround:** Implement visual timer only; mark audio as TBD in PARITY_MATRIX.
 

@@ -4,7 +4,7 @@
 
 import { GradeSchemeRepository } from '../src/repositories/grade-scheme.repository';
 import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage/node';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('GradeSchemeRepository', () => {
   let storage: SQLiteStorage;

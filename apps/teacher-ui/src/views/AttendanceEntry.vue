@@ -178,7 +178,7 @@ interface AttendanceEntry {
 const attendance = ref<Record<string, AttendanceEntry>>({})
 
 // Bridge access
-const sportBridge = getSportBridge()
+const SportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 // Computed
@@ -315,7 +315,7 @@ const handleSaveAttendance = async () => {
     }
 
     // Create a lesson for today
-    const lesson = await sportBridge.createLessonUseCase.execute({
+    const lesson = await SportBridge.createLessonUseCase.execute({
       classGroupId: selectedClassId.value,
       date: new Date()
     })
@@ -330,7 +330,7 @@ const handleSaveAttendance = async () => {
     }))
     
     // Save using batch record
-    await sportBridge.recordAttendanceUseCase.executeBatch(records)
+    await SportBridge.recordAttendanceUseCase.executeBatch(records)
     
     const savedCount = records.length
     saveSuccess.value = `${t('COMMON.success')} (${savedCount})`
@@ -357,7 +357,7 @@ const handleSaveAttendance = async () => {
 // Lifecycle
 onMounted(async () => {
   try {
-    classes.value = await sportBridge.classGroupRepository.findAll()
+    classes.value = await SportBridge.classGroupRepository.findAll()
     
     // Check if classId is passed via query params
     const classIdFromQuery = route.query.classId as string

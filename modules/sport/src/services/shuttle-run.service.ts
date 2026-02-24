@@ -1,4 +1,4 @@
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 export interface ShuttleRunResult {
   level: number;

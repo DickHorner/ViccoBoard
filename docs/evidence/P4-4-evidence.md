@@ -5,7 +5,7 @@
 | Criterion | Status | Evidence | Notes |
 |-----------|--------|----------|-------|
 | Timer modes supported (countdown, stopwatch, interval) | VERIFIED | [Timer.vue#L88-L100](../../../apps/teacher-ui/src/views/Timer.vue#L88-L100) | All 3 modes with reactive refs |
-| Session persistence | VERIFIED | [RecordTimerResultUseCase.ts#L1-L75](../../../modules/sport/src/use-cases/record-timer-result.use-case.ts#L1-L75) | Persists to `tool_sessions` via sport module persistence |
+| Session persistence | VERIFIED | [RecordTimerResultUseCase.ts#L1-L75](../../../modules/sport/src/use-cases/record-timer-result.use-case.ts#L1-L75) | Persists to `tool_sessions` via Sport module persistence |
 | Elapsed time calculation | VERIFIED | [Timer.vue#L406-L428](../../../apps/teacher-ui/src/views/Timer.vue#L406-L428) | Mode-specific calculation: countdown uses duration-remaining, stopwatch uses elapsedTime, interval uses round totals |
 | Audio mute support | VERIFIED | [Timer.vue#L167](../../../apps/teacher-ui/src/views/Timer.vue#L167) | soundEnabled checkbox at L167; audioEnabled passed to use case L422 |
 | Sport bridge integration | VERIFIED | [useSportBridge.ts#L119-L122](../../../apps/teacher-ui/src/composables/useSportBridge.ts#L119-L122) | RecordTimerResultUseCase instantiated with tool-session persistence dependency and exposed in the bridge |
@@ -72,7 +72,7 @@
 ✅ Timer.vue never imports `from '../db'`
 
 ### Module Boundaries Verified
-✅ Logic encapsulated in sport module use case
+✅ Logic encapsulated in Sport module use case
 ✅ Persistence via dedicated tool-session storage path
 ✅ No parallel data paths created
 

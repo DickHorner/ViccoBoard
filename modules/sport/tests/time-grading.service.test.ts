@@ -4,7 +4,7 @@
  */
 
 import { TimeGradingService } from '../src/services/time-grading.service';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 type TimeGradingConfig = Sport.TimeGradingConfig;
 

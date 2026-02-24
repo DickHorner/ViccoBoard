@@ -1,8 +1,8 @@
 # ViccoBoard Development Issues Tracker
 
 **Baseline Commit:** d8875dd  
-**Created:** January 16, 2026
 
+**Last status refresh:** February 24, 2026
 ---
 
 ## Phase 2: Teacher UI Foundation (1-2 weeks)
@@ -33,11 +33,11 @@ Vue 3 only (web-first, static assets; no Electron/React Native/Flutter).
 Implement main application navigation and layout structure.
 
 **Tasks:**
-- [ ] Create main app layout (header, sidebar, content area)
-- [ ] Implement navigation router (teacher app)
-- [ ] Create layout components for responsive design
-- [ ] Support Touch/Split-View iPad layouts
-- [ ] Implement dashboard routing
+- [x] Create main app layout (header, sidebar, content area)
+- [x] Implement navigation router (teacher app)
+- [x] Create layout components for responsive design
+- [x] Support Touch/Split-View iPad layouts
+- [x] Implement dashboard routing
 
 **Acceptance Criteria:**
 - Can navigate between main screens
@@ -56,11 +56,11 @@ Implement main application navigation and layout structure.
 Implement dashboard showing classes, recent activity, quick actions.
 
 **Tasks:**
-- [ ] Display list of classes
-- [ ] Show recent lessons
-- [ ] Show recent exams (when KURT ready)
-- [ ] Quick action buttons (new class, new exam)
-- [ ] Search/filter classes
+- [x] Display list of classes
+- [x] Show recent lessons
+- [x] Show recent exams (when KBR ready)
+- [x] Quick action buttons (new class, new exam)
+- [x] Search/filter classes
 
 **Acceptance Criteria:**
 - Classes load from storage
@@ -79,11 +79,11 @@ Implement dashboard showing classes, recent activity, quick actions.
 Implement detailed class management screens.
 
 **Tasks:**
-- [ ] Class list with inline actions
-- [ ] Class detail view
-- [ ] Edit class information
-- [ ] View class statistics
-- [ ] Manage grading scheme selection
+- [x] Class list with inline actions
+- [x] Class detail view
+- [x] Edit class information
+- [x] View class statistics
+- [x] Manage grading scheme selection
 
 **Acceptance Criteria:**
 - Can view all classes
@@ -91,7 +91,7 @@ Implement detailed class management screens.
 - Statistics displayed correctly
 - All operations persist offline
 
-**Relates to:** Plan.md §6.2 (SportZens - Kernverwaltung)
+**Relates to:** Plan.md §6.2 (Sport - Kernverwaltung)
 
 ---
 
@@ -102,11 +102,11 @@ Implement detailed class management screens.
 Implement student list and profile screens.
 
 **Tasks:**
-- [ ] Student list view with search
-- [ ] Add student form
-- [ ] Student profile view
-- [ ] Edit student information
-- [ ] Photo management
+- [x] Student list view with search
+- [x] Add student form
+- [x] Student profile view
+- [x] Edit student information
+- [x] Photo management
 
 **Acceptance Criteria:**
 - Can add/edit/delete students
@@ -125,11 +125,11 @@ Implement student list and profile screens.
 Implement quick attendance entry UI.
 
 **Tasks:**
-- [ ] Create attendance entry form
-- [ ] Support quick status selection (default + custom statuses from status catalog)
-- [ ] Add reason field for absence
-- [ ] Bulk attendance entry
-- [ ] Summary display
+- [x] Create attendance entry form
+- [x] Support quick status selection (default + custom statuses from status catalog)
+- [x] Add reason field for absence
+- [x] Bulk attendance entry
+- [x] Summary display
 
 **Acceptance Criteria:**
 - Can record attendance for all students
@@ -149,11 +149,11 @@ Implement quick attendance entry UI.
 Wire UI screens to existing Sport module repositories and use cases.
 
 **Tasks:**
-- [ ] Integrate CreateClassUseCase
-- [ ] Integrate AddStudentUseCase
-- [ ] Integrate RecordAttendanceUseCase
-- [ ] Hook up repository queries
-- [ ] Add error handling and notifications
+- [x] Integrate CreateClassUseCase
+- [x] Integrate AddStudentUseCase
+- [x] Integrate RecordAttendanceUseCase
+- [x] Hook up repository queries
+- [x] Add error handling and notifications
 
 **Acceptance Criteria:**
 - Can create class from UI
@@ -172,12 +172,12 @@ Wire UI screens to existing Sport module repositories and use cases.
 Implement configurable catalogs for status and criteria options as shared foundation for multiple sections.
 
 **Tasks:**
-- [ ] Add StatusCatalog domain model/repository/use-case (add, rename, disable, reorder)
-- [ ] Add CriteriaCatalog domain model/repository/use-case (add, rename, disable, reorder)
-- [ ] Wire attendance UI to StatusCatalog (class/context specific)
-- [ ] Persist catalog metadata (e.g. code/color/active/order)
-- [ ] Add export/import coverage for catalogs
-- [ ] Add unit/integration tests for catalog CRUD + usage
+- [x] Add StatusCatalog domain model/repository/use-case (add, rename, disable, reorder)
+- [x] Add CriteriaCatalog domain model/repository/use-case (add, rename, disable, reorder)
+- [x] Wire attendance UI to StatusCatalog (class/context specific)
+- [x] Persist catalog metadata (e.g. code/color/active/order)
+- [x] Add export/import coverage for catalogs
+- [x] Add unit/integration tests for catalog CRUD + usage
 
 **Acceptance Criteria:**
 - Users can define extra attendance statuses without code changes
@@ -189,7 +189,7 @@ Implement configurable catalogs for status and criteria options as shared founda
 
 ---
 
-## Phase 3: SportZens - Grading Engine (2-3 weeks)
+## Phase 3: Sport - Grading Engine (2-3 weeks)
 
 ### Issue P3-1: Grading Schema & Category Repositories
 **Priority:** HIGH | **Effort:** 3 days
@@ -198,11 +198,11 @@ Implement configurable catalogs for status and criteria options as shared founda
 Implement data layer for grading schemes and categories.
 
 **Tasks:**
-- [ ] GradeScheme repository (CRUD + queries)
-- [ ] GradeCategory repository (CRUD + queries)
-- [ ] PerformanceEntry repository
-- [ ] Add schema migration for grading tables
-- [ ] Unit tests for repositories
+- [x] GradeScheme repository (CRUD + queries)
+- [x] GradeCategory repository (CRUD + queries)
+- [x] PerformanceEntry repository
+- [x] Add schema migration for grading tables
+- [x] Unit tests for repositories
 
 **Acceptance Criteria:**
 - Can create/read/update grading schemes
@@ -221,11 +221,11 @@ Implement data layer for grading schemes and categories.
 Implement criteria-based grading calculation engine.
 
 **Tasks:**
-- [ ] Support up to 8 criteria per category
-- [ ] Implement weighting system
-- [ ] Calculate composite grades from criteria
-- [ ] Handle slider-based input (0-100)
-- [ ] Add validation rules
+- [x] Support up to 8 criteria per category
+- [x] Implement weighting system
+- [x] Calculate composite grades from criteria
+- [x] Handle slider-based input (0-100)
+- [x] Add validation rules
 
 **Acceptance Criteria:**
 - Grades calculated correctly
@@ -244,11 +244,11 @@ Implement criteria-based grading calculation engine.
 Implement time-based grading with linear mapping.
 
 **Tasks:**
-- [ ] Define best/worst time boundaries
-- [ ] Implement linear mapping algorithm
-- [ ] Calculate grades from times
-- [ ] Allow post-hoc boundary adjustment
-- [ ] Tests for calculation accuracy
+- [x] Define best/worst time boundaries
+- [x] Implement linear mapping algorithm
+- [x] Calculate grades from times
+- [x] Allow post-hoc boundary adjustment
+- [x] Tests for calculation accuracy
 
 **Acceptance Criteria:**
 - Linear mapping correct mathematically
@@ -267,11 +267,11 @@ Implement time-based grading with linear mapping.
 Implement UI for entering grades.
 
 **Tasks:**
-- [ ] Grading overview screen
-- [ ] Criteria grading entry form
-- [ ] Time-based grading entry form
-- [ ] Grade history view
-- [ ] Bulk entry support
+- [x] Grading overview screen
+- [x] Criteria grading entry form
+- [x] Time-based grading entry form
+- [x] Grade history view
+- [x] Bulk entry support
 
 **Acceptance Criteria:**
 - Can enter grades intuitively
@@ -283,7 +283,7 @@ Implement UI for entering grades.
 
 ---
 
-## Phase 4: SportZens - Tests & Measurements (2-3 weeks)
+## Phase 4: Sport - Tests & Measurements (2-3 weeks)
 
 ### Issue P4-1: Shuttle Run Implementation
 **Priority:** HIGH | **Effort:** 3 days
@@ -292,11 +292,11 @@ Implement UI for entering grades.
 Implement complete Shuttle Run test workflow.
 
 **Tasks:**
-- [ ] ShuttleRunConfig repository
-- [ ] Shuttle Run timer UI
-- [ ] Result collection and validation
-- [ ] Auto-calculation with table lookup
-- [ ] Audio signal integration
+- [x] ShuttleRunConfig repository
+- [x] Shuttle Run timer UI
+- [x] Result collection and validation
+- [x] Auto-calculation with table lookup
+- [x] Audio signal integration
 
 **Acceptance Criteria:**
 - Timer starts/stops correctly
@@ -315,14 +315,14 @@ Implement complete Shuttle Run test workflow.
 Implement Cooper Test (running/swimming) workflow.
 
 **Tasks:**
-- [ ] Track rounds/distance
-- [ ] Support running and swimming modes
-- [ ] Auto-calculate grades from table
-- [ ] Result storage
-- [ ] Sportart configuration
+- [x] Track rounds/distance
+- [x] Support running and swimming modes
+- [x] Auto-calculate grades from table
+- [x] Result storage
+- [x] Sportart configuration
 
 **Acceptance Criteria:**
-- Can select sport mode
+- Can select Sport mode
 - Results calculated correctly
 - Works with custom tables
 - Data persists
@@ -335,14 +335,14 @@ Implement Cooper Test (running/swimming) workflow.
 **Priority:** MEDIUM | **Effort:** 2 days
 
 **Description:**
-Implement age-dependent sports badge evaluation.
+Implement age-dependent Sports badge evaluation.
 
 **Tasks:**
-- [ ] Age calculation from birth year
-- [ ] Age-based performance standards
-- [ ] Badge achievement tracking
-- [ ] PDF export for overview
-- [ ] Results archive
+- [x] Age calculation from birth year
+- [x] Age-based performance standards
+- [x] Badge achievement tracking
+- [x] PDF export for overview
+- [x] Results archive
 
 **Acceptance Criteria:**
 - Age-based standards applied
@@ -379,7 +379,7 @@ Implement Timer tool plugin.
 
 ---
 
-## Phase 5: KURT - Exam Builder (2-3 weeks)
+## Phase 5: KBR - Exam Builder (2-3 weeks)
 
 ### Issue P5-1: Exam Repositories & Data Models
 **Priority:** HIGH | **Effort:** 2 days
@@ -411,11 +411,11 @@ Implement persistence layer for exams.
 Implement UI for creating simple exams.
 
 **Tasks:**
-- [ ] Create exam form
-- [ ] Add tasks sequentially
-- [ ] Set point values
-- [ ] Define criteria
-- [ ] Save and preview
+- [x] Create exam form
+- [x] Add tasks sequentially
+- [x] Set point values
+- [x] Define criteria
+- [x] Save and preview
 
 **Acceptance Criteria:**
 - Can create complete simple exam
@@ -450,7 +450,7 @@ Implement UI for complex 3-level exam builder.
 
 ---
 
-## Phase 6: KURT - Correction & Grading (2-3 weeks)
+## Phase 6: KBR - Correction & Grading (2-3 weeks)
 
 ### Issue P6-1: Correction Entry Repository & Use Cases
 **Priority:** HIGH | **Effort:** 2 days
@@ -459,11 +459,11 @@ Implement UI for complex 3-level exam builder.
 Implement data layer for exam corrections.
 
 **Tasks:**
-- [ ] CorrectionEntry repository
-- [ ] RecordCorrectionUseCase
-- [ ] CalculateGradeUseCase
-- [ ] Support partial/full correction
-- [ ] Tests
+- [x] CorrectionEntry repository
+- [x] RecordCorrectionUseCase
+- [x] CalculateGradeUseCase
+- [x] Support partial/full correction
+- [x] Tests
 
 **Acceptance Criteria:**
 - Can record grades per task
@@ -482,11 +482,11 @@ Implement data layer for exam corrections.
 Implement compact correction interface.
 
 **Tasks:**
-- [ ] Candidate selector
-- [ ] Task overview with points earned
-- [ ] Show points to next grade
-- [ ] Tab navigation between point fields
-- [ ] Real-time grade calculation
+- [x] Candidate selector
+- [x] Task overview with points earned
+- [x] Show points to next grade
+- [x] Tab navigation between point fields
+- [x] Real-time grade calculation
 
 **Acceptance Criteria:**
 - Interface compact and efficient
@@ -505,10 +505,10 @@ Implement compact correction interface.
 Implement alternative grading system option.
 
 **Tasks:**
-- [ ] Support ++/+/0/-/-- grading
-- [ ] Convert to points mapping
-- [ ] UI button group for selection
-- [ ] Integration with correction
+- [x] Support ++/+/0/-/-- grading
+- [x] Convert to points mapping
+- [x] UI button group for selection
+- [x] Integration with correction
 
 **Acceptance Criteria:**
 - Alternative grading functional
@@ -527,11 +527,11 @@ Implement alternative grading system option.
 Implement comment system and table-based correction view.
 
 **Tasks:**
-- [ ] Comment boxes per task level
-- [ ] Table-mode correction view
-- [ ] Sort by task or candidate
-- [ ] Comment storage and display
-- [ ] Copy comments between candidates
+- [x] Comment boxes per task level
+- [x] Table-mode correction view
+- [x] Sort by task or candidate
+- [x] Comment storage and display
+- [x] Copy comments between candidates
 
 **Acceptance Criteria:**
 - Comments save and display
@@ -556,4 +556,5 @@ Implement comment system and table-based correction view.
 
 ---
 
-**Next Step:** Move to Task 2 (Update ROADMAP.md & STATUS.md)
+**Next Step:** Release QA sign-off and tagging
+

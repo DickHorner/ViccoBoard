@@ -204,7 +204,7 @@ const { t } = useI18n()
 initializeSportBridge()
 initializeStudentsBridge()
 
-const sportBridge = getSportBridge()
+const SportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 // State
@@ -272,7 +272,7 @@ function initializeTimers() {
 // Load data
 async function loadClasses() {
   try {
-    classes.value = await sportBridge.classGroupRepository.findAll()
+    classes.value = await SportBridge.classGroupRepository.findAll()
   } catch (error) {
     showToast('Error loading classes', 'error')
     console.error(error)

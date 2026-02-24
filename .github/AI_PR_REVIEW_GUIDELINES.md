@@ -31,7 +31,7 @@ This document provides comprehensive instructions for AI agents performing pull 
 ### Architecture & Design
 
 #### Modularity ✓
-- [ ] Changes are in the appropriate module (`sport/`, `exams/`, `core/`, `export/`, `integrations/`)
+- [ ] Changes are in the appropriate module (`Sport/`, `exams/`, `core/`, `export/`, `integrations/`)
 - [ ] No business logic in UI components or database layers
 - [ ] Core package only contains interfaces and contracts, never concrete implementations
 - [ ] New features are implemented as plugins when applicable
@@ -270,14 +270,14 @@ async function migrate_v5_to_v6(db: IDBDatabase) {
 
 ### Specific Domain Rules
 
-#### SportZens Module ✓
+#### Sport Module ✓
 - [ ] Grading calculations match specifications (criteria-based, time-based, Cooper)
 - [ ] Statistical calculations are accurate
 - [ ] CSV import/export formats preserved
 - [ ] All test workflows supported (Shuttle Run, Cooper, etc.)
 - [ ] WOW functionality works offline
 
-#### KURT Module ✓
+#### KBR Module ✓
 - [ ] Exam structure supports 3 levels, choice tasks, bonus points
 - [ ] Grading key calculations accurate
 - [ ] Correction interface supports all modes (compact, table, AWK)

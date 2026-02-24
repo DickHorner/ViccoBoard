@@ -1,6 +1,6 @@
 /**
- * SportZens Domain Types
- * All types specific to physical education/sports assessment
+ * Sport Domain Types
+ * All types specific to physical education/Sports assessment
  */
 
 import { Student, ClassGroup } from './core.types.js';
@@ -45,7 +45,7 @@ export enum GradeCategoryType {
   Cooper = 'cooper',
   Shuttle = 'shuttle',
   Mittelstrecke = 'mittelstrecke',
-  Sportabzeichen = 'sportabzeichen',
+  Sportabzeichen = 'Sportabzeichen',
   BJS = 'bjs',
   Verbal = 'verbal'
 }
@@ -95,7 +95,7 @@ export interface TimeBoundary {
 // Cooper Test
 export interface CooperGradingConfig {
   type: 'cooper';
-  sportType: 'running' | 'swimming';
+  SportType: 'running' | 'swimming';
   distanceUnit: 'meters' | 'kilometers';
   gradingTable?: string; // reference to table
   autoEvaluation: boolean;
@@ -118,7 +118,7 @@ export interface MittelstreckeGradingConfig {
 
 // Sportabzeichen (Sports Badge)
 export interface SportabzeichenConfig {
-  type: 'sportabzeichen';
+  type: 'Sportabzeichen';
   requiresBirthYear: boolean;
   ageDependent: boolean;
   gradingTable?: string;
@@ -263,7 +263,7 @@ export interface TableDefinition {
 }
 
 export interface TableDimension {
-  name: 'age' | 'gender' | 'sport' | 'discipline' | 'custom';
+  name: 'age' | 'gender' | 'Sport' | 'discipline' | 'custom';
   values: string[];
 }
 
@@ -305,7 +305,7 @@ export interface ShuttleRunLevel {
 export interface CooperTestConfig {
   id: string;
   name: string;
-  sportType: 'running' | 'swimming';
+  SportType: 'running' | 'swimming';
   distanceUnit: 'meters' | 'kilometers';
   lapLengthMeters: number;
   gradingTableId?: string;
@@ -418,7 +418,7 @@ export interface TimerInterval {
 export interface TacticsBoardSnapshot {
   id: string;
   lessonId: string;
-  sport: string;
+  Sport: string;
   version: number;
   markings: TacticsMarking[];
   background: 'court' | 'field' | 'pitch' | 'custom';

@@ -3,7 +3,7 @@
  * Implements linear mapping algorithm for time-based performance assessments
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 type TimeGradingConfig = Sport.TimeGradingConfig;
 

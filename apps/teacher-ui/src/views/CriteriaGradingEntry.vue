@@ -307,10 +307,10 @@ import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import { v4 as uuidv4 } from 'uuid';
-import type { Sport } from '@viccoboard/core';
+import type { Sport} from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge, gradeCategories, performanceEntries } = useSportBridge();
+const { SportBridge, gradeCategories, performanceEntries } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
@@ -518,7 +518,7 @@ async function saveStudentGrade(studentId: string) {
       measurements[criterionId] = value;
     });
     
-    await sportBridge.value?.recordGradeUseCase.execute({
+    await SportBridge.value?.recordGradeUseCase.execute({
       studentId,
       categoryId,
       measurements,

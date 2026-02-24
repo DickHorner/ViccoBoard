@@ -1,5 +1,5 @@
 import { ShuttleRunService } from '../src/services/shuttle-run.service';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('ShuttleRunService', () => {
   const config: Sport.ShuttleRunConfig = {

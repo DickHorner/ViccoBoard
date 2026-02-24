@@ -58,7 +58,7 @@
 - `npm run lint:docs`: ✅ PASS
 - `npm run build:packages`: ✅ PASS
 - `npm run build:ipad`: ✅ PASS
-- `npm test`: ✅ PASS (273 sport + 74 teacher-ui; pre-existing exams TS diagnostic unrelated to this PR)
+- `npm test`: ✅ PASS (273 Sport + 74 teacher-ui; pre-existing exams TS diagnostic unrelated to this PR)
 
 ## Files Touched
 

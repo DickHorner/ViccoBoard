@@ -1,4 +1,4 @@
-# ViccoBoard ↔ SportZens-APK: Parity-Report (Sport) – 7.2.2026
+# ViccoBoard ↔ Sport APK: Parity-Report (Sport) – 7.2.2026
 
 Grundlage: extrahierter Parity-Spec aus der APK (UI-Strings/Übersetzungen + Form-Schemas) sowie ein Snapshot der aktuellen ViccoBoard-Codebasis.
 
@@ -21,7 +21,7 @@ Eine i18n-Infrastruktur ist (in der aktuellen Suche) nicht erkennbar.
 ## Schema-Parität (APK-Schemas ↔ ViccoBoard)
 
 
-### category.schema.json → GradeCategory (apps/teacher-ui DB + core sport types)
+### category.schema.json → GradeCategory (apps/teacher-ui DB + core Sport types)
 
 - APK-Felder: categories, class_id, color, created_at, deleted, id, is_dirty, main_category_id, max_value, min_value, name, settings, stats, teacher_id, type, updated_at, weight, year
 
@@ -117,11 +117,11 @@ Da im Repo kein konsistentes i18n-Setup auffindbar ist (kein Locale-Verzeichnis 
 
 ## Konkreter Implementierungsplan (Parity first)
 
-1) Parity-Spec in den Repo kopieren: `docs/parity-spec/sportzens-apk/`.
+1) Parity-Spec in den Repo kopieren: `docs/parity-spec/sport-apk/`.
 
 2) i18n minimal einführen (Teacher-UI): Loader + `t(key)`; danach Screens Schritt für Schritt auf Keys umstellen.
 
-3) Schema-Adapter: SportZens-Felder 1:1 speichern (auch `version`, `is_dirty`, `teacher_id` usw.). Empfehlung: `rawSportZens`-Subobjekt oder separate Tabellen.
+3) Schema-Adapter: Sport-Felder 1:1 speichern (auch `version`, `is_dirty`, `teacher_id` usw.). Empfehlung: `rawSPORT`-Subobjekt oder separate Tabellen.
 
 4) Fehlende Tabellen ergänzen: `tables` (Sportabzeichen/BJS), `wow`, `userData`, `newDayData`, `gradeWeighting`.
 

@@ -84,7 +84,7 @@ const { t } = useI18n()
 initializeSportBridge()
 initializeStudentsBridge()
 
-const sportBridge = getSportBridge()
+const SportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 const classes = ref<ClassGroup[]>([])
@@ -101,7 +101,7 @@ const teams = ref<Array<{ name: string; students: Student[] }>>([])
 const canGenerate = computed(() => selectedClassId.value && students.value.length > 0 && teamCount.value >= 2)
 
 async function loadClasses() {
-  classes.value = await sportBridge.classGroupRepository.findAll()
+  classes.value = await SportBridge.classGroupRepository.findAll()
 }
 
 async function loadStudents() {
@@ -120,14 +120,14 @@ async function loadStudents() {
     return
   }
 
-  const lesson = await sportBridge.lessonRepository.getMostRecent(selectedClassId.value)
+  const lesson = await SportBridge.lessonRepository.getMostRecent(selectedClassId.value)
   if (!lesson) {
     warning.value = t('COMMON.error')
     students.value = allStudents
     return
   }
 
-  const attendance = await sportBridge.attendanceRepository.findByLesson(lesson.id)
+  const attendance = await SportBridge.attendanceRepository.findByLesson(lesson.id)
   if (attendance.length === 0) {
     warning.value = t('COMMON.error')
     students.value = allStudents

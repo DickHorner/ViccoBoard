@@ -1,5 +1,5 @@
 schema,mapped_to,apk_field_count,vicco_field_count,missing_in_vicco_count,missing_in_vicco_fields
-category.schema.json,GradeCategory (apps/teacher-ui DB + core sport types),18,9,14,categories;class_id;color;created_at;deleted;is_dirty;main_category_id;max_value;min_value;settings;stats;teacher_id;updated_at;year
+category.schema.json,GradeCategory (apps/teacher-ui DB + core Sport types),18,9,14,categories;class_id;color;created_at;deleted;is_dirty;main_category_id;max_value;min_value;settings;stats;teacher_id;updated_at;year
 class.schema.json,ClassGroup (apps/teacher-ui DB + core.types),15,5,13,color;created_at;grade_category_count;grade_scheme;is_dirty;school_year;settings;sort;stats;student_count;teacher_id;updated_at;version
 grade.schema.json,PerformanceEntry / Grade (apps/teacher-ui DB),17,8,16,category_id;class_id;created_at;criterias;deleted;grade;is_dirty;main_category_id;name;student_id;teacher_id;total_points;type;updated_at;weight;year
 gradeWeighting.schema.json,Gewichtungs-/Notenschema (aktuell nur teilweise in GradeCategory.configuration?),4,0,4,attendance;grades;remarks;wow

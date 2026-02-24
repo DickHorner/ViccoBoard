@@ -1,6 +1,6 @@
-# Phase 4 Completion: SportZens Schema Roundtrip Tests
+# Phase 4 Completion: Sport Schema Roundtrip Tests
 
-**Phase:** 4 — SportZens Schema-Parität (Export/Import Roundtrip Validation)  
+**Phase:** 4 — Sport Schema-Parität (Export/Import Roundtrip Validation)  
 **Status:** ✅ **GATE 4: PASSED**  
 **Completion Date:** 2025-01-27  
 **Evidence:** `apps/teacher-ui/tests/schema-roundtrip.test.ts` (25/25 tests passing)
@@ -38,7 +38,7 @@
 
 ```
 PASS  tests/schema-roundtrip.test.ts
-  Phase 4: SportZens Schema Roundtrip Tests
+  Phase 4: Sport Schema Roundtrip Tests
     1. class.schema.json → ClassGroup Roundtrip
       ✓ should roundtrip required fields without data loss (4 ms)
       ✓ should roundtrip with optional fields (color, grade_scheme, settings, stats) (2 ms)
@@ -107,7 +107,7 @@ All optional fields serialize/deserialize correctly:
 - newDayData: `exercises`, `additionalExercises`, `notes`
 
 ### 3. Snake Case Preservation ✅
-Database field names match SportZens APK exactly:
+Database field names match Sport APK exactly:
 - `school_year` (not `schoolYear`)
 - `teacher_id` (not `teacherId`)
 - `class_id` (not `classId`)
@@ -118,7 +118,7 @@ Database field names match SportZens APK exactly:
 ### 4. WOW Exclusion ✅
 - ❌ No tests for `wow.schema.json` (explicitly excluded as `excluded_by_scope_v2`)
 - ✅ GradeWeighting.wow field preserved for schema compatibility but **always set to 0**
-- ✅ Tests document that WOW features are out of scope per SPORTZENS_PARITY_v2.md
+- ✅ Tests document that WOW features are out of scope per sport_parity_v2.md
 
 ### 5. Cross-Schema Integrity ✅
 Foreign key relationships validated:
@@ -170,7 +170,7 @@ expect(deserialized).toEqual(original);
 
 ## Next Phase
 
-**Phase 5:** SportZens UI Implementation (Workflows, Views, Components)  
+**Phase 5:** Sport UI Implementation (Workflows, Views, Components)  
 **Start Condition:** GATE 4 must pass ✅ **PASSED**  
 **Focus:** Build Class Management, Student Management, Attendance, Grading screens leveraging the validated schemas.
 
@@ -181,8 +181,8 @@ expect(deserialized).toEqual(original);
 | File | Purpose | Status |
 |------|---------|--------|
 | `apps/teacher-ui/tests/schema-roundtrip.test.ts` | Roundtrip test suite | ✅ 25/25 passing |
-| `docs/parity-spec/sportzens-apk/_evidence/PHASE_4_COMPLETION.md` | This document | ✅ Complete |
+| `docs/parity-spec/sport-apk/_evidence/PHASE_4_COMPLETION.md` | This document | ✅ Complete |
 
 ---
 
-**Sign-off:** Phase 4 successfully validates that all SportZens data can be exported/imported without loss. The foundation for backup/restore functionality is proven. Ready to proceed to UI implementation in Phase 5.
+**Sign-off:** Phase 4 successfully validates that all Sport data can be exported/imported without loss. The foundation for backup/restore functionality is proven. Ready to proceed to UI implementation in Phase 5.

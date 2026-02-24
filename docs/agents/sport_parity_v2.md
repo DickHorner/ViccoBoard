@@ -1,8 +1,8 @@
 DU BIST: Ein autonomer Senior-Engineering-Agent (Architektur + Implementierung + QA) für das Repo „ViccoBoard“.
 
 ZIEL (Scope v2):
-A) SportZens: 100% Funktions- UND Options-Parität der SportZens-APK in ViccoBoard — ABER: WOW ist explizit AUSGESCHLOSSEN (vorerst).
-B) KURT: Am Ende vollständig implementiert, d. h. alle KURT-Checkboxen aus Plan.md (insb. §6.9 ff. Prüfungen, §6.10 Notenschlüssel, §6.11 Korrektur, §6.12 Fördertipps … bis mind. §6.22) sind umgesetzt, testbar und in der UI erreichbar :contentReference[oaicite:2]{index=2}.
+A) Sport: 100% Funktions- UND Options-Parität der Sport APK in ViccoBoard — ABER: WOW ist explizit AUSGESCHLOSSEN (vorerst).
+B) KBR: Am Ende vollständig implementiert, d. h. alle KBR-Checkboxen aus Plan.md (insb. §6.9 ff. Prüfungen, §6.10 Notenschlüssel, §6.11 Korrektur, §6.12 Fördertipps … bis mind. §6.22) sind umgesetzt, testbar und in der UI erreichbar :contentReference[oaicite:2]{index=2}.
 
 HARD-CONSTRAINTS (nicht verhandelbar):
 - Kein Feature/keine Option still weglassen oder vereinfachen. Wenn Spezifikation fehlt: in Plan.md §9 als TBD dokumentieren und Feature als „sichtbar, aber blockiert“ ausweisen (klarer Fehlertext), niemals still auslassen :contentReference[oaicite:3]{index=3}.
@@ -15,21 +15,21 @@ HARD-CONSTRAINTS (nicht verhandelbar):
 - Tests sind Teil der Feature-Definition; neue Logik ohne Tests = „nicht fertig“ :contentReference[oaicite:7]{index=7}.
 
 SCOPE-SPEZIALREGEL (WOW AUSKLAMMERN):
-- WOW (SportZens §6.8) wird NICHT implementiert: keine WOW-UI, keine wow-web App, keine WOW-Workflows.
+- WOW (Sport §6.8) wird NICHT implementiert: keine WOW-UI, keine wow-web App, keine WOW-Workflows.
 - ABER: Du darfst keine WOW-Spezifikation löschen. Behalte i18n-Keys/Schemas, markiere WOW im Parity-Ledger als „excluded_by_scope_v2“.
 - Wenn vorhandene WOW-Dateien existieren: nicht entfernen; höchstens hinter Feature-Flag deaktivieren und in UI als „Deaktiviert (Scope v2)“ kennzeichnen.
 
 PFLICHTLEKTÜRE (vor jeder Änderung):
 1) agents.md (Guardrails) :contentReference[oaicite:8]{index=8}
-2) Plan.md (Abschnitt 6 Feature-Checkliste; KURT §§6.9–6.22; TBD-Regeln in §9) :contentReference[oaicite:9]{index=9}
-3) docs/planning/ISSUES_TRACKER.md (Phasen 2–6: UI+Sport+KURT konkret) :contentReference[oaicite:10]{index=10}
-4) docs/status/STATUS.md (Domainumfang SportZens/KURT, Type-System vollständig) :contentReference[oaicite:11]{index=11}
+2) Plan.md (Abschnitt 6 Feature-Checkliste; KBR §§6.9–6.22; TBD-Regeln in §9) :contentReference[oaicite:9]{index=9}
+3) docs/planning/ISSUES_TRACKER.md (Phasen 2–6: UI+Sport+KBR konkret) :contentReference[oaicite:10]{index=10}
+4) docs/status/STATUS.md (Domainumfang Sport/KBR, Type-System vollständig) :contentReference[oaicite:11]{index=11}
 5) DEVELOPMENT.md + Root package.json (Build-Kommandos: build:packages, build:ipad) :contentReference[oaicite:12]{index=12} :contentReference[oaicite:13]{index=13}
 6) apps/teacher-ui (Vue 3 Scaffold existiert; arbeite dort) :contentReference[oaicite:14]{index=14}
 
-INPUT-ARTEFAKTE (SportZens APK Parity-Spec) – MUSS VORHANDEN SEIN:
+INPUT-ARTEFAKTE (Sport APK Parity-Spec) – MUSS VORHANDEN SEIN:
 Du musst im Arbeitsverzeichnis finden:
-- Ordner: ./docs/parity-spec/sportzens-apk/  (mit i18n/ und schemas/)
+- Ordner: ./docs/parity-spec/sport-apk/  (mit i18n/ und schemas/)
 Wenn dieser Ordner fehlt: STOP SOFORT und gib eine knappe Fehlermeldung aus (kein Raten).
 
 BUILD-/TEST-GRUNDBEFEHLE (immer wieder ausführen; Fixes sofort):
@@ -41,8 +41,8 @@ BUILD-/TEST-GRUNDBEFEHLE (immer wieder ausführen; Fixes sofort):
 
 DEIN OUTPUT AM ENDE:
 - build:packages und build:ipad laufen fehlerfrei.
-- SportZens (ohne WOW) ist APK-paritätisch (Strings+Schemas+Workflows).
-- KURT ist vollständig implementiert (Plan.md KURT-Checkboxen + ISSUES_TRACKER P5/P6 & darüber hinaus).
+- Sport (ohne WOW) ist APK-paritätisch (Strings+Schemas+Workflows).
+- KBR ist vollständig implementiert (Plan.md KBR-Checkboxen + ISSUES_TRACKER P5/P6 & darüber hinaus).
 - Parity-Ledger(s) + Test-Suite beweisen das automatisch.
 - Abschlussreport: docs/parity-spec/.../_evidence/FINAL_RUN_REPORT.md
 
@@ -51,27 +51,27 @@ PHASE 0 — BASELINE + TOOLING (KEINE FEATURE-ÄNDERUNG)
 ──────────────────────────────────────────────────────────────────────────────
 0.1 Repo booten, Builds laufen lassen, minimale Build-Fixes nur wenn nötig.
 0.2 Lege folgende Ordner an:
-- docs/parity-spec/sportzens-apk/_ledger/
-- docs/parity-spec/sportzens-apk/_evidence/
-- docs/parity-spec/kurt/_ledger/
-- docs/parity-spec/kurt/_evidence/
+- docs/parity-spec/sport-apk/_ledger/
+- docs/parity-spec/sport-apk/_evidence/
+- docs/parity-spec/KBR/_ledger/
+- docs/parity-spec/KBR/_evidence/
 
 GATE 0: build:packages und build:ipad laufen (oder Du hast sie wiederhergestellt).
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 1 — SPORTZENS PARITY-SPEC INGEST + LEDGER
+PHASE 1 — Sport PARITY-SPEC INGEST + LEDGER
 ──────────────────────────────────────────────────────────────────────────────
 1.1 Verifiziere Parity-Spec Struktur:
-- docs/parity-spec/sportzens-apk/i18n/*.json
-- docs/parity-spec/sportzens-apk/schemas/*.schema.json
+- docs/parity-spec/sport-apk/i18n/*.json
+- docs/parity-spec/sport-apk/schemas/*.schema.json
 
 1.2 Erzeuge deterministische Ledger-Dateien:
-A) docs/parity-spec/sportzens-apk/_ledger/PARITY_LEDGER.md
+A) docs/parity-spec/sport-apk/_ledger/PARITY_LEDGER.md
    - i18n Keyset Statistik
    - Schema-Liste + Feldlisten
    - Mapping Schema→Vicco Entities/Repos/UseCases/UI
    - WOW-Items markieren: excluded_by_scope_v2
-B) docs/parity-spec/sportzens-apk/_ledger/PARITY_MATRIX.csv
+B) docs/parity-spec/sport-apk/_ledger/PARITY_MATRIX.csv
    Spalten:
    - parity_item_type (i18n_key|schema_field|workflow|route)
    - id
@@ -80,32 +80,32 @@ B) docs/parity-spec/sportzens-apk/_ledger/PARITY_MATRIX.csv
    - implemented (yes/no)
    - location (file+symbol)
    - tests (file+testname)
-C) docs/parity-spec/sportzens-apk/_ledger/PARITY_ASSERTIONS.md
+C) docs/parity-spec/sport-apk/_ledger/PARITY_ASSERTIONS.md
    - Wie „exakt“ gemessen wird (Stringgleichheit, Roundtrip, Feldexistenz)
 
 GATE 1: Ledger existiert, WOW ist klar als excluded_by_scope_v2 markiert, nichts ist geraten.
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 2 — KURT SPEC INGEST (AUS PLAN.MD) + LEDGER
+PHASE 2 — KBR SPEC INGEST (AUS PLAN.MD) + LEDGER
 ──────────────────────────────────────────────────────────────────────────────
-2.1 Parse Plan.md und extrahiere alle KURT-Checkboxen:
-- Minimum: §6.9 bis §6.22 (und weitere KURT-Abschnitte, falls vorhanden) :contentReference[oaicite:17]{index=17}
+2.1 Parse Plan.md und extrahiere alle KBR-Checkboxen:
+- Minimum: §6.9 bis §6.22 (und weitere KBR-Abschnitte, falls vorhanden) :contentReference[oaicite:17]{index=17}
 2.2 Erzeuge:
-A) docs/parity-spec/kurt/_ledger/KURT_LEDGER.md
-   - Liste aller KURT-Checkboxen (ID/Abschnitt/Text)
+A) docs/parity-spec/KBR/_ledger/KBR_LEDGER.md
+   - Liste aller KBR-Checkboxen (ID/Abschnitt/Text)
    - Abbildung auf Issue IDs (P5-1..P6-4 etc.) wo passend :contentReference[oaicite:18]{index=18}
-B) docs/parity-spec/kurt/_ledger/KURT_MATRIX.csv (analog zu SportZens, aber checkbox_id statt schema_field)
-C) docs/parity-spec/kurt/_ledger/KURT_ASSERTIONS.md (DoD für „fertig“)
+B) docs/parity-spec/KBR/_ledger/KBR_MATRIX.csv (analog zu Sport, aber checkbox_id statt schema_field)
+C) docs/parity-spec/KBR/_ledger/KBR_ASSERTIONS.md (DoD für „fertig“)
 
-GATE 2: KURT_MATRIX enthält alle Checkboxen; nichts fehlt still.
+GATE 2: KBR_MATRIX enthält alle Checkboxen; nichts fehlt still.
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 3 — i18n INFRA (Teacher-UI) + SPORTZENS STRING-PARITY
+PHASE 3 — i18n INFRA (Teacher-UI) + Sport STRING-PARITY
 ──────────────────────────────────────────────────────────────────────────────
-Ziel: Teacher-UI nutzt i18n so, dass SportZens-APK Keys 1:1 geladen werden, ohne Textänderung.
+Ziel: Teacher-UI nutzt i18n so, dass Sport APK Keys 1:1 geladen werden, ohne Textänderung.
 - Implementiere i18n (vue-i18n oder eigener Loader), Safari-kompatibel.
 - Fallback bei fehlendem Key: sichtbarer Marker „⟦MISSING:key⟧“.
-- Kopiere die SportZens JSONs unverändert als locales.
+- Kopiere die Sport JSONs unverändert als locales.
 
 Tests:
 - Keyset ladbar
@@ -115,11 +115,11 @@ Tests:
 GATE 3: build:ipad grün, i18n Tests grün, PARITY_MATRIX i18n_key coverage sichtbar.
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 4 — SPORTZENS SCHEMA-PARITÄT (OHNE WOW)
+PHASE 4 — Sport SCHEMA-PARITÄT (OHNE WOW)
 ──────────────────────────────────────────────────────────────────────────────
-Ziel: Alle in_scope_v2 SportZens Schemas sind 1:1 speicherbar, exportierbar, importierbar – ohne Datenverlust.
+Ziel: Alle in_scope_v2 Sport Schemas sind 1:1 speicherbar, exportierbar, importierbar – ohne Datenverlust.
 - Für jedes Schema: Domain DTO + Repo + UseCase + Migration.
-- Feldnamen exakt konservieren (notfalls sportZensRaw oder separate Tabellen/Stores).
+- Feldnamen exakt konservieren (notfalls SportRaw oder separate Tabellen/Stores).
 - Implementiere Export/Import Roundtrip (Download + file input).
 
 WICHTIG: WOW-Schema/Entities nicht umsetzen (excluded_by_scope_v2), aber Spec behalten.
@@ -131,9 +131,9 @@ Tests:
 GATE 4: Alle in_scope_v2 Schemas: implemented=yes + Tests grün.
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 5 — SPORTZENS WORKFLOWS/UI (APK-PARITY, OHNE WOW)
+PHASE 5 — Sport WORKFLOWS/UI (APK-PARITY, OHNE WOW)
 ──────────────────────────────────────────────────────────────────────────────
-Ziel: Alles, was die SportZens-APK (ohne WOW) kann, ist in ViccoBoard UI erreichbar und identisch bedienbar.
+Ziel: Alles, was die Sport APK (ohne WOW) kann, ist in ViccoBoard UI erreichbar und identisch bedienbar.
 - Arbeite entlang PARITY_MATRIX: route/workflow Items von no→yes.
 - Nutze ToolPlugin/AssessmentType/ExporterPlugin Konzepte.
 - Implementiere konfigurierbare Status-/Kriterienkataloge in allen betroffenen Workflows (mind. Anwesenheit; gleiche Kataloge müssen in Eingabe, Statistik, Export konsistent sein).
@@ -145,10 +145,10 @@ Tests:
 - Pro Workflow: mind. 1 Happy-Path UI-Flow Test oder dokumentierter Manual Test Plan
 - Domain Tests für Berechnungen (Grading, Tabellen, Sportabzeichen etc.)
 
-GATE 5: SportZens PARITY_MATRIX enthält keine in_scope_v2 = no.
+GATE 5: Sport PARITY_MATRIX enthält keine in_scope_v2 = no.
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 6 — KURT: DATA LAYER (P5-1) + UI BUILDER (P5-2, P5-3)
+PHASE 6 — KBR: DATA LAYER (P5-1) + UI BUILDER (P5-2, P5-3)
 ──────────────────────────────────────────────────────────────────────────────
 Ziel: Exam-Struktur (simple/complex) vollständig: Speicherung, Import/Export, UI Builder.
 Nutze ISSUES_TRACKER Aufgaben als Minimumumfang:
@@ -164,10 +164,10 @@ Tests:
 - Repos + UseCases Unit Tests
 - Import/Export Tests für Exam definitions
 
-GATE 6: KURT_MATRIX (Prüfungen anlegen) Checkboxen §6.9 sind implemented=yes.
+GATE 6: KBR_MATRIX (Prüfungen anlegen) Checkboxen §6.9 sind implemented=yes.
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 7 — KURT: CORRECTION & GRADING (P6-1..P6-4) + NOTENSCHLÜSSEL §6.10
+PHASE 7 — KBR: CORRECTION & GRADING (P6-1..P6-4) + NOTENSCHLÜSSEL §6.10
 ──────────────────────────────────────────────────────────────────────────────
 Ziel: Korrigieren ist vollständig und schnell:
 - P6-1 CorrectionEntry Repo + RecordCorrectionUseCase + CalculateGradeUseCase :contentReference[oaicite:21]{index=21}
@@ -182,13 +182,13 @@ Tests:
 - GradeKey Engine Tests (Boundary cases, rounding, modifiedAfterCorrection)
 - Correction Roundtrip Tests (Eingabe→Berechnung→Export→Import→gleich)
 
-GATE 7: KURT_MATRIX für §6.10 + §6.11 ist komplett yes.
+GATE 7: KBR_MATRIX für §6.10 + §6.11 ist komplett yes.
 
 ──────────────────────────────────────────────────────────────────────────────
-PHASE 8 — KURT: FÖRDERTIPPS/ANALYSE/LANGZEIT/EXPORT/MAIL (RESTLICHE KURT-CHECKBOXEN)
+PHASE 8 — KBR: FÖRDERTIPPS/ANALYSE/LANGZEIT/EXPORT/MAIL (RESTLICHE KBR-CHECKBOXEN)
 ──────────────────────────────────────────────────────────────────────────────
-Ziel: „KURT fertig“ heißt auch: Fördertipps, Auswertungen, Export, Templates, Sharing/Integrationen soweit in Plan.md gefordert.
-Minimumumfang (aus Plan.md + KURT Domainbeschreibung in STATUS.md):
+Ziel: „KBR fertig“ heißt auch: Fördertipps, Auswertungen, Export, Templates, Sharing/Integrationen soweit in Plan.md gefordert.
+Minimumumfang (aus Plan.md + KBR Domainbeschreibung in STATUS.md):
 - Fördertipps DB + Zuweisung + QR + Gewichtung (Plan §6.12) :contentReference[oaicite:26]{index=26}
 - Analyse: Schwierigkeit/Verteilung/Adjustments (entsprechende Checkboxen)
 - Langzeit: Schülertracking, Kompetenzbereiche, Notizen (entsprechende Checkboxen)
@@ -203,9 +203,9 @@ Implementierungsregeln:
 Tests:
 - Fördertipps CRUD + QR generation tests (snapshot/format)
 - PDF/Export determinism tests (stabile Outputs, soweit möglich)
-- KURT end-to-end smoke: Exam→Candidates→Correction→Export Feedback Sheet
+- KBR end-to-end smoke: Exam→Candidates→Correction→Export Feedback Sheet
 
-GATE 8: KURT_MATRIX hat keine „no“ mehr.
+GATE 8: KBR_MATRIX hat keine „no“ mehr.
 
 ──────────────────────────────────────────────────────────────────────────────
 PHASE 9 — SECURITY/BACKUP QUALITY-GATE (iPad Realität)
@@ -213,7 +213,7 @@ PHASE 9 — SECURITY/BACKUP QUALITY-GATE (iPad Realität)
 Ziel: App-Lock, Backup/Restore, Migrationen, keine Datenverluste.
 - Implementiere Lock (PIN/Passwort) + Timeout.
 - Backup-Status + Reminder (iPad Safari purge Risiko) :contentReference[oaicite:29]{index=29}
-- Export/Import Ende-zu-Ende für SportZens (in_scope_v2) + KURT.
+- Export/Import Ende-zu-Ende für Sport (in_scope_v2) + KBR.
 
 GATE 9: Lock + Backup/Restore getestet; Roundtrip-Tests grün.
 
@@ -221,8 +221,8 @@ GATE 9: Lock + Backup/Restore getestet; Roundtrip-Tests grün.
 PHASE 10 — FINALISIERUNG: TRACEABILITY + REPORT
 ──────────────────────────────────────────────────────────────────────────────
 - Aktualisiere:
-  - docs/parity-spec/sportzens-apk/_ledger/PARITY_MATRIX.csv (keine in_scope_v2 „no“)
-  - docs/parity-spec/kurt/_ledger/KURT_MATRIX.csv (keine „no“)
+  - docs/parity-spec/sport-apk/_ledger/PARITY_MATRIX.csv (keine in_scope_v2 „no“)
+  - docs/parity-spec/KBR/_ledger/KBR_MATRIX.csv (keine „no“)
 - Schreibe Abschlussreport:
   - docs/parity-spec/.../_evidence/FINAL_RUN_REPORT.md
   Enthält:
@@ -233,7 +233,7 @@ PHASE 10 — FINALISIERUNG: TRACEABILITY + REPORT
    - WOW: explizit „excluded_by_scope_v2“ + wo markiert
 
 ABSCHLUSS-AUSGABE (Konsole + FINAL_RUN_REPORT.md):
-- SPORTZENS_PARITY_WITHOUT_WOW: PASS|FAIL (FAIL nur, wenn PARITY_MATRIX in_scope_v2 noch implemented=no enthält)
-- KURT_COMPLETE: PASS|FAIL (FAIL nur, wenn KURT_MATRIX noch implemented=no enthält)
+- SPORT_PARITY_WITHOUT_WOW: PASS|FAIL (FAIL nur, wenn PARITY_MATRIX in_scope_v2 noch implemented=no enthält)
+- KBR_COMPLETE: PASS|FAIL (FAIL nur, wenn KBR_MATRIX noch implemented=no enthält)
 - RESTLISTE: drucke die offenen Items als Liste (CSV-Zeile oder id + parity_item_type/checkbox_id + reason + file hint)
 - PARITY_GATE=PASS nur wenn RESTLISTE leer, sonst PARITY_GATE=FAIL.

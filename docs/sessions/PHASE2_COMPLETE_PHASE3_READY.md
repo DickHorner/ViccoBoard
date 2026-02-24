@@ -55,18 +55,18 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 | Phase | Goal | Status | Gate |
 |-------|------|--------|------|
 | **Phase 0** | Baseline + Tooling | ✅ Complete | GATE 0 ✅ |
-| **Phase 1** | SportZens Parity-Spec ingestion | ✅ Complete | GATE 1 ✅ |
-| **Phase 2** | KURT Spec ingest (Plan.md) | ✅ Complete | GATE 2 ✅ |
+| **Phase 1** | Sport Parity-Spec ingestion | ✅ Complete | GATE 1 ✅ |
+| **Phase 2** | KBR Spec ingest (Plan.md) | ✅ Complete | GATE 2 ✅ |
 | **Phase 3** | i18n Infrastructure | ✅ Complete | GATE 3 ✅ |
-| **Phase 4** | SportZens Schema Roundtrip Tests | ✅ Complete | GATE 4 ✅ |
+| **Phase 4** | Sport Schema Roundtrip Tests | ✅ Complete | GATE 4 ✅ |
 
 ### Next Parity Phases (TODO)
 | Phase | Goal | Status | Effort |
 |-------|------|--------|--------|
-| **Phase 5** | SportZens Workflows/UI | ⏳ TODO | 2-3 weeks |
-| **Phase 6** | KURT Data Layer + Exam Builder | ⏳ TODO | 2-3 weeks |
-| **Phase 7** | KURT Correction & Grading | ⏳ TODO | 2-3 weeks |
-| **Phase 8** | KURT Fördertipps/Export/Mail | ⏳ TODO | 2-3 weeks |
+| **Phase 5** | Sport Workflows/UI | ⏳ TODO | 2-3 weeks |
+| **Phase 6** | KBR Data Layer + Exam Builder | ⏳ TODO | 2-3 weeks |
+| **Phase 7** | KBR Correction & Grading | ⏳ TODO | 2-3 weeks |
+| **Phase 8** | KBR Fördertipps/Export/Mail | ⏳ TODO | 2-3 weeks |
 | **Phase 9** | Security/Backup | ⏳ TODO | 1-2 weeks |
 | **Phase 10** | Finalization + Report | ⏳ TODO | 1 week |
 
@@ -78,7 +78,7 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 **Status:** ✅ UI scaffold created, navigation router, basic screens  
 **Completion:** P2-1 through P2-7 ready for task assignment
 
-### Phase 3: SportZens Grading Engine (NEXT)
+### Phase 3: Sport Grading Engine (NEXT)
 **Status:** ⏳ Ready to start (architecture foundation complete)  
 **Scope:** 
 - P3-1: Grading scheme repositories
@@ -89,7 +89,7 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 **Effort Estimate:** 2-3 weeks  
 **Blocking Dependencies:** None (Phase 2 foundations in place)
 
-### Phase 4: SportZens Tests & Measurements (After Phase 3)
+### Phase 4: Sport Tests & Measurements (After Phase 3)
 **Status:** ⏳ Ready after Phase 3  
 **Scope:**
 - P4-1: Shuttle-Run workflow + calculation
@@ -97,14 +97,14 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 - P4-3: Mittelstrecke timer
 - P4-4: Test integration & UI
 
-### Phase 5: KURT Exam Builder (After Phase 3)
+### Phase 5: KBR Exam Builder (After Phase 3)
 **Status:** ⏳ Ready after Phase 3  
 **Scope:**
 - P5-1: Exam repositories & data models
 - P5-2: Simple exam builder UI
 - P5-3: Complex exam builder UI
 
-### Phase 6: KURT Correction & Grading (After Phase 5)
+### Phase 6: KBR Correction & Grading (After Phase 5)
 **Status:** ⏳ Ready after Phase 5  
 **Scope:**
 - P6-1: Correction entry repository & use cases
@@ -143,11 +143,11 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 ### IMMEDIATE (Next Session Start)
 1. **Review Phase 3 Specification** 
    - Read: docs/planning/ISSUES_TRACKER.md (P3-1 through P3-4)
-   - Read: Plan.md §6.3 (SportZens Benotung & Bewertungssystem)
+   - Read: Plan.md §6.3 (Sport Benotung & Bewertungssystem)
    
 2. **Create GitHub Issues**
    - Convert P3-1 through P3-4 to GitHub issues in DickHorner/ViccoBoard
-   - Label: `phase-3`, `sport`, `grading`
+   - Label: `phase-3`, `Sport`, `grading`
    
 3. **Begin P3-1: Grading Scheme Repositories**
    - Create `modules/sport/src/grading/` structure
@@ -157,12 +157,12 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 
 ### SHORT TERM (This Week)
 - Complete P3-1 through P3-4 (Grading Engine)
-- Verify grading calculations against SportZens APK spec
+- Verify grading calculations against Sport APK spec
 - All 8 build gates must remain passing
 
 ### MEDIUM TERM (Weeks 2-3)
 - Phase 4: Tests & Measurements (Shuttle-Run, Cooper, etc.)
-- Phase 5: KURT Exam Builder (if parallel work assigned)
+- Phase 5: KBR Exam Builder (if parallel work assigned)
 
 ---
 
@@ -191,10 +191,10 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 ```typescript
 import { useSportBridge } from '../composables/useSportBridge'
 
-const { sportBridge, gradeCategories, performanceEntries } = useSportBridge()
+const { SportBridge, gradeCategories, performanceEntries } = useSportBridge()
 
 // Access repositories through bridge (computed refs)
-const grades = await sportBridge.value?.recordGradeUseCase.execute(data)
+const grades = await SportBridge.value?.recordGradeUseCase.execute(data)
 ```
 
 **Students Module:**
@@ -227,7 +227,7 @@ npm run lint:docs          # Documentation guardrails
 
 2. **P3-2 Criteria-Based Calculation**
    - [ ] Supports up to 8 criteria with individual weights
-   - [ ] Calculation logic matches SportZens APK
+   - [ ] Calculation logic matches Sport APK
    - [ ] Tests verify weighted average computation
    - [ ] Works offline without issue
 

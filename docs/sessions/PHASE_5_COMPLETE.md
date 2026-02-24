@@ -100,7 +100,7 @@
 **Key Features**:
 - ✅ **GradeCategory Management**: Create/configure grading categories via use case
 - ✅ **Performance Entry Recording**: RecordGradeUseCase for grade/measurement entries
-- ✅ **Bridge Integration**: Grading use cases accessible via sportBridge
+- ✅ **Bridge Integration**: Grading use cases accessible via SportBridge
 - ✅ **Existing UI**: GradingOverview.vue, CriteriaGradingEntry.vue, TimeGradingEntry.vue already in place
 - ✅ **Grade Repository**: GradeCategoryRepository and PerformanceEntryRepository integrated
 

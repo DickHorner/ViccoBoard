@@ -19,7 +19,7 @@ Copilot must follow these files before editing code:
 1. `.github/copilot-instructions.md`
 2. `agents.md`
 3. `Plan.md` (especially section 6 and section 9)
-4. `docs/agents/SPORTZENS_PARITY_v2.md`
+4. `docs/agents/sport_parity_v2.md`
 
 ## Execution Mode Declaration (Required)
 

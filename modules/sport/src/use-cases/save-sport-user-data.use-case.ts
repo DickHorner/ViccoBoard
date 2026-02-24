@@ -1,14 +1,14 @@
 /**
- * Save SportZens UserData Use Case
+ * Save Sport UserData Use Case
  */
 
-import { SportZens } from '@viccoboard/core';
-import { SportZensUserDataRepository } from '../repositories/sportzens-user-data.repository.js';
+import { SportSchema } from '@viccoboard/core';
+import { SportUserDataRepository } from '../repositories/sport-user-data.repository.js';
 
-export class SaveSportZensUserDataUseCase {
-  constructor(private repository: SportZensUserDataRepository) {}
+export class SaveSportUserDataUseCase {
+  constructor(private repository: SportUserDataRepository) {}
 
-  async execute(entity: SportZens.SportZensUserData): Promise<SportZens.SportZensUserData> {
+  async execute(entity: SportSchema.SportUserData): Promise<SportSchema.SportUserData> {
     return this.repository.save(entity);
   }
 }

@@ -1,9 +1,9 @@
 /**
- * SportZens APK Schema Types
+ * Sport APK Schema Types
  * Snake_case fields match parity-spec schemas exactly.
  */
 
-export interface SportZensClass {
+export interface SportClass {
   id: string;
   name: string;
   school_year: string;
@@ -21,7 +21,7 @@ export interface SportZensClass {
   version?: number;
 }
 
-export interface SportZensStudent {
+export interface SportStudent {
   class_id: string;
   first_name: string;
   id: string;
@@ -35,7 +35,7 @@ export interface SportZensStudent {
   version?: number;
 }
 
-export interface SportZensGrade {
+export interface SportGrade {
   category_id: string;
   class_id: string;
   id: string;
@@ -55,7 +55,7 @@ export interface SportZensGrade {
   weight?: number;
 }
 
-export interface SportZensCategory {
+export interface SportCategory {
   class_id: string;
   id: string;
   name: string;
@@ -76,7 +76,7 @@ export interface SportZensCategory {
   updated_at?: string;
 }
 
-export interface SportZensTable {
+export interface SportTable {
   grade_scheme: string;
   id: string;
   name: string;
@@ -91,21 +91,21 @@ export interface SportZensTable {
   visibility?: string;
 }
 
-export interface SportZensGradeWeighting {
+export interface SportGradeWeighting {
   attendance: number;
   grades: number;
   remarks: number;
   wow: number;
 }
 
-export interface SportZensNewDayData {
+export interface SportNewDayData {
   date: string;
   additionalExercises?: unknown[];
   exercises?: unknown[];
   notes?: string;
 }
 
-export interface SportZensUserData {
+export interface SportUserData {
   email: string;
   id: string;
   role: string;

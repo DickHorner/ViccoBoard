@@ -26,7 +26,7 @@ STATUS.md claimed "zero legacy database imports in production code" but the arch
 | `apps/teacher-ui/src/composables/useCorrections.ts` | Added `@deprecated` JSDoc header |
 | `packages/storage/src/adapters/in-memory.adapter.ts` | **NEW** - `InMemoryStorageAdapter` for unit tests |
 | `packages/storage/src/index.ts` | Added `InMemoryStorageAdapter` export |
-| `modules/students/jest.config.cjs` | Added `moduleNameMapper` for `@viccoboard/core` and `@viccoboard/storage` (matching sport module pattern) |
+| `modules/students/jest.config.cjs` | Added `moduleNameMapper` for `@viccoboard/core` and `@viccoboard/storage` (matching Sport module pattern) |
 | Deleted: `useDatabase.js/.d.ts`, `useExams.js/.d.ts`, `useCorrections.js/.d.ts` | Removed compiled artifacts of deprecated composables |
 
 ---
@@ -65,7 +65,7 @@ These are NOT called by any production view. Only `views-wip/` references them:
 - **Reference:** The `views-wip/AttendanceEntry.vue` has the old pattern; the production `views/AttendanceEntry.vue` needs the bridge-based pattern
 
 #### P5-3: Complex Exam Builder verification
-- **Target:** `apps/teacher-ui/src/views/KURTExamBuilder.vue`
+- **Target:** `apps/teacher-ui/src/views/KBRExamBuilder.vue`
 - **What to verify:** 3-level task hierarchy (Task -> Subtask -> Sub-subtask), choice tasks (Wahlteil), bonus points
 - **Bridge:** `useExamsBridge.ts` provides repos + use cases
 
@@ -82,8 +82,8 @@ These are NOT called by any production view. Only `views-wip/` references them:
 - **Target views:** `ShuttleGradingEntry.vue`, `CooperGradingEntry.vue`, `SportabzeichenGradingEntry.vue`, `Timer.vue`
 
 #### Parity Matrices
-- Required by `docs/agents/SPORTZENS_PARITY_v2.md`
-- Must produce feature parity comparison: SportZens v1 vs ViccoBoard
+- Required by `docs/agents/sport_parity_v2.md`
+- Must produce feature parity comparison: Sport v1 vs ViccoBoard
 
 ---
 
@@ -118,7 +118,7 @@ Get-ChildItem apps/teacher-ui/src -Recurse -File | Select-String -Pattern "useDa
 | `.github/copilot-instructions.md` | Architecture rules, mandatory reading |
 | `agents.md` | Multi-agent structure, bridge pattern |
 | `Plan.md` (esp. sections 6, 9) | Feature checklist, storage migration TBD |
-| `docs/agents/SPORTZENS_PARITY_v2.md` | Parity execution plan |
+| `docs/agents/sport_parity_v2.md` | Parity execution plan |
 | `docs/planning/ISSUES_TRACKER.md` | Issue tracking (P2-1 to P6-4) |
 | `docs/status/STATUS.md` | Current status claims (verify against audit) |
 

@@ -3,7 +3,7 @@
  * Records a grade/performance entry for a student
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { PerformanceEntryRepository } from '../repositories/performance-entry.repository.js';
 
 export interface RecordGradeInput {

@@ -39,5 +39,5 @@
 
 ## Parity Reports
 
-- [docs/parity-spec/reports/VICCOBOARD_SPORTZENS_PARITY_REPORT.md](./docs/parity-spec/reports/VICCOBOARD_SPORTZENS_PARITY_REPORT.md)
-- [docs/parity-spec/reports/VICCOBOARD_SPORTZENS_SCHEMA_PARITY.csv](./docs/parity-spec/reports/VICCOBOARD_SPORTZENS_SCHEMA_PARITY.csv)
+- [docs/parity-spec/reports/viccoboard_sport_parity_report.md](./docs/parity-spec/reports/viccoboard_sport_parity_report.md)
+- [docs/parity-spec/reports/viccoboard_sport_schema_parity.csv](./docs/parity-spec/reports/viccoboard_sport_schema_parity.csv)

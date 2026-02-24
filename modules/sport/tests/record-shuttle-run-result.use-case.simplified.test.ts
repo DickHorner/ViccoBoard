@@ -4,7 +4,7 @@
  */
 
 import { RecordShuttleRunResultUseCase } from '../src/use-cases/record-shuttle-run-result.use-case.js';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 // Mock repositories
 class MockPerformanceEntryRepository {

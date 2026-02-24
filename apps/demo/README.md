@@ -52,7 +52,7 @@ The demo application demonstrates the complete flow of ViccoBoard's core functio
 You'll see output like this:
 
 ```
-🎓 ViccoBoard Demo - SportZens & KURT Unified Suite
+🎓 ViccoBoard Demo - Sport & KBR Unified Suite
 
 ═════════════════════════════════════════════════════════════
 
@@ -190,7 +190,7 @@ Student management is centralized in `modules/students` (`StudentRepository`) an
 
 - **@viccoboard/core** - Type definitions and interfaces
 - **@viccoboard/storage** - Encrypted SQLite storage
-- **@viccoboard/sport** - SportZens domain logic
+- **@viccoboard/sport** - Sport domain logic
 - **@viccoboard/students** - Central student management
 
 ## ✅ What This Proves
@@ -210,7 +210,7 @@ Now that the foundation is proven, you can:
 2. **Implement More Features** - From the 176 items in Plan.md
 3. **Add Testing** - Unit and integration tests
 4. **Create Plugins** - Assessment types, tools, exporters
-5. **Build KURT Domain** - Exam creation and correction
+5. **Build KBR Domain** - Exam creation and correction
 
 ## 🔧 Troubleshooting
 

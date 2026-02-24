@@ -1,5 +1,5 @@
 import { SportabzeichenService } from '../src/services/sportabzeichen.service';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('SportabzeichenService', () => {
   const standards: Sport.SportabzeichenStandard[] = [

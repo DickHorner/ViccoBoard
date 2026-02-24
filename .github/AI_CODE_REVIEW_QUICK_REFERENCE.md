@@ -35,7 +35,7 @@
 ## Quick Checklist
 
 ### Architecture
-- [ ] Right module (`sport/`, `exams/`, `core/`, etc.)?
+- [ ] Right module (`Sport/`, `exams/`, `core/`, etc.)?
 - [ ] No business logic in UI?
 - [ ] Core only has interfaces?
 - [ ] Dependency direction correct (UI → App → Domain)?

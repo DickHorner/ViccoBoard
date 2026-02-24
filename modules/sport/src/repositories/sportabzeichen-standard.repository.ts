@@ -4,12 +4,12 @@
  */
 
 import { AdapterRepository } from '@viccoboard/storage';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class SportabzeichenStandardRepository extends AdapterRepository<Sport.SportabzeichenStandard> {
   constructor(adapter: StorageAdapter) {
-    super(adapter, 'sportabzeichen_standards');
+    super(adapter, 'Sportabzeichen_standards');
   }
 
   /**

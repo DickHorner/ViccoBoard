@@ -1,6 +1,6 @@
 /**
  * @deprecated Student management is centralized in @viccoboard/students.
- * Import AddStudentUseCase from there instead of the sport module.
+ * Import AddStudentUseCase from there instead of the Sport module.
  */
 export {
   AddStudentUseCase,

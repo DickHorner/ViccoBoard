@@ -29,7 +29,7 @@ Views implemented:
 - ✅ GradingOverview.vue (uses useSportBridge)
 - ✅ GradeHistory.vue (uses useSportBridge)
 
-**Likely Working:** All sport grading workflows are using proper bridges after migration.
+**Likely Working:** All Sport grading workflows are using proper bridges after migration.
 
 ---
 
@@ -60,7 +60,7 @@ const { getById } = useExams()
 
 ---
 
-## C) KURT INTEGRATION CHECK
+## C) KBR INTEGRATION CHECK
 
 ### ExamsOverview.vue
 - ✅ Fixed to use useExamsBridge (done in Phase 2)
@@ -77,7 +77,7 @@ const { getById } = useExams()
 - ❌ Uses examBuilderStore which still references useDatabase
 - Status: BROKEN (blocker)
 
-### KURTExamBuilder.vue
+### KBRExamBuilder.vue
 - Unknown current state (separate from ExamBuilder.vue)
 
 ---
@@ -86,7 +86,7 @@ const { getById } = useExams()
 
 ### i18n Infrastructure
 - ✅ vue-i18n configured
-- ✅ SportZens locales loaded (~850+ keys)
+- ✅ Sport locales loaded (~850+ keys)
 - ✅ Missing key handler shows "MISSING:key" marker
 
 ### Usage in Views
@@ -108,7 +108,7 @@ Example found in Dashboard.vue:
 
 ## E) PARITY MATRIX VALIDATION (Spot Check)
 
-### SportZens Feature Checklist (from Plan.md §6.2-6.8)
+### Sport Feature Checklist (from Plan.md §6.2-6.8)
 
 | Feature | Status | Location |
 |---------|--------|----------|
@@ -130,7 +130,7 @@ Example found in Dashboard.vue:
 | Tactics Board | ? Unknown | (TacticsBoard.vue exists) |
 | Feedback | ? Unknown | (FeedbackTool.vue exists) |
 
-### KURT Feature Checklist (from Plan.md §6.9-6.22)
+### KBR Feature Checklist (from Plan.md §6.9-6.22)
 
 | Feature | Status | Location |
 |---------|--------|----------|
@@ -169,7 +169,7 @@ Example found in Dashboard.vue:
 
 ### ✅ WORKING (Post-Migration)
 - All 9 migrated views (Times, Grading, Correction, Exams overview)
-- All sport workflows (class → student → grading)
+- All Sport workflows (class → student → grading)
 - i18n wiring (already displaying in views)
 
 ---

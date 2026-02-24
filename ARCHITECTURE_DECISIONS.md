@@ -16,7 +16,7 @@ Use npm workspaces with a hierarchical package structure: **packages/** (core sh
 - **Code reuse**: Core types, storage, crypto shared across modules and apps
 - **Independent deployment**: Apps can be deployed separately (web, desktop, mobile)
 - **Clear boundaries**: Plugin system enables optional features without core changes
-- **Team scaling**: Clear package ownership (Agent A → core, Agent D → sport module, etc.)
+- **Team scaling**: Clear package ownership (Agent A → core, Agent D → Sport module, etc.)
 
 ### Structure
 ```
@@ -26,8 +26,8 @@ packages/
 └── storage/       # Encrypted storage, repositories, migrations
 
 modules/
-├── sport/         # SportZens domain (PE management)
-└── exams/         # KURT domain (assessments)
+├── Sport/         # Sport domain (PE management)
+└── exams/         # KBR domain (assessments)
 
 apps/
 ├── teacher-ui/    # Main teacher application (UI TBD)
@@ -157,7 +157,7 @@ Defines how grades are calculated and stored.
 
 ```typescript
 interface AssessmentTypePlugin extends Plugin {
-  name: 'criteria' | 'time' | 'cooper' | 'sportabzeichen' | ...;
+  name: 'criteria' | 'time' | 'cooper' | 'Sportabzeichen' | ...;
   
   // Calculate grade from measurements
   calculateGrade(input: AssessmentInput): Grade;
@@ -259,7 +259,7 @@ const toolPlugins = registry.getByType('tool');
 | Storage adapters | ❌ | ✅ (registry agnostic) |
 | PDF export format | ✅ | ❌ |
 | WebUntis integration | ✅ | ❌ |
-| Exam builder logic | ❌ | ✅ (core KURT) |
+| Exam builder logic | ❌ | ✅ (core KBR) |
 | Timer tool | ✅ | ❌ |
 
 ### Trade-offs
@@ -543,7 +543,7 @@ Use strict TypeScript everywhere. No `any` type allowed.
 ### Type Generation from Plan.md
 All types in [packages/core/src/interfaces/](./packages/core/src/interfaces/) are derived from Plan.md.
 
-**Example: SportZens Types**
+**Example: Sport Types**
 ```typescript
 // From Plan.md §3: "Grading Scheme with categories..."
 interface GradeScheme {
@@ -556,7 +556,7 @@ interface GradeScheme {
 
 interface GradeCategory {
   id: string;
-  name: 'criteria' | 'time' | 'cooper' | 'sportabzeichen' | 'bjs' | 'verbal';
+  name: 'criteria' | 'time' | 'cooper' | 'Sportabzeichen' | 'bjs' | 'verbal';
   scheme_id: string;
   weight?: number;
   // ... category-specific fields

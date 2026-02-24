@@ -1,5 +1,5 @@
 import { MittelstreckeGradingService } from '../src/services/mittelstrecke-grading.service';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('MittelstreckeGradingService', () => {
   let service: MittelstreckeGradingService;

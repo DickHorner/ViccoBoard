@@ -195,10 +195,10 @@ export class SessionStorage implements SecureStorage {
 ### Type Safety
 ```typescript
 // ✅ GOOD
-type GradeCategoryType = 'criteria' | 'time' | 'cooper' | 'sportabzeichen';
+type GradeCategoryType = 'criteria' | 'time' | 'cooper' | 'Sportabzeichen';
 
 function isValidGradeCategoryType(value: unknown): value is GradeCategoryType {
-  return ['criteria', 'time', 'cooper', 'sportabzeichen'].includes(value as string);
+  return ['criteria', 'time', 'cooper', 'Sportabzeichen'].includes(value as string);
 }
 
 function mapToEntity(row: unknown): GradeCategory {

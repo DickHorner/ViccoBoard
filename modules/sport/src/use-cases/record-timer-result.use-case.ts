@@ -4,7 +4,7 @@
  * Refactored from PerformanceEntry to ToolSession for domain integrity
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { ToolSessionRepository } from '../repositories/tool-session.repository.js';
 
 export interface RecordTimerResultInput {

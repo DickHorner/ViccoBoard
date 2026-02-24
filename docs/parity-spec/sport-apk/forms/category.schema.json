@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "category (SportZens APK shape)",
+  "title": "category (Sport APK shape)",
   "type": "object",
-  "description": "Extracted from compiled SportZens APK JS bundles by scanning `this.category = {...}` object literals. Key union across 3 observed shapes.",
+  "description": "Extracted from compiled Sport APK JS bundles by scanning `this.category = {...}` object literals. Key union across 3 observed shapes.",
   "properties": {
     "categories": {
       "type": "object"

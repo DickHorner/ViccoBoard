@@ -5,7 +5,7 @@
 import { GradeCategoryRepository } from '../src/repositories/grade-category.repository';
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
 import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage/node';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('GradeCategoryRepository', () => {
   let storage: SQLiteStorage;
@@ -45,7 +45,7 @@ describe('GradeCategoryRepository', () => {
       const category: Omit<Sport.GradeCategory, 'id' | 'createdAt' | 'lastModified'> = {
         classGroupId: testClassGroupId,
         name: 'Team Sports Skills',
-        description: 'Assessment of team sports abilities',
+        description: 'Assessment of team Sports abilities',
         type: Sport.GradeCategoryType.Criteria,
         weight: 30,
         configuration: {
@@ -101,7 +101,7 @@ describe('GradeCategoryRepository', () => {
         weight: 25,
         configuration: {
           type: 'cooper',
-          sportType: 'running',
+          SportType: 'running',
           distanceUnit: 'meters',
           autoEvaluation: true
         }
@@ -112,7 +112,7 @@ describe('GradeCategoryRepository', () => {
       expect(result.id).toBeDefined();
       expect(result.type).toBe(Sport.GradeCategoryType.Cooper);
       const cooperConfig = result.configuration as Sport.CooperGradingConfig;
-      expect(cooperConfig.sportType).toBe('running');
+      expect(cooperConfig.SportType).toBe('running');
     });
   });
 
@@ -238,7 +238,7 @@ describe('GradeCategoryRepository', () => {
         name: 'Category 3',
         type: Sport.GradeCategoryType.Cooper,
         weight: 45,
-        configuration: { type: 'cooper', sportType: 'running', distanceUnit: 'meters', autoEvaluation: true }
+        configuration: { type: 'cooper', SportType: 'running', distanceUnit: 'meters', autoEvaluation: true }
       });
 
       const totalWeight = await repository.getTotalWeight(testClassGroupId);

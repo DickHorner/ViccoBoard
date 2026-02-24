@@ -1,4 +1,4 @@
-# SportZens APK → ViccoBoard Parity Ledger
+# Sport APK → ViccoBoard Parity Ledger
 
 **Version:** 1.0.0  
 **Date:** 2026-02-07  
@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This ledger tracks 100% functional and options parity between the SportZens APK and ViccoBoard implementation.
+This ledger tracks 100% functional and options parity between the Sport APK and ViccoBoard implementation.
 
 **Status:** Initial baseline established  
 **WOW Status:** Explicitly excluded from scope v2 (`excluded_by_scope_v2`)
@@ -16,8 +16,8 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 ## 1. i18n Keyset Statistics
 
 ### Source Files
-- `docs/parity-spec/sportzens-apk/i18n/sportzens.de.json` (German)
-- `docs/parity-spec/sportzens-apk/i18n/sportzens.en.json` (English)
+- `docs/parity-spec/sport-apk/i18n/Sport.de.json` (German)
+- `docs/parity-spec/sport-apk/i18n/Sport.en.json` (English)
 
 ### Key Hierarchy (Top-Level Sections)
 1. **HELLO** - Welcome messages
@@ -60,7 +60,7 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 38. **MULTISTOP** - Multi-stopwatch (20+ keys)
 39. **WOW** - Workout of the Week (**EXCLUDED_BY_SCOPE_V2**) (60+ keys)
 40. **FEEDBACK** - Feedback system (10+ keys)
-41. **SPORTABZEICHEN** - Sports badge (25+ keys)
+41. **SportABZEICHEN** - Sports badge (25+ keys)
 42. **BUNDESJUGENDSPIELE** - Federal youth games (15+ keys)
 43. **KALENDER** - Calendar (15+ keys)
 44. **KAISER** - King tournament (20+ keys)
@@ -92,7 +92,7 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 ## 2. Schema Inventory
 
 ### Schema Files Location
-`docs/parity-spec/sportzens-apk/schemas/*.schema.json`
+`docs/parity-spec/sport-apk/schemas/*.schema.json`
 
 ### Schema List with Field Counts
 
@@ -119,7 +119,7 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 
 ### Priority 1: Core Entities (Implemented)
 
-| SportZens Schema | ViccoBoard Entity/Type | Location | Status |
+| Sport Schema | ViccoBoard Entity/Type | Location | Status |
 |------------------|------------------------|----------|--------|
 | **class** | `ClassGroup` | `packages/core/src/interfaces/core.types.ts` + `modules/sport/src/repositories/class-group.repository.ts` | ✅ Exists |
 | **student** | `Student` | `packages/core/src/interfaces/core.types.ts` + `modules/students/src/repositories/student.repository.ts` | ✅ Exists |
@@ -128,16 +128,16 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 | **table** | `TableDefinition` | `packages/core/src/interfaces/sport.types.ts` + `modules/sport/src/repositories/table-definition.repository.ts` | ✅ Exists |
 | **userData** | `TeacherAccount` | `packages/core/src/interfaces/core.types.ts` | ✅ Exists |
 
-### Priority 2: SportZens-Specific (Needs Field Parity Check)
+### Priority 2: Sport-Specific (Needs Field Parity Check)
 
-| SportZens Schema | ViccoBoard Mapping | Status |
+| Sport Schema | ViccoBoard Mapping | Status |
 |------------------|-------------------|--------|
 | **gradeWeighting** | Grade scheme weighting settings | 🟡 Partial (needs field check) |
 | **newDayData** | `Lesson` | `packages/core/src/interfaces/core.types.ts` + `modules/sport/src/repositories/lesson.repository.ts` (field check) |
 
 ### Priority 3: Excluded
 
-| SportZens Schema | ViccoBoard Status | Scope |
+| Sport Schema | ViccoBoard Status | Scope |
 |------------------|-------------------|-------|
 | **wow** | NOT IMPLEMENTED | **excluded_by_scope_v2** |
 
@@ -174,7 +174,7 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 | Grading (Shuttle) | SHUTTLE | in_scope_v2 | ⚠️ TODO |
 | Grading (Multistop) | MULTISTOP | in_scope_v2 | ⚠️ TODO |
 | Grading (Middle Distance) | MITTELSTRECKE | in_scope_v2 | ⚠️ TODO |
-| Sportabzeichen | SPORTABZEICHEN | in_scope_v2 | ⚠️ TODO |
+| Sportabzeichen | SportABZEICHEN | in_scope_v2 | ⚠️ TODO |
 | Bundesjugendspiele | BUNDESJUGENDSPIELE | in_scope_v2 | ⚠️ TODO |
 | King Tournament | KAISER, KING | in_scope_v2 | ⚠️ TODO |
 | Teams | TEAM | in_scope_v2 | ⚠️ TODO |
@@ -196,7 +196,7 @@ This ledger tracks 100% functional and options parity between the SportZens APK 
 ## 5. WOW Exclusion Documentation
 
 ### Rationale
-Per SPORTZENS_PARITY_v2.md specification, WOW (Workout of the Week) is explicitly excluded from scope v2 to focus on core sports assessment and KURT implementation.
+Per sport_parity_v2.md specification, WOW (Workout of the Week) is explicitly excluded from scope v2 to focus on core Sports assessment and KBR implementation.
 
 ### Affected Components
 
@@ -238,7 +238,7 @@ See `PARITY_ASSERTIONS.md` for definitions of "parity" and test strategies.
 ## 7. Next Steps (Phase 2+)
 
 1. ✅ Phase 1: Ledger established (this file)
-2. ⏳ Phase 2: KURT spec ingest from Plan.md
+2. ⏳ Phase 2: KBR spec ingest from Plan.md
 3. ⏳ Phase 3: i18n infrastructure + string parity tests
 4. ⏳ Phase 4: Schema roundtrip tests for all 8 in-scope schemas
 5. ⏳ Phase 5-8: Workflow implementation + UI parity

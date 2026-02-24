@@ -5,6 +5,6 @@
 
 export function useDatabase(): never {
   throw new Error(
-    'useDatabase is legacy and disabled. Use module bridges (sport/students/exams) instead.'
+    'useDatabase is legacy and disabled. Use module bridges (Sport/students/exams) instead.'
   )
 }

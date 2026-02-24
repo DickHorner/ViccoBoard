@@ -1,14 +1,14 @@
 /**
- * Save SportZens Category Use Case
+ * Save Sport Category Use Case
  */
 
-import { SportZens } from '@viccoboard/core';
-import { SportZensCategoryRepository } from '../repositories/sportzens-category.repository.js';
+import { SportSchema } from '@viccoboard/core';
+import { SportCategoryRepository } from '../repositories/sport-category.repository.js';
 
-export class SaveSportZensCategoryUseCase {
-  constructor(private repository: SportZensCategoryRepository) {}
+export class SaveSportCategoryUseCase {
+  constructor(private repository: SportCategoryRepository) {}
 
-  async execute(entity: SportZens.SportZensCategory): Promise<SportZens.SportZensCategory> {
+  async execute(entity: SportSchema.SportCategory): Promise<SportSchema.SportCategory> {
     return this.repository.save(entity);
   }
 }

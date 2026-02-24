@@ -5,7 +5,7 @@ import deLang from './locales/de.json';
 import enLang from './locales/en.json';
 
 /**
- * Locale messages — directly from SportZens APK parity-spec
+ * Locale messages — directly from Sport APK parity-spec
  */
 const messages = {
   de: deLang,
@@ -21,7 +21,7 @@ function missingKeyHandler(path: string): string {
 }
 
 /**
- * Initialize vue-i18n with SportZens locales
+ * Initialize vue-i18n with Sport locales
  * - Detects browser language (defaults to 'en')
  * - Shows visible markers for missing keys
  * - Safari-compatible (no special APIs required)

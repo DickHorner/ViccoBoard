@@ -3,7 +3,7 @@
     <header class="overview-header">
       <div>
         <h1>Exams</h1>
-        <p class="subtitle">Build and manage simple exams for KURT.</p>
+        <p class="subtitle">Build and manage simple exams for KBR.</p>
       </div>
       <button class="primary" type="button" @click="createNew">
         New exam

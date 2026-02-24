@@ -1,5 +1,9 @@
 # AI Code Review Instructions (Security, Performance, Stability, Lightweight)
 
+## Global Philosophy
+
+The **Zen of Python** is the primary coding philosophy for all reviews and refactors in this repository. In conflicts, prefer the option that is more explicit, simpler, and easier to read/maintain.
+
 These instructions define how an AI agent should perform a complete code review of this repository. The goal is to improve security, performance, stability, and keep the codebase slim and agile. Avoid monolithic files and oversized modules.
 
 **Scope**

@@ -1,14 +1,14 @@
 /**
- * Save SportZens Table Use Case
+ * Save Sport Table Use Case
  */
 
-import { SportZens } from '@viccoboard/core';
-import { SportZensTableRepository } from '../repositories/sportzens-table.repository.js';
+import { SportSchema } from '@viccoboard/core';
+import { SportTableRepository } from '../repositories/sport-table.repository.js';
 
-export class SaveSportZensTableUseCase {
-  constructor(private repository: SportZensTableRepository) {}
+export class SaveSportTableUseCase {
+  constructor(private repository: SportTableRepository) {}
 
-  async execute(entity: SportZens.SportZensTable): Promise<SportZens.SportZensTable> {
+  async execute(entity: SportSchema.SportTable): Promise<SportSchema.SportTable> {
     return this.repository.save(entity);
   }
 }

@@ -1,17 +1,17 @@
 /**
- * SportZens Table Repository
- * Stores raw SportZens grading table schema fields in sportzens_tables.
+ * Sport Table Repository
+ * Stores raw Sport grading table schema fields in sport_tables.
  */
 
-import { SportZens } from '@viccoboard/core';
+import { SportSchema } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
-export class SportZensTableRepository {
-  private readonly tableName = 'sportzens_tables';
+export class SportTableRepository {
+  private readonly tableName = 'sport_tables';
 
   constructor(private adapter: StorageAdapter) {}
 
-  async save(entity: SportZens.SportZensTable): Promise<SportZens.SportZensTable> {
+  async save(entity: SportSchema.SportTable): Promise<SportSchema.SportTable> {
     const existing = await this.adapter.getById(this.tableName, entity.id);
     const row = this.mapToRow(entity);
 
@@ -24,12 +24,12 @@ export class SportZensTableRepository {
     return entity;
   }
 
-  async findById(id: string): Promise<SportZens.SportZensTable | null> {
+  async findById(id: string): Promise<SportSchema.SportTable | null> {
     const row = await this.adapter.getById(this.tableName, id);
     return row ? this.mapToEntity(row) : null;
   }
 
-  async findAll(): Promise<SportZens.SportZensTable[]> {
+  async findAll(): Promise<SportSchema.SportTable[]> {
     const rows = await this.adapter.getAll(this.tableName);
     return rows.map((row) => this.mapToEntity(row));
   }
@@ -38,7 +38,7 @@ export class SportZensTableRepository {
     return this.adapter.delete(this.tableName, id);
   }
 
-  private mapToEntity(row: Record<string, unknown>): SportZens.SportZensTable {
+  private mapToEntity(row: Record<string, unknown>): SportSchema.SportTable {
     return {
       grade_scheme: row.grade_scheme as string,
       id: row.id as string,
@@ -55,7 +55,7 @@ export class SportZensTableRepository {
     };
   }
 
-  private mapToRow(entity: SportZens.SportZensTable): Record<string, unknown> {
+  private mapToRow(entity: SportSchema.SportTable): Record<string, unknown> {
     return {
       id: entity.id,
       name: entity.name,

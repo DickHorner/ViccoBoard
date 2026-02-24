@@ -264,7 +264,7 @@
     "pw-zeichen": "signs",
     "pw-speichern": "save PW",
     "shuttle-konfiguration": "Shuttle-Run configuration",
-    "vorlagen": "presets on www.sportzens.de/vorlagen",
+    "vorlagen": "presets on www.Sport.de/vorlagen",
     "shuttle-import": "Import new Shuttle-Run configuration",
     "hilfe": "Help",
     "hilfe-notiz": "Show help again",
@@ -404,7 +404,7 @@
     "loeschen": "Delete",
     "speichern": "Save",
     "fragebogen": "Questionnaire",
-    "sportabzeichen": "German Sport Badge",
+    "Sportabzeichen": "German Sport Badge",
     "bundesjugendspiele": "Bundesjugendspiele",
     "schueler": "Student",
     "verbaltabelle": "Verbaltable",
@@ -438,9 +438,9 @@
   },
   "INFOS": {
     "title": "Info",
-    "danke": "Thanks for using SportZens!",
+    "danke": "Thanks for using Sport!",
     "1": "Please contact me in case of any wishes or questions!",
-    "handbuch": "You can find some instructions under www.sportzens.de/handbuch",
+    "handbuch": "You can find some instructions under www.Sport.de/handbuch",
     "impressum": "Impress",
     "entwicklungsaufwand": "Development Effort",
     "codezeilen": "Lines of Code",
@@ -474,7 +474,7 @@
     "app-groesse": "App Size",
     "trainer-tipps": "Coach Tips",
     "tipp-1": "Don't forget regular data backups!",
-    "tipp-2": "Use different grading systems for different sports",
+    "tipp-2": "Use different grading systems for different Sports",
     "tipp-3": "Use the timer function to maintain optimal training times",
     "noten-vergeben": "assigned",
     "notenkategorien-erstellt": "grade categories created",
@@ -537,7 +537,7 @@
   "STUNDEN": {
     "stunde-hinzu": "Add lesson",
     "title": "Title",
-    "sportart": "Sport",
+    "Sportart": "Sport",
     "inhalt": "Content",
     "stundenzahl": "Count of lessons",
     "abbrechen": "Cancel",
@@ -596,7 +596,7 @@
     "demo-importieren": "Import demo tables",
     "lokale-importieren": "Import local table",
     "eigene-importieren": "Import own table",
-    "sportabzeichen": "German Sport Badge",
+    "Sportabzeichen": "German Sport Badge",
     "bundesjugendspiele": "Bundesjugendspiele",
     "tabellen": "Tables",
     "typ": "Type"
@@ -623,7 +623,7 @@
     "meter": "m",
     "gesamt": "Total",
     "note": "Mark",
-    "sportart": "Sport Type",
+    "Sportart": "Sport Type",
     "running": "Running",
     "swimming": "Swimming",
     "config": "Configuration"
@@ -721,7 +721,7 @@
     "verspaetet": "too late",
     "minuten": "minutes",
     "passiv": "passive",
-    "vergessen": "no sport stuff",
+    "vergessen": "no Sport stuff",
     "menstruation": "menstruation",
     "sonstiges": "others"
   },
@@ -782,7 +782,7 @@
     "effekt": "Effekt",
     "variation": "Variation",
     "material": "Material",
-    "sportart": "Sportart",
+    "Sportart": "Sportart",
     "typ": "Typ",
     "wichtig": "Wichtig",
     "dauer": "Dauer"
@@ -982,9 +982,9 @@
       "schlecht": "bad",
       "durchschnitt": "Average"
     },
-    "SPORTABZEICHEN": {
+    "SportABZEICHEN": {
       "info-titel": "Info about the German Sport Badge",
-      "link": "More information under www.deutsches-sportabzeichen.de",
+      "link": "More information under www.deutsches-Sportabzeichen.de",
       "info1": "The German Sports Badge is a decoration of the Federal Republic of Germany with order character (Federal Law Gazette Part I, 1958, p. 422); it may only be worn if it has been properly awarded and the person awarded holds a certificate of bestowal or a certificate of possession (§ 8 of the Order Law).",
       "info2": "The individually provided services in the individual disciplines are assigned to the three service levels on the basis of the service catalog. Depending on the assignment to one of the three service levels, a point value results for each service and discipline group:",
       "bronze-1": "- Bronze: 1 point",
@@ -1026,7 +1026,7 @@
       "must-accept": "Please confirm Terms and Privacy Policy"
     },
     "LICENSES": {
-      "sportzens-all": "SportZens 365",
+      "sport-all": "Sport 365",
       "free": "Free",
       "pro": "Pro",
       "supporter": "Supporter",
@@ -1091,7 +1091,7 @@
       "self_registration": "Self-Registration",
       "self_registration_desc": "Let your students register themselves by scanning a QR code.",
       "start_session": "Start Session",
-      "scan_instruction": "Scan this QR code or go to sportzens.de/student-register",
+      "scan_instruction": "Scan this QR code or go to Sport.de/student-register",
       "incoming_students": "Incoming Registrations",
       "accept_all": "Accept All",
       "stop_session": "Stop Session",

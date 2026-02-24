@@ -12,7 +12,7 @@ Per-issue Copilot prompts for currently open GitHub parity issues.
 ## Generated Prompts
 - [P4-1 Shuttle Run Implementation](P4-1-shuttle-run-implementation.md)
 - [P4-2 Cooper Test Implementation](P4-2-cooper-test-implementation.md)
-- [P4-3 Sportabzeichen (Sports Badge) System](P4-3-sportabzeichen-sports-badge-system.md)
+- [P4-3 Sportabzeichen (Sports Badge) System](P4-3-Sportabzeichen-Sports-badge-system.md)
 - [P4-4 Live Tools - Timer Plugin](P4-4-live-tools-timer-plugin.md)
 - [P5-1 Exam Repositories & Data Models](P5-1-exam-repositories-data-models.md)
 - [P5-2 Simple Exam Builder UI](P5-2-simple-exam-builder-ui.md)

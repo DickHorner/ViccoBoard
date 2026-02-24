@@ -399,7 +399,7 @@ INFOS.berichte-erstellen	Berichte erstellen	Create Reports	OK
 INFOS.codezeilen	Codezeilen	Lines of Code	OK
 INFOS.community	Community	Community	OK
 INFOS.community-text	Tausche dich mit anderen Trainern aus	Connect with other coaches	OK
-INFOS.danke	Vielen Dank für die Nutzung von SportZens!	Thanks for using SportZens!	OK
+INFOS.danke	Vielen Dank für die Nutzung von Sport!	Thanks for using Sport!	OK
 INFOS.dateien	Dateien	Files	OK
 INFOS.durchschnitt	Durchschnitt	Average	OK
 INFOS.email-support	E-Mail Support	Email Support	OK
@@ -408,7 +408,7 @@ INFOS.entwicklungsstunden	Entwicklungsstunden	Development Hours	OK
 INFOS.features	Features	Features	OK
 INFOS.feedbacks-erhalten	Feedbacks erhalten, davon	Feedbacks received, of which	OK
 INFOS.gut	gut	good	OK
-INFOS.handbuch	Erklärungen findest du im Handbuch unter www.sportzens.de/handbuch	You can find some instructions under www.sportzens.de/handbuch	OK
+INFOS.handbuch	Erklärungen findest du im Handbuch unter www.sport.de/handbuch	You can find some instructions under www.sport.de/handbuch	OK
 INFOS.handbuch-link	Zum Handbuch	Go to Manual	OK
 INFOS.impressum	Impressum	Impress	OK
 INFOS.klassen-verwalten	Klassen verwalten	Manage Classes	OK
@@ -543,7 +543,7 @@ LICENSES.free-desc	Basisfunktionen kostenlos		MISSING_IN_EN
 LICENSES.not-active	Nicht aktiv		MISSING_IN_EN
 LICENSES.pro	Pro		MISSING_IN_EN
 LICENSES.remaining-days	Verbleibende Tage		MISSING_IN_EN
-LICENSES.sportzens-all	SportZens 365		MISSING_IN_EN
+LICENSES.sport-all	Sport 365		MISSING_IN_EN
 LICENSES.start	Startdatum		MISSING_IN_EN
 LICENSES.supporter	Supporter		MISSING_IN_EN
 LOCK.pin-required	Bitte zuerst eine PIN in den Einstellungen festlegen.	Please set a PIN in Settings first.	OK
@@ -880,7 +880,7 @@ SETTINGS.upgrade-pro	Upgrade auf Pro	Upgrade to Pro	OK
 SETTINGS.upgrade-supporter	Upgrade auf Supporter		MISSING_IN_EN
 SETTINGS.version	Version		MISSING_IN_EN
 SETTINGS.view	Öffnen		MISSING_IN_EN
-SETTINGS.vorlagen	Vorlagen auf www.sportzens.de/vorlagen	presets on www.sportzens.de/vorlagen	OK
+SETTINGS.vorlagen	Vorlagen auf www.sport.de/vorlagen	presets on www.sport.de/vorlagen	OK
 SHUTTLE.bahn	Bahn	Lane	OK
 SHUTTLE.bewerte-shuttle	Bewerte Shuttle-Run vom	Grade Shuttle-Run from	OK
 SHUTTLE.level	Level	Level	OK
@@ -962,7 +962,7 @@ STUDENTS.registration_success	Registrierung erfolgreich!		MISSING_IN_EN
 STUDENTS.remarks	Bemerkungen		MISSING_IN_EN
 STUDENTS.scan-complete	Text erkannt!		MISSING_IN_EN
 STUDENTS.scan-photo	Text erkennen		MISSING_IN_EN
-STUDENTS.scan_instruction	Scanne diesen QR-Code oder gehe auf sportzens.de/student-register		MISSING_IN_EN
+STUDENTS.scan_instruction	Scanne diesen QR-Code oder gehe auf sport.de/student-register		MISSING_IN_EN
 STUDENTS.scanning	Erkenne Text...		MISSING_IN_EN
 STUDENTS.self_registration	Selbst-Registrierung		MISSING_IN_EN
 STUDENTS.self_registration_desc	Lasse deine Schüler sich selbst registrieren, indem sie einen QR-Code scannen.		MISSING_IN_EN
@@ -1439,7 +1439,7 @@ WOW.LICENSES.free-desc		Basic features for free	EXTRA_IN_EN
 WOW.LICENSES.not-active		Not active	EXTRA_IN_EN
 WOW.LICENSES.pro		Pro	EXTRA_IN_EN
 WOW.LICENSES.remaining-days		Remaining days	EXTRA_IN_EN
-WOW.LICENSES.sportzens-all		SportZens 365	EXTRA_IN_EN
+WOW.LICENSES.sport-all		Sport 365	EXTRA_IN_EN
 WOW.LICENSES.start		Start date	EXTRA_IN_EN
 WOW.LICENSES.supporter		Supporter	EXTRA_IN_EN
 WOW.REGISTER.accept-privacy		I have read the 	EXTRA_IN_EN
@@ -1502,7 +1502,7 @@ WOW.STUDENTS.registration_success		Registration successful!	EXTRA_IN_EN
 WOW.STUDENTS.remarks		Remarks	EXTRA_IN_EN
 WOW.STUDENTS.scan-complete		Text recognized!	EXTRA_IN_EN
 WOW.STUDENTS.scan-photo		Scan Text	EXTRA_IN_EN
-WOW.STUDENTS.scan_instruction		Scan this QR code or go to sportzens.de/student-register	EXTRA_IN_EN
+WOW.STUDENTS.scan_instruction		Scan this QR code or go to sport.de/student-register	EXTRA_IN_EN
 WOW.STUDENTS.scanning		Scanning...	EXTRA_IN_EN
 WOW.STUDENTS.self_registration		Self-Registration	EXTRA_IN_EN
 WOW.STUDENTS.self_registration_desc		Let your students register themselves by scanning a QR code.	EXTRA_IN_EN

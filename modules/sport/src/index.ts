@@ -1,6 +1,6 @@
 /**
  * Sport Module Exports
- * Main entry point for SportZens domain functionality
+ * Main entry point for Sport domain functionality
  */
 
 // Repositories
@@ -16,13 +16,13 @@ export { CooperTestConfigRepository } from './repositories/cooper-test-config.re
 export { ShuttleRunConfigRepository } from './repositories/shuttle-run-config.repository.js';
 export { SportabzeichenStandardRepository } from './repositories/sportabzeichen-standard.repository.js';
 export { SportabzeichenResultRepository } from './repositories/sportabzeichen-result.repository.js';
-export { SportZensClassRepository } from './repositories/sportzens-class.repository.js';
-export { SportZensCategoryRepository } from './repositories/sportzens-category.repository.js';
-export { SportZensGradeRepository } from './repositories/sportzens-grade.repository.js';
-export { SportZensTableRepository } from './repositories/sportzens-table.repository.js';
-export { SportZensGradeWeightingRepository } from './repositories/sportzens-grade-weighting.repository.js';
-export { SportZensNewDayDataRepository } from './repositories/sportzens-new-day-data.repository.js';
-export { SportZensUserDataRepository } from './repositories/sportzens-user-data.repository.js';
+export { SportClassRepository } from './repositories/sport-class.repository.js';
+export { SportCategoryRepository } from './repositories/sport-category.repository.js';
+export { SportGradeRepository } from './repositories/sport-grade.repository.js';
+export { SportTableRepository } from './repositories/sport-table.repository.js';
+export { SportGradeWeightingRepository } from './repositories/sport-grade-weighting.repository.js';
+export { SportNewDayDataRepository } from './repositories/sport-new-day-data.repository.js';
+export { SportUserDataRepository } from './repositories/sport-user-data.repository.js';
 
 // Use Cases
 export { CreateClassUseCase } from './use-cases/create-class.use-case.js';
@@ -52,13 +52,13 @@ export type { RecordSportabzeichenResultInput } from './use-cases/record-sportab
 export { RecordTimerResultUseCase } from './use-cases/record-timer-result.use-case.js';
 export type { RecordTimerResultInput } from './use-cases/record-timer-result.use-case.js';
 
-export { SaveSportZensClassUseCase } from './use-cases/save-sportzens-class.use-case.js';
-export { SaveSportZensCategoryUseCase } from './use-cases/save-sportzens-category.use-case.js';
-export { SaveSportZensGradeUseCase } from './use-cases/save-sportzens-grade.use-case.js';
-export { SaveSportZensTableUseCase } from './use-cases/save-sportzens-table.use-case.js';
-export { SaveSportZensGradeWeightingUseCase } from './use-cases/save-sportzens-grade-weighting.use-case.js';
-export { SaveSportZensNewDayDataUseCase } from './use-cases/save-sportzens-new-day-data.use-case.js';
-export { SaveSportZensUserDataUseCase } from './use-cases/save-sportzens-user-data.use-case.js';
+export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
+export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';
+export { SaveSportGradeUseCase } from './use-cases/save-sport-grade.use-case.js';
+export { SaveSportTableUseCase } from './use-cases/save-sport-table.use-case.js';
+export { SaveSportGradeWeightingUseCase } from './use-cases/save-sport-grade-weighting.use-case.js';
+export { SaveSportNewDayDataUseCase } from './use-cases/save-sport-new-day-data.use-case.js';
+export { SaveSportUserDataUseCase } from './use-cases/save-sport-user-data.use-case.js';
 
 // Grading Engine
 export { CriteriaGradingEngine } from './grading/criteria-grading.engine.js';

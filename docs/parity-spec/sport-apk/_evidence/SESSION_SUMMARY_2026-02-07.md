@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-07  
 **Duration:** ~2 hours  
-**Agent:** Autonomous implementation following SPORTZENS_PARITY_v2.md  
+**Agent:** Autonomous implementation following sport_parity_v2.md  
 **Branch:** main  
 **Build Status:** ✅ PASSING (Exit Code: 0)
 
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-Successfully continued Phase 5 (SportZens Workflows/UI) implementation according to SPORTZENS_PARITY_v2.md instructions. Completed i18n conversion of Dashboard.vue and implemented two critical SportZens tools (Timer and Multistop) with full internationalization support. Build remains stable with zero TypeScript errors.
+Successfully continued Phase 5 (Sport Workflows/UI) implementation according to sport_parity_v2.md instructions. Completed i18n conversion of Dashboard.vue and implemented two critical Sport tools (Timer and Multistop) with full internationalization support. Build remains stable with zero TypeScript errors.
 
 **Phase 5 Progress:** 30% → 35% workflows complete (2 new tools added)
 
@@ -25,7 +25,7 @@ Successfully continued Phase 5 (SportZens Workflows/UI) implementation according
 
 **Changes:**
 - Added `useI18n` composable import
-- Converted 15+ hardcoded strings to i18n keys from SportZens APK parity-spec
+- Converted 15+ hardcoded strings to i18n keys from Sport APK parity-spec
 - Page header, buttons, modals, filters, and error states now use `t()` function
 - Pattern established for converting other views
 
@@ -50,7 +50,7 @@ Successfully continued Phase 5 (SportZens Workflows/UI) implementation according
 - ✅ **Sound Settings:** User-toggleable audio
 - ✅ **Responsive Design:** Mobile/tablet friendly (iPad optimized)
 
-**i18n Coverage:** 100% - All strings use SportZens locale keys
+**i18n Coverage:** 100% - All strings use Sport locale keys
 
 **Bundle Size:**
 - JS: 7.63 kB (2.23 kB gzipped)
@@ -74,7 +74,7 @@ Successfully continued Phase 5 (SportZens Workflows/UI) implementation according
 - ✅ **Class Integration:** Load students from selected class
 - ✅ **Real-time Display:** 10ms precision (MM:SS.ms format)
 
-**i18n Coverage:** 100% - All strings use SportZens locale keys
+**i18n Coverage:** 100% - All strings use Sport locale keys
 
 **Bundle Size:**
 - JS: 7.33 kB (2.82 kB gzipped)
@@ -145,7 +145,7 @@ Main Bundle: index-DUNeALbD.js (297.31 kB / 108.71 kB gzipped)
 
 ## PARITY_MATRIX Update
 
-### SportZens Workflows — Current Status
+### Sport Workflows — Current Status
 
 | Workflow | Status | i18n | Location | Progress |
 |----------|--------|------|----------|----------|
@@ -228,7 +228,7 @@ Main Bundle: index-DUNeALbD.js (297.31 kB / 108.71 kB gzipped)
 
 5. **Middle Distance** (time-based grading for 800m, 1000m, 1500m)
 6. **Sportabzeichen** (badge tracking + PDF export)
-7. **Bundesjugendspiele** (federal sports games)
+7. **Bundesjugendspiele** (federal Sports games)
 8. **Tournaments** (bracket generation)
 9. **Tactics Board** (drawing canvas)
 10. **Table Management** (import/export CSV grading tables)
@@ -236,7 +236,7 @@ Main Bundle: index-DUNeALbD.js (297.31 kB / 108.71 kB gzipped)
 ### i18n Completion Pass
 
 11. **Convert remaining views:** AttendanceEntry, LessonList, ClassDetail, CriteriaGradingEntry, TimeGradingEntry
-12. **Verify coverage:** Ensure ~850-950 SportZens i18n keys are accessible in UI
+12. **Verify coverage:** Ensure ~850-950 Sport i18n keys are accessible in UI
 
 ---
 
@@ -246,13 +246,13 @@ Main Bundle: index-DUNeALbD.js (297.31 kB / 108.71 kB gzipped)
 |-------|------|--------|-------|
 | Phase 0 | GATE 0 | ✅ PASS | Baseline + build working |
 | Phase 1 | GATE 1 | ✅ PASS | PARITY_LEDGER complete |
-| Phase 2 | GATE 2 | ✅ PASS | KURT_LEDGER complete (69 checkboxes) |
+| Phase 2 | GATE 2 | ✅ PASS | KBR_LEDGER complete (69 checkboxes) |
 | Phase 3 | GATE 3 | ✅ PASS | i18n loaded, vue-i18n configured |
 | Phase 4 | GATE 4 | ✅ PASS | Schema roundtrip tests (25/25 passing) |
 | **Phase 5** | **GATE 5** | **🟡 IN PROGRESS** | **8/20 workflows complete (40%)** |
-| Phase 6 | GATE 6 | ⏳ TODO | KURT data layer + exam builder |
-| Phase 7 | GATE 7 | ⏳ TODO | KURT correction + grading |
-| Phase 8 | GATE 8 | ⏳ TODO | KURT Fördertipps + export + email |
+| Phase 6 | GATE 6 | ⏳ TODO | KBR data layer + exam builder |
+| Phase 7 | GATE 7 | ⏳ TODO | KBR correction + grading |
+| Phase 8 | GATE 8 | ⏳ TODO | KBR Fördertipps + export + email |
 | Phase 9 | GATE 9 | ⏳ TODO | Security + backup roundtrip |
 | Phase 10 | GATE 10 | ⏳ TODO | Finalization + FINAL_RUN_REPORT |
 
@@ -263,7 +263,7 @@ Main Bundle: index-DUNeALbD.js (297.31 kB / 108.71 kB gzipped)
 ## Key Achievements This Session
 
 1. ✅ **Established i18n Pattern:** Dashboard.vue demonstrates conversion approach for all views
-2. ✅ **Two Critical Tools:** Timer and Multistop are foundational for many SportZens workflows
+2. ✅ **Two Critical Tools:** Timer and Multistop are foundational for many Sport workflows
 3. ✅ **Zero Technical Debt:** All code follows TypeScript strict mode, Clean Architecture
 4. ✅ **Production Ready:** Both new tools are fully functional and tested
 5. ✅ **Build Stability:** No increase in warnings/errors, fast build times maintained
@@ -276,7 +276,7 @@ Main Bundle: index-DUNeALbD.js (297.31 kB / 108.71 kB gzipped)
 2. **i18n audit pass:** Once ~15 workflows exist, do a systematic pass converting all to i18n
 3. **PARITY_MATRIX update:** After each 3-5 workflows, update the matrix CSV to track progress
 4. **Testing:** Consider adding Vitest unit tests for timer calculations and multi-stopwatch logic
-5. **Phase 6 prep:** Once Phase 5 hits 60-70% (12-14 workflows), begin KURT data layer
+5. **Phase 6 prep:** Once Phase 5 hits 60-70% (12-14 workflows), begin KBR data layer
 
 ---
 
@@ -288,7 +288,7 @@ Main Bundle: index-DUNeALbD.js (297.31 kB / 108.71 kB gzipped)
 **Code Quality:** ✅ HIGH (TypeScript strict, Clean Architecture, i18n)  
 **Next Session:** Continue Phase 5 workflow implementation
 
-According to SPORTZENS_PARITY_v2.md instructions, Phase 5 is progressing well. With 8/20 workflows complete and 2 new production-ready tools added this session, the foundation for remaining SportZens features is solid. All work follows APK parity specifications and uses authentic i18n keys from the SportZens locale files.
+According to sport_parity_v2.md instructions, Phase 5 is progressing well. With 8/20 workflows complete and 2 new production-ready tools added this session, the foundation for remaining Sport features is solid. All work follows APK parity specifications and uses authentic i18n keys from the Sport locale files.
 
 **Estimated Remaining Effort for Phase 5:** ~30-40 hours (10-12 workflows @ 3-4 hours each)
 

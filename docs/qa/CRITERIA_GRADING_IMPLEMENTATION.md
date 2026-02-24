@@ -6,7 +6,7 @@
 
 ## Overview
 
-Successfully implemented a comprehensive criteria-based grading calculation engine for the ViccoBoard SportZens module. The engine supports weighted criteria assessment with slider-based input and automatic grade conversion.
+Successfully implemented a comprehensive criteria-based grading calculation engine for the ViccoBoard Sport module. The engine supports weighted criteria assessment with slider-based input and automatic grade conversion.
 
 ## What Was Implemented
 
@@ -129,7 +129,7 @@ All acceptance criteria from the issue have been met:
 
 ## Integration
 
-The grading engine is fully integrated into the sport module:
+The grading engine is fully integrated into the Sport module:
 
 ```typescript
 import { CriteriaGradingEngine } from '@viccoboard/sport';
@@ -175,7 +175,7 @@ While the core grading engine is complete, the following could be added in futur
 
 ```typescript
 import { CriteriaGradingEngine } from '@viccoboard/sport';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 const engine = new CriteriaGradingEngine();
 

@@ -1,12 +1,12 @@
-# SportZens APK → ViccoBoard Parity-Spec (UI-Strings + Form-Schemas)
+# Sport APK → ViccoBoard Parity-Spec (UI-Strings + Form-Schemas)
 
-Diese Parity-Spec ist **aus dem APK-Bundle** (`com.owlytic.sportzens.apk`) extrahiert. Ziel: ViccoBoard soll am Ende **feature-identisch** sein, ohne dass UI-Details (Labels, Fehlermeldungen, Microcopy) verloren gehen.
+Diese Parity-Spec ist **aus dem APK-Bundle** (`com.owlytic.Sport.apk`) extrahiert. Ziel: ViccoBoard soll am Ende **feature-identisch** sein, ohne dass UI-Details (Labels, Fehlermeldungen, Microcopy) verloren gehen.
 
 ## Inhalt
 
 - `i18n/`
-  - `sportzens.de.json` – Original (de) aus dem APK
-  - `sportzens.en.json` – (en) aus dem APK, **repariert** (siehe Hinweis unten)
+  - `Sport.de.json` – Original (de) aus dem APK
+  - `Sport.en.json` – (en) aus dem APK, **repariert** (siehe Hinweis unten)
   - `i18n-leaf-strings.tsv` – flache Key→Text Tabelle (de/en), inkl. Missing-Status
   - `missing-in-en.txt` + `i18n-diff-report.json` – Diff/Report
 
@@ -17,13 +17,13 @@ Diese Parity-Spec ist **aus dem APK-Bundle** (`com.owlytic.sportzens.apk`) extra
 ## Wichtiger Hinweis zum Englisch-File
 
 Im APK ist `assets/public/assets/i18n/en.json` **offenbar am Dateiende abgeschnitten** (fehlende letzte schließende Klammer).  
-Für `sportzens.en.json` wurde **nur** ein fehlendes `}` ergänzt, damit es wieder parsebar ist.  
+Für `Sport.en.json` wurde **nur** ein fehlendes `}` ergänzt, damit es wieder parsebar ist.  
 Daher gilt: “Keys fehlen in EN” kann **entweder** echte Lücke **oder** APK-Trunkierung sein.
 
 ## Wie Du das in ViccoBoard ablegst
 
 Empfehlung im Repo:
-`docs/parity-spec/sportzens-apk/`
+`docs/parity-spec/sport-apk/`
 
 Dann:
 - `i18n/` als Referenzquelle für spätere Migration auf echtes i18n (Vue i18n o.ä.)
@@ -39,5 +39,5 @@ Das bedeutet:
 
 ## Extraction-Metadaten
 
-- APK: `com.owlytic.sportzens.apk`
+- APK: `com.owlytic.Sport.apk`
 - Extraktion: 7.2.2026

@@ -4,7 +4,7 @@
  * Separate from student performance entries to maintain domain integrity
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 import { v4 as uuidv4 } from 'uuid';
 

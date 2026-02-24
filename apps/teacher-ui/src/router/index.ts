@@ -17,7 +17,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/exams/new',
     name: 'exam-new',
-    component: () => import('../views/KURTExamBuilder.vue'),
+    component: () => import('../views/KBRExamBuilder.vue'),
     meta: { title: 'New Exam' }
   },
   {
@@ -35,7 +35,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/exams/:id',
     name: 'exam-edit',
-    component: () => import('../views/KURTExamBuilder.vue'),
+    component: () => import('../views/KBRExamBuilder.vue'),
     meta: { title: 'Exam Builder' }
   },
   {
@@ -111,8 +111,8 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Mittelstrecke Grading' }
   },
   {
-    path: '/grading/sportabzeichen/:id',
-    name: 'sportabzeichen-grading',
+    path: '/grading/Sportabzeichen/:id',
+    name: 'Sportabzeichen-grading',
     component: () => import('../views/SportabzeichenGradingEntry.vue'),
     meta: { title: 'Sportabzeichen' }
   },

@@ -127,7 +127,7 @@ Total Findings: 19 (6 Critical, 7 Important, 6 Suggestions)
 ## 💡 SUGGESTIONS (Backlog)
 
 - Photo storage: Switch from Base64 to Blob (saves 33% space)
-- useDatabase singleton pattern: Memoize sportBridge creation
+- useDatabase singleton pattern: Memoize SportBridge creation
 - Import validation: Add CSV validator before persist
 - Request deduplication: Prevent duplicate submissions
 - Remove example console.log entries from production code

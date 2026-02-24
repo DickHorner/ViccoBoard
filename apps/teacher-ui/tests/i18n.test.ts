@@ -1,5 +1,5 @@
 /**
- * i18n Tests — Verify SportZens locale parity
+ * i18n Tests — Verify Sport locale parity
  * 
  * Tests:
  * 1. Keyset is loadable (no JSON parse errors)
@@ -8,7 +8,7 @@
  * 4. Key structure matches expectations
  */
 
-describe('i18n - SportZens Locale Parity', () => {
+describe('i18n - Sport Locale Parity', () => {
   
   describe('1. Locale Files Loading', () => {
     it('should load German locale without errors', async () => {
@@ -50,7 +50,7 @@ describe('i18n - SportZens Locale Parity', () => {
     });
   });
 
-  describe('2. Required SportZens Keys', () => {
+  describe('2. Required Sport Keys', () => {
     
     it('should have HELLO key in both locales', async () => {
       const de = await import('../src/i18n/locales/de.json');

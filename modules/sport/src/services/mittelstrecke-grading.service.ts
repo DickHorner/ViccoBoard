@@ -4,7 +4,7 @@
  * Uses table lookup to map time to grade
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 export interface MittelstreckeGradingInput {
   timeInSeconds: number;

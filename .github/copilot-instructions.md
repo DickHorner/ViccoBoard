@@ -10,7 +10,7 @@ You are in ZERO-TRUST PARITY AUDIT mode for ViccoBoard.
 Read first (mandatory):
 - agents.md
 - Plan.md (especially §6 and §9)
-- docs/agents/SPORTZENS_PARITY_v2.md
+- docs/agents/sport_parity_v2.md
 - docs/planning/ISSUES_TRACKER.md
 - docs/status/STATUS.md
 - .github/copilot-instructions.md
@@ -72,12 +72,12 @@ Rules:
 1. Never add direct UI access to `../db`, Dexie tables, or storage adapters.
 2. Never add/restore app-layer repositories/use-cases in `apps/teacher-ui`.
 3. Student data is centralized only via `modules/students` + bridge.
-4. Sport logic goes through `modules/sport` + sport bridge.
+4. Sport logic goes through `modules/sport` + Sport bridge.
 5. Exams logic goes through `modules/exams` + exams bridge.
 6. No feature removal/simplification; unknown spec -> `Plan.md §9` TBD entry.
 7. No `@ts-nocheck` additions. Remove existing ones when touching a file.
 8. No placeholder logic in production paths (“TODO placeholder”, fake calculations, mock persistence).
-9. `docs/agents/SPORTZENS_PARITY_v2.md` is a mandatory instruction file for parity work and must be followed as binding scope/gate guidance.
+9. `docs/agents/sport_parity_v2.md` is a mandatory instruction file for parity work and must be followed as binding scope/gate guidance.
 10. Criteria/status options in relevant areas (at least attendance) must be configurable catalogs, not hardcoded-only enums.
 
 ## 2) Forbidden Changes
@@ -103,7 +103,7 @@ Rules:
 
 ## 4) Mandatory Pre-Edit Checks
 1. Read `AGENTS.md`.
-2. Read `docs/agents/SPORTZENS_PARITY_v2.md`.
+2. Read `docs/agents/sport_parity_v2.md`.
 3. Read `Plan.md` relevant checkbox section.
 4. Read parity ledger rows being touched.
 5. State exact target IDs before coding.

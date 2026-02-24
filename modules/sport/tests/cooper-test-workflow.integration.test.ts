@@ -22,7 +22,7 @@ import { PerformanceEntryRepository } from '../src/repositories/performance-entr
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
 import { StudentRepository } from '../src/repositories/student.repository';
 import { CooperTestService } from '../src/services/cooper-test.service';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('Cooper Test Workflow Integration', () => {
   let storage: SQLiteStorage;
@@ -80,7 +80,7 @@ describe('Cooper Test Workflow Integration', () => {
         weight: 1,
         configuration: {
           type: 'cooper',
-          sportType: 'running',
+          SportType: 'running',
           distanceUnit: 'meters',
           autoEvaluation: true
         } as Sport.CooperGradingConfig
@@ -100,24 +100,24 @@ describe('Cooper Test Workflow Integration', () => {
     test('creates running config and persists', async () => {
       const config = await configRepository.create({
         name: 'Cooper Running Test',
-        sportType: 'running',
+        SportType: 'running',
         distanceUnit: 'meters',
         lapLengthMeters: 400,
         source: 'default'
       });
 
-      expect(config.sportType).toBe('running');
+      expect(config.SportType).toBe('running');
       expect(config.lapLengthMeters).toBe(400);
 
       const found = await configRepository.findById(config.id);
       expect(found).not.toBeNull();
-      expect(found?.sportType).toBe('running');
+      expect(found?.SportType).toBe('running');
     });
 
     test('calculates distance for running mode', () => {
       const result = cooperService.buildResult('running', 8, 400, 50);
       
-      expect(result.sportType).toBe('running');
+      expect(result.SportType).toBe('running');
       expect(result.rounds).toBe(8);
       expect(result.lapLengthMeters).toBe(400);
       expect(result.extraMeters).toBe(50);
@@ -157,7 +157,7 @@ describe('Cooper Test Workflow Integration', () => {
         studentId,
         categoryId: categoryId,
         measurements: {
-          sportType: 'running',
+          SportType: 'running',
           rounds: 8,
           lapLengthMeters: 400,
           extraMeters: 50,
@@ -167,7 +167,7 @@ describe('Cooper Test Workflow Integration', () => {
         timestamp: new Date()
       });
 
-      expect(entry.measurements.sportType).toBe('running');
+      expect(entry.measurements.SportType).toBe('running');
       expect(entry.measurements.distanceMeters).toBe(3250);
       expect(entry.calculatedGrade).toBe('2');
 
@@ -198,7 +198,7 @@ describe('Cooper Test Workflow Integration', () => {
         weight: 1,
         configuration: {
           type: 'cooper',
-          sportType: 'swimming',
+          SportType: 'swimming',
           distanceUnit: 'meters',
           autoEvaluation: true
         } as Sport.CooperGradingConfig
@@ -218,24 +218,24 @@ describe('Cooper Test Workflow Integration', () => {
     test('creates swimming config and persists', async () => {
       const config = await configRepository.create({
         name: 'Cooper Swimming Test',
-        sportType: 'swimming',
+        SportType: 'swimming',
         distanceUnit: 'meters',
         lapLengthMeters: 25,
         source: 'default'
       });
 
-      expect(config.sportType).toBe('swimming');
+      expect(config.SportType).toBe('swimming');
       expect(config.lapLengthMeters).toBe(25);
 
       const found = await configRepository.findById(config.id);
       expect(found).not.toBeNull();
-      expect(found?.sportType).toBe('swimming');
+      expect(found?.SportType).toBe('swimming');
     });
 
     test('calculates distance for swimming mode', () => {
       const result = cooperService.buildResult('swimming', 16, 25, 0);
       
-      expect(result.sportType).toBe('swimming');
+      expect(result.SportType).toBe('swimming');
       expect(result.rounds).toBe(16);
       expect(result.lapLengthMeters).toBe(25);
       expect(result.distanceMeters).toBe(400);
@@ -272,7 +272,7 @@ describe('Cooper Test Workflow Integration', () => {
         studentId,
         categoryId: categoryId,
         measurements: {
-          sportType: 'swimming',
+          SportType: 'swimming',
           rounds: 16,
           lapLengthMeters: 25,
           extraMeters: 0,
@@ -282,7 +282,7 @@ describe('Cooper Test Workflow Integration', () => {
         timestamp: new Date()
       });
 
-      expect(entry.measurements.sportType).toBe('swimming');
+      expect(entry.measurements.SportType).toBe('swimming');
       expect(entry.measurements.distanceMeters).toBe(400);
     });
   });
@@ -343,7 +343,7 @@ describe('Cooper Test Workflow Integration', () => {
         weight: 1,
         configuration: {
           type: 'cooper',
-          sportType: 'running',
+          SportType: 'running',
           distanceUnit: 'meters',
           autoEvaluation: true
         } as Sport.CooperGradingConfig
@@ -369,7 +369,7 @@ describe('Cooper Test Workflow Integration', () => {
     test('cooper config persists after storage reload', async () => {
       const config = await configRepository.create({
         name: 'Persistent Config',
-        sportType: 'running',
+        SportType: 'running',
         distanceUnit: 'meters',
         lapLengthMeters: 400,
         source: 'default'
@@ -415,7 +415,7 @@ describe('Cooper Test Workflow Integration', () => {
         weight: 1,
         configuration: {
           type: 'cooper',
-          sportType: 'running',
+          SportType: 'running',
           distanceUnit: 'meters',
           autoEvaluation: true
         } as Sport.CooperGradingConfig
@@ -434,7 +434,7 @@ describe('Cooper Test Workflow Integration', () => {
         studentId: student.id,
         categoryId: categoryId,
         measurements: {
-          sportType: 'running',
+          SportType: 'running',
           rounds: 8,
           lapLengthMeters: 400,
           extraMeters: 0,

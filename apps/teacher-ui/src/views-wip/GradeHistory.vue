@@ -151,7 +151,7 @@ import { useToast } from '../composables/useToast';
 import type { GradeCategory, Student, PerformanceEntry } from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge } = useSportBridge();
+const { SportBridge } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
@@ -176,7 +176,7 @@ async function loadData() {
   
   try {
     // Load category
-    category.value = await sportBridge.value.gradeCategoryRepository.read(categoryId);
+    category.value = await SportBridge.value.gradeCategoryRepository.read(categoryId);
     
     if (!category.value) {
       error.value = 'Kategorie nicht gefunden';
@@ -189,7 +189,7 @@ async function loadData() {
     ) ?? [];
     
     // Load all performance entries for this category
-    entries.value = await sportBridge.value.performanceEntryRepository.findByCategory(categoryId);
+    entries.value = await SportBridge.value.performanceEntryRepository.findByCategory(categoryId);
     
     // Sort by timestamp descending (newest first)
     entries.value.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());

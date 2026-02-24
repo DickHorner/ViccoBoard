@@ -144,7 +144,7 @@ import { BJSGradingService } from '@viccoboard/sport';
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-const { sportBridge, gradeCategories, performanceEntries } = useSportBridge();
+const { SportBridge, gradeCategories, performanceEntries } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 const bjsService = new BJSGradingService();
@@ -178,7 +178,7 @@ async function loadData() {
 
     // Load grading table if referenced in config
     if (bjsConfig.value?.gradingTable) {
-      gradingTable.value = await sportBridge.value?.tableDefinitionRepository.findById(bjsConfig.value.gradingTable);
+      gradingTable.value = await SportBridge.value?.tableDefinitionRepository.findById(bjsConfig.value.gradingTable);
       if (!gradingTable.value) {
         console.warn(`BJS grading table not found: ${bjsConfig.value.gradingTable}`);
       }
@@ -307,7 +307,7 @@ async function saveAll() {
       };
       
       savePromises.push(
-        sportBridge.value?.recordGradeUseCase.execute({
+        SportBridge.value?.recordGradeUseCase.execute({
           studentId: student.id,
           categoryId: categoryId,
           measurements,

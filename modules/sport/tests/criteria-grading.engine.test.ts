@@ -4,7 +4,7 @@
  */
 
 import { CriteriaGradingEngine, CriteriaGradingInput, CriteriaScore } from '../src/grading/criteria-grading.engine';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 type Criterion = Sport.Criterion;
 

@@ -31,7 +31,7 @@ describe('CooperTestConfigRepository', () => {
   test('creates and reads a cooper test config', async () => {
     const created = await repository.create({
       name: 'Cooper Running',
-      sportType: 'running',
+      SportType: 'running',
       distanceUnit: 'meters',
       lapLengthMeters: 200,
       source: 'default'
@@ -39,14 +39,14 @@ describe('CooperTestConfigRepository', () => {
 
     const found = await repository.findById(created.id);
     expect(found).not.toBeNull();
-    expect(found?.sportType).toBe('running');
+    expect(found?.SportType).toBe('running');
     expect(found?.lapLengthMeters).toBe(200);
   });
 
-  test('filters by sport type', async () => {
+  test('filters by Sport type', async () => {
     await repository.create({
       name: 'Running',
-      sportType: 'running',
+      SportType: 'running',
       distanceUnit: 'meters',
       lapLengthMeters: 200,
       source: 'default'
@@ -54,7 +54,7 @@ describe('CooperTestConfigRepository', () => {
 
     await repository.create({
       name: 'Swimming',
-      sportType: 'swimming',
+      SportType: 'swimming',
       distanceUnit: 'meters',
       lapLengthMeters: 25,
       source: 'default'

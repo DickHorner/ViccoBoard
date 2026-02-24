@@ -1,5 +1,5 @@
 import { CooperTestService } from '../src/services/cooper-test.service';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('CooperTestService', () => {
   const table: Sport.TableDefinition = {
@@ -10,10 +10,10 @@ describe('CooperTestService', () => {
     dimensions: [],
     mappingRules: [],
     entries: [
-      { key: { minDistance: 0, maxDistance: 1999, sportType: 'running' }, value: '4' },
-      { key: { minDistance: 2000, maxDistance: 2499, sportType: 'running' }, value: '3' },
-      { key: { minDistance: 2500, sportType: 'running' }, value: '2' },
-      { key: { distance: 400, sportType: 'swimming' }, value: '1' }
+      { key: { minDistance: 0, maxDistance: 1999, SportType: 'running' }, value: '4' },
+      { key: { minDistance: 2000, maxDistance: 2499, SportType: 'running' }, value: '3' },
+      { key: { minDistance: 2500, SportType: 'running' }, value: '2' },
+      { key: { distance: 400, SportType: 'swimming' }, value: '1' }
     ],
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
     lastModified: new Date('2026-01-01T00:00:00.000Z')
@@ -34,13 +34,13 @@ describe('CooperTestService', () => {
 
   test('calculates grade from table with context', () => {
     const service = new CooperTestService();
-    const grade = service.calculateGradeFromTable(table, 2200, { sportType: 'running' });
+    const grade = service.calculateGradeFromTable(table, 2200, { SportType: 'running' });
     expect(grade).toBe('3');
   });
 
   test('matches exact distance entries', () => {
     const service = new CooperTestService();
-    const grade = service.calculateGradeFromTable(table, 400, { sportType: 'swimming' });
+    const grade = service.calculateGradeFromTable(table, 400, { SportType: 'swimming' });
     expect(grade).toBe('1');
   });
 });

@@ -175,7 +175,7 @@ import { useToast } from '../composables/useToast';
 import type { GradeCategory, Student, TimeGradingConfig } from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge } = useSportBridge();
+const { SportBridge } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
@@ -209,7 +209,7 @@ async function loadData() {
   
   try {
     // Load category
-    category.value = await sportBridge.value.gradeCategoryRepository.read(categoryId);
+    category.value = await SportBridge.value.gradeCategoryRepository.read(categoryId);
     
     if (!category.value) {
       error.value = 'Kategorie nicht gefunden';
@@ -223,7 +223,7 @@ async function loadData() {
     
     // Load existing times
     for (const student of students.value) {
-      const entries = await sportBridge.value.performanceEntryRepository
+      const entries = await SportBridge.value.performanceEntryRepository
         .findByStudentAndCategory(student.id, categoryId);
       
       if (entries.length > 0) {
@@ -381,7 +381,7 @@ async function saveStudentTime(studentId: string) {
   
   saving.value = true;
   try {
-    await sportBridge.value.recordGradeUseCase.execute({
+    await SportBridge.value.recordGradeUseCase.execute({
       studentId,
       categoryId,
       measurements: { time: seconds },

@@ -21,7 +21,7 @@ The Cooper Test implementation has been comprehensively verified through automat
 
 ### Hard Rules Applied
 1. ✅ No direct UI access to \`../db\` (must use bridges)
-2. ✅ Sport logic goes through \`modules/sport\` + sport bridge
+2. ✅ Sport logic goes through \`modules/sport\` + Sport bridge
 3. ✅ No placeholder logic in production paths
 4. ✅ No \`@ts-nocheck\` additions
 5. ✅ Tests are part of feature definition
@@ -42,10 +42,10 @@ The Cooper Test implementation has been comprehensively verified through automat
 
 ### 4. Result Storage via Bridge ✅
 - Performance entries persist through repository ✅
-- UI saves via \`sportBridge.recordGradeUseCase.execute()\` ✅
+- UI saves via \`SportBridge.recordGradeUseCase.execute()\` ✅
 
 ### 5. Sportart Configuration Persists ✅
-- Config persists (sportType, lapLengthMeters) ✅
+- Config persists (SportType, lapLengthMeters) ✅
 - Table references in category persist ✅
 
 ## Gate Results
@@ -81,7 +81,7 @@ Total: 484 tests passing across all workspaces
 
 ## Acceptance Criteria Status
 
-- ✅ Tests PASS (184 sport tests, all green)
+- ✅ Tests PASS (184 Sport tests, all green)
 - ✅ Manual workflow test PASS (automated coverage)
 - ✅ Both running and swimming modes functional
 - ✅ Custom tables work correctly

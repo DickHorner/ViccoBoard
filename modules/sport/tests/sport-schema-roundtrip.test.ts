@@ -1,35 +1,35 @@
 /**
- * SportZens schema roundtrip tests
+ * Sport schema roundtrip tests
  */
 
-import { SportZens } from '@viccoboard/core';
+import { SportSchema } from '@viccoboard/core';
 import {
   SQLiteStorage,
   InitialSchemaMigration,
   GradingSchemaMigration,
-  SportZensSchemaMigration
+  SportSchemaMigration
 } from '@viccoboard/storage/node';
 import {
-  SportZensClassRepository,
-  SportZensCategoryRepository,
-  SportZensGradeRepository,
-  SportZensTableRepository,
-  SportZensGradeWeightingRepository,
-  SportZensNewDayDataRepository,
-  SportZensUserDataRepository
+  SportClassRepository,
+  SportCategoryRepository,
+  SportGradeRepository,
+  SportTableRepository,
+  SportGradeWeightingRepository,
+  SportNewDayDataRepository,
+  SportUserDataRepository
 } from '../src/index.js';
-import { SportZensStudentRepository } from '@viccoboard/students';
+import { SportStudentRepository } from '@viccoboard/students';
 
-describe('SportZens schema roundtrip', () => {
+describe('Sport schema roundtrip', () => {
   let storage: SQLiteStorage;
-  let classRepository: SportZensClassRepository;
-  let studentRepository: SportZensStudentRepository;
-  let categoryRepository: SportZensCategoryRepository;
-  let gradeRepository: SportZensGradeRepository;
-  let tableRepository: SportZensTableRepository;
-  let gradeWeightingRepository: SportZensGradeWeightingRepository;
-  let newDayDataRepository: SportZensNewDayDataRepository;
-  let userDataRepository: SportZensUserDataRepository;
+  let classRepository: SportClassRepository;
+  let studentRepository: SportStudentRepository;
+  let categoryRepository: SportCategoryRepository;
+  let gradeRepository: SportGradeRepository;
+  let tableRepository: SportTableRepository;
+  let gradeWeightingRepository: SportGradeWeightingRepository;
+  let newDayDataRepository: SportNewDayDataRepository;
+  let userDataRepository: SportUserDataRepository;
 
   beforeEach(async () => {
     storage = new SQLiteStorage({
@@ -39,18 +39,18 @@ describe('SportZens schema roundtrip', () => {
     await storage.initialize('test-password');
     storage.registerMigration(new InitialSchemaMigration(storage));
     storage.registerMigration(new GradingSchemaMigration(storage));
-    storage.registerMigration(new SportZensSchemaMigration(storage));
+    storage.registerMigration(new SportSchemaMigration(storage));
     await storage.migrate();
 
     const adapter = storage.getAdapter();
-    classRepository = new SportZensClassRepository(adapter);
-    studentRepository = new SportZensStudentRepository(adapter);
-    categoryRepository = new SportZensCategoryRepository(adapter);
-    gradeRepository = new SportZensGradeRepository(adapter);
-    tableRepository = new SportZensTableRepository(adapter);
-    gradeWeightingRepository = new SportZensGradeWeightingRepository(adapter);
-    newDayDataRepository = new SportZensNewDayDataRepository(adapter);
-    userDataRepository = new SportZensUserDataRepository(adapter);
+    classRepository = new SportClassRepository(adapter);
+    studentRepository = new SportStudentRepository(adapter);
+    categoryRepository = new SportCategoryRepository(adapter);
+    gradeRepository = new SportGradeRepository(adapter);
+    tableRepository = new SportTableRepository(adapter);
+    gradeWeightingRepository = new SportGradeWeightingRepository(adapter);
+    newDayDataRepository = new SportNewDayDataRepository(adapter);
+    userDataRepository = new SportUserDataRepository(adapter);
   });
 
   afterEach(async () => {
@@ -58,7 +58,7 @@ describe('SportZens schema roundtrip', () => {
   });
 
   test('class schema roundtrip', async () => {
-    const original: SportZens.SportZensClass = {
+    const original: SportSchema.SportClass = {
       id: 'cls1',
       name: 'Class 5A',
       school_year: '2023/2024',
@@ -90,7 +90,7 @@ describe('SportZens schema roundtrip', () => {
       teacher_id: 't1'
     });
 
-    const original: SportZens.SportZensStudent = {
+    const original: SportSchema.SportStudent = {
       id: 'stu1',
       class_id: 'cls2',
       first_name: 'Lena',
@@ -118,7 +118,7 @@ describe('SportZens schema roundtrip', () => {
       teacher_id: 't1'
     });
 
-    const original: SportZens.SportZensCategory = {
+    const original: SportSchema.SportCategory = {
       id: 'cat1',
       class_id: 'cls3',
       name: 'Cooper Test',
@@ -146,7 +146,7 @@ describe('SportZens schema roundtrip', () => {
   });
 
   test('grade schema roundtrip', async () => {
-    const original: SportZens.SportZensGrade = {
+    const original: SportSchema.SportGrade = {
       id: 'gr1',
       category_id: 'cat1',
       class_id: 'cls3',
@@ -173,7 +173,7 @@ describe('SportZens schema roundtrip', () => {
   });
 
   test('table schema roundtrip', async () => {
-    const original: SportZens.SportZensTable = {
+    const original: SportSchema.SportTable = {
       id: 'tbl1',
       name: 'Standard Table',
       grade_scheme: 'viertel16',
@@ -195,7 +195,7 @@ describe('SportZens schema roundtrip', () => {
   });
 
   test('gradeWeighting schema roundtrip', async () => {
-    const original: SportZens.SportZensGradeWeighting = {
+    const original: SportSchema.SportGradeWeighting = {
       attendance: 20,
       grades: 60,
       remarks: 15,
@@ -209,7 +209,7 @@ describe('SportZens schema roundtrip', () => {
   });
 
   test('newDayData schema roundtrip', async () => {
-    const original: SportZens.SportZensNewDayData = {
+    const original: SportSchema.SportNewDayData = {
       date: '2024-02-05',
       additionalExercises: ['Jumping Jacks'],
       exercises: ['Sprints', 'Pushups'],
@@ -223,7 +223,7 @@ describe('SportZens schema roundtrip', () => {
   });
 
   test('userData schema roundtrip', async () => {
-    const original: SportZens.SportZensUserData = {
+    const original: SportSchema.SportUserData = {
       id: 'user1',
       email: 'teacher@example.com',
       role: 'teacher',

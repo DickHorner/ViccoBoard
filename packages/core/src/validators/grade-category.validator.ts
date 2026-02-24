@@ -57,8 +57,8 @@ export class GradeCategoryValidator {
     // Type validation
     if (!data.type) {
       errors.push('Type is required');
-    } else if (!['criteria', 'time', 'cooper', 'shuttle', 'mittelstrecke', 'sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
-      errors.push('Type must be one of: criteria, time, cooper, shuttle, mittelstrecke, sportabzeichen, bjs, verbal');
+    } else if (!['criteria', 'time', 'cooper', 'shuttle', 'mittelstrecke', 'Sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
+      errors.push('Type must be one of: criteria, time, cooper, shuttle, mittelstrecke, Sportabzeichen, bjs, verbal');
     }
 
     // Weight validation
@@ -128,7 +128,7 @@ export class GradeCategoryValidator {
         }
         break;
 
-      case 'sportabzeichen':
+      case 'Sportabzeichen':
       case 'bjs':
       case 'verbal':
         // These types have their own specific configurations

@@ -6,6 +6,7 @@
 - **Local-first:** offline by default; no runtime servers.
 - **Modularity:** domain logic in `modules/*`, interfaces in `packages/core`, storage adapters in `packages/storage`.
 - **Centralized student management:** `Student`/`StudentRepository` live in `modules/students`. No app-level or storage-level student repos/stores.
+- **Zen-first coding:** apply Zen of Python principles globally (explicit, simple, readable, one clear way).
 
 ## Getting Started
 
@@ -63,8 +64,8 @@ ViccoBoard/
 │   ├── plugins/          # Plugin registry
 │   └── storage/          # Storage implementation
 ├── modules/              # Domain modules
-│   ├── sport/           # SportZens functionality
-│   ├── exams/           # KURT functionality
+│   ├── sport/           # Sport functionality
+│   ├── exams/           # KBR functionality
 │   ├── students/        # Central student management
 │   ├── export/          # PDF/CSV exports
 │   └── integrations/    # External integrations

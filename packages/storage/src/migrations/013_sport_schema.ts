@@ -1,14 +1,14 @@
 /**
- * SportZens Schema Migration
- * Adds SportZens APK parity fields and tables (scope v2, WOW excluded)
+ * Sport Schema Migration
+ * Adds Sport APK parity fields and tables (scope v2, WOW excluded)
  */
 
 import { Migration } from '@viccoboard/core';
 import { SQLiteStorage } from '../storage.js';
 
-export class SportZensSchemaMigration implements Migration {
+export class SportSchemaMigration implements Migration {
   version = 13;
-  name = 'sportzens_schema';
+  name = 'sport_schema';
 
   constructor(private storage: SQLiteStorage) {}
 
@@ -79,7 +79,7 @@ export class SportZensSchemaMigration implements Migration {
     `);
 
     db.exec(`
-      CREATE TABLE IF NOT EXISTS sportzens_tables (
+      CREATE TABLE IF NOT EXISTS sport_tables (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         grade_scheme TEXT NOT NULL,
@@ -96,7 +96,7 @@ export class SportZensSchemaMigration implements Migration {
     `);
 
     db.exec(`
-      CREATE INDEX IF NOT EXISTS idx_sportzens_tables_teacher_id ON sportzens_tables(teacher_id);
+      CREATE INDEX IF NOT EXISTS idx_sport_tables_teacher_id ON sport_tables(teacher_id);
     `);
 
     db.exec(`
@@ -141,7 +141,7 @@ export class SportZensSchemaMigration implements Migration {
     // SQLite does not support dropping columns without table rebuild.
     const db = this.storage.getDatabase();
     db.exec('DROP TABLE IF EXISTS grades;');
-    db.exec('DROP TABLE IF EXISTS sportzens_tables;');
+    db.exec('DROP TABLE IF EXISTS sport_tables;');
     db.exec('DROP TABLE IF EXISTS grade_weightings;');
     db.exec('DROP TABLE IF EXISTS new_day_data;');
     db.exec('DROP TABLE IF EXISTS user_data;');

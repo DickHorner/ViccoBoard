@@ -1,15 +1,18 @@
 # ViccoBoard
 
-ViccoBoard is a local-first teacher suite that combines SportZens and KURT workflows in one TypeScript monorepo.
+A local-first teacher suite that unifies **Sport** and **KBR** workflows in one TypeScript monorepo.
 
-## Core Principles
+## Core Engineering Principles
 
-- Keep all required features from SportZens and KURT.
-- Keep domain logic inside modules, not in the UI layer.
+- The **Zen of Python** is the global coding philosophy for this repository (clarity, simplicity, explicitness, readability).
+- Preserve feature completeness while keeping boundaries clean (`apps -> modules -> packages`).
 - Keep runtime web-only and Safari-compatible (iPadOS target).
-- Keep data local-first with explicit export/import flows.
+- Keep data local-first with explicit export/import workflows.
 
-## Repository Structure
+<details open>
+<summary><strong>Tab 1 · Product Overview</strong></summary>
+
+### Repository Structure
 
 ```text
 ViccoBoard/
@@ -19,7 +22,7 @@ ViccoBoard/
 ├── modules/
 │   ├── students/       # Central student management
 │   ├── sport/          # Sport domain
-│   └── exams/          # Exams/KURT domain
+│   └── exams/          # KBR domain
 ├── packages/
 │   ├── core/           # Shared interfaces/types/validators
 │   ├── storage/        # IndexedDB + SQLite adapters and migrations
@@ -29,7 +32,7 @@ ViccoBoard/
 └── agents.md           # Agent guardrails
 ```
 
-## Quick Start
+### Quick Start
 
 ```bash
 npm install
@@ -37,17 +40,17 @@ npm run build
 npm run dev:ui
 ```
 
-## Useful Commands
+### Useful Commands
 
 ```bash
-npm run test
-npm run build:packages
-npm run build:ipad
 npm run lint:docs
+npm run build:packages
+npm run test
+npm run build
 npm run demo
 ```
 
-## Documentation
+### Documentation
 
 - [Documentation Index](./INDEX.md)
 - [Master Plan](./Plan.md)
@@ -55,9 +58,33 @@ npm run demo
 - [Developer Guide](./DEVELOPMENT.md)
 - [Docs Hub](./docs/README.md)
 
-## Status Notes
+</details>
 
-Session and verification artifacts were consolidated under `docs/sessions/`, `docs/verification/`, and `docs/reviews/`.
+<details>
+<summary><strong>Tab 2 · AI / Reviewer / Maintainer Info</strong></summary>
+
+### AI + Review Guardrails
+
+- Primary review instructions: [docs/reviews/AI_CODE_REVIEW_INSTRUCTIONS.md](./docs/reviews/AI_CODE_REVIEW_INSTRUCTIONS.md)
+- PR review guidelines: [.github/AI_PR_REVIEW_GUIDELINES.md](./.github/AI_PR_REVIEW_GUIDELINES.md)
+- Copilot review instructions: [.github/.copilot-review-instructions.md](./.github/.copilot-review-instructions.md)
+- Agent operating constraints: [agents.md](./agents.md)
+
+### Release Quality Gates
+
+- Documentation guardrails: `npm run lint:docs`
+- Package compile gate: `npm run build:packages`
+- Workspace tests gate: `npm run test`
+- Production build gate: `npm run build`
+- Git push guard hook: `.githooks/pre-push` (installed via `npm run hooks:install`)
+
+### Maintainer Notes
+
+- Session and verification artifacts are under `docs/sessions/`, `docs/verification/`, and `docs/reviews/`.
+- Keep references and examples aligned with real lowercase paths (`modules/sport`, `@viccoboard/sport`).
+- Keep naming stable for release (`sport`, `kbr`).
+
+</details>
 
 ## License
 

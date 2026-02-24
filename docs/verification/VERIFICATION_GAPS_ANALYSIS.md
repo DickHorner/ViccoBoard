@@ -2,7 +2,7 @@
 
 ## User Question: "Did you check whether the code really meets all criteria?"
 
-**Short Answer:** I verified **implementation existence** and **architecture compliance**, but NOT full **feature parity** against Plan.md and SPORTZENS_PARITY_v2.md requirements.
+**Short Answer:** I verified **implementation existence** and **architecture compliance**, but NOT full **feature parity** against Plan.md and sport_parity_v2.md requirements.
 
 ---
 
@@ -99,12 +99,12 @@
 - ❌ **NOT VERIFIED:** No search for verbal assessment views
 - ❌ **NOT VERIFIED:** Not mentioned in closed issues
 
-### 6. **SPORTZENS_PARITY_v2.md Compliance**
+### 6. **sport_parity_v2.md Compliance**
 
 **Required Artifacts:**
-- ❌ `docs/parity-spec/sportzens-apk/_ledger/PARITY_LEDGER.md` - NOT CHECKED
-- ❌ `docs/parity-spec/sportzens-apk/_ledger/PARITY_MATRIX.csv` - NOT CHECKED
-- ❌ `docs/parity-spec/sportzens-apk/_ledger/PARITY_ASSERTIONS.md` - NOT CHECKED
+- ❌ `docs/parity-spec/sport-apk/_ledger/PARITY_LEDGER.md` - NOT CHECKED
+- ❌ `docs/parity-spec/sport-apk/_ledger/PARITY_MATRIX.csv` - NOT CHECKED
+- ❌ `docs/parity-spec/sport-apk/_ledger/PARITY_ASSERTIONS.md` - NOT CHECKED
 
 **Scope Compliance:**
 - ✅ WOW exclusion noted
@@ -119,7 +119,7 @@
 2. **CSV Import/Export** - No file handling verified
 3. **Audio Signals (Shuttle-Run)** - No audio API usage found
 4. **Settings Screen** - Not verified for config imports
-5. **Parity Ledger Files** - Required by SPORTZENS_PARITY_v2.md, not checked
+5. **Parity Ledger Files** - Required by sport_parity_v2.md, not checked
 
 ### MEDIUM RISK (Implementation Unclear) 🟡
 1. **Slider UI Elements** - Code has inputs but no slider search
@@ -138,12 +138,12 @@
 
 ## What Should Have Been Done
 
-Per SPORTZENS_PARITY_v2.md Phase 1-2:
+Per sport_parity_v2.md Phase 1-2:
 
 1. **Ingest Parity Spec:**
    ```
-   docs/parity-spec/sportzens-apk/i18n/*.json
-   docs/parity-spec/sportzens-apk/schemas/*.schema.json
+   docs/parity-spec/sport-apk/i18n/*.json
+   docs/parity-spec/sport-apk/schemas/*.schema.json
    ```
 
 2. **Generate Ledger Files:**
@@ -156,9 +156,9 @@ Per SPORTZENS_PARITY_v2.md Phase 1-2:
    - UI screenshots or code inspection for each feature
    - Roundtrip tests for data flows
 
-4. **KURT Assessment:**
+4. **KBR Assessment:**
    - Parse Plan.md §6.9-6.22
-   - Generate KURT_LEDGER.md
+   - Generate KBR_LEDGER.md
    - Map to Issues P5-1 through P6-4
 
 ---
@@ -189,13 +189,13 @@ Per SPORTZENS_PARITY_v2.md Phase 1-2:
 4. Inspect Settings screen for config imports
 
 ### Short-Term (Parity Compliance)
-1. Generate PARITY_LEDGER.md per SPORTZENS_PARITY_v2.md
+1. Generate PARITY_LEDGER.md per sport_parity_v2.md
 2. Create PARITY_MATRIX.csv with implemented: yes/no
 3. Audit Plan.md §6.3-6.8 line-by-line
 4. Screenshot key UI workflows
 
 ### Long-Term (Full Audit)
-1. KURT parity assessment (Plan.md §6.9-6.22)
+1. KBR parity assessment (Plan.md §6.9-6.22)
 2. End-to-end workflow testing
 3. iPad Safari compatibility testing
 4. Performance/offline testing
@@ -204,12 +204,12 @@ Per SPORTZENS_PARITY_v2.md Phase 1-2:
 
 ## Conclusion
 
-The code **exists and passes tests**, but I verified **implementation mechanics** (clean architecture, test coverage, bridge pattern) without verifying **feature completeness** (every Plan.md checkbox, every SportZens option).
+The code **exists and passes tests**, but I verified **implementation mechanics** (clean architecture, test coverage, bridge pattern) without verifying **feature completeness** (every Plan.md checkbox, every Sport option).
 
 This was an **architecture audit**, not a **feature parity audit**.
 
 For true parity verification, need to:
-1. Generate ledger files (SPORTZENS_PARITY_v2.md Phase 1-2)
+1. Generate ledger files (sport_parity_v2.md Phase 1-2)
 2. Verify each Plan.md checkbox with evidence
 3. Test UI workflows end-to-end
 4. Confirm all options/buttons/sliders exist

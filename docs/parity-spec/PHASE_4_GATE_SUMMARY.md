@@ -18,7 +18,7 @@
 ## What Was Validated
 
 ### 1. Schema Coverage ✅
-All 8 in-scope SportZens schemas have comprehensive roundtrip tests:
+All 8 in-scope Sport schemas have comprehensive roundtrip tests:
 1. class.schema.json → ClassGroup
 2. student.schema.json → Student
 3. category.schema.json → GradeCategory
@@ -43,7 +43,7 @@ All 8 in-scope SportZens schemas have comprehensive roundtrip tests:
 - No silent field drops
 
 **Snake Case Preservation:**
-- Database field names match SportZens APK exactly
+- Database field names match Sport APK exactly
 - Examples: `school_year`, `teacher_id`, `class_id`, `grade_scheme`, `public_code`
 - No camelCase conversion bugs
 
@@ -56,7 +56,7 @@ All 8 in-scope SportZens schemas have comprehensive roundtrip tests:
 ### 4. WOW Handling ✅
 - No tests for wow.schema.json (correctly excluded)
 - GradeWeighting.wow field preserved for schema compatibility but always set to 0
-- Tests document WOW exclusion per SPORTZENS_PARITY_v2.md
+- Tests document WOW exclusion per sport_parity_v2.md
 
 ---
 
@@ -64,7 +64,7 @@ All 8 in-scope SportZens schemas have comprehensive roundtrip tests:
 
 ```
 PASS  tests/schema-roundtrip.test.ts
-  Phase 4: SportZens Schema Roundtrip Tests
+  Phase 4: Sport Schema Roundtrip Tests
     1. class.schema.json → ClassGroup Roundtrip
       ✓ should roundtrip required fields without data loss (4 ms)
       ✓ should roundtrip with optional fields (2 ms)
@@ -111,7 +111,7 @@ Time:        2.567 s
 
 ## Implications for Future Phases
 
-### Phase 5 (SportZens UI Implementation)
+### Phase 5 (Sport UI Implementation)
 ✅ **Can Proceed:** Schemas are proven to be lossless, so any UI that reads/writes these schemas will preserve data integrity.
 
 **Confidence Level:** High — The foundation is solid for implementing:
@@ -121,8 +121,8 @@ Time:        2.567 s
 - Grading workflows (criteria-based, time-based, table-based)
 - Export/Import (backup/restore will not lose data)
 
-### Phase 6-8 (KURT Implementation)
-✅ **Can Proceed:** KURT schemas follow the same pattern, so the testing approach can be replicated.
+### Phase 6-8 (KBR Implementation)
+✅ **Can Proceed:** KBR schemas follow the same pattern, so the testing approach can be replicated.
 
 ### Phase 9 (Security/Backup)
 ✅ **Can Proceed:** Backup/restore functionality depends on lossless serialization, which is now proven.
@@ -134,19 +134,19 @@ Time:        2.567 s
 | File | Purpose | Status |
 |------|---------|--------|
 | `apps/teacher-ui/tests/schema-roundtrip.test.ts` | Roundtrip test suite | ✅ 25/25 passing |
-| `docs/parity-spec/sportzens-apk/_evidence/PHASE_4_COMPLETION.md` | Detailed completion report | ✅ Complete |
+| `docs/parity-spec/sport-apk/_evidence/PHASE_4_COMPLETION.md` | Detailed completion report | ✅ Complete |
 | `docs/parity-spec/PHASE_4_GATE_SUMMARY.md` | This summary document | ✅ Complete |
 
 ---
 
 ## Gate Sign-Off
 
-**Phase 4: SportZens Schema Roundtrip Validation**  
+**Phase 4: Sport Schema Roundtrip Validation**  
 **GATE 4: ✅ PASSED**
 
 All 8 in-scope schemas can be exported/imported without data loss. The foundation for backup/restore functionality is proven. Ready to proceed to Phase 5 (UI implementation).
 
 ---
 
-**Next Phase:** Phase 5 — SportZens Workflows/UI (GATE 5)  
+**Next Phase:** Phase 5 — Sport Workflows/UI (GATE 5)  
 **Focus:** Implement Class Management, Student Management, Attendance, Grading screens leveraging the validated schemas and existing type definitions.

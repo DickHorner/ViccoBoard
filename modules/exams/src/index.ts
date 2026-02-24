@@ -1,5 +1,5 @@
 /**
- * KURT Module Exports
+ * KBR Module Exports
  * Main entry point for exam builder and correction
  */
 

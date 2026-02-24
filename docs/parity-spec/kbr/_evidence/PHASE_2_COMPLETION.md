@@ -2,20 +2,20 @@
 
 **Status:** ✅ GATE 2 PASSED  
 **Date:** 2026-02-07  
-**Phase:** 2 — KURT Spec Ingest + Ledger
+**Phase:** 2 — KBR Spec Ingest + Ledger
 
 ## Deliverables
 
-### 1. KURT Specification Extraction
+### 1. KBR Specification Extraction
 - ✅ Parsed Plan.md §6.9–6.22 completely
 - ✅ Extracted 69 checkboxes across 14 subsections
 - ✅ Mapped to domain entities (Exam, ExamPart, TaskNode, CorrectionEntry, GradeKey, SupportTip, etc.)
 - ✅ Mapped to proposed implementation phases (Phase 6–8 + Beyond)
 
-### 2. KURT Ledger Files
-- ✅ `KURT_LEDGER.md` — Complete feature inventory with priorities
-- ✅ `KURT_MATRIX.csv` — Row-by-row traceability (checkbox_id, feature, status, location, tests)
-- ✅ `KURT_ASSERTIONS.md` — Definition of "done" per checkbox type
+### 2. KBR Ledger Files
+- ✅ `KBR_LEDGER.md` — Complete feature inventory with priorities
+- ✅ `KBR_MATRIX.csv` — Row-by-row traceability (checkbox_id, feature, status, location, tests)
+- ✅ `KBR_ASSERTIONS.md` — Definition of "done" per checkbox type
 
 ### 3. Checkpoint Summary
 
@@ -37,9 +37,9 @@
 | **§6.22** | 5 | Oberstufe EWH | ✅ Extracted |
 | **TOTAL** | **69** | — | **✅ 100%** |
 
-### 4. Integration with SportZens
+### 4. Integration with Sport
 
-- ✅ Independent KURT domain module (modules/exams)
+- ✅ Independent KBR domain module (modules/exams)
 - ✅ Shared Student entity via centralized StudentRepository
 - ✅ Clear separation of concerns (no cross-domain feature pollution)
 - ✅ Both modules use @viccoboard/storage and @viccoboard/core
@@ -47,8 +47,8 @@
 ### 5. WOW Status (Verified)
 
 - ✅ WOW (Workout of Week) remains **excluded from scope v2**
-- ✅ No KURT features depend on WOW
-- ✅ No WOW i18n keys or schemas added to KURT specs
+- ✅ No KBR features depend on WOW
+- ✅ No WOW i18n keys or schemas added to KBR specs
 
 ## Phase Distribution (from ISSUES_TRACKER.md mapping)
 
@@ -62,11 +62,11 @@
 
 ## Next Phase: Phase 3 — i18n Infrastructure
 
-**Objective:** Set up i18n system (vue-i18n or custom loader) and load SportZens i18n keys without modification. Implement missing-key detection.
+**Objective:** Set up i18n system (vue-i18n or custom loader) and load Sport i18n keys without modification. Implement missing-key detection.
 
 **Entry Points:**
 - `apps/teacher-ui/src/i18n/` (setup location)
-- `docs/parity-spec/sportzens-apk/i18n/*.json` (load these unmodified)
+- `docs/parity-spec/sport-apk/i18n/*.json` (load these unmodified)
 - Test: missing key markers in UI
 
 ---

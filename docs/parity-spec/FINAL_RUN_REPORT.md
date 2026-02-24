@@ -1,4 +1,4 @@
-# FINAL PARITY REPORT — ViccoBoard Scope v2 (SportZens + KURT)
+# FINAL PARITY REPORT — ViccoBoard Scope v2 (Sport + KBR)
 
 **Date:** 2025-01-27  
 **Author:** CI/PARITY_RUNNER  
@@ -9,7 +9,7 @@
 
 ## EXECUTIVE SUMMARY
 
-This report documents the **implementation status** of SPORTZens (without WOW) and KURT feature parity as of 2025-01-27.
+This report documents the **implementation status** of Sport (without WOW) and KBR feature parity as of 2025-01-27.
 
 Phases 0–4 (Baseline, Ledgers, i18n, Schema Roundtrip Tests) have been **completed and gated**. Phases 5–10 remain as future work.
 
@@ -22,14 +22,14 @@ Phases 0–4 (Baseline, Ledgers, i18n, Schema Roundtrip Tests) have been **compl
 | Phase | Name | Gate | Status | Completion |
 |-------|------|------|--------|------------|
 | **Phase 0** | Baseline + Tooling | GATE 0 | ✅ PASSED | npm build:ipad working |
-| **Phase 1** | SportZens Parity-Spec | GATE 1 | ✅ PASSED | PARITY_LEDGER.md + MATRIX complete |
-| **Phase 2** | KURT Spec Ingest | GATE 2 | ✅ PASSED | KURT_LEDGER.md (69 checkboxes) |
-| **Phase 3** | i18n Infrastructure | GATE 3 | ✅ PASSED | vue-i18n + SportZens strings loaded |
-| **Phase 4** | SportZens Schema Parity | GATE 4 | ✅ PASSED | 25/25 roundtrip tests passing |
-| **Phase 5** | SportZens Workflows/UI | GATE 5 | ⏳ TODO | UI implementation |
-| **Phase 6** | KURT Data Layer | GATE 6 | ⏳ TODO | Exam builder + repos |
-| **Phase 7** | KURT Correction & Grading | GATE 7 | ⏳ TODO | Correction UI + GradeKey |
-| **Phase 8** | KURT Fördertipps/Export/Mail | GATE 8 | ⏳ TODO | Support tips + PDF + Email |
+| **Phase 1** | Sport Parity-Spec | GATE 1 | ✅ PASSED | PARITY_LEDGER.md + MATRIX complete |
+| **Phase 2** | KBR Spec Ingest | GATE 2 | ✅ PASSED | KBR_LEDGER.md (69 checkboxes) |
+| **Phase 3** | i18n Infrastructure | GATE 3 | ✅ PASSED | vue-i18n + Sport strings loaded |
+| **Phase 4** | Sport Schema Parity | GATE 4 | ✅ PASSED | 25/25 roundtrip tests passing |
+| **Phase 5** | Sport Workflows/UI | GATE 5 | ⏳ TODO | UI implementation |
+| **Phase 6** | KBR Data Layer | GATE 6 | ⏳ TODO | Exam builder + repos |
+| **Phase 7** | KBR Correction & Grading | GATE 7 | ⏳ TODO | Correction UI + GradeKey |
+| **Phase 8** | KBR Fördertipps/Export/Mail | GATE 8 | ⏳ TODO | Support tips + PDF + Email |
 | **Phase 9** | Security/Backup | GATE 9 | ⏳ TODO | App-Lock + Backup roundtrip |
 | **Phase 10** | Finalization + Report | GATE 10 | ⏳ TODO | Evidence artifacts |
 
@@ -52,9 +52,9 @@ Phases 0–4 (Baseline, Ledgers, i18n, Schema Roundtrip Tests) have been **compl
 
 ## PARITY MATRICES — Current Status
 
-### SportZens Parity Status
+### Sport Parity Status
 
-**Location:** `docs/parity-spec/sportzens-apk/_ledger/PARITY_MATRIX.csv`
+**Location:** `docs/parity-spec/sport-apk/_ledger/PARITY_MATRIX.csv`
 
 **Summary:**
 - **Total i18n keys sampled:** 55+ (estimated 850–950 in-scope keys)
@@ -72,12 +72,12 @@ Phases 0–4 (Baseline, Ledgers, i18n, Schema Roundtrip Tests) have been **compl
 
 ---
 
-### KURT Parity Status
+### KBR Parity Status
 
-**Location:** `docs/parity-spec/kurt/_ledger/KURT_MATRIX.csv`
+**Location:** `docs/parity-spec/KBR/_ledger/KBR_MATRIX.csv`
 
 **Summary:**
-- **Total KURT checkboxes:** 69 (14 subsections)
+- **Total KBR checkboxes:** 69 (14 subsections)
 - **Checkboxes implemented:** 0 (under construction)
 - **Checkboxes in Phase 6 scope:** ~15 (Exam Builder)
 - **Checkboxes in Phase 7 scope:** ~18 (Correction + GradeKey)
@@ -103,7 +103,7 @@ Phases 0–4 (Baseline, Ledgers, i18n, Schema Roundtrip Tests) have been **compl
 
 ## RESTLIST (Open Items)
 
-### SportZens — Open Items in PARITY_MATRIX.csv
+### Sport — Open Items in PARITY_MATRIX.csv
 
 All items marked with `implemented=no` are in this restlist:
 
@@ -116,7 +116,7 @@ All items marked with `implemented=no` are in this restlist:
 | **i18n_key** | GRADES.* | yes | no | ~30+ |
 | **i18n_key** | COOPER.*, SHUTTLE.*, etc. | yes | no | ~25+ |
 | **i18n_key** | TIMER.*, TOURNAMENTS.*, etc. | yes | no | ~15+ |
-| **i18n_key** | SPORTS.*, FEEDBACK.*, WOW.* (excluded) | yes/no | no | ~60+ |
+| **i18n_key** | SportS.*, FEEDBACK.*, WOW.* (excluded) | yes/no | no | ~60+ |
 | **schema_field** | class.color | no | no | 1 |
 | **schema_field** | class.grade_scheme | no | no | 1 |
 | **schema_field** | class.settings | no | no | 1 |
@@ -134,9 +134,9 @@ All items marked with `implemented=no` are in this restlist:
 | **workflow** | Shuttle-Run/Cooper UI | — | no | 6 |
 | **workflow** | Timer/Scoreboard UI | — | no | 6 |
 | **workflow** | Table Management UI | — | no | 1 |
-| — | **SUBTOTAL SportZens OPEN** | — | — | **~170+ items** |
+| — | **SUBTOTAL Sport OPEN** | — | — | **~170+ items** |
 
-### KURT — Open Items in KURT_MATRIX.csv
+### KBR — Open Items in KBR_MATRIX.csv
 
 All 69 checkboxes are currently `implemented=no`:
 
@@ -156,7 +156,7 @@ All 69 checkboxes are currently `implemented=no`:
 | 6.20 | Collaboration | 4 | Phase 8 |
 | 6.21 | Formats | 1 | Phase 8 |
 | 6.22 | Oberstufe EWH | 5 | Phase 6–8 |
-| — | **SUBTOTAL KURT OPEN** | **69** | — |
+| — | **SUBTOTAL KBR OPEN** | **69** | — |
 
 ### Total Restlist: **~239+ items**
 
@@ -166,10 +166,10 @@ All 69 checkboxes are currently `implemented=no`:
 
 | Domain | Implemented | Total | Progress |
 |--------|-------------|-------|----------|
-| **SportZens (excl. WOW)** | ~80 schema fields | ~90 required fields | **89%** |
-| **SportZens i18n** | 0 | 850–950 keys | **0%** |
-| **SportZens Workflows** | 0 | 15+ major flows | **0%** |
-| **KURT Checkboxes** | 0 | 69 | **0%** |
+| **Sport (excl. WOW)** | ~80 schema fields | ~90 required fields | **89%** |
+| **Sport i18n** | 0 | 850–950 keys | **0%** |
+| **Sport Workflows** | 0 | 15+ major flows | **0%** |
+| **KBR Checkboxes** | 0 | 69 | **0%** |
 | **Total** | **~80** | **~939+** | **~8.5%** |
 
 ---
@@ -180,7 +180,7 @@ All 69 checkboxes are currently `implemented=no`:
 ╔════════════════════════════════════════════════════╗
 ║           PARITY_GATE = FAIL (ONGOING)             ║
 ╠════════════════════════════════════════════════════╣
-║ Reason: Open items in SportZens i18n & KURT       ║
+║ Reason: Open items in Sport i18n & KBR       ║
 ║ (Expected; Phases 4–10 will close gaps)            ║
 ║                                                    ║
 ║ PASS Condition: All in_scope_v2 items             ║
@@ -196,37 +196,37 @@ All 69 checkboxes are currently `implemented=no`:
   - [x] npm builds working
   - [x] Browser compat issues fixed
 
-- [x] **Phase 1:** SportZens Parity-Spec (GATE 1 ✅)
+- [x] **Phase 1:** Sport Parity-Spec (GATE 1 ✅)
   - [x] PARITY_LEDGER.md complete
   - [x] PARITY_MATRIX.csv generated
   - [x] WOW marked excluded_by_scope_v2
 
-- [x] **Phase 2:** KURT Spec Ingest (GATE 2 ✅)
-  - [x] KURT_LEDGER.md (69 checkboxes)
-  - [x] KURT_MATRIX.csv generated
+- [x] **Phase 2:** KBR Spec Ingest (GATE 2 ✅)
+  - [x] KBR_LEDGER.md (69 checkboxes)
+  - [x] KBR_MATRIX.csv generated
   - [x] Mapped to Phase 6–8
 
 - [x] **Phase 3:** i18n Infrastructure (GATE 3 ✅)
   - [x] vue-i18n configured
-  - [x] SportZens locales loaded
+  - [x] Sport locales loaded
   - [x] Missing key handler active
 
-- [x] **Phase 4:** SportZens Schema Roundtrip (GATE 4 ✅)
+- [x] **Phase 4:** Sport Schema Roundtrip (GATE 4 ✅)
   - [x] Roundtrip tests for 8 in-scope schemas (25/25 tests passing)
   - [x] Zero data loss validated for export/import
   - [x] snake_case field preservation verified
   - [x] WOW exclusion documented in tests
 
-- [ ] **Phase 5:** SportZens Workflows/UI (GATE 5 ⏳)
+- [ ] **Phase 5:** Sport Workflows/UI (GATE 5 ⏳)
   - Implementation of 15+ major workflows
 
-- [ ] **Phase 6:** KURT Data Layer (GATE 6 ⏳)
+- [ ] **Phase 6:** KBR Data Layer (GATE 6 ⏳)
   - Exam builder + data models
 
-- [ ] **Phase 7:** KURT Correction & Grading (GATE 7 ⏳)
+- [ ] **Phase 7:** KBR Correction & Grading (GATE 7 ⏳)
   - Correction UI + GradeKey engine
 
-- [ ] **Phase 8:** KURT Fördertipps/Export (GATE 8 ⏳)
+- [ ] **Phase 8:** KBR Fördertipps/Export (GATE 8 ⏳)
   - Support tips DB, PDFs, email, analysis
 
 - [ ] **Phase 9:** Security/Backup (GATE 9 ⏳)
@@ -241,12 +241,12 @@ All 69 checkboxes are currently `implemented=no`:
 
 | Artifact | Location | Status |
 |----------|----------|--------|
-| PARITY_LEDGER.md | `docs/parity-spec/sportzens-apk/_ledger/` | ✅ Complete |
-| PARITY_MATRIX.csv | `docs/parity-spec/sportzens-apk/_ledger/` | ✅ Complete |
-| PARITY_ASSERTIONS.md | `docs/parity-spec/sportzens-apk/_ledger/` | ✅ Complete |
-| KURT_LEDGER.md | `docs/parity-spec/kurt/_ledger/` | ✅ Complete |
-| KURT_MATRIX.csv | `docs/parity-spec/kurt/_ledger/` | ✅ Complete |
-| KURT_ASSERTIONS.md | `docs/parity-spec/kurt/_ledger/` | ✅ Complete |
+| PARITY_LEDGER.md | `docs/parity-spec/sport-apk/_ledger/` | ✅ Complete |
+| PARITY_MATRIX.csv | `docs/parity-spec/sport-apk/_ledger/` | ✅ Complete |
+| PARITY_ASSERTIONS.md | `docs/parity-spec/sport-apk/_ledger/` | ✅ Complete |
+| KBR_LEDGER.md | `docs/parity-spec/KBR/_ledger/` | ✅ Complete |
+| KBR_MATRIX.csv | `docs/parity-spec/KBR/_ledger/` | ✅ Complete |
+| KBR_ASSERTIONS.md | `docs/parity-spec/KBR/_ledger/` | ✅ Complete |
 | i18n Tests | `apps/teacher-ui/tests/i18n.test.ts` | ✅ Complete |
 | Schema Roundtrip Tests | `apps/teacher-ui/tests/schema-roundtrip.test.ts` | ✅ Complete (25/25 passing) |
 | Phase Completion Reports | `_evidence/PHASE_*_COMPLETION.md` | ✅ Complete (0-4) |
@@ -255,11 +255,11 @@ All 69 checkboxes are currently `implemented=no`:
 
 ## Next Steps (Recommended Sequence)
 
-1. **Phase 5 (Long):** Implement SportZens workflows (leveraging existing type definitions and validated schemas)
-2. **Phase 5 (Long):** Implement SportZens workflows (leveraging existing type definitions)
-3. **Phase 6 (Medium):** Implement KURT Exam Builder data layer
-4. **Phase 7 (Medium):** Implement KURT Correction UIs + GradeKey
-5. **Phase 8 (Long):** Implement KURT Fördertipps, PDF Export, Email, Analysis
+1. **Phase 5 (Long):** Implement Sport workflows (leveraging existing type definitions and validated schemas)
+2. **Phase 5 (Long):** Implement Sport workflows (leveraging existing type definitions)
+3. **Phase 6 (Medium):** Implement KBR Exam Builder data layer
+4. **Phase 7 (Medium):** Implement KBR Correction UIs + GradeKey
+5. **Phase 8 (Long):** Implement KBR Fördertipps, PDF Export, Email, Analysis
 6. **Phase 9 (Medium):** Implement security/backup features
 7. **Phase 10:** Generate final parity report
 
@@ -272,12 +272,12 @@ All 69 checkboxes are currently `implemented=no`:
 - ✅ Baseline infrastructure is solid
 - ✅ Feature specifications completely documented
 - ✅ i18n system ready
-- ✅ Both SportZens and KURT scope clearly defined
+- ✅ Both Sport and KBR scope clearly defined
 - ✅ WOW exclusion clearly marked (no ambiguity)
 
 **PARITY_GATE = FAIL** — *Expected*, until Phases 4–10 implementation completes.
 
-When all phases are complete, PARITY_GATE will transition to **PASS**, and both SportZens (without WOW) and KURT will achieve 100% functional/option parity.
+When all phases are complete, PARITY_GATE will transition to **PASS**, and both Sport (without WOW) and KBR will achieve 100% functional/option parity.
 
 ---
 

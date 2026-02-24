@@ -4,7 +4,7 @@
  */
 
 import { RecordCooperTestResultUseCase } from '../src/use-cases/record-cooper-test-result.use-case.js';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 // Mock repositories
 class MockPerformanceEntryRepository {
@@ -45,7 +45,7 @@ class MockCooperTestConfigRepository {
     const result: Sport.CooperTestConfig = {
       id: `config-${++this.nextId}`,
       name: config.name!,
-      sportType: config.sportType || 'running',
+      SportType: config.SportType || 'running',
       distanceUnit: config.distanceUnit || 'meters',
       lapLengthMeters: config.lapLengthMeters || 400,
       source: config.source || 'default',
@@ -112,7 +112,7 @@ describe('RecordCooperTestResultUseCase', () => {
     // Create test config
     const config = await cooperTestConfigRepository.create({
       name: 'Test Cooper Config',
-      sportType: 'running',
+      SportType: 'running',
       distanceUnit: 'meters',
       lapLengthMeters: 400,
       source: 'default'
@@ -148,7 +148,7 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: testConfigId,
-        sportType: 'running',
+        SportType: 'running',
         rounds: 7,
         lapLengthMeters: 400,
         extraMeters: 0,
@@ -159,7 +159,7 @@ describe('RecordCooperTestResultUseCase', () => {
       expect(result.id).toBeDefined();
       expect(result.studentId).toBe(testStudentId);
       expect(result.categoryId).toBe(testCategoryId);
-      expect(result.measurements.sportType).toBe('running');
+      expect(result.measurements.SportType).toBe('running');
       expect(result.measurements.rounds).toBe(7);
       expect(result.measurements.lapLengthMeters).toBe(400);
       expect(result.measurements.distanceMeters).toBe(2800);
@@ -173,7 +173,7 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: testConfigId,
-        sportType: 'running',
+        SportType: 'running',
         rounds: 8,
         lapLengthMeters: 400,
         extraMeters: 50
@@ -187,7 +187,7 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: testConfigId,
-        sportType: 'running',
+        SportType: 'running',
         rounds: 7,
         lapLengthMeters: 400,
         extraMeters: 0,
@@ -198,10 +198,10 @@ describe('RecordCooperTestResultUseCase', () => {
       expect(result.calculatedGrade).toBe('3'); // 2800 falls in 2800-3200 range = grade 3
     });
 
-    test('handles swimming sport type', async () => {
+    test('handles swimming Sport type', async () => {
       const swimConfig = await cooperTestConfigRepository.create({
         name: 'Test Cooper Swimming Config',
-        sportType: 'swimming',
+        SportType: 'swimming',
         distanceUnit: 'meters',
         lapLengthMeters: 50,
         source: 'default'
@@ -211,13 +211,13 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: swimConfig.id,
-        sportType: 'swimming',
+        SportType: 'swimming',
         rounds: 100,
         lapLengthMeters: 50,
         extraMeters: 25
       });
 
-      expect(result.measurements.sportType).toBe('swimming');
+      expect(result.measurements.SportType).toBe('swimming');
       expect(result.measurements.distanceMeters).toBe(5025); // (100 * 50) + 25
     });
 
@@ -227,7 +227,7 @@ describe('RecordCooperTestResultUseCase', () => {
           studentId: '',
           categoryId: testCategoryId,
           configId: testConfigId,
-          sportType: 'running',
+          SportType: 'running',
           rounds: 7,
           lapLengthMeters: 400
         })
@@ -240,20 +240,20 @@ describe('RecordCooperTestResultUseCase', () => {
           studentId: testStudentId,
           categoryId: '',
           configId: testConfigId,
-          sportType: 'running',
+          SportType: 'running',
           rounds: 7,
           lapLengthMeters: 400
         })
       ).rejects.toThrow('Category ID is required');
     });
 
-    test('validates that sport type is required', async () => {
+    test('validates that Sport type is required', async () => {
       await expect(
         useCase.execute({
           studentId: testStudentId,
           categoryId: testCategoryId,
           configId: testConfigId,
-          sportType: null as any,
+          SportType: null as any,
           rounds: 7,
           lapLengthMeters: 400
         })
@@ -266,7 +266,7 @@ describe('RecordCooperTestResultUseCase', () => {
           studentId: testStudentId,
           categoryId: testCategoryId,
           configId: testConfigId,
-          sportType: 'running',
+          SportType: 'running',
           rounds: null as any,
           lapLengthMeters: 400
         })
@@ -279,7 +279,7 @@ describe('RecordCooperTestResultUseCase', () => {
           studentId: testStudentId,
           categoryId: testCategoryId,
           configId: testConfigId,
-          sportType: 'running',
+          SportType: 'running',
           rounds: 7,
           lapLengthMeters: null as any
         })
@@ -292,20 +292,20 @@ describe('RecordCooperTestResultUseCase', () => {
           studentId: testStudentId,
           categoryId: testCategoryId,
           configId: 'non-existent-config',
-          sportType: 'running',
+          SportType: 'running',
           rounds: 7,
           lapLengthMeters: 400
         })
       ).rejects.toThrow('Cooper Test Config not found');
     });
 
-    test('validates that sport type matches config', async () => {
+    test('validates that Sport type matches config', async () => {
       await expect(
         useCase.execute({
           studentId: testStudentId,
           categoryId: testCategoryId,
           configId: testConfigId,
-          sportType: 'swimming', // Config is for running
+          SportType: 'swimming', // Config is for running
           rounds: 7,
           lapLengthMeters: 400
         })
@@ -317,7 +317,7 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: testConfigId,
-        sportType: 'running',
+        SportType: 'running',
         rounds: 7,
         lapLengthMeters: 400
       });
@@ -336,7 +336,7 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: testConfigId,
-        sportType: 'running',
+        SportType: 'running',
         rounds: 6,
         lapLengthMeters: 400,
         calculatedGrade: '4'
@@ -349,7 +349,7 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: testConfigId,
-        sportType: 'running',
+        SportType: 'running',
         rounds: 8,
         lapLengthMeters: 400,
         calculatedGrade: '2'
@@ -375,7 +375,7 @@ describe('RecordCooperTestResultUseCase', () => {
         studentId: testStudentId,
         categoryId: testCategoryId,
         configId: testConfigId,
-        sportType: 'running',
+        SportType: 'running',
         rounds: 7,
         lapLengthMeters: 400,
         metadata: customMetadata

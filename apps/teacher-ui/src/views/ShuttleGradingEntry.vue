@@ -173,7 +173,7 @@ const route = useRoute()
 initializeSportBridge()
 initializeStudentsBridge()
 
-const sportBridge = getSportBridge()
+const SportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 const category = ref<Sport.GradeCategory | null>(null)
@@ -381,7 +381,7 @@ function recalculate(studentId: string) {
 
   if (selectedTable.value) {
     try {
-      entry.grade = sportBridge.shuttleRunService.calculateGradeFromTable(
+      entry.grade = SportBridge.shuttleRunService.calculateGradeFromTable(
         selectedTable.value,
         entry.level,
         entry.lane
@@ -430,7 +430,7 @@ async function saveAll() {
       const entry = results.value[student.id]
       if (!entry || entry.level === '' || entry.lane === '') return null
 
-      return sportBridge.recordShuttleRunResultUseCase.execute({
+      return SportBridge.recordShuttleRunResultUseCase.execute({
         studentId: student.id,
         categoryId: category.value!.id,
         configId: selectedConfigId.value,
@@ -458,7 +458,7 @@ async function handleConfigChange() {
   if (!category.value) return
   const config = category.value.configuration as Sport.ShuttleGradingConfig
 
-  await sportBridge.gradeCategoryRepository.update(category.value.id, {
+  await SportBridge.gradeCategoryRepository.update(category.value.id, {
     configuration: {
       ...config,
       gradingTable: selectedTableId.value || undefined,
@@ -478,7 +478,7 @@ watch(selectedConfig, (config) => {
 onMounted(async () => {
   try {
     const categoryId = route.params.id as string
-    category.value = await sportBridge.gradeCategoryRepository.findById(categoryId)
+    category.value = await SportBridge.gradeCategoryRepository.findById(categoryId)
 
     if (!category.value) {
       errorMessage.value = t('COMMON.error')
@@ -487,9 +487,9 @@ onMounted(async () => {
     }
 
     students.value = await studentsBridge.studentRepository.findByClassGroup(category.value.classGroupId)
-    tables.value = await sportBridge.tableDefinitionRepository.findAll()
-    configs.value = await sportBridge.shuttleRunConfigRepository.findAll()
-    const existingEntries = await sportBridge.performanceEntryRepository.findByCategory(category.value.id)
+    tables.value = await SportBridge.tableDefinitionRepository.findAll()
+    configs.value = await SportBridge.shuttleRunConfigRepository.findAll()
+    const existingEntries = await SportBridge.performanceEntryRepository.findByCategory(category.value.id)
 
     const config = category.value.configuration as Sport.ShuttleGradingConfig
     selectedTableId.value = config.gradingTable ?? ''

@@ -1,4 +1,4 @@
-# KURT Feature Ledger (from Plan.md)
+# KBR Feature Ledger (from Plan.md)
 
 **Version:** 1.0.0  
 **Date:** 2026-02-07  
@@ -8,16 +8,16 @@
 
 ## 1. Executive Summary
 
-This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) features from Plan.md to ensure complete implementation.
+This ledger tracks all KBR (Klassenarbeiten Unterricht Rückmeldung Tests) features from Plan.md to ensure complete implementation.
 
 **Status:** Initial baseline established  
-**KURT Scope:** All exam/correction/feedback/export features
+**KBR Scope:** All exam/correction/feedback/export features
 
 ---
 
 ## 2. Feature Checklist Extraction
 
-### §6.9 KURT — Prüfungen anlegen (Strukturen)
+### §6.9 KBR — Prüfungen anlegen (Strukturen)
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -29,7 +29,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.9.6 | Pro Aufgabe festlegen, ob Aufgabenkommentare oder Fördertipps vergeben werden sollen | P1 | ⏳ TODO |
 | 6.9.7 | Prüfungsteile definieren; Teilpunkte/Teilnoten automatisch; optional mitdruckbar | P1 | ⏳ TODO |
 
-### §6.10 KURT — Benotung/Notenschlüssel
+### §6.10 KBR — Benotung/Notenschlüssel
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -41,7 +41,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.10.6 | Finetuning (z. B. Rundungslogik) | P1 | ⏳ TODO |
 | 6.10.7 | Optional: Fehlerpunkte → Aufgabennote | P2 | ⏳ TODO |
 
-### §6.11 KURT — Korrigieren (Flows & Modi)
+### §6.11 KBR — Korrigieren (Flows & Modi)
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -57,7 +57,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.11.10 | Im komplexen Modus: drei Aufgabenebenen in UI/Logik | P1 | ⏳ TODO |
 | 6.11.11 | Schnelles Wechseln zwischen Prüflingen | P1 | ⏳ TODO |
 
-### §6.12 KURT — Fördertipps (DB, Zuweisung, QR, Auswertung)
+### §6.12 KBR — Fördertipps (DB, Zuweisung, QR, Auswertung)
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -71,7 +71,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.12.8 | Dropdown-Vorschau: Name, Beschreibungsvorschau, Anzahl vergebener Tipps, Kategorie; häufige Tipps oben | P1 | ⏳ TODO |
 | 6.12.9 | Fördertipps pro Aufgabenebene nutzbar oder für Ebenen/Aufgaben deaktivierbar | P1 | ⏳ TODO |
 
-### §6.13 KURT — Auswertung & nachträgliche Anpassung
+### §6.13 KBR — Auswertung & nachträgliche Anpassung
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -80,7 +80,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.13.3 | Notenschlüssel nachträglich anpassen; Noten ändern automatisch | P0 | ⏳ TODO |
 | 6.13.4 | Ergebnis-/Auswertungstabellen sortierbar: Korrekturreihenfolge, Name, Punkte, Aufgabenpunkte; Sortierung nach (Unter-)Aufgabe | P1 | ⏳ TODO |
 
-### §6.14 KURT — Langzeit-Überblick & Notizen
+### §6.14 KBR — Langzeit-Überblick & Notizen
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -88,7 +88,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.14.2 | Interne Notizen für Entwicklungen/Förderschwerpunkte | P1 | ⏳ TODO |
 | 6.14.3 | Pro Prüfling Überblick: Aufgaben-/Endkommentare & Fördertipps | P1 | ⏳ TODO |
 
-### §6.15 KURT — Rückmeldung/Kommentare
+### §6.15 KBR — Rückmeldung/Kommentare
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -96,7 +96,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.15.2 | Kommentare bleiben nach Rückgabe verfügbar | P0 | ⏳ TODO |
 | 6.15.3 | Kommentare anderer SuS derselben Prüfung einsehen und wiederverwenden | P1 | ⏳ TODO |
 
-### §6.16 KURT — Export & Druck (PDF)
+### §6.16 KBR — Export & Druck (PDF)
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -108,7 +108,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.16.6 | Punktabzüge anzeigen oder deaktivieren | P2 | ⏳ TODO |
 | 6.16.7 | Unterschrift: Bilddatei, per Hand malen, oder leer | P1 | ⏳ TODO |
 
-### §6.17 KURT — Besondere Schülerleistungen markieren
+### §6.17 KBR — Besondere Schülerleistungen markieren
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -116,14 +116,14 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.17.2 | Übersicht nach Aufgabe & Kategorie | P2 | ⏳ TODO |
 | 6.17.3 | Namen ausblendbar (Anonymisierung) | P2 | ⏳ TODO |
 
-### §6.18 KURT — E-Mail-Versand
+### §6.18 KBR — E-Mail-Versand
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
 | 6.18.1 | Ergebnisse per E-Mail an Schüler und/oder Eltern | P1 | ⏳ TODO |
 | 6.18.2 | E-Mail enthält Noten- und Aufgabenergebnisse; Platzhalter automatisch korrekt befüllen | P1 | ⏳ TODO |
 
-### §6.19 KURT — Gruppenweise korrigieren & Splitscreen
+### §6.19 KBR — Gruppenweise korrigieren & Splitscreen
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -131,7 +131,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.19.2 | Vollbildmodus; bis zu vier Prüflinge gleichzeitig | P2 | ⏳ TODO |
 | 6.19.3 | Thema für Referate/mündliche Prüfungen festlegen | P2 | ⏳ TODO |
 
-### §6.20 KURT — Zusammenarbeit/Kompatibilität
+### §6.20 KBR — Zusammenarbeit/Kompatibilität
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -140,13 +140,13 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 | 6.20.3 | Fördermöglichkeiten oder Prüfungsentwürfe mit anderen Nutzern teilen | P2 | ⏳ TODO |
 | 6.20.4 | Notenspalte kopieren (Excel/Notenprogramme) | P2 | ⏳ TODO |
 
-### §6.21 KURT — Unterstützte Bewertungsformate
+### §6.21 KBR — Unterstützte Bewertungsformate
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
 | 6.21.1 | Abdeckung der genannten Formate: Mappen, Portfolios, Referate, Tests, Facharbeiten, mündliche Prüfungen etc. | P1 | ⏳ TODO |
 
-### §6.22 KURT — Oberstufenklausuren & Erwartungshorizont-Workflow
+### §6.22 KBR — Oberstufenklausuren & Erwartungshorizont-Workflow
 
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
@@ -175,7 +175,7 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 - **§6.21:** 1 checkbox
 - **§6.22:** 5 checkboxes
 
-**Total KURT Checkboxes:** 69
+**Total KBR Checkboxes:** 69
 
 ---
 
@@ -208,16 +208,16 @@ This ledger tracks all KURT (Klassenarbeiten Unterricht Rückmeldung Tests) feat
 
 ---
 
-## 5. Link to KURT_MATRIX.csv
+## 5. Link to KBR_MATRIX.csv
 
-See `KURT_MATRIX.csv` for row-by-row tracking of each checkbox with implementation status and test coverage.
-
----
-
-## 6. Link to KURT_ASSERTIONS.md
-
-See `KURT_ASSERTIONS.md` for definition of "done" for each checkbox type.
+See `KBR_MATRIX.csv` for row-by-row tracking of each checkbox with implementation status and test coverage.
 
 ---
 
-**END OF KURT_LEDGER.md**
+## 6. Link to KBR_ASSERTIONS.md
+
+See `KBR_ASSERTIONS.md` for definition of "done" for each checkbox type.
+
+---
+
+**END OF KBR_LEDGER.md**

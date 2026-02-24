@@ -1,9 +1,9 @@
 /**
  * Record Sportabzeichen Result Use Case
- * Records a sportabzeichen (sports badge) test result for a student with age-based performance evaluation
+ * Records a Sportabzeichen (Sports badge) test result for a student with age-based performance evaluation
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { SportabzeichenResultRepository } from '../repositories/sportabzeichen-result.repository.js';
 import type { SportabzeichenStandardRepository } from '../repositories/sportabzeichen-standard.repository.js';
 import { SportabzeichenService } from '../services/sportabzeichen.service.js';
@@ -19,13 +19,13 @@ export interface RecordSportabzeichenResultInput {
 }
 
 export class RecordSportabzeichenResultUseCase {
-  private sportabzeichenService: SportabzeichenService;
+  private SportabzeichenService: SportabzeichenService;
 
   constructor(
-    private sportabzeichenResultRepository: SportabzeichenResultRepository,
-    private sportabzeichenStandardRepository: SportabzeichenStandardRepository
+    private SportabzeichenResultRepository: SportabzeichenResultRepository,
+    private SportabzeichenStandardRepository: SportabzeichenStandardRepository
   ) {
-    this.sportabzeichenService = new SportabzeichenService();
+    this.SportabzeichenService = new SportabzeichenService();
   }
 
   async execute(input: RecordSportabzeichenResultInput): Promise<Sport.SportabzeichenResult> {
@@ -50,10 +50,10 @@ export class RecordSportabzeichenResultUseCase {
     }
 
     // Fetch all applicable standards for this discipline
-    const allStandards = await this.sportabzeichenStandardRepository.findByDiscipline(input.disciplineId);
+    const allStandards = await this.SportabzeichenStandardRepository.findByDiscipline(input.disciplineId);
 
     // Build result using service
-    const resultData = this.sportabzeichenService.buildResult({
+    const resultData = this.SportabzeichenService.buildResult({
       studentId: input.studentId,
       disciplineId: input.disciplineId,
       birthYear: input.birthYear,
@@ -65,7 +65,7 @@ export class RecordSportabzeichenResultUseCase {
     });
 
     // Save to repository (id, createdAt, lastModified will be auto-generated)
-    const result = await this.sportabzeichenResultRepository.create(resultData);
+    const result = await this.SportabzeichenResultRepository.create(resultData);
 
     return result;
   }

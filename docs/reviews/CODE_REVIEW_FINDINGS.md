@@ -377,7 +377,7 @@ const saveExam = async () => {
 
 **Issues:**
 - Single function exports database, mock bridge, exam ops, correction ops, class groups, students, attendance
-- 150+ lines of `sportBridge` mock directly in composable
+- 150+ lines of `SportBridge` mock directly in composable
 - Repeated mapper patterns (mapRecordToExam, mapExamToRecord, etc.)
 - No error handling for database operations
 - Creates Dexie schema in constructor (side effect)
@@ -390,7 +390,7 @@ Split into:
 3. **`composables/useCorrections.ts`** — Correction entry operations
 4. **`composables/useClassGroups.ts`** — Class group operations
 5. **`services/ExamMapper.ts`** — Serialization logic
-6. **`mocks/sportBridgeFactory.ts`** — Bridge creation (not in composable)
+6. **`mocks/SportBridgeFactory.ts`** — Bridge creation (not in composable)
 
 ```typescript
 // composables/useExams.ts
@@ -647,7 +647,7 @@ mapToEntity(row: any): Sport.GradeCategory { // ☠️ ANY INPUT
 Use type guards instead of `as any`:
 ```typescript
 function isValidGradeCategoryType(value: unknown): value is Sport.GradeCategoryType {
-  return ['criteria', 'time', 'cooper', 'sportabzeichen', 'bjs', 'verbal'].includes(value as string);
+  return ['criteria', 'time', 'cooper', 'Sportabzeichen', 'bjs', 'verbal'].includes(value as string);
 }
 
 mapToEntity(row: unknown): Sport.GradeCategory {
@@ -756,18 +756,18 @@ Saves 33% storage and avoids encoding/decoding CPU overhead.
 **Issue:**
 ```typescript
 export function useDatabase() {
-  const sportBridge = ref({
+  const SportBridge = ref({
     classGroupRepository: { /* ... */ },
     // ... 150 lines of object definitions
   });
   
-  return { /* ... */, sportBridge };
+  return { /* ... */, SportBridge };
 }
 
 // In any component:
-const { sportBridge } = useDatabase(); // ☠️ NEW OBJECT EVERY CALL
-const { sportBridge: bridge2 } = useDatabase(); // ☠️ DIFFERENT INSTANCE
-sportBridge === bridge2; // false — they're different objects
+const { SportBridge } = useDatabase(); // ☠️ NEW OBJECT EVERY CALL
+const { SportBridge: bridge2 } = useDatabase(); // ☠️ DIFFERENT INSTANCE
+SportBridge === bridge2; // false — they're different objects
 ```
 
 **Suggestion:**

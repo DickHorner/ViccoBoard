@@ -125,7 +125,7 @@ npm test              # ✅ PASS (466/466)
 - Issue #15 (P4-3): Sportabzeichen Logic
 - Issue #16 (P4-4): Live Tools (Timer/Teams/Scoreboard)
 
-### Wave 4 (P5/P6 KURT Exams) - 7 issues:
+### Wave 4 (P5/P6 KBR Exams) - 7 issues:
 - Issue #17-23: Exam structure, correction interface, grading keys, support tips, etc.
 
 ---

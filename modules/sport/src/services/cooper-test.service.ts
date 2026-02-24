@@ -1,7 +1,7 @@
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 export interface CooperTestResult {
-  sportType: 'running' | 'swimming';
+  SportType: 'running' | 'swimming';
   rounds: number;
   lapLengthMeters: number;
   extraMeters: number;
@@ -52,7 +52,7 @@ export class CooperTestService {
   }
 
   buildResult(
-    sportType: CooperTestResult['sportType'],
+    SportType: CooperTestResult['SportType'],
     rounds: number,
     lapLengthMeters: number,
     extraMeters = 0
@@ -61,7 +61,7 @@ export class CooperTestService {
     this.validateDistance(distanceMeters);
 
     return {
-      sportType,
+      SportType,
       rounds,
       lapLengthMeters,
       extraMeters,

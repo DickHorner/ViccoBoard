@@ -148,7 +148,7 @@ import { useRoute } from 'vue-router';
 import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { Sport } from '@viccoboard/core';
+import type { Sport} from '@viccoboard/core';
 
 const route = useRoute();
 const { gradeCategories, performanceEntries } = useSportBridge()

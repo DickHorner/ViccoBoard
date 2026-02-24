@@ -1,5 +1,5 @@
 import { BJSGradingService } from '../src/services/bjs-grading.service';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('BJSGradingService', () => {
   let service: BJSGradingService;

@@ -5,7 +5,7 @@
 
 // Repositories
 export { StudentRepository } from './repositories/student.repository.js';
-export { SportZensStudentRepository } from './repositories/sportzens-student.repository.js';
+export { SportStudentRepository } from './repositories/sport-student.repository.js';
 export { StatusCatalogRepository } from './repositories/status-catalog.repository.js';
 
 // Use Cases
@@ -14,7 +14,7 @@ export type {
   AddStudentInput,
   ClassGroupLookup
 } from './use-cases/add-student.use-case.js';
-export { SaveSportZensStudentUseCase } from './use-cases/save-sportzens-student.use-case.js';
+export { SaveSportStudentUseCase } from './use-cases/save-sport-student.use-case.js';
 export { AddStatusUseCase } from './use-cases/add-status.use-case.js';
 export type { AddStatusInput } from './use-cases/add-status.use-case.js';
 export { UpdateStatusUseCase } from './use-cases/update-status.use-case.js';

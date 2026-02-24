@@ -19,7 +19,7 @@ export function isValidGradeCategoryType(value: unknown): value is GradeCategory
     'cooper',
     'shuttle',
     'mittelstrecke',
-    'sportabzeichen',
+    'Sportabzeichen',
     'bjs',
     'verbal'
   ].includes(value)

@@ -6,7 +6,7 @@ You are in STRICT COMPLIANCE mode for ViccoBoard.
 - `.github/copilot-instructions.md`
 - `agents.md`
 - `Plan.md` (especially section 6 and section 9)
-- `docs/agents/SPORTZENS_PARITY_v2.md`
+- `docs/agents/sport_parity_v2.md`
 - `docs/planning/ISSUES_TRACKER.md`
 - `docs/status/STATUS.md`
 
@@ -22,7 +22,7 @@ You are in STRICT COMPLIANCE mode for ViccoBoard.
 - Do not implement unrelated issue IDs.
 
 ## Issue Description
-- Implement age-dependent sports badge evaluation.
+- Implement age-dependent Sports badge evaluation.
 
 ## Required Tasks (from tracker)
 - [ ] Age calculation from birth year

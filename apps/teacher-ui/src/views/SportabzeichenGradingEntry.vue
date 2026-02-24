@@ -1,9 +1,9 @@
 <template>
-  <div class="sportabzeichen-view">
+  <div class="Sportabzeichen-view">
     <div class="page-header">
       <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
-      <h2>{{ t('SPORTABZEICHEN.title') }}</h2>
-      <p class="info-text">{{ t('SPORTABZEICHEN.explainer') }}</p>
+      <h2>{{ t('SportABZEICHEN.title') }}</h2>
+      <p class="info-text">{{ t('SportABZEICHEN.explainer') }}</p>
     </div>
 
     <div v-if="loading" class="loading-state">
@@ -22,7 +22,7 @@
             @click="selectedCategory = cat"
             class="tab-button"
           >
-            {{ t(`SPORTABZEICHEN.${cat}`) }}
+            {{ t(`SportABZEICHEN.${cat}`) }}
           </button>
         </div>
       </section>
@@ -30,7 +30,7 @@
       <!-- Student Grading Table -->
       <section class="card">
         <div class="card-header">
-          <h3>{{ t(`SPORTABZEICHEN.${selectedCategory}`) }}</h3>
+          <h3>{{ t(`SportABZEICHEN.${selectedCategory}`) }}</h3>
           <button 
             v-if="hasChanges" 
             class="btn-primary btn-small"
@@ -46,11 +46,11 @@
             <thead>
               <tr>
                 <th>{{ t('SCHUELER.name') }}</th>
-                <th>{{ t('SPORTABZEICHEN.disziplin') }}</th>
-                <th>{{ t('SPORTABZEICHEN.leistung') }}</th>
-                <th>{{ t('SPORTABZEICHEN.bronze') }}</th>
-                <th>{{ t('SPORTABZEICHEN.silber') }}</th>
-                <th>{{ t('SPORTABZEICHEN.gold') }}</th>
+                <th>{{ t('SportABZEICHEN.disziplin') }}</th>
+                <th>{{ t('SportABZEICHEN.leistung') }}</th>
+                <th>{{ t('SportABZEICHEN.bronze') }}</th>
+                <th>{{ t('SportABZEICHEN.silber') }}</th>
+                <th>{{ t('SportABZEICHEN.gold') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -120,7 +120,7 @@
 
       <!-- Overall Results Summary -->
       <section class="card">
-        <h3>{{ t('SPORTABZEICHEN.gesamtergebnis') }}</h3>
+        <h3>{{ t('SportABZEICHEN.gesamtergebnis') }}</h3>
         <div class="summary-grid">
           <div 
             v-for="student in students" 
@@ -162,13 +162,13 @@ import { useI18n } from 'vue-i18n';
 import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { Sport } from '@viccoboard/core';
+import type { Sport} from '@viccoboard/core';
 import type { SportabzeichenReportEntry } from '@viccoboard/sport';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-const { sportBridge } = useSportBridge();
+const { SportBridge } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
@@ -204,7 +204,7 @@ onMounted(async () => {
 async function loadData() {
   loading.value = true;
   try {
-    const category = await sportBridge.value?.gradeCategoryRepository.findById(categoryId) ?? null;
+    const category = await SportBridge.value?.gradeCategoryRepository.findById(categoryId) ?? null;
     if (!category) {
       toast.error('Kategorie nicht gefunden');
       router.back();
@@ -213,12 +213,12 @@ async function loadData() {
 
     students.value = await studentRepository.value?.findByClassGroup(category.classGroupId) ?? [];
 
-    // Load all sportabzeichen standards
-    allStandards.value = await sportBridge.value?.sportabzeichenStandardRepository.findAll() ?? [];
+    // Load all Sportabzeichen standards
+    allStandards.value = await SportBridge.value?.SportabzeichenStandardRepository.findAll() ?? [];
 
     // Load existing results for each student
     for (const student of students.value) {
-      const results = await sportBridge.value?.sportabzeichenResultRepository.findByStudent(student.id) ?? [];
+      const results = await SportBridge.value?.SportabzeichenResultRepository.findByStudent(student.id) ?? [];
       studentResults.value[student.id] = results;
     }
   } catch (error) {
@@ -265,7 +265,7 @@ async function onPerformanceChange(studentId: string) {
   }
 
   // Calculate age using service
-  const service = sportBridge.value?.sportabzeichenService;
+  const service = SportBridge.value?.SportabzeichenService;
   if (!service) {
     levels.value[studentId] = 'none';
     return;
@@ -289,7 +289,7 @@ function getOverallLevel(studentId: string): Sport.SportabzeichenLevel {
   const results = studentResults.value[studentId] || [];
   if (results.length === 0) return 'none';
   
-  const service = sportBridge.value?.sportabzeichenService;
+  const service = SportBridge.value?.SportabzeichenService;
   if (!service) return 'none';
   
   return service.calculateOverallLevel(results);
@@ -298,7 +298,7 @@ function getOverallLevel(studentId: string): Sport.SportabzeichenLevel {
 async function saveAll() {
   saving.value = true;
   try {
-    const useCase = sportBridge.value?.recordSportabzeichenResultUseCase;
+    const useCase = SportBridge.value?.recordSportabzeichenResultUseCase;
     if (!useCase) {
       throw new Error('RecordSportabzeichenResultUseCase not available');
     }
@@ -361,7 +361,7 @@ async function saveAll() {
 async function exportPdf() {
   exporting.value = true;
   try {
-    const service = sportBridge.value?.sportabzeichenService;
+    const service = SportBridge.value?.SportabzeichenService;
     if (!service) {
       throw new Error('SportabzeichenService not available');
     }
@@ -390,7 +390,7 @@ async function exportPdf() {
     });
 
     const pdfBytes = await service.generateOverviewPdf({
-      title: t('SPORTABZEICHEN.title'),
+      title: t('SportABZEICHEN.title'),
       generatedAt: new Date(),
       entries
     });
@@ -400,7 +400,7 @@ async function exportPdf() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sportabzeichen-${new Date().toISOString().slice(0, 10)}.pdf`;
+    a.download = `Sportabzeichen-${new Date().toISOString().slice(0, 10)}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -417,7 +417,7 @@ async function exportPdf() {
 </script>
 
 <style scoped>
-.sportabzeichen-view {
+.Sportabzeichen-view {
   padding: 1rem;
   max-width: 1400px;
   margin: 0 auto;

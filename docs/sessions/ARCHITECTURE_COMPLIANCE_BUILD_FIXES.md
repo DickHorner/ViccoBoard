@@ -10,9 +10,9 @@
 ### 1. Test Infrastructure Fixes (All Gates Passing)
 
 **Sport Repository NOT NULL Mapping Bugs:**
-- Fixed `sportabzeichen-standard.repository.ts`: Added missing `unit` field mapping in `mapToRow()`
-- Fixed `sportabzeichen-result.repository.ts`: Added missing `achieved_level` field mapping in `mapToRow()`
-- Result: All 166 sport tests passing (18 suites)
+- Fixed `Sportabzeichen-standard.repository.ts`: Added missing `unit` field mapping in `mapToRow()`
+- Fixed `Sportabzeichen-result.repository.ts`: Added missing `achieved_level` field mapping in `mapToRow()`
+- Result: All 166 Sport tests passing (18 suites)
 
 **ESM Jest Configuration:**
 - Renamed `jest.config.js` → `jest.config.cjs` for ESM modules (@viccoboard/exams, @viccoboard/students)
@@ -29,7 +29,7 @@
 **Root npm Test Configuration:**
 - Updated root `package.json` test script to run workspace tests only
 - Added `--passWithNoTests` flag to students module
-- Result: All tests passing (442 total: 227 exams + 166 sport + 49 teacher-ui)
+- Result: All tests passing (442 total: 227 exams + 166 Sport + 49 teacher-ui)
 
 ### 2. Build Warning Elimination
 
@@ -44,7 +44,7 @@
 - Result: Clean iPad build with no module warnings
 
 **Jest Worker Teardown Notices:**
-- Added `forceExit: true` to all Jest configs (sport, exams, students, teacher-ui)
+- Added `forceExit: true` to all Jest configs (Sport, exams, students, teacher-ui)
 - Enhanced `SQLiteStorage.close()` with error handling and module reference cleanup
 - Result: Tests exit cleanly with code 0 (warning managed but non-blocking)
 
@@ -62,7 +62,7 @@
 **Created:** `apps/teacher-ui/src/composables/useExamsBridge.ts`
 
 **Features:**
-- Singleton bridge pattern following sport/students bridge architecture
+- Singleton bridge pattern following Sport/students bridge architecture
 - Full wiring to @viccoboard/exams module:
   - **Repositories:** ExamRepository, TaskNodeRepository, CriterionRepository, CorrectionEntryRepository, SupportTipRepository, StudentLongTermNoteRepository
   - **Use Cases:** createExamPayload, RecordCorrectionUseCase, CalculateGradeUseCase
@@ -172,7 +172,7 @@
 - 🔄 View migration to bridges (in progress)
 
 **Next Immediate Action:**
-Per SPORTZENS_PARITY_v2.md and agents.md hard constraints:
+Per sport_parity_v2.md and agents.md hard constraints:
 1. Complete view migration to proper bridges
 2. Remove direct ../db access from UI layer
 3. Then proceed with parity implementation work

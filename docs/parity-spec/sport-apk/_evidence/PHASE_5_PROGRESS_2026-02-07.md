@@ -1,14 +1,14 @@
-# Phase 5 Progress Report — SportZens Workflows/UI Implementation
+# Phase 5 Progress Report — Sport Workflows/UI Implementation
 
 **Date:** 2026-02-07  
-**Session:** Continuation of SPORTZENS_PARITY_v2  
+**Session:** Continuation of SPORT_PARITY_v2  
 **Author:** AI Agent (Autonomous Implementation)
 
 ---
 
 ## Session Objective
 
-Continue implementation according to SPORTZENS_PARITY_v2.md instructions, focusing on Phase 5: SportZens Workflows/UI (without WOW).
+Continue implementation according to sport_parity_v2.md instructions, focusing on Phase 5: Sport Workflows/UI (without WOW).
 
 ## Work Completed This Session
 
@@ -32,7 +32,7 @@ Continue implementation according to SPORTZENS_PARITY_v2.md instructions, focusi
 - ✅ Converted form buttons: Cancel → `t('COMMON.cancel')`, Add → `t('KLASSEN.button-hinzufuegen')`
 
 **Impact:**
-- Dashboard now uses 15+ i18n keys from SportZens APK parity-spec
+- Dashboard now uses 15+ i18n keys from Sport APK parity-spec
 - Demonstrates i18n pattern for other views to follow
 - No hardcoded German strings in converted sections
 
@@ -45,7 +45,7 @@ Continue implementation according to SPORTZENS_PARITY_v2.md instructions, focusi
   - Countdown timer (configurable minutes/seconds)
   - Stopwatch with lap times
   - Interval timer (work/rest periods with rounds)
-- ✅ **Full i18n integration:** Uses TIMER.* keys from SportZens locale files
+- ✅ **Full i18n integration:** Uses TIMER.* keys from Sport locale files
 - ✅ **Controls:** Start, Pause, Resume, Reset
 - ✅ **Visual feedback:** Warning states, phase indicators (work/rest)
 - ✅ **Audio:** Configurable beep sounds using Web Audio API
@@ -95,7 +95,7 @@ Continue implementation according to SPORTZENS_PARITY_v2.md instructions, focusi
 
 ## PARITY_MATRIX Progress
 
-### SportZens Workflows — Status Update
+### Sport Workflows — Status Update
 
 | Workflow | File | Status | i18n | Notes |
 |----------|------|--------|------|-------|
@@ -151,27 +151,27 @@ Continue implementation according to SPORTZENS_PARITY_v2.md instructions, focusi
 
 3. **Phase 5.5:** Implement advanced features
    - **Sportabzeichen** (badge tracking + PDF overview export)
-   - **Bundesjugendspiele** (federal sports games tracking)
+   - **Bundesjugendspiele** (federal Sports games tracking)
    - **Tournaments** (bracket generation, match tracking)
 
 4. **Phase 5.6:** i18n Audit
    - Convert remaining views to use i18n keys
    - Eliminate all hardcoded strings
-   - Verify ~850-950 SportZens keys are accessible in UI
+   - Verify ~850-950 Sport keys are accessible in UI
 
 ### Medium Term (Phase 6-8)
 
-5. **Phase 6:** KURT Data Layer
+5. **Phase 6:** KBR Data Layer
    - Exam builder (simple/complex modes)
    - Candidate management
    - Grade key engine
 
-6. **Phase 7:** KURT Correction UI
+6. **Phase 7:** KBR Correction UI
    - Compact correction mask
    - AWK mode (task-wise correction)
    - Alternative grading (++/+/0/-/--)
 
-7. **Phase 8:** KURT Advanced
+7. **Phase 8:** KBR Advanced
    - Fördertipps DB + QR generation
    - PDF export (4 layouts)
    - Email templates

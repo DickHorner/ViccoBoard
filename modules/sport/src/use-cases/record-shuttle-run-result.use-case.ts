@@ -3,7 +3,7 @@
  * Records a shuttle run test result for a student
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { PerformanceEntryRepository } from '../repositories/performance-entry.repository.js';
 import type { ShuttleRunConfigRepository } from '../repositories/shuttle-run-config.repository.js';
 import { ShuttleRunService } from '../services/shuttle-run.service.js';

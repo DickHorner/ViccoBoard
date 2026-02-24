@@ -7,7 +7,7 @@
 | Age-based standards applied | VERIFIED | [SportabzeichenService.ts#L41-L56](../../../modules/sport/src/services/sportabzeichen.service.ts#L41-L56) | calculateAgeFromBirthYear() used in UI |
 | Badge achievements accurate | VERIFIED | [SportabzeichenService.ts#L70-L92](../../../modules/sport/src/services/sportabzeichen.service.ts#L70-L92) | evaluatePerformance() validates against age/gender-specific standards |
 | PDF shows all students | VERIFIED | [SportabzeichenService.ts#L158-L186](../../../modules/sport/src/services/sportabzeichen.service.ts#L158-L186) | generateOverviewPdf() creates multi-student report |
-| Historical data available | VERIFIED | [SportabzeichenGradingEntry.vue#L217-L223](../../../apps/teacher-ui/src/views/SportabzeichenGradingEntry.vue#L217-L223) | Results loaded via sport bridge on mount |
+| Historical data available | VERIFIED | [SportabzeichenGradingEntry.vue#L217-L223](../../../apps/teacher-ui/src/views/SportabzeichenGradingEntry.vue#L217-L223) | Results loaded via Sport bridge on mount |
 
 ## Implementation Summary
 
@@ -74,7 +74,7 @@
 ### Module Boundaries
 - ✅ No `from '../db'` imports in teacher-ui (audit clean)
 - ✅ No `useDatabase()` calls in app layer (audit clean)
-- ✅ UI accesses sport logic only via useSportBridge
+- ✅ UI accesses Sport logic only via useSportBridge
 - ✅ Use case properly encapsulates domain logic
 - ✅ Student data accessed via centralized students module
 
@@ -142,7 +142,7 @@ All mandatory gates passed:
 - Use case integration: **VERIFIED** (proper repository usage, service orchestration)
 - UI integration: **VERIFIED** (bridge usage, service calls, PDF download logic)
 - Runtime behavior: **NOT VERIFIED** (requires manual UI execution)
-- PDF generation (service): **VERIFIED** (`modules/sport/tests/sportabzeichen.service.test.ts#L117-L130`); UI download / manual PDF inspection: **NOT VERIFIED**
+- PDF generation (service): **VERIFIED** (`modules/sport/tests/Sportabzeichen.service.test.ts#L117-L130`); UI download / manual PDF inspection: **NOT VERIFIED**
 - Results persistence: **NOT VERIFIED** (requires runtime database interaction)
 
 ## Remaining Blockers
@@ -152,5 +152,5 @@ Runtime/manual verification is still pending for UI flow and downloaded PDF insp
 ## Next Steps
 
 1. **Manual Runtime Verification**: Execute test procedure above in running app
-2. **Update Parity Ledger**: Update `docs/parity-spec/sportzens-apk/_ledger/PARITY_MATRIX.csv` row for `grade_sportabzeichen` workflow
+2. **Update Parity Ledger**: Update `docs/parity-spec/sport-apk/_ledger/PARITY_MATRIX.csv` row for `grade_Sportabzeichen` workflow
 3. **Close P4-3**: Mark issue complete after runtime verification confirms UI/PDF behavior

@@ -10,7 +10,7 @@ import { InitialSchemaMigration } from '@viccoboard/storage/node';
 import { GradingSchemaMigration } from '@viccoboard/storage/node';
 import { ToolSessionsSchemaMigration } from '@viccoboard/storage/node';
 import type { StorageAdapter } from '@viccoboard/storage/node';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';

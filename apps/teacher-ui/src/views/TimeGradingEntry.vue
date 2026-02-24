@@ -172,10 +172,10 @@ import { useRoute } from 'vue-router';
 import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { Sport } from '@viccoboard/core';
+import type { Sport} from '@viccoboard/core';
 
 const route = useRoute();
-const { sportBridge, gradeCategories, performanceEntries } = useSportBridge();
+const { SportBridge, gradeCategories, performanceEntries } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 
@@ -381,7 +381,7 @@ async function saveStudentTime(studentId: string) {
   
   saving.value = true;
   try {
-    await sportBridge.value?.recordGradeUseCase.execute({
+    await SportBridge.value?.recordGradeUseCase.execute({
       studentId,
       categoryId,
       measurements: { time: seconds },

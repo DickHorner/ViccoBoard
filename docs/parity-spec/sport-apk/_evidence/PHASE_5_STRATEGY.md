@@ -1,9 +1,9 @@
-# Phase 5 Implementation Strategy — SportZens Workflows/UI
+# Phase 5 Implementation Strategy — Sport Workflows/UI
 
-**Phase:** 5 — SportZens Workflows/UI Implementation  
+**Phase:** 5 — Sport Workflows/UI Implementation  
 **Status:** 🚧 IN PROGRESS  
 **Start Date:** 2026-02-07  
-**Gate Condition:** All 15+ major SportZens workflows must be functional with UI screens
+**Gate Condition:** All 15+ major Sport workflows must be functional with UI screens
 
 ---
 
@@ -29,8 +29,8 @@
 | Shuttle Run UI | SHUTTLE | 🟡 MEDIUM | Table-based grading workflow |
 | Multistop Timer | MULTISTOP | 🟡 MEDIUM | Multi-stopwatch tool |
 | Middle Distance | MITTELSTRECKE | 🟡 MEDIUM | Time-based grading |
-| Sportabzeichen | SPORTABZEICHEN | 🟡 MEDIUM | Badge tracking + PDF export |
-| Bundesjugendspiele | BUNDESJUGENDSPIELE | 🟡 MEDIUM | Federal sports games tracking |
+| Sportabzeichen | SportABZEICHEN | 🟡 MEDIUM | Badge tracking + PDF export |
+| Bundesjugendspiele | BUNDESJUGENDSPIELE | 🟡 MEDIUM | Federal Sports games tracking |
 | King Tournament | KAISER, KING | 🟢 LOW | Tournament bracket |
 | Team Builder | TEAM | 🟡 MEDIUM | Random team generation |
 | Tournaments | TOURNAMENTS | 🟢 LOW | Tournament management |
@@ -48,7 +48,7 @@
 ## Implementation Phases (Sequential)
 
 ### 🎯 Phase 5.1: Student Management (High Priority)
-**Gate:** Student List view must be fully functional with all SportZens features
+**Gate:** Student List view must be fully functional with all Sport features
 
 **Tasks:**
 1. ✅ Analyze `StudentList.vue` current state (stub)
@@ -130,7 +130,7 @@
 ---
 
 ### 🎯 Phase 5.5: Tools Integration
-**Gate:** All SportZens tools must be accessible and functional
+**Gate:** All Sport tools must be accessible and functional
 
 **Subtasks:**
 1. ⏳ **Timer** (TIMER.* ~25 keys)
@@ -160,7 +160,7 @@
 **Gate:** Sportabzeichen, Bundesjugendspiele, Tournaments, Feedback
 
 **Subtasks:**
-1. ⏳ **Sportabzeichen** (SPORTABZEICHEN.* ~25 keys)
+1. ⏳ **Sportabzeichen** (SportABZEICHEN.* ~25 keys)
    - Badge tracking (Bronze/Silver/Gold)
    - Discipline requirements
    - PDF overview export
@@ -244,7 +244,7 @@
    - Data backup: ✅ (basic, full in Phase 9)
 
 8. **i18n Integration:**
-   - All ~170 SportZens i18n keys used in UI
+   - All ~170 Sport i18n keys used in UI
    - No hardcoded strings
    - Missing key handler working
 

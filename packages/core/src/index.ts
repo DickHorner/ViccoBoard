@@ -47,7 +47,7 @@ export type { ExportOptions as PluginExportOptions } from './interfaces/plugins.
 // Domain-specific types under namespaces to avoid collisions
 export * as Sport from './interfaces/sport.types.js';
 export * as Exams from './interfaces/exam.types.js';
-export * as SportZens from './interfaces/sportzens.types.js';
+export * as SportSchema from './interfaces/sport-schema.types.js';
 
 // Validators
 export * from './validators/exam.validator.js';

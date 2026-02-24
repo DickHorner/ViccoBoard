@@ -90,7 +90,7 @@ import { MittelstreckeGradingService } from '@viccoboard/sport';
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
-const { sportBridge } = useSportBridge();
+const { SportBridge } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
 const mittelstreckeService = new MittelstreckeGradingService();
@@ -115,7 +115,7 @@ async function loadData() {
   loading.value = true;
   try {
     // Load category
-    const category = await sportBridge.value?.gradeCategoryRepository.findById(categoryId) ?? null;
+    const category = await SportBridge.value?.gradeCategoryRepository.findById(categoryId) ?? null;
     if (!category) {
       toast.error('Kategorie nicht gefunden');
       router.back();
@@ -127,11 +127,11 @@ async function loadData() {
     students.value = await studentRepository.value?.findByClassGroup(category.classGroupId) ?? [];
 
     // Load tables
-    tables.value = await sportBridge.value?.tableDefinitionRepository.findAll() ?? [];
+    tables.value = await SportBridge.value?.tableDefinitionRepository.findAll() ?? [];
 
     // Load existing performance entries
-    const entries = await sportBridge.value?.performanceEntryRepository.findByCategory(categoryId) ?? [];
-    entries.forEach((entry) => {
+    const entries = await SportBridge.value?.performanceEntryRepository.findByCategory(categoryId) ?? [];
+    entries.forEach((entry: any) => {
       existingEntries.value[entry.studentId] = entry;
       if (entry.measurements?.timeInSeconds) {
         times.value[entry.studentId] = formatSecondsToTime(entry.measurements.timeInSeconds);
@@ -231,9 +231,9 @@ async function saveAll() {
         timeFormatted: timeStr
       };
       
-      if (sportBridge.value) {
+      if (SportBridge.value) {
         savePromises.push(
-          sportBridge.value.recordGradeUseCase.execute({
+          SportBridge.value.recordGradeUseCase.execute({
             studentId: student.id,
             categoryId: categoryId,
             measurements,

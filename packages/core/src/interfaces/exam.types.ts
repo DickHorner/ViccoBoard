@@ -1,5 +1,5 @@
 /**
- * KURT Domain Types
+ * KBR Domain Types
  * All types specific to exam creation, correction, and assessment
  */
 

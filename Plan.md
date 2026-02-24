@@ -1,9 +1,9 @@
-# Plan.md — Unified Teacher Suite (SportZens + KURT)
+# Plan.md — Unified Teacher Suite (Sport + KBR)
 
 ## 1) Zielbild & harte Constraints
 Wir bauen eine **einzige** App, die den **vollen Funktionsumfang** von:
-- **SportZens** (Organisation, Bewertung, Live-Unterrichtstools, WOW, Security/Local-first) und
-- **KURT** (Prüfungen strukturieren, Korrigieren, Auswerten, Rückmeldebögen, Versand/Sharing, Langzeit-Übersicht)
+- **Sport** (Organisation, Bewertung, Live-Unterrichtstools, WOW, Security/Local-first) und
+- **KBR** (Prüfungen strukturieren, Korrigieren, Auswerten, Rückmeldebögen, Versand/Sharing, Langzeit-Übersicht)
 
 in einem konsistenten System vereint.
 
@@ -43,11 +43,11 @@ Diese App wird **primär** für iPadOS (Safari/WebKit) gebaut. Das beeinflusst i
 - **Backup/Restore**: Export/Import kompletter Datenbestand + selektive Exporte (z. B. nur Prüfungsentwürfe). **Pflicht:** sichtbarer Backup-Status + Reminder (iPadOS-Persistenz-Risiko).
 - **Import/Export Hub**: CSV/PDF/„Share Packages“ (für Austausch ohne Cloud). (iPadOS: Export immer als Download/Share, Import über Datei-Auswahl; keine File-System-Write APIs).
 - **Templates**: Tabellen-/CSV-Vorlagen, Druckpresets, E-Mail-Templates.
-- **Analytics Engine**: aggregierte Statistiken (SportZens-Statistik + KURT-Auswertung), ohne personenbezogene Daten nach außen.
+- **Analytics Engine**: aggregierte Statistiken (Sport-Statistik + KBR-Auswertung), ohne personenbezogene Daten nach außen.
 - **Plugin Registry**: Registrierung von Tools (Timer, Scoreboard…), Assessment-Typen, Exportern und Integrationen.
 
 ### 2.2 Domänenmodule
-**Sport-Unterricht (SportZens):**
+**Sport-Unterricht (Sport):**
 - Klassen, Schüler, Stunden, Anwesenheiten
 - Notenschemata & Notenkategorien (Kriterien, Zeit, Cooper) + Verbalbeurteilungen
 - Tabellen (inkl. „einfache Tabellen“), CSV-Import/Export, Schüler-Import
@@ -56,7 +56,7 @@ Diese App wird **primär** für iPadOS (Safari/WebKit) gebaut. Das beeinflusst i
 - Feedback (mehrere Methoden, am Lehrertablet) + Statistiken
 - WOW: Workouts erstellen, Web-Eingabe durch Schüler, Fortschritt abrufen, Schüler-Übersichten
 
-**Prüfungen/Korrektur (KURT):**
+**Prüfungen/Korrektur (KBR):**
 - Prüfungen anlegen (einfach/komplex, 3 Ebenen, Wahlaufgaben, Kriterienformatierung, Prüfungsteile, Bonuspunkte)
 - Notenschlüssel/Benotungsoptionen inkl. Prozentgrenzen, Presets, Rundung, Fehlerpunkte→Aufgabennote
 - Korrekturflows: kompakte Maske, Tab-Navigation, aufgabenweise (Tabellenmodus/AWK), Kommentarboxen, ++/+…-Bepunktung, schneller Prüflingswechsel
@@ -76,7 +76,7 @@ Diese App wird **primär** für iPadOS (Safari/WebKit) gebaut. Das beeinflusst i
 
 ### 3.2 Plugin/Capability-System
 Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
-- `AssessmentType` (z. B. Sport-Kriteriennote, Zeitnote, Cooper-Test, Sportabzeichen; KURT-Aufgabenstruktur).
+- `AssessmentType` (z. B. Sport-Kriteriennote, Zeitnote, Cooper-Test, Sportabzeichen; KBR-Aufgabenstruktur).
 - `ToolPlugin` (Timer, Scoreboard, Taktikboard, Würfeln…)
 - `Exporter` (PDF-Rückmeldebogen, PDF-Tabellen, CSV-Export, Share-Package)
 - `Integration` (WebUntis-Import, Notenapp-Clipboard, Teilen mit anderen Nutzern)
@@ -108,12 +108,12 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 ### 4.1 Kern-Entitäten
 - **TeacherAccount** (lokal): Security-Settings (PIN, Passwortänderung, DB-Passwort, Lock-Policy).
 - **ClassGroup**: Name, Schuljahr, Bundesland/Ferienkalender-Ref, Notenschema (Sport), optional Fächerprofil.
-- **Student**: Stammdaten inkl. Geburtsjahr, Geschlecht (für Import), Foto; Kontaktinfos (für KURT-Mailversand optional).
+- **Student**: Stammdaten inkl. Geburtsjahr, Geschlecht (für Import), Foto; Kontaktinfos (für KBR-Mailversand optional).
 - **Lesson**: Datum, Stundenteile-Doku, Shortcuts/Verknüpfungen, Zufallsschüler-Auswahl-Seed/History.
 - **AttendanceRecord**: Status (anwesend/fehlend/passiv/etc.), Begründung optional; Export-Flags.
 - **StatusCatalog / CriteriaCatalog**: benutzerdefinierbare Status- und Kriterienkataloge pro Kontext (z. B. Anwesenheit, Mitarbeit), inkl. Sortierung, Aktiv-Flag, Anzeige-Metadaten.
 
-### 4.2 Assessment-Entitäten (SportZens)
+### 4.2 Assessment-Entitäten (Sport)
 - **GradeScheme (Sport)**: pro Klasse.
 - **GradeCategory (Sport)**: Typ (Kriterien/Zeit/Cooper/Sportabzeichen/BJS/…); Parameter (z. B. bis 8 Kriterien + Gewichtung; Best/Worst Note; Sportart Laufen/Schwimmen).
 - **PerformanceEntry**: Messwert(e) + berechnete Note + Meta (Zeitstempel, Gerät, Kommentar).
@@ -125,7 +125,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - **DiceLogEntry** (Würfeln: Bereich + Ergebnis + Timestamp)
 - **TacticsBoardSnapshot** (Sportart, Markierungen, Version)
 
-### 4.3 Exam-Entitäten (KURT)
+### 4.3 Exam-Entitäten (KBR)
 - **Exam**: Struktur, Modus (einfach/komplex), Notenschlüssel-Config, Druckpresets.
 - **ExamPart**: Prüfungsteile (Teilpunkte/Teilnoten, optional druckbar).
 - **TaskNode**: 1–3 Ebenen, beliebige Anzahl (komplex), Unteraufgaben, Wahlaufgaben, Bonuspunkte.
@@ -139,12 +139,12 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 ---
 
 ## 5) UI-Informationsarchitektur (Navigation)
-- **Dashboard**: Klassen (Sport), Prüfungen (KURT), Schnellzugriff auf letzte Stunde / letzte Korrektur.
+- **Dashboard**: Klassen (Sport), Prüfungen (KBR), Schnellzugriff auf letzte Stunde / letzte Korrektur.
 - **Klasse**:
   - Übersicht, Schülerliste, Stundenliste, Notenschema, Notenkategorien, Tabellen, WOW, Tools, Statistiken.
 - **Schülerprofil**:
   - Sport: Entwicklung, Fehlzeiten, WOW-Übersicht.
-  - KURT: Prüfungen, Kommentare, Fördertipps, Langzeitnotizen.
+  - KBR: Prüfungen, Kommentare, Fördertipps, Langzeitnotizen.
 - **Prüfung**:
   - Setup (Struktur), Korrektur (2 Modi), Auswertung, Export/Druck, Versand, Sharing.
 - **Einstellungen**:
@@ -164,7 +164,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] **Backups verwalten** (Export/Import).
 - [ ] **Einstellungen**: Shuttle-Run-Konfiguration importieren/verwenden, Sprache, Einrichtungshilfe.
 
-### 6.2 SportZens — Kernverwaltung (Klassen/Schüler/Stunden/Fehlzeiten)
+### 6.2 Sport — Kernverwaltung (Klassen/Schüler/Stunden/Fehlzeiten)
 - [ ] **Klasse anlegen**.
 - [ ] **Notenschema pro Klasse wählen**.
 - [ ] **Stunden automatisch anlegen** (Ferien berücksichtigt).
@@ -185,7 +185,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Stunden: **Direktsprünge** zu Tools/Funktionen.
 - [ ] Stunden: **Zufälligen Schüler auswählen**.
 
-### 6.3 SportZens — Benotung & Bewertungssystem
+### 6.3 Sport — Benotung & Bewertungssystem
 - [ ] **Notenschemata**: pro Klasse auswählbar.
 - [ ] **Notenkategorien: Noten nach Kriterien**:
   - [ ] bis zu **8 Kriterien** definieren
@@ -202,7 +202,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] **Verbalbeurteilungen** (eigener Funktionspunkt; Detail-Spezifikation TBD, aber Feature muss existieren).
 - [ ] **Kriterienkataloge bereichsübergreifend**: eigene Kriterien in verschiedenen Bereichen definierbar (u. a. Anwesenheit/Verhalten/Mitarbeit), inkl. Wiederverwendung pro Klasse.
 
-### 6.4 SportZens — Tabellen & CSV (Import/Export)
+### 6.4 Sport — Tabellen & CSV (Import/Export)
 - [ ] Unterscheidung **„einfache Tabellen“ vs „Tabellen“**.
 - [ ] **Lokale Tabellen auswählen & anpassen**.
 - [ ] **Tabellen-Vorlagen herunterladen/anpassen/importieren** (CSV).
@@ -211,7 +211,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Android-Import-Hinweis/Pfad-Hilfe (als UX-Hilfe in App).
 - [ ] **Schüler-Import per CSV** inkl. Geschlecht & Geburtsjahr.
 
-### 6.5 SportZens — Test- & Mess-Workflows
+### 6.5 Sport — Test- & Mess-Workflows
 - [ ] **Shuttle-Run**:
   - [ ] Start–Stop–Fertig; Stopp je Schüler beim Aufhören
   - [ ] Auswertung automatisiert mit Tabelle (Vorlage/lokal)
@@ -233,25 +233,25 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
   - [ ] Leistungen erfassen und auswerten
   - [ ] optionale Tabelle → automatische Einbindung als Note
 
-### 6.6 SportZens — Live-Unterrichtstools
+### 6.6 Sport — Live-Unterrichtstools
 - [ ] **Teams einteilen** (digital, schnell, fair).
 - [ ] **Turnierplanung** (planen & durchführen).
 - [ ] **Scoreboard** (Spielstände erfassen).
 - [x] **Timer** (Zeiten stoppen). ✅ P4-4 COMPLETE
-- [ ] **Taktikboard**: Top-Down-Ansicht + sportartspezifische Annotation/Markierungen.
+- [ ] **Taktikboard**: Top-Down-Ansicht + Sportartspezifische Annotation/Markierungen.
 - [ ] **Würfeln**: Zahlenbereich wählen + Ergebnisse loggen.
 
-### 6.7 SportZens — Feedback & Statistiken
+### 6.7 Sport — Feedback & Statistiken
 - [ ] **Feedback**: mehrere Methoden, direkt am Lehrertablet.
 - [ ] **Statistiken**: Überblick über geleistete Arbeit/Nutzung.
 
-### 6.8 SportZens — WOW
+### 6.8 Sport — WOW
 - [ ] Workouts erstellen & bereitstellen.
 - [ ] Schüler tragen Ergebnisse **über Browser** ein (ohne Registrierung/ohne App).
 - [ ] Lehrkraft ruft Ergebnisse/Fortschritt ab.
 - [ ] WOW-Übersichten in App (auch pro Schüler).
 
-### 6.9 KURT — Prüfungen anlegen (Strukturen)
+### 6.9 KBR — Prüfungen anlegen (Strukturen)
 - [ ] Prüfungen mit Unteraufgaben und komplexen Bausteinen (Darstellungsleistung, Schreibaufgabe, Kriterien, Unterkriterien, Wahlaufgaben, Kommentare, Prüfungsteile, Bonuspunkte).
 - [ ] **Einfacher vs. komplexer Aufgabenmodus**:
   - [ ] Einfach (Standard)
@@ -261,7 +261,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Pro Aufgabe festlegen, ob Aufgabenkommentare oder Fördertipps vergeben werden sollen.
 - [ ] **Prüfungsteile** definieren; Teilpunkte/Teilnoten automatisch; optional mitdruckbar.
 
-### 6.10 KURT — Benotung/Notenschlüssel
+### 6.10 KBR — Benotung/Notenschlüssel
 - [ ] Verschiedene Notenschlüssel schnell einsetzbar; flexible Benotungsoptionen.
 - [ ] Nach der Korrektur Notenschlüssel/Optionen ohne Datenverlust anpassbar.
 - [ ] Notengrenzen per Prozentwerten anpassbar, auch nachträglich; zurücksetzbar.
@@ -270,7 +270,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Finetuning (z. B. Rundungslogik).
 - [ ] Optional: „Fehlerpunkte → Aufgabennote“.
 
-### 6.11 KURT — Korrigieren (Flows & Modi)
+### 6.11 KBR — Korrigieren (Flows & Modi)
 - [ ] Kompakte Korrekturmaske: Auto-Gesamtpunkte/Note, minimierte Verrechnungsfehler.
 - [ ] Anzeige: Punkte bis zur nächsten Notenstufe.
 - [ ] Tab-Navigation in Punktefelder.
@@ -283,7 +283,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Im komplexen Modus: drei Aufgabenebenen in UI/Logik.
 - [ ] Schnelles Wechseln zwischen Prüflingen.
 
-### 6.12 KURT — Fördertipps (DB, Zuweisung, QR, Auswertung)
+### 6.12 KBR — Fördertipps (DB, Zuweisung, QR, Auswertung)
 - [ ] Fördertipps aufgabenbezogen oder allgemein; persönliche Datenbank.
 - [ ] Nach Korrektur: Überblick wem/wann/wo Tipps; Auswertung Handlungs-/Übungsbedarf (Klasse/Individuum).
 - [ ] Pro Fördermöglichkeit: Titel, Kurzbeschreibung, optionale Kategorien.
@@ -294,23 +294,23 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Dropdown-Vorschau: Name, Beschreibungsvorschau, Anzahl vergebener Tipps, Kategorie; häufige Tipps oben.
 - [ ] Fördertipps pro Aufgabenebene nutzbar oder für Ebenen/Aufgaben deaktivierbar.
 
-### 6.13 KURT — Auswertung & nachträgliche Anpassung
+### 6.13 KBR — Auswertung & nachträgliche Anpassung
 - [ ] Schwierigkeit: welche Aufgaben/Unteraufgaben/Kriterien schwierig; Streuungen; Bewertungskorridore.
 - [ ] Punkteänderungsassistent: Aufgabengewichtungen anpassen, Punkteverhältnisse erhalten.
 - [ ] Notenschlüssel nachträglich anpassen; Noten ändern automatisch.
 - [ ] Ergebnis-/Auswertungstabellen sortierbar: Korrekturreihenfolge, Name, Punkte, Aufgabenpunkte; Sortierung nach (Unter-)Aufgabe.
 
-### 6.14 KURT — Langzeit-Überblick & Notizen
+### 6.14 KBR — Langzeit-Überblick & Notizen
 - [ ] Schuljahres-Überblick zur Entwicklung von Kompetenzbereichen.
 - [ ] Interne Notizen für Entwicklungen/Förderschwerpunkte.
 - [ ] Pro Prüfling Überblick: Aufgaben-/Endkommentare & Fördertipps.
 
-### 6.15 KURT — Rückmeldung/Kommentare
+### 6.15 KBR — Rückmeldung/Kommentare
 - [ ] Aufgabenbezogene oder allgemeine Kommentare als individuelle Rückmeldung.
 - [ ] Kommentare bleiben nach Rückgabe verfügbar.
 - [ ] Kommentare anderer SuS derselben Prüfung einsehen und wiederverwenden.
 
-### 6.16 KURT — Export & Druck (PDF)
+### 6.16 KBR — Export & Druck (PDF)
 - [ ] PDF-Rückmeldebögen inkl. Teilpunkte, Kommentare, Fördertipps, Unterschrift, Schullogo.
 - [ ] Mit einem Klick alle PDFs erzeugen.
 - [ ] Drucklayouts: **vier** Layouts.
@@ -319,30 +319,30 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Punktabzüge anzeigen oder deaktivieren.
 - [ ] Unterschrift: Bilddatei, per Hand malen, oder leer.
 
-### 6.17 KURT — Besondere Schülerleistungen markieren
+### 6.17 KBR — Besondere Schülerleistungen markieren
 - [ ] Während Korrektur markieren; Bild und/oder Wortlaut dokumentieren.
 - [ ] Übersicht nach Aufgabe & Kategorie.
 - [ ] Namen ausblendbar (Anonymisierung).
 
-### 6.18 KURT — E-Mail-Versand
+### 6.18 KBR — E-Mail-Versand
 - [ ] Ergebnisse per E-Mail an Schüler und/oder Eltern.
 - [ ] E-Mail enthält Noten- und Aufgabenergebnisse; Platzhalter automatisch korrekt befüllen.
 
-### 6.19 KURT — Gruppenweise korrigieren & Splitscreen
+### 6.19 KBR — Gruppenweise korrigieren & Splitscreen
 - [ ] Gruppenkorrektur im Splitscreenmodus (Referate/mündlich).
 - [ ] Vollbildmodus; bis zu vier Prüflinge gleichzeitig.
 - [ ] Thema für Referate/mündliche Prüfungen festlegen.
 
-### 6.20 KURT — Zusammenarbeit/Kompatibilität
+### 6.20 KBR — Zusammenarbeit/Kompatibilität
 - [ ] Lerngruppen aus WebUntis importieren.
 - [ ] Prüfungsnoten in Notenapps kopieren; Notenspiegel kopieren.
 - [ ] Fördermöglichkeiten oder Prüfungsentwürfe mit anderen Nutzern teilen.
 - [ ] Notenspalte kopieren (Excel/Notenprogramme).
 
-### 6.21 KURT — Unterstützte Bewertungsformate
+### 6.21 KBR — Unterstützte Bewertungsformate
 - [ ] Abdeckung der genannten Formate: Mappen, Portfolios, Referate, Tests, Facharbeiten, mündliche Prüfungen etc.
 
-### 6.22 KURT — Oberstufenklausuren & Erwartungshorizont-Workflow
+### 6.22 KBR — Oberstufenklausuren & Erwartungshorizont-Workflow
 - [ ] Aufgabenaspekte/Unterkriterien feiner beschreibbar.
 - [ ] Kriterien/Aufgabenaspekte formatierbar.
 - [ ] Copy & Paste aus Word: Formatierungen bleiben erhalten (best effort).
@@ -364,7 +364,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - App-Lock (PIN/Passwort), Password-change, DB-Passwort.
 - Backup/Restore-End-to-End.
 
-### Schritt 3 — SportZens Core (Klassen/Schüler/Stunden/Fehlzeiten)
+### Schritt 3 — Sport Core (Klassen/Schüler/Stunden/Fehlzeiten)
 - UI + Domain-Model + Export.
 - Konfigurierbare Statuskataloge für Anwesenheit (add/rename/disable/reorder) als Pflichtbestandteil.
 
@@ -374,12 +374,12 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - Shuttle-Run/Cooper/Mittelstrecke/Sportabzeichen/BJS.
 - Tools: Teams, Turnier, Scoreboard, Timer, Taktikboard, Würfeln.
 
-### Schritt 5 — KURT Core (Exam Builder + Correction)
+### Schritt 5 — KBR Core (Exam Builder + Correction)
 - Exam-Model (einfach/komplex) + UI.
 - Correction UI (kompakt + AWK/Tabellenmodus).
 - Notenschlüssel-Engine (Prozentgrenzen, Presets, Rundung, nachträglich).
 
-### Schritt 6 — KURT Extras (Fördertipps, Auswertung, Export, Versand)
+### Schritt 6 — KBR Extras (Fördertipps, Auswertung, Export, Versand)
 - Fördertipps-DB + QR + Gewichtung.
 - Auswertungen + Punkteänderungsassistent.
 - PDF-Renderer (4 Layouts, Presets, Logo, Signatur-Optionen).
@@ -403,10 +403,10 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 
 ## 9) Offene Spezifikationspunkte (ohne Raten)
 Damit wir nichts erfinden, aber trotzdem 100% implementieren können, brauchen diese Punkte später noch Detail-Input (als Mini-Spez in separaten Dateien):
-1. **Verbalbeurteilungen**: Felder/Skalen/Exportformat (SportZens nennt es als Funktionspunkt, Details fehlen).
-2. **Turnierplanung/Scoreboard**: genaue Turnierformate, Regeln, Spielplan-Algorithmen (SportZens nennt den Funktionspunkt, Details sind knapp).
+1. **Verbalbeurteilungen**: Felder/Skalen/Exportformat (Sport nennt es als Funktionspunkt, Details fehlen).
+2. **Turnierplanung/Scoreboard**: genaue Turnierformate, Regeln, Spielplan-Algorithmen (Sport nennt den Funktionspunkt, Details sind knapp).
 3. **WebUntis-Import**: gewünschter Importweg (CSV-Export vs API) und Feld-Mapping.
-4. **E-Mail-Versand**: Welche Platzhalter genau? (KURT sagt „Platzhalter automatisch korrekt befüllt“, ohne Liste).
+4. **E-Mail-Versand**: Welche Platzhalter genau? (KBR sagt „Platzhalter automatisch korrekt befüllt“, ohne Liste).
 5. **[CRITICAL] Storage Architecture Migration (Phase 4)**: teacher-ui currently uses custom Dexie (IndexedDB) instance directly, violating modular boundaries. Must be refactored to:
    - Use `@viccoboard/storage` package's `IndexedDBStorage` instead of custom Dexie
    - Access domain repositories through proper bridges (see `modules/sport/src/repositories/` and `modules/students/src/repositories/`)

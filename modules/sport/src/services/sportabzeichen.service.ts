@@ -1,4 +1,4 @@
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 export interface SportabzeichenPerformanceInput {
@@ -60,7 +60,7 @@ export class SportabzeichenService {
    * the performance value must be greater than or equal to the threshold (e.g.,
    * distance or count-based disciplines where higher is better).
    * 
-   * @param standards - Array of applicable sportabzeichen standards to evaluate against
+   * @param standards - Array of applicable Sportabzeichen standards to evaluate against
    * @param input - The student's performance input containing discipline ID, gender, age, and performance value
    * @returns The highest level achieved that meets the performance threshold, or 'none' if no threshold is met
    */
@@ -90,7 +90,7 @@ export class SportabzeichenService {
   }
 
   /**
-   * Builds a sportabzeichen result from student performance data.
+   * Builds a Sportabzeichen result from student performance data.
    * 
    * Calculates the student's age from their birth year at the test date,
    * evaluates their performance against applicable standards, and returns
@@ -104,7 +104,7 @@ export class SportabzeichenService {
    *   - performanceValue: The numeric performance value achieved
    *   - unit: The unit of measurement for the performance (e.g., 'seconds', 'meters')
    *   - testDate: Optional reference date for age calculation (defaults to today)
-   *   - standards: Array of sportabzeichen standards to evaluate against
+   *   - standards: Array of Sportabzeichen standards to evaluate against
    * @returns A partial SportabzeichenResult object with id, createdAt, and lastModified omitted
    * @see calculateAgeFromBirthYear
    * @see evaluatePerformance
@@ -141,7 +141,7 @@ export class SportabzeichenService {
   }
 
   /**
-   * Calculates the overall sportabzeichen level from individual discipline results.
+   * Calculates the overall Sportabzeichen level from individual discipline results.
    * 
    * Determines the overall achievement level by finding the minimum (weakest) level
    * across all discipline results. This follows the principle that the overall badge
@@ -161,9 +161,9 @@ export class SportabzeichenService {
   }
 
   /**
-   * Generates a PDF document containing an overview of sportabzeichen results.
+   * Generates a PDF document containing an overview of Sportabzeichen results.
    * 
-   * Creates a formatted PDF report displaying the sportabzeichen achievements for multiple
+   * Creates a formatted PDF report displaying the Sportabzeichen achievements for multiple
    * students. The document includes a title, generation timestamp, and for each student:
    * their name, age, gender, overall achievement level, and individual discipline results.
    * Content automatically pages when necessary to fit within page margins.

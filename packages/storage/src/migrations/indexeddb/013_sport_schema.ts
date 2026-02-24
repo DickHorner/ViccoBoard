@@ -1,9 +1,9 @@
 import { IndexedDBMigration } from './indexeddb-migration.js';
 
-export class IndexedDBSportZensSchemaMigration implements IndexedDBMigration {
+export class IndexedDBSportSchemaMigration implements IndexedDBMigration {
   storage: 'indexeddb' = 'indexeddb';
   version = 13;
-  name = 'indexeddb_sportzens_schema';
+  name = 'indexeddb_sport_schema';
 
   up(db: IDBDatabase, _tx: IDBTransaction): void {
     const createStore = (
@@ -26,7 +26,7 @@ export class IndexedDBSportZensSchemaMigration implements IndexedDBMigration {
       { name: 'category_id', keyPath: 'category_id' }
     ]);
 
-    createStore('sportzens_tables', 'id', [
+    createStore('sport_tables', 'id', [
       { name: 'teacher_id', keyPath: 'teacher_id' }
     ]);
 

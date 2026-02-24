@@ -24,7 +24,7 @@ npm install @viccoboard/sport
 
 ```typescript
 import { CriteriaGradingEngine } from '@viccoboard/sport';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 const engine = new CriteriaGradingEngine();
 

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "newDayData (SportZens APK shape)",
+  "title": "newDayData (Sport APK shape)",
   "type": "object",
-  "description": "Extracted from compiled SportZens APK JS bundles by scanning `this.newDayData = {...}` object literals. Key union across 1 observed shapes.",
+  "description": "Extracted from compiled Sport APK JS bundles by scanning `this.newDayData = {...}` object literals. Key union across 1 observed shapes.",
   "properties": {
     "additionalExercises": {
       "type": "array"

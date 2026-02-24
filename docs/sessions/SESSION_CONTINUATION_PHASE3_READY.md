@@ -28,7 +28,7 @@
 - ✅ Architecture compliance COMPLETE - zero legacy imports
 - ✅ Module bridge pattern established (Sport computed refs, Exams direct getters)
 - ✅ All 11 critical code pieces migrated
-- ✅ Critical blockers (examBuilderStore, KURTExamBuilder) fixed
+- ✅ Critical blockers (examBuilderStore, KBRExamBuilder) fixed
 
 ### 2. Development Environment Verified ✅
 
@@ -61,17 +61,17 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
    - Test: Create exam → Save → Navigate away → Reload → Load exam
    - Validation: Data preserved through examRepository bridge
    - Success criteria: Zero errors, data integrity maintained
-   - Estimated impact: Blocks all KURT functionality if broken
+   - Estimated impact: Blocks all KBR functionality if broken
 
 2. **End-to-End Feature Verification**
    - PDF export pipeline test (4 layout variants)
    - Email template rendering test (mailto: launch)
    - Sport grading workflow test (comprehensive flow)
-   - KURT correction workflow test (comprehensive flow)
+   - KBR correction workflow test (comprehensive flow)
 
 3. **Parity Matrix Scan**
-   - SportZens APK feature checklist vs implementation
-   - KURT feature checklist vs implementation  
+   - Sport APK feature checklist vs implementation
+   - KBR feature checklist vs implementation  
    - Identify missing items
    - Expected: ~10-15 items pending
 
@@ -86,7 +86,7 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 1. **Sport Bridge** (useSportBridge)
    - Returns: Computed refs
    - Accessor: Requires `.value`
-   - Example: `sportBridge.value?.method()`
+   - Example: `SportBridge.value?.method()`
 
 2. **Exam Bridge** (useExamsBridge) 
    - Returns: Direct getters
@@ -116,7 +116,7 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 - ExamsOverview.vue ← Uses useExamsBridge
 - CorrectionCompact.vue ← Uses useExamsBridge
 - examBuilderStore.ts ← Uses useExamsBridge (FIXED)
-- KURTExamBuilder.vue ← Uses useExamsBridge (FIXED)
+- KBRExamBuilder.vue ← Uses useExamsBridge (FIXED)
 - All tool views ← No DB access, i18n only
 - All other views ← Compliant
 
@@ -130,7 +130,7 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 **Changes:** 3 fixes across 3 functions  
 **Verification:** Build passes, zero TypeScript errors  
 
-### Blocker #2: KURTExamBuilder.vue
+### Blocker #2: KBRExamBuilder.vue
 **Fixed:** ✅ COMPLETE  
 **Severity:** CRITICAL (exam builder would crash)  
 **Changes:** 3 fixes across 3 functions  
@@ -150,7 +150,7 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 2. **PDF export verification** (all 4 layout variants)
 3. **Email functionality testing** (template rendering, mailto:)
 4. **Sport grading workflows** (complete pipelines)
-5. **Parity validation** (against SportZens APK and original spec)
+5. **Parity validation** (against Sport APK and original spec)
 
 ### ❌ System is NOT ready for:
 1. ~~Phase 3 feature implementation~~ - Most features already built
@@ -216,7 +216,7 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 **Success Criteria:** mailto: launches with correct data
 
 ### Step 4: Sport Grading Workflow Test (1-2 hours)
-**Goal:** Complete sport grading pipeline verification
+**Goal:** Complete Sport grading pipeline verification
 
 **Test Plan:**
 1. Create lesson
@@ -232,8 +232,8 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 **Goal:** Document what's implemented vs what's missing
 
 **Test Plan:**
-1. Compare SportZens APK features against implementation
-2. Compare KURT spec against implementation
+1. Compare Sport APK features against implementation
+2. Compare KBR spec against implementation
 3. Document missing items
 4. Estimate effort for each missing item
 5. Prioritize next work
@@ -251,7 +251,7 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 
 **Architecture References:**
 - [agents.md](../../agents.md) - Team/agent role definitions
-- [docs/agents/SPORTZENS_PARITY_v2.md](../../docs/agents/SPORTZENS_PARITY_v2.md) - Execution protocol
+- [docs/agents/sport_parity_v2.md](../../docs/agents/sport_parity_v2.md) - Execution protocol
 - [ARCHITECTURE_DECISIONS.md](../../ARCHITECTURE_DECISIONS.md) - Design rationale
 - [Plan.md](../../Plan.md) - Feature specification (176 items)
 
@@ -278,7 +278,7 @@ Created clear focus areas based on actual system state (not roadmap assumptions)
 
 **The real work ahead is verification and integration**, not feature implementation. Most features already exist - they just need to be validated end-to-end and any edge cases handled.
 
-**Next session should start with Exam Save/Load Workflow Test** - this is critical path blocker for all KURT functionality.
+**Next session should start with Exam Save/Load Workflow Test** - this is critical path blocker for all KBR functionality.
 
 All documentation has been updated to reflect actual completion status. System is healthy, architecture is sound, and ready to move forward.
 

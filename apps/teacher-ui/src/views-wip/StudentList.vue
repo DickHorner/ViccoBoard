@@ -204,7 +204,7 @@ const newStudent = ref({
 })
 
 // Composables
-const { sportBridge } = useSportBridge()
+const { SportBridge } = useSportBridge()
 const { repository: studentRepository, addStudentUseCase } = useStudents()
 
 // Debounced search for performance
@@ -239,7 +239,7 @@ const loadStudents = async () => {
   loadError.value = ''
   try {
     const studentRepo = studentRepository.value
-    const classGroupRepo = sportBridge.value?.classGroupRepository
+    const classGroupRepo = SportBridge.value?.classGroupRepository
     if (!studentRepo || !classGroupRepo) {
       throw new Error('Bridges are not initialized')
     }

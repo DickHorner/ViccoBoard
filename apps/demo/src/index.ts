@@ -27,7 +27,7 @@ import * as os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 
 async function main() {
-  console.log('🎓 ViccoBoard Demo - SportZens & KURT Unified Suite\n');
+  console.log('🎓 ViccoBoard Demo - Sport & KBR Unified Suite\n');
   console.log('═'.repeat(60));
 
   try {

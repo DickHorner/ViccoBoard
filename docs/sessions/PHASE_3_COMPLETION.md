@@ -18,7 +18,7 @@
   - vue-i18n v9 composition API configuration
 
 - **Locale Files:** 
-  - `apps/teacher-ui/src/i18n/locales/de.json` → ~900+ keys from SportZens APK
+  - `apps/teacher-ui/src/i18n/locales/de.json` → ~900+ keys from Sport APK
   - `apps/teacher-ui/src/i18n/locales/en.json` → Parallel English translations
 
 - **Vue App Integration:**
@@ -138,8 +138,8 @@ Coverage:    Locale loading, key existence, structure validation, parity checks
 
 ### 5.1 NOT STARTED (Optional, AFTER Phase 4)
 - [ ] Integrate i18n into Vue components (global `$t()` usage)
-- [ ] Create i18n usage examples for sport + exam modules
-- [ ] Snapshot tests for 2-3 sport screens (de/en pair)
+- [ ] Create i18n usage examples for Sport + exam modules
+- [ ] Snapshot tests for 2-3 Sport screens (de/en pair)
 - [ ] Measure i18n coverage % vs. PARITY_MATRIX
 - [ ] Migrate from vue-i18n v9 → v11 (when v11 stable for projects)
 
@@ -197,7 +197,7 @@ apps/teacher-ui/
 - Validate data persistence with i18n keys
 
 **Phase 5-9:** Workflow/UI Implementation (~50 workflows)  
-- Integrate i18n into sport module views
+- Integrate i18n into Sport module views
 - Integrate i18n into exam module views  
 - Create component usage examples
 

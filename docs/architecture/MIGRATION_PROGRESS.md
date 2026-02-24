@@ -9,7 +9,7 @@
 
 ## Summary
 
-All 9 views in `apps/teacher-ui/src/views/` have been successfully migrated to use proper module bridges. This ensures compliance with the architecture pattern established in `docs/agents/SPORTZENS_PARITY_v2.md` Section 3 (Boundaries & Module Access).
+All 9 views in `apps/teacher-ui/src/views/` have been successfully migrated to use proper module bridges. This ensures compliance with the architecture pattern established in `docs/agents/sport_parity_v2.md` Section 3 (Boundaries & Module Access).
 
 ---
 
@@ -20,15 +20,15 @@ The successful pattern applied to all views:
 ```typescript
 // BEFORE: Direct DB access
 import { useDatabase } from '../composables/useDatabase'
-const { sportBridge } = useDatabase()
-const data = await sportBridge.value.repository.method()
+const { SportBridge } = useDatabase()
+const data = await SportBridge.value.repository.method()
 
 // AFTER: Through proper bridges
 import { useSportBridge } from '../composables/useSportBridge'
 import { useStudents } from '../composables/useStudents'
-const { sportBridge, gradeCategories, performanceEntries } = useSportBridge()
+const { SportBridge, gradeCategories, performanceEntries } = useSportBridge()
 const { repository: studentRepository } = useStudents()
-const data = await sportBridge.value?.method()  // computed ref = .value accessor
+const data = await SportBridge.value?.method()  // computed ref = .value accessor
 const data = studentRepository?.method()         // direct getter = NO .value
 ```
 
@@ -92,7 +92,7 @@ await recordCorrectionUseCase?.execute(entry)
 **Solution:** Updated all ExamsOverview and CorrectionCompact calls to match interface:
 ```typescript
 // Sport bridge (computed ref - use .value)
-await sportBridge.value?.recordGradeUseCase.execute(...)
+await SportBridge.value?.recordGradeUseCase.execute(...)
 
 // Exams bridge (direct getter - NO .value)
 await examRepository?.findAll()          // NOT examRepository.value?.findAll()
@@ -106,9 +106,9 @@ await recordCorrectionUseCase?.execute() // NOT recordCorrectionUseCase.value?.e
 
 **Solution:** Added null safety guards:
 ```typescript
-if (sportBridge.value) {
+if (SportBridge.value) {
   savePromises.push(
-    sportBridge.value.recordGradeUseCase.execute({...})
+    SportBridge.value.recordGradeUseCase.execute({...})
   )
 }
 ```
@@ -154,7 +154,7 @@ npm run build:ipad
 
 ## Next Steps for Phase 3
 
-Phase 3 will follow `docs/agents/SPORTZENS_PARITY_v2.md` execution protocol:
+Phase 3 will follow `docs/agents/sport_parity_v2.md` execution protocol:
 
 1. **Run mandatory gates** (all must pass):
    - `npm run lint:docs`
@@ -168,7 +168,7 @@ Phase 3 will follow `docs/agents/SPORTZENS_PARITY_v2.md` execution protocol:
 
 2. **Feature Implementation** - Begin parity work from `Plan.md §6` checkboxes
 
-3. **Ledger Updates** - Update parity implementation ledger with findings per `SPORTZENS_PARITY_v2.md` §6
+3. **Ledger Updates** - Update parity implementation ledger with findings per `sport_parity_v2.md` §6
 
 ---
 
@@ -192,6 +192,6 @@ Phase 3 will follow `docs/agents/SPORTZENS_PARITY_v2.md` execution protocol:
 ## Architecture Reference
 
 See also:
-- [SPORTZENS_PARITY_v2.md](./docs/agents/SPORTZENS_PARITY_v2.md) - Binding execution protocol
+- [sport_parity_v2.md](./docs/agents/sport_parity_v2.md) - Binding execution protocol
 - [agents.md](./agents.md) - Agent responsibilities and guardrails  
 - [Plan.md](./Plan.md) - Feature checklist and requirements

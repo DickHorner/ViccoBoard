@@ -6,7 +6,7 @@ import { CreateGradeCategoryUseCase } from '../src/use-cases/create-grade-catego
 import { GradeCategoryRepository } from '../src/repositories/grade-category.repository';
 import { ClassGroupRepository } from '../src/repositories/class-group.repository';
 import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration } from '@viccoboard/storage/node';
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 
 describe('CreateGradeCategoryUseCase', () => {
   let storage: SQLiteStorage;

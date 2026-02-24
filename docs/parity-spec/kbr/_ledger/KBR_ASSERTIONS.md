@@ -1,14 +1,14 @@
-# KURT Parity Assertions
+# KBR Parity Assertions
 
 **Version:** 1.0.0  
 **Date:** 2026-02-07  
-**Purpose:** Define "Definition of Done" for each KURT checkbox
+**Purpose:** Define "Definition of Done" for each KBR checkbox
 
 ---
 
 ## 1. Definition of "Implemented"
 
-A KURT checkbox is marked `implemented=yes` when:
+A KBR checkbox is marked `implemented=yes` when:
 1. **Data Model:** All necessary entities/fields exist and persist correctly
 2. **Business Logic:** Core use cases are implemented and tested
 3. **UI:** Feature is accessible and functional in teacher-ui
@@ -273,7 +273,7 @@ npm run test:advanced
 - `{{exam_title}}`: Exam title
 - `{{date}}`: Exam date
 
-**If more needed:** Add to Plan.md §9 TBD + mark in KURT_MATRIX
+**If more needed:** Add to Plan.md §9 TBD + mark in KBR_MATRIX
 
 ### WebUntis Import (§6.20.1)
 **Issue:** Import method unclear (CSV vs API)
@@ -282,4 +282,4 @@ npm run test:advanced
 
 ---
 
-**END OF KURT_ASSERTIONS.md**
+**END OF KBR_ASSERTIONS.md**

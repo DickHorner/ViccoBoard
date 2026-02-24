@@ -1,9 +1,9 @@
 /**
- * Phase 4: SportZens Schema Roundtrip Tests
+ * Phase 4: Sport Schema Roundtrip Tests
  * 
  * Test Objectives:
  * 1. Verify all 8 in-scope schemas can be exported/imported without data loss
- * 2. Verify field names match SportZens APK exactly (snake_case preservation)
+ * 2. Verify field names match Sport APK exactly (snake_case preservation)
  * 3. Verify optional fields are preserved
  * 4. Verify WOW schema is excluded (no tests for wow.schema.json)
  * 
@@ -27,7 +27,7 @@
  * This simulates the export/import flow without requiring full repository implementations
  */
 
-describe('Phase 4: SportZens Schema Roundtrip Tests', () => {
+describe('Phase 4: Sport Schema Roundtrip Tests', () => {
   
   describe('1. class.schema.json → ClassGroup Roundtrip', () => {
     it('should roundtrip required fields without data loss', () => {

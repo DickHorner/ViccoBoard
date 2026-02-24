@@ -3,7 +3,7 @@
  * Creates a new grading category for a class
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport} from '@viccoboard/core';
 import type { GradeCategoryRepository } from '../repositories/grade-category.repository.js';
 
 export interface CreateGradeCategoryInput {

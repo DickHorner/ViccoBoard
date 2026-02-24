@@ -16,7 +16,7 @@
     <section v-else-if="category" class="card">
       <div class="config-row">
         <div class="form-group">
-          <label>{{ t('COOPER.sportart') }}</label>
+          <label>{{ t('COOPER.Sportart') }}</label>
           <select v-model="selectedSportType" class="form-input" @change="handleSportTypeChange">
             <option value="running">{{ t('COOPER.running') }}</option>
             <option value="swimming">{{ t('COOPER.swimming') }}</option>
@@ -126,14 +126,14 @@ const route = useRoute()
 initializeSportBridge()
 initializeStudentsBridge()
 
-const sportBridge = getSportBridge()
+const SportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 const category = ref<Sport.GradeCategory | null>(null)
 const students = ref<Student[]>([])
 const tables = ref<Sport.TableDefinition[]>([])
 const configs = ref<Sport.CooperTestConfig[]>([])
-const selectedSportType = ref<Sport.CooperTestConfig['sportType']>('running')
+const selectedSportType = ref<Sport.CooperTestConfig['SportType']>('running')
 const selectedConfigId = ref('')
 const selectedTableId = ref('')
 const lapLengthMeters = ref(400)
@@ -177,7 +177,7 @@ function buildContext(student: Student): Record<string, unknown> {
     genderLong: student.gender,
     age,
     birthYear: student.birthYear,
-    sportType: selectedSportType.value
+    SportType: selectedSportType.value
   }
 }
 
@@ -207,7 +207,7 @@ function recalculate(studentId: string) {
   const rounds = Number(entry.rounds) || 0
   const extraMeters = Number(entry.extraMeters) || 0
 
-  const distance = sportBridge.cooperTestService.calculateDistance(
+  const distance = SportBridge.cooperTestService.calculateDistance(
     rounds,
     lapLengthMeters.value,
     extraMeters
@@ -219,7 +219,7 @@ function recalculate(studentId: string) {
     try {
       const student = students.value.find(s => s.id === studentId)
       if (student) {
-        entry.grade = sportBridge.cooperTestService.calculateGradeFromTable(
+        entry.grade = SportBridge.cooperTestService.calculateGradeFromTable(
           selectedTable.value,
           distance,
           buildContext(student)
@@ -251,11 +251,11 @@ async function saveAll() {
       const entry = results.value[student.id]
       if (!entry || entry.distanceMeters <= 0) return null
 
-      return sportBridge.recordCooperTestResultUseCase.execute({
+      return SportBridge.recordCooperTestResultUseCase.execute({
         studentId: student.id,
         categoryId: category.value!.id,
         configId: selectedConfigId.value,
-        sportType: selectedSportType.value,
+        SportType: selectedSportType.value,
         rounds: entry.rounds,
         lapLengthMeters: lapLengthMeters.value,
         extraMeters: entry.extraMeters,
@@ -283,7 +283,7 @@ async function handleTableChange() {
   const config = category.value.configuration as Sport.CooperGradingConfig
 
   if (selectedTableId.value && config.gradingTable !== selectedTableId.value) {
-    await sportBridge.gradeCategoryRepository.update(category.value.id, {
+    await SportBridge.gradeCategoryRepository.update(category.value.id, {
       configuration: {
         ...config,
         gradingTable: selectedTableId.value
@@ -298,11 +298,11 @@ async function handleSportTypeChange() {
   if (!category.value) return
   const config = category.value.configuration as Sport.CooperGradingConfig
 
-  if (config.sportType !== selectedSportType.value) {
-    await sportBridge.gradeCategoryRepository.update(category.value.id, {
+  if (config.SportType !== selectedSportType.value) {
+    await SportBridge.gradeCategoryRepository.update(category.value.id, {
       configuration: {
         ...config,
-        sportType: selectedSportType.value
+        SportType: selectedSportType.value
       }
     })
   }
@@ -326,8 +326,8 @@ async function handleConfigChange() {
   students.value.forEach(student => recalculate(student.id))
 }
 
-async function loadConfigs(sportType: Sport.CooperTestConfig['sportType']) {
-  configs.value = await sportBridge.cooperTestConfigRepository.findBySportType(sportType)
+async function loadConfigs(SportType: Sport.CooperTestConfig['SportType']) {
+  configs.value = await SportBridge.cooperTestConfigRepository.findBySportType(SportType)
 
   if (selectedConfigId.value) {
     const stillAvailable = configs.value.some(config => config.id === selectedConfigId.value)
@@ -349,7 +349,7 @@ async function loadConfigs(sportType: Sport.CooperTestConfig['sportType']) {
 onMounted(async () => {
   try {
     const categoryId = route.params.id as string
-    category.value = await sportBridge.gradeCategoryRepository.findById(categoryId)
+    category.value = await SportBridge.gradeCategoryRepository.findById(categoryId)
 
     if (!category.value) {
       errorMessage.value = t('COMMON.error')
@@ -358,12 +358,12 @@ onMounted(async () => {
     }
 
     students.value = await studentsBridge.studentRepository.findByClassGroup(category.value.classGroupId)
-    tables.value = await sportBridge.tableDefinitionRepository.findAll()
-    const existingEntries = await sportBridge.performanceEntryRepository.findByCategory(category.value.id)
+    tables.value = await SportBridge.tableDefinitionRepository.findAll()
+    const existingEntries = await SportBridge.performanceEntryRepository.findByCategory(category.value.id)
 
     const config = category.value.configuration as Sport.CooperGradingConfig
     selectedTableId.value = config.gradingTable ?? ''
-    selectedSportType.value = config.sportType ?? 'running'
+    selectedSportType.value = config.SportType ?? 'running'
 
     await loadConfigs(selectedSportType.value)
 
