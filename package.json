@@ -18,7 +18,10 @@
     "build:ipad": "npm run build:packages && npm run build --workspace=teacher-ui",
     "demo": "npm run build:packages && cd apps/demo && npm run dev",
     "install:all": "npm install && npm install --workspaces",
-    "lint:docs": "node scripts/doc-guardrails.mjs"
+    "lint:docs": "node scripts/doc-guardrails.mjs",
+    "hooks:check": "node scripts/pre-push-guard.mjs",
+    "hooks:install": "git config core.hooksPath .githooks",
+    "prepare": "npm run hooks:install"
   },
   "keywords": [
     "education",

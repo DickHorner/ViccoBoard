@@ -400,6 +400,26 @@ npm run lint:docs
 
 This checks documentation for forbidden platform drift (Electron/React Native/Flutter) and app-level student repo patterns.
 
+
+### Pre-Push Quality Gate
+
+Install the repository hooks once per clone:
+
+```bash
+npm run hooks:install
+```
+
+The `pre-push` hook blocks a push unless all of these pass:
+
+```bash
+npm run lint:docs
+npm run build:packages
+npm run test
+npm run build
+```
+
+It also blocks pushes if tracked files violate repository hygiene (for example generated `.js/.d.ts` sidecars next to `.ts`, `.bak` files, or banned root artifact files).
+
 ## Code Style
 
 ### TypeScript Guidelines
