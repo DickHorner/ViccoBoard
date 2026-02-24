@@ -56,6 +56,8 @@ npm run demo
 - [Master Plan](./Plan.md)
 - [Architecture Decisions](./ARCHITECTURE_DECISIONS.md)
 - [Developer Guide](./DEVELOPMENT.md)
+- [Contributing Guide](./CONTRIBUTING.md)
+- [Security Policy](./SECURITY.md)
 - [Docs Hub](./docs/README.md)
 
 </details>
@@ -89,3 +91,5 @@ npm run demo
 ## License
 
 UNLICENSED (private repository)
+
+

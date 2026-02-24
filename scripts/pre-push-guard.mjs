@@ -36,6 +36,8 @@ const ROOT_DOC_ALLOWLIST = new Set([
   'DEVELOPMENT.md',
   'ARCHITECTURE_DECISIONS.md',
   'INDEX.md',
+  'CONTRIBUTING.md',
+  'SECURITY.md',
   'agents.md',
   'AGENTS.md'
 ]);
@@ -239,3 +241,5 @@ try {
   console.error(`\n[pre-push] ${error instanceof Error ? error.message : String(error)}`);
   process.exit(1);
 }
+
+
