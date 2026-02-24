@@ -90,6 +90,6 @@ npm run demo
 
 ## License
 
-UNLICENSED (private repository)
+MIT
 
 
