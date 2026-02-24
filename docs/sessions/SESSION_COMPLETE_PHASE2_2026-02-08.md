@@ -200,7 +200,7 @@ const students = await studentRepository?.findAll()
 
 ## Documentation Created
 
-1. **ARCHITECTURE_MIGRATION_PROGRESS.md** (This Document)
+1. **../architecture/MIGRATION_PROGRESS.md** (This Document)
    - Comprehensive migration summary
    - Pattern reference for future views
    - Issue resolution documentation
@@ -260,7 +260,7 @@ const students = await studentRepository?.findAll()
    - Delete + recreate is reasonable for <500 line Vue components
 
 2. **Bridge Pattern Documentation:**
-   - Store bridge access patterns in a reference doc (DONE: ARCHITECTURE_MIGRATION_PROGRESS.md)
+   - Store bridge access patterns in a reference doc (DONE: ../architecture/MIGRATION_PROGRESS.md)
    - Computed refs need special handling vs direct getters
    - Verify bridge interface before assuming method signatures
 
@@ -300,3 +300,4 @@ const students = await studentRepository?.findAll()
 - **Documentation Created:** 1 comprehensive guide
 - **Architecture Gates Passing:** 1 of 8 verified (build)
 - **Session Status:** ✅ COMPLETE, Ready for Phase 3
+

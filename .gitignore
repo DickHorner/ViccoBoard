@@ -45,6 +45,17 @@ demo-data/
 logs/
 *.log
 
+# Local run artifacts
+$filePath
+exams-forcexit-test.txt
+exams-test-output.txt
+final-exams-test-forcexit.txt
+final-test.txt
+full-test-forcexit.txt
+ipad-build.txt
+root-test-output.txt
+test-output.txt
+
 # Expo (if used)
 .expo/
 .expo-shared/
@@ -57,5 +68,36 @@ android/app/build/
 ios/Pods/
 ios/build/
 
-# TypeScript
-*.tsbuildinfo
+# Transpiled sidecars next to TypeScript sources (source of truth is .ts)
+apps/demo/src/index.js
+apps/demo/src/index.d.ts
+apps/demo/src/*.bak
+apps/teacher-ui/src/composables/*.js
+apps/teacher-ui/src/composables/*.d.ts
+apps/teacher-ui/src/constants/*.js
+apps/teacher-ui/src/constants/*.d.ts
+apps/teacher-ui/src/db/*.js
+apps/teacher-ui/src/db/*.d.ts
+apps/teacher-ui/src/i18n/index.js
+apps/teacher-ui/src/i18n/index.d.ts
+apps/teacher-ui/src/main.js
+apps/teacher-ui/src/main.d.ts
+apps/teacher-ui/src/router/index.js
+apps/teacher-ui/src/router/index.d.ts
+apps/teacher-ui/src/services/*.js
+apps/teacher-ui/src/services/*.d.ts
+apps/teacher-ui/src/stores/*.js
+apps/teacher-ui/src/stores/*.d.ts
+apps/teacher-ui/src/utils/*.js
+apps/teacher-ui/src/utils/*.d.ts
+apps/teacher-ui/tests/*.js
+apps/teacher-ui/tests/*.d.ts
+apps/teacher-ui/vite.config.js
+apps/teacher-ui/vite.config.d.ts
+modules/*/tests/**/*.js
+modules/*/tests/**/*.d.ts
+modules/sport/examples/*.js
+modules/sport/examples/*.d.ts
+packages/storage/tests/*.js
+packages/storage/tests/*.d.ts
+

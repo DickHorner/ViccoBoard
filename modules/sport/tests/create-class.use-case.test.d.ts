@@ -1,4 +1,0 @@
-/**
- * CreateClassUseCase Tests
- */
-export {};

@@ -19,7 +19,7 @@ Update progress documentation and continue architecture migration work towards S
 - ✅ No warnings or deprecation issues
 
 ### ✅ Documentation Created
-1. **ARCHITECTURE_MIGRATION_PROGRESS.md** - Detailed migration status and pattern documentation
+1. **../architecture/MIGRATION_PROGRESS.md** - Detailed migration status and pattern documentation
 2. **Migration Pattern Documentation** - Step-by-step guide for remaining 7 view refactoring
 3. **Phase 2-4 Roadmap** - Clear path to parity implementation
 
@@ -86,7 +86,7 @@ Expected: Zero matches
 Start SPORTZENS_PARITY_v2.md Phase 0 (baseline + tooling)
 
 ## Files Modified This Session
-- **Created:** docs/sessions/ARCHITECTURE_MIGRATION_PROGRESS.md
+- **Created:** docs/sessions/../architecture/MIGRATION_PROGRESS.md
 - **Updated:** docs/status/STATUS.md (section 8)
 - **Modified:** apps/teacher-ui/src/views/BJSGradingEntry.vue (✅ Complete)
 - **Modified:** apps/teacher-ui/src/views/CriteriaGradingEntry.vue (✅ Complete)
@@ -122,4 +122,5 @@ The repository is in stable, buildable state with a clear migration path. All ha
 
 ---
 
-**Next Agent:** See ARCHITECTURE_MIGRATION_PROGRESS.md Phase 2 for detailed step-by-step instructions for remaining view refactoring.
+**Next Agent:** See ../architecture/MIGRATION_PROGRESS.md Phase 2 for detailed step-by-step instructions for remaining view refactoring.
+

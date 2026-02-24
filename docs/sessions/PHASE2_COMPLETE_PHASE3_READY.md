@@ -131,8 +131,8 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 - **Hard Rule #8** (No placeholder logic): ✅ All real implementations
 
 ### Documentation
-- ARCHITECTURE_MIGRATION_PROGRESS.md ✅ Created
-- SESSION_COMPLETE_2026-02-08_PHASE2.md ✅ Created  
+- ../architecture/MIGRATION_PROGRESS.md ✅ Created
+- SESSION_COMPLETE_PHASE2_2026-02-08.md ✅ Created  
 - All 8 build gate results captured
 - Bridge access patterns documented for future reference
 
@@ -178,8 +178,8 @@ Gate 8: npm test @viccoboard/students ✅ 0 tests (passWithNoTests)
 7. apps/teacher-ui/src/views/CorrectionCompact.vue (deleted + recreated)
 
 ### Documentation Created (2 files)
-8. ARCHITECTURE_MIGRATION_PROGRESS.md
-9. SESSION_COMPLETE_2026-02-08_PHASE2.md (this document)
+8. ../architecture/MIGRATION_PROGRESS.md
+9. SESSION_COMPLETE_PHASE2_2026-02-08.md (this document)
 
 ---
 
@@ -252,3 +252,4 @@ npm run lint:docs          # Documentation guardrails
 For next session: Use this document as context summary. Start with reviewing ISSUES_TRACKER.md P3-1, then begin implementation following the bridge access patterns documented above. Ensure all 8 build gates pass before committing any changes.
 
 All ground work is in place. Architecture is solid. Ready to build features.
+

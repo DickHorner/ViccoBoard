@@ -201,16 +201,6 @@ export function useAttendance() {
   return bridge.attendanceRepository
 }
 
-/**
- * Vue composable for students access
- * Note: Students module should be initialized separately through StudentsBridge
- * For now, this is a placeholder that returns null if not available
- */
-export function useStudents() {
-  // This will need to come from a StudentsBridge similar to SportBridge
-  // For now, return null - this should be refactored
-  return null
-}
 
 /**
  * Vue composable for sport module access
@@ -246,6 +236,15 @@ export function useSportBridge() {
   }
 }
 
+/**
+ * @deprecated Use useStudents() from useStudentsBridge.ts.
+ * Keeping this named export prevents silent null usage in legacy imports.
+ */
+export function useStudents(): never {
+  throw new Error(
+    'useStudents from useSportBridge is deprecated. Import useStudents from useStudentsBridge instead.'
+  )
+}
 // Re-exports for convenience
 export {
   ClassGroupRepository,
@@ -268,4 +267,3 @@ export type {
   CreateGradeCategoryInput,
   RecordGradeInput
 }
-

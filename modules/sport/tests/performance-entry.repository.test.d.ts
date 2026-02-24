@@ -1,4 +1,0 @@
-/**
- * PerformanceEntry Repository Tests
- */
-export {};

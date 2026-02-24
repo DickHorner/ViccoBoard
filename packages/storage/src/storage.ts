@@ -25,6 +25,10 @@ export interface StorageConfig {
   memory?: boolean;
 }
 
+function escapeSqlString(value: string): string {
+  return value.replace(/'/g, "''");
+}
+
 export class SQLiteStorage implements Storage {
   private db: any = null;
   private adapter: SQLiteAdapter | null = null;
@@ -89,7 +93,14 @@ export class SQLiteStorage implements Storage {
 
     // Initialize adapter
     this.adapter = new SQLiteAdapter(this.db);
-    
+
+    if (!password) {
+      this.db.close();
+      this.db = null;
+      this.adapter = null;
+      throw new Error('SQLiteStorage requires a non-empty encryption password');
+    }
+
     // Enable encryption (using SQLCipher pragma)
     // Note: better-sqlite3 doesn't include SQLCipher by default
     // For production, use @journeyapps/sqlcipher or install SQLCipher separately
@@ -97,7 +108,8 @@ export class SQLiteStorage implements Storage {
     // ⚠️ SECURITY: This implementation hard-fails if encryption is unavailable
     // to prevent accidental plaintext database storage
     try {
-      this.db.pragma(`key = '${password}'`);
+      const escapedPassword = escapeSqlString(password);
+      this.db.pragma(`key = '${escapedPassword}'`);
       
       // Verify encryption is actually working by trying to access the database
       // If SQLCipher is not installed, this will fail

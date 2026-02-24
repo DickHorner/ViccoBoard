@@ -48,7 +48,7 @@ async function main() {
       verbose: true
     });
 
-    const password = 'demo-password-2024';
+    const password = process.env.VICCOBOARD_DEMO_PASSWORD ?? 'viccoboard-demo-password';
     await storage.initialize(password);
     console.log('✓ Storage initialized with encryption');
     console.log(`  Database: ${dbPath}`);
@@ -163,7 +163,7 @@ async function main() {
 
     // Step 5: Create a Lesson
     console.log('\n Step 5: Create a Lesson');
-    console.log(''.repeat(60));
+    console.log('─'.repeat(60));
 
     // Create or reuse a lesson for the same class/date to keep the demo idempotent
     const lessonDate = new Date('2024-01-13');
@@ -225,8 +225,8 @@ async function main() {
     });
     console.log(`✓ ${createdStudents[3].firstName} ${createdStudents[3].lastName}: Passive (Injury)`);
 
-    // Step 6: View Statistics
-    console.log('\n📊 Step 6: View Statistics');
+    // Step 7: View Statistics
+    console.log('\n📊 Step 7: View Statistics');
     console.log('─'.repeat(60));
     
     const classStudents = await studentRepo.findByClassGroup(classGroup.id);
@@ -243,8 +243,8 @@ async function main() {
       console.log(`  Attendance Rate: ${summary.percentage.toFixed(1)}%`);
     }
 
-    // Step 7: Query Examples
-    console.log('🔍 Step 7: Query Examples');
+    // Step 8: Query Examples
+    console.log('🔍 Step 8: Query Examples');
     console.log('─'.repeat(60));
     
     const searchResults = await studentRepo.findByName('schmidt');
@@ -274,7 +274,6 @@ async function main() {
     console.log('  ✓ Statistical analysis');
     console.log('  ✓ Search and query capabilities');
     console.log('\nDatabase location:', dbPath);
-    console.log('Password:', password);
     console.log('\nYou can inspect the database using SQLite tools.');
     console.log('');
 

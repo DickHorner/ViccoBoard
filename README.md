@@ -1,269 +1,64 @@
-# ViccoBoard - Unified Teacher Suite
+# ViccoBoard
 
-ViccoBoard is a comprehensive teacher application that combines **SportZens** (physical education organization and assessment) and **KURT** (exam creation, correction, and grading) into a single, unified platform.
+ViccoBoard is a local-first teacher suite that combines SportZens and KURT workflows in one TypeScript monorepo.
 
-## 🎯 Project Vision
+## Core Principles
 
-A single application that provides the full functionality of:
-- **SportZens**: Class organization, grading, live classroom tools, WOW workouts, and statistics
-- **KURT**: Exam structuring, correction, feedback, support tips, long-term tracking, and email distribution
+- Keep all required features from SportZens and KURT.
+- Keep domain logic inside modules, not in the UI layer.
+- Keep runtime web-only and Safari-compatible (iPadOS target).
+- Keep data local-first with explicit export/import flows.
 
-## 🏗️ Architecture
+## Repository Structure
 
-### Monorepo Structure
-
-```
+```text
 ViccoBoard/
-├── packages/          # Core packages
-│   ├── core/         # Domain models, interfaces, storage abstractions
-│   └── plugins/      # Plugin registry and contracts
-├── modules/          # Domain modules
-│   ├── sport/        # SportZens functionality
-│   ├── exams/        # KURT functionality
-│   ├── students/     # Central student management
-│   ├── export/       # PDF/CSV/Email exports
-│   └── integrations/ # WebUntis, grade apps, sharing
-└── apps/             # Applications
-    ├── teacher/      # Main teacher app (mobile)
-    └── wow-web/      # WOW web interface for students
+├── apps/
+│   ├── demo/           # CLI demo
+│   └── teacher-ui/     # Vue 3 teacher application
+├── modules/
+│   ├── students/       # Central student management
+│   ├── sport/          # Sport domain
+│   └── exams/          # Exams/KURT domain
+├── packages/
+│   ├── core/           # Shared interfaces/types/validators
+│   ├── storage/        # IndexedDB + SQLite adapters and migrations
+│   └── plugins/        # Plugin contracts/registry
+├── docs/               # Project documentation
+├── Plan.md             # Master feature specification
+└── agents.md           # Agent guardrails
 ```
 
-### Core Principles
-
-1. **No Features Left Behind**: Every feature from both SportZens and KURT is included
-2. **Modular Architecture**: New domains can be added as modules/plugins without core changes
-3. **Local-First/Offline, iPadOS Safari-first**: Runs as static web app; data stays local; network only when explicitly needed (WOW link/QR, email). No Electron/Node server at runtime.
-4. **Security & Backups**: Encrypted local storage, app lock (PIN/password), backup/restore with visible backup status/reminders (Safari may purge local storage after inactivity)
-
-### Technology Stack
-
-- **Language**: TypeScript
-- **Mobile Framework**: None. Web-only (iPadOS Safari) per constraints.
-- **Storage**: Encrypted IndexedDB (browser-first, Safari/WebKit compatible) — SQLite adapter available for Node/dev and testing (SQLCipher ready); exports/imports via download/file-picker (no File System Access API)
-- **Architecture**: Clean Architecture + Domain-Driven Design
-- **Plugin System**: Interface-based extensibility
-
-## 📦 Packages
-
-### @viccoboard/core
-
-Core domain models, interfaces, and contracts. Defines:
-- Security & Identity types
-- Storage & Backup interfaces
-- Core entities (Classes, Students, Lessons, Attendance)
-- Plugin system interfaces (AssessmentType, ToolPlugin, Exporter, Integration)
-- SportZens domain types
-- KURT/Exam domain types
-
-### @viccoboard/plugins
-
-Plugin registry and management system. Allows registration of:
-- Assessment types (criteria-based, time-based, Cooper test, etc.)
-- Tools (timer, scoreboard, tactics board, etc.)
-- Exporters (PDF, CSV, share packages)
-- Integrations (WebUntis, grade apps)
-
-## 🎓 SportZens Features
-
-### Core Management
-- ✅ Class creation and management
-- ✅ Student profiles with photos and birth years
-- ✅ Lesson planning with automatic generation
-- ✅ Attendance tracking and export
-- ✅ Quick navigation and shortcuts
-
-### Grading System
-- ✅ Multiple grading schemes per class
-- ✅ Criteria-based grading (up to 8 criteria)
-- ✅ Time-based grading with linear mapping
-- ✅ Cooper test (paperless, automated)
-- ✅ Verbal assessments
-
-### Tests & Measurements
-- ✅ Shuttle Run with audio signals and custom config
-- ✅ Cooper Test (running/swimming)
-- ✅ Middle-distance timing
-- ✅ Sportabzeichen (sports badge) with PDF export
-- ✅ Bundesjugendspiele (federal youth games)
-
-### Live Tools
-- ✅ Team division (digital, fair algorithms)
-- ✅ Tournament planning and execution
-- ✅ Scoreboard for tracking scores
-- ✅ Timer (countdown, stopwatch, intervals)
-- ✅ Tactics board with sport-specific annotations
-- ✅ Dice rolling with logging
-
-### WOW (Workouts Online Worksheet)
-- ✅ Create and publish workouts
-- ✅ Browser-based student input (no registration)
-- ✅ Progress tracking and overview
-
-## 📝 KURT Features
-
-### Exam Structure
-- ✅ Simple vs. Complex modes
-- ✅ 3-level task hierarchy (unlimited tasks in complex mode)
-- ✅ Choice tasks (e.g., 3a/3b)
-- ✅ Bonus points
-- ✅ Exam parts with sub-scores
-- ✅ Criteria formatting (bold, italic, etc.)
-
-### Grading System
-- ✅ Flexible grading keys with presets
-- ✅ Percentage-based grade boundaries
-- ✅ Post-correction adjustments
-- ✅ Error points to grade conversion
-- ✅ Rounding rules and fine-tuning
-
-### Correction
-- ✅ Compact correction interface
-- ✅ Tab navigation
-- ✅ Task-wise correction (table mode)
-- ✅ Alternative grading (++, +, 0, -, --)
-- ✅ Comment boxes per task level
-- ✅ Quick candidate switching
-
-### Support Tips (Fördertipps)
-- ✅ Personal database of support tips
-- ✅ Task-specific assignment
-- ✅ Up to 3 links per tip
-- ✅ QR code generation
-- ✅ Weighting and prioritization
-- ✅ Usage analytics
-
-### Analysis & Export
-- ✅ Difficulty analysis
-- ✅ Point adjustment assistant
-- ✅ 4 PDF layouts with customization
-- ✅ Batch PDF generation
-- ✅ Email distribution with templates
-- ✅ Special achievement highlighting
-
-### Integration
-- ✅ WebUntis import
-- ✅ Grade app compatibility
-- ✅ Exam draft sharing
-- ✅ Support tip sharing
-
-## 🔒 Security Features
-
-- ✅ Encrypted local storage
-- ✅ App lock (PIN/Password)
-- ✅ Database password protection
-- ✅ Session timeout
-- ✅ Biometric authentication (optional)
-- ✅ Backup/Restore with encryption
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 20.x or higher
-- npm 10.x or higher
-
-### Quick Demo
-
-See ViccoBoard in action with a working demonstration:
+## Quick Start
 
 ```bash
-# Windows (PowerShell)
-.\build-and-run.ps1
-
-# Unix/Mac/Linux
-chmod +x build-and-run.sh
-./build-and-run.sh
-
-# Or manually
+npm install
 npm run build
+npm run dev:ui
+```
+
+## Useful Commands
+
+```bash
+npm run test
+npm run build:packages
+npm run build:ipad
+npm run lint:docs
 npm run demo
 ```
 
-### Build Scripts
+## Documentation
 
-```bash
-# Build everything (packages + apps)
-npm run build
+- [Documentation Index](./INDEX.md)
+- [Master Plan](./Plan.md)
+- [Architecture Decisions](./ARCHITECTURE_DECISIONS.md)
+- [Developer Guide](./DEVELOPMENT.md)
+- [Docs Hub](./docs/README.md)
 
-# Build only internal packages (core/modules/plugins/storage)
-npm run build:packages
+## Status Notes
 
-# Build the iPad app only (teacher UI)
-npm run build:ipad
-```
+Session and verification artifacts were consolidated under `docs/sessions/`, `docs/verification/`, and `docs/reviews/`.
 
-### Run The App
+## License
 
-```bash
-# Teacher UI (iPad target) - dev server
-cd apps/teacher-ui
-npm run dev
-
-# Teacher UI - production preview
-npm run build
-npm run preview
-
-# Demo CLI app (optional)
-cd apps/demo
-npm run dev
-```
-
-The demo creates a class, enrolls students, records attendance, and shows statistics - proving the entire architecture works end-to-end!
-
-See [docs/demo/DEMO_COMPLETE.md](./docs/demo/DEMO_COMPLETE.md) for details.
-
-### Development
-
-```bash
-# Install dependencies for a specific package
-cd packages/core && npm install
-
-# Build a specific package
-cd packages/core && npm run build
-
-# Run tests (when available)
-npm test
-```
-
-## 📖 Documentation
-
-For detailed documentation, see:
-- [INDEX.md](./INDEX.md) - Documentation index
-- [docs/README.md](./docs/README.md) - Docs landing page
-- [Plan.md](./Plan.md) - Complete feature specification
-- [agents.md](./agents.md) - Agent setup and development guidelines
-
-## 🛠️ Development
-
-### Project Status
-
-✅ **Working Proof-of-Concept Complete!**
-
-A full working demo is available that demonstrates:
-- Encrypted database storage
-- Class and student management
-- Attendance tracking
-- Statistics and queries
-- Complete Clean Architecture implementation
-
-**Progress: 25% complete** - Foundation proven, ready for feature expansion.
-
-Run `npm run demo` to see it in action!
-
-### Contributing
-
-This project follows strict modularity principles:
-1. Core knows only interfaces, never implementations
-2. Each module is self-contained
-3. Plugins extend functionality without core changes
-4. All features from Plan.md must be implemented
-
-## 📋 License
-
-UNLICENSED - Private project
-
----
-
-**Note**: This is a comprehensive educational software project combining physical education management (SportZens) with exam/assessment management (KURT) into a unified teacher toolkit.
-
-demo-password-2024
+UNLICENSED (private repository)

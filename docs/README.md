@@ -1,18 +1,21 @@
 # Documentation
 
-Welcome to the ViccoBoard documentation hub. Start with the index for a full map of all documents.
+This folder is the canonical home for project documentation.
 
 ## Start Here
 
 - [Documentation Index](../INDEX.md)
-- [Project Overview](../README.md)
-- [Developer Guide](../DEVELOPMENT.md)
+- [Planning Roadmap](./planning/ROADMAP.md)
+- [Current Status](./status/STATUS.md)
 
-## Key Areas
+## Sections
 
-- Planning: [docs/planning/](./planning/)
-- Status: [docs/status/](./status/)
-- Reviews: [docs/reviews/](./reviews/)
-- QA: [docs/qa/](./qa/)
-- Demo: [docs/demo/](./demo/)
-- Sessions: [docs/sessions/](./sessions/)
+- `agents/` agent-specific guidance and prompt assets
+- `architecture/` migration and architecture notes
+- `planning/` roadmap, issue tracker, and execution planning
+- `reviews/` review instructions, findings, and follow-up docs
+- `qa/` quality and security checklists
+- `sessions/` implementation session logs
+- `verification/` verification reports and gap analysis
+- `parity-spec/` SportZens/KURT parity source material and reports
+- `demo/` demo app documentation

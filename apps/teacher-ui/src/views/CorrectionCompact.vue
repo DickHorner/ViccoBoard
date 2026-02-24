@@ -137,11 +137,11 @@ const alternativeOptions: ExamsTypes.AlternativeGrading['type'][] = ['++', '+', 
 const scoreInputEls = ref<HTMLInputElement[]>([])
 
 const registerScoreInput = (el: HTMLInputElement | null, index: number): void => {
+  if (el) {
     scoreInputEls.value[index] = el
-  } else {
-    delete scoreInputEls.value[index]
-    scoreInputEls.value[index] = el
+    return
   }
+  delete scoreInputEls.value[index]
 }
 
 const focusScoreInput = (index: number) => {
@@ -205,6 +205,11 @@ const pointsToNextGrade = computed(() => {
   return pts.toFixed(1)
 })
 
+const canSave = computed(() => {
+  return Boolean(exam.value && selectedCandidateId.value)
+})
+
+const loadExam = async () => {
   const examId = route.params.id as string
   if (!examId) {
     error('No exam ID provided.')
@@ -212,17 +217,18 @@ const pointsToNextGrade = computed(() => {
     return
   }
 
-const loadExam = async () => {
-  const examId = route.params.id as string
   const data = await examRepository?.findById(examId) ?? null
   if (!data) {
     error('Exam not found.')
     router.push('/exams')
     return
   }
+
   exam.value = data
   candidates.value = data.candidates
   tasks.value = data.structure.tasks.filter(task => task.level === 1)
+  taskScores.value = {}
+  alternativeGrades.value = {}
   tasks.value.forEach(task => {
     taskScores.value[task.id] = 0
   })
@@ -234,12 +240,14 @@ const addCandidate = async () => {
     error('Provide first and last name.')
     return
   }
+
   const candidate: ExamsTypes.Candidate = {
     id: createUuid(),
     examId: exam.value.id,
     firstName: candidateFirstName.value.trim(),
     lastName: candidateLastName.value.trim()
   }
+
   candidates.value = [...candidates.value, candidate]
   exam.value.candidates = candidates.value
   await examRepository?.update(exam.value.id, exam.value)
@@ -283,17 +291,20 @@ watch(useAlternativeGrading, (enabled) => {
     tasks.value.forEach(task => {
       if (!alternativeGrades.value[task.id]) {
         setAlternative(task, '0')
-  if (!useAlternativeGrading.value) {
-    nextTick(() => focusScoreInput(0))
-  }
+      }
     })
+    return
   }
+
+  nextTick(() => focusScoreInput(0))
 })
 
 watch(tasks, () => {
   // Clear stale refs; the upcoming render will repopulate via registerScoreInput
   scoreInputEls.value = []
-  nextTick(() => focusScoreInput(0))
+  if (!useAlternativeGrading.value) {
+    nextTick(() => focusScoreInput(0))
+  }
 })
 
 onMounted(() => {
@@ -505,11 +516,3 @@ onMounted(() => {
   }
 }
 </style>
-
-
-
-
-
-
-
-
