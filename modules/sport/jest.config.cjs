@@ -19,12 +19,14 @@ module.exports = {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
+    '^.+\\.[tj]sx?$': ['ts-jest', {
       useESM: false,
       tsconfig: {
+        allowJs: true,
         allowSyntheticDefaultImports: true,
         esModuleInterop: true
       }
     }]
-  }
+  },
+  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)']
 };

@@ -7,17 +7,19 @@ module.exports = {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   transform: {
-    '^.+\\.tsx?$': [
+    '^.+\\.[tj]sx?$': [
       'ts-jest',
       {
         useESM: false,
         tsconfig: {
+          allowJs: true,
           allowSyntheticDefaultImports: true,
           esModuleInterop: true
         }
       }
     ]
   },
+  transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
   testMatch: ['**/tests/**/*.test.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   moduleFileExtensions: ['ts', 'js', 'json'],
