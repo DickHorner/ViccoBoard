@@ -76,6 +76,13 @@ npm run build
 
 Roadmap docs: [Plan.md](./Plan.md), [docs/planning/ROADMAP.md](./docs/planning/ROADMAP.md)
 
+
+## OpenSSF Best Practices badge (CII)
+
+We are actively pursuing the OpenSSF Best Practices badge.
+
+- Fast-track playbook: [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
+- Current blocker: one manual account/project enrollment step on bestpractices.dev
 ## License
 
 MIT - see [LICENSE](./LICENSE).
@@ -93,4 +100,5 @@ MIT - see [LICENSE](./LICENSE).
 [scorecard-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecard.yml
 [scorecard]: https://securityscorecards.dev/viewer/?uri=github.com/DickHorner/ViccoBoard
 [license]: https://github.com/DickHorner/ViccoBoard/blob/main/LICENSE
+
 

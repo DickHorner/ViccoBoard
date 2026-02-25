@@ -38,6 +38,9 @@ jobs:
       - name: Lint workflows
         run: npm run lint:workflows
 
+      - name: OpenSSF readiness
+        run: npm run lint:openssf
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -46,3 +49,4 @@ jobs:
 
       - name: Build
         run: npm run build
+

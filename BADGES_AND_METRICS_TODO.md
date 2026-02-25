@@ -59,12 +59,13 @@ This file tracks useful badges/metrics that were **not** auto-added because they
 ## 6) OpenSSF Best Practices Badge
 
 - **Signals:** Open source process maturity (policy/process checklist).
-- **Why not auto-added:** Requires manual project enrollment and checklist completion.
-- **User inputs needed:** Best Practices project registration and maintainer updates.
+- **Why not auto-added:** Badge requires a project entry tied to a signed-in maintainer account on bestpractices.dev.
+- **User inputs needed:** Maintainer login and one-time project registration.
 - **Setup steps:**
-  - Register project in OpenSSF Best Practices.
-  - Complete checklist items.
-  - Add badge once project has a public score.
+  - Open [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md).
+  - Sign in at https://www.bestpractices.dev/en/login.
+  - Create project at https://www.bestpractices.dev/en/projects/new using repo URL.
+  - Add badge URL once project ID exists.
 
 ## 7) CII Best Practices Badge (legacy ecosystem)
 
@@ -102,3 +103,4 @@ This file tracks useful badges/metrics that were **not** auto-added because they
   - Run `release.yml` with a real version.
   - Verify GitHub release is published.
   - Add `latest release` badge to README.
+

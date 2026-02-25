@@ -23,7 +23,8 @@
     "hooks:install": "git config core.hooksPath .githooks",
     "prepare": "npm run hooks:install",
     "typecheck": "npm run build:packages && npm run typecheck --workspace=teacher-ui",
-    "lint:workflows": "node scripts/workflow-guardrails.mjs"
+    "lint:workflows": "node scripts/workflow-guardrails.mjs",
+    "lint:openssf": "node scripts/openssf-badge-readiness.mjs"
   },
   "keywords": [
     "education",
