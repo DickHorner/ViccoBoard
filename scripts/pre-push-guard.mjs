@@ -206,6 +206,7 @@ function main() {
   checkReadmeTabs();
 
   runNpmGate('lint:docs', 'Documentation guardrails');
+  runNpmGate('lint:workflows', 'Workflow guardrails');
   runNpmGate('build:packages', 'Package compilation');
   runNpmGate('test', 'Workspace tests');
   runNpmGate('build', 'Full production build');
@@ -219,6 +220,7 @@ try {
   console.error(`\n[pre-push] ${error instanceof Error ? error.message : String(error)}`);
   process.exit(1);
 }
+
 
 
 

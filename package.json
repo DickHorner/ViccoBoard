@@ -22,7 +22,8 @@
     "hooks:check": "node scripts/pre-push-guard.mjs",
     "hooks:install": "git config core.hooksPath .githooks",
     "prepare": "npm run hooks:install",
-    "typecheck": "npm run build:packages && npm run typecheck --workspace=teacher-ui"
+    "typecheck": "npm run build:packages && npm run typecheck --workspace=teacher-ui",
+    "lint:workflows": "node scripts/workflow-guardrails.mjs"
   },
   "keywords": [
     "education",
@@ -46,3 +47,4 @@
     "@types/sql.js": "^1.4.9"
   }
 }
+

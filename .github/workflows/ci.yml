@@ -35,6 +35,9 @@ jobs:
       - name: Lint docs
         run: npm run lint:docs
 
+      - name: Lint workflows
+        run: npm run lint:workflows
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -43,3 +46,4 @@ jobs:
 
       - name: Build
         run: npm run build
+
