@@ -14,24 +14,26 @@ on:
         default: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-release:
     name: Build Release Artifacts
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Lint documentation
         run: npm run lint:docs
@@ -147,7 +149,7 @@ jobs:
           sha256sum viccoboard-v${{ inputs.version }}.tar.gz > viccoboard-v${{ inputs.version }}.tar.gz.sha256
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@26994186c0ac3ef5cae75ac16aa32e8153525f77 # v1
         with:
           tag_name: v${{ inputs.version }}
           name: ViccoBoard v${{ inputs.version }}
@@ -207,7 +209,7 @@ jobs:
             viccoboard-v${{ inputs.version }}.tar.gz.sha256
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: viccoboard-v${{ inputs.version }}
           path: release-artifacts/
@@ -229,3 +231,4 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Deployment" >> $GITHUB_STEP_SUMMARY
           echo "See \`DEPLOY.md\` in the release artifacts for deployment instructions." >> $GITHUB_STEP_SUMMARY
+

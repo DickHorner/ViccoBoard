@@ -10,7 +10,7 @@
 
 [![CI][badge-ci]][ci]
 [![CodeQL][badge-codeql]][codeql]
-[![Scorecards Workflow][badge-scorecards-workflow]][scorecards-workflow]
+[![Scorecard Workflow][badge-scorecard-workflow]][scorecard-workflow]
 [![OpenSSF Scorecard][badge-scorecard]][scorecard]
 [![License][badge-license]][license]
 
@@ -83,13 +83,14 @@ MIT - see [LICENSE](./LICENSE).
 <!-- Badges -->
 [badge-ci]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/ci.yml?branch=main&label=CI
 [badge-codeql]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/codeql.yml?branch=main&label=CodeQL
-[badge-scorecards-workflow]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/scorecards.yml?branch=main&label=Scorecards
+[badge-scorecard-workflow]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/scorecard.yml?branch=main&label=Scorecards
 [badge-scorecard]: https://api.securityscorecards.dev/projects/github.com/DickHorner/ViccoBoard/badge
 [badge-license]: https://img.shields.io/github/license/DickHorner/ViccoBoard
 
 <!-- Links -->
 [ci]: https://github.com/DickHorner/ViccoBoard/actions/workflows/ci.yml
 [codeql]: https://github.com/DickHorner/ViccoBoard/actions/workflows/codeql.yml
-[scorecards-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecards.yml
+[scorecard-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecard.yml
 [scorecard]: https://securityscorecards.dev/viewer/?uri=github.com/DickHorner/ViccoBoard
 [license]: https://github.com/DickHorner/ViccoBoard/blob/main/LICENSE
+

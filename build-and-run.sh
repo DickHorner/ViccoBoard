@@ -7,7 +7,7 @@ echo "============================================================"
 # Install dependencies at root (handles all workspaces)
 echo ""
 echo "📦 Installing dependencies..."
-npm install
+npm ci
 
 # Build all packages using workspace command
 echo ""
@@ -24,3 +24,4 @@ cd apps/demo && npm start
 
 echo ""
 echo "✨ Complete!"
+

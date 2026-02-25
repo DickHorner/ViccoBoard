@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const filePath = path.join(process.cwd(), '.github', 'workflows', 'scorecards.yml');
+const workflowPath = path.join(process.cwd(), '.github', 'workflows', 'scorecard.yml');
 
 function fail(errors) {
   for (const error of errors) {
@@ -10,16 +10,16 @@ function fail(errors) {
   process.exit(1);
 }
 
-if (!fs.existsSync(filePath)) {
-  fail([`Missing workflow file: ${filePath}`]);
+if (!fs.existsSync(workflowPath)) {
+  fail([`Missing workflow file: ${workflowPath}`]);
 }
 
-const text = fs.readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n');
+const text = fs.readFileSync(workflowPath, 'utf8').replace(/\r\n/g, '\n');
 const lines = text.split('\n');
 const errors = [];
 
 if (!/^permissions:\s*read-all\s*$/m.test(text)) {
-  errors.push('Scorecards workflow must set top-level `permissions: read-all`.');
+  errors.push('Scorecard workflow must set top-level `permissions: read-all`.');
 }
 
 const topLevelPermissionsBlock = text.match(/^permissions:\s*\n((?: {2}[^\n]*\n?)*)/m);
@@ -29,7 +29,7 @@ if (topLevelPermissionsBlock && /:\s*write\b/.test(topLevelPermissionsBlock[1]))
 
 const analysisIndex = lines.findIndex((line) => /^  analysis:\s*$/.test(line));
 if (analysisIndex === -1) {
-  errors.push('Missing `jobs.analysis` block in scorecards workflow.');
+  errors.push('Missing `jobs.analysis` block in scorecard workflow.');
 } else {
   const analysisLines = [];
   for (let i = analysisIndex + 1; i < lines.length; i += 1) {
@@ -56,11 +56,11 @@ if (analysisIndex === -1) {
 }
 
 if (!/publish_results:\s*true\s*$/m.test(text)) {
-  errors.push('Scorecards must keep `publish_results: true` to publish public Scorecard results.');
+  errors.push('Scorecard workflow must keep `publish_results: true` to publish public results.');
 }
 
 if (errors.length > 0) {
   fail(errors);
 }
 
-console.log('[workflow-guardrails] Scorecards workflow permissions are valid.');
+console.log('[workflow-guardrails] Scorecard workflow permissions are valid.');

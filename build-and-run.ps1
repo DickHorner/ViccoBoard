@@ -6,7 +6,7 @@ Write-Host "=" * 60
 
 # Install dependencies at root (handles all workspaces)
 Write-Host "`n📦 Installing dependencies..." -ForegroundColor Yellow
-npm install
+npm ci
 
 # Build all packages using workspace command
 Write-Host "`n🔨 Building packages..." -ForegroundColor Yellow
@@ -20,3 +20,4 @@ Set-Location apps/demo
 npm start
 
 Write-Host "`n✨ Complete!" -ForegroundColor Green
+

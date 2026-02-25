@@ -10,7 +10,7 @@
 
 [![CI][badge-ci]][ci]
 [![CodeQL][badge-codeql]][codeql]
-[![Scorecards Workflow][badge-scorecards-workflow]][scorecards-workflow]
+[![Scorecard Workflow][badge-scorecard-workflow]][scorecard-workflow]
 [![OpenSSF Scorecard][badge-scorecard]][scorecard]
 [![License][badge-license]][license]
 [![Stars][badge-stars]][stargazers]
@@ -157,7 +157,7 @@ Dadurch bleiben Features erweiterbar und werden nicht zu schwer wartbaren Einzel
 - Plugin-Registry: `packages/plugins/src/registry.ts`
 - Local-first Storage: `apps/teacher-ui/src/services/storage.service.ts`, `packages/storage/src/indexeddb.storage.ts`
 - Modul-Entrypoints: `modules/sport/src/index.ts`, `modules/students/src/index.ts`, `modules/exams/src/index.ts`
-- CI/Security Workflows: `.github/workflows/ci.yml`, `codeql.yml`, `scorecards.yml`
+- CI/Security Workflows: `.github/workflows/ci.yml`, `codeql.yml`, `scorecard.yml`
 
 [Zurueck nach oben](#top)
 
@@ -262,7 +262,7 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 <!-- Badges -->
 [badge-ci]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/ci.yml?branch=main&label=CI
 [badge-codeql]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/codeql.yml?branch=main&label=CodeQL
-[badge-scorecards-workflow]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/scorecards.yml?branch=main&label=Scorecards
+[badge-scorecard-workflow]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/scorecard.yml?branch=main&label=Scorecards
 [badge-scorecard]: https://api.securityscorecards.dev/projects/github.com/DickHorner/ViccoBoard/badge
 [badge-license]: https://img.shields.io/github/license/DickHorner/ViccoBoard
 [badge-stars]: https://img.shields.io/github/stars/DickHorner/ViccoBoard?style=flat
@@ -275,7 +275,7 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 <!-- Links -->
 [ci]: https://github.com/DickHorner/ViccoBoard/actions/workflows/ci.yml
 [codeql]: https://github.com/DickHorner/ViccoBoard/actions/workflows/codeql.yml
-[scorecards-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecards.yml
+[scorecard-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecard.yml
 [scorecard]: https://securityscorecards.dev/viewer/?uri=github.com/DickHorner/ViccoBoard
 [license]: https://github.com/DickHorner/ViccoBoard/blob/main/LICENSE
 [stargazers]: https://github.com/DickHorner/ViccoBoard/stargazers
@@ -284,3 +284,4 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 [pulls]: https://github.com/DickHorner/ViccoBoard/pulls
 [contributors]: https://github.com/DickHorner/ViccoBoard/graphs/contributors
 [commits]: https://github.com/DickHorner/ViccoBoard/commits/main
+
