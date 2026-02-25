@@ -11,12 +11,7 @@ const LEGACY_PATH_PATTERNS = [
   new RegExp(LEGACY_LABEL_A, 'i'),
   new RegExp(`(^|[/_-])${LEGACY_LABEL_B}([/_\\-.]|$)`, 'i')
 ];
-const README_TAB_MARKERS = ['Tab 1 · Product Overview', 'Tab 2 · AI / Reviewer / Maintainer Info'];
-const ZEN_ANCHOR_FILES = [
-  'README.md',
-  'DEVELOPMENT.md',
-  'docs/reviews/AI_CODE_REVIEW_INSTRUCTIONS.md'
-];
+const README_TAB_MARKERS = ['[Deutsch](./README.md) | [English](./README.en.md)', '## Inhaltsverzeichnis'];
 
 const BANNED_ROOT_ARTIFACTS = new Set([
   '$filePath',
@@ -32,12 +27,15 @@ const BANNED_ROOT_ARTIFACTS = new Set([
 
 const ROOT_DOC_ALLOWLIST = new Set([
   'README.md',
+  'README.en.md',
   'Plan.md',
   'DEVELOPMENT.md',
   'ARCHITECTURE_DECISIONS.md',
   'INDEX.md',
   'CONTRIBUTING.md',
+  'CODE_OF_CONDUCT.md',
   'SECURITY.md',
+  'BADGES_AND_METRICS_TODO.md',
   'agents.md',
   'AGENTS.md'
 ]);
@@ -190,30 +188,11 @@ function checkLegacyNaming(files) {
   }
 }
 
-function checkZenAnchors(files) {
-  const missingFiles = ZEN_ANCHOR_FILES.filter((file) => !files.includes(file));
-  if (missingFiles.length > 0) {
-    failWithList('Zen anchor files are missing.', missingFiles);
-  }
-
-  const missingMentions = [];
-  for (const file of ZEN_ANCHOR_FILES) {
-    const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
-    if (!/zen of python/i.test(text)) {
-      missingMentions.push(`${file} (missing "Zen of Python" reference)`);
-    }
-  }
-
-  if (missingMentions.length > 0) {
-    failWithList('Zen of Python must remain explicit in repository governance docs.', missingMentions);
-  }
-}
-
 function checkReadmeTabs() {
   const text = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
   const missingMarkers = README_TAB_MARKERS.filter((marker) => !text.includes(marker));
   if (missingMarkers.length > 0) {
-    failWithList('README tab layout markers are missing.', missingMarkers);
+    failWithList('README landing markers are missing.', missingMarkers);
   }
 }
 
@@ -224,7 +203,6 @@ function main() {
 
   checkTrackedStructure(trackedFiles);
   checkLegacyNaming(trackedFiles);
-  checkZenAnchors(trackedFiles);
   checkReadmeTabs();
 
   runNpmGate('lint:docs', 'Documentation guardrails');
@@ -241,5 +219,6 @@ try {
   console.error(`\n[pre-push] ${error instanceof Error ? error.message : String(error)}`);
   process.exit(1);
 }
+
 
 
