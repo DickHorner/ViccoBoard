@@ -21,7 +21,8 @@
     "lint:docs": "node scripts/doc-guardrails.mjs",
     "hooks:check": "node scripts/pre-push-guard.mjs",
     "hooks:install": "git config core.hooksPath .githooks",
-    "prepare": "npm run hooks:install"
+    "prepare": "npm run hooks:install",
+    "typecheck": "npm run build:packages && npm run typecheck --workspace=teacher-ui"
   },
   "keywords": [
     "education",
@@ -31,7 +32,7 @@
     "teacher-tools"
   ],
   "author": "",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",

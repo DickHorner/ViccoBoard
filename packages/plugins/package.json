@@ -16,9 +16,13 @@
     "test": "jest",
     "lint": "eslint src --ext .ts"
   },
-  "keywords": ["plugins", "registry", "extensibility"],
+  "keywords": [
+    "plugins",
+    "registry",
+    "extensibility"
+  ],
   "author": "",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "@viccoboard/core": "*"
   },

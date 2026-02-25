@@ -159,4 +159,5 @@ await storage.migrate();
 
 ## License
 
-UNLICENSED - Private project
+MIT
+
