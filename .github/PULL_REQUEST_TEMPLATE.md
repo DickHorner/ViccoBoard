@@ -1,31 +1,37 @@
-## Issue & Traceability Gate
+## Summary
 
-- [ ] Primary issue ID is declared (format: `[P*-*]`) and is open
-- [ ] Scope is limited to the declared issue IDs only
-- [ ] Related `Plan.md` checkbox IDs are listed
-- [ ] `docs/planning/ISSUES_TRACKER.md` is updated to match implementation status
-- [ ] All mandatory gates passed:
-  - [ ] `npm run lint:docs`
-  - [ ] `npm run build:packages`
-  - [ ] `npm run build:ipad`
-  - [ ] `npm test`
-- [ ] Issue close criteria met with evidence (tests/build outputs linked in PR body)
+<!-- What changed and why? Keep this concise. -->
 
-## Review Summary
+## Linked issue(s)
 
-**Status**: ✅ Approved / ⚠️ Approved with comments / ❌ Changes requested
+- Closes #
+- Related to #
 
-### 🚨 Critical Issues (Must Fix)
-- 
+## Checklist
 
-### ⚠️ Important Issues (Should Fix)
-- 
+- [ ] Scope is focused and intentional
+- [ ] Docs updated (README/docs/roadmap) where needed
+- [ ] `npm run lint:docs` passes
+- [ ] `npm run typecheck` passes
+- [ ] `npm run test` passes
+- [ ] `npm run build` passes
 
-### 💡 Suggestions (Nice to Have)
-- 
+## Testing evidence
 
-### ✨ Positive Observations
-- 
+<!-- Paste relevant output snippets or describe manual verification. -->
 
-### Recommendation
-- 
+## Architecture and risk notes
+
+- [ ] Module boundaries preserved (`apps -> modules -> packages`)
+- [ ] No hidden breaking changes
+- [ ] Local-first / iPadOS Safari behavior considered
+
+## Module proposal impact (if applicable)
+
+- Subject:
+- School form:
+- New module/plugin contracts affected:
+
+## Screenshots / recordings (if UI change)
+
+<!-- Add before/after visuals when possible. -->

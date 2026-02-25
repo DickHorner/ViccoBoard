@@ -2,30 +2,50 @@
 
 ## Supported Versions
 
-ViccoBoard is under active development. Security fixes are applied to the latest `main` branch.
+Security fixes are applied to the latest `main` branch.
 
 ## Reporting a Vulnerability
 
-Please do **not** open a public issue for security vulnerabilities.
+Please do **not** open public issues for vulnerabilities.
 
-Report privately by contacting the repository owner via GitHub:
-- https://github.com/DickHorner
+Use private reporting:
 
-Include:
-1. Affected area/file
-2. Reproduction steps
-3. Impact assessment
-4. Suggested mitigation (if available)
+1. GitHub Security Advisory (preferred)
+2. Or contact the repository owner: https://github.com/DickHorner
 
-## Response Process
+Please include:
 
-1. Acknowledgement target: within 5 business days
-2. Triage and severity assessment
-3. Fix on a private branch when needed
-4. Coordinated disclosure after patch availability
+- Affected component/path
+- Reproduction steps
+- Expected vs actual behavior
+- Impact assessment (confidentiality/integrity/availability)
+- Suggested mitigation (optional)
 
-## Security Baseline
+## Response Targets
 
-Project-specific security and quality controls are documented here:
+- Initial acknowledgement: within 5 business days
+- Triage and severity assessment after acknowledgement
+- Fix planning and coordinated disclosure after patch readiness
+
+## Scope priorities
+
+Because ViccoBoard handles sensitive school data, priority is highest for:
+
+- Authentication/lock bypass
+- Data exfiltration or unintended data exposure
+- Backup/restore integrity issues
+- Storage encryption/key-handling weaknesses
+- Dependency supply-chain vulnerabilities in runtime paths
+
+## Project security baseline
+
+- Local-first default operation
+- Optional integrations must remain opt-in
+- Architecture boundaries (`apps -> modules -> packages`)
+- Required CI quality gate before merge
+
+Related docs:
+
 - [docs/qa/SECURITY_AND_QA_CHECKLIST.md](./docs/qa/SECURITY_AND_QA_CHECKLIST.md)
-- [docs/reviews/AI_CODE_REVIEW_INSTRUCTIONS.md](./docs/reviews/AI_CODE_REVIEW_INSTRUCTIONS.md)
+- [DEVELOPMENT.md](./DEVELOPMENT.md)
+- [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md)

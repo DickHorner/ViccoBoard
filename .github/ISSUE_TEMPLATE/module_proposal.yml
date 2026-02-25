@@ -1,0 +1,74 @@
+name: Module proposal
+description: Propose a new subject/school-form module
+labels:
+  - module-proposal
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to propose a new ViccoBoard module.
+        Focus on subject + school form and concrete classroom outcomes.
+
+  - type: input
+    id: module_name
+    attributes:
+      label: Proposed module name
+      placeholder: "music-secondary" or "physics-upper-school"
+    validations:
+      required: true
+
+  - type: input
+    id: subject
+    attributes:
+      label: Subject
+      placeholder: "Sport, Deutsch, Mathematik, ..."
+    validations:
+      required: true
+
+  - type: input
+    id: school_form
+    attributes:
+      label: School form
+      placeholder: "Sek I, Sek II, Grundschule, Berufsschule, ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Core teaching workflow
+      description: Describe the weekly workflow this module should support
+    validations:
+      required: true
+
+  - type: textarea
+    id: entities
+    attributes:
+      label: Data model ideas
+      description: Entities/fields that are essential
+      placeholder: "e.g. rubric, attempts, criteria, lesson block, ..."
+
+  - type: textarea
+    id: assessments
+    attributes:
+      label: Assessment and grading rules
+      description: Domain-specific rules or edge cases
+
+  - type: textarea
+    id: outputs
+    attributes:
+      label: Exports and reports
+      description: What should be printable/shareable?
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Required constraints
+      options:
+        - label: Local-first by default
+          required: true
+        - label: iPadOS Safari compatibility
+          required: true
+        - label: Implementable via module/plugin boundaries
+          required: true

@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible bug in ViccoBoard
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve ViccoBoard.
+        Please provide clear steps so we can reproduce the issue quickly.
+
+  - type: input
+    id: area
+    attributes:
+      label: Area
+      description: Where does the bug happen?
+      placeholder: "Student list / Attendance / Grading / Exam builder / CI"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Add numbered steps and include any input values
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. Enter ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - iPadOS Safari
+        - Desktop Safari
+        - Chrome
+        - Firefox
+        - Edge
+        - CI only
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console logs or screenshots
+      description: Paste logs or attach images if available
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues
+          required: true
+        - label: I can reproduce this on current main
+          required: false

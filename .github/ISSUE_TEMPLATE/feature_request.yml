@@ -1,0 +1,49 @@
+name: Feature request
+description: Suggest a user-facing improvement
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature ideas are best when they start from real classroom workflows.
+
+  - type: input
+    id: workflow
+    attributes:
+      label: Teaching workflow
+      description: Which workflow should improve?
+      placeholder: "Attendance entry, grading day, exam correction, ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: pain
+    attributes:
+      label: Current pain point
+      description: What is slow, error-prone, or frustrating today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Classroom impact
+      description: How will this help teachers/students?
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints
+      options:
+        - label: Must work local-first/offline
+        - label: Must work on iPadOS Safari
+        - label: Should be modular (module/plugin-friendly)
