@@ -339,7 +339,7 @@ const newCriterion = ref({
   weight: 100
 });
 
-const criteria = computed(() => {
+const criteria = computed((): any[] => {
   if (!category.value) return [];
   const config = category.value.configuration as any;
   return config.criteria || [];
