@@ -68,7 +68,7 @@
             </div>
             <button 
               class="btn-danger-text btn-small"
-              @click="removeCriterion(index)"
+              @click="removeCriterion(index as number)"
               :disabled="saving"
             >
               Entfernen
