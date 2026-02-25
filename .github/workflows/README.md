@@ -28,6 +28,13 @@ Runs on pushes to `main`, weekly, and branch-protection updates.
 - Publishes SARIF results to GitHub code scanning
 - Publishes Scorecard results for the public badge
 
+### `dependabot-auto-merge.yml` (`Dependabot auto-merge`)
+Runs on pull requests opened by `dependabot[bot]`.
+
+- Fetches Dependabot update metadata
+- Auto-approves and squash-merges **patch** and **minor** updates when CI passes
+- **Major** version bumps are left for manual review
+
 ### `docs-guardrails.yml` (`Docs Guardrails`)
 Fast docs-policy validation on push/PR.
 
