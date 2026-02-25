@@ -39,7 +39,7 @@
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.0",
     "sql.js": "^1.13.0",
-    "uuid": "^9.0.1"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
