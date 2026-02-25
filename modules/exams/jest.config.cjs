@@ -14,19 +14,19 @@ module.exports = {
     '^@viccoboard/sport$': '<rootDir>/../../modules/sport/src/index.ts'
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      useESM: true,
-      tsconfig: {
-        module: 'ESNext'
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: {
+          module: 'ESNext'
+        },
+        diagnostics: false
       }
-    }]
+    ]
   },
   testMatch: ['**/tests/**/*.test.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   moduleFileExtensions: ['ts', 'js', 'json'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/index.ts'
-  ]
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/index.ts']
 };
