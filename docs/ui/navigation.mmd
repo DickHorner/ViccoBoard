@@ -1,0 +1,88 @@
+flowchart LR
+  route_dashboard["Dashboard\n/"]
+  route_exams["Exams\n/exams"]
+  route_exam_new["New Exam\n/exams/new"]
+  route_simple_exam_new["Create Simple Exam\n/exams/simple/new"]
+  route_simple_exam_edit["Edit Simple Exam\n/exams/simple/:id"]
+  route_exam_edit["Exam Builder\n/exams/:id"]
+  route_exam_correct["Exam Correction\n/exams/:id/correct"]
+  route_class_detail["Class Detail\n/classes/:id"]
+  route_students["Students\n/students"]
+  route_student_profile["Student Profile\n/students/:id"]
+  route_attendance["Attendance Entry\n/attendance"]
+  route_lessons["Lessons\n/lessons"]
+  route_grading_overview["Grading Overview\n/grading"]
+  route_criteria_grading["Criteria Grading\n/grading/criteria/:id"]
+  route_time_grading["Time-Based Grading\n/grading/time/:id"]
+  route_cooper_grading["Cooper Grading\n/grading/cooper/:id"]
+  route_shuttle_grading["Shuttle Grading\n/grading/shuttle/:id"]
+  route_mittelstrecke_grading["Mittelstrecke Grading\n/grading/mittelstrecke/:id"]
+  route_Sportabzeichen_grading["Sportabzeichen\n/grading/Sportabzeichen/:id"]
+  route_bjs_grading["Bundesjugendspiele\n/grading/bjs/:id"]
+  route_grade_history["Grade History\n/grading/history/:id"]
+  route_timer["Timer\n/tools/timer"]
+  route_multistop["Multistop\n/tools/multistop"]
+  route_scoreboard["Scoreboard\n/tools/scoreboard"]
+  route_teams["Teams\n/tools/teams"]
+  route_tournaments["Tournaments\n/tools/tournaments"]
+  route_tactics["Tactics\n/tools/tactics"]
+  route_feedback["Feedback\n/tools/feedback"]
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue(["shared\napps/teacher-ui/src/layouts/AppLayout.vue"])
+  shared_apps_teacher_ui_src_stores_examBuilderStore_ts(["shared\napps/teacher-ui/src/stores/examBuilderStore.ts"])
+  shared_apps_teacher_ui_src_views_wip_ClassDetail_clean_vue(["shared\napps/teacher-ui/src/views-wip/ClassDetail-clean.vue"])
+  shared_apps_teacher_ui_src_views_wip_ClassDetail_vue(["shared\napps/teacher-ui/src/views-wip/ClassDetail.vue"])
+  shared_apps_teacher_ui_src_views_wip_Dashboard_vue(["shared\napps/teacher-ui/src/views-wip/Dashboard.vue"])
+  shared_apps_teacher_ui_src_views_wip_GradingOverview_vue(["shared\napps/teacher-ui/src/views-wip/GradingOverview.vue"])
+  shared_apps_teacher_ui_src_views_wip_StudentList_vue(["shared\napps/teacher-ui/src/views-wip/StudentList.vue"])
+  shared_apps_teacher_ui_src_views_wip_StudentProfile_vue(["shared\napps/teacher-ui/src/views-wip/StudentProfile.vue"])
+  shared_apps_teacher_ui_src_views_CorrectionCompact_vue(["shared\napps/teacher-ui/src/views/CorrectionCompact.vue"])
+  shared_apps_teacher_ui_src_views_CorrectionCompactUI_vue(["shared\napps/teacher-ui/src/views/CorrectionCompactUI.vue"])
+  shared_apps_teacher_ui_src_views_ExamBuilder_vue(["shared\napps/teacher-ui/src/views/ExamBuilder.vue"])
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_dashboard
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_exams
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_students
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_lessons
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_attendance
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_grading_overview
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_timer
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_multistop
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_scoreboard
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_teams
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_tournaments
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_tactics
+  shared_apps_teacher_ui_src_layouts_AppLayout_vue -->|link| route_feedback
+  shared_apps_teacher_ui_src_stores_examBuilderStore_ts -->|push| route_exams
+  route_class_detail -->|link| route_student_profile
+  route_class_detail -->|link| route_attendance
+  shared_apps_teacher_ui_src_views_CorrectionCompact_vue -->|push| route_exams
+  shared_apps_teacher_ui_src_views_CorrectionCompactUI_vue -->|push| route_exams
+  route_exam_correct -->|push| route_exams
+  route_dashboard -->|link| route_class_detail
+  route_dashboard -->|link| route_students
+  route_dashboard -->|link| route_attendance
+  shared_apps_teacher_ui_src_views_ExamBuilder_vue -->|push| route_exams
+  route_exams -->|push| route_exam_new
+  route_grading_overview -->|push| route_criteria_grading
+  route_grading_overview -->|push| route_time_grading
+  route_grading_overview -->|push| route_cooper_grading
+  route_grading_overview -->|push| route_shuttle_grading
+  route_grading_overview -->|push| route_mittelstrecke_grading
+  route_grading_overview -->|push| route_Sportabzeichen_grading
+  route_grading_overview -->|push| route_bjs_grading
+  route_grading_overview -->|push| route_grade_history
+  route_exam_new -->|push| route_exams
+  route_exam_edit -->|push| route_exams
+  route_lessons -->|link| route_attendance
+  route_students -->|link| route_student_profile
+  shared_apps_teacher_ui_src_views_wip_ClassDetail_clean_vue -->|link| route_student_profile
+  shared_apps_teacher_ui_src_views_wip_ClassDetail_clean_vue -->|link| route_attendance
+  shared_apps_teacher_ui_src_views_wip_ClassDetail_vue -->|link| route_student_profile
+  shared_apps_teacher_ui_src_views_wip_ClassDetail_vue -->|link| route_attendance
+  shared_apps_teacher_ui_src_views_wip_Dashboard_vue -->|link| route_class_detail
+  shared_apps_teacher_ui_src_views_wip_Dashboard_vue -->|link| route_students
+  shared_apps_teacher_ui_src_views_wip_Dashboard_vue -->|link| route_attendance
+  shared_apps_teacher_ui_src_views_wip_GradingOverview_vue -->|push| route_criteria_grading
+  shared_apps_teacher_ui_src_views_wip_GradingOverview_vue -->|push| route_time_grading
+  shared_apps_teacher_ui_src_views_wip_GradingOverview_vue -->|push| route_grade_history
+  shared_apps_teacher_ui_src_views_wip_StudentList_vue -->|link| route_student_profile
+  shared_apps_teacher_ui_src_views_wip_StudentProfile_vue -->|push| route_students

@@ -1,0 +1,510 @@
+{
+  "screens": [
+    {
+      "id": "route:dashboard",
+      "routePath": "/",
+      "title": "Dashboard",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/Dashboard.vue"
+    },
+    {
+      "id": "route:exams",
+      "routePath": "/exams",
+      "title": "Exams",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/ExamsOverview.vue"
+    },
+    {
+      "id": "route:exam-new",
+      "routePath": "/exams/new",
+      "title": "New Exam",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/KBRExamBuilder.vue"
+    },
+    {
+      "id": "route:simple-exam-new",
+      "routePath": "/exams/simple/new",
+      "title": "Create Simple Exam",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/SimpleExamBuilder.vue"
+    },
+    {
+      "id": "route:simple-exam-edit",
+      "routePath": "/exams/simple/:id",
+      "title": "Edit Simple Exam",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/SimpleExamBuilder.vue"
+    },
+    {
+      "id": "route:exam-edit",
+      "routePath": "/exams/:id",
+      "title": "Exam Builder",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/KBRExamBuilder.vue"
+    },
+    {
+      "id": "route:exam-correct",
+      "routePath": "/exams/:id/correct",
+      "title": "Exam Correction",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue"
+    },
+    {
+      "id": "route:class-detail",
+      "routePath": "/classes/:id",
+      "title": "Class Detail",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/ClassDetail.vue"
+    },
+    {
+      "id": "route:students",
+      "routePath": "/students",
+      "title": "Students",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/StudentList.vue"
+    },
+    {
+      "id": "route:student-profile",
+      "routePath": "/students/:id",
+      "title": "Student Profile",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/StudentProfile.vue"
+    },
+    {
+      "id": "route:attendance",
+      "routePath": "/attendance",
+      "title": "Attendance Entry",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/AttendanceEntry.vue"
+    },
+    {
+      "id": "route:lessons",
+      "routePath": "/lessons",
+      "title": "Lessons",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/LessonList.vue"
+    },
+    {
+      "id": "route:grading-overview",
+      "routePath": "/grading",
+      "title": "Grading Overview",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/GradingOverview.vue"
+    },
+    {
+      "id": "route:criteria-grading",
+      "routePath": "/grading/criteria/:id",
+      "title": "Criteria Grading",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/CriteriaGradingEntry.vue"
+    },
+    {
+      "id": "route:time-grading",
+      "routePath": "/grading/time/:id",
+      "title": "Time-Based Grading",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/TimeGradingEntry.vue"
+    },
+    {
+      "id": "route:cooper-grading",
+      "routePath": "/grading/cooper/:id",
+      "title": "Cooper Grading",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/CooperGradingEntry.vue"
+    },
+    {
+      "id": "route:shuttle-grading",
+      "routePath": "/grading/shuttle/:id",
+      "title": "Shuttle Grading",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/ShuttleGradingEntry.vue"
+    },
+    {
+      "id": "route:mittelstrecke-grading",
+      "routePath": "/grading/mittelstrecke/:id",
+      "title": "Mittelstrecke Grading",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/MittelstreckeGradingEntry.vue"
+    },
+    {
+      "id": "route:Sportabzeichen-grading",
+      "routePath": "/grading/Sportabzeichen/:id",
+      "title": "Sportabzeichen",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/SportabzeichenGradingEntry.vue"
+    },
+    {
+      "id": "route:bjs-grading",
+      "routePath": "/grading/bjs/:id",
+      "title": "Bundesjugendspiele",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/BJSGradingEntry.vue"
+    },
+    {
+      "id": "route:grade-history",
+      "routePath": "/grading/history/:id",
+      "title": "Grade History",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/GradeHistory.vue"
+    },
+    {
+      "id": "route:timer",
+      "routePath": "/tools/timer",
+      "title": "Timer",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/Timer.vue"
+    },
+    {
+      "id": "route:multistop",
+      "routePath": "/tools/multistop",
+      "title": "Multistop",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/Multistop.vue"
+    },
+    {
+      "id": "route:scoreboard",
+      "routePath": "/tools/scoreboard",
+      "title": "Scoreboard",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/Scoreboard.vue"
+    },
+    {
+      "id": "route:teams",
+      "routePath": "/tools/teams",
+      "title": "Teams",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/TeamBuilder.vue"
+    },
+    {
+      "id": "route:tournaments",
+      "routePath": "/tools/tournaments",
+      "title": "Tournaments",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/Tournaments.vue"
+    },
+    {
+      "id": "route:tactics",
+      "routePath": "/tools/tactics",
+      "title": "Tactics",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/TacticsBoard.vue"
+    },
+    {
+      "id": "route:feedback",
+      "routePath": "/tools/feedback",
+      "title": "Feedback",
+      "component": "C:/Users/jaspe/OneDrive/Coding/ViccoBoard/apps/teacher-ui/src/views/FeedbackTool.vue"
+    }
+  ],
+  "links": [
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:dashboard",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:exams",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:students",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:lessons",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:attendance",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:grading-overview",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:timer",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:multistop",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:scoreboard",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:teams",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:tournaments",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:tactics",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/layouts/AppLayout.vue",
+      "toScreenId": "route:feedback",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/layouts/AppLayout.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/stores/examBuilderStore.ts",
+      "toScreenId": "route:exams",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/stores/examBuilderStore.ts",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "route:class-detail",
+      "toScreenId": "route:student-profile",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views/ClassDetail.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:class-detail",
+      "toScreenId": "route:attendance",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views/ClassDetail.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views/CorrectionCompact.vue",
+      "toScreenId": "route:exams",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/CorrectionCompact.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views/CorrectionCompactUI.vue",
+      "toScreenId": "route:exams",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/CorrectionCompactUI.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "route:exam-correct",
+      "toScreenId": "route:exams",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "route:dashboard",
+      "toScreenId": "route:class-detail",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views/Dashboard.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:dashboard",
+      "toScreenId": "route:students",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views/Dashboard.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "route:dashboard",
+      "toScreenId": "route:attendance",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views/Dashboard.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views/ExamBuilder.vue",
+      "toScreenId": "route:exams",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/ExamBuilder.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "route:exams",
+      "toScreenId": "route:exam-new",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/ExamsOverview.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:criteria-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:time-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:cooper-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:shuttle-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:mittelstrecke-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:Sportabzeichen-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:bjs-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:grading-overview",
+      "toScreenId": "route:grade-history",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/GradingOverview.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "route:exam-new",
+      "toScreenId": "route:exams",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/KBRExamBuilder.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "route:exam-edit",
+      "toScreenId": "route:exams",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views/KBRExamBuilder.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "route:lessons",
+      "toScreenId": "route:attendance",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views/LessonList.vue",
+      "confidence": 1.0
+    },
+    {
+      "fromScreenId": "route:students",
+      "toScreenId": "route:student-profile",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views/StudentList.vue",
+      "confidence": 0.85
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/ClassDetail-clean.vue",
+      "toScreenId": "route:student-profile",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/ClassDetail-clean.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/ClassDetail-clean.vue",
+      "toScreenId": "route:attendance",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/ClassDetail-clean.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/ClassDetail.vue",
+      "toScreenId": "route:student-profile",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/ClassDetail.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/ClassDetail.vue",
+      "toScreenId": "route:attendance",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/ClassDetail.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/Dashboard.vue",
+      "toScreenId": "route:class-detail",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/Dashboard.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/Dashboard.vue",
+      "toScreenId": "route:students",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/Dashboard.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/Dashboard.vue",
+      "toScreenId": "route:attendance",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/Dashboard.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/GradingOverview.vue",
+      "toScreenId": "route:criteria-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views-wip/GradingOverview.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/GradingOverview.vue",
+      "toScreenId": "route:time-grading",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views-wip/GradingOverview.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/GradingOverview.vue",
+      "toScreenId": "route:grade-history",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views-wip/GradingOverview.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/StudentList.vue",
+      "toScreenId": "route:student-profile",
+      "kind": "link",
+      "sourceFile": "apps/teacher-ui/src/views-wip/StudentList.vue",
+      "confidence": 0.8
+    },
+    {
+      "fromScreenId": "shared:apps/teacher-ui/src/views-wip/StudentProfile.vue",
+      "toScreenId": "route:students",
+      "kind": "push",
+      "sourceFile": "apps/teacher-ui/src/views-wip/StudentProfile.vue",
+      "confidence": 0.8
+    }
+  ]
+}

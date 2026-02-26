@@ -1,0 +1,39 @@
+flowchart TB
+  subgraph Root
+    route_dashboard["Dashboard\n/\nDashboard.vue"]
+    route_class_detail["Class Detail\n/classes/:id\nClassDetail.vue"]
+    route_attendance["Attendance Entry\n/attendance\nAttendanceEntry.vue"]
+    route_lessons["Lessons\n/lessons\nLessonList.vue"]
+  end
+  subgraph Exams
+    route_exams["Exams\n/exams\nExamsOverview.vue"]
+    route_exam_new["New Exam\n/exams/new\nKBRExamBuilder.vue"]
+    route_simple_exam_new["Create Simple Exam\n/exams/simple/new\nSimpleExamBuilder.vue"]
+    route_simple_exam_edit["Edit Simple Exam\n/exams/simple/:id\nSimpleExamBuilder.vue"]
+    route_exam_edit["Exam Builder\n/exams/:id\nKBRExamBuilder.vue"]
+    route_exam_correct["Exam Correction\n/exams/:id/correct\nCorrectionCompactUI_v2.vue"]
+  end
+  subgraph Students
+    route_students["Students\n/students\nStudentList.vue"]
+    route_student_profile["Student Profile\n/students/:id\nStudentProfile.vue"]
+  end
+  subgraph Grading
+    route_grading_overview["Grading Overview\n/grading\nGradingOverview.vue"]
+    route_criteria_grading["Criteria Grading\n/grading/criteria/:id\nCriteriaGradingEntry.vue"]
+    route_time_grading["Time-Based Grading\n/grading/time/:id\nTimeGradingEntry.vue"]
+    route_cooper_grading["Cooper Grading\n/grading/cooper/:id\nCooperGradingEntry.vue"]
+    route_shuttle_grading["Shuttle Grading\n/grading/shuttle/:id\nShuttleGradingEntry.vue"]
+    route_mittelstrecke_grading["Mittelstrecke Grading\n/grading/mittelstrecke/:id\nMittelstreckeGradingEntry.vue"]
+    route_Sportabzeichen_grading["Sportabzeichen\n/grading/Sportabzeichen/:id\nSportabzeichenGradingEntry.vue"]
+    route_bjs_grading["Bundesjugendspiele\n/grading/bjs/:id\nBJSGradingEntry.vue"]
+    route_grade_history["Grade History\n/grading/history/:id\nGradeHistory.vue"]
+  end
+  subgraph Tools
+    route_timer["Timer\n/tools/timer\nTimer.vue"]
+    route_multistop["Multistop\n/tools/multistop\nMultistop.vue"]
+    route_scoreboard["Scoreboard\n/tools/scoreboard\nScoreboard.vue"]
+    route_teams["Teams\n/tools/teams\nTeamBuilder.vue"]
+    route_tournaments["Tournaments\n/tools/tournaments\nTournaments.vue"]
+    route_tactics["Tactics\n/tools/tactics\nTacticsBoard.vue"]
+    route_feedback["Feedback\n/tools/feedback\nFeedbackTool.vue"]
+  end
