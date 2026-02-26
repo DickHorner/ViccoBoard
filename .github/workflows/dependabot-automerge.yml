@@ -1,0 +1,76 @@
+name: Dependabot Auto Merge
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+permissions:
+  contents: read
+
+jobs:
+  automerge:
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      checks: read
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Fetch metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a # v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-approve patch/minor updates
+        if: contains(fromJSON('["version-update:semver-patch","version-update:semver-minor"]'), steps.metadata.outputs.update-type)
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            try {
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: "APPROVE",
+                body: "Auto-approved for Dependabot semver patch/minor update."
+              });
+              core.info("Pull request approved.");
+            } catch (error) {
+              if (error.status === 422) {
+                core.info("Pull request already approved by this actor.");
+              } else {
+                throw error;
+              }
+            }
+
+      - name: Enable auto-merge (squash)
+        if: contains(fromJSON('["version-update:semver-patch","version-update:semver-minor"]'), steps.metadata.outputs.update-type)
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const pullRequestId = context.payload.pull_request.node_id;
+            try {
+              await github.graphql(
+                `mutation($pullRequestId: ID!) {
+                  enablePullRequestAutoMerge(input: {
+                    pullRequestId: $pullRequestId
+                    mergeMethod: SQUASH
+                  }) {
+                    clientMutationId
+                  }
+                }`,
+                { pullRequestId }
+              );
+              core.info("Auto-merge enabled.");
+            } catch (error) {
+              if (String(error.message).includes("already enabled")) {
+                core.info("Auto-merge was already enabled.");
+              } else {
+                throw error;
+              }
+            }
