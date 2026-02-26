@@ -24,7 +24,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -149,7 +149,7 @@ jobs:
           sha256sum viccoboard-v${{ inputs.version }}.tar.gz > viccoboard-v${{ inputs.version }}.tar.gz.sha256
 
       - name: Create Release
-        uses: softprops/action-gh-release@26994186c0ac3ef5cae75ac16aa32e8153525f77 # v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           tag_name: v${{ inputs.version }}
           name: ViccoBoard v${{ inputs.version }}
@@ -209,7 +209,7 @@ jobs:
             viccoboard-v${{ inputs.version }}.tar.gz.sha256
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: viccoboard-v${{ inputs.version }}
           path: release-artifacts/

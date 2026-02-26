@@ -207,6 +207,7 @@ function main() {
 
   runNpmGate('lint:docs', 'Documentation guardrails');
   runNpmGate('lint:workflows', 'Workflow guardrails');
+  runNpmGate('lint:openssf', 'OpenSSF badge readiness');
   runNpmGate('build:packages', 'Package compilation');
   runNpmGate('test', 'Workspace tests');
   runNpmGate('build', 'Full production build');
@@ -220,6 +221,7 @@ try {
   console.error(`\n[pre-push] ${error instanceof Error ? error.message : String(error)}`);
   process.exit(1);
 }
+
 
 
 

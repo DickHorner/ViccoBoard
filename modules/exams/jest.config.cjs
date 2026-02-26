@@ -18,15 +18,11 @@ module.exports = {
         allowSyntheticDefaultImports: true,
         esModuleInterop: true
       }
-    }]
+    ]
   },
   transformIgnorePatterns: ['/node_modules/(?!(uuid)/)'],
   testMatch: ['**/tests/**/*.test.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   moduleFileExtensions: ['ts', 'js', 'json'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/index.ts'
-  ]
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/index.ts']
 };

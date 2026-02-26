@@ -38,6 +38,7 @@ Der Kern ist bewusst modular: bereits heute mit Sport + KBR-Pruefungsbausteinen,
 - [Schnellstart](#schnellstart)
 - [Roadmap (Now / Next / Later = Vision)](#roadmap-now-next-later-vision)
 - [Contributing (Lehrkraefte + Devs)](#contributing-lehrkraefte--devs)
+- [OpenSSF Best Practices Badge (CII)](#openssf-best-practices-badge-cii)
 - [Weitere Metriken (Setup noetig)](#weitere-metriken-setup-noetig)
 - [Community und Philosophie](#community-und-philosophie)
 - [Lizenz](#lizenz)
@@ -225,12 +226,41 @@ Es fokussiert bewusst auf **Fach + Schulform + Unterrichtsworkflow**.
 
 [Zurueck nach oben](#top)
 
+
+## OpenSSF Best Practices Badge (CII)
+
+Wir verfolgen aktiv das OpenSSF Best Practices Badge (frueher CII).
+
+- Fast-Track Playbook: [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
+- Status: Registrierung auf bestpractices.dev ist der einzige manuelle Konto-Schritt
+
+Hinweis: Das Scorecard-Kriterium CII-Best-Practices steigt erst, sobald das Projekt dort angelegt ist.
+
+[Zurueck nach oben](#top)
 ## Weitere Metriken (Setup noetig)
 
 Nicht alle sinnvollen Metriken lassen sich ohne zusaetzliche Konten/Tokens aktivieren.
 Die offene Liste mit konkreten Setup-Schritten findest du hier:
 
 - [BADGES_AND_METRICS_TODO.md](./BADGES_AND_METRICS_TODO.md)
+
+[Zurueck nach oben](#top)
+- Security: [SECURITY.md](./SECURITY.md)
+
+Fuer neue Fachideen nutze bitte das **Module Proposal**-Issue-Template.
+Es fokussiert bewusst auf **Fach + Schulform + Unterrichtsworkflow**.
+
+[Zurueck nach oben](#top)
+
+
+## OpenSSF Best Practices Badge (CII)
+
+Wir verfolgen aktiv das OpenSSF Best Practices Badge (frueher CII).
+
+- Fast-Track Playbook: [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
+- Status: Registrierung auf bestpractices.dev ist der einzige manuelle Konto-Schritt
+
+Hinweis: Das Scorecard-Kriterium CII-Best-Practices steigt erst, sobald das Projekt dort angelegt ist.
 
 [Zurueck nach oben](#top)
 
@@ -284,4 +314,6 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 [pulls]: https://github.com/DickHorner/ViccoBoard/pulls
 [contributors]: https://github.com/DickHorner/ViccoBoard/graphs/contributors
 [commits]: https://github.com/DickHorner/ViccoBoard/commits/main
+
+
 

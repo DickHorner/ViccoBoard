@@ -24,8 +24,9 @@ Please include:
 ## Response Targets
 
 - Initial acknowledgement: within 5 business days
-- Triage and severity assessment after acknowledgement
-- Fix planning and coordinated disclosure after patch readiness
+- Confidential triage response: within 14 days
+- Coordinated remediation and disclosure plan after patch readiness
+- Publicly known critical vulnerabilities should be fixed within 60 days when feasible
 
 ## Scope priorities
 
@@ -47,5 +48,6 @@ Because ViccoBoard handles sensitive school data, priority is highest for:
 Related docs:
 
 - [docs/qa/SECURITY_AND_QA_CHECKLIST.md](./docs/qa/SECURITY_AND_QA_CHECKLIST.md)
+- [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
 - [DEVELOPMENT.md](./DEVELOPMENT.md)
 - [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md)
