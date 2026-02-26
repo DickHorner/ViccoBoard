@@ -94,6 +94,13 @@ apps/teacher-ui/tests/*.js
 apps/teacher-ui/tests/*.d.ts
 apps/teacher-ui/vite.config.js
 apps/teacher-ui/vite.config.d.ts
+# Generated Vue component declaration files (emitted by vue-tsc composite builds)
+apps/teacher-ui/src/**/*.vue.d.ts
+apps/teacher-ui/src/components/*.d.ts
+apps/teacher-ui/src/layouts/*.d.ts
+apps/teacher-ui/src/views/*.d.ts
+apps/teacher-ui/src/views-wip/*.d.ts
+apps/teacher-ui/src/App.vue.d.ts
 modules/*/tests/**/*.js
 modules/*/tests/**/*.d.ts
 modules/sport/examples/*.js

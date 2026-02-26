@@ -47,6 +47,7 @@
     { "path": "../../modules/sport" },
     { "path": "../../modules/exams" }
   ],
+  "files": ["src/shims-vue.d.ts"],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
@@ -58,6 +59,6 @@
     "../../modules/sport/src/**/*",
     "../../modules/exams/src/**/*"
   ],
-  "exclude": ["node_modules", "src/views-wip/**"]
+  "exclude": ["node_modules", "src/views-wip/**", "src/**/*.d.ts"]
 }
 

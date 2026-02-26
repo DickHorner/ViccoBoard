@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "npm run build:packages && npm run dev --workspace=teacher-ui",
     "dev:ui": "npm run dev --workspace=teacher-ui",
-    "test": "npm run test --workspace=@viccoboard/students --workspace=@viccoboard/exams --workspace=@viccoboard/sport --workspace=teacher-ui",
+    "test": "npm run test --workspace=@viccoboard/storage --workspace=@viccoboard/students --workspace=@viccoboard/exams --workspace=@viccoboard/sport --workspace=teacher-ui",
     "build": "npm run build:all",
     "build:packages": "npm run build --workspace=@viccoboard/core && npm run build --workspace=@viccoboard/plugins && npm run build --workspace=@viccoboard/storage && npm run build --workspace=@viccoboard/students && npm run build --workspace=@viccoboard/exams && npm run build --workspace=@viccoboard/sport",
     "build:all": "npm run build:packages && npm run build --workspace=@viccoboard/demo --workspace=teacher-ui",
