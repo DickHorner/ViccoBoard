@@ -31,3 +31,7 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Major updates require manual review
+        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        run: echo "Major version update detected; this pull request will not be auto-merged and requires manual review."
