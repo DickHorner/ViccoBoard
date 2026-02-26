@@ -68,7 +68,7 @@
             </div>
             <button 
               class="btn-danger-text btn-small"
-              @click="removeCriterion(index)"
+              @click="removeCriterion(index as number)"
               :disabled="saving"
             >
               Entfernen
@@ -339,7 +339,7 @@ const newCriterion = ref({
   weight: 100
 });
 
-const criteria = computed(() => {
+const criteria = computed((): any[] => {
   if (!category.value) return [];
   const config = category.value.configuration as any;
   return config.criteria || [];
