@@ -17,7 +17,7 @@
     "@viccoboard/core": "*",
     "dexie": "^4.2.1",
     "pinia": "^3.0.4",
-    "vue": "^3.5.13",
+    "vue": "^3.5.29",
     "vue-i18n": "^11.2.8",
     "vue-router": "^4.6.4"
   },
@@ -25,7 +25,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^20.0.0",
     "@vitejs/plugin-vue": "^6.0.0",
-    "@vue/tsconfig": "^0.7.0",
+    "@vue/tsconfig": "^0.8.1",
     "@vue/vue3-jest": "^29.2.6",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
