@@ -95,6 +95,7 @@ apps/teacher-ui/tests/*.d.ts
 apps/teacher-ui/vite.config.js
 apps/teacher-ui/vite.config.d.ts
 # Generated Vue SFC transpile sidecars
+apps/teacher-ui/src/*.vue.js
 apps/teacher-ui/src/**/*.vue.js
 # Generated Vue component declaration files (emitted by vue-tsc composite builds)
 apps/teacher-ui/src/**/*.vue.d.ts
@@ -109,5 +110,6 @@ modules/sport/examples/*.js
 modules/sport/examples/*.d.ts
 packages/storage/tests/*.js
 packages/storage/tests/*.d.ts
+
 
 
