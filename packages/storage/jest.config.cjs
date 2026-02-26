@@ -5,6 +5,7 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   moduleFileExtensions: ['ts', 'js', 'json'],
   moduleNameMapper: {
+    '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   transform: {
