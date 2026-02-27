@@ -235,7 +235,7 @@ Es fokussiert bewusst auf **Fach + Schulform + Unterrichtsworkflow**.
 
 ## OpenSSF Best Practices Badge (CII)
 
-Wir verfolgen aktiv das OpenSSF Best Practices Badge (frueher CII).
+Wir verfolgen aktiv das OpenSSF Best Practices Badge (frueher CII). (OpenSSF Best Practices Badge pursuit).
 
 - Fast-Track Playbook: [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
 
