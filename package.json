@@ -24,7 +24,9 @@
     "prepare": "npm run hooks:install",
     "typecheck": "npm run build:packages && npm run typecheck --workspace=teacher-ui",
     "lint:workflows": "node scripts/workflow-guardrails.mjs",
-    "lint:openssf": "node scripts/openssf-badge-readiness.mjs"
+    "lint:openssf": "node scripts/openssf-badge-readiness.mjs",
+    "scorecard:zeros": "node scripts/scorecard-zero-checks.mjs",
+    "badge:bestpractices": "node scripts/set-bestpractices-badge.mjs"
   },
   "keywords": [
     "education",
@@ -48,4 +50,3 @@
     "@types/sql.js": "^1.4.9"
   }
 }
-

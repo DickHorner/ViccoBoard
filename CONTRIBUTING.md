@@ -60,6 +60,7 @@ A strong proposal lets us build a reusable module without reworking the core.
 ## Branch and PR expectations
 
 - Keep PRs focused and small when possible
+- For human-authored changes, prefer PR merges over direct pushes to main (except documented emergency hotfixes)
 - Include tests for behavior changes
 - Link issues in the PR description
 - Mention known limitations clearly
@@ -75,3 +76,4 @@ A strong proposal lets us build a reusable module without reworking the core.
 ## Community
 
 By participating, you agree to our [Code of Conduct](./CODE_OF_CONDUCT.md).
+

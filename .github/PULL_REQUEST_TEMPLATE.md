@@ -10,6 +10,7 @@
 ## Checklist
 
 - [ ] Scope is focused and intentional
+- [ ] At least one non-author human review approval (or emergency hotfix rationale documented)
 - [ ] Docs updated (README/docs/roadmap) where needed
 - [ ] `npm run lint:docs` passes
 - [ ] `npm run typecheck` passes
@@ -35,3 +36,4 @@
 ## Screenshots / recordings (if UI change)
 
 <!-- Add before/after visuals when possible. -->
+

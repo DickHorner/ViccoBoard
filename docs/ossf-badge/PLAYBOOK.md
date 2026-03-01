@@ -76,3 +76,72 @@ Expected URL pattern:
 - Project page: `https://www.bestpractices.dev/projects/<PROJECT_ID>`
 
 Do not add placeholder IDs.
+
+## 7) Scorecard zero-check reality (as of 2026-02-26)
+
+These are the three checks currently at zero in Scorecard and what can move them.
+
+### Maintained = 0
+
+- Current reason: repository is younger than 90 days.
+- Repo creation date (GitHub API): 2026-01-12.
+- Earliest date this can score above 0: 2026-04-12.
+- This check is time-gated by Scorecard and cannot be forced by repo file changes.
+
+### Code-Review = 0
+
+- Current reason: `0/6 approved changesets` in recent history.
+- Scorecard uses recent changes (roughly the last ~30 commits).
+- Direct pushes to `main` by the same human contributor keep this at 0.
+- Fastest path to lift:
+  1. Route all human changes through PRs.
+  2. Get approval from a non-author human reviewer before merge.
+  3. Keep doing this until unreviewed human changes age out of the recent commit window.
+
+### CII-Best-Practices = 0
+
+- Current reason: project is not enrolled in OpenSSF Best Practices.
+- Earliest lift is `In Progress` (= score 2) after account-bound enrollment.
+- Required manual step: register the repository on https://www.bestpractices.dev.
+
+## 8) Quick command to re-check only zero checks
+
+Run:
+
+```bash
+npm run scorecard:zeros
+```
+
+This script fetches live data from:
+- `https://api.securityscorecards.dev/projects/github.com/DickHorner/ViccoBoard`
+- `https://api.github.com/repos/DickHorner/ViccoBoard`
+
+It prints blockers and actionability for `Maintained`, `Code-Review`, and `CII-Best-Practices`.
+
+## 9) Code-review lift companion
+
+Use this alongside this badge playbook:
+
+- `docs/ossf-badge/CODE_REVIEW_LIFT_PLAYBOOK.md`
+
+It documents a practical path to move `Code-Review` from zero without forcing an abrupt workflow break.
+
+## 10) After you get a bestpractices.dev project ID
+
+1. Copy the numeric project ID from the project URL.
+2. Run:
+
+```bash
+npm run badge:bestpractices -- <PROJECT_ID>
+```
+
+This updates both `README.md` and `README.en.md` with:
+- top badge: `OpenSSF Best Practices`
+- reference links: `badge-bestpractices` + `bestpractices`
+
+3. Commit and push to `main`.
+4. Re-check status with:
+
+```bash
+npm run scorecard:zeros
+```

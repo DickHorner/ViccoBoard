@@ -30,13 +30,39 @@ function read(file) {
   return fs.readFileSync(path.join(ROOT, file), 'utf8');
 }
 
-if (fs.existsSync(path.join(ROOT, 'README.md'))) {
-  const readme = read('README.md');
-  if (!/bestpractices\.dev/i.test(readme) && !/ossf badge/i.test(readme)) {
-    issues.push('README.md should mention OpenSSF Best Practices badge pursuit.');
+function hasBadgePursuitMention(text) {
+  return (
+    /bestpractices\.dev/i.test(text) ||
+    /openssf\s+best\s+practices\s+badge/i.test(text) ||
+    /(open\s*ssf|ossf)[\s\S]{0,120}best\s*practices[\s\S]{0,60}badge/i.test(text) ||
+    /cii[-\s]*best[-\s]*practices/i.test(text)
+  );
+}
+
+const readmeFiles = ['README.md', 'README.en.md'].filter((file) =>
+  fs.existsSync(path.join(ROOT, file))
+);
+
+const readmeContents = readmeFiles.map((file) => ({
+  file,
+  content: read(file)
+}));
+
+if (readmeContents.length > 0) {
+  const hasAnyBadgeMention = readmeContents.some(({ content }) =>
+    hasBadgePursuitMention(content)
+  );
+
+  if (!hasAnyBadgeMention) {
+    issues.push('README.md or README.en.md should mention OpenSSF Best Practices badge pursuit.');
   }
-  if (!/docs\/ossf-badge\/PLAYBOOK\.md/i.test(readme)) {
-    issues.push('README.md should link to docs/ossf-badge/PLAYBOOK.md.');
+
+  const hasPlaybookLink = readmeContents.some(({ content }) =>
+    /docs\/ossf-badge\/PLAYBOOK\.md/i.test(content)
+  );
+
+  if (!hasPlaybookLink) {
+    issues.push('README.md or README.en.md should link to docs/ossf-badge/PLAYBOOK.md.');
   }
 }
 

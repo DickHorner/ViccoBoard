@@ -235,7 +235,8 @@ Es fokussiert bewusst auf **Fach + Schulform + Unterrichtsworkflow**.
 
 ## OpenSSF Best Practices Badge (CII)
 
-Wir verfolgen aktiv das OpenSSF Best Practices Badge (frueher CII). (OpenSSF Best Practices Badge pursuit).
+Wir verfolgen aktiv das OpenSSF Best Practices Badge (frueher CII).
+Kurz: Dieses Projekt verfolgt aktiv das OpenSSF Badge auf bestpractices.dev (OpenSSF Best Practices badge pursuit).
 
 - Fast-Track Playbook: [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
 
@@ -291,6 +292,3 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 [pulls]: https://github.com/DickHorner/ViccoBoard/pulls
 [contributors]: https://github.com/DickHorner/ViccoBoard/graphs/contributors
 [commits]: https://github.com/DickHorner/ViccoBoard/commits/main
-
-
-
