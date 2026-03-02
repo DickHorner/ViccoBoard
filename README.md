@@ -8,6 +8,7 @@
 
 [Deutsch](./README.md) | [English](./README.en.md)
 
+[![OSSF]best-practices]][bp]
 [![CI][badge-ci]][ci]
 [![CodeQL][badge-codeql]][codeql]
 [![Scorecard Workflow][badge-scorecard-workflow]][scorecard-workflow]
@@ -268,6 +269,7 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 [Zurueck nach oben](#top)
 
 <!-- Badges -->
+[OSSF]: https://www.bestpractices.dev/projects/12057/badge
 [badge-ci]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/ci.yml?branch=main&label=CI
 [badge-codeql]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/codeql.yml?branch=main&label=CodeQL
 [badge-scorecard-workflow]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/scorecard.yml?branch=main&label=Scorecards
@@ -281,6 +283,7 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 [badge-last-commit]: https://img.shields.io/github/last-commit/DickHorner/ViccoBoard?branch=main
 
 <!-- Links -->
+[bp]: https://www.bestpractices.dev/projects/12057
 [ci]: https://github.com/DickHorner/ViccoBoard/actions/workflows/ci.yml
 [codeql]: https://github.com/DickHorner/ViccoBoard/actions/workflows/codeql.yml
 [scorecard-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecard.yml
