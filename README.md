@@ -8,6 +8,7 @@
 
 [Deutsch](./README.md) | [English](./README.en.md)
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12057/badge)](https://www.bestpractices.dev/projects/12057)
 [![CI][badge-ci]][ci]
 [![CodeQL][badge-codeql]][codeql]
 [![Scorecard Workflow][badge-scorecard-workflow]][scorecard-workflow]
