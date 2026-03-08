@@ -6,10 +6,12 @@
 2. [Plan.md](./Plan.md)
 3. [ARCHITECTURE_DECISIONS.md](./ARCHITECTURE_DECISIONS.md)
 4. [DEVELOPMENT.md](./DEVELOPMENT.md)
+5. [.motherlode/README.md](./.motherlode/README.md)
 
 ## Docs Hub
 
 - [docs/README.md](./docs/README.md)
+- [.motherlode/MOTHERLODE.md](./.motherlode/MOTHERLODE.md)
 - [docs/planning/ROADMAP.md](./docs/planning/ROADMAP.md)
 - [docs/planning/ISSUES_TRACKER.md](./docs/planning/ISSUES_TRACKER.md)
 - [docs/status/STATUS.md](./docs/status/STATUS.md)
@@ -41,3 +43,4 @@
 
 - [docs/parity-spec/reports/viccoboard_sport_parity_report.md](./docs/parity-spec/reports/viccoboard_sport_parity_report.md)
 - [docs/parity-spec/reports/viccoboard_sport_schema_parity.csv](./docs/parity-spec/reports/viccoboard_sport_schema_parity.csv)
+

@@ -23,7 +23,7 @@
 ViccoBoard hilft Lehrkraeften, Unterrichtsorganisation, Leistungsbewertung und Pruefungsarbeit in **einer** App zu buendeln.
 Der Kern ist bewusst modular: bereits heute mit Sport + KBR-Pruefungsbausteinen, langfristig fuer weitere Faecher und Schulformen.
 
-[Quickstart](#schnellstart) · [Dokumentation](./INDEX.md) · [Roadmap](#roadmap-now-next-later-vision) · [Mitmachen](./CONTRIBUTING.md)
+[Quickstart](#schnellstart) · [Dokumentation](./INDEX.md) · [Roadmap](#roadmap-now-next-later-vision) · [Motherlode](./.motherlode/README.md) · [Mitmachen](./CONTRIBUTING.md)
 
 </div>
 
@@ -233,6 +233,16 @@ Es fokussiert bewusst auf **Fach + Schulform + Unterrichtsworkflow**.
 
 [Zurueck nach oben](#top)
 
+## Motherlode (Cross-Repo Standard)
+
+Diese Repo enthaelt ein wiederverwendbares "mother lode"-Paket unter [`.motherlode/`](./.motherlode/README.md).
+Damit kannst du andere Projekte gegen dieselben Engineering-Kriterien pruefen, Refactorings priorisieren und Agent-Instruktionen automatisch erzeugen.
+
+Schnellstart:
+
+```powershell
+pwsh -NoLogo -File .\.motherlode\scripts\activate.ps1 -RunAudit -CopyToClipboard
+```
 ## OpenSSF Best Practices Badge (CII)
 
 Wir verfolgen aktiv das OpenSSF Best Practices Badge (frueher CII).
@@ -292,3 +302,5 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for details.
 [pulls]: https://github.com/DickHorner/ViccoBoard/pulls
 [contributors]: https://github.com/DickHorner/ViccoBoard/graphs/contributors
 [commits]: https://github.com/DickHorner/ViccoBoard/commits/main
+
+

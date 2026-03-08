@@ -113,3 +113,8 @@ packages/storage/tests/*.d.ts
 
 
 
+
+# Motherlode runtime outputs
+.motherlode/outputs/*.json
+.motherlode/outputs/*.md
+!.motherlode/outputs/.gitkeep

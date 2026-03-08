@@ -14,7 +14,7 @@
 [![OpenSSF Scorecard][badge-scorecard]][scorecard]
 [![License][badge-license]][license]
 
-[Quickstart](#quickstart) · [Docs](./INDEX.md) · [Roadmap](#roadmap-high-level) · [Contributing](./CONTRIBUTING.md)
+[Quickstart](#quickstart) · [Docs](./INDEX.md) · [Roadmap](#roadmap-high-level) · [Motherlode](./.motherlode/README.md) · [Contributing](./CONTRIBUTING.md)
 
 </div>
 
@@ -77,6 +77,16 @@ npm run build
 Roadmap docs: [Plan.md](./Plan.md), [docs/planning/ROADMAP.md](./docs/planning/ROADMAP.md)
 
 
+## Motherlode (Cross-Repo Standard)
+
+This repository includes a reusable motherlode pack in [`.motherlode/`](./.motherlode/README.md).
+Use it to audit other repositories against one engineering standard, prioritize refactors, and auto-generate robust agent instructions.
+
+Quick start:
+
+```powershell
+pwsh -NoLogo -File .\.motherlode\scripts\activate.ps1 -RunAudit -CopyToClipboard
+```
 ## OpenSSF Best Practices badge (CII)
 
 We are actively pursuing the OpenSSF Best Practices badge (formerly CII).
@@ -101,3 +111,5 @@ MIT - see [LICENSE](./LICENSE).
 [scorecard-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecard.yml
 [scorecard]: https://securityscorecards.dev/viewer/?uri=github.com/DickHorner/ViccoBoard
 [license]: https://github.com/DickHorner/ViccoBoard/blob/main/LICENSE
+
+
