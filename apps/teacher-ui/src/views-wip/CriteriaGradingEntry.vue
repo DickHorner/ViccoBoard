@@ -396,7 +396,6 @@ async function loadData() {
       }
     }
   } catch (err) {
-    console.error('Failed to load grading data:', err);
     error.value = 'Fehler beim Laden der Daten';
   } finally {
     loading.value = false;
@@ -531,7 +530,6 @@ async function saveStudentGrade(studentId: string) {
       hasUnsavedChanges.value = false;
     }
   } catch (err) {
-    console.error('Failed to save grade:', err);
     toast.error('Fehler beim Speichern der Note');
   } finally {
     saving.value = false;
@@ -546,7 +544,6 @@ async function saveAllGrades() {
     }
     toast.success('Alle Noten gespeichert!');
   } catch (err) {
-    console.error('Failed to save all grades:', err);
     toast.error('Fehler beim Speichern einiger Noten');
   } finally {
     saving.value = false;
@@ -610,7 +607,6 @@ async function addCriterion() {
     };
     showAddCriterionModal.value = false;
   } catch (err) {
-    console.error('Failed to add criterion:', err);
     toast.error('Fehler beim Hinzufügen des Kriteriums');
   } finally {
     saving.value = false;
@@ -644,7 +640,6 @@ async function removeCriterion(index: number) {
     
     category.value = updatedCategory;
   } catch (err) {
-    console.error('Failed to remove criterion:', err);
     toast.error('Fehler beim Entfernen des Kriteriums');
   } finally {
     saving.value = false;

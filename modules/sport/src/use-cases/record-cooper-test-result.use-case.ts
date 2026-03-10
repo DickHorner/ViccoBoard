@@ -84,8 +84,6 @@ export class RecordCooperTestResultUseCase {
             { SportType: input.SportType }
           );
         } catch (error) {
-          // Log but don't fail - grade calculation is optional
-          console.warn('Could not auto-calculate Cooper Test grade:', error);
         }
       }
     }

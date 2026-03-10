@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "repo_name": "ViccoBoard",
+  "approved_by": "repository-owner (chat approval)",
+  "approved_on": "2026-03-09",
+  "repo_context": {
+    "primary_stack": [
+      "TypeScript",
+      "Vue 3",
+      "Vite",
+      "Jest",
+      "IndexedDB",
+      "SQLite"
+    ],
+    "repo_type": "monorepo",
+    "internet_facing": false,
+    "handles_sensitive_data": true,
+    "notes": [
+      "Local-first teacher application targeting iPadOS Safari/WebKit.",
+      "Handles student data, attendance, grades, and exam feedback.",
+      "Primary operational risk is data integrity and privacy rather than backend uptime."
+    ]
+  },
+  "enabled_rules": {
+    "baseline_audit": true,
+    "risky_change_notes": true,
+    "architecture_boundaries": true,
+    "trust_boundary_validation": true,
+    "sensitive_logging": true,
+    "observability_minimums": false
+  },
+  "rule_rationale": {
+    "architecture_boundaries": "The repo already declares strict module boundaries and central student ownership; enforcing them reduces drift in a multi-package monorepo.",
+    "trust_boundary_validation": "The app imports and validates local data, links, and backup-like payloads while handling student and grading records; explicit trust-boundary checks are appropriate.",
+    "sensitive_logging": "The repo processes student PII, attendance, grades, and credentials, so log hygiene should be actively enforced.",
+    "observability_minimums": "Disabled because this repo is an offline-first static web app, not a long-running backend service, and privacy-first operation takes priority.",
+    "risky_change_notes": "Storage, migrations, security, and local persistence changes are high-impact in this repo and should carry rollback and verification notes."
+  },
+  "repo_specific_overrides": {
+    "min_codeowners": 2,
+    "sensitive_paths": [
+      "packages/storage/src",
+      "modules/students/src",
+      "modules/exams/src/services/support-tip-management.service.ts",
+      "apps/teacher-ui/src/services/storage.service.ts"
+    ],
+    "critical_paths": [
+      "apps/teacher-ui/src/composables/useStudentsBridge.ts",
+      "modules/students/src/repositories/student.repository.ts",
+      "packages/storage/src",
+      "modules/exams/src/services/support-tip-management.service.ts"
+    ],
+    "forbidden_log_patterns": [
+      "(?i)password",
+      "(?i)secret",
+      "(?i)token",
+      "(?i)auth",
+      "(?i)decrypt",
+      "(?i)firstname",
+      "(?i)lastname",
+      "(?i)email",
+      "(?i)attendance",
+      "(?i)grade"
+    ],
+    "allowed_log_exceptions": [
+      "Applying migration",
+      "Migration .* completed",
+      "Migration .* failed"
+    ]
+  }
+}

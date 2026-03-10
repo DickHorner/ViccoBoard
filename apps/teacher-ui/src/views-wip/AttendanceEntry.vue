@@ -250,7 +250,6 @@ const onClassChange = async () => {
     students.value = await studentsComposable.getByClassId(selectedClassId.value)
     attendance.value = {}
   } catch (err) {
-    console.error('Failed to load students:', err)
   } finally {
     loading.value = false
   }
@@ -288,7 +287,6 @@ const handleSaveAttendance = async () => {
       }
     }, 2000)
   } catch (err) {
-    console.error('Failed to save attendance:', err)
     if (err instanceof Error) {
       saveError.value = err.message
     } else {
@@ -311,7 +309,6 @@ onMounted(async () => {
       await onClassChange()
     }
   } catch (err) {
-    console.error('Failed to load classes:', err)
   }
 })
 </script>

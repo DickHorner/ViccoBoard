@@ -246,6 +246,28 @@ describe('SupportTipManagementService', () => {
     });
   });
 
+  describe('generateQRCode', () => {
+    it('should generate a local SVG data URL', () => {
+      const qrCode = SupportTipManagementService.generateQRCode(testTip);
+
+      expect(qrCode.startsWith('data:image/svg+xml;charset=utf-8,')).toBe(true);
+      expect(qrCode.includes('api.qrserver.com')).toBe(false);
+
+      const svg = decodeURIComponent(qrCode.replace('data:image/svg+xml;charset=utf-8,', ''));
+      expect(svg).toContain('<svg');
+      expect(svg).toContain('shape-rendering="crispEdges"');
+      expect(svg).toContain('<rect');
+    });
+
+    it('should honor requested QR render size', () => {
+      const qrCode = SupportTipManagementService.generateQRCode(testTip, { size: 320 });
+      const svg = decodeURIComponent(qrCode.replace('data:image/svg+xml;charset=utf-8,', ''));
+
+      expect(svg).toContain('width="320"');
+      expect(svg).toContain('height="320"');
+    });
+  });
+
   describe('getMostUsedTips', () => {
     it('should return tips sorted by usage', () => {
       const tips = [

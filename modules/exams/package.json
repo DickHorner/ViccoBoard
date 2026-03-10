@@ -17,8 +17,10 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@types/qrcode": "^1.5.6",
     "@viccoboard/core": "*",
     "@viccoboard/storage": "*",
+    "qrcode": "^1.5.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

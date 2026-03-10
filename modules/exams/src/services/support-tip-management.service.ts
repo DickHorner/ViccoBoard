@@ -5,6 +5,7 @@
  */
 
 import { Exams } from '@viccoboard/core';
+import QRCode from 'qrcode';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -149,7 +150,6 @@ export class SupportTipManagementService {
     tip: Exams.SupportTip,
     options: QRCodeOptions = {}
   ): string {
-    // Create shareable data for the QR code
     const data = JSON.stringify({
       id: tip.id,
       title: tip.title,
@@ -158,10 +158,31 @@ export class SupportTipManagementService {
       links: tip.links.map(l => ({ title: l.title, url: l.url }))
     });
 
-    // Encode as data URI (simplified - in production would use qrcode library)
-    const encoded = encodeURIComponent(data);
-    // Using a QR code generation service URL (example: qr-server.com)
-    return `https://api.qrserver.com/v1/create-qr-code/?size=${options.size || 200}x${options.size || 200}&data=${encoded}`;
+    const margin = options.margin ?? 2;
+    const renderedSize = options.size || 200;
+    const qrCode = QRCode.create(data, {
+      errorCorrectionLevel: options.level ?? 'M'
+    });
+    const moduleSize = qrCode.modules.size;
+    const viewBoxSize = moduleSize + margin * 2;
+    const rects: string[] = [];
+
+    for (let y = 0; y < moduleSize; y++) {
+      for (let x = 0; x < moduleSize; x++) {
+        if (qrCode.modules.get(x, y)) {
+          rects.push(`<rect x="${x + margin}" y="${y + margin}" width="1" height="1" fill="#000"/>`);
+        }
+      }
+    }
+
+    const svg = [
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" width="${renderedSize}" height="${renderedSize}" shape-rendering="crispEdges">`,
+      `<rect width="${viewBoxSize}" height="${viewBoxSize}" fill="#fff"/>`,
+      ...rects,
+      '</svg>'
+    ].join('');
+
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 
   /**

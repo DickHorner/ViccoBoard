@@ -179,9 +179,6 @@ async function loadData() {
     // Load grading table if referenced in config
     if (bjsConfig.value?.gradingTable) {
       gradingTable.value = await SportBridge.value?.tableDefinitionRepository.findById(bjsConfig.value.gradingTable);
-      if (!gradingTable.value) {
-        console.warn(`BJS grading table not found: ${bjsConfig.value.gradingTable}`);
-      }
     }
 
     // Initialize performance objects
@@ -209,7 +206,6 @@ async function loadData() {
       }
     });
   } catch (error) {
-    console.error('Failed to load data:', error);
     toast.error('Fehler beim Laden der Daten');
   } finally {
     loading.value = false;
@@ -233,8 +229,6 @@ function calculatePoints(studentId: string) {
       totalPoints[studentId] = result.totalPoints;
       return;
     } catch (error) {
-      console.warn(`Failed to calculate BJS points for student ${studentId}:`, error);
-      // Fall back to simplified calculation if table lookup fails
     }
   }
 
@@ -320,7 +314,6 @@ async function saveAll() {
     await Promise.all(savePromises);
     toast.success(t('COMMON.success'));
   } catch (error) {
-    console.error('Failed to save grades:', error);
     toast.error('Fehler beim Speichern');
   } finally {
     saving.value = false;

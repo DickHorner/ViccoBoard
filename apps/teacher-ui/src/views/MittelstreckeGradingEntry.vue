@@ -141,7 +141,6 @@ async function loadData() {
       }
     });
   } catch (error) {
-    console.error('Failed to load data:', error);
     toast.error('Fehler beim Laden der Daten');
   } finally {
     loading.value = false;
@@ -207,7 +206,6 @@ function calculateGradeFromTable(timeInSeconds: number): string | number {
     });
     return result.grade;
   } catch (error) {
-    console.error('Failed to calculate grade from table:', error);
     return '';
   }
 }
@@ -247,7 +245,6 @@ async function saveAll() {
     hasChanges.value = false;
     toast.success(t('COMMON.success'));
   } catch (error) {
-    console.error('Failed to save grades:', error);
     toast.error('Fehler beim Speichern');
   } finally {
     saving.value = false;
