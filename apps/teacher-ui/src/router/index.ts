@@ -76,6 +76,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Exam Correction' }
   },
   {
+    path: '/exams/:id/analysis',
+    name: 'exam-analysis',
+    component: () => import('../views/KBRExamAnalysisPage.vue'),
+    meta: { title: 'KBR Analyse' }
+  },
+  {
     path: '/classes/:id',
     name: 'class-detail',
     component: () => import('../views/ClassDetail.vue'),
@@ -104,6 +110,12 @@ const routes: RouteRecordRaw[] = [
     name: 'lessons',
     component: () => import('../views/LessonList.vue'),
     meta: { title: 'Stunden' }
+  },
+  {
+    path: '/lessons/:id/workspace',
+    name: 'lesson-workspace',
+    component: () => import('../views/LessonWorkspace.vue'),
+    meta: { title: 'Stunden-Workspace' }
   },
   {
     path: '/grading',

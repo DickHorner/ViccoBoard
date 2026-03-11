@@ -8,6 +8,21 @@
       <span class="summary-pill">{{ examCount }} Pruefungen</span>
     </header>
 
+    <section class="metrics-grid">
+      <article class="metric-card">
+        <strong>{{ examCount }}</strong>
+        <span>Pruefungen</span>
+      </article>
+      <article class="metric-card">
+        <strong>{{ supportTipCount }}</strong>
+        <span>Foerdertipps</span>
+      </article>
+      <article class="metric-card">
+        <strong>{{ longTermNoteCount }}</strong>
+        <span>Langzeitnotizen</span>
+      </article>
+    </section>
+
     <div class="hub-grid">
       <RouterLink class="hub-card" to="/exams">
         <p class="eyebrow">Uebersicht</p>
@@ -21,11 +36,11 @@
         <p>Direkter Einstieg in den KBR-Builder fuer einfache und komplexe Strukturen.</p>
       </RouterLink>
 
-      <article class="hub-card static-card">
-        <p class="eyebrow">Ausblick</p>
-        <h2>Foerdertipps & Export</h2>
-        <p>Diese Bereiche bleiben im KBR-Hub verankert, sobald die Navigation weiter konsolidiert wird.</p>
-      </article>
+      <RouterLink class="hub-card" :to="analysisEntry.to">
+        <p class="eyebrow">Analyse</p>
+        <h2>{{ analysisEntry.title }}</h2>
+        <p>{{ analysisEntry.description }}</p>
+      </RouterLink>
     </div>
 
     <section class="recent-panel">
@@ -45,6 +60,7 @@
           <div class="row-actions">
             <RouterLink :to="`/exams/${exam.id}`" class="ghost-link">Oeffnen</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/correct`" class="ghost-link">Korrigieren</RouterLink>
+            <RouterLink :to="`/exams/${exam.id}/analysis`" class="ghost-link">Analyse</RouterLink>
           </div>
         </article>
       </div>
@@ -59,9 +75,12 @@ import { useExamsBridge } from '../composables/useExamsBridge'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 
 const { examRepository } = useExamsBridge()
+const { supportTipRepository, studentLongTermNoteRepository } = useExamsBridge()
 
 const loading = ref(true)
 const exams = ref<ExamsTypes.Exam[]>([])
+const supportTipCount = ref(0)
+const longTermNoteCount = ref(0)
 
 const examCount = computed(() => exams.value.length)
 const recentExams = computed(() =>
@@ -69,10 +88,35 @@ const recentExams = computed(() =>
     .sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime())
     .slice(0, 5)
 )
+const analysisEntry = computed(() => {
+  const exam = recentExams.value[0]
+
+  if (!exam) {
+    return {
+      to: '/exams',
+      title: 'Analyse vorbereiten',
+      description: 'Sobald Pruefungen vorhanden sind, oeffnet sich hier der direkte Weg in Statistik und Schwierigkeit.'
+    }
+  }
+
+  return {
+    to: `/exams/${exam.id}/analysis`,
+    title: 'Letzte Analyse',
+    description: `Direkt in die Analyse von ${exam.title} springen.`
+  }
+})
 
 const loadData = async () => {
   loading.value = true
-  exams.value = await examRepository?.findAll() ?? []
+  const [loadedExams, supportTips, longTermNotes] = await Promise.all([
+    examRepository?.findAll() ?? [],
+    supportTipRepository?.findAll() ?? [],
+    studentLongTermNoteRepository?.findAll() ?? []
+  ])
+
+  exams.value = loadedExams
+  supportTipCount.value = supportTips.length
+  longTermNoteCount.value = longTermNotes.length
   loading.value = false
 }
 
@@ -128,6 +172,30 @@ onMounted(() => {
   font-weight: 700;
 }
 
+.metrics-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.metric-card {
+  background: white;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.metric-card strong {
+  font-size: 1.5rem;
+}
+
+.metric-card span {
+  color: #64748b;
+}
+
 .hub-grid {
   display: grid;
   gap: 1rem;
@@ -146,10 +214,6 @@ onMounted(() => {
   padding: 1.25rem;
   text-decoration: none;
   color: #0f172a;
-}
-
-.static-card {
-  padding: 1.25rem;
 }
 
 .eyebrow {
