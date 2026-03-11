@@ -524,7 +524,14 @@ const loadData = async () => {
     ])
 
     recentActivity.value = attendanceRecords
-    lessons.value = lessonCollections.flat()
+    const allLessons = lessonCollections.flat()
+    const now = new Date()
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const startOfTomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    lessons.value = allLessons.filter((lesson) => {
+      const lessonDate = new Date(lesson.date)
+      return lessonDate >= startOfToday && lessonDate < startOfTomorrow
+    })
   } catch (err) {
     console.error('Failed to load data:', err)
     loadError.value = 'Fehler beim Laden der Uebersichtsdaten. Bitte aktualisieren Sie die Seite.'

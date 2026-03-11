@@ -28,14 +28,7 @@ export function getDashboardLessonState<TLesson extends DashboardLesson>(
 
   const currentOrNextLesson = futureLessons[0] ?? pastLessons[pastLessons.length - 1] ?? null
 
-  let upcomingLesson: TLesson | null = null
-
-  if (futureLessons.length > 1) {
-    upcomingLesson = futureLessons[1]
-  } else if (futureLessons.length === 0) {
-    upcomingLesson = null
-  }
-
+  const upcomingLesson = futureLessons[1] ?? null
   return {
     todayLessons,
     currentOrNextLesson,

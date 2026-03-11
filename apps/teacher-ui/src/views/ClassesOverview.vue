@@ -106,15 +106,25 @@ const loadData = async () => {
 
     classes.value = await Promise.all(
       allClasses.map(async (classGroup) => {
-        const [students, lessons] = await Promise.all([
-          studentRepository.value?.findByClassGroup(classGroup.id) ?? [],
-          lessonsRepository.findByClassGroup(classGroup.id)
+        const [studentCount, lessonCount] = await Promise.all([
+          studentRepository.value
+            ? typeof (studentRepository.value as any).countByClassGroup === 'function'
+              ? (studentRepository.value as any).countByClassGroup(classGroup.id)
+              : typeof (studentRepository.value as any).count === 'function'
+                ? (studentRepository.value as any).count({ classGroupId: classGroup.id })
+                : 0
+            : 0,
+          typeof (lessonsRepository as any).countByClassGroup === 'function'
+            ? (lessonsRepository as any).countByClassGroup(classGroup.id)
+            : typeof (lessonsRepository as any).count === 'function'
+              ? (lessonsRepository as any).count({ classGroupId: classGroup.id })
+              : 0
         ])
 
         return {
           classGroup,
-          studentCount: students.length,
-          lessonCount: lessons.length
+          studentCount,
+          lessonCount
         }
       })
     )

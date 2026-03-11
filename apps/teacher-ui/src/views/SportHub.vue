@@ -26,6 +26,7 @@ import type { ClassGroup } from '@viccoboard/core'
 
 const classGroups = useClassGroups()
 const classes = ref<ClassGroup[]>([])
+const loadError = ref<string | null>(null)
 
 const entries = [
   {
@@ -63,7 +64,13 @@ const entries = [
 const classCount = computed(() => classes.value.filter((classGroup) => !classGroup.archived).length)
 
 onMounted(async () => {
-  classes.value = await classGroups.findAll()
+  try {
+    classes.value = await classGroups.findAll()
+    loadError.value = null
+  } catch (error) {
+    loadError.value = error instanceof Error ? error.message : 'Failed to load classes'
+    classes.value = []
+  }
 })
 </script>
 
