@@ -112,6 +112,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Stunden' }
   },
   {
+    path: '/lessons/:id/workspace',
+    name: 'lesson-workspace',
+    component: () => import('../views/LessonWorkspace.vue'),
+    meta: { title: 'Stunden-Workspace' }
+  },
+  {
     path: '/grading',
     name: 'grading-overview',
     component: () => import('../views/GradingOverview.vue'),

@@ -91,6 +91,13 @@
             </div>
             <div class="lesson-actions">
               <RouterLink 
+                :to="`/lessons/${lesson.id}/workspace`"
+                class="action-btn action-btn-workspace"
+                title="Workspace oeffnen"
+              >
+                →
+              </RouterLink>
+              <RouterLink 
                 :to="`/attendance?classId=${lesson.classGroupId}&lessonId=${lesson.id}`" 
                 class="action-btn action-btn-attendance"
                 title="Anwesenheit erfassen"
