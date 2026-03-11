@@ -53,6 +53,7 @@ interface SportBridge {
   gradeCategoryRepository: GradeCategoryRepository
   performanceEntryRepository: PerformanceEntryRepository
   attendanceRepository: AttendanceRepository
+  toolSessionRepository: ToolSessionRepository
   tableDefinitionRepository: TableDefinitionRepository
   cooperTestConfigRepository: CooperTestConfigRepository
   shuttleRunConfigRepository: ShuttleRunConfigRepository
@@ -140,6 +141,7 @@ export function initializeSportBridge(): SportBridge {
     gradeCategoryRepository: gradeCategoryRepo,
     performanceEntryRepository: performanceEntryRepo,
     attendanceRepository: attendanceRepo,
+    toolSessionRepository: toolSessionRepo,
     tableDefinitionRepository: tableDefinitionRepo,
     cooperTestConfigRepository: cooperTestConfigRepo,
     shuttleRunConfigRepository: shuttleRunConfigRepo,
@@ -228,6 +230,7 @@ export function useSportBridge() {
     gradeCategories: computed(() => bridge.value?.gradeCategoryRepository),
     performanceEntries: computed(() => bridge.value?.performanceEntryRepository),
     attendance: computed(() => bridge.value?.attendanceRepository),
+    toolSessions: computed(() => bridge.value?.toolSessionRepository),
     tableDefinitions: computed(() => bridge.value?.tableDefinitionRepository),
 
     // Use case accessors

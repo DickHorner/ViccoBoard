@@ -33,6 +33,7 @@
         <div class="exam-actions">
           <button class="ghost" type="button" @click="editExam(exam.id)">Open</button>
           <button class="ghost" type="button" @click="openCorrection(exam.id)">Correct</button>
+          <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analyze</button>
         </div>
       </article>
     </div>
@@ -66,7 +67,11 @@ const editExam = (id: string) => {
 }
 
 const openCorrection = (id: string) => {
-  router.push(`/corrections/${id}`)
+  router.push(`/exams/${id}/correct`)
+}
+
+const openAnalysis = (id: string) => {
+  router.push(`/exams/${id}/analysis`)
 }
 
 const formatStatus = (status: ExamsTypes.Exam['status']) => {

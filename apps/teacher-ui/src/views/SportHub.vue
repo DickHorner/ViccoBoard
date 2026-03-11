@@ -8,6 +8,25 @@
       <span class="summary-pill">{{ classCount }} aktive Klassen</span>
     </header>
 
+    <section class="metrics-grid">
+      <article class="metric-card">
+        <strong>{{ gradeCategoryCount }}</strong>
+        <span>Bewertungskategorien</span>
+      </article>
+      <article class="metric-card">
+        <strong>{{ tableCount }}</strong>
+        <span>Tabellen</span>
+      </article>
+      <article class="metric-card">
+        <strong>{{ toolSessionCount }}</strong>
+        <span>Tool-Sessions</span>
+      </article>
+      <article class="metric-card">
+        <strong>{{ sportabzeichenStandardCount }}</strong>
+        <span>Sportabzeichen-Standards</span>
+      </article>
+    </section>
+
     <div class="hub-grid">
       <RouterLink v-for="entry in entries" :key="entry.to" :to="entry.to" class="hub-card">
         <p class="eyebrow">{{ entry.eyebrow }}</p>
@@ -21,11 +40,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useClassGroups } from '../composables/useSportBridge'
+import { getSportBridge, useClassGroups } from '../composables/useSportBridge'
 import type { ClassGroup } from '@viccoboard/core'
 
 const classGroups = useClassGroups()
+const SportBridge = getSportBridge()
 const classes = ref<ClassGroup[]>([])
+const gradeCategoryCount = ref(0)
+const tableCount = ref(0)
+const toolSessionCount = ref(0)
+const sportabzeichenStandardCount = ref(0)
 
 const entries = [
   {
@@ -64,6 +88,18 @@ const classCount = computed(() => classes.value.filter((classGroup) => !classGro
 
 onMounted(async () => {
   classes.value = await classGroups.findAll()
+
+  const [categories, tables, toolSessions, standards] = await Promise.all([
+    SportBridge.gradeCategoryRepository.findAll(),
+    SportBridge.tableDefinitionRepository.findAll(),
+    SportBridge.toolSessionRepository.findAll(),
+    SportBridge.sportabzeichenStandardRepository.findAll()
+  ])
+
+  gradeCategoryCount.value = categories.length
+  tableCount.value = tables.length
+  toolSessionCount.value = toolSessions.length
+  sportabzeichenStandardCount.value = standards.length
 })
 </script>
 
@@ -101,6 +137,30 @@ onMounted(async () => {
   background: rgba(14, 116, 144, 0.12);
   color: #155e75;
   font-weight: 700;
+}
+
+.metrics-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.metric-card {
+  background: white;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.metric-card strong {
+  font-size: 1.5rem;
+}
+
+.metric-card span {
+  color: #64748b;
 }
 
 .hub-grid {
