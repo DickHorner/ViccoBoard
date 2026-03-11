@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`i18n - Sport Locale Parity 6. Snapshot Tests (Sample Sections) should have stable AUTH keys snapshot (EN) 1`] = `
 {
