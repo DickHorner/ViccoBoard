@@ -15,8 +15,8 @@
           <p>{{ formatLessonDateTime(currentOrNextLesson.date) }}</p>
 
           <div class="focus-actions">
-            <RouterLink :to="`/lessons?classId=${currentOrNextLesson.classGroupId}`" class="action-button action-button-inline">
-              Stunde oeffnen
+            <RouterLink :to="`/lessons/${currentOrNextLesson.id}/workspace`" class="action-button action-button-inline">
+              Workspace oeffnen
             </RouterLink>
             <RouterLink :to="`/attendance?classId=${currentOrNextLesson.classGroupId}&lessonId=${currentOrNextLesson.id}`" class="action-button action-button-inline">
               Anwesenheit
@@ -67,7 +67,7 @@
           <RouterLink
             v-for="lesson in todayLessons.slice(0, 4)"
             :key="lesson.id"
-            :to="`/lessons?classId=${lesson.classGroupId}`"
+            :to="`/lessons/${lesson.id}/workspace`"
             class="lesson-timeline-item"
           >
             <strong>{{ getClassName(lesson.classGroupId) }}</strong>
