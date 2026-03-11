@@ -76,6 +76,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Exam Correction' }
   },
   {
+    path: '/exams/:id/analysis',
+    name: 'exam-analysis',
+    component: () => import('../views/KBRExamAnalysisPage.vue'),
+    meta: { title: 'KBR Analyse' }
+  },
+  {
     path: '/classes/:id',
     name: 'class-detail',
     component: () => import('../views/ClassDetail.vue'),

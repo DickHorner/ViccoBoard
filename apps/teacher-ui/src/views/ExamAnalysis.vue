@@ -238,7 +238,7 @@
             >
               <td>
                 <router-link
-                  :to="{ name: 'correction-compact', params: { candidateId: student.candidateId } }"
+                  :to="`/exams/${props.exam.id}/correct`"
                   class="student-link"
                 >
                   {{ getCandidateName(student.candidateId) }}
