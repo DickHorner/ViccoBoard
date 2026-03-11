@@ -6,13 +6,44 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'dashboard',
     component: () => import('../views/Dashboard.vue'),
+    alias: '/dashboard',
     meta: { title: 'Dashboard' }
+  },
+  {
+    path: '/schedule',
+    name: 'schedule',
+    component: () => import('../views/ScheduleOverview.vue'),
+    meta: { title: 'Stundenplan' }
+  },
+  {
+    path: '/classes',
+    name: 'classes',
+    component: () => import('../views/ClassesOverview.vue'),
+    meta: { title: 'Klassen' }
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('../views/SettingsOverview.vue'),
+    meta: { title: 'Einstellungen' }
+  },
+  {
+    path: '/subjects/sport',
+    name: 'subject-sport',
+    component: () => import('../views/SportHub.vue'),
+    meta: { title: 'Sport' }
+  },
+  {
+    path: '/subjects/kbr',
+    name: 'subject-kbr',
+    component: () => import('../views/KBRHub.vue'),
+    meta: { title: 'KBR' }
   },
   {
     path: '/exams',
     name: 'exams',
     component: () => import('../views/ExamsOverview.vue'),
-    meta: { title: 'Exams' }
+    meta: { title: 'KBR Pruefungen' }
   },
   {
     path: '/exams/new',
@@ -48,13 +79,13 @@ const routes: RouteRecordRaw[] = [
     path: '/classes/:id',
     name: 'class-detail',
     component: () => import('../views/ClassDetail.vue'),
-    meta: { title: 'Class Detail' }
+    meta: { title: 'Klasse' }
   },
   {
     path: '/students',
     name: 'students',
     component: () => import('../views/StudentList.vue'),
-    meta: { title: 'Students' }
+    meta: { title: 'Schueler' }
   },
   {
     path: '/students/:id',
@@ -66,19 +97,19 @@ const routes: RouteRecordRaw[] = [
     path: '/attendance',
     name: 'attendance',
     component: () => import('../views/AttendanceEntry.vue'),
-    meta: { title: 'Attendance Entry' }
+    meta: { title: 'Anwesenheit' }
   },
   {
     path: '/lessons',
     name: 'lessons',
     component: () => import('../views/LessonList.vue'),
-    meta: { title: 'Lessons' }
+    meta: { title: 'Stunden' }
   },
   {
     path: '/grading',
     name: 'grading-overview',
     component: () => import('../views/GradingOverview.vue'),
-    meta: { title: 'Grading Overview' }
+    meta: { title: 'Sport Bewertung' }
   },
   {
     path: '/grading/criteria/:id',

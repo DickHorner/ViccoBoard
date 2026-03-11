@@ -35,24 +35,31 @@
         aria-label="Primary"
       >
         <nav class="nav-menu">
-          <RouterLink
-            v-for="item in navItems"
-            :key="item.to"
-            :to="item.to"
-            class="nav-item"
-            active-class="active"
-            @click="handleNavClick"
+          <section
+            v-for="section in navSections"
+            :key="section.id"
+            class="nav-section"
           >
-            <span class="nav-dot" aria-hidden="true"></span>
-            <span class="nav-label">{{ item.label }}</span>
-            <span class="nav-hint">{{ item.hint }}</span>
-          </RouterLink>
+            <p class="nav-section-title">{{ section.title }}</p>
+            <RouterLink
+              v-for="item in section.items"
+              :key="item.to"
+              :to="item.to"
+              class="nav-item"
+              :class="{ active: isNavItemActive(item.to) }"
+              @click="handleNavClick"
+            >
+              <span class="nav-dot" aria-hidden="true"></span>
+              <span class="nav-label">{{ item.label }}</span>
+              <span class="nav-hint">{{ item.hint }}</span>
+            </RouterLink>
+          </section>
         </nav>
 
         <div class="sidebar-footer">
           <div class="sidebar-card">
-            <p class="sidebar-card-title">Quick actions</p>
-            <p class="sidebar-card-body">New class, attendance, and grading shortcuts land in P2-3.</p>
+            <p class="sidebar-card-title">Arbeitsprinzip</p>
+            <p class="sidebar-card-body">Organisation bleibt fachneutral. Fachtools oeffnen wir erst im passenden Workspace.</p>
           </div>
         </div>
       </aside>
@@ -79,24 +86,11 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { primaryNavSections } from '../navigation'
 
 const route = useRoute()
 
-const navItems = [
-  { to: '/', label: 'Dashboard', hint: 'Classes and activity' },
-  { to: '/exams', label: 'Exams', hint: 'KBR assessments' },
-  { to: '/students', label: 'Students', hint: 'Roster and profiles' },
-  { to: '/lessons', label: 'Lessons', hint: 'Schedule and history' },
-  { to: '/attendance', label: 'Attendance', hint: 'Daily check-in' },
-  { to: '/grading', label: 'Grading', hint: 'Entries and history' },
-  { to: '/tools/timer', label: 'Timer', hint: 'Tools' },
-  { to: '/tools/multistop', label: 'Multistop', hint: 'Tools' },
-  { to: '/tools/scoreboard', label: 'Scoreboard', hint: 'Tools' },
-  { to: '/tools/teams', label: 'Teams', hint: 'Tools' },
-  { to: '/tools/tournaments', label: 'Tournaments', hint: 'Tools' },
-  { to: '/tools/tactics', label: 'Tactics', hint: 'Tools' },
-  { to: '/tools/feedback', label: 'Feedback', hint: 'Tools' }
-]
+const navSections = primaryNavSections
 
 const pageTitle = computed(() => {
   const metaTitle = route.meta?.title
@@ -143,6 +137,24 @@ const handleNavClick = () => {
   if (isCompact.value) {
     isSidebarOpen.value = false
   }
+}
+
+const isNavItemActive = (target: string) => {
+  if (target === '/') {
+    return route.path === '/' || route.path === '/dashboard'
+  }
+
+  if (target === '/subjects/sport') {
+    return route.path === target
+      || route.path.startsWith('/grading')
+      || route.path.startsWith('/tools/')
+  }
+
+  if (target === '/subjects/kbr') {
+    return route.path === target || route.path.startsWith('/exams')
+  }
+
+  return route.path === target || route.path.startsWith(`${target}/`)
 }
 
 onMounted(() => {
@@ -291,6 +303,22 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.nav-section-title {
+  margin: 0;
+  padding: 0 0.9rem;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .nav-item {

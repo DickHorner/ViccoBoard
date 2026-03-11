@@ -1,8 +1,80 @@
 <template>
   <div class="dashboard-view">
     <div class="page-header">
-      <h2>{{ t('TOURNAMENT.overview') }}</h2>
-      <p class="page-description">{{ t('HELLO') }}! {{ t('KLASSEN.klassen-verwalten') }}</p>
+      <p class="dashboard-eyebrow">Landing Page</p>
+      <h2>Dashboard</h2>
+      <p class="page-description">Schneller Einstieg in die aktuelle Arbeit: Stunde, Organisation und Fachbereiche.</p>
+    </div>
+
+    <div class="focus-grid">
+      <section class="card focus-card focus-card-primary">
+        <h3>Jetzt / Als Naechstes</h3>
+        <div v-if="currentOrNextLesson" class="focus-content">
+          <p class="focus-meta">{{ currentOrNextMode }}</p>
+          <h4>{{ getClassName(currentOrNextLesson.classGroupId) }}</h4>
+          <p>{{ formatLessonDateTime(currentOrNextLesson.date) }}</p>
+
+          <div class="focus-actions">
+            <RouterLink :to="`/lessons?classId=${currentOrNextLesson.classGroupId}`" class="action-button action-button-inline">
+              Stunde oeffnen
+            </RouterLink>
+            <RouterLink :to="`/attendance?classId=${currentOrNextLesson.classGroupId}&lessonId=${currentOrNextLesson.id}`" class="action-button action-button-inline">
+              Anwesenheit
+            </RouterLink>
+          </div>
+
+          <p v-if="upcomingLesson" class="focus-follow-up">
+            Danach: {{ getClassName(upcomingLesson.classGroupId) }} um {{ formatLessonTime(upcomingLesson.date) }}
+          </p>
+        </div>
+        <div v-else class="empty-state">
+          <p>Fuer heute ist noch keine Stunde hinterlegt.</p>
+          <RouterLink to="/schedule" class="action-button action-button-inline">
+            Stundenplan oeffnen
+          </RouterLink>
+        </div>
+      </section>
+
+      <section class="card focus-card">
+        <h3>Organisation</h3>
+        <div class="card-links">
+          <RouterLink v-for="link in organizationLinks" :key="link.to" :to="link.to" class="dashboard-link">
+            <strong>{{ link.title }}</strong>
+            <span>{{ link.description }}</span>
+          </RouterLink>
+        </div>
+      </section>
+
+      <section class="card focus-card">
+        <h3>Fachbereiche</h3>
+        <div class="card-links">
+          <RouterLink v-for="link in subjectLinks" :key="link.to" :to="link.to" class="dashboard-link">
+            <strong>{{ link.title }}</strong>
+            <span>{{ link.description }}</span>
+          </RouterLink>
+        </div>
+      </section>
+
+      <section class="card focus-card focus-card-wide">
+        <div class="card-header">
+          <h3>Heute</h3>
+          <RouterLink to="/schedule" class="btn-text btn-small">Zum Stundenplan</RouterLink>
+        </div>
+        <div v-if="todayLessons.length === 0" class="empty-state">
+          <p>Heute sind noch keine Stunden eingetragen.</p>
+        </div>
+        <div v-else class="lesson-timeline">
+          <RouterLink
+            v-for="lesson in todayLessons.slice(0, 4)"
+            :key="lesson.id"
+            :to="`/lessons?classId=${lesson.classGroupId}`"
+            class="lesson-timeline-item"
+          >
+            <strong>{{ getClassName(lesson.classGroupId) }}</strong>
+            <span>{{ formatLessonTime(lesson.date) }}</span>
+          </RouterLink>
+        </div>
+      </section>
     </div>
     
     <div class="dashboard-grid">
@@ -337,9 +409,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useClassGroups, useAttendance } from '../composables/useSportBridge'
+import { useClassGroups, useAttendance, useLessons } from '../composables/useSportBridge'
+import { getDashboardLessonState } from '../utils/dashboard-workspace'
 import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading'
-import type { ClassGroup, AttendanceRecord } from '@viccoboard/core'
+import type { ClassGroup, AttendanceRecord, Lesson } from '@viccoboard/core'
 
 // i18n
 const { t } = useI18n()
@@ -347,6 +420,7 @@ const { t } = useI18n()
 // State
 const classes = ref<ClassGroup[]>([])
 const recentActivity = ref<AttendanceRecord[]>([])
+const lessons = ref<Lesson[]>([])
 const loading = ref(true)
 const loadError = ref('')
 const searchQuery = ref('')
@@ -378,6 +452,7 @@ const deleting = ref(false)
 // Composables
 const classGroups = useClassGroups()
 const attendance = useAttendance()
+const lessonsRepository = useLessons()
 const gradingSchemes = GRADING_SCHEMES
 const classColorOptions = [
   { value: 'white', label: 'Weiß' },
@@ -388,11 +463,35 @@ const classColorOptions = [
   { value: 'yellow', label: 'Gelb' },
   { value: 'grey', label: 'Grau' }
 ]
+const organizationLinks = [
+  { to: '/schedule', title: 'Stundenplan', description: 'Tagesuebersicht und Spaeter Wochenraster' },
+  { to: '/classes', title: 'Klassen', description: 'Klassenverwaltung fachneutral steuern' },
+  { to: '/students', title: 'Schueler', description: 'Zentrale Schuelerverwaltung' },
+  { to: '/settings', title: 'Einstellungen', description: 'Sicherheit, Backups und Konfiguration' }
+]
+
+const subjectLinks = [
+  { to: '/subjects/sport', title: 'Sport', description: 'Bewertung, Tests und Live-Tools' },
+  { to: '/subjects/kbr', title: 'KBR', description: 'Pruefungen, Korrektur und Auswertung' }
+]
 
 // Computed
+const classesById = computed(() => new Map(classes.value.map((cls) => [cls.id, cls])))
 const schoolYears = computed(() => {
   const years = new Set(classes.value.map((cls: ClassGroup) => cls.schoolYear))
   return Array.from(years).sort().reverse()
+})
+
+const dashboardLessonState = computed(() => getDashboardLessonState(lessons.value))
+const todayLessons = computed(() => dashboardLessonState.value.todayLessons)
+const currentOrNextLesson = computed(() => dashboardLessonState.value.currentOrNextLesson)
+const upcomingLesson = computed(() => dashboardLessonState.value.upcomingLesson)
+const currentOrNextMode = computed(() => {
+  if (!currentOrNextLesson.value) {
+    return 'Heute'
+  }
+
+  return currentOrNextLesson.value.date.getTime() >= Date.now() ? 'Als Naechstes' : 'Zuletzt heute'
 })
 
 const filteredClasses = computed(() => {
@@ -412,19 +511,40 @@ const loadData = async () => {
   loading.value = true
   loadError.value = ''
   try {
-    classes.value = await classGroups.findAll()
-    recentActivity.value = await attendance.findAll({
-      orderBy: 'timestamp',
-      orderDirection: 'desc',
-      limit: 5
-    })
+    const loadedClasses = await classGroups.findAll()
+    classes.value = loadedClasses
+
+    const [attendanceRecords, lessonCollections] = await Promise.all([
+      attendance.findAll({
+        orderBy: 'timestamp',
+        orderDirection: 'desc',
+        limit: 5
+      }),
+      Promise.all(loadedClasses.map((cls) => lessonsRepository.findByClassGroup(cls.id)))
+    ])
+
+    recentActivity.value = attendanceRecords
+    lessons.value = lessonCollections.flat()
   } catch (err) {
     console.error('Failed to load data:', err)
-    loadError.value = 'Fehler beim Laden der Übersichtsdaten. Bitte aktualisieren Sie die Seite.'
+    loadError.value = 'Fehler beim Laden der Uebersichtsdaten. Bitte aktualisieren Sie die Seite.'
   } finally {
     loading.value = false
   }
 }
+
+const getClassName = (classGroupId: string): string =>
+  classesById.value.get(classGroupId)?.name ?? 'Unbekannte Klasse'
+
+const formatLessonTime = (date: Date): string =>
+  new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+const formatLessonDateTime = (date: Date): string =>
+  new Date(date).toLocaleString([], {
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 
 const handleCreateClass = async () => {
   error.value = ''
@@ -616,6 +736,15 @@ onMounted(() => {
   margin-bottom: 2rem;
 }
 
+.dashboard-eyebrow {
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: #0f766e;
+  font-weight: 700;
+}
+
 .page-header h2 {
   font-size: 2rem;
   color: #333;
@@ -626,6 +755,74 @@ onMounted(() => {
   color: #666;
   font-size: 1rem;
   margin: 0;
+}
+
+.focus-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.focus-card {
+  min-height: 220px;
+}
+
+.focus-card-primary {
+  background: linear-gradient(135deg, rgba(14, 116, 144, 0.12), rgba(56, 189, 248, 0.08));
+}
+
+.focus-card-wide {
+  grid-column: 1 / -1;
+  min-height: auto;
+}
+
+.focus-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.focus-meta,
+.focus-follow-up {
+  margin: 0;
+  color: #475569;
+}
+
+.focus-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.card-links {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.dashboard-link,
+.lesson-timeline-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.dashboard-link span,
+.lesson-timeline-item span {
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.lesson-timeline {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .dashboard-grid {
@@ -1002,6 +1199,11 @@ onMounted(() => {
   text-align: left;
 }
 
+.action-button-inline {
+  width: auto;
+  justify-content: center;
+}
+
 .action-button:hover {
   background: #e9ecef;
   transform: translateX(4px);
@@ -1011,6 +1213,16 @@ onMounted(() => {
 .action-icon {
   font-size: 1.5rem;
   flex-shrink: 0;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Modal Styles */
@@ -1150,12 +1362,17 @@ onMounted(() => {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .focus-grid,
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
   
   .page-header h2 {
     font-size: 1.5rem;
+  }
+
+  .focus-actions {
+    flex-direction: column;
   }
   
   .card-header {
