@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import { resolveLessonWorkspaceSubject } from '../utils/lesson-workspace'
