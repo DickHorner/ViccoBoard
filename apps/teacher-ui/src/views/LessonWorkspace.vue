@@ -1,7 +1,21 @@
 <template>
   <section class="lesson-workspace">
-    <div v-if="loading" class="state-card">Arbeitsbereich wird geladen...</div>
-    <div v-else-if="loadError" class="state-card error">{{ loadError }}</div>
+    <div
+      v-if="loading"
+      class="state-card"
+      role="status"
+      aria-live="polite"
+    >
+      Arbeitsbereich wird geladen...
+    </div>
+    <div
+      v-else-if="loadError"
+      class="state-card error"
+      role="alert"
+      aria-live="assertive"
+    >
+      {{ loadError }}
+    </div>
 
     <template v-else-if="lesson && classGroup">
       <header class="page-header">
@@ -88,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import { resolveLessonWorkspaceSubject } from '../utils/lesson-workspace'
