@@ -46,6 +46,7 @@ import type { ClassGroup } from '@viccoboard/core'
 const classGroups = useClassGroups()
 const SportBridge = getSportBridge()
 const classes = ref<ClassGroup[]>([])
+const loadError = ref<string | null>(null)
 const gradeCategoryCount = ref(0)
 const tableCount = ref(0)
 const toolSessionCount = ref(0)
@@ -87,7 +88,13 @@ const entries = [
 const classCount = computed(() => classes.value.filter((classGroup) => !classGroup.archived).length)
 
 onMounted(async () => {
-  classes.value = await classGroups.findAll()
+  try {
+    classes.value = await classGroups.findAll()
+    loadError.value = null
+  } catch (error) {
+    loadError.value = error instanceof Error ? error.message : 'Failed to load classes'
+    classes.value = []
+  }
 
   const [categories, tables, toolSessions, standards] = await Promise.all([
     SportBridge.gradeCategoryRepository.findAll(),

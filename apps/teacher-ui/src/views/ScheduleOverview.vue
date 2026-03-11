@@ -86,10 +86,11 @@ const loading = ref(true)
 const loadError = ref('')
 const classes = ref<ClassGroup[]>([])
 const lessons = ref<Lesson[]>([])
+const now = ref(Date.now())
 
 const classesById = computed(() => new Map(classes.value.map((classGroup) => [classGroup.id, classGroup])))
 
-const lessonState = computed(() => getDashboardLessonState(lessons.value))
+const lessonState = computed(() => getDashboardLessonState(lessons.value, new Date(now.value)))
 const todayLessons = computed(() => lessonState.value.todayLessons)
 const currentOrNextLesson = computed(() => lessonState.value.currentOrNextLesson)
 const upcomingLesson = computed(() => lessonState.value.upcomingLesson)
@@ -99,7 +100,7 @@ const currentOrNextMode = computed(() => {
     return 'Heute'
   }
 
-  return currentOrNextLesson.value.date.getTime() >= Date.now() ? 'Als Naechstes' : 'Zuletzt heute'
+  return currentOrNextLesson.value.date.getTime() >= now.value ? 'Als Naechstes' : 'Zuletzt heute'
 })
 
 const loadData = async () => {
@@ -110,8 +111,23 @@ const loadData = async () => {
     const loadedClasses = await classGroups.findAll()
     classes.value = loadedClasses
 
+    // Fetch only today's and upcoming lessons to reduce IO and memory
+    // instead of loading full lesson histories for each class
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    // Look ahead 7 days to catch upcoming lessons
+    const endDate = new Date(today)
+    endDate.setDate(endDate.getDate() + 7)
+
     const allLessons = await Promise.all(
-      loadedClasses.map((classGroup) => lessonsRepository.findByClassGroup(classGroup.id))
+      loadedClasses.map((classGroup) => {
+        // Try to use date-range fetching if available, otherwise fallback to full fetch
+        if (typeof lessonsRepository.findByDateRange === 'function') {
+          return lessonsRepository.findByDateRange(classGroup.id, today, endDate)
+        }
+        return lessonsRepository.findByClassGroup(classGroup.id)
+      })
     )
 
     lessons.value = allLessons.flat()

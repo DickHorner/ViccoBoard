@@ -28,11 +28,8 @@ describe('primary navigation', () => {
   it('keeps sport tools out of the primary navigation', () => {
     const targets = primaryNavSections.flatMap((section) => section.items.map((item) => item.to))
 
-    expect(targets).not.toEqual(expect.arrayContaining([
-      '/tools/timer',
-      '/tools/scoreboard',
-      '/tools/teams'
-    ]))
+    expect(targets).not.toContain('/tools/timer')
+    expect(targets).not.toContain('/tools/scoreboard')
+    expect(targets).not.toContain('/tools/teams')
   })
 })
-
