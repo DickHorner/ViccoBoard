@@ -15,7 +15,7 @@ This plan assumes the current working tree changes are split into **4 PRs**.
 
 **Title**
 
-`[teacher-ui] Refactor primary navigation shell (Plan.md §6.2 Schnellnavigation in Unterfunktionen)`
+`[teacher-ui] Refactor primary navigation shell (Plan.md §6.2 Schnelle Navigation in Unterfunktionen)`
 
 **Scope**
 
@@ -35,7 +35,7 @@ This plan assumes the current working tree changes are split into **4 PRs**.
 
 **Plan.md references**
 
-- `§6.2 Schnellnavigation in Unterfunktionen`
+- `§6.2 Schnelle Navigation in Unterfunktionen`
 - supportive context: `§5 UI-Informationsarchitektur`
 
 **Why separate**
