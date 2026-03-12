@@ -32,6 +32,7 @@ import {
   RecordTimerResultUseCase,
   RecordFeedbackSessionUseCase,
   SaveTeamAssignmentUseCase,
+  SaveTacticsSnapshotUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -196,8 +197,8 @@ export function initializeSportBridge(): SportBridge {
     shuttleRunService,
     sportabzeichenService,
     SportabzeichenService: sportabzeichenService,
-    bjsGradingService
-    sportStatisticsService
+    bjsGradingService,
+    sportStatisticsService,
     teamBuilderService
   }
 
