@@ -28,6 +28,8 @@ import {
   RecordShuttleRunResultUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
+  SaveTeamAssignmentUseCase,
+  TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
   CooperTestService,
@@ -72,6 +74,7 @@ interface SportBridge {
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
   recordTimerResultUseCase: RecordTimerResultUseCase
+  saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
 
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
@@ -80,6 +83,7 @@ interface SportBridge {
   shuttleRunService: ShuttleRunService
   sportabzeichenService: SportabzeichenService
   SportabzeichenService: SportabzeichenService
+  teamBuilderService: TeamBuilderService
 }
 
 /**
@@ -126,6 +130,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenStandardRepo
   )
   const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
+  const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -133,6 +138,7 @@ export function initializeSportBridge(): SportBridge {
   const cooperTestService = new CooperTestService()
   const shuttleRunService = new ShuttleRunService()
   const sportabzeichenService = new SportabzeichenService()
+  const teamBuilderService = new TeamBuilderService()
 
   sportBridgeInstance = {
     // Repositories
@@ -160,6 +166,7 @@ export function initializeSportBridge(): SportBridge {
     recordShuttleRunResultUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
+    saveTeamAssignmentUseCase,
 
     // Services
     criteriaGradingEngine,
@@ -167,7 +174,8 @@ export function initializeSportBridge(): SportBridge {
     cooperTestService,
     shuttleRunService,
     sportabzeichenService,
-    SportabzeichenService: sportabzeichenService
+    SportabzeichenService: sportabzeichenService,
+    teamBuilderService
   }
 
   return sportBridgeInstance

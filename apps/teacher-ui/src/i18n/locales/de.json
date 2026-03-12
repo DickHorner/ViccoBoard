@@ -798,7 +798,15 @@
 		"gewichtung-title": "Gewichtung",
 		"speichern": "Speichern",
 		"loeschen": "Löschen",
-		"bearbeiten": "Team bearbeiten"
+		"bearbeiten": "Team bearbeiten",
+		"session-name": "Sitzungsname",
+		"algorithm": "Algorithmus",
+		"algorithm-random": "Zufällig",
+		"algorithm-gender-balanced": "Geschlechterausgleich",
+		"gespeicherte-sessions": "Gespeicherte Teams",
+		"sitzung-laden": "Laden",
+		"keine-sessions": "Keine gespeicherten Teams vorhanden",
+		"session-gespeichert": "Teams gespeichert"
 	},
 	"ANWESENHEIT": {
 		"liste": "Anwesenheitsliste vom",
