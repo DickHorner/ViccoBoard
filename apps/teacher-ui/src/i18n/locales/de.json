@@ -79,7 +79,31 @@
       "fields_bracket": "Felder → Finale: Phase 1: Auf jedem Feld werden in Mini-Brackets die Siegermannschaften ermittelt. Phase 2: Die Feld-Sieger spielen den Gesamtsieger aus, die Feld-Verlierer spielen Platzierungen aus.",
       "random_students": "Zufällige Teams: Jede Runde werden die Schüler zufällig in Teams aufgeteilt. Individuelle Schüler-Punkte werden vergeben, basierend auf Team-Ergebnissen."
     },
-    "empty": "Keine Turniere. Tippe auf + um ein Turnier zu erstellen."
+    "empty": "Keine Turniere. Tippe auf + um ein Turnier zu erstellen.",
+    "new": "Neues Turnier",
+    "create": "Turnier erstellen",
+    "name_label": "Name",
+    "name_placeholder": "z.B. Volleyball Turnier",
+    "format_label": "Format",
+    "teams_label": "Teams",
+    "add_team": "Team hinzufügen",
+    "team_name_placeholder": "z.B. Team 1",
+    "min_teams": "Mindestens 2 Teams erforderlich",
+    "status": {
+      "planning": "Planung",
+      "in-progress": "Laufend",
+      "completed": "Abgeschlossen"
+    },
+    "back": "Zurück zur Übersicht",
+    "standings": "Tabelle",
+    "bracket": "Bracket",
+    "enter_result": "Ergebnis eintragen",
+    "round_label": "Runde {round}",
+    "vs": "vs.",
+    "save_result": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "confirm_delete": "Turnier wirklich löschen?"
   },
   "TOURNAMENT": {
     "title": "Turnier",

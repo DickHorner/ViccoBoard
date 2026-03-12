@@ -15,6 +15,7 @@ import {
   CreateClassUseCase,
   CreateGradeCategoryUseCase,
   CreateLessonUseCase,
+  CreateTournamentUseCase,
   CriteriaGradingEngine,
   DeleteGradeCategoryUseCase,
   DeleteTableDefinitionUseCase,
@@ -48,7 +49,10 @@ import {
   TeamBuilderService,
   TimeGradingService,
   ToolSessionRepository,
+  TournamentRepository,
+  TournamentService,
   UpdateGradeCategoryUseCase,
+  UpdateTournamentMatchUseCase,
   type CreateClassInput,
   type CreateGradeCategoryInput,
   type CreateLessonInput,
@@ -80,6 +84,7 @@ interface SportBridge {
   sportabzeichenResultRepository: SportabzeichenResultRepository;
   SportabzeichenResultRepository: SportabzeichenResultRepository;
   tacticsSnapshotRepository: TacticsSnapshotRepository;
+  tournamentRepository: TournamentRepository;
 
   createClassUseCase: CreateClassUseCase;
   createLessonUseCase: CreateLessonUseCase;
@@ -102,6 +107,8 @@ interface SportBridge {
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
+  createTournamentUseCase: CreateTournamentUseCase;
+  updateTournamentMatchUseCase: UpdateTournamentMatchUseCase;
 
   criteriaGradingEngine: CriteriaGradingEngine;
   timeGradingService: TimeGradingService;
@@ -112,6 +119,7 @@ interface SportBridge {
   bjsGradingService: BJSGradingService;
   sportStatisticsService: SportStatisticsService;
   teamBuilderService: TeamBuilderService;
+  tournamentService: TournamentService;
 }
 
 export function initializeSportBridge(): SportBridge {
@@ -134,6 +142,7 @@ export function initializeSportBridge(): SportBridge {
   const toolSessionRepository = new ToolSessionRepository(adapter);
   const feedbackSessionRepository = new FeedbackSessionRepository(toolSessionRepository);
   const tacticsSnapshotRepository = new TacticsSnapshotRepository(adapter);
+  const tournamentRepository = new TournamentRepository(adapter);
 
   const createClassUseCase = new CreateClassUseCase(classGroupRepository);
   const createLessonUseCase = new CreateLessonUseCase(lessonRepository);
@@ -179,6 +188,15 @@ export function initializeSportBridge(): SportBridge {
   const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(
     tableDefinitionRepository
   );
+  const tournamentService = new TournamentService();
+  const createTournamentUseCase = new CreateTournamentUseCase(
+    tournamentRepository,
+    tournamentService
+  );
+  const updateTournamentMatchUseCase = new UpdateTournamentMatchUseCase(
+    tournamentRepository,
+    tournamentService
+  );
 
   const criteriaGradingEngine = new CriteriaGradingEngine();
   const timeGradingService = new TimeGradingService();
@@ -205,6 +223,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenResultRepository,
     SportabzeichenResultRepository: sportabzeichenResultRepository,
     tacticsSnapshotRepository,
+    tournamentRepository,
 
     createClassUseCase,
     createLessonUseCase,
@@ -227,6 +246,8 @@ export function initializeSportBridge(): SportBridge {
     saveCooperSessionUseCase,
     saveMultistopSessionUseCase,
     importTableDefinitionUseCase,
+    createTournamentUseCase,
+    updateTournamentMatchUseCase,
 
     criteriaGradingEngine,
     timeGradingService,
@@ -236,7 +257,8 @@ export function initializeSportBridge(): SportBridge {
     SportabzeichenService: sportabzeichenService,
     bjsGradingService,
     sportStatisticsService,
-    teamBuilderService
+    teamBuilderService,
+    tournamentService
   };
 
   return sportBridgeInstance;
