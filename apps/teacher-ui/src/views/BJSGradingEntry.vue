@@ -125,6 +125,13 @@
           >
             {{ saving ? t('COMMON.syncing') : t('COMMON.save') }}
           </button>
+          <button
+            class="btn-primary"
+            @click="exportPdf"
+            :disabled="exporting"
+          >
+            {{ exporting ? t('BUNDESJUGENDSPIELE.pdf-erstelle') : t('BUNDESJUGENDSPIELE.pdf-export') }}
+          </button>
         </div>
       </section>
     </div>
@@ -139,7 +146,7 @@ import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import type { Student } from '@viccoboard/core';
-import { BJSGradingService } from '@viccoboard/sport';
+import type { BJSOverviewReportEntry } from '@viccoboard/sport';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -147,11 +154,11 @@ const router = useRouter();
 const { SportBridge, gradeCategories, performanceEntries } = useSportBridge();
 const { repository: studentRepository } = useStudents();
 const toast = useToast();
-const bjsService = new BJSGradingService();
 
 const categoryId = route.params.id as string;
 const loading = ref(true);
 const saving = ref(false);
+const exporting = ref(false);
 const students = ref<Student[]>([]);
 const performances = reactive<Record<string, any>>({});
 const totalPoints = reactive<Record<string, number>>({});
@@ -219,15 +226,18 @@ function calculatePoints(studentId: string) {
   // If we have a grading table, use proper BJS scoring via the service
   if (gradingTable.value && bjsConfig.value?.disciplines) {
     try {
-      const result = bjsService.calculateScore({
-        disciplines: bjsConfig.value.disciplines,
-        performances: perf,
-        table: gradingTable.value,
-        context: {}
-      });
+      const service = SportBridge.value?.bjsGradingService;
+      if (service) {
+        const result = service.calculateScore({
+          disciplines: bjsConfig.value.disciplines,
+          performances: perf,
+          table: gradingTable.value,
+          context: {}
+        });
 
-      totalPoints[studentId] = result.totalPoints;
-      return;
+        totalPoints[studentId] = result.totalPoints;
+        return;
+      }
     } catch (error) {
     }
   }
@@ -317,6 +327,85 @@ async function saveAll() {
     toast.error('Fehler beim Speichern');
   } finally {
     saving.value = false;
+  }
+}
+
+async function exportPdf() {
+  exporting.value = true;
+  try {
+    const service = SportBridge.value?.bjsGradingService;
+    if (!service) {
+      throw new Error('BJSGradingService not available');
+    }
+
+    const disciplineLabels: Record<string, string> = {
+      sprint: t('BUNDESJUGENDSPIELE.sprint'),
+      sprung: t('BUNDESJUGENDSPIELE.sprung'),
+      wurf: t('BUNDESJUGENDSPIELE.wurf'),
+      ausdauer: t('BUNDESJUGENDSPIELE.ausdauer')
+    };
+
+    const entries: BJSOverviewReportEntry[] = students.value.map(student => {
+      const perf = performances[student.id] || {};
+      const points = totalPoints[student.id] || 0;
+      const certType = getCertificateType(student.id) as BJSOverviewReportEntry['certificateType'];
+
+      // Compute per-discipline points via the service when a grading table is available
+      let disciplinePointMap: Record<string, number> = {};
+      if (gradingTable.value && bjsConfig.value?.disciplines) {
+        try {
+          const result = service.calculateScore({
+            disciplines: bjsConfig.value.disciplines,
+            performances: perf,
+            table: gradingTable.value,
+            context: {}
+          });
+          for (const dr of result.disciplineResults) {
+            disciplinePointMap[dr.disciplineId] = dr.points;
+          }
+        } catch {
+          // Fallback: leave per-discipline points at 0
+        }
+      }
+
+      const disciplines = (['sprint', 'sprung', 'wurf', 'ausdauer'] as const)
+        .filter(key => perf[key] != null && perf[key] > 0)
+        .map(key => ({
+          name: disciplineLabels[key] || key,
+          performance: String(perf[key]),
+          points: disciplinePointMap[key] ?? 0
+        }));
+
+      return {
+        studentName: `${student.firstName} ${student.lastName}`,
+        disciplines,
+        totalPoints: points,
+        certificateType: certType
+      };
+    });
+
+    const pdfBytes = await service.generateOverviewPdf({
+      title: t('BUNDESJUGENDSPIELE.info-titel'),
+      generatedAt: new Date(),
+      entries
+    });
+
+    const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `BJS-${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast.success(t('EXPORT.toast-erfolgreich'));
+  } catch (error) {
+    console.error('Failed to export PDF:', error);
+    toast.error(t('EXPORT.toast-fehler'));
+  } finally {
+    exporting.value = false;
   }
 }
 </script>

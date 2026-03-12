@@ -38,6 +38,7 @@ import {
   CooperTestService,
   ShuttleRunService,
   SportabzeichenService,
+  BJSGradingService,
   SportStatisticsService,
   type CreateClassInput,
   type CreateLessonInput,
@@ -91,6 +92,7 @@ interface SportBridge {
   shuttleRunService: ShuttleRunService
   sportabzeichenService: SportabzeichenService
   SportabzeichenService: SportabzeichenService
+  bjsGradingService: BJSGradingService
   sportStatisticsService: SportStatisticsService
   teamBuilderService: TeamBuilderService
 }
@@ -151,6 +153,7 @@ export function initializeSportBridge(): SportBridge {
   const cooperTestService = new CooperTestService()
   const shuttleRunService = new ShuttleRunService()
   const sportabzeichenService = new SportabzeichenService()
+  const bjsGradingService = new BJSGradingService()
   const sportStatisticsService = new SportStatisticsService()
   const teamBuilderService = new TeamBuilderService()
 
@@ -193,6 +196,7 @@ export function initializeSportBridge(): SportBridge {
     shuttleRunService,
     sportabzeichenService,
     SportabzeichenService: sportabzeichenService,
+    bjsGradingService
     sportStatisticsService
     teamBuilderService
   }

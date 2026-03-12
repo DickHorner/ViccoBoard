@@ -394,4 +394,65 @@ describe('BJSGradingService', () => {
       expect(partResult.totalPoints).toBeLessThan(2000);
     });
   });
+
+  describe('generateOverviewPdf', () => {
+    test('generates a PDF for a single student with Ehrenurkunde', async () => {
+      const pdf = await service.generateOverviewPdf({
+        title: 'BJS Übersicht',
+        generatedAt: new Date('2026-01-01T00:00:00.000Z'),
+        entries: [
+          {
+            studentName: 'Max Mustermann',
+            disciplines: [
+              { name: 'Sprint 50m', performance: '6.0 s', points: 800 },
+              { name: 'Weitsprung', performance: '5.5 m', points: 800 }
+            ],
+            totalPoints: 1600,
+            certificateType: 'ehrenurkunde'
+          }
+        ]
+      });
+
+      expect(pdf.byteLength).toBeGreaterThan(0);
+    });
+
+    test('generates a PDF for multiple students with mixed certificates', async () => {
+      const pdf = await service.generateOverviewPdf({
+        title: 'BJS Klasse 9a',
+        generatedAt: new Date('2026-01-01T00:00:00.000Z'),
+        entries: [
+          {
+            studentName: 'Anna Schmidt',
+            disciplines: [{ name: 'Sprint', performance: '7.2 s', points: 500 }],
+            totalPoints: 500,
+            certificateType: 'teilnahmeurkunde'
+          },
+          {
+            studentName: 'Ben Müller',
+            disciplines: [{ name: 'Sprint', performance: '6.8 s', points: 700 }],
+            totalPoints: 700,
+            certificateType: 'siegerurkunde'
+          },
+          {
+            studentName: 'Clara Weber',
+            disciplines: [],
+            totalPoints: 0,
+            certificateType: null
+          }
+        ]
+      });
+
+      expect(pdf.byteLength).toBeGreaterThan(0);
+    });
+
+    test('generates a PDF with no entries', async () => {
+      const pdf = await service.generateOverviewPdf({
+        title: 'Leere Klasse',
+        generatedAt: new Date('2026-01-01T00:00:00.000Z'),
+        entries: []
+      });
+
+      expect(pdf.byteLength).toBeGreaterThan(0);
+    });
+  });
 });

@@ -737,6 +737,7 @@
     "achtung1": "Attention: CSV files are",
     "achtung2": "not encrypted!",
     "toast-erfolgreich": "Export succesful.",
+    "toast-fehler": "Export failed.",
     "stunden-alles": "all lessons"
   },
   "TABELLE": {
@@ -1018,7 +1019,9 @@
       "link": "Furhter information under www.bundesjugendspiele.de",
       "info1": "Each student competes in four disciplines at the Federal Youth Games and receives points for their performance.",
       "info2": "These points are added up to a total score, which then leads to a participation, winner or even honorary certificate.",
-      "disziplinen-einzeln": "single disciplines"
+      "disziplinen-einzeln": "single disciplines",
+      "pdf-export": "Export overview as PDF",
+      "pdf-erstelle": "Creating PDF..."
     },
     "REGISTER": {
       "subtitle": "Create your free account",
