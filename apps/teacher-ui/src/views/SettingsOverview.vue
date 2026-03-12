@@ -8,7 +8,12 @@
     </header>
 
     <div class="settings-grid">
-      <article v-for="card in settingsCards" :key="card.title" class="settings-card" :class="{ 'settings-card--link': card.to }">
+      <article
+        v-for="card in settingsCards"
+        :key="card.title"
+        class="settings-card"
+        :class="{ 'settings-card--link': card.to }"
+      >
         <template v-if="card.to">
           <RouterLink :to="card.to" class="card-link">
             <p class="eyebrow">{{ card.status }}</p>
@@ -21,19 +26,6 @@
           <h2>{{ card.title }}</h2>
           <p>{{ card.description }}</p>
         </template>
-      <RouterLink
-        :to="{ name: 'catalog-management' }"
-        class="settings-card settings-card-link"
-      >
-        <p class="eyebrow">verfügbar</p>
-        <h2>Katalogverwaltung</h2>
-        <p>Status- und Kriterienkataloge für Anwesenheit, Mitarbeit und Verhalten konfigurieren, sortieren und aktivieren/deaktivieren.</p>
-      </RouterLink>
-
-      <article v-for="card in settingsCards" :key="card.title" class="settings-card">
-        <p class="eyebrow">{{ card.status }}</p>
-        <h2>{{ card.title }}</h2>
-        <p>{{ card.description }}</p>
       </article>
     </div>
   </section>
@@ -41,33 +33,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-
-const settingsCards = [
-  {
-    title: 'Sicherheit & App-Sperre',
-    description: 'PIN, Passwort, Timeout und weitere Schutzmechanismen werden hier gebuendelt.',
-    status: 'in Aufbau',
-    to: null
-  },
-  {
-    title: 'Backups & Wiederherstellung',
-    description: 'Export, Import und Backup-Status fuer die iPad-Safari-Realitaet.',
-    status: 'in Aufbau',
-    to: null
-  },
-  {
-    title: 'Sprache & Einrichtung',
-    description: 'Sprachwahl, Hilfen fuer den Einstieg und spaetere Onboarding-Optionen.',
-    status: 'in Aufbau',
-    to: null
-  },
-  {
-    title: 'Sport-Konfiguration',
-    description: 'Shuttle-Run-Konfigurationen, Status-Katalog, Tabellen und weitere fachspezifische Einstellungen.',
-    status: 'aktiv',
-    to: '/settings/sport'
-  }
-]
+import { settingsCards } from '../settings-sections'
 </script>
 
 <style scoped>
@@ -115,20 +81,6 @@ const settingsCards = [
 
 .card-link:hover {
   background: #f0fdfa;
-.settings-card-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  border-color: #0f766e;
-  transition: box-shadow 0.15s;
-}
-
-.settings-card-link:hover {
-  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.12);
-}
-
-.settings-card-link h2 {
-  color: #0f766e;
 }
 
 .eyebrow {
@@ -140,5 +92,3 @@ const settingsCards = [
   font-weight: 700;
 }
 </style>
-
-
