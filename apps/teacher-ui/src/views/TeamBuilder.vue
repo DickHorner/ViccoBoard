@@ -33,10 +33,10 @@
           <span>{{ t('TEAM.anwesenheit') }}</span>
         </label>
         <div class="form-group">
-          <label>{{ t('TEAM.geschlecht') }}</label>
-          <select v-model="genderMode" class="form-input">
-            <option value="mixed">{{ t('TEAM.gemischt') }}</option>
-            <option value="separated">{{ t('TEAM.getrennt') }}</option>
+          <label>{{ t('TEAM.algorithm') }}</label>
+          <select v-model="algorithm" class="form-input">
+            <option value="random">{{ t('TEAM.algorithm-random') }}</option>
+            <option value="gender-balanced">{{ t('TEAM.algorithm-gender-balanced') }}</option>
           </select>
         </div>
       </div>
@@ -58,13 +58,46 @@
         <h3>{{ t('TEAM.turniere') }}</h3>
       </div>
       <div class="teams-grid">
-        <div v-for="team in teams" :key="team.name" class="team-card">
+        <div v-for="team in teams" :key="team.id" class="team-card">
           <h4>{{ team.name }}</h4>
           <ul>
             <li v-for="student in team.students" :key="student.id">
               {{ student.firstName }} {{ student.lastName }}
             </li>
           </ul>
+        </div>
+      </div>
+
+      <div class="save-section">
+        <div class="form-group">
+          <label>{{ t('TEAM.session-name') }}</label>
+          <input v-model="sessionName" type="text" class="form-input" :placeholder="t('TEAM.session-name')" />
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" @click="saveTeams" :disabled="!canSave">
+            {{ t('TEAM.speichern') }}
+          </button>
+        </div>
+        <div v-if="saveSuccess" class="success-banner">{{ t('TEAM.session-gespeichert') }}</div>
+      </div>
+    </section>
+
+    <section class="card" v-if="selectedClassId">
+      <div class="card-header">
+        <h3>{{ t('TEAM.gespeicherte-sessions') }}</h3>
+      </div>
+      <div v-if="savedSessions.length === 0" class="empty-hint">
+        {{ t('TEAM.keine-sessions') }}
+      </div>
+      <div v-else class="sessions-list">
+        <div v-for="session in savedSessions" :key="session.id" class="session-item">
+          <div class="session-info">
+            <span class="session-name">{{ session.sessionMetadata.sessionName }}</span>
+            <span class="session-meta">{{ formatDate(session.createdAt) }} · {{ session.sessionMetadata.teams?.length }} {{ t('TEAM.anzahl') }}</span>
+          </div>
+          <button class="btn-secondary btn-small" @click="loadSession(session)">
+            {{ t('TEAM.sitzung-laden') }}
+          </button>
         </div>
       </div>
     </section>
@@ -77,7 +110,8 @@ import { useI18n } from 'vue-i18n'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import { AttendanceStatus } from '@viccoboard/core'
-import type { ClassGroup, Student } from '@viccoboard/core'
+import type { ClassGroup, Student, Sport } from '@viccoboard/core'
+import type { TeamSessionMetadata } from '@viccoboard/sport'
 
 const { t } = useI18n()
 
@@ -93,12 +127,22 @@ const students = ref<Student[]>([])
 const teamCount = ref(2)
 const teamLabel = ref('Team')
 const useLatestAttendance = ref(false)
-const genderMode = ref<'mixed' | 'separated'>('mixed')
+const algorithm = ref<'random' | 'gender-balanced'>('random')
+const sessionName = ref('')
 const warning = ref('')
+const saveSuccess = ref(false)
+const savedSessions = ref<Sport.ToolSession[]>([])
 
-const teams = ref<Array<{ name: string; students: Student[] }>>([])
+interface DisplayTeam {
+  id: string
+  name: string
+  students: Student[]
+}
+
+const teams = ref<DisplayTeam[]>([])
 
 const canGenerate = computed(() => selectedClassId.value && students.value.length > 0 && teamCount.value >= 2)
+const canSave = computed(() => teams.value.length > 0 && sessionName.value.trim().length > 0 && selectedClassId.value)
 
 async function loadClasses() {
   classes.value = await SportBridge.classGroupRepository.findAll()
@@ -107,6 +151,7 @@ async function loadClasses() {
 async function loadStudents() {
   warning.value = ''
   teams.value = []
+  savedSessions.value = []
 
   if (!selectedClassId.value) {
     students.value = []
@@ -117,91 +162,110 @@ async function loadStudents() {
 
   if (!useLatestAttendance.value) {
     students.value = allStudents
-    return
+  } else {
+    const lesson = await SportBridge.lessonRepository.getMostRecent(selectedClassId.value)
+    if (!lesson) {
+      warning.value = t('COMMON.error')
+      students.value = allStudents
+    } else {
+      const attendance = await SportBridge.attendanceRepository.findByLesson(lesson.id)
+      if (attendance.length === 0) {
+        warning.value = t('COMMON.error')
+        students.value = allStudents
+      } else {
+        const presentIds = attendance
+          .filter(record => [AttendanceStatus.Present, AttendanceStatus.Passive].includes(record.status))
+          .map(record => record.studentId)
+        const filtered = allStudents.filter(student => presentIds.includes(student.id))
+        if (filtered.length === 0) {
+          warning.value = t('COMMON.error')
+          students.value = allStudents
+        } else {
+          students.value = filtered
+        }
+      }
+    }
   }
 
-  const lesson = await SportBridge.lessonRepository.getMostRecent(selectedClassId.value)
-  if (!lesson) {
-    warning.value = t('COMMON.error')
-    students.value = allStudents
-    return
-  }
-
-  const attendance = await SportBridge.attendanceRepository.findByLesson(lesson.id)
-  if (attendance.length === 0) {
-    warning.value = t('COMMON.error')
-    students.value = allStudents
-    return
-  }
-
-  const presentIds = attendance
-    .filter(record => [AttendanceStatus.Present, AttendanceStatus.Passive].includes(record.status))
-    .map(record => record.studentId)
-
-  const filtered = allStudents.filter(student => presentIds.includes(student.id))
-  if (filtered.length === 0) {
-    warning.value = t('COMMON.error')
-    students.value = allStudents
-    return
-  }
-
-  students.value = filtered
+  await loadSavedSessions()
 }
 
-function shuffle<T>(input: T[]): T[] {
-  const array = [...input]
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[array[i], array[j]] = [array[j], array[i]]
-  }
-  return array
+async function loadSavedSessions() {
+  if (!selectedClassId.value) return
+  const allSessions = await SportBridge.toolSessionRepository.findByClassGroup(selectedClassId.value)
+  savedSessions.value = allSessions
+    .filter(s => s.toolType === 'teams')
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 }
 
 function generateTeams() {
   if (!canGenerate.value) return
 
-  const members = genderMode.value === 'separated'
-    ? buildSeparatedTeams()
-    : buildMixedTeams()
-
-  teams.value = members
-}
-
-function buildMixedTeams(): Array<{ name: string; students: Student[] }> {
-  const shuffled = shuffle(students.value)
-  const result: Array<{ name: string; students: Student[] }> = Array.from({ length: teamCount.value }, (_, index) => ({
-    name: `${teamLabel.value} ${index + 1}`,
-    students: []
-  }))
-
-  shuffled.forEach((student, index) => {
-    result[index % teamCount.value].students.push(student)
+  const builtTeams = SportBridge.teamBuilderService.buildTeams({
+    students: students.value.map(s => ({ id: s.id, gender: s.gender })),
+    teamCount: teamCount.value,
+    teamLabel: teamLabel.value,
+    algorithm: algorithm.value
   })
 
-  return result
-}
-
-function buildSeparatedTeams(): Array<{ name: string; students: Student[] }> {
-  const males = students.value.filter(student => student.gender === 'male')
-  const females = students.value.filter(student => student.gender === 'female')
-  const others = students.value.filter(student => !student.gender)
-
-  const mixed = [...shuffle(males), ...shuffle(females), ...shuffle(others)]
-
-  const result: Array<{ name: string; students: Student[] }> = Array.from({ length: teamCount.value }, (_, index) => ({
-    name: `${teamLabel.value} ${index + 1}`,
-    students: []
+  // Map built teams back to display teams with full student objects
+  const studentMap = new Map(students.value.map(s => [s.id, s]))
+  teams.value = builtTeams.map(bt => ({
+    id: bt.id,
+    name: bt.name,
+    students: bt.studentIds.map(id => studentMap.get(id)).filter((s): s is Student => s !== undefined)
   }))
 
-  mixed.forEach((student, index) => {
-    result[index % teamCount.value].students.push(student)
+  saveSuccess.value = false
+  sessionName.value = ''
+}
+
+async function saveTeams() {
+  if (!canSave.value) return
+
+  await SportBridge.saveTeamAssignmentUseCase.execute({
+    classGroupId: selectedClassId.value,
+    sessionName: sessionName.value,
+    algorithm: algorithm.value,
+    teamLabel: teamLabel.value,
+    teams: teams.value.map(t => ({
+      id: t.id,
+      name: t.name,
+      studentIds: t.students.map(s => s.id)
+    }))
   })
 
-  return result
+  saveSuccess.value = true
+  await loadSavedSessions()
+}
+
+function loadSession(session: Sport.ToolSession) {
+  const meta = session.sessionMetadata as TeamSessionMetadata
+
+  if (!meta?.teams) return
+
+  algorithm.value = meta.algorithm ?? 'random'
+  if (meta.teamLabel) teamLabel.value = meta.teamLabel
+  teamCount.value = meta.teams.length
+
+  const studentMap = new Map(students.value.map(s => [s.id, s]))
+  teams.value = meta.teams.map(t => ({
+    id: t.id,
+    name: t.name,
+    students: t.studentIds.map(id => studentMap.get(id)).filter((s): s is Student => s !== undefined)
+  }))
+
+  saveSuccess.value = false
+  sessionName.value = session.sessionMetadata.sessionName ?? ''
 }
 
 function clearTeams() {
   teams.value = []
+  saveSuccess.value = false
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString()
 }
 
 loadClasses()
@@ -234,6 +298,14 @@ loadClasses()
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 1.5rem;
+}
+
+.card-header {
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  margin: 0;
 }
 
 .form-row {
@@ -282,10 +354,26 @@ loadClasses()
   color: white;
 }
 
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   background: white;
   border: 2px solid #ddd;
   color: #333;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  padding: 0.4rem 0.9rem;
+  min-height: 36px;
+  font-size: 0.875rem;
 }
 
 .warning-banner {
@@ -294,6 +382,14 @@ loadClasses()
   background: #fff3cd;
   color: #856404;
   margin-bottom: 1rem;
+}
+
+.success-banner {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #d4edda;
+  color: #155724;
+  margin-top: 0.75rem;
 }
 
 .teams-grid {
@@ -322,9 +418,57 @@ loadClasses()
   padding: 0.25rem 0;
 }
 
+.save-section {
+  margin-top: 1.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  gap: 1rem;
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.session-name {
+  font-weight: 600;
+}
+
+.session-meta {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.empty-hint {
+  color: #888;
+  padding: 1rem 0;
+}
+
 @media (max-width: 768px) {
   .form-actions {
     flex-direction: column;
   }
+
+  .session-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>
+

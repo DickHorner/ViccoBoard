@@ -707,7 +707,15 @@
     "gewichtung-title": "Weight",
     "speichern": "Save",
     "loeschen": "delete",
-    "bearbeiten": "Edit team"
+    "bearbeiten": "Edit team",
+    "session-name": "Session name",
+    "algorithm": "Algorithm",
+    "algorithm-random": "Random",
+    "algorithm-gender-balanced": "Gender balanced",
+    "gespeicherte-sessions": "Saved Teams",
+    "sitzung-laden": "Load",
+    "keine-sessions": "No saved teams available",
+    "session-gespeichert": "Teams saved"
   },
   "ANWESENHEIT": {
     "liste": "List of presence from",
