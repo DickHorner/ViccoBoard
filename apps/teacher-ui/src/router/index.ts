@@ -46,6 +46,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Sport Statistiken' }
   },
   {
+    path: '/subjects/sport/tables',
+    name: 'sport-tables',
+    component: () => import('../views/SportTablesView.vue'),
+    meta: { title: 'Sport Tabellen' }
+  },
+  {
     path: '/subjects/kbr',
     name: 'subject-kbr',
     component: () => import('../views/KBRHub.vue'),

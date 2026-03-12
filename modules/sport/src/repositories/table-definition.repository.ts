@@ -19,6 +19,7 @@ export class TableDefinitionRepository extends AdapterRepository<Sport.TableDefi
       type: row.type,
       description: row.description ?? undefined,
       source: row.source,
+      active: row.active !== undefined ? Boolean(row.active) : true,
       dimensions: safeJsonParse(row.dimensions, [], 'TableDefinition.dimensions'),
       mappingRules: safeJsonParse(row.mapping_rules, [], 'TableDefinition.mappingRules'),
       entries: safeJsonParse(row.entries, [], 'TableDefinition.entries'),
@@ -35,6 +36,7 @@ export class TableDefinitionRepository extends AdapterRepository<Sport.TableDefi
     if (entity.type !== undefined) row.type = entity.type;
     if (entity.description !== undefined) row.description = entity.description;
     if (entity.source !== undefined) row.source = entity.source;
+    if (entity.active !== undefined) row.active = entity.active ? 1 : 0;
     if (entity.dimensions !== undefined) row.dimensions = safeJsonStringify(entity.dimensions, 'TableDefinition.dimensions');
     if (entity.mappingRules !== undefined) row.mapping_rules = safeJsonStringify(entity.mappingRules, 'TableDefinition.mappingRules');
     if (entity.entries !== undefined) row.entries = safeJsonStringify(entity.entries, 'TableDefinition.entries');

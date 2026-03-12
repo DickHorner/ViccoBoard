@@ -35,6 +35,7 @@ import {
   RecordFeedbackSessionUseCase,
   SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
+  ImportTableDefinitionUseCase,
   SaveTacticsSnapshotUseCase,
   SaveTableDefinitionUseCase,
   DeleteTableDefinitionUseCase,
@@ -99,6 +100,7 @@ interface SportBridge {
 
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
+  importTableDefinitionUseCase: ImportTableDefinitionUseCase
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
   timeGradingService: TimeGradingService
@@ -162,6 +164,7 @@ export function initializeSportBridge(): SportBridge {
   const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
   const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
   const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
+  const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(tableDefinitionRepo)
   const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepo)
   const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(gradeCategoryRepo)
   const saveTableDefinitionUseCase = new SaveTableDefinitionUseCase(tableDefinitionRepo)
@@ -212,6 +215,7 @@ export function initializeSportBridge(): SportBridge {
     recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
+    importTableDefinitionUseCase,
 
     // Services
     criteriaGradingEngine,
