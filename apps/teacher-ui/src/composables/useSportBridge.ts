@@ -19,6 +19,7 @@ import {
   SportabzeichenStandardRepository,
   SportabzeichenResultRepository,
   ToolSessionRepository,
+  TacticsSnapshotRepository,
   CreateClassUseCase,
   CreateLessonUseCase,
   RecordAttendanceUseCase,
@@ -28,6 +29,8 @@ import {
   RecordShuttleRunResultUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
+  SaveTeamAssignmentUseCase,
+  TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
   CooperTestService,
@@ -62,6 +65,7 @@ interface SportBridge {
   SportabzeichenStandardRepository: SportabzeichenStandardRepository
   sportabzeichenResultRepository: SportabzeichenResultRepository
   SportabzeichenResultRepository: SportabzeichenResultRepository
+  tacticsSnapshotRepository: TacticsSnapshotRepository
 
   // Use Cases
   createClassUseCase: CreateClassUseCase
@@ -73,7 +77,8 @@ interface SportBridge {
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
   recordTimerResultUseCase: RecordTimerResultUseCase
-
+  saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
+  saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
   timeGradingService: TimeGradingService
@@ -82,6 +87,7 @@ interface SportBridge {
   sportabzeichenService: SportabzeichenService
   SportabzeichenService: SportabzeichenService
   sportStatisticsService: SportStatisticsService
+  teamBuilderService: TeamBuilderService
 }
 
 /**
@@ -107,6 +113,7 @@ export function initializeSportBridge(): SportBridge {
   const sportabzeichenStandardRepo = new SportabzeichenStandardRepository(adapter)
   const sportabzeichenResultRepo = new SportabzeichenResultRepository(adapter)
   const toolSessionRepo = new ToolSessionRepository(adapter)
+  const tacticsSnapshotRepo = new TacticsSnapshotRepository(adapter)
 
   // Initialize use cases with repositories
   const createClassUseCase = new CreateClassUseCase(classGroupRepo)
@@ -128,6 +135,8 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenStandardRepo
   )
   const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
+  const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
+  const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -136,6 +145,7 @@ export function initializeSportBridge(): SportBridge {
   const shuttleRunService = new ShuttleRunService()
   const sportabzeichenService = new SportabzeichenService()
   const sportStatisticsService = new SportStatisticsService()
+  const teamBuilderService = new TeamBuilderService()
 
   sportBridgeInstance = {
     // Repositories
@@ -152,6 +162,7 @@ export function initializeSportBridge(): SportBridge {
     SportabzeichenStandardRepository: sportabzeichenStandardRepo,
     sportabzeichenResultRepository: sportabzeichenResultRepo,
     SportabzeichenResultRepository: sportabzeichenResultRepo,
+    tacticsSnapshotRepository: tacticsSnapshotRepo,
 
     // Use Cases
     createClassUseCase,
@@ -163,6 +174,8 @@ export function initializeSportBridge(): SportBridge {
     recordShuttleRunResultUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
+    saveTacticsSnapshotUseCase,
+    saveTeamAssignmentUseCase,
 
     // Services
     criteriaGradingEngine,
@@ -172,6 +185,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenService,
     SportabzeichenService: sportabzeichenService,
     sportStatisticsService
+    teamBuilderService
   }
 
   return sportBridgeInstance
