@@ -5,6 +5,16 @@
       <h2>Bewertungsübersicht</h2>
       <p class="page-description">Verwalten Sie Bewertungskategorien und erfassen Sie Noten.</p>
     </div>
+
+    <!-- Quick Links -->
+    <div class="quick-links">
+      <button class="quick-link-btn" @click="$router.push('/grading/tables')">
+        📊 Tabellenverwaltung
+      </button>
+      <button class="quick-link-btn" @click="$router.push('/settings/catalogs')">
+        📋 Kriterienkataloge
+      </button>
+    </div>
     
     <div class="grading-content">
       <!-- Class Selection -->
@@ -82,6 +92,19 @@
                   >
                     Historie
                   </button>
+                  <button
+                    class="btn-text btn-small"
+                    @click="openEditCategoryModal(category)"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    class="btn-icon btn-small btn-danger-icon"
+                    :title="'Kategorie löschen: ' + category.name"
+                    @click="openDeleteConfirm(category)"
+                  >
+                    🗑️
+                  </button>
                 </div>
               </div>
             </div>
@@ -139,6 +162,23 @@
         <div class="modal-content">
           <form @submit.prevent="createCategory">
             <div class="form-group">
+              <label for="category-type">Typ*</label>
+              <select 
+                id="category-type"
+                v-model="newCategory.type" 
+                required
+                @change="applyPreset(newCategory.type)"
+              >
+                <option value="">Typ auswählen...</option>
+                <option
+                  v-for="t in SUPPORTED_TYPES"
+                  :key="t.value"
+                  :value="t.value"
+                >{{ t.label }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
               <label for="category-name">Name*</label>
               <input 
                 id="category-name"
@@ -157,25 +197,6 @@
                 rows="3"
                 placeholder="Optionale Beschreibung..."
               ></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label for="category-type">Typ*</label>
-              <select 
-                id="category-type"
-                v-model="newCategory.type" 
-                required
-              >
-                <option value="">Typ auswählen...</option>
-                <option value="criteria">Kriterienbasiert</option>
-                <option value="time">Zeitbasiert</option>
-                <option value="cooper">Cooper-Test</option>
-                <option value="shuttle">Shuttle-Run</option>
-                <option value="mittelstrecke">Mittelstrecke</option>
-                <option value="Sportabzeichen">Sportabzeichen</option>
-                <option value="bjs">Bundesjugendspiele</option>
-                <option value="verbal">Verbal</option>
-              </select>
             </div>
             
             <div class="form-group">
@@ -203,16 +224,279 @@
         </div>
       </div>
     </div>
+
+    <!-- Edit Category Modal -->
+    <div v-if="showEditCategoryModal" class="modal-overlay" @click="closeEditModal">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3>Kategorie bearbeiten</h3>
+          <button class="close-btn" @click="closeEditModal">×</button>
+        </div>
+        <div class="modal-content">
+          <form @submit.prevent="saveEditCategory">
+            <div class="form-group">
+              <label for="edit-category-name">Name*</label>
+              <input
+                id="edit-category-name"
+                v-model="editForm.name"
+                type="text"
+                required
+                placeholder="Kategoriename"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="edit-category-description">Beschreibung</label>
+              <textarea
+                id="edit-category-description"
+                v-model="editForm.description"
+                rows="3"
+                placeholder="Optionale Beschreibung..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-category-weight">Gewicht (%)*</label>
+              <input
+                id="edit-category-weight"
+                v-model.number="editForm.weight"
+                type="number"
+                min="0"
+                max="100"
+                required
+                placeholder="0-100"
+              />
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-secondary" @click="closeEditModal">
+                Abbrechen
+              </button>
+              <button type="submit" class="btn-primary" :disabled="saving">
+                {{ saving ? 'Wird gespeichert...' : 'Speichern' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div v-if="showDeleteConfirmModal" class="modal-overlay" @click="closeDeleteConfirm">
+      <div class="modal modal-small" @click.stop>
+        <div class="modal-header">
+          <h3>Kategorie löschen?</h3>
+          <button class="close-btn" @click="closeDeleteConfirm">×</button>
+        </div>
+        <div class="modal-content">
+          <p>
+            Möchten Sie die Kategorie <strong>{{ deletingCategory?.name }}</strong> wirklich löschen?
+          </p>
+          <p v-if="deleteEntryCount > 0" class="warning-text">
+            ⚠️ Es gibt <strong>{{ deleteEntryCount }}</strong> erfasste Noteneinträge für diese Kategorie. Diese werden zusammen mit der Kategorie <strong>unwiderruflich gelöscht</strong>.
+          </p>
+          <p v-else class="info-text">Es gibt keine erfassten Noteneinträge für diese Kategorie.</p>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" @click="closeDeleteConfirm">
+              Abbrechen
+            </button>
+            <button type="button" class="btn-danger" :disabled="deleting" @click="confirmDeleteCategory">
+              {{ deleting ? 'Wird gelöscht...' : 'Löschen' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div v-if="showEditCategoryModal" class="modal-overlay" @click.self="closeEditModal">
+    <div class="modal" @click.stop>
+      <div class="modal-header">
+        <h3>Kategorie bearbeiten</h3>
+        <button class="close-btn" @click="closeEditModal">×</button>
+      </div>
+      <div class="modal-content">
+        <form @submit.prevent="saveEditCategory">
+          <div class="form-group">
+            <label for="edit-category-name">Name*</label>
+            <input
+              id="edit-category-name"
+              v-model="editCategoryForm.name"
+              type="text"
+              required
+              placeholder="Kategoriename"
+            />
+          </div>
+          <div class="form-group">
+            <label for="edit-category-description">Beschreibung</label>
+            <textarea
+              id="edit-category-description"
+              v-model="editCategoryForm.description"
+              rows="3"
+              placeholder="Optionale Beschreibung…"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="edit-category-weight">Gewicht (%)*</label>
+            <input
+              id="edit-category-weight"
+              v-model.number="editCategoryForm.weight"
+              type="number"
+              min="0"
+              max="100"
+              required
+              placeholder="0-100"
+            />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" @click="closeEditModal">Abbrechen</button>
+            <button type="submit" class="btn-primary" :disabled="saving">
+              {{ saving ? 'Wird gespeichert…' : 'Speichern' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Category Confirmation -->
+  <div v-if="deleteCategoryTarget" class="modal-overlay" @click.self="deleteCategoryTarget = null">
+    <div class="modal" @click.stop>
+      <div class="modal-header">
+        <h3>Kategorie löschen?</h3>
+        <button class="close-btn" @click="deleteCategoryTarget = null">×</button>
+      </div>
+      <div class="modal-content">
+        <p>
+          Möchten Sie die Kategorie <strong>{{ deleteCategoryTarget.name }}</strong> wirklich löschen?
+        </p>
+        <p style="color:#c00; font-size:0.875rem;">
+          Alle zugehörigen Leistungseinträge bleiben erhalten, sind aber ohne Kategorie nicht mehr auswertbar.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" @click="deleteCategoryTarget = null">Abbrechen</button>
+        <button
+          class="btn-danger-solid"
+          :disabled="!!deletingCategoryId"
+          @click="executeDeleteCategory"
+        >
+          {{ deletingCategoryId ? 'Wird gelöscht…' : 'Löschen' }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSportBridge } from '../composables/useSportBridge';
+import { useSportBridge, getSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
-import type { Sport} from '@viccoboard/core';
+import type { Sport } from '@viccoboard/core';
+
+// Supported types have a dedicated grading-entry route+view.
+// 'verbal' is intentionally excluded as no view exists yet.
+const SUPPORTED_TYPES: { value: Sport.GradeCategoryType; label: string }[] = [
+  { value: 'criteria' as Sport.GradeCategoryType, label: 'Kriterienbasiert' },
+  { value: 'time' as Sport.GradeCategoryType, label: 'Zeitbasiert' },
+  { value: 'cooper' as Sport.GradeCategoryType, label: 'Cooper-Test' },
+  { value: 'shuttle' as Sport.GradeCategoryType, label: 'Shuttle-Run' },
+  { value: 'mittelstrecke' as Sport.GradeCategoryType, label: 'Mittelstrecke' },
+  { value: 'Sportabzeichen' as Sport.GradeCategoryType, label: 'Sportabzeichen' },
+  { value: 'bjs' as Sport.GradeCategoryType, label: 'Bundesjugendspiele' },
+];
+
+const TYPE_LABEL_MAP: Record<string, string> = Object.fromEntries(
+  SUPPORTED_TYPES.map(t => [t.value, t.label])
+);
+
+/** Category presets: sensible defaults keyed by type */
+const CATEGORY_PRESETS: Record<string, { name: string; description: string; weight: number; configuration: Sport.GradeCategoryConfig }> = {
+  criteria: {
+    name: 'Technik & Teamfähigkeit',
+    description: 'Bewertung technischer Fähigkeiten und der Zusammenarbeit',
+    weight: 30,
+    configuration: {
+      type: 'criteria',
+      criteria: [],
+      allowSelfAssessment: false,
+      selfAssessmentViaWOW: false,
+    },
+  },
+  time: {
+    name: 'Sprint 100 m',
+    description: 'Zeitbasierte Bewertung des 100-m-Sprints',
+    weight: 20,
+    configuration: {
+      type: 'time',
+      bestGrade: 1,
+      worstGrade: 6,
+      linearMapping: true,
+      adjustableAfterwards: true,
+    },
+  },
+  cooper: {
+    name: 'Cooper-Test Ausdauer',
+    description: '12-Minuten-Lauftest nach Cooper',
+    weight: 25,
+    configuration: {
+      type: 'cooper',
+      SportType: 'running',
+      distanceUnit: 'meters',
+      autoEvaluation: true,
+    },
+  },
+  shuttle: {
+    name: 'Shuttle-Run',
+    description: 'Mehrstufiger Ausdauertest',
+    weight: 25,
+    configuration: {
+      type: 'shuttle',
+      autoEvaluation: true,
+    },
+  },
+  mittelstrecke: {
+    name: 'Mittelstrecke 800 m',
+    description: 'Laufbewertung über 800 Meter',
+    weight: 20,
+    configuration: {
+      type: 'mittelstrecke',
+      autoEvaluation: true,
+    },
+  },
+  Sportabzeichen: {
+    name: 'Sportabzeichen',
+    description: 'Deutsches Sportabzeichen – altersbezogene Disziplinen',
+    weight: 15,
+    configuration: {
+      type: 'Sportabzeichen',
+      requiresBirthYear: true,
+      ageDependent: true,
+      disciplines: [],
+      pdfExportEnabled: true,
+    },
+  },
+  bjs: {
+    name: 'Bundesjugendspiele',
+    description: 'Wettbewerbs- oder Leichtathletikfestformat',
+    weight: 15,
+    configuration: {
+      type: 'bjs',
+      disciplines: [],
+      autoGrading: true,
+    },
+  },
+};
+
+function buildDefaultConfiguration(type: string): Sport.GradeCategoryConfig {
+  const preset = CATEGORY_PRESETS[type];
+  if (preset) return { ...preset.configuration };
+  throw new Error('Unsupported category type');
+}
 
 const router = useRouter();
 const { SportBridge } = useSportBridge();
@@ -226,14 +510,37 @@ const students = ref<any[]>([]);
 const performanceEntries = ref<any[]>([]);
 const loading = ref(false);
 const saving = ref(false);
-const showCreateCategoryModal = ref(false);
+const deleting = ref(false);
+
+// Edit category state
+const showEditCategoryModal = ref(false);
+const editingCategory = ref<Sport.GradeCategory | null>(null);
+const editCategoryForm = ref({ name: '', description: '', weight: 0 });
+
+// Delete category state
+const deleteCategoryTarget = ref<Sport.GradeCategory | null>(null);
+const deletingCategoryId = ref<string | null>(null);
 
 const newCategory = ref({
   name: '',
   description: '',
   type: '' as any,
-  weight: 0
+  weight: 0,
 });
+
+// Edit modal
+const showEditCategoryModal = ref(false);
+const editingCategory = ref<Sport.GradeCategory | null>(null);
+const editForm = ref({
+  name: '',
+  description: '',
+  weight: 0,
+});
+
+// Delete confirm modal
+const showDeleteConfirmModal = ref(false);
+const deletingCategory = ref<Sport.GradeCategory | null>(null);
+const deleteEntryCount = ref(0);
 
 onMounted(async () => {
   await loadClasses();
@@ -254,14 +561,12 @@ async function onClassChange() {
     performanceEntries.value = [];
     return;
   }
-  
+
   loading.value = true;
   try {
-    // Load categories, students, and performance entries
     categories.value = await SportBridge.value?.gradeCategoryRepository.findByClassGroup(selectedClassId.value) ?? [];
     students.value = await studentRepository.value?.findByClassGroup(selectedClassId.value) ?? [];
-    
-    // Load all performance entries for students in this class in parallel
+
     const entryPromises = students.value.map((student) =>
       SportBridge.value?.performanceEntryRepository.findByStudent(student.id) ?? Promise.resolve([])
     );
@@ -275,17 +580,7 @@ async function onClassChange() {
 }
 
 function getCategoryTypeLabel(type: any): string {
-  const labels: Record<any, string> = {
-    criteria: 'Kriterienbasiert',
-    time: 'Zeitbasiert',
-    cooper: 'Cooper-Test',
-    shuttle: 'Shuttle-Run',
-    mittelstrecke: 'Mittelstrecke',
-    Sportabzeichen: 'Sportabzeichen',
-    bjs: 'Bundesjugendspiele',
-    verbal: 'Verbal'
-  };
-  return labels[type] || type;
+  return TYPE_LABEL_MAP[type] || type;
 }
 
 function getStudentGrade(studentId: string, categoryId: string): string | number | null {
@@ -301,6 +596,18 @@ function formatGrade(grade: string | number | null): string {
 }
 
 function openGradingEntry(category: Sport.GradeCategory) {
+  const routes: Record<string, string> = {
+    criteria: `/grading/criteria/${category.id}`,
+    time: `/grading/time/${category.id}`,
+    cooper: `/grading/cooper/${category.id}`,
+    shuttle: `/grading/shuttle/${category.id}`,
+    mittelstrecke: `/grading/mittelstrecke/${category.id}`,
+    Sportabzeichen: `/grading/Sportabzeichen/${category.id}`,
+    bjs: `/grading/bjs/${category.id}`,
+  };
+  const route = routes[category.type];
+  if (route) {
+    router.push(route);
   if (category.type === 'criteria') {
     router.push(`/grading/criteria/${category.id}`);
   } else if (category.type === 'time') {
@@ -326,100 +633,187 @@ function viewHistory(category: Sport.GradeCategory) {
   router.push(`/grading/history/${category.id}`);
 }
 
+// ── Preset application ────────────────────────────────────────────────────────
+
+function applyPreset(type: string) {
+  const preset = CATEGORY_PRESETS[type];
+  if (!preset) return;
+  newCategory.value.name = preset.name;
+  newCategory.value.description = preset.description;
+  newCategory.value.weight = preset.weight;
+}
+
+// ── Create ────────────────────────────────────────────────────────────────────
+// ── Edit category ─────────────────────────────────────────────────────────────
+
+function openEditCategoryModal(category: Sport.GradeCategory): void {
+  editingCategory.value = category;
+  editCategoryForm.value = {
+    name: category.name,
+    description: category.description ?? '',
+    weight: category.weight
+  };
+  showEditCategoryModal.value = true;
+}
+
+function closeEditModal(): void {
+  showEditCategoryModal.value = false;
+  editingCategory.value = null;
+}
+
+async function saveEditCategory(): Promise<void> {
+  if (!editingCategory.value) return;
+  saving.value = true;
+  try {
+    const bridge = getSportBridge();
+    await bridge.updateGradeCategoryUseCase.execute({
+      id: editingCategory.value.id,
+      name: editCategoryForm.value.name,
+      description: editCategoryForm.value.description || undefined,
+      weight: editCategoryForm.value.weight
+    });
+    toast.success('Kategorie aktualisiert.');
+    closeEditModal();
+    await onClassChange();
+  } catch (e: any) {
+    toast.error(e?.message ?? 'Fehler beim Speichern.');
+  } finally {
+    saving.value = false;
+  }
+}
+
+// ── Delete category ───────────────────────────────────────────────────────────
+
+function confirmDeleteCategory(category: Sport.GradeCategory): void {
+  deleteCategoryTarget.value = category;
+}
+
+async function executeDeleteCategory(): Promise<void> {
+  if (!deleteCategoryTarget.value) return;
+  deletingCategoryId.value = deleteCategoryTarget.value.id;
+  try {
+    const bridge = getSportBridge();
+    await bridge.deleteGradeCategoryUseCase.execute(deleteCategoryTarget.value.id);
+    toast.success('Kategorie gelöscht.');
+    deleteCategoryTarget.value = null;
+    await onClassChange();
+  } catch (e: any) {
+    toast.error(e?.message ?? 'Fehler beim Löschen.');
+  } finally {
+    deletingCategoryId.value = null;
+  }
+}
+
 async function createCategory() {
   if (!selectedClassId.value) return;
   if (!newCategory.value.name || !newCategory.value.type) return;
-  
+
   saving.value = true;
   try {
-    // Create default configuration based on type
-    let configuration: any;
-    
-    if (newCategory.value.type === 'criteria') {
-      configuration = {
-        type: 'criteria',
-        criteria: [],
-        allowSelfAssessment: false,
-        selfAssessmentViaWOW: false
-      };
-    } else if (newCategory.value.type === 'time') {
-      configuration = {
-        type: 'time',
-        bestGrade: 1,
-        worstGrade: 6,
-        linearMapping: true,
-        adjustableAfterwards: true
-      };
-    } else if (newCategory.value.type === 'cooper') {
-      configuration = {
-        type: 'cooper',
-        SportType: 'running',
-        distanceUnit: 'meters',
-        autoEvaluation: true
-      };
-    } else if (newCategory.value.type === 'shuttle') {
-      configuration = {
-        type: 'shuttle',
-        autoEvaluation: true
-      };
-    } else if (newCategory.value.type === 'mittelstrecke') {
-      configuration = {
-        type: 'mittelstrecke',
-        autoEvaluation: true
-      };
-    } else if (newCategory.value.type === 'Sportabzeichen') {
-      configuration = {
-        type: 'Sportabzeichen',
-        requiresBirthYear: true,
-        ageDependent: true,
-        disciplines: [],
-        pdfExportEnabled: true
-      };
-    } else if (newCategory.value.type === 'bjs') {
-      configuration = {
-        type: 'bjs',
-        disciplines: [],
-        autoGrading: true
-      };
-    } else if (newCategory.value.type === 'verbal') {
-      configuration = {
-        type: 'verbal',
-        fields: [],
-        scales: [],
-        exportFormat: 'text'
-      };
-    } else {
-      throw new Error('Unsupported category type');
-    }
-    
+    const configuration = buildDefaultConfiguration(newCategory.value.type);
+
     await SportBridge.value?.createGradeCategoryUseCase.execute({
       classGroupId: selectedClassId.value,
       name: newCategory.value.name,
       description: newCategory.value.description || undefined,
-      type: newCategory.value.type as any,
+      type: newCategory.value.type as Sport.GradeCategoryType,
       weight: newCategory.value.weight,
-      configuration
+      configuration,
     });
-    
-    // Reset form
+
     newCategory.value = { name: '', description: '', type: '', weight: 0 };
     showCreateCategoryModal.value = false;
-    
-    // Reload categories
     await onClassChange();
   } catch (error) {
     console.error('Failed to create category:', error);
     let userMessage = 'Die Kategorie konnte nicht erstellt werden.';
-    if (error instanceof Error) {
-      if (error.message === 'Unsupported category type') {
-        userMessage = 'Die ausgewählte Bewertungskategorie wird nicht unterstützt. Bitte wählen Sie einen anderen Typ.';
-      } else if (error.message && error.message.trim().length > 0) {
-        userMessage = `Die Kategorie konnte nicht erstellt werden: ${error.message}`;
-      }
+    if (error instanceof Error && error.message.trim().length > 0) {
+      userMessage = `Die Kategorie konnte nicht erstellt werden: ${error.message}`;
     }
     toast.error(userMessage);
   } finally {
     saving.value = false;
+  }
+}
+
+// ── Edit ──────────────────────────────────────────────────────────────────────
+
+function openEditModal(category: Sport.GradeCategory) {
+  editingCategory.value = category;
+  editForm.value = {
+    name: category.name,
+    description: category.description ?? '',
+    weight: category.weight,
+  };
+  showEditCategoryModal.value = true;
+}
+
+function closeEditModal() {
+  showEditCategoryModal.value = false;
+  editingCategory.value = null;
+}
+
+async function saveEditCategory() {
+  if (!editingCategory.value) return;
+  if (!editForm.value.name.trim()) return;
+
+  saving.value = true;
+  try {
+    await SportBridge.value?.updateGradeCategoryUseCase.execute({
+      id: editingCategory.value.id,
+      name: editForm.value.name,
+      description: editForm.value.description || undefined,
+      weight: editForm.value.weight,
+    });
+
+    closeEditModal();
+    await onClassChange();
+    toast.success('Kategorie erfolgreich aktualisiert.');
+  } catch (error) {
+    console.error('Failed to update category:', error);
+    toast.error('Die Kategorie konnte nicht aktualisiert werden.');
+  } finally {
+    saving.value = false;
+  }
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+
+async function openDeleteConfirm(category: Sport.GradeCategory) {
+  deletingCategory.value = category;
+  // Count how many performance entries reference this category
+  try {
+    const entries = await SportBridge.value?.performanceEntryRepository.findByCategory(category.id) ?? [];
+    deleteEntryCount.value = entries.length;
+  } catch {
+    deleteEntryCount.value = 0;
+  }
+  showDeleteConfirmModal.value = true;
+}
+
+function closeDeleteConfirm() {
+  showDeleteConfirmModal.value = false;
+  deletingCategory.value = null;
+  deleteEntryCount.value = 0;
+}
+
+async function confirmDeleteCategory() {
+  if (!deletingCategory.value) return;
+
+  deleting.value = true;
+  try {
+    await SportBridge.value?.deleteGradeCategoryUseCase.execute({
+      id: deletingCategory.value.id,
+    });
+
+    closeDeleteConfirm();
+    await onClassChange();
+    toast.success('Kategorie wurde gelöscht.');
+  } catch (error) {
+    console.error('Failed to delete category:', error);
+    toast.error('Die Kategorie konnte nicht gelöscht werden.');
+  } finally {
+    deleting.value = false;
   }
 }
 </script>
@@ -630,6 +1024,72 @@ async function createCategory() {
   background-color: #f0f7ff;
 }
 
+.btn-danger-text {
+  background-color: transparent;
+  color: #c0392b;
+  border: 1px solid #c0392b;
+  padding: 0.625rem 1.25rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.btn-danger-text:hover {
+  background-color: #fdf2f2;
+}
+
+.btn-danger-text:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger-solid {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 44px;
+}
+
+.btn-danger-solid:hover {
+  background-color: #b02a37;
+}
+
+.btn-danger-solid:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quick-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.quick-link-btn {
+  background: #f0f7ff;
+  color: #0066cc;
+  border: 1px solid #b3d4f7;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 44px;
+}
+
+.quick-link-btn:hover {
+  background: #daeeff;
+}
+
 .btn-small {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
@@ -778,6 +1238,65 @@ async function createCategory() {
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 2rem;
+}
+
+.modal-small {
+  max-width: 420px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.4rem;
+  border-radius: 4px;
+  min-height: 36px;
+  min-width: 36px;
+  touch-action: manipulation;
+}
+
+.btn-icon:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-danger-icon:hover {
+  background-color: #ffe0e0;
+}
+
+.btn-danger {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 44px;
+  background-color: #cc3300;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #a32800;
+}
+
+.btn-danger:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.warning-text {
+  color: #8a4700;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.info-text {
+  color: #555;
+  margin: 0.75rem 0;
 }
 
 @media (max-width: 768px) {

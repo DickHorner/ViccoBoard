@@ -157,9 +157,11 @@
     <div v-if="capturedTimes.length > 0" class="card">
       <div class="card-header">
         <h3>{{ t('MULTISTOP.captured-times') }}</h3>
-        <button @click="exportTimes" class="btn-secondary btn-small">
-          📊 {{ t('COMMON.export') || 'Export' }}
-        </button>
+        <div class="header-actions">
+          <button @click="exportTimes" class="btn-secondary btn-small">
+            📊 {{ t('COMMON.export') || 'Export' }}
+          </button>
+        </div>
       </div>
       <div class="captured-times-list">
         <div 
@@ -182,6 +184,44 @@
           </div>
         </div>
       </div>
+
+      <!-- Send to Mittelstrecke handoff -->
+      <div v-if="mittelstreckeCategories.length > 0" class="handoff-section">
+        <h4>{{ t('MULTISTOP.send-to-mittelstrecke') }}</h4>
+        <div class="handoff-row">
+          <select v-model="selectedCategoryId" class="form-input">
+            <option value="">{{ t('MULTISTOP.select-category') }}...</option>
+            <option v-for="cat in mittelstreckeCategories" :key="cat.id" :value="cat.id">
+              {{ cat.name }}
+            </option>
+          </select>
+          <button
+            class="btn-primary"
+            :disabled="!selectedCategoryId || sending"
+            @click="sendToMittelstrecke"
+          >
+            {{ sending ? '…' : '→' }} {{ t('MITTELSTRECKE.bewerte') || 'Zur Bewertung' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session History -->
+    <div v-if="selectedClassId" class="card">
+      <div class="card-header">
+        <h3>{{ t('MULTISTOP.session-history') }}</h3>
+      </div>
+      <div v-if="sessionHistory.length === 0" class="empty-state">
+        {{ t('MULTISTOP.no-sessions') }}
+      </div>
+      <div v-else class="session-list">
+        <div v-for="session in sessionHistory" :key="session.id" class="session-item">
+          <span class="session-date">{{ formatSessionDate(session.startedAt) }}</span>
+          <span class="session-count">
+            {{ session.sessionMetadata.results?.length ?? 0 }} {{ t('MULTISTOP.schueler') }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Toast Notification -->
@@ -192,13 +232,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import type { ClassGroup, Student } from '@viccoboard/core'
+import type { Sport } from '@viccoboard/core'
 
 const { t } = useI18n()
+const router = useRouter()
 
 // Initialize bridges
 initializeSportBridge()
@@ -212,6 +255,10 @@ const classes = ref<ClassGroup[]>([])
 const students = ref<Student[]>([])
 const selectedClassId = ref('')
 const numberOfStopwatches = ref(4)
+const mittelstreckeCategories = ref<Sport.GradeCategory[]>([])
+const selectedCategoryId = ref('')
+const sending = ref(false)
+const sessionHistory = ref<Sport.ToolSession[]>([])
 
 interface Timer {
   studentId: string
@@ -282,15 +329,44 @@ async function loadClasses() {
 async function loadStudents() {
   if (!selectedClassId.value) {
     students.value = []
+    mittelstreckeCategories.value = []
+    sessionHistory.value = []
     return
   }
   
   try {
     students.value = await studentsBridge.studentRepository.findByClassGroup(selectedClassId.value)
     initializeTimers()
+    await loadMittelstreckeCategories()
+    await loadSessionHistory()
   } catch (error) {
     showToast('Error loading students', 'error')
     console.error(error)
+  }
+}
+
+async function loadMittelstreckeCategories() {
+  if (!selectedClassId.value) return
+  try {
+    const all = await SportBridge.gradeCategoryRepository.findByClassGroup(selectedClassId.value)
+    mittelstreckeCategories.value = all.filter(
+      cat => cat.type === 'time' || cat.type === 'mittelstrecke'
+    )
+  } catch {
+    mittelstreckeCategories.value = []
+  }
+}
+
+async function loadSessionHistory() {
+  if (!selectedClassId.value) return
+  try {
+    const all = await SportBridge.toolSessionRepository.findByClassGroup(selectedClassId.value)
+    sessionHistory.value = all
+      .filter(s => s.toolType === 'multistop')
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+      .slice(0, 10)
+  } catch {
+    sessionHistory.value = []
   }
 }
 
@@ -380,7 +456,7 @@ function saveTime(index: number) {
   resetTimer(index)
 }
 
-function saveAllTimes() {
+async function saveAllTimes() {
   let saved = 0
   timers.value.forEach((timer, index) => {
     if (timer.isStopped && timer.time > 0) {
@@ -391,6 +467,46 @@ function saveAllTimes() {
   
   if (saved > 0) {
     showToast(`${saved} times saved`, 'success')
+    await persistSession()
+  }
+}
+
+/** Persist current capturedTimes as a ToolSession */
+async function persistSession(): Promise<string | null> {
+  if (!selectedClassId.value || capturedTimes.value.length === 0) return null
+  try {
+    const session = await SportBridge.saveMultistopSessionUseCase.execute({
+      classGroupId: selectedClassId.value,
+      results: capturedTimes.value.map(r => ({
+        studentId: r.studentId,
+        studentName: r.studentName,
+        timeMs: r.time,
+        laps: r.laps
+      }))
+    })
+    showToast(t('MULTISTOP.session-saved'), 'success')
+    await loadSessionHistory()
+    return session.id
+  } catch (err) {
+    console.error('Failed to persist multistop session', err)
+    return null
+  }
+}
+
+async function sendToMittelstrecke() {
+  if (!selectedCategoryId.value) return
+  sending.value = true
+  try {
+    const sessionId = await persistSession()
+    const query: Record<string, string> = {}
+    if (sessionId) query.sessionId = sessionId
+    router.push({
+      name: 'mittelstrecke-grading',
+      params: { id: selectedCategoryId.value },
+      query
+    })
+  } finally {
+    sending.value = false
   }
 }
 
@@ -409,6 +525,16 @@ function formatTime(ms: number): string {
   const pad = (n: number) => n.toString().padStart(2, '0')
   
   return `${pad(minutes)}:${pad(seconds)}.${pad(milliseconds)}`
+}
+
+function formatSessionDate(date: Date): string {
+  return date.toLocaleString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 // Export
@@ -440,6 +566,13 @@ function showToast(message: string, type: 'success' | 'error' = 'success') {
     toast.value.show = false
   }, 3000)
 }
+
+// Watch class change to reload mittelstrecke categories
+watch(selectedClassId, async (newId) => {
+  if (newId) {
+    await loadMittelstreckeCategories()
+  }
+})
 
 // Lifecycle
 loadClasses()
@@ -602,6 +735,66 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.handoff-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.handoff-section h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.handoff-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.handoff-row select {
+  flex: 1;
+  min-width: 180px;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.session-date {
+  color: #555;
+}
+
+.session-count {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  color: #888;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
 }
 
 .toast {

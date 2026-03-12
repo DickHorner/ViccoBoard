@@ -46,6 +46,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Sport Statistiken' }
   },
   {
+    path: '/subjects/sport/tables',
+    name: 'sport-tables',
+    component: () => import('../views/SportTablesView.vue'),
+    meta: { title: 'Sport Tabellen' }
+  },
+  {
     path: '/subjects/kbr',
     name: 'subject-kbr',
     component: () => import('../views/KBRHub.vue'),
@@ -184,6 +190,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Verbalbeurteilung' }
   },
   {
+    path: '/grading/tables',
+    name: 'table-management',
+    component: () => import('../views/TableManagement.vue'),
+    meta: { title: 'Tabellenverwaltung' }
+  },
+  {
     path: '/grading/history/:id',
     name: 'grade-history',
     component: () => import('../views/GradeHistory.vue'),
@@ -230,12 +242,6 @@ const routes: RouteRecordRaw[] = [
     name: 'feedback',
     component: () => import('../views/FeedbackTool.vue'),
     meta: { title: 'Feedback' }
-  },
-  {
-    path: '/subjects/sport/statistics',
-    name: 'sport-statistics',
-    component: () => import('../views/SportStatistics.vue'),
-    meta: { title: 'Sport Statistiken' }
   },
   {
     path: '/settings/sport',
