@@ -20,3 +20,4 @@ export * from './migrations/indexeddb/008_class_group_color.js';
 export * from './migrations/indexeddb/009_class_group_archive.js';
 export * from './migrations/indexeddb/013_sport_schema.js';
 export * from './migrations/indexeddb/014_tool_sessions_schema.js';
+export * from './migrations/indexeddb/015_tactics_snapshots_schema.js';
