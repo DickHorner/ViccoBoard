@@ -11,6 +11,7 @@ export { GradeSchemeRepository } from './repositories/grade-scheme.repository.js
 export { GradeCategoryRepository } from './repositories/grade-category.repository.js';
 export { PerformanceEntryRepository } from './repositories/performance-entry.repository.js';
 export { ToolSessionRepository } from './repositories/tool-session.repository.js';
+export { FeedbackSessionRepository } from './repositories/feedback-session.repository.js';
 export { TableDefinitionRepository } from './repositories/table-definition.repository.js';
 export { CooperTestConfigRepository } from './repositories/cooper-test-config.repository.js';
 export { ShuttleRunConfigRepository } from './repositories/shuttle-run-config.repository.js';
@@ -51,6 +52,9 @@ export type { RecordSportabzeichenResultInput } from './use-cases/record-sportab
 
 export { RecordTimerResultUseCase } from './use-cases/record-timer-result.use-case.js';
 export type { RecordTimerResultInput } from './use-cases/record-timer-result.use-case.js';
+
+export { RecordFeedbackSessionUseCase } from './use-cases/record-feedback-session.use-case.js';
+export type { RecordFeedbackSessionInput } from './use-cases/record-feedback-session.use-case.js';
 
 export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
 export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';

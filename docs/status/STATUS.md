@@ -1,7 +1,7 @@
 # ViccoBoard Development Status
 
-**Last Updated:** February 24, 2026  
-**Project Stage:** Release Hardening  
+**Last Updated:** March 12, 2026  
+**Project Stage:** Sport Epic – Feedback, Statistiken, Konfiguration  
 **Global Guideline:** The Zen of Python is the primary coding and review philosophy (explicit, simple, readable, one clear way).
 
 ---
@@ -25,7 +25,38 @@
 - [x] Phase 4 - Sport Tests & Measurements
 - [x] Phase 5 - KBR Exam Builder
 - [x] Phase 6 - KBR Correction & Grading
-- [ ] Phase 7+ incremental release extensions (post-release scope)
+- [ ] Phase 7 - Sport Epic: Feedback, Statistiken, Konfiguration (in progress — see #144)
+- [ ] Phase 8+ incremental release extensions (post-release scope)
+
+---
+
+## Sport Epic #144 – Status (Issue Map)
+
+| Issue | Title | Status |
+|-------|-------|--------|
+| #147 | Feedback-MVP mit Auswertung liefern | ✅ implemented |
+| #146 | Statistikbereich als eigener Einstieg aufbauen | ✅ implemented |
+| #148 | Sport-Konfigurationszentrum in den Einstellungen freischalten | ✅ implemented |
+| #145 | Parity- und Status-Dokumentation an den Ist-Stand anpassen | ✅ this update |
+
+### Real State of Sport Features (as of March 2026)
+
+**Implemented and reachable in UI:**
+- Class management, student management, lesson tracking
+- Attendance entry with configurable status catalog
+- Grading: criteria, time-based, Cooper, Shuttle-Run, Mittelstrecke, Sportabzeichen, BJS
+- Live tools: Timer, Scoreboard, TeamBuilder, Tournaments, TacticsBoard
+- Feedback MVP: Smiley-Abfrage and Bewertungsskala with result storage and analysis view
+- Statistics: Dedicated `/subjects/sport/statistics` route with attendance, performance, and tool usage overviews
+- Sport configuration center: `/settings/sport` entry point linked from Settings
+
+**Known gaps (not yet implemented, tracked in Plan.md §9):**
+- WOW (excluded by scope v2)
+- Verbal assessments (Plan.md §6.3)
+- Fehlzeiten status metadata in export (Plan.md §6.2)
+- Würfeln tool (Plan.md §6.6)
+- Full security/encryption/app-lock (Plan.md §6.1)
+- Backup/restore UI (Plan.md §6.1)
 
 ---
 
@@ -49,9 +80,6 @@ The push hook also blocks:
 
 ## Next Milestone
 
+- [ ] Sport Epic #144 PR review and merge
 - [ ] Final release QA sign-off + tag creation
-
-
-
-
 

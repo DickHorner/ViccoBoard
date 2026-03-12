@@ -8,36 +8,51 @@
     </header>
 
     <div class="settings-grid">
-      <article v-for="card in settingsCards" :key="card.title" class="settings-card">
-        <p class="eyebrow">{{ card.status }}</p>
-        <h2>{{ card.title }}</h2>
-        <p>{{ card.description }}</p>
+      <article v-for="card in settingsCards" :key="card.title" class="settings-card" :class="{ 'settings-card--link': card.to }">
+        <template v-if="card.to">
+          <RouterLink :to="card.to" class="card-link">
+            <p class="eyebrow">{{ card.status }}</p>
+            <h2>{{ card.title }}</h2>
+            <p>{{ card.description }}</p>
+          </RouterLink>
+        </template>
+        <template v-else>
+          <p class="eyebrow">{{ card.status }}</p>
+          <h2>{{ card.title }}</h2>
+          <p>{{ card.description }}</p>
+        </template>
       </article>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
+
 const settingsCards = [
   {
     title: 'Sicherheit & App-Sperre',
     description: 'PIN, Passwort, Timeout und weitere Schutzmechanismen werden hier gebuendelt.',
-    status: 'in Aufbau'
+    status: 'in Aufbau',
+    to: null
   },
   {
     title: 'Backups & Wiederherstellung',
     description: 'Export, Import und Backup-Status fuer die iPad-Safari-Realitaet.',
-    status: 'in Aufbau'
+    status: 'in Aufbau',
+    to: null
   },
   {
     title: 'Sprache & Einrichtung',
     description: 'Sprachwahl, Hilfen fuer den Einstieg und spaetere Onboarding-Optionen.',
-    status: 'in Aufbau'
+    status: 'in Aufbau',
+    to: null
   },
   {
     title: 'Sport-Konfiguration',
-    description: 'Shuttle-Run-Konfigurationen und weitere fachspezifische Einstellungen bleiben von hier aus erreichbar.',
-    status: 'vorbereitet'
+    description: 'Shuttle-Run-Konfigurationen, Status-Katalog, Tabellen und weitere fachspezifische Einstellungen.',
+    status: 'aktiv',
+    to: '/settings/sport'
   }
 ]
 </script>
@@ -72,6 +87,23 @@ const settingsCards = [
   padding: 1.25rem;
 }
 
+.settings-card--link {
+  padding: 0;
+}
+
+.card-link {
+  display: block;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 18px;
+  transition: background 0.15s;
+}
+
+.card-link:hover {
+  background: #f0fdfa;
+}
+
 .eyebrow {
   margin: 0 0 0.5rem;
   text-transform: uppercase;
@@ -81,4 +113,5 @@ const settingsCards = [
   font-weight: 700;
 }
 </style>
+
 

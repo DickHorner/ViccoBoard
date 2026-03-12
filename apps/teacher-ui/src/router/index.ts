@@ -212,6 +212,18 @@ const routes: RouteRecordRaw[] = [
     name: 'feedback',
     component: () => import('../views/FeedbackTool.vue'),
     meta: { title: 'Feedback' }
+  },
+  {
+    path: '/subjects/sport/statistics',
+    name: 'sport-statistics',
+    component: () => import('../views/SportStatistics.vue'),
+    meta: { title: 'Sport Statistiken' }
+  },
+  {
+    path: '/settings/sport',
+    name: 'settings-sport',
+    component: () => import('../views/SportSettingsView.vue'),
+    meta: { title: 'Sport-Konfiguration' }
   }
 ]
 

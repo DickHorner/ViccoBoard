@@ -19,6 +19,7 @@ import {
   SportabzeichenStandardRepository,
   SportabzeichenResultRepository,
   ToolSessionRepository,
+  FeedbackSessionRepository,
   CreateClassUseCase,
   CreateLessonUseCase,
   RecordAttendanceUseCase,
@@ -28,6 +29,7 @@ import {
   RecordShuttleRunResultUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
+  RecordFeedbackSessionUseCase,
   CriteriaGradingEngine,
   TimeGradingService,
   CooperTestService,
@@ -54,6 +56,7 @@ interface SportBridge {
   performanceEntryRepository: PerformanceEntryRepository
   attendanceRepository: AttendanceRepository
   toolSessionRepository: ToolSessionRepository
+  feedbackSessionRepository: FeedbackSessionRepository
   tableDefinitionRepository: TableDefinitionRepository
   cooperTestConfigRepository: CooperTestConfigRepository
   shuttleRunConfigRepository: ShuttleRunConfigRepository
@@ -72,6 +75,7 @@ interface SportBridge {
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
   recordTimerResultUseCase: RecordTimerResultUseCase
+  recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase
 
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
@@ -105,6 +109,7 @@ export function initializeSportBridge(): SportBridge {
   const sportabzeichenStandardRepo = new SportabzeichenStandardRepository(adapter)
   const sportabzeichenResultRepo = new SportabzeichenResultRepository(adapter)
   const toolSessionRepo = new ToolSessionRepository(adapter)
+  const feedbackSessionRepo = new FeedbackSessionRepository(toolSessionRepo)
 
   // Initialize use cases with repositories
   const createClassUseCase = new CreateClassUseCase(classGroupRepo)
@@ -126,6 +131,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenStandardRepo
   )
   const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
+  const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -142,6 +148,7 @@ export function initializeSportBridge(): SportBridge {
     performanceEntryRepository: performanceEntryRepo,
     attendanceRepository: attendanceRepo,
     toolSessionRepository: toolSessionRepo,
+    feedbackSessionRepository: feedbackSessionRepo,
     tableDefinitionRepository: tableDefinitionRepo,
     cooperTestConfigRepository: cooperTestConfigRepo,
     shuttleRunConfigRepository: shuttleRunConfigRepo,
@@ -160,6 +167,7 @@ export function initializeSportBridge(): SportBridge {
     recordShuttleRunResultUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
+    recordFeedbackSessionUseCase,
 
     // Services
     criteriaGradingEngine,
