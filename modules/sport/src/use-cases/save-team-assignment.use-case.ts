@@ -53,6 +53,9 @@ export class SaveTeamAssignmentUseCase {
     if (!input.sessionName || !input.sessionName.trim()) {
       throw new Error('sessionName is required');
     }
+    if (!['random', 'gender-balanced'].includes(input.algorithm)) {
+      throw new Error('algorithm must be one of: random, gender-balanced');
+    }
 
     return this.toolSessionRepository.create({
       toolType: 'teams',

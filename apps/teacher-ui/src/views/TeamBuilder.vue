@@ -223,23 +223,28 @@ function generateTeams() {
 async function saveTeams() {
   if (!canSave.value) return
 
-  await SportBridge.saveTeamAssignmentUseCase.execute({
-    classGroupId: selectedClassId.value,
-    sessionName: sessionName.value,
-    algorithm: algorithm.value,
-    teamLabel: teamLabel.value,
-    teams: teams.value.map(t => ({
-      id: t.id,
-      name: t.name,
-      studentIds: t.students.map(s => s.id)
-    }))
-  })
+  try {
+    await SportBridge.saveTeamAssignmentUseCase.execute({
+      classGroupId: selectedClassId.value,
+      sessionName: sessionName.value,
+      algorithm: algorithm.value,
+      teamLabel: teamLabel.value,
+      teams: teams.value.map(t => ({
+        id: t.id,
+        name: t.name,
+        studentIds: t.students.map(s => s.id)
+      }))
+    })
 
-  saveSuccess.value = true
-  await loadSavedSessions()
+    saveSuccess.value = true
+    await loadSavedSessions()
+  } catch {
+    saveSuccess.value = false
+    warning.value = t('COMMON.error')
+  }
 }
 
-function loadSession(session: Sport.ToolSession) {
+async function loadSession(session: Sport.ToolSession) {
   const meta = session.sessionMetadata as TeamSessionMetadata
 
   if (!meta?.teams) return
@@ -248,12 +253,25 @@ function loadSession(session: Sport.ToolSession) {
   if (meta.teamLabel) teamLabel.value = meta.teamLabel
   teamCount.value = meta.teams.length
 
-  const studentMap = new Map(students.value.map(s => [s.id, s]))
+  // Always resolve against the full class roster so that students filtered out
+  // by attendance are still shown when a saved session is reopened.
+  const fullRoster = await studentsBridge.studentRepository.findByClassGroup(selectedClassId.value)
+  const studentMap = new Map(fullRoster.map(s => [s.id, s]))
+
+  const missingIds: string[] = []
   teams.value = meta.teams.map(t => ({
     id: t.id,
     name: t.name,
-    students: t.studentIds.map(id => studentMap.get(id)).filter((s): s is Student => s !== undefined)
+    students: t.studentIds.map(id => {
+      const s = studentMap.get(id)
+      if (!s) missingIds.push(id)
+      return s
+    }).filter((s): s is Student => s !== undefined)
   }))
+
+  if (missingIds.length > 0) {
+    warning.value = t('COMMON.error')
+  }
 
   saveSuccess.value = false
   sessionName.value = session.sessionMetadata.sessionName ?? ''

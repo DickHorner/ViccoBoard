@@ -109,6 +109,19 @@ describe('SaveTeamAssignmentUseCase', () => {
         })
       ).rejects.toThrow('sessionName is required');
     });
+
+    it('should throw when algorithm is invalid', async () => {
+      await createClassGroup(adapter, 'class-1');
+      await expect(
+        useCase.execute({
+          classGroupId: 'class-1',
+          sessionName: 'Test',
+          algorithm: 'unknown' as any,
+          teamLabel: 'Team',
+          teams: [{ id: 'team-1', name: 'Team 1', studentIds: ['s1'] }]
+        })
+      ).rejects.toThrow('algorithm must be one of: random, gender-balanced');
+    });
   });
 
   // -------------------------------------------------------------------------

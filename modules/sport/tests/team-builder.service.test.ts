@@ -3,7 +3,7 @@
  * Verifies team generation algorithms: random and gender-balanced.
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 import { TeamBuilderService } from '../src/services/team-builder.service';
 
 const makeStudents = (specs: Array<{ id: string; gender?: string }>) =>
