@@ -159,7 +159,8 @@ async function loadData() {
         }
       }
     }
-  } catch {
+  } catch (err) {
+    console.warn('[VerbalGrading] Failed to load data', err);
     error.value = 'Fehler beim Laden der Daten';
   } finally {
     loading.value = false;
@@ -199,8 +200,10 @@ async function saveStudentEntry(studentId: string): Promise<void> {
     if (unsavedStudents.value.size === 0) {
       hasUnsavedChanges.value = false;
     }
-  } catch {
+  } catch (err) {
+    console.warn('[VerbalGrading] Failed to save entry for student', studentId, err);
     toast.error('Fehler beim Speichern der Beurteilung');
+    throw err;
   } finally {
     saving.value = false;
   }
@@ -208,13 +211,20 @@ async function saveStudentEntry(studentId: string): Promise<void> {
 
 async function saveAllEntries(): Promise<void> {
   saving.value = true;
+  let failureCount = 0;
   try {
     for (const studentId of [...unsavedStudents.value]) {
-      await saveStudentEntry(studentId);
+      try {
+        await saveStudentEntry(studentId);
+      } catch {
+        failureCount++;
+      }
     }
-    toast.success('Alle Beurteilungen gespeichert!');
-  } catch {
-    toast.error('Fehler beim Speichern einiger Beurteilungen');
+    if (failureCount === 0) {
+      toast.success('Alle Beurteilungen gespeichert!');
+    } else {
+      toast.error(`${failureCount} Beurteilung(en) konnten nicht gespeichert werden.`);
+    }
   } finally {
     saving.value = false;
   }
