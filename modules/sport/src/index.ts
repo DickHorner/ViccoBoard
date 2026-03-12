@@ -99,7 +99,9 @@ export { BJSGradingService } from './services/bjs-grading.service.js';
 export type {
   BJSGradingInput,
   BJSGradingResult,
-  BJSDisciplineResult
+  BJSDisciplineResult,
+  BJSOverviewReport,
+  BJSOverviewReportEntry
 } from './services/bjs-grading.service.js';
 export { SportabzeichenService } from './services/sportabzeichen.service.js';
 export type {

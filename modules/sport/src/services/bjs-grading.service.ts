@@ -4,6 +4,7 @@
  */
 
 import { Sport} from '@viccoboard/core';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 export interface BJSDisciplineResult {
   disciplineId: string;
@@ -24,6 +25,23 @@ export interface BJSGradingResult {
   totalPoints: number;
   disciplineResults: BJSDisciplineResult[];
   certificateType: 'ehrenurkunde' | 'siegerurkunde' | 'teilnahmeurkunde' | null;
+}
+
+export interface BJSOverviewReportEntry {
+  studentName: string;
+  disciplines: Array<{
+    name: string;
+    performance: string;
+    points: number;
+  }>;
+  totalPoints: number;
+  certificateType: 'ehrenurkunde' | 'siegerurkunde' | 'teilnahmeurkunde' | null;
+}
+
+export interface BJSOverviewReport {
+  title: string;
+  generatedAt: Date;
+  entries: BJSOverviewReportEntry[];
 }
 
 const toNumber = (value: unknown): number | null => {
@@ -271,5 +289,52 @@ export class BJSGradingService {
     }
 
     return true;
+  }
+
+  /**
+   * Generates a PDF document containing a BJS results overview.
+   *
+   * Creates a formatted PDF report with student names, discipline performances,
+   * total points, and certificate types.
+   *
+   * @param report - The BJSOverviewReport data
+   * @returns A promise resolving to a Uint8Array containing the binary PDF data
+   */
+  async generateOverviewPdf(report: BJSOverviewReport): Promise<Uint8Array> {
+    const doc = await PDFDocument.create();
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+
+    const pageMargin = 40;
+    const lineHeight = 16;
+    let page = doc.addPage();
+    let { height } = page.getSize();
+    let y = height - pageMargin;
+
+    const drawLine = (text: string, size = 12) => {
+      if (y < pageMargin) {
+        page = doc.addPage();
+        ({ height } = page.getSize());
+        y = height - pageMargin;
+      }
+      page.drawText(text, { x: pageMargin, y, size, font });
+      y -= lineHeight;
+    };
+
+    drawLine(report.title, 16);
+    drawLine(`Generated: ${report.generatedAt.toISOString()}`, 10);
+    y -= lineHeight / 2;
+
+    for (const entry of report.entries) {
+      const certLabel = entry.certificateType
+        ? entry.certificateType.charAt(0).toUpperCase() + entry.certificateType.slice(1)
+        : 'Keine Urkunde';
+      drawLine(`${entry.studentName} — ${entry.totalPoints} Pkt. (${certLabel})`);
+      for (const disc of entry.disciplines) {
+        drawLine(`  ${disc.name}: ${disc.performance} = ${disc.points} Pkt.`, 10);
+      }
+      y -= lineHeight / 2;
+    }
+
+    return doc.save();
   }
 }
