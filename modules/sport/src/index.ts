@@ -42,6 +42,15 @@ export type { RecordAttendanceInput } from './use-cases/record-attendance.use-ca
 
 export { CreateGradeCategoryUseCase } from './use-cases/create-grade-category.use-case.js';
 export type { CreateGradeCategoryInput } from './use-cases/create-grade-category.use-case.js';
+export { UpdateGradeCategoryUseCase } from './use-cases/update-grade-category.use-case.js';
+export type { UpdateGradeCategoryInput } from './use-cases/update-grade-category.use-case.js';
+export { DeleteGradeCategoryUseCase } from './use-cases/delete-grade-category.use-case.js';
+
+export { UpdateGradeCategoryUseCase } from './use-cases/update-grade-category.use-case.js';
+export type { UpdateGradeCategoryInput } from './use-cases/update-grade-category.use-case.js';
+
+export { DeleteGradeCategoryUseCase } from './use-cases/delete-grade-category.use-case.js';
+export type { DeleteGradeCategoryInput, DeleteGradeCategoryResult } from './use-cases/delete-grade-category.use-case.js';
 
 export { RecordGradeUseCase } from './use-cases/record-grade.use-case.js';
 export type { RecordGradeInput } from './use-cases/record-grade.use-case.js';
@@ -75,6 +84,12 @@ export { SaveSportTableUseCase } from './use-cases/save-sport-table.use-case.js'
 export { SaveSportGradeWeightingUseCase } from './use-cases/save-sport-grade-weighting.use-case.js';
 export { SaveSportNewDayDataUseCase } from './use-cases/save-sport-new-day-data.use-case.js';
 export { SaveSportUserDataUseCase } from './use-cases/save-sport-user-data.use-case.js';
+export { SaveTableDefinitionUseCase } from './use-cases/save-table-definition.use-case.js';
+export type { SaveTableDefinitionInput } from './use-cases/save-table-definition.use-case.js';
+export { DeleteTableDefinitionUseCase } from './use-cases/delete-table-definition.use-case.js';
+
+export { ImportTableDefinitionUseCase } from './use-cases/import-table-definition.use-case.js';
+export type { ImportTableDefinitionInput, ImportTableDefinitionResult } from './use-cases/import-table-definition.use-case.js';
 
 // Grading Engine
 export { CriteriaGradingEngine } from './grading/criteria-grading.engine.js';
@@ -124,6 +139,9 @@ export type {
   ToolUsageSummary,
   ToolUsageOverview
 } from './services/sport-statistics.service.js';
+
+export { TableImportService } from './services/table-import.service.js';
+export type { TableImportResult, TableImportValidationError } from './services/table-import.service.js';
 
 // Plugins
 export { TimerToolPlugin } from './plugins/timer.plugin.js';

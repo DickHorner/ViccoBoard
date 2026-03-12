@@ -255,6 +255,7 @@ export interface TableDefinition {
   type: 'simple' | 'complex';
   description?: string;
   source: 'local' | 'imported' | 'downloaded';
+  active?: boolean;
   dimensions: TableDimension[];
   mappingRules: MappingRule[];
   entries: TableEntry[];
