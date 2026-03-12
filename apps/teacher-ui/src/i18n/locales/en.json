@@ -650,8 +650,6 @@
     "current-lane": "Current lane",
     "note": "Mark",
     "meter": "Meter",
-    "start": "Start",
-    "stop": "Stop",
     "individual-stops": "Individual Stops",
     "audio-unlock-required": "Tap 'Start' to enable audio signals (required by Safari)"
   },
@@ -707,7 +705,15 @@
     "gewichtung-title": "Weight",
     "speichern": "Save",
     "loeschen": "delete",
-    "bearbeiten": "Edit team"
+    "bearbeiten": "Edit team",
+    "session-name": "Session name",
+    "algorithm": "Algorithm",
+    "algorithm-random": "Random",
+    "algorithm-gender-balanced": "Gender balanced",
+    "gespeicherte-sessions": "Saved Teams",
+    "sitzung-laden": "Load",
+    "keine-sessions": "No saved teams available",
+    "session-gespeichert": "Teams saved"
   },
   "ANWESENHEIT": {
     "liste": "List of presence from",
@@ -1118,5 +1124,36 @@
       "phone": "Phone",
       "speichern": "Save"
     }
+  },
+  "TACTICS": {
+    "title": "Tactics Board",
+    "newSnapshot": "Save New Snapshot",
+    "loadSnapshot": "Load Snapshot",
+    "snapshots": "Saved Snapshots",
+    "noSnapshots": "No snapshots saved yet.",
+    "snapshotTitle": "Snapshot Title",
+    "snapshotTitlePlaceholder": "e.g. Attack Phase 1",
+    "background": "Playing Field",
+    "backgroundField": "Football/Soccer",
+    "backgroundCourt": "Basketball",
+    "backgroundPitch": "Rugby/Handball",
+    "backgroundCustom": "Blank",
+    "save": "Save",
+    "saveSuccess": "Snapshot saved.",
+    "delete": "Delete",
+    "clearBoard": "Clear Board",
+    "tools": "Tools",
+    "toolPlayer": "Player",
+    "toolBall": "Ball",
+    "toolArrow": "Arrow",
+    "toolLine": "Line",
+    "toolCircle": "Circle",
+    "toolText": "Text",
+    "selectTool": "Select Tool",
+    "teamRed": "Team Red",
+    "teamBlue": "Team Blue",
+    "createdAt": "Created at",
+    "reopen": "Open",
+    "sport": "Sport (optional)"
   }
 }

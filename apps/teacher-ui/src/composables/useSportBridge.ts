@@ -20,6 +20,7 @@ import {
   SportabzeichenResultRepository,
   ToolSessionRepository,
   FeedbackSessionRepository,
+  TacticsSnapshotRepository,
   CreateClassUseCase,
   CreateLessonUseCase,
   RecordAttendanceUseCase,
@@ -30,11 +31,14 @@ import {
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   RecordFeedbackSessionUseCase,
+  SaveTeamAssignmentUseCase,
+  TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
   CooperTestService,
   ShuttleRunService,
   SportabzeichenService,
+  SportStatisticsService,
   type CreateClassInput,
   type CreateLessonInput,
   type RecordAttendanceInput,
@@ -64,6 +68,7 @@ interface SportBridge {
   SportabzeichenStandardRepository: SportabzeichenStandardRepository
   sportabzeichenResultRepository: SportabzeichenResultRepository
   SportabzeichenResultRepository: SportabzeichenResultRepository
+  tacticsSnapshotRepository: TacticsSnapshotRepository
 
   // Use Cases
   createClassUseCase: CreateClassUseCase
@@ -77,6 +82,8 @@ interface SportBridge {
   recordTimerResultUseCase: RecordTimerResultUseCase
   recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase
 
+  saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
+  saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
   timeGradingService: TimeGradingService
@@ -84,6 +91,8 @@ interface SportBridge {
   shuttleRunService: ShuttleRunService
   sportabzeichenService: SportabzeichenService
   SportabzeichenService: SportabzeichenService
+  sportStatisticsService: SportStatisticsService
+  teamBuilderService: TeamBuilderService
 }
 
 /**
@@ -110,6 +119,7 @@ export function initializeSportBridge(): SportBridge {
   const sportabzeichenResultRepo = new SportabzeichenResultRepository(adapter)
   const toolSessionRepo = new ToolSessionRepository(adapter)
   const feedbackSessionRepo = new FeedbackSessionRepository(toolSessionRepo)
+  const tacticsSnapshotRepo = new TacticsSnapshotRepository(adapter)
 
   // Initialize use cases with repositories
   const createClassUseCase = new CreateClassUseCase(classGroupRepo)
@@ -132,6 +142,8 @@ export function initializeSportBridge(): SportBridge {
   )
   const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
   const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
+  const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
+  const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -139,6 +151,8 @@ export function initializeSportBridge(): SportBridge {
   const cooperTestService = new CooperTestService()
   const shuttleRunService = new ShuttleRunService()
   const sportabzeichenService = new SportabzeichenService()
+  const sportStatisticsService = new SportStatisticsService()
+  const teamBuilderService = new TeamBuilderService()
 
   sportBridgeInstance = {
     // Repositories
@@ -156,6 +170,7 @@ export function initializeSportBridge(): SportBridge {
     SportabzeichenStandardRepository: sportabzeichenStandardRepo,
     sportabzeichenResultRepository: sportabzeichenResultRepo,
     SportabzeichenResultRepository: sportabzeichenResultRepo,
+    tacticsSnapshotRepository: tacticsSnapshotRepo,
 
     // Use Cases
     createClassUseCase,
@@ -168,6 +183,8 @@ export function initializeSportBridge(): SportBridge {
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
     recordFeedbackSessionUseCase,
+    saveTacticsSnapshotUseCase,
+    saveTeamAssignmentUseCase,
 
     // Services
     criteriaGradingEngine,
@@ -175,7 +192,9 @@ export function initializeSportBridge(): SportBridge {
     cooperTestService,
     shuttleRunService,
     sportabzeichenService,
-    SportabzeichenService: sportabzeichenService
+    SportabzeichenService: sportabzeichenService,
+    sportStatisticsService
+    teamBuilderService
   }
 
   return sportBridgeInstance
@@ -276,7 +295,8 @@ export {
   CreateGradeCategoryUseCase,
   RecordGradeUseCase,
   CriteriaGradingEngine,
-  TimeGradingService
+  TimeGradingService,
+  SportStatisticsService
 }
 export type { 
   CreateClassInput, 

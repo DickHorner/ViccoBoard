@@ -86,14 +86,14 @@ const entries = [
   {
     to: '/tools/tactics',
     eyebrow: 'Tool',
-    title: 'Taktik',
-    description: 'Taktikboard fuer den laufenden Unterricht.'
+    title: 'Taktik & Feedback',
+    description: 'Taktikboard und Feedbackmethoden fuer den laufenden Unterricht.'
   },
   {
-    to: '/tools/feedback',
-    eyebrow: 'Feedback',
-    title: 'Feedback',
-    description: 'Smiley-Abfragen und Bewertungsskalen direkt am Lehrertablet.'
+    to: '/subjects/sport/statistics',
+    eyebrow: 'Auswertung',
+    title: 'Statistiken',
+    description: 'Anwesenheitsquoten, Leistungsübersicht und Tool-Nutzung im Überblick.'
   }
 ]
 
