@@ -12,6 +12,11 @@ export { GradeCategoryRepository } from './repositories/grade-category.repositor
 export { PerformanceEntryRepository } from './repositories/performance-entry.repository.js';
 export { ToolSessionRepository } from './repositories/tool-session.repository.js';
 export { TableDefinitionRepository } from './repositories/table-definition.repository.js';
+export { TacticsSnapshotRepository } from './repositories/tactics-snapshot.repository.js';
+export type {
+  CreateTacticsSnapshotInput,
+  UpdateTacticsSnapshotInput
+} from './repositories/tactics-snapshot.repository.js';
 export { CooperTestConfigRepository } from './repositories/cooper-test-config.repository.js';
 export { ShuttleRunConfigRepository } from './repositories/shuttle-run-config.repository.js';
 export { SportabzeichenStandardRepository } from './repositories/sportabzeichen-standard.repository.js';
@@ -52,6 +57,8 @@ export type { RecordSportabzeichenResultInput } from './use-cases/record-sportab
 export { RecordTimerResultUseCase } from './use-cases/record-timer-result.use-case.js';
 export type { RecordTimerResultInput } from './use-cases/record-timer-result.use-case.js';
 
+export { SaveTacticsSnapshotUseCase } from './use-cases/save-tactics-snapshot.use-case.js';
+export type { SaveTacticsSnapshotInput } from './use-cases/save-tactics-snapshot.use-case.js';
 export { SaveTeamAssignmentUseCase } from './use-cases/save-team-assignment.use-case.js';
 export type { SaveTeamAssignmentInput, TeamSessionMetadata } from './use-cases/save-team-assignment.use-case.js';
 
