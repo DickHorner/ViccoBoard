@@ -626,7 +626,10 @@
     "Sportart": "Sport Type",
     "running": "Running",
     "swimming": "Swimming",
-    "config": "Configuration"
+    "config": "Configuration",
+    "session-history": "Test History",
+    "no-sessions": "No tests saved",
+    "session-date": "Date"
   },
   "SHUTTLE": {
     "bewerte-shuttle": "Grade Shuttle-Run from",
@@ -651,7 +654,15 @@
     "note": "Mark",
     "meter": "Meter",
     "individual-stops": "Individual Stops",
-    "audio-unlock-required": "Tap 'Start' to enable audio signals (required by Safari)"
+    "audio-unlock-required": "Tap 'Start' to enable audio signals (required by Safari)",
+    "session-history": "Test History",
+    "no-sessions": "No tests saved",
+    "session-date": "Date",
+    "import-config": "Import configuration",
+    "import-config-hint": "Select a JSON file with shuttle-run configuration",
+    "config-imported": "Configuration imported",
+    "config-import-error": "Error importing configuration",
+    "configs-count": "{{count}} configuration(s) saved"
   },
   "MITTELSTRECKE": {
     "bewerte": "Grade middle distance from",
@@ -916,7 +927,12 @@
     "video-review": "Video review",
     "speed": "Speed",
     "adjust-times": "Adjust times",
-    "set-time": "Set time"
+    "set-time": "Set time",
+    "session-saved": "Session saved",
+    "send-to-mittelstrecke": "Send to Middle-Distance Grading",
+    "select-category": "Select category",
+    "session-history": "Session History",
+    "no-sessions": "No sessions yet"
   },
   "WOW": {
     "no-wow-title": "No WOWs yet",

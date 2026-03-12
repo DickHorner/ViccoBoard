@@ -150,6 +150,22 @@
 
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
+
+      <!-- Session History -->
+      <div class="session-history">
+        <h3>{{ t('SHUTTLE.session-history') }}</h3>
+        <p v-if="sessionHistory.length === 0" class="empty-state-small">
+          {{ t('SHUTTLE.no-sessions') }}
+        </p>
+        <div v-else class="session-list">
+          <div v-for="session in sessionHistory" :key="session.id" class="session-item">
+            <span class="session-date">{{ formatSessionDate(session.startedAt) }}</span>
+            <span class="session-count">
+              {{ session.sessionMetadata.studentCount ?? 0 }} {{ t('SCHUELER.schueler') }}
+            </span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section v-else class="card">
@@ -186,6 +202,7 @@ const loading = ref(true)
 const saving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+const sessionHistory = ref<Sport.ToolSession[]>([])
 
 interface ShuttleResult {
   level: number | ''
@@ -446,11 +463,50 @@ async function saveAll() {
     }
 
     await Promise.all(entries)
+
+    // Persist a session record so history is visible
+    await SportBridge.toolSessionRepository.create({
+      toolType: 'shuttle-run',
+      classGroupId: category.value.classGroupId,
+      sessionMetadata: {
+        configId: selectedConfigId.value,
+        tableId: selectedTableId.value,
+        categoryId: category.value.id,
+        studentCount: entries.length
+      },
+      startedAt: new Date(),
+      endedAt: new Date()
+    })
+    await loadSessionHistory()
+
     successMessage.value = t('COMMON.success')
   } catch (error) {
     errorMessage.value = t('COMMON.error')
   } finally {
     saving.value = false
+  }
+}
+
+function formatSessionDate(date: Date): string {
+  return date.toLocaleString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+async function loadSessionHistory() {
+  if (!category.value) return
+  try {
+    const all = await SportBridge.toolSessionRepository.findByClassGroup(category.value.classGroupId)
+    sessionHistory.value = all
+      .filter(s => s.toolType === 'shuttle-run')
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+      .slice(0, 5)
+  } catch {
+    sessionHistory.value = []
   }
 }
 
@@ -496,6 +552,7 @@ onMounted(async () => {
     selectedConfigId.value = config.configId ?? ''
 
     initResults(existingEntries)
+    await loadSessionHistory()
   } catch (error) {
     errorMessage.value = t('COMMON.error')
   } finally {
@@ -707,6 +764,48 @@ onMounted(async () => {
   border-radius: 6px;
   background: #e8f5e9;
   color: #2e7d32;
+}
+
+.session-history {
+  margin-top: 1.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.session-history h3 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  color: #555;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.session-date {
+  color: #444;
+}
+
+.session-count {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.empty-state-small {
+  color: #888;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {

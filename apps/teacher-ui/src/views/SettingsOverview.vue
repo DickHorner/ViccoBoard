@@ -27,6 +27,7 @@
           <p>{{ card.description }}</p>
         </template>
       </article>
+
       <RouterLink
         :to="{ name: 'catalog-management' }"
         class="settings-card settings-card-link"
@@ -116,5 +117,3 @@ import { settingsCards } from '../settings-sections'
   font-weight: 700;
 }
 </style>
-
-
