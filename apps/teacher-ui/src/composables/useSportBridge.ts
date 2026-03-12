@@ -31,6 +31,7 @@ import {
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   RecordFeedbackSessionUseCase,
+  SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
   SaveTacticsSnapshotUseCase,
   TeamBuilderService,
