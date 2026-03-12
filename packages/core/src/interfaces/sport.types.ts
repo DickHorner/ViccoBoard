@@ -417,12 +417,14 @@ export interface TimerInterval {
 // Tactics Board
 export interface TacticsBoardSnapshot {
   id: string;
-  lessonId: string;
-  Sport: string;
+  lessonId?: string;
+  sport: string;
+  title: string;
   version: number;
   markings: TacticsMarking[];
   background: 'court' | 'field' | 'pitch' | 'custom';
   createdAt: Date;
+  lastModified: Date;
 }
 
 export interface TacticsMarking {
