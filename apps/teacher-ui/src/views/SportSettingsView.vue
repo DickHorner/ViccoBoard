@@ -22,7 +22,7 @@
         <p class="eyebrow">Anwesenheit</p>
         <h2>Status-Katalog</h2>
         <p>Anwesenheitsstatus anpassen: Kürzel, Bezeichnung, Farbe und Reihenfolge.</p>
-        <RouterLink to="/attendance" class="config-link">Zu Anwesenheitserfassung →</RouterLink>
+        <RouterLink to="/settings/catalogs" class="config-link">Zur Katalogverwaltung →</RouterLink>
       </section>
 
       <!-- Table management -->
