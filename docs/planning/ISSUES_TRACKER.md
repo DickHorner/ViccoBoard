@@ -2,7 +2,7 @@
 
 **Baseline Commit:** d8875dd  
 
-**Last status refresh:** February 24, 2026
+**Last status refresh:** March 12, 2026
 ---
 
 ## Phase 2: Teacher UI Foundation (1-2 weeks)
@@ -545,8 +545,8 @@ Implement comment system and table-based correction view.
 
 ## Summary Metrics
 
-**Total Issues:** 20  
-**Total Estimated Effort:** ~18-22 weeks  
+**Total Issues:** 24  
+**Total Estimated Effort:** ~20-24 weeks  
 **Critical Path Items:** Phases 2-3 (Foundation + UI)
 
 **Blocks & Dependencies:**
@@ -556,5 +556,112 @@ Implement comment system and table-based correction view.
 
 ---
 
-**Next Step:** Release QA sign-off and tagging
+## Phase 7: Sport Epic – Feedback, Statistiken, Konfiguration
+
+### Issue P7-1: Feedback-MVP mit Auswertung (GitHub #147)
+**Priority:** HIGH | **Effort:** 2 days | **Status:** COMPLETE ✅
+
+**Description:**
+Replace the placeholder FeedbackTool with working feedback methods, result storage, and analysis view.
+
+**Tasks:**
+- [x] `FeedbackSessionRepository` (uses tool_sessions table, toolType='feedback')
+- [x] `RecordFeedbackSessionUseCase`
+- [x] Export from `@viccoboard/sport`
+- [x] Wire into `useSportBridge`
+- [x] Rewrite `FeedbackTool.vue` with Smiley method and Rating-scale method
+- [x] Analysis/summary view per session
+- [x] Unit tests: `record-feedback-session.use-case.test.ts` (6 tests)
+
+**Acceptance Criteria:**
+- [x] Teachers can run at least two feedback methods (Smileys, Rating scale)
+- [x] Results persist locally via tool_sessions table
+- [x] A basic analysis/summary view is available
+- [x] Feedback linked to class context
+
+**Relates to:** Plan.md §6.7 (Feedback), Epic #144
+
+**Implementation:**
+- `modules/sport/src/repositories/feedback-session.repository.ts`
+- `modules/sport/src/use-cases/record-feedback-session.use-case.ts`
+- `apps/teacher-ui/src/views/FeedbackTool.vue`
+- `modules/sport/tests/record-feedback-session.use-case.test.ts`
+
+---
+
+### Issue P7-2: Statistikbereich als eigener Einstieg (GitHub #146)
+**Priority:** HIGH | **Effort:** 2 days | **Status:** COMPLETE ✅
+
+**Description:**
+Add a dedicated statistics route and views for attendance, performance, and tool usage overviews.
+
+**Tasks:**
+- [x] New `SportStatistics.vue` view
+- [x] Route `/subjects/sport/statistics`
+- [x] Attendance overview (total, present, absent, excused, rate)
+- [x] Performance overview (categories, entry count, avg grade)
+- [x] Tool usage overview (sessions per tool type)
+- [x] Entry card added to `SportHub.vue`
+- [x] Class filter for all overviews
+
+**Acceptance Criteria:**
+- [x] Dedicated statistics area reachable from Sport hub
+- [x] Attendance and performance overviews visible
+- [x] Tool/workflow usage overview exists
+
+**Relates to:** Plan.md §6.7 (Statistiken), Epic #144
+
+**Implementation:**
+- `apps/teacher-ui/src/views/SportStatistics.vue`
+- `apps/teacher-ui/src/views/SportHub.vue` (updated entries)
+- `apps/teacher-ui/src/router/index.ts` (new route)
+
+---
+
+### Issue P7-3: Sport-Konfigurationszentrum freischalten (GitHub #148)
+**Priority:** HIGH | **Effort:** 1 day | **Status:** COMPLETE ✅
+
+**Description:**
+Replace status-only settings cards with functional RouterLink entries and a dedicated Sport settings page.
+
+**Tasks:**
+- [x] `SportSettingsView.vue` with 4 configuration sections
+- [x] Route `/settings/sport`
+- [x] `SettingsOverview.vue` updated: Sport card is now a RouterLink to /settings/sport
+- [x] Sections link to shuttle config, status catalog, tables, grade categories
+
+**Acceptance Criteria:**
+- [x] Settings exposes sport configuration areas
+- [x] Teachers can reach catalog/table/shuttle setup from settings
+- [x] Flow is Safari-compatible and offline-first
+
+**Relates to:** Plan.md §6.1, §6.2, §6.4, §6.5, Epic #144
+
+**Implementation:**
+- `apps/teacher-ui/src/views/SportSettingsView.vue`
+- `apps/teacher-ui/src/views/SettingsOverview.vue` (updated)
+- `apps/teacher-ui/src/router/index.ts` (new route)
+
+---
+
+### Issue P7-4: Parity- und Status-Dokumentation (GitHub #145)
+**Priority:** MEDIUM | **Effort:** 0.5 days | **Status:** COMPLETE ✅
+
+**Description:**
+Refresh sport parity and status documentation to match the real implementation state.
+
+**Tasks:**
+- [x] `docs/status/STATUS.md` updated with real sport gaps and Phase 7 issue map
+- [x] `docs/planning/ISSUES_TRACKER.md` updated with P7-1..P7-4 issues
+
+**Acceptance Criteria:**
+- [x] Status docs no longer imply missing placeholders are complete
+- [x] Issue structure traceable from docs
+- [x] Future contributors can tell what remains open
+
+**Relates to:** Plan.md traceability requirements, Epic #144
+
+---
+
+**Next Step:** Sport Epic #144 PR review and merge
 

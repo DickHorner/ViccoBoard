@@ -60,6 +60,12 @@ const entries = [
     description: 'Kategorien, Kriterien, Zeitnoten, Cooper, Shuttle-Run, Mittelstrecke, Sportabzeichen und BJS.'
   },
   {
+    to: '/subjects/sport/statistics',
+    eyebrow: 'Statistiken',
+    title: 'Statistiken',
+    description: 'Anwesenheitsquoten, Leistungsübersichten und Tool-Nutzung auf einen Blick.'
+  },
+  {
     to: '/tools/timer',
     eyebrow: 'Tool',
     title: 'Timer & Multistop',
@@ -82,6 +88,12 @@ const entries = [
     eyebrow: 'Tool',
     title: 'Taktik & Feedback',
     description: 'Taktikboard und Feedbackmethoden fuer den laufenden Unterricht.'
+  },
+  {
+    to: '/subjects/sport/statistics',
+    eyebrow: 'Auswertung',
+    title: 'Statistiken',
+    description: 'Anwesenheitsquoten, Leistungsübersicht und Tool-Nutzung im Überblick.'
   }
 ]
 
