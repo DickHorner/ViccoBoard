@@ -1,220 +1,207 @@
 /**
  * Sport Module Bridge
- * Provides UI access to sport module repositories and use-cases
- * 
- * ARCHITECTURE: This is the ONLY place where UI should access sport domain.
- * All sport-related data access must go through this bridge.
+ * Provides UI access to sport module repositories and use-cases.
+ *
+ * ARCHITECTURE: This is the only place where UI should access sport domain data.
  */
 
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue';
 import {
-  ClassGroupRepository,
-  LessonRepository,
-  GradeCategoryRepository,
-  PerformanceEntryRepository,
   AttendanceRepository,
-  TableDefinitionRepository,
+  BJSGradingService,
+  ClassGroupRepository,
   CooperTestConfigRepository,
-  ShuttleRunConfigRepository,
-  SportabzeichenStandardRepository,
-  SportabzeichenResultRepository,
-  ToolSessionRepository,
-  FeedbackSessionRepository,
-  TacticsSnapshotRepository,
+  CooperTestService,
   CreateClassUseCase,
-  CreateLessonUseCase,
-  RecordAttendanceUseCase,
   CreateGradeCategoryUseCase,
-  UpdateGradeCategoryUseCase,
+  CreateLessonUseCase,
+  CriteriaGradingEngine,
   DeleteGradeCategoryUseCase,
-  RecordGradeUseCase,
-  RecordCooperTestResultUseCase,
-  RecordShuttleRunResultUseCase,
+  DeleteTableDefinitionUseCase,
+  FeedbackSessionRepository,
+  GradeCategoryRepository,
   ImportShuttleRunConfigUseCase,
+  ImportTableDefinitionUseCase,
+  LessonRepository,
+  PerformanceEntryRepository,
+  RecordAttendanceUseCase,
+  RecordCooperTestResultUseCase,
+  RecordFeedbackSessionUseCase,
+  RecordGradeUseCase,
+  RecordShuttleRunResultUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
-  RecordFeedbackSessionUseCase,
+  SaveCooperSessionUseCase,
+  SaveMultistopSessionUseCase,
+  SaveTableDefinitionUseCase,
   SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
-  SaveCooperSessionUseCase,
-  SaveTacticsSnapshotUseCase,
-  SaveTacticsSnapshotUseCase,
-  SaveMultistopSessionUseCase,
-  SaveTacticsSnapshotUseCase,
-  ImportTableDefinitionUseCase,
-  SaveTacticsSnapshotUseCase,
-  SaveTableDefinitionUseCase,
-  DeleteTableDefinitionUseCase,
-  TeamBuilderService,
-  CriteriaGradingEngine,
-  TimeGradingService,
-  CooperTestService,
+  ShuttleRunConfigRepository,
   ShuttleRunService,
-  SportabzeichenService,
-  BJSGradingService,
   SportStatisticsService,
+  SportabzeichenResultRepository,
+  SportabzeichenService,
+  SportabzeichenStandardRepository,
+  TableDefinitionRepository,
+  TacticsSnapshotRepository,
+  TeamBuilderService,
+  TimeGradingService,
+  ToolSessionRepository,
+  UpdateGradeCategoryUseCase,
   type CreateClassInput,
-  type CreateLessonInput,
-  type RecordAttendanceInput,
   type CreateGradeCategoryInput,
-  type UpdateGradeCategoryInput,
+  type CreateLessonInput,
   type DeleteGradeCategoryInput,
   type DeleteGradeCategoryResult,
+  type RecordAttendanceInput,
+  type RecordGradeInput,
   type SaveTableDefinitionInput,
-  type RecordGradeInput
-} from '@viccoboard/sport'
-import { getStorageAdapter } from '../services/storage.service'
+  type UpdateGradeCategoryInput
+} from '@viccoboard/sport';
+import { getStorageAdapter } from '../services/storage.service';
 
-/**
- * Singleton sport bridge instance
- */
-let sportBridgeInstance: SportBridge | null = null
+let sportBridgeInstance: SportBridge | null = null;
 
 interface SportBridge {
-  // Repositories
-  classGroupRepository: ClassGroupRepository
-  lessonRepository: LessonRepository
-  gradeCategoryRepository: GradeCategoryRepository
-  performanceEntryRepository: PerformanceEntryRepository
-  attendanceRepository: AttendanceRepository
-  toolSessionRepository: ToolSessionRepository
-  feedbackSessionRepository: FeedbackSessionRepository
-  tableDefinitionRepository: TableDefinitionRepository
-  cooperTestConfigRepository: CooperTestConfigRepository
-  shuttleRunConfigRepository: ShuttleRunConfigRepository
-  sportabzeichenStandardRepository: SportabzeichenStandardRepository
-  SportabzeichenStandardRepository: SportabzeichenStandardRepository
-  sportabzeichenResultRepository: SportabzeichenResultRepository
-  SportabzeichenResultRepository: SportabzeichenResultRepository
-  tacticsSnapshotRepository: TacticsSnapshotRepository
+  classGroupRepository: ClassGroupRepository;
+  lessonRepository: LessonRepository;
+  gradeCategoryRepository: GradeCategoryRepository;
+  performanceEntryRepository: PerformanceEntryRepository;
+  attendanceRepository: AttendanceRepository;
+  toolSessionRepository: ToolSessionRepository;
+  feedbackSessionRepository: FeedbackSessionRepository;
+  tableDefinitionRepository: TableDefinitionRepository;
+  cooperTestConfigRepository: CooperTestConfigRepository;
+  shuttleRunConfigRepository: ShuttleRunConfigRepository;
+  sportabzeichenStandardRepository: SportabzeichenStandardRepository;
+  SportabzeichenStandardRepository: SportabzeichenStandardRepository;
+  sportabzeichenResultRepository: SportabzeichenResultRepository;
+  SportabzeichenResultRepository: SportabzeichenResultRepository;
+  tacticsSnapshotRepository: TacticsSnapshotRepository;
 
-  // Use Cases
-  createClassUseCase: CreateClassUseCase
-  createLessonUseCase: CreateLessonUseCase
-  recordAttendanceUseCase: RecordAttendanceUseCase
-  createGradeCategoryUseCase: CreateGradeCategoryUseCase
-  updateGradeCategoryUseCase: UpdateGradeCategoryUseCase
-  deleteGradeCategoryUseCase: DeleteGradeCategoryUseCase
-  saveTableDefinitionUseCase: SaveTableDefinitionUseCase
-  deleteTableDefinitionUseCase: DeleteTableDefinitionUseCase
-  recordGradeUseCase: RecordGradeUseCase
-  recordCooperTestResultUseCase: RecordCooperTestResultUseCase
-  recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
-  importShuttleRunConfigUseCase: ImportShuttleRunConfigUseCase
-  recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
-  recordTimerResultUseCase: RecordTimerResultUseCase
-  recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase
+  createClassUseCase: CreateClassUseCase;
+  createLessonUseCase: CreateLessonUseCase;
+  recordAttendanceUseCase: RecordAttendanceUseCase;
+  createGradeCategoryUseCase: CreateGradeCategoryUseCase;
+  updateGradeCategoryUseCase: UpdateGradeCategoryUseCase;
+  deleteGradeCategoryUseCase: DeleteGradeCategoryUseCase;
+  saveTableDefinitionUseCase: SaveTableDefinitionUseCase;
+  deleteTableDefinitionUseCase: DeleteTableDefinitionUseCase;
+  recordGradeUseCase: RecordGradeUseCase;
+  recordCooperTestResultUseCase: RecordCooperTestResultUseCase;
+  recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase;
+  importShuttleRunConfigUseCase: ImportShuttleRunConfigUseCase;
+  recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase;
+  recordTimerResultUseCase: RecordTimerResultUseCase;
+  recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase;
+  saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase;
+  saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase;
+  saveCooperSessionUseCase: SaveCooperSessionUseCase;
+  saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
+  importTableDefinitionUseCase: ImportTableDefinitionUseCase;
 
-  saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
-  saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
-  saveCooperSessionUseCase: SaveCooperSessionUseCase
-  saveMultistopSessionUseCase: SaveMultistopSessionUseCase
-  importTableDefinitionUseCase: ImportTableDefinitionUseCase
-  // Services
-  criteriaGradingEngine: CriteriaGradingEngine
-  timeGradingService: TimeGradingService
-  cooperTestService: CooperTestService
-  shuttleRunService: ShuttleRunService
-  sportabzeichenService: SportabzeichenService
-  SportabzeichenService: SportabzeichenService
-  bjsGradingService: BJSGradingService
-  sportStatisticsService: SportStatisticsService
-  teamBuilderService: TeamBuilderService
+  criteriaGradingEngine: CriteriaGradingEngine;
+  timeGradingService: TimeGradingService;
+  cooperTestService: CooperTestService;
+  shuttleRunService: ShuttleRunService;
+  sportabzeichenService: SportabzeichenService;
+  SportabzeichenService: SportabzeichenService;
+  bjsGradingService: BJSGradingService;
+  sportStatisticsService: SportStatisticsService;
+  teamBuilderService: TeamBuilderService;
 }
 
-/**
- * Initialize sport bridge
- * Must be called after storage is initialized
- */
 export function initializeSportBridge(): SportBridge {
   if (sportBridgeInstance) {
-    return sportBridgeInstance
+    return sportBridgeInstance;
   }
 
-  const adapter = getStorageAdapter()
+  const adapter = getStorageAdapter();
 
-  // Initialize repositories with storage adapter
-  const classGroupRepo = new ClassGroupRepository(adapter)
-  const lessonRepo = new LessonRepository(adapter)
-  const gradeCategoryRepo = new GradeCategoryRepository(adapter)
-  const performanceEntryRepo = new PerformanceEntryRepository(adapter)
-  const attendanceRepo = new AttendanceRepository(adapter)
-  const tableDefinitionRepo = new TableDefinitionRepository(adapter)
-  const cooperTestConfigRepo = new CooperTestConfigRepository(adapter)
-  const shuttleRunConfigRepo = new ShuttleRunConfigRepository(adapter)
-  const sportabzeichenStandardRepo = new SportabzeichenStandardRepository(adapter)
-  const sportabzeichenResultRepo = new SportabzeichenResultRepository(adapter)
-  const toolSessionRepo = new ToolSessionRepository(adapter)
-  const feedbackSessionRepo = new FeedbackSessionRepository(toolSessionRepo)
-  const tacticsSnapshotRepo = new TacticsSnapshotRepository(adapter)
+  const classGroupRepository = new ClassGroupRepository(adapter);
+  const lessonRepository = new LessonRepository(adapter);
+  const gradeCategoryRepository = new GradeCategoryRepository(adapter);
+  const performanceEntryRepository = new PerformanceEntryRepository(adapter);
+  const attendanceRepository = new AttendanceRepository(adapter);
+  const tableDefinitionRepository = new TableDefinitionRepository(adapter);
+  const cooperTestConfigRepository = new CooperTestConfigRepository(adapter);
+  const shuttleRunConfigRepository = new ShuttleRunConfigRepository(adapter);
+  const sportabzeichenStandardRepository = new SportabzeichenStandardRepository(adapter);
+  const sportabzeichenResultRepository = new SportabzeichenResultRepository(adapter);
+  const toolSessionRepository = new ToolSessionRepository(adapter);
+  const feedbackSessionRepository = new FeedbackSessionRepository(toolSessionRepository);
+  const tacticsSnapshotRepository = new TacticsSnapshotRepository(adapter);
 
-  // Initialize use cases with repositories
-  const createClassUseCase = new CreateClassUseCase(classGroupRepo)
-  const createLessonUseCase = new CreateLessonUseCase(lessonRepo)
-  const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo)
-  const createGradeCategoryUseCase = new CreateGradeCategoryUseCase(gradeCategoryRepo)
-  const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepo)
-  const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(gradeCategoryRepo, performanceEntryRepo)
-  const recordGradeUseCase = new RecordGradeUseCase(performanceEntryRepo)
+  const createClassUseCase = new CreateClassUseCase(classGroupRepository);
+  const createLessonUseCase = new CreateLessonUseCase(lessonRepository);
+  const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepository);
+  const createGradeCategoryUseCase = new CreateGradeCategoryUseCase(gradeCategoryRepository);
+  const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepository);
+  const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(
+    gradeCategoryRepository,
+    performanceEntryRepository
+  );
+  const saveTableDefinitionUseCase = new SaveTableDefinitionUseCase(tableDefinitionRepository);
+  const deleteTableDefinitionUseCase = new DeleteTableDefinitionUseCase(tableDefinitionRepository);
+  const recordGradeUseCase = new RecordGradeUseCase(performanceEntryRepository);
   const recordCooperTestResultUseCase = new RecordCooperTestResultUseCase(
-    performanceEntryRepo,
-    cooperTestConfigRepo,
-    tableDefinitionRepo
-  )
+    performanceEntryRepository,
+    cooperTestConfigRepository,
+    tableDefinitionRepository
+  );
   const recordShuttleRunResultUseCase = new RecordShuttleRunResultUseCase(
-    performanceEntryRepo,
-    shuttleRunConfigRepo
-  )
-  const importShuttleRunConfigUseCase = new ImportShuttleRunConfigUseCase(shuttleRunConfigRepo)
+    performanceEntryRepository,
+    shuttleRunConfigRepository
+  );
+  const importShuttleRunConfigUseCase = new ImportShuttleRunConfigUseCase(
+    shuttleRunConfigRepository
+  );
   const recordSportabzeichenResultUseCase = new RecordSportabzeichenResultUseCase(
-    sportabzeichenResultRepo,
-    sportabzeichenStandardRepo
-  )
-  const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
-  const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
-  const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
-  const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
+    sportabzeichenResultRepository,
+    sportabzeichenStandardRepository
+  );
+  const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepository);
+  const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(
+    feedbackSessionRepository
+  );
+  const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepository);
+  const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepository);
   const saveCooperSessionUseCase = new SaveCooperSessionUseCase(
-    toolSessionRepo,
-    performanceEntryRepo,
-    cooperTestConfigRepo
-  )
-  const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepo)
-  const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(tableDefinitionRepo)
-  const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepo)
-  const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(gradeCategoryRepo)
-  const saveTableDefinitionUseCase = new SaveTableDefinitionUseCase(tableDefinitionRepo)
-  const deleteTableDefinitionUseCase = new DeleteTableDefinitionUseCase(tableDefinitionRepo)
+    toolSessionRepository,
+    performanceEntryRepository,
+    cooperTestConfigRepository
+  );
+  const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepository);
+  const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(
+    tableDefinitionRepository
+  );
 
-  // Initialize services
-  const criteriaGradingEngine = new CriteriaGradingEngine()
-  const timeGradingService = new TimeGradingService()
-  const cooperTestService = new CooperTestService()
-  const shuttleRunService = new ShuttleRunService()
-  const sportabzeichenService = new SportabzeichenService()
-  const bjsGradingService = new BJSGradingService()
-  const sportStatisticsService = new SportStatisticsService()
-  const teamBuilderService = new TeamBuilderService()
+  const criteriaGradingEngine = new CriteriaGradingEngine();
+  const timeGradingService = new TimeGradingService();
+  const cooperTestService = new CooperTestService();
+  const shuttleRunService = new ShuttleRunService();
+  const sportabzeichenService = new SportabzeichenService();
+  const bjsGradingService = new BJSGradingService();
+  const sportStatisticsService = new SportStatisticsService();
+  const teamBuilderService = new TeamBuilderService();
 
   sportBridgeInstance = {
-    // Repositories
-    classGroupRepository: classGroupRepo,
-    lessonRepository: lessonRepo,
-    gradeCategoryRepository: gradeCategoryRepo,
-    performanceEntryRepository: performanceEntryRepo,
-    attendanceRepository: attendanceRepo,
-    toolSessionRepository: toolSessionRepo,
-    feedbackSessionRepository: feedbackSessionRepo,
-    tableDefinitionRepository: tableDefinitionRepo,
-    cooperTestConfigRepository: cooperTestConfigRepo,
-    shuttleRunConfigRepository: shuttleRunConfigRepo,
-    sportabzeichenStandardRepository: sportabzeichenStandardRepo,
-    SportabzeichenStandardRepository: sportabzeichenStandardRepo,
-    sportabzeichenResultRepository: sportabzeichenResultRepo,
-    SportabzeichenResultRepository: sportabzeichenResultRepo,
-    tacticsSnapshotRepository: tacticsSnapshotRepo,
+    classGroupRepository,
+    lessonRepository,
+    gradeCategoryRepository,
+    performanceEntryRepository,
+    attendanceRepository,
+    toolSessionRepository,
+    feedbackSessionRepository,
+    tableDefinitionRepository,
+    cooperTestConfigRepository,
+    shuttleRunConfigRepository,
+    sportabzeichenStandardRepository,
+    SportabzeichenStandardRepository: sportabzeichenStandardRepository,
+    sportabzeichenResultRepository,
+    SportabzeichenResultRepository: sportabzeichenResultRepository,
+    tacticsSnapshotRepository,
 
-    // Use Cases
     createClassUseCase,
     createLessonUseCase,
     recordAttendanceUseCase,
@@ -236,7 +223,6 @@ export function initializeSportBridge(): SportBridge {
     saveMultistopSessionUseCase,
     importTableDefinitionUseCase,
 
-    // Services
     criteriaGradingEngine,
     timeGradingService,
     cooperTestService,
@@ -246,63 +232,39 @@ export function initializeSportBridge(): SportBridge {
     bjsGradingService,
     sportStatisticsService,
     teamBuilderService
-  }
+  };
 
-  return sportBridgeInstance
+  return sportBridgeInstance;
 }
 
-/**
- * Get sport bridge instance
- */
 export function getSportBridge(): SportBridge {
   if (!sportBridgeInstance) {
-    throw new Error(
-      'SportBridge not initialized. Call initializeSportBridge() first.'
-    )
+    throw new Error('SportBridge not initialized. Call initializeSportBridge() first.');
   }
-  return sportBridgeInstance
+
+  return sportBridgeInstance;
 }
 
-/**
- * Vue composable for class groups access
- */
 export function useClassGroups() {
-  const bridge = getSportBridge()
-  return bridge.classGroupRepository
+  return getSportBridge().classGroupRepository;
 }
 
-/**
- * Vue composable for lessons access
- */
 export function useLessons() {
-  const bridge = getSportBridge()
-  return bridge.lessonRepository
+  return getSportBridge().lessonRepository;
 }
 
-/**
- * Vue composable for attendance access
- */
 export function useAttendance() {
-  const bridge = getSportBridge()
-  return bridge.attendanceRepository
+  return getSportBridge().attendanceRepository;
 }
 
-
-/**
- * Vue composable for sport module access
- * Provides reactive access to sport bridge
- */
 export function useSportBridge() {
-  const bridge = ref<SportBridge | null>(sportBridgeInstance)
-
-  const isInitialized = computed(() => bridge.value !== null)
+  const bridge = ref<SportBridge | null>(sportBridgeInstance);
+  const isInitialized = computed(() => bridge.value !== null);
 
   return {
     sportBridge: bridge,
     SportBridge: bridge,
     isInitialized,
-
-    // Convenience accessors
     classGroups: computed(() => bridge.value?.classGroupRepository),
     lessons: computed(() => bridge.value?.lessonRepository),
     gradeCategories: computed(() => bridge.value?.gradeCategoryRepository),
@@ -310,56 +272,49 @@ export function useSportBridge() {
     attendance: computed(() => bridge.value?.attendanceRepository),
     toolSessions: computed(() => bridge.value?.toolSessionRepository),
     tableDefinitions: computed(() => bridge.value?.tableDefinitionRepository),
-
-    // Use case accessors
     useCreateClass: computed(() => bridge.value?.createClassUseCase),
     useCreateLesson: computed(() => bridge.value?.createLessonUseCase),
     useRecordAttendance: computed(() => bridge.value?.recordAttendanceUseCase),
-
-    // Service accessors
     useCriteriaGrading: computed(() => bridge.value?.criteriaGradingEngine),
     useTimeGrading: computed(() => bridge.value?.timeGradingService),
     useCooperTest: computed(() => bridge.value?.cooperTestService),
     useShuttleRun: computed(() => bridge.value?.shuttleRunService)
-  }
+  };
 }
 
-/**
- * @deprecated Use useStudents() from useStudentsBridge.ts.
- * Keeping this named export prevents silent null usage in legacy imports.
- */
 export function useStudents(): never {
   throw new Error(
     'useStudents from useSportBridge is deprecated. Import useStudents from useStudentsBridge instead.'
-  )
+  );
 }
-// Re-exports for convenience
+
 export {
-  ClassGroupRepository,
-  LessonRepository,
-  GradeCategoryRepository,
-  PerformanceEntryRepository,
   AttendanceRepository,
+  ClassGroupRepository,
   CreateClassUseCase,
-  CreateLessonUseCase,
-  RecordAttendanceUseCase,
   CreateGradeCategoryUseCase,
-  UpdateGradeCategoryUseCase,
-  DeleteGradeCategoryUseCase,
-  SaveTableDefinitionUseCase,
-  DeleteTableDefinitionUseCase,
-  RecordGradeUseCase,
+  CreateLessonUseCase,
   CriteriaGradingEngine,
+  DeleteGradeCategoryUseCase,
+  DeleteTableDefinitionUseCase,
+  GradeCategoryRepository,
+  LessonRepository,
+  PerformanceEntryRepository,
+  RecordAttendanceUseCase,
+  RecordGradeUseCase,
+  SaveTableDefinitionUseCase,
+  SportStatisticsService,
   TimeGradingService,
-  SportStatisticsService
-}
-export type { 
-  CreateClassInput, 
-  CreateLessonInput, 
-  RecordAttendanceInput,
+  UpdateGradeCategoryUseCase
+};
+export type {
+  CreateClassInput,
   CreateGradeCategoryInput,
-  UpdateGradeCategoryInput,
+  CreateLessonInput,
   DeleteGradeCategoryInput,
   DeleteGradeCategoryResult,
-  RecordGradeInput
-}
+  RecordAttendanceInput,
+  RecordGradeInput,
+  SaveTableDefinitionInput,
+  UpdateGradeCategoryInput
+};
