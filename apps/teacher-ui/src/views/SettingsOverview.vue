@@ -21,6 +21,7 @@
           <h2>{{ card.title }}</h2>
           <p>{{ card.description }}</p>
         </template>
+      </article>
       <RouterLink
         :to="{ name: 'catalog-management' }"
         class="settings-card settings-card-link"
@@ -115,6 +116,8 @@ const settingsCards = [
 
 .card-link:hover {
   background: #f0fdfa;
+}
+
 .settings-card-link {
   text-decoration: none;
   color: inherit;
