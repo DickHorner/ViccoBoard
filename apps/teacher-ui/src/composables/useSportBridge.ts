@@ -33,6 +33,7 @@ import {
   RecordFeedbackSessionUseCase,
   SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
+  SaveTacticsSnapshotUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
