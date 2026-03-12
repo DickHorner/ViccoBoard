@@ -655,6 +655,12 @@
     "meter": "Meter",
     "individual-stops": "Individual Stops",
     "audio-unlock-required": "Tap 'Start' to enable audio signals (required by Safari)",
+    "session-save": "Save session",
+    "session-saved": "Session saved.",
+    "session-saved-at": "Saved session from",
+    "session-reopen": "Resume",
+    "session-discard": "Discard",
+    "history-title": "Past results"
     "session-history": "Test History",
     "no-sessions": "No tests saved",
     "session-date": "Date",

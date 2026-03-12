@@ -35,6 +35,15 @@
         </div>
       </div>
 
+      <!-- Session reopen banner -->
+      <div v-if="savedSession" class="session-banner">
+        <span>{{ t('SHUTTLE.session-saved-at') }} {{ formatSessionDate(savedSession.savedAt) }}</span>
+        <div class="session-banner-actions">
+          <button class="btn-session-reopen" @click="reopenSession">{{ t('SHUTTLE.session-reopen') }}</button>
+          <button class="btn-session-discard" @click="discardSession">{{ t('SHUTTLE.session-discard') }}</button>
+        </div>
+      </div>
+
       <div class="timer-panel" v-if="selectedConfig">
         <div class="timer-status">
           <div class="status-item">
@@ -143,6 +152,9 @@
         <button class="btn-secondary" @click="resetAll" :disabled="saving">
           {{ t('SHUTTLE.noten-neu') }}
         </button>
+        <button class="btn-secondary" @click="saveSessionState" :disabled="isRunning">
+          {{ t('SHUTTLE.session-save') }}
+        </button>
         <button class="btn-primary" @click="saveAll" :disabled="saving || !selectedTableId || !selectedConfigId">
           {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
         </button>
@@ -171,6 +183,32 @@
     <section v-else class="card">
       <p class="empty-state">{{ t('COMMON.error') }}</p>
     </section>
+
+    <!-- Session History -->
+    <section v-if="historyGroups.length > 0" class="card history-card">
+      <h3 class="history-title">{{ t('SHUTTLE.history-title') }}</h3>
+      <div v-for="group in historyGroups" :key="group.date" class="history-group">
+        <p class="history-date">{{ group.date }}</p>
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>{{ t('SCHUELER.schueler') }}</th>
+              <th>{{ t('SHUTTLE.level') }}</th>
+              <th>{{ t('SHUTTLE.bahn') }}</th>
+              <th>{{ t('SHUTTLE.note') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="entry in group.entries" :key="entry.id">
+              <td>{{ studentName(entry.studentId) }}</td>
+              <td>{{ entry.measurements.level ?? '—' }}</td>
+              <td>{{ entry.measurements.lane ?? '—' }}</td>
+              <td>{{ entry.calculatedGrade ?? '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -183,7 +221,7 @@ import { getStudentsBridge, initializeStudentsBridge } from '../composables/useS
 import type { Student, Sport } from '@viccoboard/core'
 import { buildShuttleRunSchedule, getCurrentShuttleSegment } from '../utils/shuttle-run-schedule'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 
 initializeSportBridge()
@@ -213,12 +251,128 @@ interface ShuttleResult {
 
 const results = ref<Record<string, ShuttleResult>>({})
 
+// ─── Session persistence ────────────────────────────────────────────────────
+
+interface SessionSnapshot {
+  categoryId: string
+  selectedTableId: string
+  selectedConfigId: string
+  elapsedMs: number
+  soundEnabled: boolean
+  results: Record<string, ShuttleResult>
+  savedAt: string
+}
+
+const savedSession = ref<SessionSnapshot | null>(null)
+
+function sessionKey(categoryId: string): string {
+  return `shuttle-session:${categoryId}`
+}
+
+function saveSessionState() {
+  if (!category.value) return
+  const snapshot: SessionSnapshot = {
+    categoryId: category.value.id,
+    selectedTableId: selectedTableId.value,
+    selectedConfigId: selectedConfigId.value,
+    elapsedMs: elapsedMs.value,
+    soundEnabled: soundEnabled.value,
+    results: structuredClone(results.value),
+    savedAt: new Date().toISOString()
+  }
+  try {
+    localStorage.setItem(sessionKey(category.value.id), JSON.stringify(snapshot))
+    savedSession.value = null
+    successMessage.value = t('SHUTTLE.session-saved')
+    setTimeout(() => { successMessage.value = '' }, 3000)
+  } catch {
+    // localStorage unavailable – silently skip
+  }
+}
+
+function loadSessionFromStorage(categoryId: string): SessionSnapshot | null {
+  try {
+    const raw = localStorage.getItem(sessionKey(categoryId))
+    if (!raw) return null
+    return JSON.parse(raw) as SessionSnapshot
+  } catch {
+    return null
+  }
+}
+
+function reopenSession() {
+  if (!savedSession.value) return
+  const s = savedSession.value
+  selectedTableId.value = s.selectedTableId
+  selectedConfigId.value = s.selectedConfigId
+  elapsedMs.value = s.elapsedMs
+  accumulatedMs = s.elapsedMs
+  soundEnabled.value = s.soundEnabled
+  results.value = s.results
+  savedSession.value = null
+  clearStoredSession()
+}
+
+function discardSession() {
+  savedSession.value = null
+  clearStoredSession()
+}
+
+function clearStoredSession() {
+  if (!category.value) return
+  try {
+    localStorage.removeItem(sessionKey(category.value.id))
+  } catch {
+    // ignore
+  }
+}
+
+// ─── History ─────────────────────────────────────────────────────────────────
+
+interface HistoryGroup {
+  date: string
+  entries: Sport.PerformanceEntry[]
+}
+
+const allEntries = ref<Sport.PerformanceEntry[]>([])
+
+const historyGroups = computed<HistoryGroup[]>(() => {
+  if (allEntries.value.length === 0) return []
+
+  const byDate = new Map<string, Sport.PerformanceEntry[]>()
+  for (const entry of allEntries.value) {
+    const d = new Date(entry.timestamp).toLocaleDateString(locale.value, {
+      weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric'
+    })
+    if (!byDate.has(d)) byDate.set(d, [])
+    byDate.get(d)!.push(entry)
+  }
+
+  return Array.from(byDate.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([date, entries]) => ({ date, entries }))
+})
+
+const studentMap = computed<Record<string, string>>(() => {
+  const map: Record<string, string> = {}
+  for (const s of students.value) {
+    map[s.id] = `${s.firstName} ${s.lastName}`
+  }
+  return map
+})
+
+function studentName(id: string): string {
+  return studentMap.value[id] ?? id
+}
+
+// ─── Timer ───────────────────────────────────────────────────────────────────
+
 const currentDate = computed(() => {
-  return new Date().toLocaleDateString('de-DE', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return new Date().toLocaleDateString(locale.value, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
 })
 
@@ -292,6 +446,12 @@ function formatTime(ms: number): string {
   const seconds = totalSeconds % 60
   const pad = (value: number) => value.toString().padStart(2, '0')
   return `${pad(minutes)}:${pad(seconds)}`
+}
+
+function formatSessionDate(iso: string): string {
+  return new Date(iso).toLocaleString(locale.value, {
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  })
 }
 
 function playBeep() {
@@ -480,6 +640,8 @@ async function saveAll() {
     await loadSessionHistory()
 
     successMessage.value = t('COMMON.success')
+    clearStoredSession()
+    allEntries.value = await SportBridge.performanceEntryRepository.findByCategory(category.value.id)
   } catch (error) {
     errorMessage.value = t('COMMON.error')
   } finally {
@@ -546,12 +708,19 @@ onMounted(async () => {
     tables.value = await SportBridge.tableDefinitionRepository.findAll()
     configs.value = await SportBridge.shuttleRunConfigRepository.findAll()
     const existingEntries = await SportBridge.performanceEntryRepository.findByCategory(category.value.id)
+    allEntries.value = existingEntries
 
     const config = category.value.configuration as Sport.ShuttleGradingConfig
     selectedTableId.value = config.gradingTable ?? ''
     selectedConfigId.value = config.configId ?? ''
 
     initResults(existingEntries)
+
+    // Offer to reopen a saved (paused) session if one exists
+    const stored = loadSessionFromStorage(category.value.id)
+    if (stored) {
+      savedSession.value = stored
+    }
     await loadSessionHistory()
   } catch (error) {
     errorMessage.value = t('COMMON.error')
@@ -566,10 +735,13 @@ onMounted(async () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .page-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
 }
 
 .back-button {
@@ -606,6 +778,51 @@ onMounted(async () => {
   padding: 0.75rem;
   border-radius: 6px;
   border: 1px solid #ddd;
+}
+
+/* Session banner */
+.session-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #e0f2fe;
+  border: 1px solid #7dd3fc;
+  color: #0c4a6e;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.session-banner-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-session-reopen {
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: none;
+  background: #0284c7;
+  color: white;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-height: 36px;
+}
+
+.btn-session-discard {
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #7dd3fc;
+  background: white;
+  color: #0c4a6e;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-height: 36px;
 }
 
 .warning-banner {
@@ -707,6 +924,7 @@ onMounted(async () => {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .btn-primary,
@@ -766,6 +984,45 @@ onMounted(async () => {
   color: #2e7d32;
 }
 
+/* History */
+.history-card {
+  padding: 1.5rem;
+}
+
+.history-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.history-group {
+  margin-bottom: 1.5rem;
+}
+
+.history-date {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f766e;
+  margin: 0 0 0.5rem;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.history-table th {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 2px solid #e2e8f0;
+  color: #475569;
+  font-weight: 600;
+}
+
+.history-table td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #f1f5f9;
 .session-history {
   margin-top: 1.5rem;
   border-top: 1px solid #eee;

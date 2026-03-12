@@ -744,6 +744,12 @@
     "meter": "Meter",
     "individual-stops": "Einzelne Stopps",
     "audio-unlock-required": "Tippen Sie auf 'Start', um Audiosignale zu aktivieren (von Safari erforderlich)",
+    "session-save": "Sitzung speichern",
+    "session-saved": "Sitzung gespeichert.",
+    "session-saved-at": "Gespeicherte Sitzung vom",
+    "session-reopen": "Fortsetzen",
+    "session-discard": "Verwerfen",
+    "history-title": "Vergangene Ergebnisse"
     "session-history": "Test-Historie",
     "no-sessions": "Keine Tests gespeichert",
     "session-date": "Datum",
