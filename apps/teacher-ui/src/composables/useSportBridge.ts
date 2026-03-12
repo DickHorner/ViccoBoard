@@ -35,6 +35,9 @@ import {
   RecordFeedbackSessionUseCase,
   SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
+  SaveTacticsSnapshotUseCase,
+  SaveTableDefinitionUseCase,
+  DeleteTableDefinitionUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -50,6 +53,7 @@ import {
   type UpdateGradeCategoryInput,
   type DeleteGradeCategoryInput,
   type DeleteGradeCategoryResult,
+  type SaveTableDefinitionInput,
   type RecordGradeInput
 } from '@viccoboard/sport'
 import { getStorageAdapter } from '../services/storage.service'
@@ -84,6 +88,8 @@ interface SportBridge {
   createGradeCategoryUseCase: CreateGradeCategoryUseCase
   updateGradeCategoryUseCase: UpdateGradeCategoryUseCase
   deleteGradeCategoryUseCase: DeleteGradeCategoryUseCase
+  saveTableDefinitionUseCase: SaveTableDefinitionUseCase
+  deleteTableDefinitionUseCase: DeleteTableDefinitionUseCase
   recordGradeUseCase: RecordGradeUseCase
   recordCooperTestResultUseCase: RecordCooperTestResultUseCase
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
@@ -156,6 +162,10 @@ export function initializeSportBridge(): SportBridge {
   const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
   const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
   const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
+  const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepo)
+  const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(gradeCategoryRepo)
+  const saveTableDefinitionUseCase = new SaveTableDefinitionUseCase(tableDefinitionRepo)
+  const deleteTableDefinitionUseCase = new DeleteTableDefinitionUseCase(tableDefinitionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -192,6 +202,8 @@ export function initializeSportBridge(): SportBridge {
     createGradeCategoryUseCase,
     updateGradeCategoryUseCase,
     deleteGradeCategoryUseCase,
+    saveTableDefinitionUseCase,
+    deleteTableDefinitionUseCase,
     recordGradeUseCase,
     recordCooperTestResultUseCase,
     recordShuttleRunResultUseCase,
@@ -311,6 +323,8 @@ export {
   CreateGradeCategoryUseCase,
   UpdateGradeCategoryUseCase,
   DeleteGradeCategoryUseCase,
+  SaveTableDefinitionUseCase,
+  DeleteTableDefinitionUseCase,
   RecordGradeUseCase,
   CriteriaGradingEngine,
   TimeGradingService,
