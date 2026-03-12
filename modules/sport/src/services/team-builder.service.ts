@@ -9,7 +9,6 @@
  *                    distribution of male / female / other students
  */
 
-import type { Sport } from '@viccoboard/core';
 
 export interface TeamBuildInput {
   /** Students to distribute (minimal shape required). */
