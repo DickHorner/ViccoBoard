@@ -95,39 +95,51 @@
       </section>
       
       <section class="card">
-        <h3>Statistiken</h3>
+        <h3>Sport-Kennzahlen</h3>
         <div class="card-content">
-          <p class="info-note">📊 Statistiken werden aus tatsächlichen Anwesenheits- und Bewertungsdaten berechnet.</p>
           <div class="stats-grid">
             <div class="stat-item">
-              <div class="stat-value">{{ statistics.attendanceRate }}%</div>
-              <div class="stat-label">Anwesenheitsquote</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">{{ statistics.totalLessons }}</div>
+              <div class="stat-value">{{ sportSummary.lessonCount }}</div>
               <div class="stat-label">Unterrichtsstunden</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value">{{ statistics.assessmentCount }}</div>
+              <div class="stat-value">{{ sportSummary.gradeCategoryCount }}</div>
+              <div class="stat-label">Bewertungskategorien</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ sportSummary.assessmentCount }}</div>
               <div class="stat-label">Bewertungen</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ sportSummary.studentCount }}</div>
+              <div class="stat-label">Schüler</div>
             </div>
           </div>
         </div>
       </section>
-      
-      <section class="card">
-        <h3>Schnellzugriffe</h3>
+
+      <section class="card sport-workbench-card">
+        <h3>Sport-Arbeitsbereiche</h3>
         <div class="card-content">
-          <RouterLink 
-            :to="`/attendance?classId=${classGroup.id}`" 
+          <RouterLink
+            v-for="area in sportWorkAreas"
+            :key="area.to"
+            :to="area.to"
             class="action-button"
           >
-            <span class="action-icon">✓</span>
-            <span>Anwesenheit erfassen</span>
+            <span class="action-icon">{{ area.icon }}</span>
+            <span class="action-text">
+              <span class="action-label">{{ area.label }}</span>
+              <span class="action-description">{{ area.description }}</span>
+            </span>
+            <span class="action-arrow">→</span>
           </RouterLink>
           <button class="action-button" @click="showEditModal = true">
             <span class="action-icon">✏️</span>
-            <span>Klasseninformationen bearbeiten</span>
+            <span class="action-text">
+              <span class="action-label">Klasse bearbeiten</span>
+              <span class="action-description">Klasseninformationen anpassen</span>
+            </span>
           </button>
         </div>
       </section>
@@ -219,11 +231,11 @@
 </template>
 
 <script setup lang="ts">
-// @ts-nocheck
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
+import { RouterLink, useRoute } from 'vue-router'
+import { getSportBridge, initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
+import { buildClassSportSummary, buildSportWorkAreas } from '../utils/class-detail-summary'
 import type { ClassGroup, Student } from '@viccoboard/core'
 
 const route = useRoute()
@@ -240,11 +252,8 @@ const addingStudent = ref(false)
 const addStudentError = ref('')
 const showEditModal = ref(false)
 
-const statistics = ref({
-  attendanceRate: 0,
-  totalLessons: 0,
-  assessmentCount: 0
-})
+const sportSummary = ref(buildClassSportSummary(0, 0, 0, 0))
+const sportWorkAreas = ref(buildSportWorkAreas(''))
 
 const newStudent = ref({
   firstName: '',
@@ -259,6 +268,7 @@ initializeStudentsBridge()
 
 // Composables
 const classGroups = useClassGroups()
+const sportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 // Methods
@@ -277,6 +287,25 @@ const loadData = async () => {
     
     // Load students for this class
     students.value = await studentsBridge.studentRepository.findByClassGroup(classId)
+
+    // Load sport-specific data for summary cards
+    const [lessons, gradeCategories, studentEntryArrays] = await Promise.all([
+      sportBridge.lessonRepository.findByClassGroup(classId),
+      sportBridge.gradeCategoryRepository.findByClassGroup(classId),
+      Promise.all(
+        students.value.map((s) => sportBridge.performanceEntryRepository.findByStudent(s.id))
+      )
+    ])
+
+    const classAssessmentCount = studentEntryArrays.reduce((sum, entries) => sum + entries.length, 0)
+
+    sportSummary.value = buildClassSportSummary(
+      students.value.length,
+      lessons.length,
+      gradeCategories.length,
+      classAssessmentCount
+    )
+    sportWorkAreas.value = buildSportWorkAreas(classId)
   } catch (err) {
     console.error('Failed to load class:', err)
     error.value = 'Fehler beim Laden der Klasse. Bitte versuchen Sie es erneut.'
@@ -700,6 +729,30 @@ onMounted(() => {
 
 .action-icon {
   font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.action-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.action-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.action-description {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.action-arrow {
+  font-size: 1.25rem;
+  color: #667eea;
   flex-shrink: 0;
 }
 
