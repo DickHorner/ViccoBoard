@@ -51,6 +51,8 @@ import {
   type RecordAttendanceInput,
   type CreateGradeCategoryInput,
   type UpdateGradeCategoryInput,
+  type DeleteGradeCategoryInput,
+  type DeleteGradeCategoryResult,
   type SaveTableDefinitionInput,
   type RecordGradeInput
 } from '@viccoboard/sport'
@@ -140,6 +142,8 @@ export function initializeSportBridge(): SportBridge {
   const createLessonUseCase = new CreateLessonUseCase(lessonRepo)
   const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo)
   const createGradeCategoryUseCase = new CreateGradeCategoryUseCase(gradeCategoryRepo)
+  const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepo)
+  const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(gradeCategoryRepo, performanceEntryRepo)
   const recordGradeUseCase = new RecordGradeUseCase(performanceEntryRepo)
   const recordCooperTestResultUseCase = new RecordCooperTestResultUseCase(
     performanceEntryRepo,
@@ -332,6 +336,7 @@ export type {
   RecordAttendanceInput,
   CreateGradeCategoryInput,
   UpdateGradeCategoryInput,
-  SaveTableDefinitionInput,
+  DeleteGradeCategoryInput,
+  DeleteGradeCategoryResult,
   RecordGradeInput
 }
