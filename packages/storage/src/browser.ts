@@ -22,3 +22,4 @@ export * from './migrations/indexeddb/013_sport_schema.js';
 export * from './migrations/indexeddb/014_tool_sessions_schema.js';
 export * from './migrations/indexeddb/015_tactics_snapshots_schema.js';
 export * from './migrations/indexeddb/016_tournament_schema.js';
+export * from './migrations/indexeddb/017_legacy_store_repair.js';
