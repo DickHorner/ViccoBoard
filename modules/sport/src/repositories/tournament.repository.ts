@@ -8,6 +8,8 @@ import type { StorageAdapter } from '@viccoboard/storage';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface CreateTournamentInput {
+  /** Optional pre-generated ID — useful when the caller needs to embed the ID in matches before persisting. */
+  id?: string;
   classGroupId: string;
   name: string;
   type: Sport.Tournament['type'];
@@ -41,7 +43,7 @@ export class TournamentRepository {
   async create(input: CreateTournamentInput): Promise<Sport.Tournament> {
     const now = new Date();
     const tournament: Sport.Tournament = {
-      id: uuidv4(),
+      id: input.id ?? uuidv4(),
       classGroupId: input.classGroupId,
       name: input.name,
       type: input.type,
