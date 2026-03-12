@@ -9,12 +9,102 @@
     </header>
 
     <div class="settings-sections">
-      <!-- Shuttle-Run config -->
+      <!-- Shuttle-Run config import -->
       <section class="config-card">
         <p class="eyebrow">Test-Konfiguration</p>
-        <h2>Shuttle-Run-Konfiguration</h2>
-        <p>Konfigurationstabellen importieren oder bestehende verwalten.</p>
+        <h2>{{ t('SETTINGS.shuttle-konfiguration') }}</h2>
+        <p>{{ t('SETTINGS.shuttle-import') }}</p>
+
+        <div class="import-form">
+          <div class="form-group">
+            <label for="config-name">Name</label>
+            <input
+              id="config-name"
+              v-model="importName"
+              type="text"
+              class="form-input"
+              placeholder="z.B. Standard 20m"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Format</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" v-model="importFormat" value="csv" /> CSV
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="importFormat" value="json" /> JSON
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="config-file">Datei auswählen (.{{ importFormat }})</label>
+            <input
+              id="config-file"
+              ref="fileInput"
+              type="file"
+              :accept="importFormat === 'csv' ? '.csv,text/csv' : '.json,application/json'"
+              class="file-input"
+              @change="handleFileSelected"
+            />
+          </div>
+
+          <div v-if="importFileName" class="file-preview">
+            Ausgewählt: <strong>{{ importFileName }}</strong>
+          </div>
+
+          <div class="import-actions">
+            <label class="audio-toggle">
+              <input type="checkbox" v-model="importAudio" />
+              Audio-Signale aktivieren
+            </label>
+            <button
+              class="btn-primary"
+              :disabled="!importFileContent || importing"
+              @click="runImport"
+            >
+              {{ importing ? 'Importiere…' : 'Konfiguration importieren' }}
+            </button>
+          </div>
+
+          <div v-if="importError" class="error-message">{{ importError }}</div>
+          <div v-if="importSuccess" class="success-message">{{ importSuccess }}</div>
+        </div>
+
+        <!-- Existing imported configs -->
+        <div v-if="importedConfigs.length > 0" class="imported-list">
+          <p class="list-label">Importierte Konfigurationen ({{ importedConfigs.length }})</p>
+          <ul class="config-list">
+            <li v-for="cfg in importedConfigs" :key="cfg.id" class="config-item">
+              <span class="config-name">{{ cfg.name }}</span>
+              <span class="config-meta">{{ cfg.levels.length }} Einträge · {{ formatDate(cfg.createdAt) }}</span>
+            </li>
+          </ul>
+        </div>
+
         <RouterLink to="/grading" class="config-link">Zur Bewertungsübersicht →</RouterLink>
+        <h2>Shuttle-Run-Konfiguration</h2>
+        <p>{{ t('SHUTTLE.import-config-hint') }}</p>
+        <div class="import-row">
+          <label class="file-label">
+            <span class="config-link">{{ t('SHUTTLE.import-config') }} →</span>
+            <input
+              type="file"
+              accept=".json"
+              class="file-input-hidden"
+              @change="importShuttleConfig"
+            />
+          </label>
+        </div>
+        <p v-if="importMessage" :class="importError ? 'msg-error' : 'msg-success'">
+          {{ importMessage }}
+        </p>
+        <p v-if="importedConfigs.length > 0" class="existing-configs">
+          {{ t('SHUTTLE.configs-count', { count: importedConfigs.length }) }}
+        </p>
+        <RouterLink to="/grading" class="config-link-secondary">Zur Bewertungsübersicht →</RouterLink>
       </section>
 
       <!-- Status catalog -->
@@ -22,15 +112,15 @@
         <p class="eyebrow">Anwesenheit</p>
         <h2>Status-Katalog</h2>
         <p>Anwesenheitsstatus anpassen: Kürzel, Bezeichnung, Farbe und Reihenfolge.</p>
-        <RouterLink to="/attendance" class="config-link">Zu Anwesenheitserfassung →</RouterLink>
+        <RouterLink to="/settings/catalogs" class="config-link">Zur Katalogverwaltung →</RouterLink>
       </section>
 
       <!-- Table management -->
       <section class="config-card">
         <p class="eyebrow">Bewertungstabellen</p>
-        <h2>Tabellen & Normen</h2>
+        <h2>Tabellen &amp; Normen</h2>
         <p>Leistungstabellen für Cooper-Test, Shuttle-Run und weitere Disziplinen verwalten.</p>
-        <RouterLink to="/grading" class="config-link">Zur Bewertungsübersicht →</RouterLink>
+        <RouterLink to="/grading/tables" class="config-link">Zur Tabellenverwaltung →</RouterLink>
       </section>
 
       <!-- Grade categories -->
@@ -38,14 +128,151 @@
         <p class="eyebrow">Bewertung</p>
         <h2>Bewertungskategorien</h2>
         <p>Kriterienkataloge, Zeitgrenzen und Gewichtungen für alle Bewertungsformen einsehen.</p>
-        <RouterLink to="/grading" class="config-link">Zu Bewertung & Tests →</RouterLink>
+        <RouterLink to="/grading" class="config-link">Zu Bewertung &amp; Tests →</RouterLink>
       </section>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
+import type { Sport } from '@viccoboard/core'
+
+const { t, locale } = useI18n()
+
+initializeSportBridge()
+const bridge = getSportBridge()
+
+const importName = ref('')
+const importFormat = ref<'csv' | 'json'>('csv')
+const importAudio = ref(true)
+const importFileContent = ref<string | null>(null)
+const importFileName = ref('')
+const importing = ref(false)
+const importError = ref('')
+const importSuccess = ref('')
+const importedConfigs = ref<Sport.ShuttleRunConfig[]>([])
+const fileInput = ref<HTMLInputElement | null>(null)
+
+function handleFileSelected(event: Event) {
+const { t } = useI18n()
+
+initializeSportBridge()
+const SportBridge = getSportBridge()
+
+const importMessage = ref('')
+const importError = ref(false)
+const importedConfigs = ref<Sport.ShuttleRunConfig[]>([])
+
+onMounted(async () => {
+  try {
+    importedConfigs.value = await SportBridge.shuttleRunConfigRepository.findAll()
+  } catch {
+    // Non-blocking
+  }
+})
+
+async function importShuttleConfig(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  importFileName.value = file.name
+  importError.value = ''
+  importSuccess.value = ''
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    importFileContent.value = (e.target?.result as string) ?? null
+  }
+  reader.onerror = () => {
+    importError.value = 'Datei konnte nicht gelesen werden.'
+    importFileContent.value = null
+  }
+  reader.readAsText(file, 'utf-8')
+}
+
+async function runImport() {
+  if (!importFileContent.value) return
+
+  importing.value = true
+  importError.value = ''
+  importSuccess.value = ''
+
+  try {
+    const result = await bridge.importShuttleRunConfigUseCase.execute({
+      rawContent: importFileContent.value,
+      format: importFormat.value,
+      name: importName.value || importFileName.value.replace(/\.[^.]+$/, ''),
+      audioSignalsEnabled: importAudio.value
+    })
+
+    importSuccess.value = `✓ Konfiguration „${result.config.name}" importiert (${result.levelsImported} Einträge).`
+    importFileContent.value = null
+    importFileName.value = ''
+    importName.value = ''
+    if (fileInput.value) fileInput.value.value = ''
+
+    await loadImportedConfigs()
+  } catch (err: any) {
+    importError.value = (err as Error)?.message ?? 'Import fehlgeschlagen.'
+  } finally {
+    importing.value = false
+  }
+}
+
+async function loadImportedConfigs() {
+  try {
+    importedConfigs.value = await bridge.shuttleRunConfigRepository.findBySource('imported')
+  } catch {
+    // silently ignore on load failure
+  }
+}
+
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString(locale.value, { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+onMounted(loadImportedConfigs)
+  importMessage.value = ''
+  importError.value = false
+
+  try {
+    const text = await file.text()
+    const parsed: unknown = JSON.parse(text)
+
+    // Accept either a single config object or an array
+    const configs: unknown[] = Array.isArray(parsed) ? parsed : [parsed]
+
+    let saved = 0
+    for (const raw of configs) {
+      const cfg = raw as Record<string, unknown>
+      if (!cfg.name || !Array.isArray(cfg.levels)) {
+        throw new Error('Invalid config format: missing "name" or "levels"')
+      }
+      await SportBridge.shuttleRunConfigRepository.create({
+        name: String(cfg.name),
+        levels: cfg.levels as Sport.ShuttleRunConfig['levels'],
+        audioSignalsEnabled: cfg.audioSignalsEnabled === true,
+        source: 'imported'
+      })
+      saved++
+    }
+
+    importedConfigs.value = await SportBridge.shuttleRunConfigRepository.findAll()
+    importMessage.value = t('SHUTTLE.config-imported') + ` (${saved})`
+  } catch (err: unknown) {
+    importError.value = true
+    importMessage.value = t('SHUTTLE.config-import-error') +
+      (err instanceof Error ? ': ' + err.message : '')
+  } finally {
+    // Reset the input so the same file can be re-selected
+    input.value = ''
+  }
+}
 </script>
 
 <style scoped>
@@ -94,7 +321,7 @@ import { RouterLink } from 'vue-router'
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .config-card h2 {
@@ -102,7 +329,7 @@ import { RouterLink } from 'vue-router'
   font-size: 1.05rem;
 }
 
-.config-card p {
+.config-card > p {
   color: #64748b;
   margin: 0;
   font-size: 0.875rem;
@@ -117,16 +344,205 @@ import { RouterLink } from 'vue-router'
   font-weight: 700;
 }
 
+.import-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.form-input {
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.file-input {
+  font-size: 0.875rem;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.file-preview {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.import-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.audio-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  background: #0f766e;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-message {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #ffebee;
+  color: #c62828;
+  font-size: 0.8rem;
+}
+
+.success-message {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.8rem;
+}
+
+.imported-list {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.75rem;
+}
+
+.list-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 0.5rem;
+}
+
+.config-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.875rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.config-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.config-meta {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
 .config-link {
   margin-top: auto;
   color: #0f766e;
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
-  padding-top: 0.5rem;
+  padding-top: 0.25rem;
 }
 
 .config-link:hover {
   text-decoration: underline;
+}
+
+.config-link-secondary {
+  color: #64748b;
+  font-size: 0.8rem;
+  text-decoration: none;
+  margin-top: 0.25rem;
+}
+
+.config-link-secondary:hover {
+  text-decoration: underline;
+}
+
+.import-row {
+  display: flex;
+  align-items: center;
+}
+
+.file-label {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.file-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.msg-success {
+  color: #0f766e;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.msg-error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.existing-configs {
+  color: #64748b;
+  font-size: 0.8rem;
+  margin: 0;
 }
 </style>

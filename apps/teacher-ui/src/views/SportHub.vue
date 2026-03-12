@@ -60,6 +60,12 @@ const entries = [
     description: 'Kategorien, Kriterien, Zeitnoten, Cooper, Shuttle-Run, Mittelstrecke, Sportabzeichen und BJS.'
   },
   {
+    to: '/subjects/sport/tables',
+    eyebrow: 'Tabellen',
+    title: 'Tabellenverwaltung',
+    description: 'Leistungstabellen importieren, aktivieren und als Bewertungsgrundlage hinterlegen.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Statistiken',
     title: 'Statistiken',

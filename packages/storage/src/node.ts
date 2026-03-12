@@ -19,3 +19,4 @@ export * from './migrations/009_class_group_archive.js';
 export * from './migrations/013_sport_schema.js';
 export * from './migrations/014_tool_sessions_schema.js';
 export * from './migrations/015_tactics_snapshots_schema.js';
+export * from './migrations/016_table_active_schema.js';

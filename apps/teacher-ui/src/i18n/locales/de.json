@@ -715,7 +715,15 @@
     "Sportart": "Sportart",
     "running": "Laufen",
     "swimming": "Schwimmen",
-    "config": "Konfiguration"
+    "config": "Konfiguration",
+    "session-history": "Sitzungshistorie",
+    "session-new": "Neue Sitzung",
+    "session-load": "Laden",
+    "session-count": "{count} Schüler",
+    "no-sessions": "Noch keine Sitzungen gespeichert.",
+    "session-history": "Test-Historie",
+    "no-sessions": "Keine Tests gespeichert",
+    "session-date": "Datum"
   },
   "SHUTTLE": {
     "bewerte-shuttle": "Bewerte Shuttle-Run vom",
@@ -740,7 +748,21 @@
     "note": "Note",
     "meter": "Meter",
     "individual-stops": "Einzelne Stopps",
-    "audio-unlock-required": "Tippen Sie auf 'Start', um Audiosignale zu aktivieren (von Safari erforderlich)"
+    "audio-unlock-required": "Tippen Sie auf 'Start', um Audiosignale zu aktivieren (von Safari erforderlich)",
+    "session-save": "Sitzung speichern",
+    "session-saved": "Sitzung gespeichert.",
+    "session-saved-at": "Gespeicherte Sitzung vom",
+    "session-reopen": "Fortsetzen",
+    "session-discard": "Verwerfen",
+    "history-title": "Vergangene Ergebnisse"
+    "session-history": "Test-Historie",
+    "no-sessions": "Keine Tests gespeichert",
+    "session-date": "Datum",
+    "import-config": "Konfiguration importieren",
+    "import-config-hint": "JSON-Datei mit Shuttle-Run-Konfiguration auswählen",
+    "config-imported": "Konfiguration importiert",
+    "config-import-error": "Fehler beim Importieren der Konfiguration",
+    "configs-count": "{{count}} Konfiguration(en) gespeichert"
   },
   "MITTELSTRECKE": {
     "bewerte": "Bewerte Mittelstrecke vom",
@@ -1034,7 +1056,12 @@
     "video-review": "Video-Überprüfung",
     "speed": "Geschwindigkeit",
     "adjust-times": "Zeiten anpassen",
-    "set-time": "Zeit setzen"
+    "set-time": "Zeit setzen",
+    "session-saved": "Sitzung gespeichert",
+    "send-to-mittelstrecke": "An Mittelstrecken-Bewertung übergeben",
+    "select-category": "Kategorie auswählen",
+    "session-history": "Sitzungs-Historie",
+    "no-sessions": "Keine Sitzungen vorhanden"
   },
   "WOW": {
     "no-wow-title": "Noch keine WOWs",

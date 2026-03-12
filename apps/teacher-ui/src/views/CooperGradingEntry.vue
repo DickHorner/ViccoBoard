@@ -50,10 +50,6 @@
         {{ t('COOPER.config') }}: {{ t('COMMON.error') }}
       </div>
 
-      <div v-else-if="!selectedTableId" class="warning-banner">
-        {{ t('COOPER.tabelle') }}: {{ t('COMMON.error') }}
-      </div>
-
       <div class="table-wrapper" v-if="students.length > 0">
         <table class="cooper-table">
           <thead>
@@ -97,13 +93,63 @@
         <button class="btn-secondary" @click="resetAll" :disabled="saving">
           {{ t('COOPER.noten-neu') }}
         </button>
-        <button class="btn-primary" @click="saveAll" :disabled="saving || !selectedTableId || !selectedConfigId">
+        <button class="btn-primary" @click="saveAll" :disabled="saving || !selectedConfigId">
           {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
         </button>
       </div>
 
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
+
+      <!-- Session History -->
+      <div class="session-history">
+        <h3>{{ t('COOPER.session-history') }}</h3>
+        <p v-if="sessionHistory.length === 0" class="empty-state-small">
+          {{ t('COOPER.no-sessions') }}
+        </p>
+        <div v-else class="session-list">
+          <div v-for="session in sessionHistory" :key="session.id" class="session-item">
+            <span class="session-date">{{ formatSessionDate(session.startedAt) }}</span>
+            <span class="session-info">
+              {{ session.sessionMetadata.sportType ?? '' }}
+              · {{ session.sessionMetadata.studentCount ?? 0 }} {{ t('SCHUELER.schueler') }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Session History -->
+    <section v-if="category && pastSessions.length > 0" class="card history-card">
+      <h3>{{ t('COOPER.session-history') }}</h3>
+      <div class="session-list">
+        <div
+          v-for="session in pastSessions"
+          :key="session.id"
+          class="session-item"
+          :class="{ 'session-item--active': activeSessionId === session.id }"
+        >
+          <div class="session-info">
+            <span class="session-date">{{ formatSessionDate(session.startedAt) }}</span>
+            <span class="session-meta">
+              {{ sessionSportType(session) }} ·
+              {{ t('COOPER.session-count', { count: sessionEntryCount(session) }) }}
+            </span>
+          </div>
+          <button
+            class="btn-secondary btn-small"
+            @click="loadSession(session)"
+            :disabled="saving"
+          >
+            {{ t('COOPER.session-load') }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section v-else-if="category" class="card history-card">
+      <h3>{{ t('COOPER.session-history') }}</h3>
+      <p class="empty-state">{{ t('COOPER.no-sessions') }}</p>
     </section>
 
     <section v-else class="card">
@@ -119,6 +165,7 @@ import { useI18n } from 'vue-i18n'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import type { Student, Sport } from '@viccoboard/core'
+import type { CooperSessionMetadata } from '@viccoboard/sport'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -133,6 +180,8 @@ const category = ref<Sport.GradeCategory | null>(null)
 const students = ref<Student[]>([])
 const tables = ref<Sport.TableDefinition[]>([])
 const configs = ref<Sport.CooperTestConfig[]>([])
+const pastSessions = ref<Sport.ToolSession[]>([])
+const activeSessionId = ref<string | null>(null)
 const selectedSportType = ref<Sport.CooperTestConfig['SportType']>('running')
 const selectedConfigId = ref('')
 const selectedTableId = ref('')
@@ -141,6 +190,7 @@ const loading = ref(true)
 const saving = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+const sessionHistory = ref<Sport.ToolSession[]>([])
 
 interface CooperResult {
   rounds: number
@@ -152,11 +202,11 @@ interface CooperResult {
 const results = ref<Record<string, CooperResult>>({})
 
 const currentDate = computed(() => {
-  return new Date().toLocaleDateString('de-DE', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return new Date().toLocaleDateString('de-DE', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
 })
 
@@ -167,6 +217,10 @@ const selectedTable = computed(() =>
 const selectedConfig = computed(() =>
   configs.value.find(config => config.id === selectedConfigId.value) || null
 )
+
+function sessionIdOf(entry: Sport.PerformanceEntry): string | undefined {
+  return (entry.metadata as Record<string, unknown>)?.sessionId as string | undefined
+}
 
 function buildContext(student: Student): Record<string, unknown> {
   const genderShort = student.gender === 'male' ? 'm' : student.gender === 'female' ? 'w' : 'd'
@@ -225,9 +279,11 @@ function recalculate(studentId: string) {
           buildContext(student)
         )
       }
-    } catch (error) {
+    } catch {
       entry.grade = undefined
     }
+  } else {
+    entry.grade = undefined
   }
 }
 
@@ -237,44 +293,155 @@ function resetAll() {
     results.value[student.id].extraMeters = 0
     recalculate(student.id)
   })
+  activeSessionId.value = null
 }
 
 async function saveAll() {
-  if (!category.value || !selectedTableId.value || !selectedConfigId.value) return
+  if (!category.value || !selectedConfigId.value) return
 
   saving.value = true
   errorMessage.value = ''
   successMessage.value = ''
 
   try {
-    const entries = students.value.map(student => {
-      const entry = results.value[student.id]
-      if (!entry || entry.distanceMeters <= 0) return null
-
-      return SportBridge.recordCooperTestResultUseCase.execute({
-        studentId: student.id,
-        categoryId: category.value!.id,
-        configId: selectedConfigId.value,
-        SportType: selectedSportType.value,
-        rounds: entry.rounds,
-        lapLengthMeters: lapLengthMeters.value,
-        extraMeters: entry.extraMeters,
-        calculatedGrade: entry.grade,
-        tableId: selectedTableId.value
+    const activeEntries = students.value
+      .filter(student => {
+        const entry = results.value[student.id]
+        return entry && entry.distanceMeters > 0
       })
-    }).filter(Boolean) as Promise<any>[]
+      .map(student => {
+        const entry = results.value[student.id]
+        return {
+          studentId: student.id,
+          rounds: entry.rounds,
+          lapLengthMeters: lapLengthMeters.value,
+          extraMeters: entry.extraMeters,
+          distanceMeters: entry.distanceMeters,
+          calculatedGrade: entry.grade
+        }
+      })
 
-    if (entries.length === 0) {
+    if (activeEntries.length === 0) {
       errorMessage.value = t('COMMON.error')
       return
     }
 
+    const session = await SportBridge.saveCooperSessionUseCase.execute({
+      classGroupId: category.value.classGroupId,
+      categoryId: category.value.id,
+      SportType: selectedSportType.value,
+      configId: selectedConfigId.value,
+      tableId: selectedTableId.value || undefined,
+      lapLengthMeters: lapLengthMeters.value,
+      entries: activeEntries
+    })
+
+    activeSessionId.value = session.id
     await Promise.all(entries)
+
+    // Persist a session record so history is visible
+    await SportBridge.toolSessionRepository.create({
+      toolType: 'cooper-test',
+      classGroupId: category.value.classGroupId,
+      sessionMetadata: {
+        configId: selectedConfigId.value,
+        tableId: selectedTableId.value,
+        sportType: selectedSportType.value,
+        categoryId: category.value.id,
+        studentCount: entries.length
+      },
+      startedAt: new Date(),
+      endedAt: new Date()
+    })
+    await loadSessionHistory()
+
     successMessage.value = t('COMMON.success')
+    await loadPastSessions()
   } catch (error) {
     errorMessage.value = t('COMMON.error')
   } finally {
     saving.value = false
+  }
+}
+
+async function loadPastSessions() {
+  if (!category.value) return
+  const allSessions = await SportBridge.toolSessionRepository.findByClassGroup(
+    category.value.classGroupId
+  )
+  pastSessions.value = allSessions
+    .filter(
+      s =>
+        s.toolType === 'cooper-test' &&
+        (s.sessionMetadata as CooperSessionMetadata).categoryId === category.value!.id
+    )
+    .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+}
+
+async function loadSession(session: Sport.ToolSession) {
+  const meta = session.sessionMetadata as CooperSessionMetadata
+  if (!meta) return
+
+  // Restore config from session
+  selectedSportType.value = meta.SportType ?? selectedSportType.value
+  selectedTableId.value = meta.tableId ?? ''
+  lapLengthMeters.value = meta.lapLengthMeters ?? lapLengthMeters.value
+
+  await loadConfigs(selectedSportType.value)
+  if (meta.configId) {
+    selectedConfigId.value = meta.configId
+  }
+
+  // Restore student entries from performance entries tagged with this session
+  const allEntries = await SportBridge.performanceEntryRepository.findByCategory(category.value!.id)
+  const sessionEntries = allEntries.filter(
+    e => sessionIdOf(e) === session.id
+  )
+
+  initResults(sessionEntries)
+  activeSessionId.value = session.id
+}
+
+function sessionSportType(session: Sport.ToolSession): string {
+  const meta = session.sessionMetadata as CooperSessionMetadata
+  if (!meta?.SportType) return ''
+  return meta.SportType === 'running' ? t('COOPER.running') : t('COOPER.swimming')
+}
+
+function sessionEntryCount(session: Sport.ToolSession): number {
+  const meta = session.sessionMetadata as CooperSessionMetadata
+  return meta?.entryCount ?? 0
+}
+
+function formatSessionDate(date: Date): string {
+  return new Date(date).toLocaleDateString('de-DE', {
+    weekday: 'short',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
+function formatSessionDate(date: Date): string {
+  return date.toLocaleString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+async function loadSessionHistory() {
+  if (!category.value) return
+  try {
+    const all = await SportBridge.toolSessionRepository.findByClassGroup(category.value.classGroupId)
+    sessionHistory.value = all
+      .filter(s => s.toolType === 'cooper-test')
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+      .slice(0, 5)
+  } catch {
+    sessionHistory.value = []
   }
 }
 
@@ -357,22 +524,55 @@ onMounted(async () => {
       return
     }
 
-    students.value = await studentsBridge.studentRepository.findByClassGroup(category.value.classGroupId)
+    students.value = await studentsBridge.studentRepository.findByClassGroup(
+      category.value.classGroupId
+    )
     tables.value = await SportBridge.tableDefinitionRepository.findAll()
-    const existingEntries = await SportBridge.performanceEntryRepository.findByCategory(category.value.id)
 
     const config = category.value.configuration as Sport.CooperGradingConfig
     selectedTableId.value = config.gradingTable ?? ''
     selectedSportType.value = config.SportType ?? 'running'
 
     await loadConfigs(selectedSportType.value)
+    await loadPastSessions()
 
-    const lapLengthFromEntry = existingEntries.find(entry => entry.measurements?.lapLengthMeters)?.measurements?.lapLengthMeters
-    if (lapLengthFromEntry) {
-      lapLengthMeters.value = Number(lapLengthFromEntry) || lapLengthMeters.value
+    // Pre-fill with the most recent session's entries (if any)
+    if (pastSessions.value.length > 0) {
+      const latest = pastSessions.value[0]
+      const meta = latest.sessionMetadata as CooperSessionMetadata
+      if (meta.lapLengthMeters) {
+        lapLengthMeters.value = meta.lapLengthMeters
+      }
+      if (meta.configId) {
+        selectedConfigId.value = meta.configId
+      }
+      if (meta.tableId) {
+        selectedTableId.value = meta.tableId
+      }
+      const allEntries = await SportBridge.performanceEntryRepository.findByCategory(
+        category.value.id
+      )
+      const sessionEntries = allEntries.filter(
+        e => sessionIdOf(e) === latest.id
+      )
+      initResults(sessionEntries)
+      activeSessionId.value = latest.id
+    } else {
+      // Legacy: load latest entries even if they have no session tag
+      const existingEntries = await SportBridge.performanceEntryRepository.findByCategory(
+        category.value.id
+      )
+      const lapLengthFromEntry = existingEntries.find(
+        entry => entry.measurements?.lapLengthMeters
+      )?.measurements?.lapLengthMeters
+      if (lapLengthFromEntry) {
+        lapLengthMeters.value = Number(lapLengthFromEntry) || lapLengthMeters.value
+      }
+      initResults(existingEntries)
     }
 
     initResults(existingEntries)
+    await loadSessionHistory()
   } catch (error) {
     errorMessage.value = t('COMMON.error')
   } finally {
@@ -407,6 +607,11 @@ onMounted(async () => {
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.history-card {
+  margin-top: 0;
 }
 
 .config-row {
@@ -495,6 +700,49 @@ onMounted(async () => {
   color: #333;
 }
 
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+  min-height: 36px;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.session-item--active {
+  border-color: #667eea;
+  background: #f0f2ff;
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.session-date {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.session-meta {
+  font-size: 0.85rem;
+  color: #666;
+}
+
 .loading-state {
   display: flex;
   align-items: center;
@@ -531,9 +779,55 @@ onMounted(async () => {
   color: #2e7d32;
 }
 
+.empty-state {
+  color: #666;
+  font-style: italic;
+.session-history {
+  margin-top: 1.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.session-history h3 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  color: #555;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.session-date {
+  color: #444;
+}
+
+.session-info {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.empty-state-small {
+  color: #888;
+  font-size: 0.875rem;
+}
+
 @media (max-width: 768px) {
   .form-actions {
     flex-direction: column;
   }
 }
 </style>
+
