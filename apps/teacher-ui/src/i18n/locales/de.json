@@ -715,7 +715,13 @@
     "Sportart": "Sportart",
     "running": "Laufen",
     "swimming": "Schwimmen",
-    "config": "Konfiguration"
+    "config": "Konfiguration",
+    "session-history": "Sitzungshistorie",
+    "session-new": "Neue Sitzung",
+    "session-load": "Laden",
+    "session-count": "{count} Schüler",
+    "no-sessions": "Noch keine Sitzungen gespeichert.",
+    "session-date": "Datum"
   },
   "SHUTTLE": {
     "bewerte-shuttle": "Bewerte Shuttle-Run vom",

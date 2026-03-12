@@ -626,7 +626,13 @@
     "Sportart": "Sport Type",
     "running": "Running",
     "swimming": "Swimming",
-    "config": "Configuration"
+    "config": "Configuration",
+    "session-history": "Session history",
+    "session-new": "New session",
+    "session-load": "Load",
+    "session-count": "{count} students",
+    "no-sessions": "No sessions saved yet.",
+    "session-date": "Date"
   },
   "SHUTTLE": {
     "bewerte-shuttle": "Grade Shuttle-Run from",

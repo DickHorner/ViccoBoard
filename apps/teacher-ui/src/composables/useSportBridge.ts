@@ -32,6 +32,8 @@ import {
   RecordTimerResultUseCase,
   RecordFeedbackSessionUseCase,
   SaveTeamAssignmentUseCase,
+  SaveCooperSessionUseCase,
+  SaveTacticsSnapshotUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -85,6 +87,7 @@ interface SportBridge {
 
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
+  saveCooperSessionUseCase: SaveCooperSessionUseCase
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
   timeGradingService: TimeGradingService
@@ -146,6 +149,11 @@ export function initializeSportBridge(): SportBridge {
   const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
   const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
   const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
+  const saveCooperSessionUseCase = new SaveCooperSessionUseCase(
+    toolSessionRepo,
+    performanceEntryRepo,
+    cooperTestConfigRepo
+  )
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -188,6 +196,7 @@ export function initializeSportBridge(): SportBridge {
     recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
+    saveCooperSessionUseCase,
 
     // Services
     criteriaGradingEngine,
@@ -196,8 +205,8 @@ export function initializeSportBridge(): SportBridge {
     shuttleRunService,
     sportabzeichenService,
     SportabzeichenService: sportabzeichenService,
-    bjsGradingService
-    sportStatisticsService
+    bjsGradingService,
+    sportStatisticsService,
     teamBuilderService
   }
 

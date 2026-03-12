@@ -65,6 +65,13 @@ export type { SaveTacticsSnapshotInput } from './use-cases/save-tactics-snapshot
 export { SaveTeamAssignmentUseCase } from './use-cases/save-team-assignment.use-case.js';
 export type { SaveTeamAssignmentInput, TeamSessionMetadata } from './use-cases/save-team-assignment.use-case.js';
 
+export { SaveCooperSessionUseCase } from './use-cases/save-cooper-session.use-case.js';
+export type {
+  SaveCooperSessionInput,
+  CooperSessionStudentEntry,
+  CooperSessionMetadata
+} from './use-cases/save-cooper-session.use-case.js';
+
 export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
 export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';
 export { SaveSportGradeUseCase } from './use-cases/save-sport-grade.use-case.js';
