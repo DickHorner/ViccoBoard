@@ -28,6 +28,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Einstellungen' }
   },
   {
+    path: '/settings/catalogs',
+    name: 'catalog-management',
+    component: () => import('../views/CatalogManagement.vue'),
+    meta: { title: 'Katalogverwaltung' }
+  },
+  {
     path: '/subjects/sport',
     name: 'subject-sport',
     component: () => import('../views/SportHub.vue'),
