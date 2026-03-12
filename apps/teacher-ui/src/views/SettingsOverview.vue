@@ -8,6 +8,15 @@
     </header>
 
     <div class="settings-grid">
+      <RouterLink
+        :to="{ name: 'catalog-management' }"
+        class="settings-card settings-card-link"
+      >
+        <p class="eyebrow">verfügbar</p>
+        <h2>Katalogverwaltung</h2>
+        <p>Status- und Kriterienkataloge für Anwesenheit, Mitarbeit und Verhalten konfigurieren, sortieren und aktivieren/deaktivieren.</p>
+      </RouterLink>
+
       <article v-for="card in settingsCards" :key="card.title" class="settings-card">
         <p class="eyebrow">{{ card.status }}</p>
         <h2>{{ card.title }}</h2>
@@ -72,6 +81,22 @@ const settingsCards = [
   padding: 1.25rem;
 }
 
+.settings-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  border-color: #0f766e;
+  transition: box-shadow 0.15s;
+}
+
+.settings-card-link:hover {
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.12);
+}
+
+.settings-card-link h2 {
+  color: #0f766e;
+}
+
 .eyebrow {
   margin: 0 0 0.5rem;
   text-transform: uppercase;
@@ -81,4 +106,5 @@ const settingsCards = [
   font-weight: 700;
 }
 </style>
+
 

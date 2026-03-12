@@ -134,7 +134,22 @@
                   :class="{ 'highlight-row': hasUnsavedChangesForStudent(student.id) }"
                 >
                   <td class="student-name">
-                    {{ student.firstName }} {{ student.lastName }}
+                    <div class="student-name-cell">
+                      {{ student.firstName }} {{ student.lastName }}
+                      <div v-if="participationOptions.length > 0" class="participation-badges">
+                        <button
+                          v-for="opt in participationOptions"
+                          :key="opt.code"
+                          :class="['participation-chip', { selected: participationStatus.get(student.id) === opt.code }]"
+                          :style="participationStatus.get(student.id) === opt.code
+                            ? { background: opt.color || '#94a3b8', color: '#fff', borderColor: opt.color || '#94a3b8' }
+                            : { borderColor: opt.color || '#94a3b8' }"
+                          :title="opt.name"
+                          @click="setParticipation(student.id, opt.code)"
+                          type="button"
+                        >{{ opt.icon || opt.code }}</button>
+                      </div>
+                    </div>
                   </td>
                   <td 
                     v-for="criterion in criteria" 
@@ -304,10 +319,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSportBridge } from '../composables/useSportBridge';
-import { useStudents } from '../composables/useStudentsBridge';
+import { useStudents, getStudentsBridge } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import { v4 as uuidv4 } from 'uuid';
-import type { Sport} from '@viccoboard/core';
+import type { Sport, StatusOption } from '@viccoboard/core';
 
 const route = useRoute();
 const { SportBridge, gradeCategories, performanceEntries } = useSportBridge();
@@ -330,6 +345,11 @@ const showAddCriterionModal = ref(false);
 const showCommentModal = ref(false);
 const currentCommentStudentId = ref<string | null>(null);
 const currentComment = ref('');
+
+// Participation catalog (second catalog context)
+const participationOptions = ref<StatusOption[]>([]);
+const participationStatus = ref<Map<string, string>>(new Map());
+const participationCatalogId = ref<string | null>(null);
 
 const newCriterion = ref({
   name: '',
@@ -395,6 +415,21 @@ async function loadData() {
         }
       }
     }
+    // Load participation catalog for this class
+    try {
+      const studentsBridge = getStudentsBridge();
+      const catalog = await studentsBridge.statusCatalogRepository.getOrCreateForClassGroup(
+        category.value.classGroupId,
+        'participation'
+      );
+      participationCatalogId.value = catalog.id;
+      participationOptions.value = catalog.statuses
+        .filter(s => s.active)
+        .sort((a, b) => a.order - b.order);
+    } catch (e) {
+      // Participation catalog is optional; log but don't block grading
+      console.warn('[CriteriaGrading] Participation catalog could not be loaded:', e)
+    }
   } catch (err) {
     error.value = 'Fehler beim Laden der Daten';
   } finally {
@@ -405,6 +440,14 @@ async function loadData() {
 function getGradeValue(studentId: string, criterionId: string): number | '' {
   const value = gradeEntries.value.get(studentId)?.get(criterionId);
   return value === undefined ? '' : value;
+}
+
+function setParticipation(studentId: string, code: string): void {
+  if (participationStatus.value.get(studentId) === code) {
+    participationStatus.value.delete(studentId);
+  } else {
+    participationStatus.value.set(studentId, code);
+  }
 }
 
 function onGradeChange(
@@ -850,6 +893,34 @@ async function saveComment() {
 .student-name {
   font-weight: 500;
   white-space: nowrap;
+}
+
+.student-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.participation-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.participation-chip {
+  padding: 0.1rem 0.4rem;
+  border-radius: 99px;
+  border: 1.5px solid;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.4;
+  transition: background 0.1s, color 0.1s;
+}
+
+.participation-chip.selected {
+  font-weight: 800;
 }
 
 .input-cell {
