@@ -90,14 +90,19 @@ export class TeamBuilderService {
     // the round-robin assignment.
     const interleaved: string[] = [];
     const buckets = [males, females, others];
-    let added = true;
-    while (added) {
-      added = false;
-      for (const bucket of buckets) {
-        const id = bucket.shift();
-        if (id !== undefined) {
-          interleaved.push(id);
-          added = true;
+    const indices = [0, 0, 0]; // queue pointers for each bucket
+    let remaining = males.length + females.length + others.length;
+    while (remaining > 0) {
+      for (let i = 0; i < buckets.length; i++) {
+        const bucket = buckets[i];
+        const index = indices[i];
+        if (index < bucket.length) {
+          interleaved.push(bucket[index]);
+          indices[i] = index + 1;
+          remaining--;
+          if (remaining === 0) {
+            break;
+          }
         }
       }
     }
