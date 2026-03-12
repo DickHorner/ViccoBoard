@@ -46,7 +46,6 @@ export class CreateTournamentUseCase {
       color: t.color
     }));
 
-    // Generate a temporary ID for the tournament so the schedule can reference it
     const { v4: uuidv4 } = await import('uuid');
     const tournamentId = uuidv4();
 
@@ -63,26 +62,15 @@ export class CreateTournamentUseCase {
       );
     }
 
-    const tournament = await this.tournamentRepository.create({
+    // Pass the pre-generated ID so matches and tournament share the same ID
+    // without requiring a second database round-trip.
+    return this.tournamentRepository.create({
+      id: tournamentId,
       classGroupId: input.classGroupId.trim(),
       name: input.name.trim(),
       type: input.type,
       teams,
       matches
     });
-
-    // Overwrite the id so all match.tournamentId values are consistent
-    // (the repository assigned a fresh UUID, so we need to sync up if they differ)
-    if (tournament.id !== tournamentId) {
-      const syncedMatches = tournament.matches.map(m => ({
-        ...m,
-        tournamentId: tournament.id
-      }));
-      return this.tournamentRepository.update(tournament.id, {
-        matches: syncedMatches
-      });
-    }
-
-    return tournament;
   }
 }

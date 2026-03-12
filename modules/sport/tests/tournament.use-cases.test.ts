@@ -203,6 +203,19 @@ describe('UpdateTournamentMatchUseCase', () => {
         updateUseCase.execute({ tournamentId: 'ghost', matchId: 'm1', score1: 1, score2: 0 })
       ).rejects.toThrow('not found');
     });
+
+    it('should throw for a draw in a knockout tournament', async () => {
+      const t = await createUseCase.execute({
+        classGroupId: DEFAULT_CLASS_ID,
+        name: 'KO Draw',
+        type: 'knockout',
+        teams: [TEAM_A, TEAM_B]
+      });
+      const firstMatch = t.matches.find(m => m.team1Id && m.team2Id && m.round === 1)!;
+      await expect(
+        updateUseCase.execute({ tournamentId: t.id, matchId: firstMatch.id, score1: 1, score2: 1 })
+      ).rejects.toThrow('Knockout matches must have a winner');
+    });
   });
 
   describe('round-robin match update', () => {

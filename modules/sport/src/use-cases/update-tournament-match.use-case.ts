@@ -40,6 +40,11 @@ export class UpdateTournamentMatchUseCase {
       throw new Error(`Tournament ${input.tournamentId} not found`);
     }
 
+    // Knockout matches must have a clear winner (no draws allowed)
+    if (tournament.type === 'knockout' && input.score1 === input.score2) {
+      throw new Error('Knockout matches must have a winner — scores cannot be equal');
+    }
+
     const matchIndex = tournament.matches.findIndex(
       m => m.id === input.matchId
     );
