@@ -34,10 +34,10 @@
 
 | Issue | Title | Status |
 |-------|-------|--------|
-| #147 | Feedback-MVP mit Auswertung liefern | ✅ implemented |
-| #146 | Statistikbereich als eigener Einstieg aufbauen | ✅ implemented |
-| #148 | Sport-Konfigurationszentrum in den Einstellungen freischalten | ✅ implemented |
-| #145 | Parity- und Status-Dokumentation an den Ist-Stand anpassen | ✅ this update |
+| #146 | Statistikbereich als eigener Einstieg aufbauen | ✅ closed |
+| #147 | Feedback-MVP mit Auswertung liefern | ⏳ open |
+| #148 | Sport-Konfigurationszentrum in den Einstellungen freischalten | ⏳ open |
+| #145 | Parity- und Status-Dokumentation an den Ist-Stand anpassen | ⏳ this update |
 
 ### Real State of Sport Features (as of March 2026)
 
@@ -46,9 +46,11 @@
 - Attendance entry with configurable status catalog
 - Grading: criteria, time-based, Cooper, Shuttle-Run, Mittelstrecke, Sportabzeichen, BJS
 - Live tools: Timer, Scoreboard, TeamBuilder, Tournaments, TacticsBoard
-- Feedback MVP: Smiley-Abfrage and Bewertungsskala with result storage and analysis view
-- Statistics: Dedicated `/subjects/sport/statistics` route with attendance, performance, and tool usage overviews
-- Sport configuration center: `/settings/sport` entry point linked from Settings
+
+**In codebase but issues still open (not yet formally closed):**
+- FeedbackTool: Smiley-Abfrage and Bewertungsskala views exist (`apps/teacher-ui/src/views/FeedbackTool.vue`); tracked by #147
+- Statistics: `/subjects/sport/statistics` route and `SportStatistics.vue` view exist; tracked by #147 acceptance criteria
+- Sport settings: `/settings/sport` route and `SportSettingsView.vue` exist; tracked by #148
 
 **Known gaps (not yet implemented, tracked in Plan.md §9):**
 - WOW (excluded by scope v2)
@@ -57,6 +59,16 @@
 - Würfeln tool (Plan.md §6.6)
 - Full security/encryption/app-lock (Plan.md §6.1)
 - Backup/restore UI (Plan.md §6.1)
+- Lesson-bound attendance (incomplete – tracked by #124)
+- Student profile with real history (placeholder – tracked by #125)
+- Lesson workspace shortcuts (tracked by #126)
+- Table management screen (tracked by #129)
+- Category lifecycle (edit/delete/template – tracked by #130)
+- Team builder persistence (tracked by #139)
+- Scoreboard session model (tracked by #140)
+- Tournament planning (tracked by #141)
+- Dice tool (tracked by #142)
+- Tactics board snapshots (tracked by #143)
 
 ---
 

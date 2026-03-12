@@ -559,7 +559,7 @@ Implement comment system and table-based correction view.
 ## Phase 7: Sport Epic – Feedback, Statistiken, Konfiguration
 
 ### Issue P7-1: Feedback-MVP mit Auswertung (GitHub #147)
-**Priority:** HIGH | **Effort:** 2 days | **Status:** COMPLETE ✅
+**Priority:** HIGH | **Effort:** 2 days | **Status:** ⏳ OPEN
 
 **Description:**
 Replace the placeholder FeedbackTool with working feedback methods, result storage, and analysis view.
@@ -590,7 +590,7 @@ Replace the placeholder FeedbackTool with working feedback methods, result stora
 ---
 
 ### Issue P7-2: Statistikbereich als eigener Einstieg (GitHub #146)
-**Priority:** HIGH | **Effort:** 2 days | **Status:** COMPLETE ✅
+**Priority:** HIGH | **Effort:** 2 days | **Status:** COMPLETE ✅ (issue closed)
 
 **Description:**
 Add a dedicated statistics route and views for attendance, performance, and tool usage overviews.
@@ -619,7 +619,7 @@ Add a dedicated statistics route and views for attendance, performance, and tool
 ---
 
 ### Issue P7-3: Sport-Konfigurationszentrum freischalten (GitHub #148)
-**Priority:** HIGH | **Effort:** 1 day | **Status:** COMPLETE ✅
+**Priority:** HIGH | **Effort:** 1 day | **Status:** ⏳ OPEN
 
 **Description:**
 Replace status-only settings cards with functional RouterLink entries and a dedicated Sport settings page.
@@ -645,14 +645,17 @@ Replace status-only settings cards with functional RouterLink entries and a dedi
 ---
 
 ### Issue P7-4: Parity- und Status-Dokumentation (GitHub #145)
-**Priority:** MEDIUM | **Effort:** 0.5 days | **Status:** COMPLETE ✅
+**Priority:** MEDIUM | **Effort:** 0.5 days | **Status:** ⏳ OPEN (this PR)
 
 **Description:**
 Refresh sport parity and status documentation to match the real implementation state.
 
 **Tasks:**
 - [x] `docs/status/STATUS.md` updated with real sport gaps and Phase 7 issue map
-- [x] `docs/planning/ISSUES_TRACKER.md` updated with P7-1..P7-4 issues
+- [x] `docs/planning/ISSUES_TRACKER.md` updated with P7-1..P7-4 issues and correct statuses
+- [x] `docs/planning/sport_epics_and_work_packages.md` corrected Epic 5 issue number mapping
+- [x] `docs/parity-spec/sport-apk/_ledger/PARITY_LEDGER.md` workflow statuses updated
+- [x] `docs/parity-spec/sport-apk/_ledger/PARITY_MATRIX.csv` implemented flags updated
 
 **Acceptance Criteria:**
 - [x] Status docs no longer imply missing placeholders are complete

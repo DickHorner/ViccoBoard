@@ -128,16 +128,16 @@ GitHub epic:
 
 Work packages:
 
-1. [#145](https://github.com/DickHorner/ViccoBoard/issues/145) Feedback MVP with analysis
+1. [#147](https://github.com/DickHorner/ViccoBoard/issues/147) Feedback MVP with analysis
    - `Plan.md`: §6.7 Feedback
    - Goal: implement at least two feedback methods, result storage, and a basic analysis view.
 2. [#146](https://github.com/DickHorner/ViccoBoard/issues/146) Statistics shell
    - `Plan.md`: §6.7 Statistiken
    - Goal: add a dedicated statistics area for attendance, usage, and performance overviews.
-3. [#147](https://github.com/DickHorner/ViccoBoard/issues/147) Sport configuration center
+3. [#148](https://github.com/DickHorner/ViccoBoard/issues/148) Sport configuration center
    - `Plan.md`: §6.1 settings, §6.2 attendance status catalogs, §6.4 tables, §6.5 Shuttle-Run config
    - Goal: `SettingsOverview` becomes a real control center for sport-relevant configuration.
-4. [#148](https://github.com/DickHorner/ViccoBoard/issues/148) Sport parity documentation refresh
+4. [#145](https://github.com/DickHorner/ViccoBoard/issues/145) Sport parity documentation refresh
    - `Plan.md`: traceability requirement across §6
    - Goal: align parity docs and status docs with actual implementation status and open gaps.
 

@@ -1,14 +1,14 @@
 # Sport APK → ViccoBoard Parity Ledger
 
-**Version:** 1.0.0  
-**Date:** 2026-02-07  
+**Version:** 1.1.0  
+**Date:** 2026-03-12 (refreshed from 2026-02-07 baseline)  
 **Scope:** v2 (WOW excluded)
 
 ## Executive Summary
 
-This ledger tracks 100% functional and options parity between the Sport APK and ViccoBoard implementation.
+This ledger tracks functional and options parity between the Sport APK and ViccoBoard implementation.
 
-**Status:** Initial baseline established  
+**Status (March 2026):** Partial parity. Core grading, measurements, and basic tools are implemented. Open gaps remain in calendar, video-delay, tracking, table management, full persistence for teams/scoreboard/tactics, and security/backup. See Phase Status table in §7.  
 **WOW Status:** Explicitly excluded from scope v2 (`excluded_by_scope_v2`)
 
 ---
@@ -166,29 +166,31 @@ This ledger tracks 100% functional and options parity between the Sport APK and 
 
 | Workflow | i18n Section | Scope | Status |
 |----------|--------------|-------|--------|
-| Class Management | KLASSEN, CLASSES | in_scope_v2 | 🟡 Needs field check |
-| Student Management | SCHUELER, STUDENTS | in_scope_v2 | 🟡 Needs field check |
-| Grading (Criteria) | GRADES.criteria-title | in_scope_v2 | ⚠️ TODO |
-| Grading (Time) | GRADES.time | in_scope_v2 | ⚠️ TODO |
-| Grading (Cooper) | COOPER | in_scope_v2 | ⚠️ TODO |
-| Grading (Shuttle) | SHUTTLE | in_scope_v2 | ⚠️ TODO |
-| Grading (Multistop) | MULTISTOP | in_scope_v2 | ⚠️ TODO |
-| Grading (Middle Distance) | MITTELSTRECKE | in_scope_v2 | ⚠️ TODO |
-| Sportabzeichen | SportABZEICHEN | in_scope_v2 | ⚠️ TODO |
-| Bundesjugendspiele | BUNDESJUGENDSPIELE | in_scope_v2 | ⚠️ TODO |
-| King Tournament | KAISER, KING | in_scope_v2 | ⚠️ TODO |
-| Teams | TEAM | in_scope_v2 | ⚠️ TODO |
-| Tournaments | TOURNAMENTS, TOURNAMENT | in_scope_v2 | ⚠️ TODO |
-| Attendance | ANWESENHEIT | in_scope_v2 | ⚠️ TODO |
-| Lessons | STUNDEN, LESSONS | in_scope_v2 | 🟡 Basic exists |
-| Tables Import/Export | TABLES | in_scope_v2 | ⚠️ TODO |
-| Feedback | FEEDBACK | in_scope_v2 | ⚠️ TODO |
-| Calendar | KALENDER, CALENDAR | in_scope_v2 | ⚠️ TODO |
-| Timer | TIMER | in_scope_v2 | ⚠️ TODO |
-| Scoreboard | SCORES | in_scope_v2 | ⚠️ TODO |
-| Tactics Board | TACTICS | in_scope_v2 | ⚠️ TODO |
-| Video Delay | DELAY | in_scope_v2 | ⚠️ TODO |
-| Tracking | TRACKING | in_scope_v2 | ⚠️ TODO |
+| Class Management | KLASSEN, CLASSES | in_scope_v2 | ✅ Implemented (`ClassesOverview.vue`, `ClassDetail.vue`) |
+| Student Management | SCHUELER, STUDENTS | in_scope_v2 | ✅ Implemented (`StudentList.vue`, `StudentProfile.vue`) |
+| Grading (Criteria) | GRADES.criteria-title | in_scope_v2 | ✅ Implemented (`CriteriaGradingEntry.vue`) |
+| Grading (Time) | GRADES.time | in_scope_v2 | ✅ Implemented (`TimeGradingEntry.vue`) |
+| Grading (Cooper) | COOPER | in_scope_v2 | ✅ Implemented (`CooperGradingEntry.vue`, `RecordCooperTestResultUseCase`) |
+| Grading (Shuttle) | SHUTTLE | in_scope_v2 | ✅ Implemented (`ShuttleGradingEntry.vue`) |
+| Grading (Multistop) | MULTISTOP | in_scope_v2 | ✅ Implemented (`Multistop.vue`) |
+| Grading (Middle Distance) | MITTELSTRECKE | in_scope_v2 | ✅ Implemented (`MittelstreckeGradingEntry.vue`) |
+| Sportabzeichen | SportABZEICHEN | in_scope_v2 | ✅ Implemented (`SportabzeichenGradingEntry.vue`, `sportabzeichen.service.ts`) |
+| Bundesjugendspiele | BUNDESJUGENDSPIELE | in_scope_v2 | ✅ Implemented (`BJSGradingEntry.vue`) |
+| King Tournament | KAISER, KING | in_scope_v2 | ⚠️ GAP (not yet implemented) |
+| Teams | TEAM | in_scope_v2 | ✅ Basic UI (`TeamBuilder.vue`); persistence and fairness rules open (#139) |
+| Tournaments | TOURNAMENTS, TOURNAMENT | in_scope_v2 | ✅ Basic UI (`Tournaments.vue`); full session model open (#141) |
+| Attendance | ANWESENHEIT | in_scope_v2 | ✅ Basic (`AttendanceEntry.vue`); lesson-bound repair open (#124) |
+| Lessons | STUNDEN, LESSONS | in_scope_v2 | ✅ Implemented (`LessonList.vue`, `LessonWorkspace.vue`) |
+| Tables Import/Export | TABLES | in_scope_v2 | ⚠️ GAP (management screen open – #129) |
+| Feedback | FEEDBACK | in_scope_v2 | ✅ In codebase (`FeedbackTool.vue`, `RecordFeedbackSessionUseCase`); issue #147 open |
+| Calendar | KALENDER, CALENDAR | in_scope_v2 | ⚠️ GAP (not yet implemented) |
+| Timer | TIMER | in_scope_v2 | ✅ Implemented (`Timer.vue`, `record-timer-result.use-case.ts`) |
+| Scoreboard | SCORES | in_scope_v2 | ✅ Basic UI (`Scoreboard.vue`); session model open (#140) |
+| Tactics Board | TACTICS | in_scope_v2 | ✅ Basic UI (`TacticsBoard.vue`); snapshots open (#143) |
+| Video Delay | DELAY | in_scope_v2 | ⚠️ GAP (not yet implemented) |
+| Tracking | TRACKING | in_scope_v2 | ⚠️ GAP (not yet implemented) |
+| Statistics | ANALYTICS | in_scope_v2 | ✅ In codebase (`SportStatistics.vue`, `/subjects/sport/statistics`); issue #147 open |
+| Sport Settings | SETTINGS | in_scope_v2 | ✅ In codebase (`SportSettingsView.vue`, `/settings/sport`); issue #148 open |
 | **WOW** | **WOW** | **excluded_by_scope_v2** | ❌ NOT IMPLEMENTED |
 
 ---
@@ -235,15 +237,46 @@ See `PARITY_ASSERTIONS.md` for definitions of "parity" and test strategies.
 
 ---
 
-## 7. Next Steps (Phase 2+)
+## 7. Phase Status (Updated March 2026)
 
-1. ✅ Phase 1: Ledger established (this file)
-2. ⏳ Phase 2: KBR spec ingest from Plan.md
-3. ⏳ Phase 3: i18n infrastructure + string parity tests
-4. ⏳ Phase 4: Schema roundtrip tests for all 8 in-scope schemas
-5. ⏳ Phase 5-8: Workflow implementation + UI parity
-6. ⏳ Phase 9: Security/backup quality gate
-7. ⏳ Phase 10: Final report
+| Phase | Description | Status |
+|-------|-------------|--------|
+| Phase 0 | Baseline + Build | ✅ Done (2026-02-07) |
+| Phase 1 | Sport Ledger | ✅ Done (2026-02-07) |
+| Phase 2 | KBR Ledger | ✅ Done (2026-02-07) |
+| Phase 3 | i18n Infrastructure | ⚠️ GAP (no vue-i18n, strings still hardcoded in components) |
+| Phase 4 | Schema Parity | ✅ Partial (core schemas implemented; schema roundtrip tests in modules/sport/tests/) |
+| Phase 5 | Sport Workflows/UI | ✅ Partial (see workflow table above; open gaps: Calendar, Video Delay, Tracking, King Tournament, Table management, full persistence for Teams/Scoreboard/Tactics) |
+| Phase 6 | KBR Data Layer + Builder | ✅ Done (P5-1, P5-2, P5-3 complete) |
+| Phase 7 | KBR Correction + Grading | ✅ Done (P6-1..P6-4 complete) |
+| Phase 8 | KBR Fördertipps/Export/Mail | ⏳ Pending (KBR advanced features) |
+| Phase 9 | Security/Backup | ⚠️ GAP (app-lock, backup/restore not implemented) |
+| Phase 10 | Finalization + Report | ⏳ Pending |
+
+### Open Gaps (backlog tracking issues)
+
+| Gap | Tracking Issue |
+|-----|----------------|
+| Feedback formal close | #147 |
+| Sport configuration formal close | #148 |
+| Parity/status docs (this PR) | #145 |
+| Lesson-bound attendance | #124 |
+| Student profile with real history | #125 |
+| Lesson workspace shortcuts | #126 |
+| Class detail as sport workbench | #127 |
+| Table management screen | #129 |
+| Category lifecycle (edit/delete/template) | #130 |
+| Verbal assessments | #131 |
+| Cross-context criteria catalogs | #132 |
+| Shuttle-run config and session management | #134 |
+| Cooper workflow end-to-end | #135 |
+| Middle-distance flow | #136 |
+| Sportabzeichen and BJS completion | #137 |
+| Team builder persistence | #139 |
+| Scoreboard session model | #140 |
+| Tournament planning MVP | #141 |
+| Dice tool | #142 |
+| Tactics board snapshots | #143 |
 
 ---
 

@@ -209,39 +209,39 @@ schema_field,newDayData.additionalExercises,no,in_scope_v2,yes,modules/sport/src
 schema_field,wow.name,yes,excluded_by_scope_v2,no,N/A,N/A
 schema_field,wow.wowtyp,yes,excluded_by_scope_v2,no,N/A,N/A
 schema_field,wow.wowtimer,no,excluded_by_scope_v2,no,N/A,N/A
-workflow,class_create,yes,in_scope_v2,no,N/A,N/A
-workflow,class_edit,yes,in_scope_v2,no,N/A,N/A
-workflow,class_delete,yes,in_scope_v2,no,N/A,N/A
-workflow,student_create,yes,in_scope_v2,no,N/A,N/A
+workflow,class_create,yes,in_scope_v2,yes,apps/teacher-ui/src/views/ClassesOverview.vue,N/A
+workflow,class_edit,yes,in_scope_v2,yes,apps/teacher-ui/src/views/ClassDetail.vue,N/A
+workflow,class_delete,yes,in_scope_v2,yes,apps/teacher-ui/src/views/ClassDetail.vue,N/A
+workflow,student_create,yes,in_scope_v2,yes,apps/teacher-ui/src/views/StudentList.vue,N/A
 workflow,student_csv_import,yes,in_scope_v2,no,N/A,N/A
-workflow,student_edit,yes,in_scope_v2,no,N/A,N/A
-workflow,student_delete,yes,in_scope_v2,no,N/A,N/A
-workflow,grade_criteria_entry,yes,in_scope_v2,no,N/A,N/A
-workflow,grade_time_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,student_edit,yes,in_scope_v2,yes,apps/teacher-ui/src/views/StudentList.vue,N/A
+workflow,student_delete,yes,in_scope_v2,yes,apps/teacher-ui/src/views/StudentList.vue,N/A
+workflow,grade_criteria_entry,yes,in_scope_v2,yes,apps/teacher-ui/src/views/CriteriaGradingEntry.vue,N/A
+workflow,grade_time_entry,yes,in_scope_v2,yes,apps/teacher-ui/src/views/TimeGradingEntry.vue,N/A
 workflow,grade_cooper_entry,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/CooperGradingEntry.vue (Sport type+config+save); modules/sport/src/use-cases/RecordCooperTestResultUseCase.ts",docs/evidence/P4-2-evidence.md;modules/sport/tests/ (24 passing tests)
-workflow,grade_shuttle_entry,yes,in_scope_v2,no,apps/teacher-ui/src/views/ShuttleGradingEntry.vue (timer+save),docs/evidence/p4-1/workflow-checklist.md;docs/evidence/p4-1/persistence-proof.md;docs/evidence/p4-1/timer-audio-proof.md
-workflow,grade_multistop_entry,yes,in_scope_v2,no,N/A,N/A
-workflow,grade_middle_distance_entry,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_shuttle_entry,yes,in_scope_v2,yes,apps/teacher-ui/src/views/ShuttleGradingEntry.vue (timer+save),docs/evidence/p4-1/workflow-checklist.md;docs/evidence/p4-1/persistence-proof.md;docs/evidence/p4-1/timer-audio-proof.md
+workflow,grade_multistop_entry,yes,in_scope_v2,yes,apps/teacher-ui/src/views/Multistop.vue,N/A
+workflow,grade_middle_distance_entry,yes,in_scope_v2,yes,apps/teacher-ui/src/views/MittelstreckeGradingEntry.vue,N/A
 workflow,grade_Sportabzeichen,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/SportabzeichenGradingEntry.vue (age calc+standards+PDF); modules/sport/src/use-cases/RecordSportabzeichenResultUseCase.ts; modules/sport/src/services/sportabzeichen.service.ts (age+eval+overall+PDF)",docs/evidence/P4-3-evidence.md;modules/sport/tests/ (190 passing tests)
-workflow,grade_bundesjugendspiele,yes,in_scope_v2,no,N/A,N/A
+workflow,grade_bundesjugendspiele,yes,in_scope_v2,yes,apps/teacher-ui/src/views/BJSGradingEntry.vue,N/A
 workflow,grade_king_tournament,yes,in_scope_v2,no,N/A,N/A
-workflow,category_create,yes,in_scope_v2,no,N/A,N/A
-workflow,category_edit,yes,in_scope_v2,no,N/A,N/A
-workflow,category_delete,yes,in_scope_v2,no,N/A,N/A
+workflow,category_create,yes,in_scope_v2,yes,apps/teacher-ui/src/views/GradingOverview.vue,N/A
+workflow,category_edit,yes,in_scope_v2,yes,"modules/sport/src/use-cases/update-grade-category.use-case.ts",N/A
+workflow,category_delete,yes,in_scope_v2,yes,"modules/sport/src/use-cases/delete-grade-category.use-case.ts",N/A
 workflow,table_import,yes,in_scope_v2,no,N/A,N/A
 workflow,table_create,yes,in_scope_v2,no,N/A,N/A
 workflow,table_delete,yes,in_scope_v2,no,N/A,N/A
-workflow,team_create,yes,in_scope_v2,no,N/A,N/A
-workflow,tournament_create,yes,in_scope_v2,no,N/A,N/A
-workflow,tournament_manage_matches,yes,in_scope_v2,no,N/A,N/A
-workflow,attendance_mark,yes,in_scope_v2,no,N/A,N/A
-workflow,lesson_create,yes,in_scope_v2,no,N/A,N/A
-workflow,lesson_edit,yes,in_scope_v2,no,N/A,N/A
-workflow,feedback_collect,yes,in_scope_v2,no,N/A,N/A
+workflow,team_create,yes,in_scope_v2,yes,apps/teacher-ui/src/views/TeamBuilder.vue,N/A
+workflow,tournament_create,yes,in_scope_v2,yes,apps/teacher-ui/src/views/Tournaments.vue,N/A
+workflow,tournament_manage_matches,yes,in_scope_v2,yes,apps/teacher-ui/src/views/Tournaments.vue,N/A
+workflow,attendance_mark,yes,in_scope_v2,yes,apps/teacher-ui/src/views/AttendanceEntry.vue,N/A
+workflow,lesson_create,yes,in_scope_v2,yes,apps/teacher-ui/src/views/LessonList.vue,N/A
+workflow,lesson_edit,yes,in_scope_v2,yes,apps/teacher-ui/src/views/LessonWorkspace.vue,N/A
+workflow,feedback_collect,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/FeedbackTool.vue; modules/sport/src/use-cases/record-feedback-session.use-case.ts",N/A
 workflow,calendar_event_create,yes,in_scope_v2,no,N/A,N/A
 workflow,timer_tool,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/Timer.vue (UI controls + save); modules/sport/src/use-cases/record-timer-result.use-case.ts (persistence)","docs/evidence/P4-4-evidence.md;modules/sport/tests/record-timer-result.use-case.test.ts"
-workflow,scoreboard_tool,yes,in_scope_v2,no,N/A,N/A
-workflow,tactics_board_tool,yes,in_scope_v2,no,N/A,N/A
+workflow,scoreboard_tool,yes,in_scope_v2,yes,apps/teacher-ui/src/views/Scoreboard.vue,N/A
+workflow,tactics_board_tool,yes,in_scope_v2,yes,apps/teacher-ui/src/views/TacticsBoard.vue,N/A
 workflow,video_delay_tool,yes,in_scope_v2,no,N/A,N/A
 workflow,tracking_pushups,yes,in_scope_v2,no,N/A,N/A
 workflow,export_csv,yes,in_scope_v2,no,N/A,N/A
