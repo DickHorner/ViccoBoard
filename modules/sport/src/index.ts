@@ -77,6 +77,12 @@ export type { SaveTacticsSnapshotInput } from './use-cases/save-tactics-snapshot
 export { SaveTeamAssignmentUseCase } from './use-cases/save-team-assignment.use-case.js';
 export type { SaveTeamAssignmentInput, TeamSessionMetadata } from './use-cases/save-team-assignment.use-case.js';
 
+export { SaveCooperSessionUseCase } from './use-cases/save-cooper-session.use-case.js';
+export type {
+  SaveCooperSessionInput,
+  CooperSessionStudentEntry,
+  CooperSessionMetadata
+} from './use-cases/save-cooper-session.use-case.js';
 export { SaveMultistopSessionUseCase } from './use-cases/save-multistop-session.use-case.js';
 export type { SaveMultistopSessionInput, MultistopStudentResult } from './use-cases/save-multistop-session.use-case.js';
 
