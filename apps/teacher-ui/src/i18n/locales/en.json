@@ -916,7 +916,20 @@
     "video-review": "Video review",
     "speed": "Speed",
     "adjust-times": "Adjust times",
-    "set-time": "Set time"
+    "set-time": "Set time",
+    "save-session": "Save session",
+    "saved-sessions": "Saved sessions",
+    "session-saved": "Session saved",
+    "session-save-error": "Error saving session",
+    "reopen-session": "Reopen session",
+    "session-reopened": "Session loaded",
+    "session-reopen-error": "Error loading session",
+    "transfer-to-mittelstrecke": "Transfer to middle-distance grading",
+    "select-category": "Select grade category",
+    "confirm-transfer": "Transfer",
+    "no-times-to-save": "No times to save",
+    "no-times-to-transfer": "No times to transfer",
+    "no-class-selected": "No class selected"
   },
   "WOW": {
     "no-wow-title": "No WOWs yet",

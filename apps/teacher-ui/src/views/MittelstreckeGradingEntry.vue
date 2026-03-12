@@ -109,6 +109,7 @@ const hasChanges = ref(false);
 
 onMounted(async () => {
   await loadData();
+  applyPrefilledTimes();
 });
 
 async function loadData() {
@@ -248,6 +249,34 @@ async function saveAll() {
     toast.error('Fehler beim Speichern');
   } finally {
     saving.value = false;
+  }
+}
+
+/**
+ * Apply pre-filled times from route query (passed by Multistop handoff).
+ * Query param: prefilledTimes = JSON string of { [studentId]: timeInSeconds }
+ * Only sets times for students that don't already have a saved entry.
+ * Negative or infinite values are rejected.
+ */
+function applyPrefilledTimes() {
+  const raw = route.query.prefilledTimes;
+  if (!raw || typeof raw !== 'string') return;
+
+  let parsed: Record<string, number>;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    console.warn('[MittelstreckeGradingEntry] Failed to parse prefilledTimes query param:', err);
+    return;
+  }
+
+  for (const [studentId, timeInSeconds] of Object.entries(parsed)) {
+    if (typeof timeInSeconds !== 'number' || !Number.isFinite(timeInSeconds) || timeInSeconds <= 0) continue;
+    // Only prefill if no existing entry for this student
+    if (!times.value[studentId]) {
+      times.value[studentId] = formatSecondsToTime(timeInSeconds);
+      hasChanges.value = true;
+    }
   }
 }
 

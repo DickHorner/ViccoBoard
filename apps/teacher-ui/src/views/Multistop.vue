@@ -157,9 +157,21 @@
     <div v-if="capturedTimes.length > 0" class="card">
       <div class="card-header">
         <h3>{{ t('MULTISTOP.captured-times') }}</h3>
-        <button @click="exportTimes" class="btn-secondary btn-small">
-          📊 {{ t('COMMON.export') || 'Export' }}
-        </button>
+        <div class="card-header-actions">
+          <button @click="exportTimes" class="btn-secondary btn-small">
+            📊 {{ t('COMMON.export') || 'Export' }}
+          </button>
+          <button @click="saveSession" class="btn-success btn-small">
+            💾 {{ t('MULTISTOP.save-session') }}
+          </button>
+          <button
+            v-if="gradeCategories.length > 0"
+            @click="openTransferDialog"
+            class="btn-primary btn-small"
+          >
+            🏃 {{ t('MULTISTOP.transfer-to-mittelstrecke') }}
+          </button>
+        </div>
       </div>
       <div class="captured-times-list">
         <div 
@@ -184,6 +196,60 @@
       </div>
     </div>
 
+    <!-- Saved Sessions Panel -->
+    <div v-if="selectedClassId && savedSessions.length > 0" class="card">
+      <div class="card-header">
+        <h3>{{ t('MULTISTOP.saved-sessions') }}</h3>
+        <button @click="showSessionsPanel = !showSessionsPanel" class="btn-secondary btn-small">
+          {{ showSessionsPanel ? '▲' : '▼' }}
+        </button>
+      </div>
+      <div v-if="showSessionsPanel" class="sessions-list">
+        <div
+          v-for="session in savedSessions"
+          :key="session.id"
+          class="session-item"
+        >
+          <div class="session-info">
+            <strong>{{ session.sessionName }}</strong>
+            <small>{{ session.capturedCount }} {{ t('MULTISTOP.times') }}</small>
+            <small>{{ session.startedAt.toLocaleDateString() }}</small>
+          </div>
+          <button @click="reopenSession(session)" class="btn-secondary btn-small">
+            ↩ {{ t('MULTISTOP.reopen-session') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transfer to Mittelstrecke Dialog -->
+    <div v-if="showTransferDialog" class="dialog-overlay" @click.self="showTransferDialog = false">
+      <div class="dialog">
+        <h3>{{ t('MULTISTOP.transfer-to-mittelstrecke') }}</h3>
+        <div class="form-group">
+          <label>{{ t('MULTISTOP.select-category') }}</label>
+          <select v-model="selectedTransferCategoryId" class="form-input">
+            <option value="">—</option>
+            <option v-for="cat in gradeCategories" :key="cat.id" :value="cat.id">
+              {{ cat.name }}
+            </option>
+          </select>
+        </div>
+        <div class="dialog-actions">
+          <button @click="showTransferDialog = false" class="btn-secondary">
+            {{ t('COMMON.cancel') || 'Abbrechen' }}
+          </button>
+          <button
+            @click="confirmTransfer"
+            class="btn-primary"
+            :disabled="!selectedTransferCategoryId"
+          >
+            🏃 {{ t('MULTISTOP.confirm-transfer') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast Notification -->
     <div v-if="toast.show" class="toast" :class="toast.type">
       {{ toast.message }}
@@ -194,11 +260,14 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import type { ClassGroup, Student } from '@viccoboard/core'
+import type { MultistopCapturedTime } from '@viccoboard/sport'
 
 const { t } = useI18n()
+const router = useRouter()
 
 // Initialize bridges
 initializeSportBridge()
@@ -236,6 +305,28 @@ const toast = ref({
   message: '',
   type: 'success' as 'success' | 'error'
 })
+
+// Grade categories for Mittelstrecke handoff
+interface GradeCategory {
+  id: string
+  name: string
+  type: string
+  classGroupId: string
+}
+const gradeCategories = ref<GradeCategory[]>([])
+const showTransferDialog = ref(false)
+const selectedTransferCategoryId = ref('')
+
+// Saved sessions for reopen
+interface SavedSession {
+  id: string
+  sessionName: string
+  classGroupId: string
+  capturedCount: number
+  startedAt: Date
+}
+const savedSessions = ref<SavedSession[]>([])
+const showSessionsPanel = ref(false)
 
 // Computed
 const availableStudents = computed(() => {
@@ -288,9 +379,42 @@ async function loadStudents() {
   try {
     students.value = await studentsBridge.studentRepository.findByClassGroup(selectedClassId.value)
     initializeTimers()
+    await loadGradeCategories()
+    await loadSavedSessions()
   } catch (error) {
     showToast('Error loading students', 'error')
     console.error(error)
+  }
+}
+
+async function loadGradeCategories() {
+  if (!selectedClassId.value) return
+  try {
+    const allCategories: GradeCategory[] = await SportBridge.gradeCategoryRepository.findAll()
+    gradeCategories.value = allCategories.filter(
+      c => c.classGroupId === selectedClassId.value && c.type === 'mittelstrecke'
+    )
+  } catch {
+    gradeCategories.value = []
+  }
+}
+
+async function loadSavedSessions() {
+  if (!selectedClassId.value) return
+  try {
+    const sessions = await SportBridge.toolSessionRepository.findByClassGroup(selectedClassId.value)
+    savedSessions.value = sessions
+      .filter(s => s.toolType === 'multistop')
+      .map(s => ({
+        id: s.id,
+        sessionName: (s.sessionMetadata as { sessionName: string }).sessionName ?? '',
+        classGroupId: s.classGroupId ?? '',
+        capturedCount: ((s.sessionMetadata as { capturedTimes?: unknown[] }).capturedTimes ?? []).length,
+        startedAt: s.startedAt
+      }))
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+  } catch {
+    savedSessions.value = []
   }
 }
 
@@ -397,6 +521,93 @@ function saveAllTimes() {
 function deleteRecord(index: number) {
   capturedTimes.value.splice(index, 1)
   showToast('Record deleted', 'success')
+}
+
+// Session persistence
+async function saveSession() {
+  if (capturedTimes.value.length === 0) {
+    showToast(t('MULTISTOP.no-times-to-save'), 'error')
+    return
+  }
+  if (!selectedClassId.value) {
+    showToast(t('MULTISTOP.no-class-selected'), 'error')
+    return
+  }
+
+  const className = classes.value.find(c => c.id === selectedClassId.value)?.name ?? ''
+  const sessionName = `${className} – ${new Date().toLocaleDateString()}`
+
+  try {
+    await SportBridge.saveMultistopSessionUseCase.execute({
+      classGroupId: selectedClassId.value,
+      sessionName,
+      capturedTimes: capturedTimes.value.map(r => ({
+        studentId: r.studentId,
+        studentName: r.studentName,
+        timeMs: r.time,
+        capturedAt: r.timestamp,
+        laps: r.laps
+      }))
+    })
+    showToast(t('MULTISTOP.session-saved'), 'success')
+    await loadSavedSessions()
+  } catch (error) {
+    showToast(t('MULTISTOP.session-save-error'), 'error')
+    console.error(error)
+  }
+}
+
+async function reopenSession(session: SavedSession) {
+  try {
+    const s = await SportBridge.toolSessionRepository.findById(session.id)
+    if (!s) return
+    const meta = s.sessionMetadata as { capturedTimes?: MultistopCapturedTime[] }
+    if (!meta.capturedTimes) return
+
+    capturedTimes.value = meta.capturedTimes.map(ct => ({
+      studentId: ct.studentId,
+      studentName: ct.studentName,
+      time: ct.timeMs,
+      timestamp: ct.capturedAt,
+      laps: ct.laps
+    }))
+    showSessionsPanel.value = false
+    showToast(t('MULTISTOP.session-reopened'), 'success')
+  } catch {
+    showToast(t('MULTISTOP.session-reopen-error'), 'error')
+  }
+}
+
+// Transfer to Mittelstrecke grading
+function openTransferDialog() {
+  if (capturedTimes.value.length === 0) {
+    showToast(t('MULTISTOP.no-times-to-transfer'), 'error')
+    return
+  }
+  selectedTransferCategoryId.value = gradeCategories.value[0]?.id ?? ''
+  showTransferDialog.value = true
+}
+
+function confirmTransfer() {
+  if (!selectedTransferCategoryId.value) return
+
+  // Build prefilledTimes: studentId -> timeInSeconds
+  const prefilledTimes: Record<string, number> = {}
+  for (const record of capturedTimes.value) {
+    // Use best (lowest) time if student has multiple entries
+    const existing = prefilledTimes[record.studentId]
+    const timeInSeconds = record.time / 1000
+    if (existing === undefined || timeInSeconds < existing) {
+      prefilledTimes[record.studentId] = timeInSeconds
+    }
+  }
+
+  router.push({
+    name: 'mittelstrecke-grading',
+    params: { id: selectedTransferCategoryId.value },
+    query: { prefilledTimes: JSON.stringify(prefilledTimes) }
+  })
+  showTransferDialog.value = false
 }
 
 // Format time in MM:SS.ms
@@ -623,6 +834,73 @@ onUnmounted(() => {
 
 .toast.error {
   background: #f44336;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+}
+
+.dialog {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-width: 280px;
+  max-width: 90vw;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dialog h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
 }
 
 @keyframes slideIn {

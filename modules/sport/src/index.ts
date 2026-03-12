@@ -73,6 +73,13 @@ export { SaveSportGradeWeightingUseCase } from './use-cases/save-sport-grade-wei
 export { SaveSportNewDayDataUseCase } from './use-cases/save-sport-new-day-data.use-case.js';
 export { SaveSportUserDataUseCase } from './use-cases/save-sport-user-data.use-case.js';
 
+export { SaveMultistopSessionUseCase } from './use-cases/save-multistop-session.use-case.js';
+export type {
+  SaveMultistopSessionInput,
+  MultistopSessionMetadata,
+  MultistopCapturedTime
+} from './use-cases/save-multistop-session.use-case.js';
+
 // Grading Engine
 export { CriteriaGradingEngine } from './grading/criteria-grading.engine.js';
 export type {

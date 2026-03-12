@@ -1034,7 +1034,20 @@
     "video-review": "Video-Überprüfung",
     "speed": "Geschwindigkeit",
     "adjust-times": "Zeiten anpassen",
-    "set-time": "Zeit setzen"
+    "set-time": "Zeit setzen",
+    "save-session": "Sitzung speichern",
+    "saved-sessions": "Gespeicherte Sitzungen",
+    "session-saved": "Sitzung gespeichert",
+    "session-save-error": "Fehler beim Speichern der Sitzung",
+    "reopen-session": "Sitzung wiedereröffnen",
+    "session-reopened": "Sitzung geladen",
+    "session-reopen-error": "Fehler beim Laden der Sitzung",
+    "transfer-to-mittelstrecke": "In Mittelstrecke-Bewertung übertragen",
+    "select-category": "Bewertungskategorie auswählen",
+    "confirm-transfer": "Übertragen",
+    "no-times-to-save": "Keine Zeiten zum Speichern",
+    "no-times-to-transfer": "Keine Zeiten zum Übertragen",
+    "no-class-selected": "Keine Klasse ausgewählt"
   },
   "WOW": {
     "no-wow-title": "Noch keine WOWs",
