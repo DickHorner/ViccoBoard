@@ -34,6 +34,7 @@ import {
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   SaveCooperSessionUseCase,
+  SaveScoreboardSessionUseCase,
   SaveMultistopSessionUseCase,
   SaveTableDefinitionUseCase,
   SaveTacticsSnapshotUseCase,
@@ -104,6 +105,7 @@ interface SportBridge {
   recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase;
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase;
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase;
+  saveScoreboardSessionUseCase: SaveScoreboardSessionUseCase;
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
@@ -179,6 +181,7 @@ export function initializeSportBridge(): SportBridge {
   );
   const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepository);
   const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepository);
+  const saveScoreboardSessionUseCase = new SaveScoreboardSessionUseCase(toolSessionRepository);
   const saveCooperSessionUseCase = new SaveCooperSessionUseCase(
     toolSessionRepository,
     performanceEntryRepository,
@@ -243,6 +246,7 @@ export function initializeSportBridge(): SportBridge {
     recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
+    saveScoreboardSessionUseCase,
     saveCooperSessionUseCase,
     saveMultistopSessionUseCase,
     importTableDefinitionUseCase,

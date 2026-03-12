@@ -1464,7 +1464,31 @@
     "sport": "Sportart (optional)"
   },
   "SCORES": {
-    "title": "Scoreboard"
+    "title": "Scoreboard",
+    "description": "Spielstaende speichern, Team-Sessions uebernehmen und Timer verknuepfen.",
+    "classGroup": "Klasse",
+    "noClassBinding": "Ohne Klassenbindung",
+    "importTeams": "Team-Session uebernehmen",
+    "importTeamsPlaceholder": "Gespeicherte Teams waehlen",
+    "noTeamSessions": "Keine passenden Team-Sessions gefunden.",
+    "timerLink": "Timer verknuepfen",
+    "timerLinkPlaceholder": "Optionalen Timer waehlen",
+    "noTimerSessions": "Keine Timer-Sessions verfuegbar.",
+    "timerLinkedSummary": "Verknuepfter Timer: {timer}",
+    "scoreHistory": "Ereignisprotokoll",
+    "reset": "Zuruecksetzen",
+    "saveSession": "Session speichern",
+    "existingSession": "Bestehende Session",
+    "sessionName": "Session-Name",
+    "sessionNamePlaceholder": "z. B. Volleyball Finale",
+    "save": "Speichern",
+    "saveSuccess": "Scoreboard-Session gespeichert.",
+    "savedSessions": "Gespeicherte Sessions",
+    "noSessions": "Noch keine Scoreboard-Sessions vorhanden.",
+    "loadSession": "Laden",
+    "eventAdded": "Punkte hinzugefuegt",
+    "eventRemoved": "Punkte abgezogen",
+    "importedTeamsNotice": "Es wurden die ersten beiden Teams aus der Session uebernommen."
   },
   "DELAY": {
     "title": "Video Delay",

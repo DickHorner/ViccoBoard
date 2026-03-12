@@ -76,6 +76,13 @@ export { SaveTacticsSnapshotUseCase } from './use-cases/save-tactics-snapshot.us
 export type { SaveTacticsSnapshotInput } from './use-cases/save-tactics-snapshot.use-case.js';
 export { SaveTeamAssignmentUseCase } from './use-cases/save-team-assignment.use-case.js';
 export type { SaveTeamAssignmentInput, TeamSessionMetadata } from './use-cases/save-team-assignment.use-case.js';
+export { SaveScoreboardSessionUseCase } from './use-cases/save-scoreboard-session.use-case.js';
+export type {
+  SaveScoreboardSessionInput,
+  ScoreboardSessionMetadata,
+  ScoreEventInput,
+  ScoreboardTeamInput
+} from './use-cases/save-scoreboard-session.use-case.js';
 export { CreateTournamentUseCase } from './use-cases/create-tournament.use-case.js';
 export type { CreateTournamentInput } from './use-cases/create-tournament.use-case.js';
 export { UpdateTournamentMatchUseCase } from './use-cases/update-tournament-match.use-case.js';
