@@ -315,6 +315,8 @@ function openGradingEntry(category: Sport.GradeCategory) {
     router.push(`/grading/Sportabzeichen/${category.id}`);
   } else if (category.type === 'bjs') {
     router.push(`/grading/bjs/${category.id}`);
+  } else if (category.type === 'verbal') {
+    router.push(`/grading/verbal/${category.id}`);
   } else {
     toast.info('Dieser Bewertungstyp wird noch nicht unterstützt.');
   }

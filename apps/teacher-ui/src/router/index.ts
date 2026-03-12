@@ -178,6 +178,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Bundesjugendspiele' }
   },
   {
+    path: '/grading/verbal/:id',
+    name: 'verbal-grading',
+    component: () => import('../views/VerbalGradingEntry.vue'),
+    meta: { title: 'Verbalbeurteilung' }
+  },
+  {
     path: '/grading/history/:id',
     name: 'grade-history',
     component: () => import('../views/GradeHistory.vue'),
