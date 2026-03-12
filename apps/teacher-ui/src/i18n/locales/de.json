@@ -833,6 +833,7 @@
 		"achtung1": "Achtung: CSV Dateien werden",
 		"achtung2": "nicht verschlüsselt!",
 		"toast-erfolgreich": "Export erfolgreich.",
+		"toast-fehler": "Fehler beim Exportieren.",
 		"stunden-alles": "alle Stunden"
 	},
 	"TABELLE": {
@@ -1190,7 +1191,9 @@
 		"link": "Nähere Infos unter www.bundesjugendspiele.de",
 		"info1": "Jede Schülerin und jeder Schüler tritt bei den Bundesjugendspielen in vier Disziplinen an und bekommt für seine Leistungen Punkte.",
 		"info2": "Diese Punkte werden zu einer Gesamtpunktzahl aufaddiert, die dann zu einer Teilnahme-, Siger- oder sogar Ehrenurkunde führt.",
-		"disziplinen-einzeln": "Disziplinen einzeln"
+		"disziplinen-einzeln": "Disziplinen einzeln",
+		"pdf-export": "Übersicht als PDF exportieren",
+		"pdf-erstelle": "Erstelle PDF..."
 	},
 	"KALENDER": {
 		"title": "Kalender",
