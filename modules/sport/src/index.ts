@@ -65,6 +65,20 @@ export type { SaveTacticsSnapshotInput } from './use-cases/save-tactics-snapshot
 export { SaveTeamAssignmentUseCase } from './use-cases/save-team-assignment.use-case.js';
 export type { SaveTeamAssignmentInput, TeamSessionMetadata } from './use-cases/save-team-assignment.use-case.js';
 
+export { SaveScoreboardSessionUseCase } from './use-cases/save-scoreboard-session.use-case.js';
+export type {
+  SaveScoreboardSessionInput,
+  ScoreboardSessionMetadata,
+  ScoreboardTeamInput,
+  ScoreEventInput
+} from './use-cases/save-scoreboard-session.use-case.js';
+
+export { RecordDiceRollUseCase } from './use-cases/record-dice-roll.use-case.js';
+export type { RecordDiceRollInput } from './use-cases/record-dice-roll.use-case.js';
+
+export { SaveTournamentUseCase } from './use-cases/save-tournament.use-case.js';
+export type { SaveTournamentInput, TournamentData } from './use-cases/save-tournament.use-case.js';
+
 export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
 export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';
 export { SaveSportGradeUseCase } from './use-cases/save-sport-grade.use-case.js';
@@ -113,6 +127,8 @@ export type {
   SportabzeichenReportEntry
 } from './services/sportabzeichen.service.js';
 export { SportStatisticsService } from './services/sport-statistics.service.js';
+export { TournamentSchedulerService } from './services/tournament-scheduler.service.js';
+export type { StandingsRow } from './services/tournament-scheduler.service.js';
 export type {
   AttendanceStats,
   AttendanceOverview,

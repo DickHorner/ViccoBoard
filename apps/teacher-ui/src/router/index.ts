@@ -220,6 +220,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Tactics' }
   },
   {
+    path: '/tools/dice',
+    name: 'dice',
+    component: () => import('../views/DiceTool.vue'),
+    meta: { title: 'Dice' }
+  },
+  {
     path: '/tools/feedback',
     name: 'feedback',
     component: () => import('../views/FeedbackTool.vue'),

@@ -124,7 +124,37 @@
       "slot_def": "Slot: Eine Welle innerhalb einer Runde, wenn mehr Spiele als Felder vorhanden sind. Pro Slot laufen parallel so viele Spiele wie Felder."
     },
     "students": "Schüler",
-    "students_per_team": "Schüler pro Team"
+    "students_per_team": "Schüler pro Team",
+    "createNew": "Neues Turnier",
+    "teamCount": "Anzahl Teams",
+    "addTeam": "Team hinzufügen",
+    "removeTeam": "Team entfernen",
+    "teamName": "Teamname",
+    "generate": "Spielplan erstellen",
+    "save": "Speichern",
+    "saveSuccess": "Turnier gespeichert",
+    "type": "Format",
+    "roundRobin": "Jeder gegen Jeden",
+    "knockout": "K.-o.-System",
+    "standings": "Tabelle",
+    "pts": "Pkt",
+    "played": "Sp",
+    "won": "S",
+    "drawn": "U",
+    "lost": "N",
+    "goalsFor": "+",
+    "goalsAgainst": "-",
+    "recordResult": "Ergebnis eintragen",
+    "score": "Ergebnis",
+    "complete": "Abschließen",
+    "noTournaments": "Kein Turnier vorhanden. Erstelle ein neues Turnier.",
+    "loadTournament": "Turnier laden",
+    "savedTournaments": "Gespeicherte Turniere",
+    "status": {
+      "planning": "Planung",
+      "in-progress": "Laufend",
+      "completed": "Abgeschlossen"
+    }
   },
   "COMMON": {
     "syncing": "Synchronisiere...",
@@ -1413,7 +1443,17 @@
     "sport": "Sportart (optional)"
   },
   "SCORES": {
-    "title": "Scoreboard"
+    "title": "Scoreboard",
+    "sessionName": "Session-Name",
+    "sessionNamePlaceholder": "z.B. Volleyball Finale",
+    "save": "Speichern",
+    "saveSuccess": "Session gespeichert",
+    "savedSessions": "Gespeicherte Sessions",
+    "noSessions": "Keine Sessions vorhanden",
+    "loadSession": "Session laden",
+    "reset": "Zurücksetzen",
+    "scoreHistory": "Verlauf",
+    "noHistory": "Kein Verlauf"
   },
   "DELAY": {
     "title": "Video Delay",
@@ -1558,5 +1598,20 @@
   },
   "SEARCH": {
     "placeholder": "Suche..."
+  },
+  "DICE": {
+    "title": "Würfeln",
+    "description": "Zahlenbereich wählen und Würfeln",
+    "min": "Min",
+    "max": "Max",
+    "roll": "Würfeln",
+    "result": "Ergebnis",
+    "log": "Protokoll",
+    "noLog": "Kein Protokoll",
+    "clearLog": "Protokoll löschen",
+    "rollCount": "Würfe",
+    "classContext": "Klasse (optional)",
+    "selectClass": "Klasse wählen...",
+    "rollSaved": "Ergebnis protokolliert"
   }
 }

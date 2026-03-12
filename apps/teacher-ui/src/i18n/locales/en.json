@@ -137,6 +137,36 @@
     "explain": {
       "round_def": "Round: A match day. All pairings of this round are to be played.",
       "slot_def": "Slot: A wave within a round when there are more matches than fields. Each slot runs as many matches in parallel as there are fields."
+    },
+    "createNew": "New Tournament",
+    "teamCount": "Number of Teams",
+    "addTeam": "Add Team",
+    "removeTeam": "Remove Team",
+    "teamName": "Team Name",
+    "generate": "Generate Schedule",
+    "save": "Save",
+    "saveSuccess": "Tournament saved",
+    "type": "Format",
+    "roundRobin": "Round Robin",
+    "knockout": "Knockout",
+    "standings": "Standings",
+    "pts": "Pts",
+    "played": "P",
+    "won": "W",
+    "drawn": "D",
+    "lost": "L",
+    "goalsFor": "+",
+    "goalsAgainst": "-",
+    "recordResult": "Record result",
+    "score": "Score",
+    "complete": "Complete",
+    "noTournaments": "No tournament yet. Create a new tournament.",
+    "loadTournament": "Load tournament",
+    "savedTournaments": "Saved Tournaments",
+    "status": {
+      "planning": "Planning",
+      "in-progress": "In Progress",
+      "completed": "Completed"
     }
   },
   "COMMON": {
@@ -1158,5 +1188,33 @@
     "createdAt": "Created at",
     "reopen": "Open",
     "sport": "Sport (optional)"
+  },
+  "SCORES": {
+    "title": "Scoreboard",
+    "sessionName": "Session Name",
+    "sessionNamePlaceholder": "e.g. Volleyball Final",
+    "save": "Save",
+    "saveSuccess": "Session saved",
+    "savedSessions": "Saved Sessions",
+    "noSessions": "No sessions yet",
+    "loadSession": "Load session",
+    "reset": "Reset",
+    "scoreHistory": "History",
+    "noHistory": "No history"
+  },
+  "DICE": {
+    "title": "Dice",
+    "description": "Choose a number range and roll",
+    "min": "Min",
+    "max": "Max",
+    "roll": "Roll",
+    "result": "Result",
+    "log": "Log",
+    "noLog": "No log entries",
+    "clearLog": "Clear log",
+    "rollCount": "Rolls",
+    "classContext": "Class (optional)",
+    "selectClass": "Select class...",
+    "rollSaved": "Result logged"
   }
 }

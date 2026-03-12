@@ -90,6 +90,18 @@ const entries = [
     description: 'Taktikboard und Feedbackmethoden fuer den laufenden Unterricht.'
   },
   {
+    to: '/tools/dice',
+    eyebrow: 'Tool',
+    title: 'Würfeln',
+    description: 'Zahlenbereich wählen, Würfeln und Ergebnisse protokollieren.'
+  },
+  {
+    to: '/tools/tournaments',
+    eyebrow: 'Tool',
+    title: 'Turnierplanung',
+    description: 'Turnierplaene erstellen, Spielergebnisse eintragen und Tabelle anzeigen.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Auswertung',
     title: 'Statistiken',

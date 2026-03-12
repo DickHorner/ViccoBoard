@@ -21,19 +21,6 @@
           <h2>{{ card.title }}</h2>
           <p>{{ card.description }}</p>
         </template>
-      <RouterLink
-        :to="{ name: 'catalog-management' }"
-        class="settings-card settings-card-link"
-      >
-        <p class="eyebrow">verfügbar</p>
-        <h2>Katalogverwaltung</h2>
-        <p>Status- und Kriterienkataloge für Anwesenheit, Mitarbeit und Verhalten konfigurieren, sortieren und aktivieren/deaktivieren.</p>
-      </RouterLink>
-
-      <article v-for="card in settingsCards" :key="card.title" class="settings-card">
-        <p class="eyebrow">{{ card.status }}</p>
-        <h2>{{ card.title }}</h2>
-        <p>{{ card.description }}</p>
       </article>
     </div>
   </section>
@@ -115,6 +102,8 @@ const settingsCards = [
 
 .card-link:hover {
   background: #f0fdfa;
+}
+
 .settings-card-link {
   text-decoration: none;
   color: inherit;

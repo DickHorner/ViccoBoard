@@ -32,6 +32,11 @@ import {
   RecordTimerResultUseCase,
   RecordFeedbackSessionUseCase,
   SaveTeamAssignmentUseCase,
+  SaveScoreboardSessionUseCase,
+  RecordDiceRollUseCase,
+  SaveTournamentUseCase,
+  SaveTacticsSnapshotUseCase,
+  TournamentSchedulerService,
   TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -85,6 +90,9 @@ interface SportBridge {
 
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
+  saveScoreboardSessionUseCase: SaveScoreboardSessionUseCase
+  recordDiceRollUseCase: RecordDiceRollUseCase
+  saveTournamentUseCase: SaveTournamentUseCase
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
   timeGradingService: TimeGradingService
@@ -95,6 +103,7 @@ interface SportBridge {
   bjsGradingService: BJSGradingService
   sportStatisticsService: SportStatisticsService
   teamBuilderService: TeamBuilderService
+  tournamentSchedulerService: TournamentSchedulerService
 }
 
 /**
@@ -146,6 +155,9 @@ export function initializeSportBridge(): SportBridge {
   const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
   const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
   const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
+  const saveScoreboardSessionUseCase = new SaveScoreboardSessionUseCase(toolSessionRepo)
+  const recordDiceRollUseCase = new RecordDiceRollUseCase(toolSessionRepo)
+  const saveTournamentUseCase = new SaveTournamentUseCase(toolSessionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -156,6 +168,7 @@ export function initializeSportBridge(): SportBridge {
   const bjsGradingService = new BJSGradingService()
   const sportStatisticsService = new SportStatisticsService()
   const teamBuilderService = new TeamBuilderService()
+  const tournamentSchedulerService = new TournamentSchedulerService()
 
   sportBridgeInstance = {
     // Repositories
@@ -188,6 +201,9 @@ export function initializeSportBridge(): SportBridge {
     recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
+    saveScoreboardSessionUseCase,
+    recordDiceRollUseCase,
+    saveTournamentUseCase,
 
     // Services
     criteriaGradingEngine,
@@ -196,9 +212,10 @@ export function initializeSportBridge(): SportBridge {
     shuttleRunService,
     sportabzeichenService,
     SportabzeichenService: sportabzeichenService,
-    bjsGradingService
-    sportStatisticsService
-    teamBuilderService
+    bjsGradingService,
+    sportStatisticsService,
+    teamBuilderService,
+    tournamentSchedulerService
   }
 
   return sportBridgeInstance
