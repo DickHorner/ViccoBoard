@@ -141,8 +141,8 @@ interface DisplayTeam {
 
 const teams = ref<DisplayTeam[]>([])
 
-const canGenerate = computed(() => selectedClassId.value && students.value.length > 0 && teamCount.value >= 2)
-const canSave = computed(() => teams.value.length > 0 && sessionName.value.trim().length > 0 && selectedClassId.value)
+const canGenerate = computed(() => Boolean(selectedClassId.value && students.value.length > 0 && teamCount.value >= 2))
+const canSave = computed(() => Boolean(teams.value.length > 0 && sessionName.value.trim().length > 0 && selectedClassId.value))
 
 async function loadClasses() {
   classes.value = await SportBridge.classGroupRepository.findAll()
