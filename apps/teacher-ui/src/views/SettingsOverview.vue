@@ -8,7 +8,12 @@
     </header>
 
     <div class="settings-grid">
-      <article v-for="card in settingsCards" :key="card.title" class="settings-card" :class="{ 'settings-card--link': card.to }">
+      <article
+        v-for="card in settingsCards"
+        :key="card.title"
+        class="settings-card"
+        :class="{ 'settings-card--link': card.to }"
+      >
         <template v-if="card.to">
           <RouterLink :to="card.to" class="card-link">
             <p class="eyebrow">{{ card.status }}</p>
@@ -36,33 +41,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-
-const settingsCards = [
-  {
-    title: 'Sicherheit & App-Sperre',
-    description: 'PIN, Passwort, Timeout und weitere Schutzmechanismen werden hier gebuendelt.',
-    status: 'in Aufbau',
-    to: null
-  },
-  {
-    title: 'Backups & Wiederherstellung',
-    description: 'Export, Import und Backup-Status fuer die iPad-Safari-Realitaet.',
-    status: 'in Aufbau',
-    to: null
-  },
-  {
-    title: 'Sprache & Einrichtung',
-    description: 'Sprachwahl, Hilfen fuer den Einstieg und spaetere Onboarding-Optionen.',
-    status: 'in Aufbau',
-    to: null
-  },
-  {
-    title: 'Sport-Konfiguration',
-    description: 'Shuttle-Run-Konfigurationen, Status-Katalog, Tabellen und weitere fachspezifische Einstellungen.',
-    status: 'aktiv',
-    to: '/settings/sport'
-  }
-]
+import { settingsCards } from '../settings-sections'
 </script>
 
 <style scoped>
