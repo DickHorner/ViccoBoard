@@ -163,6 +163,7 @@ const { t } = useI18n()
 const classes = ref<ClassGroup[]>([])
 const students = ref<Student[]>([])
 const selectedClassId = ref<string>('')
+const currentLessonId = ref<string | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const saveError = ref('')
@@ -313,16 +314,23 @@ const handleSaveAttendance = async () => {
       throw new Error('Keine Klasse ausgewählt')
     }
 
-    // Create a lesson for today
-    const lesson = await SportBridge.createLessonUseCase.execute({
-      classGroupId: selectedClassId.value,
-      date: new Date()
-    })
+    // Reuse existing lesson if editing, otherwise create a new one
+    let lessonId: string
+    if (currentLessonId.value) {
+      lessonId = currentLessonId.value
+    } else {
+      const lesson = await SportBridge.createLessonUseCase.execute({
+        classGroupId: selectedClassId.value,
+        date: new Date()
+      })
+      lessonId = lesson.id
+      currentLessonId.value = lessonId
+    }
     
     // Prepare attendance records
     const records = Object.entries(attendance.value).map(([studentId, entry]) => ({
       studentId,
-      lessonId: lesson.id,
+      lessonId,
       status: entry.status,
       reason: entry.reason,
       notes: undefined
@@ -357,9 +365,28 @@ onMounted(async () => {
   try {
     classes.value = await SportBridge.classGroupRepository.findAll()
     
-    // Check if classId is passed via query params
+    // Check if lessonId is passed via query params (edit mode)
+    const lessonIdFromQuery = route.query.lessonId as string
     const classIdFromQuery = route.query.classId as string
-    if (classIdFromQuery) {
+    
+    if (lessonIdFromQuery) {
+      const lesson = await SportBridge.lessonRepository.findById(lessonIdFromQuery)
+      if (lesson) {
+        currentLessonId.value = lesson.id
+        selectedClassId.value = lesson.classGroupId
+        await onClassChange()
+        // Load existing attendance records for this lesson
+        const records = await SportBridge.attendanceRepository.findByLesson(lesson.id)
+        for (const record of records) {
+          attendance.value[record.studentId] = {
+            status: record.status,
+            reason: record.reason
+          }
+        }
+      } else {
+        saveError.value = t('COMMON.error')
+      }
+    } else if (classIdFromQuery) {
       selectedClassId.value = classIdFromQuery
       await onClassChange()
     }
