@@ -19,6 +19,7 @@ import {
   SportabzeichenStandardRepository,
   SportabzeichenResultRepository,
   ToolSessionRepository,
+  FeedbackSessionRepository,
   TacticsSnapshotRepository,
   CreateClassUseCase,
   CreateLessonUseCase,
@@ -29,6 +30,7 @@ import {
   RecordShuttleRunResultUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
+  RecordFeedbackSessionUseCase,
   SaveTeamAssignmentUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
@@ -59,6 +61,7 @@ interface SportBridge {
   performanceEntryRepository: PerformanceEntryRepository
   attendanceRepository: AttendanceRepository
   toolSessionRepository: ToolSessionRepository
+  feedbackSessionRepository: FeedbackSessionRepository
   tableDefinitionRepository: TableDefinitionRepository
   cooperTestConfigRepository: CooperTestConfigRepository
   shuttleRunConfigRepository: ShuttleRunConfigRepository
@@ -78,6 +81,8 @@ interface SportBridge {
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
   recordTimerResultUseCase: RecordTimerResultUseCase
+  recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase
+
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
   // Services
@@ -115,6 +120,7 @@ export function initializeSportBridge(): SportBridge {
   const sportabzeichenStandardRepo = new SportabzeichenStandardRepository(adapter)
   const sportabzeichenResultRepo = new SportabzeichenResultRepository(adapter)
   const toolSessionRepo = new ToolSessionRepository(adapter)
+  const feedbackSessionRepo = new FeedbackSessionRepository(toolSessionRepo)
   const tacticsSnapshotRepo = new TacticsSnapshotRepository(adapter)
 
   // Initialize use cases with repositories
@@ -137,6 +143,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenStandardRepo
   )
   const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
+  const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
   const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
   const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
 
@@ -158,6 +165,7 @@ export function initializeSportBridge(): SportBridge {
     performanceEntryRepository: performanceEntryRepo,
     attendanceRepository: attendanceRepo,
     toolSessionRepository: toolSessionRepo,
+    feedbackSessionRepository: feedbackSessionRepo,
     tableDefinitionRepository: tableDefinitionRepo,
     cooperTestConfigRepository: cooperTestConfigRepo,
     shuttleRunConfigRepository: shuttleRunConfigRepo,
@@ -177,6 +185,7 @@ export function initializeSportBridge(): SportBridge {
     recordShuttleRunResultUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
+    recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
 
