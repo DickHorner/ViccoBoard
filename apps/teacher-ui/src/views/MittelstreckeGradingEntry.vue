@@ -96,6 +96,7 @@ const toast = useToast();
 const mittelstreckeService = new MittelstreckeGradingService();
 
 const categoryId = route.params.id as string;
+const sessionId = route.query.sessionId as string | undefined;
 const categoryName = ref('');
 const loading = ref(true);
 const saving = ref(false);
@@ -110,6 +111,12 @@ const hasChanges = ref(false);
 onMounted(async () => {
   await loadData();
 });
+
+/** Convert milliseconds from Multistop to the mm:ss.ms format used in this view */
+function formatMsToTime(ms: number): string {
+  const totalSeconds = ms / 1000;
+  return formatSecondsToTime(totalSeconds);
+}
 
 async function loadData() {
   loading.value = true;
@@ -140,6 +147,28 @@ async function loadData() {
         grades.value[entry.studentId] = entry.calculatedGrade;
       }
     });
+
+    // Pre-populate times from a Multistop session if sessionId was provided
+    if (sessionId && SportBridge.value) {
+      try {
+        const session = await SportBridge.value.toolSessionRepository.findById(sessionId);
+        if (session?.sessionMetadata?.results) {
+          const results: Array<{ studentId: string; timeMs: number }> =
+            session.sessionMetadata.results;
+          results.forEach(r => {
+            if (r.studentId && typeof r.timeMs === 'number') {
+              // Only pre-fill if not already filled from existing entries
+              if (!times.value[r.studentId]) {
+                times.value[r.studentId] = formatMsToTime(r.timeMs);
+                hasChanges.value = true;
+              }
+            }
+          });
+        }
+      } catch {
+        // Non-blocking: ignore session load errors
+      }
+    }
   } catch (error) {
     toast.error('Fehler beim Laden der Daten');
   } finally {
