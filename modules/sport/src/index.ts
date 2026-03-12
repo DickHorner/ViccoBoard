@@ -59,6 +59,8 @@ export type { RecordTimerResultInput } from './use-cases/record-timer-result.use
 
 export { SaveTacticsSnapshotUseCase } from './use-cases/save-tactics-snapshot.use-case.js';
 export type { SaveTacticsSnapshotInput } from './use-cases/save-tactics-snapshot.use-case.js';
+export { SaveTeamAssignmentUseCase } from './use-cases/save-team-assignment.use-case.js';
+export type { SaveTeamAssignmentInput, TeamSessionMetadata } from './use-cases/save-team-assignment.use-case.js';
 
 export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
 export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';
@@ -78,6 +80,8 @@ export type {
 } from './grading/criteria-grading.engine.js';
 
 // Services
+export { TeamBuilderService } from './services/team-builder.service.js';
+export type { TeamBuildInput, BuiltTeam } from './services/team-builder.service.js';
 export { TimeGradingService } from './services/time-grading.service.js';
 export type {
   TimeToGradeInput,
