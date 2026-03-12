@@ -43,6 +43,12 @@ export type { RecordAttendanceInput } from './use-cases/record-attendance.use-ca
 export { CreateGradeCategoryUseCase } from './use-cases/create-grade-category.use-case.js';
 export type { CreateGradeCategoryInput } from './use-cases/create-grade-category.use-case.js';
 
+export { UpdateGradeCategoryUseCase } from './use-cases/update-grade-category.use-case.js';
+export type { UpdateGradeCategoryInput } from './use-cases/update-grade-category.use-case.js';
+
+export { DeleteGradeCategoryUseCase } from './use-cases/delete-grade-category.use-case.js';
+export type { DeleteGradeCategoryInput, DeleteGradeCategoryResult } from './use-cases/delete-grade-category.use-case.js';
+
 export { RecordGradeUseCase } from './use-cases/record-grade.use-case.js';
 export type { RecordGradeInput } from './use-cases/record-grade.use-case.js';
 
