@@ -28,10 +28,22 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Einstellungen' }
   },
   {
+    path: '/settings/catalogs',
+    name: 'catalog-management',
+    component: () => import('../views/CatalogManagement.vue'),
+    meta: { title: 'Katalogverwaltung' }
+  },
+  {
     path: '/subjects/sport',
     name: 'subject-sport',
     component: () => import('../views/SportHub.vue'),
     meta: { title: 'Sport' }
+  },
+  {
+    path: '/subjects/sport/statistics',
+    name: 'sport-statistics',
+    component: () => import('../views/SportStatisticsView.vue'),
+    meta: { title: 'Sport Statistiken' }
   },
   {
     path: '/subjects/kbr',
