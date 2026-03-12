@@ -33,6 +33,7 @@ import {
   CooperTestService,
   ShuttleRunService,
   SportabzeichenService,
+  SportStatisticsService,
   type CreateClassInput,
   type CreateLessonInput,
   type RecordAttendanceInput,
@@ -80,6 +81,7 @@ interface SportBridge {
   shuttleRunService: ShuttleRunService
   sportabzeichenService: SportabzeichenService
   SportabzeichenService: SportabzeichenService
+  sportStatisticsService: SportStatisticsService
 }
 
 /**
@@ -133,6 +135,7 @@ export function initializeSportBridge(): SportBridge {
   const cooperTestService = new CooperTestService()
   const shuttleRunService = new ShuttleRunService()
   const sportabzeichenService = new SportabzeichenService()
+  const sportStatisticsService = new SportStatisticsService()
 
   sportBridgeInstance = {
     // Repositories
@@ -167,7 +170,8 @@ export function initializeSportBridge(): SportBridge {
     cooperTestService,
     shuttleRunService,
     sportabzeichenService,
-    SportabzeichenService: sportabzeichenService
+    SportabzeichenService: sportabzeichenService,
+    sportStatisticsService
   }
 
   return sportBridgeInstance
@@ -268,7 +272,8 @@ export {
   CreateGradeCategoryUseCase,
   RecordGradeUseCase,
   CriteriaGradingEngine,
-  TimeGradingService
+  TimeGradingService,
+  SportStatisticsService
 }
 export type { 
   CreateClassInput, 

@@ -82,6 +82,12 @@ const entries = [
     eyebrow: 'Tool',
     title: 'Taktik & Feedback',
     description: 'Taktikboard und Feedbackmethoden fuer den laufenden Unterricht.'
+  },
+  {
+    to: '/subjects/sport/statistics',
+    eyebrow: 'Auswertung',
+    title: 'Statistiken',
+    description: 'Anwesenheitsquoten, Leistungsübersicht und Tool-Nutzung im Überblick.'
   }
 ]
 

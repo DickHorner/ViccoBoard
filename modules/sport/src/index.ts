@@ -95,6 +95,15 @@ export type {
   SportabzeichenReport,
   SportabzeichenReportEntry
 } from './services/sportabzeichen.service.js';
+export { SportStatisticsService } from './services/sport-statistics.service.js';
+export type {
+  AttendanceStats,
+  AttendanceOverview,
+  CategoryPerformanceSummary,
+  PerformanceOverview,
+  ToolUsageSummary,
+  ToolUsageOverview
+} from './services/sport-statistics.service.js';
 
 // Plugins
 export { TimerToolPlugin } from './plugins/timer.plugin.js';
