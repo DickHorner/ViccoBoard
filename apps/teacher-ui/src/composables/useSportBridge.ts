@@ -28,10 +28,12 @@ import {
   RecordGradeUseCase,
   RecordCooperTestResultUseCase,
   RecordShuttleRunResultUseCase,
+  ImportShuttleRunConfigUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   RecordFeedbackSessionUseCase,
   SaveTeamAssignmentUseCase,
+  SaveTacticsSnapshotUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -79,6 +81,7 @@ interface SportBridge {
   recordGradeUseCase: RecordGradeUseCase
   recordCooperTestResultUseCase: RecordCooperTestResultUseCase
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
+  importShuttleRunConfigUseCase: ImportShuttleRunConfigUseCase
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
   recordTimerResultUseCase: RecordTimerResultUseCase
   recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase
@@ -138,6 +141,7 @@ export function initializeSportBridge(): SportBridge {
     performanceEntryRepo,
     shuttleRunConfigRepo
   )
+  const importShuttleRunConfigUseCase = new ImportShuttleRunConfigUseCase(shuttleRunConfigRepo)
   const recordSportabzeichenResultUseCase = new RecordSportabzeichenResultUseCase(
     sportabzeichenResultRepo,
     sportabzeichenStandardRepo
@@ -183,6 +187,7 @@ export function initializeSportBridge(): SportBridge {
     recordGradeUseCase,
     recordCooperTestResultUseCase,
     recordShuttleRunResultUseCase,
+    importShuttleRunConfigUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
     recordFeedbackSessionUseCase,
@@ -196,8 +201,8 @@ export function initializeSportBridge(): SportBridge {
     shuttleRunService,
     sportabzeichenService,
     SportabzeichenService: sportabzeichenService,
-    bjsGradingService
-    sportStatisticsService
+    bjsGradingService,
+    sportStatisticsService,
     teamBuilderService
   }
 

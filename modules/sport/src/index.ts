@@ -49,6 +49,9 @@ export type { RecordGradeInput } from './use-cases/record-grade.use-case.js';
 export { RecordShuttleRunResultUseCase } from './use-cases/record-shuttle-run-result.use-case.js';
 export type { RecordShuttleRunResultInput } from './use-cases/record-shuttle-run-result.use-case.js';
 
+export { ImportShuttleRunConfigUseCase } from './use-cases/import-shuttle-run-config.use-case.js';
+export type { ImportShuttleRunConfigInput, ImportShuttleRunConfigResult } from './use-cases/import-shuttle-run-config.use-case.js';
+
 export { RecordCooperTestResultUseCase } from './use-cases/record-cooper-test-result.use-case.js';
 export type { RecordCooperTestResultInput } from './use-cases/record-cooper-test-result.use-case.js';
 

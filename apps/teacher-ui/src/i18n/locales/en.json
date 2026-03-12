@@ -651,7 +651,13 @@
     "note": "Mark",
     "meter": "Meter",
     "individual-stops": "Individual Stops",
-    "audio-unlock-required": "Tap 'Start' to enable audio signals (required by Safari)"
+    "audio-unlock-required": "Tap 'Start' to enable audio signals (required by Safari)",
+    "session-save": "Save session",
+    "session-saved": "Session saved.",
+    "session-saved-at": "Saved session from",
+    "session-reopen": "Resume",
+    "session-discard": "Discard",
+    "history-title": "Past results"
   },
   "MITTELSTRECKE": {
     "bewerte": "Grade middle distance from",
