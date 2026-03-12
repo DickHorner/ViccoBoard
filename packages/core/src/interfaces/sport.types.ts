@@ -345,6 +345,10 @@ export interface Match {
   team2Id: string;
   score1?: number;
   score2?: number;
+  /** Round index (1-based). In knockout brackets this is the bracket round. */
+  round: number;
+  /** Match sequence within the round (1-based). */
+  sequence: number;
   status: 'scheduled' | 'in-progress' | 'completed';
   startTime?: Date;
   endTime?: Date;

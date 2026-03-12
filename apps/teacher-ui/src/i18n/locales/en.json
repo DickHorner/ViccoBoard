@@ -94,7 +94,31 @@
       "fields_bracket": "Fields → Finals: Phase 1: On each field, mini-brackets determine field winners. Phase 2: Field winners play the overall winner; field losers play placement matches.",
       "random_students": "Random Teams: Each round, students are randomly assigned to teams. Individual student points are awarded based on team results."
     },
-    "empty": "No tournaments yet. Tap + to create one."
+    "empty": "No tournaments yet. Tap + to create one.",
+    "new": "New Tournament",
+    "create": "Create Tournament",
+    "name_label": "Name",
+    "name_placeholder": "e.g. Volleyball Tournament",
+    "format_label": "Format",
+    "teams_label": "Teams",
+    "add_team": "Add Team",
+    "team_name_placeholder": "e.g. Team 1",
+    "min_teams": "At least 2 teams required",
+    "status": {
+      "planning": "Planning",
+      "in-progress": "In Progress",
+      "completed": "Completed"
+    },
+    "back": "Back to overview",
+    "standings": "Standings",
+    "bracket": "Bracket",
+    "enter_result": "Enter result",
+    "round_label": "Round {round}",
+    "vs": "vs.",
+    "save_result": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm_delete": "Delete tournament?"
   },
   "TOURNAMENT": {
     "title": "Tournament",
@@ -137,7 +161,8 @@
     "explain": {
       "round_def": "Round: A match day. All pairings of this round are to be played.",
       "slot_def": "Slot: A wave within a round when there are more matches than fields. Each slot runs as many matches in parallel as there are fields."
-    }
+    },
+    "students_per_team": "Students per team"
   },
   "COMMON": {
     "syncing": "Syncing...",

@@ -18,6 +18,8 @@ export type {
   CreateTacticsSnapshotInput,
   UpdateTacticsSnapshotInput
 } from './repositories/tactics-snapshot.repository.js';
+export { TournamentRepository } from './repositories/tournament.repository.js';
+export type { CreateTournamentInput as CreateTournamentRepositoryInput } from './repositories/tournament.repository.js';
 export { CooperTestConfigRepository } from './repositories/cooper-test-config.repository.js';
 export { ShuttleRunConfigRepository } from './repositories/shuttle-run-config.repository.js';
 export { SportabzeichenStandardRepository } from './repositories/sportabzeichen-standard.repository.js';
@@ -64,6 +66,10 @@ export { SaveTacticsSnapshotUseCase } from './use-cases/save-tactics-snapshot.us
 export type { SaveTacticsSnapshotInput } from './use-cases/save-tactics-snapshot.use-case.js';
 export { SaveTeamAssignmentUseCase } from './use-cases/save-team-assignment.use-case.js';
 export type { SaveTeamAssignmentInput, TeamSessionMetadata } from './use-cases/save-team-assignment.use-case.js';
+export { CreateTournamentUseCase } from './use-cases/create-tournament.use-case.js';
+export type { CreateTournamentInput } from './use-cases/create-tournament.use-case.js';
+export { UpdateTournamentMatchUseCase } from './use-cases/update-tournament-match.use-case.js';
+export type { UpdateTournamentMatchInput } from './use-cases/update-tournament-match.use-case.js';
 
 export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
 export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';
@@ -85,6 +91,12 @@ export type {
 // Services
 export { TeamBuilderService } from './services/team-builder.service.js';
 export type { TeamBuildInput, BuiltTeam } from './services/team-builder.service.js';
+export { TournamentService } from './services/tournament.service.js';
+export type {
+  RoundRobinStanding,
+  KnockoutBracket,
+  KnockoutRound
+} from './services/tournament.service.js';
 export { TimeGradingService } from './services/time-grading.service.js';
 export type {
   TimeToGradeInput,
