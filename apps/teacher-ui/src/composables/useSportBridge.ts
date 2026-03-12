@@ -25,15 +25,26 @@ import {
   CreateLessonUseCase,
   RecordAttendanceUseCase,
   CreateGradeCategoryUseCase,
+  UpdateGradeCategoryUseCase,
+  DeleteGradeCategoryUseCase,
   RecordGradeUseCase,
   RecordCooperTestResultUseCase,
   RecordShuttleRunResultUseCase,
+  ImportShuttleRunConfigUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   RecordFeedbackSessionUseCase,
+  SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
   SaveCooperSessionUseCase,
   SaveTacticsSnapshotUseCase,
+  SaveTacticsSnapshotUseCase,
+  SaveMultistopSessionUseCase,
+  SaveTacticsSnapshotUseCase,
+  ImportTableDefinitionUseCase,
+  SaveTacticsSnapshotUseCase,
+  SaveTableDefinitionUseCase,
+  DeleteTableDefinitionUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -46,6 +57,10 @@ import {
   type CreateLessonInput,
   type RecordAttendanceInput,
   type CreateGradeCategoryInput,
+  type UpdateGradeCategoryInput,
+  type DeleteGradeCategoryInput,
+  type DeleteGradeCategoryResult,
+  type SaveTableDefinitionInput,
   type RecordGradeInput
 } from '@viccoboard/sport'
 import { getStorageAdapter } from '../services/storage.service'
@@ -78,9 +93,14 @@ interface SportBridge {
   createLessonUseCase: CreateLessonUseCase
   recordAttendanceUseCase: RecordAttendanceUseCase
   createGradeCategoryUseCase: CreateGradeCategoryUseCase
+  updateGradeCategoryUseCase: UpdateGradeCategoryUseCase
+  deleteGradeCategoryUseCase: DeleteGradeCategoryUseCase
+  saveTableDefinitionUseCase: SaveTableDefinitionUseCase
+  deleteTableDefinitionUseCase: DeleteTableDefinitionUseCase
   recordGradeUseCase: RecordGradeUseCase
   recordCooperTestResultUseCase: RecordCooperTestResultUseCase
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
+  importShuttleRunConfigUseCase: ImportShuttleRunConfigUseCase
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
   recordTimerResultUseCase: RecordTimerResultUseCase
   recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase
@@ -88,6 +108,8 @@ interface SportBridge {
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase
   saveCooperSessionUseCase: SaveCooperSessionUseCase
+  saveMultistopSessionUseCase: SaveMultistopSessionUseCase
+  importTableDefinitionUseCase: ImportTableDefinitionUseCase
   // Services
   criteriaGradingEngine: CriteriaGradingEngine
   timeGradingService: TimeGradingService
@@ -131,6 +153,8 @@ export function initializeSportBridge(): SportBridge {
   const createLessonUseCase = new CreateLessonUseCase(lessonRepo)
   const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepo)
   const createGradeCategoryUseCase = new CreateGradeCategoryUseCase(gradeCategoryRepo)
+  const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepo)
+  const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(gradeCategoryRepo, performanceEntryRepo)
   const recordGradeUseCase = new RecordGradeUseCase(performanceEntryRepo)
   const recordCooperTestResultUseCase = new RecordCooperTestResultUseCase(
     performanceEntryRepo,
@@ -141,6 +165,7 @@ export function initializeSportBridge(): SportBridge {
     performanceEntryRepo,
     shuttleRunConfigRepo
   )
+  const importShuttleRunConfigUseCase = new ImportShuttleRunConfigUseCase(shuttleRunConfigRepo)
   const recordSportabzeichenResultUseCase = new RecordSportabzeichenResultUseCase(
     sportabzeichenResultRepo,
     sportabzeichenStandardRepo
@@ -154,6 +179,12 @@ export function initializeSportBridge(): SportBridge {
     performanceEntryRepo,
     cooperTestConfigRepo
   )
+  const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepo)
+  const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(tableDefinitionRepo)
+  const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepo)
+  const deleteGradeCategoryUseCase = new DeleteGradeCategoryUseCase(gradeCategoryRepo)
+  const saveTableDefinitionUseCase = new SaveTableDefinitionUseCase(tableDefinitionRepo)
+  const deleteTableDefinitionUseCase = new DeleteTableDefinitionUseCase(tableDefinitionRepo)
 
   // Initialize services
   const criteriaGradingEngine = new CriteriaGradingEngine()
@@ -188,15 +219,22 @@ export function initializeSportBridge(): SportBridge {
     createLessonUseCase,
     recordAttendanceUseCase,
     createGradeCategoryUseCase,
+    updateGradeCategoryUseCase,
+    deleteGradeCategoryUseCase,
+    saveTableDefinitionUseCase,
+    deleteTableDefinitionUseCase,
     recordGradeUseCase,
     recordCooperTestResultUseCase,
     recordShuttleRunResultUseCase,
+    importShuttleRunConfigUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
     recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
     saveCooperSessionUseCase,
+    saveMultistopSessionUseCase,
+    importTableDefinitionUseCase,
 
     // Services
     criteriaGradingEngine,
@@ -306,6 +344,10 @@ export {
   CreateLessonUseCase,
   RecordAttendanceUseCase,
   CreateGradeCategoryUseCase,
+  UpdateGradeCategoryUseCase,
+  DeleteGradeCategoryUseCase,
+  SaveTableDefinitionUseCase,
+  DeleteTableDefinitionUseCase,
   RecordGradeUseCase,
   CriteriaGradingEngine,
   TimeGradingService,
@@ -316,5 +358,8 @@ export type {
   CreateLessonInput, 
   RecordAttendanceInput,
   CreateGradeCategoryInput,
+  UpdateGradeCategoryInput,
+  DeleteGradeCategoryInput,
+  DeleteGradeCategoryResult,
   RecordGradeInput
 }

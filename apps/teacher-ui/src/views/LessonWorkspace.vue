@@ -68,6 +68,22 @@
           </div>
         </section>
 
+        <section v-if="recentSessions.length > 0" class="panel full-width">
+          <h2>Zuletzt gearbeitet</h2>
+          <p class="section-hint">Letzte Tool-Sessions fuer diese Klasse — Weitermachen mit einem Klick.</p>
+          <div class="sessions-list">
+            <RouterLink
+              v-for="session in recentSessions"
+              :key="session.id"
+              :to="session.resumeLink"
+              class="session-card"
+            >
+              <strong>{{ session.toolLabel }}</strong>
+              <span>{{ formatLessonDateTime(session.startedAt) }}</span>
+            </RouterLink>
+          </div>
+        </section>
+
         <section class="panel full-width">
           <h2>Stundendetails</h2>
           <div class="details-grid">
@@ -105,8 +121,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
-import { resolveLessonWorkspaceSubject } from '../utils/lesson-workspace'
-import type { ClassGroup, Lesson } from '@viccoboard/core'
+import { resolveLessonWorkspaceSubject, buildSportToolEntries, formatToolLabel, SPORT_TOOL_ROUTES } from '../utils/lesson-workspace'
+import type { ClassGroup, Lesson, Sport } from '@viccoboard/core'
 
 const route = useRoute()
 const SportBridge = getSportBridge()
@@ -115,18 +131,22 @@ const loading = ref(true)
 const loadError = ref('')
 const lesson = ref<Lesson | null>(null)
 const classGroup = ref<ClassGroup | null>(null)
+const recentSessions = ref<Array<{ id: string; toolLabel: string; startedAt: Date; resumeLink: string }>>([])
+
+const MAX_RECENT_SESSIONS = 3
 
 const workspaceSubject = computed(() =>
   resolveLessonWorkspaceSubject(classGroup.value?.subjectProfile)
 )
 
+const lessonContext = computed(() => {
+  if (!lesson.value || !classGroup.value) return null
+  return { lessonId: lesson.value.id, classGroupId: classGroup.value.id }
+})
+
 const subjectEntries = computed(() => {
-  if (workspaceSubject.value === 'sport') {
-    return [
-      { to: '/subjects/sport', title: 'Sport-Hub', description: 'Bewertung, Tests und Tools fuer diese Stunde.' },
-      { to: '/grading', title: 'Sport-Bewertung', description: 'Kategorien und Leistungserfassung oeffnen.' },
-      { to: '/tools/timer', title: 'Live-Tools', description: 'Timer, Teams, Scoreboard und weitere Unterrichtstools.' }
-    ]
+  if (workspaceSubject.value === 'sport' && lessonContext.value) {
+    return buildSportToolEntries(lessonContext.value)
   }
 
   if (workspaceSubject.value === 'kbr') {
@@ -143,6 +163,11 @@ const subjectEntries = computed(() => {
     { to: '/schedule', title: 'Organisation', description: 'Fachneutral im Stundenplan und bei der Stunde bleiben.' }
   ]
 })
+
+function buildResumeLink(session: Sport.ToolSession, ctx: { lessonId: string; classGroupId: string }): string {
+  const basePath = SPORT_TOOL_ROUTES[session.toolType.toLowerCase()] ?? '/subjects/sport'
+  return `${basePath}?lessonId=${encodeURIComponent(ctx.lessonId)}&classGroupId=${encodeURIComponent(ctx.classGroupId)}`
+}
 
 const loadData = async () => {
   loading.value = true
@@ -166,6 +191,18 @@ const loadData = async () => {
 
     lesson.value = loadedLesson
     classGroup.value = loadedClassGroup
+
+    const allSessions = await SportBridge.toolSessionRepository.findByClassGroup(loadedClassGroup.id)
+    const ctx = { lessonId: loadedLesson.id, classGroupId: loadedClassGroup.id }
+    recentSessions.value = allSessions
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+      .slice(0, MAX_RECENT_SESSIONS)
+      .map((s) => ({
+        id: s.id,
+        toolLabel: formatToolLabel(s.toolType),
+        startedAt: s.startedAt,
+        resumeLink: buildResumeLink(s, ctx),
+      }))
   } catch (error) {
     console.error('Failed to load lesson workspace:', error)
     loadError.value = 'Der Stunden-Workspace konnte nicht geladen werden.'
@@ -304,6 +341,35 @@ onMounted(() => {
   gap: 0.75rem;
   margin-top: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.section-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.sessions-list {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.session-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+  background: rgba(248, 250, 252, 0.9);
+  text-decoration: none;
+}
+
+.session-card span {
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
 @media (max-width: 820px) {
