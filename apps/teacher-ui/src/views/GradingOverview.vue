@@ -284,7 +284,7 @@
             Möchten Sie die Kategorie <strong>{{ deletingCategory?.name }}</strong> wirklich löschen?
           </p>
           <p v-if="deleteEntryCount > 0" class="warning-text">
-            ⚠️ Es gibt <strong>{{ deleteEntryCount }}</strong> erfasste Noteneinträge für diese Kategorie. Diese bleiben gespeichert, werden aber nicht mehr der Kategorie zugeordnet.
+            ⚠️ Es gibt <strong>{{ deleteEntryCount }}</strong> erfasste Noteneinträge für diese Kategorie. Diese werden zusammen mit der Kategorie <strong>unwiderruflich gelöscht</strong>.
           </p>
           <p v-else class="info-text">Es gibt keine erfassten Noteneinträge für diese Kategorie.</p>
 
