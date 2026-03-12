@@ -65,6 +65,9 @@ export type { RecordSportabzeichenResultInput } from './use-cases/record-sportab
 export { RecordTimerResultUseCase } from './use-cases/record-timer-result.use-case.js';
 export type { RecordTimerResultInput } from './use-cases/record-timer-result.use-case.js';
 
+export { RecordDiceRollUseCase } from './use-cases/record-dice-roll.use-case.js';
+export type { RecordDiceRollInput } from './use-cases/record-dice-roll.use-case.js';
+
 export { RecordFeedbackSessionUseCase } from './use-cases/record-feedback-session.use-case.js';
 export type { RecordFeedbackSessionInput } from './use-cases/record-feedback-session.use-case.js';
 export { SaveTacticsSnapshotUseCase } from './use-cases/save-tactics-snapshot.use-case.js';

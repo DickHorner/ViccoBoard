@@ -244,6 +244,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Feedback' }
   },
   {
+    path: '/tools/dice',
+    name: 'dice',
+    component: () => import('../views/DiceTool.vue'),
+    meta: { title: 'Wuerfeln' }
+  },
+  {
     path: '/settings/sport',
     name: 'settings-sport',
     component: () => import('../views/SportSettingsView.vue'),
@@ -255,18 +261,14 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, _from, savedPosition) {
-    // If there's a saved position (browser back/forward), use it
     if (savedPosition) {
       return savedPosition
     }
-    // For hash links, scroll to the element
     if (to.hash) {
       return { el: to.hash, behavior: 'smooth' }
     }
-    // Otherwise, scroll to top
     return { top: 0, behavior: 'smooth' }
   }
 })
 
 export default router
-

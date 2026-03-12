@@ -96,6 +96,12 @@ const entries = [
     description: 'Taktikboard und Feedbackmethoden fuer den laufenden Unterricht.'
   },
   {
+    to: '/tools/dice',
+    eyebrow: 'Tool',
+    title: 'Wuerfeln',
+    description: 'Zufallszahlen mit konfigurierbarem Bereich wuerfeln und Ergebnisse protokollieren.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Auswertung',
     title: 'Statistiken',

@@ -26,6 +26,7 @@ import {
   PerformanceEntryRepository,
   RecordAttendanceUseCase,
   RecordCooperTestResultUseCase,
+  RecordDiceRollUseCase,
   RecordFeedbackSessionUseCase,
   RecordGradeUseCase,
   RecordShuttleRunResultUseCase,
@@ -54,6 +55,7 @@ import {
   type DeleteGradeCategoryInput,
   type DeleteGradeCategoryResult,
   type RecordAttendanceInput,
+  type RecordDiceRollInput,
   type RecordGradeInput,
   type SaveTableDefinitionInput,
   type UpdateGradeCategoryInput
@@ -93,6 +95,7 @@ interface SportBridge {
   importShuttleRunConfigUseCase: ImportShuttleRunConfigUseCase;
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase;
   recordTimerResultUseCase: RecordTimerResultUseCase;
+  recordDiceRollUseCase: RecordDiceRollUseCase;
   recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase;
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase;
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase;
@@ -161,6 +164,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenStandardRepository
   );
   const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepository);
+  const recordDiceRollUseCase = new RecordDiceRollUseCase(toolSessionRepository);
   const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(
     feedbackSessionRepository
   );
@@ -216,6 +220,7 @@ export function initializeSportBridge(): SportBridge {
     importShuttleRunConfigUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
+    recordDiceRollUseCase,
     recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
@@ -314,6 +319,7 @@ export type {
   DeleteGradeCategoryInput,
   DeleteGradeCategoryResult,
   RecordAttendanceInput,
+  RecordDiceRollInput,
   RecordGradeInput,
   SaveTableDefinitionInput,
   UpdateGradeCategoryInput
