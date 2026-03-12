@@ -30,7 +30,9 @@ import {
   RecordShuttleRunResultUseCase,
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
+  RecordDiceRollUseCase,
   RecordFeedbackSessionUseCase,
+  SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
   TeamBuilderService,
   CriteriaGradingEngine,
@@ -44,7 +46,8 @@ import {
   type CreateLessonInput,
   type RecordAttendanceInput,
   type CreateGradeCategoryInput,
-  type RecordGradeInput
+  type RecordGradeInput,
+  type RecordDiceRollInput
 } from '@viccoboard/sport'
 import { getStorageAdapter } from '../services/storage.service'
 
@@ -81,6 +84,7 @@ interface SportBridge {
   recordShuttleRunResultUseCase: RecordShuttleRunResultUseCase
   recordSportabzeichenResultUseCase: RecordSportabzeichenResultUseCase
   recordTimerResultUseCase: RecordTimerResultUseCase
+  recordDiceRollUseCase: RecordDiceRollUseCase
   recordFeedbackSessionUseCase: RecordFeedbackSessionUseCase
 
   saveTacticsSnapshotUseCase: SaveTacticsSnapshotUseCase
@@ -143,6 +147,7 @@ export function initializeSportBridge(): SportBridge {
     sportabzeichenStandardRepo
   )
   const recordTimerResultUseCase = new RecordTimerResultUseCase(toolSessionRepo)
+  const recordDiceRollUseCase = new RecordDiceRollUseCase(toolSessionRepo)
   const recordFeedbackSessionUseCase = new RecordFeedbackSessionUseCase(feedbackSessionRepo)
   const saveTacticsSnapshotUseCase = new SaveTacticsSnapshotUseCase(tacticsSnapshotRepo)
   const saveTeamAssignmentUseCase = new SaveTeamAssignmentUseCase(toolSessionRepo)
@@ -185,6 +190,7 @@ export function initializeSportBridge(): SportBridge {
     recordShuttleRunResultUseCase,
     recordSportabzeichenResultUseCase,
     recordTimerResultUseCase,
+    recordDiceRollUseCase,
     recordFeedbackSessionUseCase,
     saveTacticsSnapshotUseCase,
     saveTeamAssignmentUseCase,
@@ -196,8 +202,8 @@ export function initializeSportBridge(): SportBridge {
     shuttleRunService,
     sportabzeichenService,
     SportabzeichenService: sportabzeichenService,
-    bjsGradingService
-    sportStatisticsService
+    bjsGradingService,
+    sportStatisticsService,
     teamBuilderService
   }
 
@@ -307,5 +313,6 @@ export type {
   CreateLessonInput, 
   RecordAttendanceInput,
   CreateGradeCategoryInput,
-  RecordGradeInput
+  RecordGradeInput,
+  RecordDiceRollInput
 }

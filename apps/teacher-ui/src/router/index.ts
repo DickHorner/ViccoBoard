@@ -226,6 +226,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Feedback' }
   },
   {
+    path: '/tools/dice',
+    name: 'dice',
+    component: () => import('../views/DiceTool.vue'),
+    meta: { title: 'Wuerfeln' }
+  },
+  {
     path: '/subjects/sport/statistics',
     name: 'sport-statistics',
     component: () => import('../views/SportStatistics.vue'),
