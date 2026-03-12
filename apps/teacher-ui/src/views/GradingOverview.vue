@@ -5,6 +5,16 @@
       <h2>Bewertungsübersicht</h2>
       <p class="page-description">Verwalten Sie Bewertungskategorien und erfassen Sie Noten.</p>
     </div>
+
+    <!-- Quick Links -->
+    <div class="quick-links">
+      <button class="quick-link-btn" @click="$router.push('/grading/tables')">
+        📊 Tabellenverwaltung
+      </button>
+      <button class="quick-link-btn" @click="$router.push('/settings/catalogs')">
+        📋 Kriterienkataloge
+      </button>
+    </div>
     
     <div class="grading-content">
       <!-- Class Selection -->
@@ -81,6 +91,19 @@
                     @click="viewHistory(category)"
                   >
                     Historie
+                  </button>
+                  <button
+                    class="btn-text btn-small"
+                    @click="openEditCategoryModal(category)"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    class="btn-danger-text btn-small"
+                    :disabled="deletingCategoryId === category.id"
+                    @click="confirmDeleteCategory(category)"
+                  >
+                    {{ deletingCategoryId === category.id ? '…' : '🗑' }}
                   </button>
                 </div>
               </div>
@@ -204,12 +227,91 @@
       </div>
     </div>
   </div>
+
+  <!-- Edit Category Modal -->
+  <div v-if="showEditCategoryModal" class="modal-overlay" @click.self="closeEditModal">
+    <div class="modal" @click.stop>
+      <div class="modal-header">
+        <h3>Kategorie bearbeiten</h3>
+        <button class="close-btn" @click="closeEditModal">×</button>
+      </div>
+      <div class="modal-content">
+        <form @submit.prevent="saveEditCategory">
+          <div class="form-group">
+            <label for="edit-category-name">Name*</label>
+            <input
+              id="edit-category-name"
+              v-model="editCategoryForm.name"
+              type="text"
+              required
+              placeholder="Kategoriename"
+            />
+          </div>
+          <div class="form-group">
+            <label for="edit-category-description">Beschreibung</label>
+            <textarea
+              id="edit-category-description"
+              v-model="editCategoryForm.description"
+              rows="3"
+              placeholder="Optionale Beschreibung…"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="edit-category-weight">Gewicht (%)*</label>
+            <input
+              id="edit-category-weight"
+              v-model.number="editCategoryForm.weight"
+              type="number"
+              min="0"
+              max="100"
+              required
+              placeholder="0-100"
+            />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" @click="closeEditModal">Abbrechen</button>
+            <button type="submit" class="btn-primary" :disabled="saving">
+              {{ saving ? 'Wird gespeichert…' : 'Speichern' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Category Confirmation -->
+  <div v-if="deleteCategoryTarget" class="modal-overlay" @click.self="deleteCategoryTarget = null">
+    <div class="modal" @click.stop>
+      <div class="modal-header">
+        <h3>Kategorie löschen?</h3>
+        <button class="close-btn" @click="deleteCategoryTarget = null">×</button>
+      </div>
+      <div class="modal-content">
+        <p>
+          Möchten Sie die Kategorie <strong>{{ deleteCategoryTarget.name }}</strong> wirklich löschen?
+        </p>
+        <p style="color:#c00; font-size:0.875rem;">
+          Alle zugehörigen Leistungseinträge bleiben erhalten, sind aber ohne Kategorie nicht mehr auswertbar.
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" @click="deleteCategoryTarget = null">Abbrechen</button>
+        <button
+          class="btn-danger-solid"
+          :disabled="!!deletingCategoryId"
+          @click="executeDeleteCategory"
+        >
+          {{ deletingCategoryId ? 'Wird gelöscht…' : 'Löschen' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSportBridge } from '../composables/useSportBridge';
+import { useSportBridge, getSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import type { Sport} from '@viccoboard/core';
@@ -227,6 +329,15 @@ const performanceEntries = ref<any[]>([]);
 const loading = ref(false);
 const saving = ref(false);
 const showCreateCategoryModal = ref(false);
+
+// Edit category state
+const showEditCategoryModal = ref(false);
+const editingCategory = ref<Sport.GradeCategory | null>(null);
+const editCategoryForm = ref({ name: '', description: '', weight: 0 });
+
+// Delete category state
+const deleteCategoryTarget = ref<Sport.GradeCategory | null>(null);
+const deletingCategoryId = ref<string | null>(null);
 
 const newCategory = ref({
   name: '',
@@ -315,6 +426,8 @@ function openGradingEntry(category: Sport.GradeCategory) {
     router.push(`/grading/Sportabzeichen/${category.id}`);
   } else if (category.type === 'bjs') {
     router.push(`/grading/bjs/${category.id}`);
+  } else if (category.type === 'verbal') {
+    router.push(`/grading/verbal/${category.id}`);
   } else {
     toast.info('Dieser Bewertungstyp wird noch nicht unterstützt.');
   }
@@ -322,6 +435,66 @@ function openGradingEntry(category: Sport.GradeCategory) {
 
 function viewHistory(category: Sport.GradeCategory) {
   router.push(`/grading/history/${category.id}`);
+}
+
+// ── Edit category ─────────────────────────────────────────────────────────────
+
+function openEditCategoryModal(category: Sport.GradeCategory): void {
+  editingCategory.value = category;
+  editCategoryForm.value = {
+    name: category.name,
+    description: category.description ?? '',
+    weight: category.weight
+  };
+  showEditCategoryModal.value = true;
+}
+
+function closeEditModal(): void {
+  showEditCategoryModal.value = false;
+  editingCategory.value = null;
+}
+
+async function saveEditCategory(): Promise<void> {
+  if (!editingCategory.value) return;
+  saving.value = true;
+  try {
+    const bridge = getSportBridge();
+    await bridge.updateGradeCategoryUseCase.execute({
+      id: editingCategory.value.id,
+      name: editCategoryForm.value.name,
+      description: editCategoryForm.value.description || undefined,
+      weight: editCategoryForm.value.weight
+    });
+    toast.success('Kategorie aktualisiert.');
+    closeEditModal();
+    await onClassChange();
+  } catch (e: any) {
+    toast.error(e?.message ?? 'Fehler beim Speichern.');
+  } finally {
+    saving.value = false;
+  }
+}
+
+// ── Delete category ───────────────────────────────────────────────────────────
+
+function confirmDeleteCategory(category: Sport.GradeCategory): void {
+  deleteCategoryTarget.value = category;
+}
+
+async function executeDeleteCategory(): Promise<void> {
+  if (!deleteCategoryTarget.value) return;
+  deletingCategoryId.value = deleteCategoryTarget.value.id;
+  try {
+    const bridge = getSportBridge();
+    await bridge.deleteGradeCategoryUseCase.execute(deleteCategoryTarget.value.id);
+    toast.success('Kategorie gelöscht.');
+    deleteCategoryTarget.value = null;
+    await onClassChange();
+  } catch (e: any) {
+    toast.error(e?.message ?? 'Fehler beim Löschen.');
+  } finally {
+    deletingCategoryId.value = null;
+  }
 }
 
 async function createCategory() {
@@ -626,6 +799,72 @@ async function createCategory() {
 
 .btn-text:hover {
   background-color: #f0f7ff;
+}
+
+.btn-danger-text {
+  background-color: transparent;
+  color: #c0392b;
+  border: 1px solid #c0392b;
+  padding: 0.625rem 1.25rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.btn-danger-text:hover {
+  background-color: #fdf2f2;
+}
+
+.btn-danger-text:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger-solid {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 44px;
+}
+
+.btn-danger-solid:hover {
+  background-color: #b02a37;
+}
+
+.btn-danger-solid:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quick-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.quick-link-btn {
+  background: #f0f7ff;
+  color: #0066cc;
+  border: 1px solid #b3d4f7;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 44px;
+}
+
+.quick-link-btn:hover {
+  background: #daeeff;
 }
 
 .btn-small {

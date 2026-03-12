@@ -30,7 +30,7 @@
         <p class="eyebrow">Bewertungstabellen</p>
         <h2>Tabellen & Normen</h2>
         <p>Leistungstabellen für Cooper-Test, Shuttle-Run und weitere Disziplinen verwalten.</p>
-        <RouterLink to="/grading" class="config-link">Zur Bewertungsübersicht →</RouterLink>
+        <RouterLink to="/grading/tables" class="config-link">Zur Tabellenverwaltung →</RouterLink>
       </section>
 
       <!-- Grade categories -->
