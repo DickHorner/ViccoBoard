@@ -337,7 +337,7 @@ describe('GradingKeyEngine', () => {
         'Test reason'
       );
 
-      const report = GradingKeyEngine.exportchangeHistory(testKey.id);
+      const report = GradingKeyEngine.exportChangeHistory(testKey.id);
 
       expect(report).toContain('Grading Key Change History');
       expect(report).toContain(testKey.id);
@@ -345,7 +345,7 @@ describe('GradingKeyEngine', () => {
     });
 
     it('should handle empty history', () => {
-      const report = GradingKeyEngine.exportchangeHistory('unknown');
+      const report = GradingKeyEngine.exportChangeHistory('unknown');
       expect(report).toContain('No changes recorded');
     });
   });
