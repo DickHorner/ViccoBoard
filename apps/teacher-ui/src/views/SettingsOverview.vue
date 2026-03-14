@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1>Einstellungen</h1>
-        <p class="subtitle">Zentraler Einstieg fuer Sicherheit, Backups, Sprache und fachspezifische Konfigurationen.</p>
+        <p class="subtitle">Zentraler Einstieg für Sicherheit, Backups, Sprache und fachspezifische Konfigurationen.</p>
       </div>
     </header>
 

@@ -2,41 +2,41 @@
   <div class="exam-builder-page">
     <div class="builder-header">
       <div>
-        <h1>{{ isEditing ? 'Edit Exam' : 'Create Exam' }}</h1>
-        <p v-if="exam">{{ exam.mode === 'simple' ? 'Simple: flat task list' : 'Complex: nested tasks (3 levels)' }}</p>
+        <h1>{{ isEditing ? 'Prüfung bearbeiten' : 'Prüfung erstellen' }}</h1>
+        <p v-if="exam">{{ exam.mode === 'simple' ? 'Einfach: flache Aufgabenliste' : 'Komplex: verschachtelte Aufgaben (3 Ebenen)' }}</p>
       </div>
       <div class="actions">
-        <button @click="goBack" class="btn-secondary">Cancel</button>
-        <button @click="saveExam" class="btn-primary" :disabled="!canSave">Save Exam</button>
+        <button @click="goBack" class="btn-secondary">Abbrechen</button>
+        <button @click="saveExam" class="btn-primary" :disabled="!canSave">Prüfung speichern</button>
       </div>
     </div>
 
     <div v-if="exam" class="builder-content">
       <!-- Exam Details Section -->
       <section class="section">
-        <h2>Exam Details</h2>
+        <h2>Prüfungsdetails</h2>
         <div class="form-group">
-          <label>Exam Title</label>
-          <input v-model="exam.title" type="text" placeholder="Exam title" />
+          <label>Prüfungstitel</label>
+          <input v-model="exam.title" type="text" placeholder="Prüfungstitel" />
         </div>
         <div class="form-group">
-          <label>Description</label>
-          <textarea v-model="exam.description" placeholder="Optional exam description"></textarea>
+          <label>Beschreibung</label>
+          <textarea v-model="exam.description" placeholder="Optionale Prüfungsbeschreibung"></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Mode</label>
+            <label>Modus</label>
             <select v-model="exam.mode" @change="handleModeChange">
-              <option value="simple">Simple (flat)</option>
-              <option value="complex">Complex (nested)</option>
+              <option value="simple">Einfach (flach)</option>
+              <option value="complex">Komplex (verschachtelt)</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Allow Comments</label>
+            <label>Kommentare erlauben</label>
             <input v-model="exam.structure.allowsComments" type="checkbox" />
           </div>
           <div class="form-group">
-            <label>Allow Support Tips</label>
+            <label>Fördertipps erlauben</label>
             <input v-model="exam.structure.allowsSupportTips" type="checkbox" />
           </div>
         </div>
@@ -45,12 +45,12 @@
       <!-- Tasks Section -->
       <section class="section">
         <div class="section-header">
-          <h2>Tasks</h2>
-          <button @click="addTask" class="btn-small">+ Add Task</button>
+          <h2>Aufgaben</h2>
+          <button @click="addTask" class="btn-small">+ Aufgabe hinzufügen</button>
         </div>
 
         <div v-if="exam.structure.tasks.length === 0" class="empty-state">
-          No tasks yet. Add your first task to get started.
+          Noch keine Aufgaben. Fügen Sie die erste Aufgabe hinzu.
         </div>
 
         <div v-for="(task, idx) in exam.structure.tasks" :key="task.id" class="task-card">
@@ -58,117 +58,117 @@
             <input
               v-model="task.title"
               type="text"
-              placeholder="Task title (e.g., Task 1, Task 2a)"
+              placeholder="Aufgabentitel (z. B. Aufgabe 1, Aufgabe 2a)"
               class="task-title-input"
             />
-            <button @click="removeTask(idx)" class="btn-danger-small">Remove</button>
+            <button @click="removeTask(idx)" class="btn-danger-small">Entfernen</button>
           </div>
 
           <div class="task-details">
             <div class="form-group">
-              <label>Points</label>
+              <label>Punkte</label>
               <input v-model.number="task.points" type="number" min="0" step="1" />
             </div>
             <div class="form-group">
-              <label>Bonus Points</label>
+              <label>Bonuspunkte</label>
               <input v-model.number="task.bonusPoints" type="number" min="0" step="1" />
             </div>
 
             <div class="form-row">
               <div class="form-group checkbox">
                 <input v-model="task.isChoice" type="checkbox" />
-                <label>Choice Task (e.g., 3a/3b)</label>
+                <label>Wahlaufgabe (z. B. 3a/3b)</label>
               </div>
               <div class="form-group checkbox">
                 <input v-model="task.allowComments" type="checkbox" />
-                <label>Allow Comments</label>
+                <label>Kommentare erlauben</label>
               </div>
             </div>
           </div>
 
           <!-- Criteria for this task -->
           <div v-if="task.criteria.length > 0" class="criteria-list">
-            <h4>Criteria</h4>
+            <h4>Kriterien</h4>
             <div v-for="(criterion, cidx) in task.criteria" :key="criterion.id" class="criterion-item">
-              <input v-model="criterion.text" type="text" placeholder="Criterion description" class="criterion-input" />
-              <input v-model.number="criterion.points" type="number" min="0" step="0.5" class="points-input" title="Points" />
-              <button @click="removeCriterion(idx, cidx)" class="btn-danger-small">Remove</button>
+              <input v-model="criterion.text" type="text" placeholder="Kriterium beschreiben" class="criterion-input" />
+              <input v-model.number="criterion.points" type="number" min="0" step="0.5" class="points-input" title="Punkte" />
+              <button @click="removeCriterion(idx, cidx)" class="btn-danger-small">Entfernen</button>
             </div>
           </div>
-          <button @click="addCriterion(idx)" class="btn-secondary-small">+ Add Criterion</button>
+          <button @click="addCriterion(idx)" class="btn-secondary-small">+ Kriterium hinzufügen</button>
 
           <!-- Subtasks for complex mode -->
           <div v-if="exam.mode === 'complex' && task.subtasks.length > 0" class="subtasks-section">
-            <h4>Subtasks</h4>
+            <h4>Teilaufgaben</h4>
             <div v-for="(subtaskId, sidx) in task.subtasks" :key="subtaskId" class="subtask-row">
               <span>{{ sidx + 1 }}</span>
-              <button @click="removeSubtask(idx, sidx)" class="btn-danger-small">Remove</button>
+              <button @click="removeSubtask(idx, sidx)" class="btn-danger-small">Entfernen</button>
             </div>
           </div>
-          <button v-if="exam.mode === 'complex'" @click="addSubtask(idx)" class="btn-secondary-small">+ Add Subtask</button>
+          <button v-if="exam.mode === 'complex'" @click="addSubtask(idx)" class="btn-secondary-small">+ Teilaufgabe hinzufügen</button>
         </div>
       </section>
 
       <!-- Exam Parts Section -->
       <section class="section">
         <div class="section-header">
-          <h2>Exam Parts</h2>
-          <button @click="addPart" class="btn-small">+ Add Part</button>
+          <h2>Prüfungsteile</h2>
+          <button @click="addPart" class="btn-small">+ Teil hinzufügen</button>
         </div>
 
         <div v-if="exam.structure.parts.length === 0" class="empty-state">
-          No parts yet. Exam parts are optional.
+          Noch keine Teile. Prüfungsteile sind optional.
         </div>
 
         <div v-for="(part, pidx) in exam.structure.parts" :key="part.id" class="part-card">
-          <input v-model="part.name" type="text" placeholder="Part name (e.g., Part A)" />
+          <input v-model="part.name" type="text" placeholder="Teilname (z. B. Teil A)" />
           <div class="form-row">
             <div class="form-group checkbox">
               <input v-model="part.calculateSubScore" type="checkbox" />
-              <label>Calculate Sub-Score</label>
+              <label>Teilnote berechnen</label>
             </div>
             <div class="form-group checkbox">
               <input v-model="part.printable" type="checkbox" />
-              <label>Printable</label>
+              <label>Druckbar</label>
             </div>
           </div>
-          <button @click="removePart(pidx)" class="btn-danger-small">Remove</button>
+          <button @click="removePart(pidx)" class="btn-danger-small">Entfernen</button>
         </div>
       </section>
 
       <!-- Grading Key Section -->
       <section class="section">
-        <h2>Grading Key</h2>
+        <h2>Notenschlüssel</h2>
         <div class="form-group">
-          <label>Grading Type</label>
+          <label>Schlüsseltyp</label>
           <select v-model="exam.gradingKey.type">
-            <option value="percentage">Percentage</option>
-            <option value="points">Points</option>
-            <option value="error-points">Error Points</option>
+            <option value="percentage">Prozent</option>
+            <option value="points">Punkte</option>
+            <option value="error-points">Fehlerpunkte</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Total Points</label>
+          <label>Gesamtpunkte</label>
           <input v-model.number="exam.gradingKey.totalPoints" type="number" min="0" step="1" readonly />
         </div>
         <div class="form-group">
-          <label>Rounding</label>
+          <label>Rundung</label>
           <select v-model="exam.gradingKey.roundingRule.type">
-            <option value="up">Round Up</option>
-            <option value="down">Round Down</option>
-            <option value="nearest">Nearest</option>
-            <option value="none">No Rounding</option>
+            <option value="up">Aufrunden</option>
+            <option value="down">Abrunden</option>
+            <option value="nearest">Kaufmännisch</option>
+            <option value="none">Keine Rundung</option>
           </select>
         </div>
         <div v-if="exam.gradingKey.gradeBoundaries.length > 0">
-          <h3>Grade Boundaries</h3>
+          <h3>Notengrenzen</h3>
           <table class="boundaries-table">
             <thead>
               <tr>
-                <th>Grade</th>
-                <th>Min %</th>
-                <th>Max %</th>
-                <th>Display Value</th>
+                <th>Note</th>
+                <th>Min. %</th>
+                <th>Max. %</th>
+                <th>Anzeigewert</th>
               </tr>
             </thead>
             <tbody>
@@ -185,29 +185,29 @@
 
       <!-- Summary -->
       <section class="section summary">
-        <h2>Summary</h2>
+        <h2>Zusammenfassung</h2>
         <div class="summary-grid">
           <div class="summary-item">
-            <span class="label">Total Tasks</span>
+            <span class="label">Aufgaben gesamt</span>
             <span class="value">{{ exam.structure.tasks.length }}</span>
           </div>
           <div class="summary-item">
-            <span class="label">Total Points</span>
+            <span class="label">Punkte gesamt</span>
             <span class="value">{{ exam.gradingKey.totalPoints }}</span>
           </div>
           <div class="summary-item">
-            <span class="label">Exam Parts</span>
+            <span class="label">Prüfungsteile</span>
             <span class="value">{{ exam.structure.parts.length }}</span>
           </div>
           <div class="summary-item">
-            <span class="label">Mode</span>
-            <span class="value">{{ exam.mode === 'simple' ? 'Simple' : 'Complex' }}</span>
+            <span class="label">Modus</span>
+            <span class="value">{{ exam.mode === 'simple' ? 'Einfach' : 'Komplex' }}</span>
           </div>
         </div>
       </section>
     </div>
 
-    <div v-else class="loading">Loading exam...</div>
+    <div v-else class="loading">Prüfung wird geladen...</div>
   </div>
 </template>
 
@@ -245,7 +245,7 @@ const addTask = () => {
     id: uuidv4(),
     level: 1,
     order: exam.value.structure.tasks.length,
-    title: `Task ${exam.value.structure.tasks.length + 1}`,
+    title: `Aufgabe ${exam.value.structure.tasks.length + 1}`,
     points: 0,
     isChoice: false,
     criteria: [],
@@ -302,7 +302,7 @@ const addPart = () => {
   if (!exam.value) return;
   exam.value.structure.parts.push({
     id: uuidv4(),
-    name: `Part ${exam.value.structure.parts.length + 1}`,
+    name: `Teil ${exam.value.structure.parts.length + 1}`,
     taskIds: [],
     calculateSubScore: false,
     scoreType: 'points',
@@ -363,7 +363,7 @@ onMounted(async () => {
       },
       gradingKey: {
         id: uuidv4(),
-        name: 'Default',
+        name: 'Standard',
         type: Exams.GradingKeyType.Points,
         totalPoints: 0,
         gradeBoundaries: [],

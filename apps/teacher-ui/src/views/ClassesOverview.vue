@@ -3,10 +3,10 @@
     <header class="page-header">
       <div>
         <h1>Klassen</h1>
-        <p class="subtitle">Fachuebergreifende Klassenverwaltung mit Direktzugriff auf Stunden, Schueler und Anwesenheit.</p>
+        <p class="subtitle">Fächerübergreifende Klassenverwaltung mit Direktzugriff auf Stunden, Schüler und Anwesenheit.</p>
       </div>
       <RouterLink class="primary-link" to="/">
-        Neue Klasse im Dashboard
+        Neue Klasse auf der Startseite
       </RouterLink>
     </header>
 
@@ -44,7 +44,7 @@
         <div class="class-metrics">
           <div>
             <strong>{{ entry.studentCount }}</strong>
-            <span>Schueler</span>
+            <span>Schüler</span>
           </div>
           <div>
             <strong>{{ entry.lessonCount }}</strong>
@@ -130,7 +130,7 @@ const loadData = async () => {
     )
   } catch (error) {
     console.error('Failed to load class overview:', error)
-    loadError.value = 'Die Klassenuebersicht konnte nicht geladen werden.'
+    loadError.value = 'Die Klassenübersicht konnte nicht geladen werden.'
   } finally {
     loading.value = false
   }

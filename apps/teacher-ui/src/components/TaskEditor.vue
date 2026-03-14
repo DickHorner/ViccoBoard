@@ -10,8 +10,8 @@
       <div
         class="drag-handle"
 aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss        draggable="true"
-        :title="`Drag to reorder task ${taskNumber}`"
-        :aria-label="`Drag handle for task ${taskNumber}. Use Alt+Up or Alt+Down to reorder with keyboard.`"
+        :title="`Aufgabe ${taskNumber} zum Umordnen ziehen`"
+        :aria-label="`Ziehpunkt für Aufgabe ${taskNumber}. Mit Alt+Pfeil hoch oder Alt+Pfeil runter per Tastatur umordnen.`"
         role="button"
         tabindex="0"
         @keydown.enter.prevent="handleKeyActivate"
@@ -22,14 +22,14 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
       >
         ⋮⋮
       </div>
-      <component :is="headerTag">Task {{ taskNumber }}</component>
+      <component :is="headerTag">Aufgabe {{ taskNumber }}</component>
       <div class="task-actions">
         <button
           v-if="index > 0"
           class="ghost"
           type="button"
           @click="$emit('moveUp')"
-          title="Move up"
+          title="Nach oben"
         >
           ↑
         </button>
@@ -38,29 +38,29 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
           class="ghost"
           type="button"
           @click="$emit('moveDown')"
-          title="Move down"
+          title="Nach unten"
         >
           ↓
         </button>
-        <button class="ghost" type="button" @click="$emit('remove')" title="Remove task">
+        <button class="ghost" type="button" @click="$emit('remove')" title="Aufgabe entfernen">
           ✕
         </button>
       </div>
     </div>
 
     <div class="field">
-      <label :for="`task-title-${task.id}`">Title</label>
+      <label :for="`task-title-${task.id}`">Titel</label>
       <input
         :id="`task-title-${task.id}`"
         v-model="task.title"
         type="text"
-        placeholder="Task title"
+        placeholder="Aufgabentitel"
       />
     </div>
 
     <div class="field-grid">
       <div class="field">
-        <label :for="`task-points-${task.id}`">Points</label>
+        <label :for="`task-points-${task.id}`">Punkte</label>
         <input
           :id="`task-points-${task.id}`"
           v-model.number="task.points"
@@ -70,7 +70,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
         />
       </div>
       <div class="field">
-        <label :for="`task-bonus-${task.id}`">Bonus points</label>
+        <label :for="`task-bonus-${task.id}`">Bonuspunkte</label>
         <input
           :id="`task-bonus-${task.id}`"
           v-model.number="task.bonusPoints"
@@ -84,25 +84,25 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
     <div v-if="mode === 'complex'" class="field">
       <label class="choice-toggle">
         <input v-model="task.isChoice" type="checkbox" />
-        Choice task
+        Wahlaufgabe
       </label>
       <input
         v-if="task.isChoice"
         v-model="task.choiceGroup"
         type="text"
-        placeholder="Choice group (e.g., A, B, C)"
+        placeholder="Wahlgruppe (z. B. A, B, C)"
       />
     </div>
 
     <div class="criteria-block">
       <div class="panel-header">
-        <component :is="criteriaHeaderTag">Criteria</component>
+        <component :is="criteriaHeaderTag">Kriterien</component>
         <button class="ghost" type="button" @click="store.addCriterion(task)">
-          Add criterion
+          Kriterium hinzufügen
         </button>
       </div>
       <div v-if="task.criteria.length === 0" class="empty">
-        No criteria yet.
+        Noch keine Kriterien.
       </div>
       <div
         v-for="criterion in task.criteria"
@@ -112,7 +112,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
         <input
           v-model="criterion.text"
           type="text"
-          placeholder="Criterion"
+          placeholder="Kriterium"
         />
         <input
           v-model.number="criterion.points"
@@ -125,20 +125,20 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
           type="button"
           @click="store.removeCriterion(task, criterion.id)"
         >
-          Remove
+          Entfernen
         </button>
       </div>
     </div>
 
     <div v-if="canAddSubtasks" class="subtasks">
       <div class="panel-header">
-        <component :is="subtasksHeaderTag">Subtasks {{ subtasksLevel }}</component>
+        <component :is="subtasksHeaderTag">Teilaufgaben {{ subtasksLevel }}</component>
         <button
           class="ghost"
           type="button"
           @click="store.addSubtask(task, nextLevel)"
         >
-          Add subtask
+          Teilaufgabe hinzufügen
         </button>
       </div>
 
@@ -218,8 +218,8 @@ const subtasksHeaderTag = computed(() => {
 })
 
 const subtasksLevel = computed(() => {
-  if (props.level === 1) return '(level 2)'
-  return '(level 3)'
+  if (props.level === 1) return '(Ebene 2)'
+  return '(Ebene 3)'
 })
 
 // Drag-and-drop handlers
@@ -256,7 +256,7 @@ const handleDrop = (event: DragEvent) => {
 
     // Only allow drops within same level for safety
     if (fromLevel !== props.level) {
-      toast.warning('Cannot move tasks between different hierarchy levels')
+      toast.warning('Aufgaben können nicht zwischen verschiedenen Hierarchieebenen verschoben werden.')
       return
     }
 
@@ -274,7 +274,7 @@ const handleDrop = (event: DragEvent) => {
       // Nested level reorder within same parent
       // Validate that dragged task belongs to the same parent
       if (data.parentId !== props.parentTask.id) {
-        toast.warning('Cannot move tasks between different parent subtask lists')
+        toast.warning('Aufgaben können nicht zwischen verschiedenen Teilaufgabenlisten verschoben werden.')
         return
       }
       const fromPos = props.parentTask.subtasks.findIndex(t => t.id === taskId)
@@ -283,7 +283,7 @@ const handleDrop = (event: DragEvent) => {
       }
     }
   } catch (err) {
-    toast.error('Error reordering tasks. Please try again.')
+    toast.error('Fehler beim Umordnen der Aufgaben. Bitte erneut versuchen.')
   }
 }
 
@@ -313,7 +313,7 @@ const handleKeyReorder = (event: KeyboardEvent) => {
 
 const handleKeyActivate = (event: KeyboardEvent) => {
   if (event.repeat) return
-  toast.info('Use Alt+Up or Alt+Down to reorder tasks.')
+  toast.info('Mit Alt+Pfeil hoch oder Alt+Pfeil runter lassen sich Aufgaben umordnen.')
 }
 </script>
 

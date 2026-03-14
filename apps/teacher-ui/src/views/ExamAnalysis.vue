@@ -1,13 +1,13 @@
 <template>
   <div class="exam-analysis">
     <div class="analysis-header">
-      <h1>{{ exam.title }} - Analysis & Difficulty</h1>
+      <h1>{{ exam.title }} - Analyse und Schwierigkeit</h1>
       <div class="header-controls">
         <button @click="refreshAnalysis" class="btn-refresh">
-          🔄 Refresh
+          🔄 Aktualisieren
         </button>
         <button @click="exportAnalysis" class="btn-export">
-          ⬇️ Export
+          ⬇️ Exportieren
         </button>
       </div>
     </div>
@@ -25,41 +25,41 @@
 
     <!-- Overall Statistics Tab -->
     <div v-if="selectedTab === 'statistics'" class="analysis-section">
-      <h2>Overall Statistics</h2>
+      <h2>Gesamtstatistik</h2>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Total Candidates</div>
+          <div class="stat-label">Schüler gesamt</div>
           <div class="stat-value">{{ analysis?.totalCandidates }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Completed</div>
+          <div class="stat-label">Abgeschlossen</div>
           <div class="stat-value">{{ analysis?.completedCount }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Average Score</div>
+          <div class="stat-label">Durchschnittspunktzahl</div>
           <div class="stat-value">{{ formatScore(analysis?.averageScore) }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Median Score</div>
+          <div class="stat-label">Medianpunktzahl</div>
           <div class="stat-value">{{ formatScore(analysis?.medianScore) }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Min Score</div>
+          <div class="stat-label">Minimum</div>
           <div class="stat-value">{{ formatScore(analysis?.minScore) }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Max Score</div>
+          <div class="stat-label">Maximum</div>
           <div class="stat-value">{{ formatScore(analysis?.maxScore) }}</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Std Deviation</div>
+          <div class="stat-label">Standardabweichung</div>
           <div class="stat-value">{{ formatScore(analysis?.standardDeviation) }}</div>
         </div>
       </div>
 
       <!-- Grade Distribution -->
       <div v-if="analysis" class="grade-distribution">
-        <h3>Grade Distribution</h3>
+        <h3>Notenverteilung</h3>
         <div class="grade-bars">
           <div
             v-for="[grade, count] of analysis.gradeDistribution"
@@ -81,15 +81,15 @@
 
     <!-- Task Difficulty Tab -->
     <div v-if="selectedTab === 'difficulty'" class="analysis-section">
-      <h2>Task Difficulty Analysis</h2>
+      <h2>Aufgabenschwierigkeit</h2>
       <div class="difficulty-table">
         <table>
           <thead>
             <tr>
-              <th @click="sortBy('title')" class="sortable">Task {{ getSortIcon('title') }}</th>
-              <th @click="sortBy('difficultyIndex')" class="sortable">Difficulty {{ getSortIcon('difficultyIndex') }}</th>
-              <th @click="sortBy('averageScore')" class="sortable">Avg Score {{ getSortIcon('averageScore') }}</th>
-              <th @click="sortBy('standardDeviation')" class="sortable">Std Dev {{ getSortIcon('standardDeviation') }}</th>
+              <th @click="sortBy('title')" class="sortable">Aufgabe {{ getSortIcon('title') }}</th>
+              <th @click="sortBy('difficultyIndex')" class="sortable">Schwierigkeit {{ getSortIcon('difficultyIndex') }}</th>
+              <th @click="sortBy('averageScore')" class="sortable">Ø Punkte {{ getSortIcon('averageScore') }}</th>
+              <th @click="sortBy('standardDeviation')" class="sortable">Std.-Abw. {{ getSortIcon('standardDeviation') }}</th>
               <th>Critical</th>
               <th>Excellent</th>
             </tr>
@@ -118,19 +118,19 @@
       <!-- Outliers -->
       <div v-if="outliers" class="outliers-section">
         <div v-if="outliers.veryDifficult.length > 0" class="outlier-group">
-          <h3>🚨 Very Difficult Tasks</h3>
+          <h3>🚨 Sehr schwierige Aufgaben</h3>
           <ul>
             <li v-for="task in outliers.veryDifficult" :key="task.taskId">
-              {{ task.taskTitle }} ({{ formatPercentage(task.difficultyIndex) }}% average)
+              {{ task.taskTitle }} ({{ formatPercentage(task.difficultyIndex) }} % im Mittel)
             </li>
           </ul>
         </div>
 
         <div v-if="outliers.veryEasy.length > 0" class="outlier-group">
-          <h3>✅ Very Easy Tasks</h3>
+          <h3>✅ Sehr leichte Aufgaben</h3>
           <ul>
             <li v-for="task in outliers.veryEasy" :key="task.taskId">
-              {{ task.taskTitle }} ({{ formatPercentage(task.difficultyIndex) }}% average)
+              {{ task.taskTitle }} ({{ formatPercentage(task.difficultyIndex) }} % im Mittel)
             </li>
           </ul>
         </div>
@@ -139,10 +139,10 @@
 
     <!-- Point Adjustment Tab -->
     <div v-if="selectedTab === 'adjustment'" class="analysis-section">
-      <h2>Point Distribution Adjustment</h2>
+      <h2>Anpassung der Punkteverteilung</h2>
 
       <div class="adjustment-controls">
-        <label>Target Difficulty Index</label>
+        <label>Ziel-Schwierigkeitsindex</label>
         <input
           v-model.number="targetDifficulty"
           type="range"
@@ -152,21 +152,21 @@
         />
         <span>{{ formatPercentage(targetDifficulty * 100) }}%</span>
         <button @click="calculateAdjustments" class="btn-calculate">
-          Calculate Suggestions
+          Vorschläge berechnen
         </button>
       </div>
 
       <div v-if="adjustmentSuggestion" class="adjustment-results">
-        <h3>Suggested Adjustments</h3>
+        <h3>Vorgeschlagene Anpassungen</h3>
 
         <table class="adjustment-table">
           <thead>
             <tr>
-              <th>Task</th>
-              <th>Current Points</th>
-              <th>Suggested Points</th>
-              <th>Change</th>
-              <th>Reason</th>
+              <th>Aufgabe</th>
+              <th>Aktuelle Punkte</th>
+              <th>Vorgeschlagene Punkte</th>
+              <th>Änderung</th>
+              <th>Begründung</th>
             </tr>
           </thead>
           <tbody>
@@ -187,19 +187,19 @@
         </table>
 
         <div class="impact-analysis">
-          <h4>Projected Impact</h4>
-          <p>Average Grade Shift: {{ formatScore(adjustmentSuggestion.impactAnalysis.gradeShift) }}</p>
+          <h4>Erwartete Auswirkung</h4>
+          <p>Durchschnittliche Notenverschiebung: {{ formatScore(adjustmentSuggestion.impactAnalysis.gradeShift) }}</p>
           <p v-if="adjustmentSuggestion.adjustments.length === 0" class="no-changes">
-            ✅ Current distribution is optimal
+            ✅ Die aktuelle Verteilung ist optimal
           </p>
         </div>
 
         <div class="action-buttons">
           <button @click="applyAdjustments" class="btn-apply">
-            ✅ Apply Adjustments
+            ✅ Anpassungen übernehmen
           </button>
           <button @click="resetAdjustments" class="btn-reset">
-            ↺ Reset
+            ↺ Zurücksetzen
           </button>
         </div>
       </div>
@@ -207,10 +207,10 @@
 
     <!-- Students at Risk Tab -->
     <div v-if="selectedTab === 'risk'" class="analysis-section">
-      <h2>Students at Risk</h2>
+      <h2>Gefährdete Schüler</h2>
 
       <div class="risk-controls">
-        <label>Risk Threshold (%)</label>
+        <label>Risikogrenze (%)</label>
         <input
           v-model.number="riskThreshold"
           type="range"
@@ -225,9 +225,9 @@
         <table>
           <thead>
             <tr>
-              <th @click="sortRiskBy('name')" class="sortable">Student {{ getSortIcon('name') }}</th>
-              <th @click="sortRiskBy('percentage')" class="sortable">Score % {{ getSortIcon('percentage') }}</th>
-              <th @click="sortRiskBy('riskLevel')" class="sortable">Risk Level {{ getSortIcon('riskLevel') }}</th>
+              <th @click="sortRiskBy('name')" class="sortable">Schüler {{ getSortIcon('name') }}</th>
+              <th @click="sortRiskBy('percentage')" class="sortable">Punktzahl % {{ getSortIcon('percentage') }}</th>
+              <th @click="sortRiskBy('riskLevel')" class="sortable">Risikostufe {{ getSortIcon('riskLevel') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -256,20 +256,20 @@
       </div>
 
       <div v-else class="no-risk">
-        <p>✅ All students above threshold</p>
+        <p>✅ Alle Schüler liegen über dem Grenzwert</p>
       </div>
     </div>
 
     <!-- Variance Analysis Tab -->
     <div v-if="selectedTab === 'variance'" class="analysis-section">
-      <h2>Performance Variance by Task</h2>
+      <h2>Leistungsstreuung je Aufgabe</h2>
       <div class="variance-table">
         <table>
           <thead>
             <tr>
-              <th>Task</th>
-              <th>Variance</th>
-              <th>Consistency</th>
+              <th>Aufgabe</th>
+              <th>Varianz</th>
+              <th>Konsistenz</th>
             </tr>
           </thead>
           <tbody>
@@ -293,7 +293,7 @@
         </table>
       </div>
       <p class="variance-note">
-        Higher variance = less consistent performance (some students score much higher/lower than others)
+        Höhere Varianz bedeutet weniger konsistente Leistungen, also deutlich größere Unterschiede zwischen den Schülern.
       </p>
     </div>
   </div>
@@ -363,13 +363,13 @@ const exportAnalysis = () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `analysis-${props.exam.id}-${Date.now()}.json`;
+  a.download = `analyse-${props.exam.id}-${Date.now()}.json`;
   a.click();
 };
 
 const applyAdjustments = () => {
   // This would emit an event or call a use case to actually apply the adjustments
-  alert('Adjustment application would be implemented via use-case pattern');
+  alert('Das Übernehmen der Anpassungen wird über einen Use Case umgesetzt.');
 };
 
 const resetAdjustments = () => {
@@ -480,22 +480,22 @@ const formatRiskLevel = (level: string): string => {
 
 const getCandidateName = (candidateId: string): string => {
   const candidate = props.candidates?.find(c => c.id === candidateId);
-  if (!candidate) return 'Unknown';
+  if (!candidate) return 'Unbekannt';
   return `${candidate.firstName} ${candidate.lastName}`.trim();
 };
 
 const getTabLabel = (tab: string): string => {
   switch (tab) {
     case 'statistics':
-      return 'Statistics';
+      return 'Statistik';
     case 'difficulty':
-      return 'Difficulty';
+      return 'Schwierigkeit';
     case 'adjustment':
-      return 'Adjustments';
+      return 'Anpassungen';
     case 'risk':
-      return 'At Risk';
+      return 'Risiko';
     case 'variance':
-      return 'Variance';
+      return 'Varianz';
     default:
       return tab;
   }
@@ -503,7 +503,7 @@ const getTabLabel = (tab: string): string => {
 
 const getTaskTitle = (taskId: string): string => {
   const task = props.exam.structure.tasks.find(t => t.id === taskId);
-  return task?.title || 'Unknown Task';
+  return task?.title || 'Unbekannte Aufgabe';
 };
 
 const getSortIcon = (field: string): string => {

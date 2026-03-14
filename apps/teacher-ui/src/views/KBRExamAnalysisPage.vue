@@ -38,7 +38,7 @@ const loadData = async () => {
     const loadedExam = await examRepository?.findById(examId) ?? null
 
     if (!loadedExam) {
-      loadError.value = 'Die angeforderte Pruefung wurde nicht gefunden.'
+      loadError.value = 'Die angeforderte Prüfung wurde nicht gefunden.'
       return
     }
 
