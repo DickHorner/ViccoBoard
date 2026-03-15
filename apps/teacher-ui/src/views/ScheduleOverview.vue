@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1>Stundenplan</h1>
-        <p class="subtitle">Zentrale Stunden- und Tagesuebersicht. Die volle Stundenplanlogik folgt, vorhandene Stunden sind bereits eingebunden.</p>
+        <p class="subtitle">Zentrale Stunden- und Tagesübersicht. Die volle Stundenplanlogik folgt, vorhandene Stunden sind bereits eingebunden.</p>
       </div>
       <RouterLink class="primary-link" to="/lessons">
         Stunden verwalten
@@ -12,21 +12,21 @@
 
     <section class="notice-card">
       <strong>Hinweis zum Ausbaustand</strong>
-      <p>Die Stundenplan-Startseite zeigt bereits heutige und anstehende Stunden. Automatische Stundenplanerzeugung und Wochenraster werden im naechsten Schritt ausgebaut.</p>
+      <p>Die Stundenplan-Startseite zeigt bereits heutige und anstehende Stunden. Automatische Stundenplanerzeugung und Wochenraster werden im nächsten Schritt ausgebaut.</p>
     </section>
 
     <div v-if="loading" class="state-card">Stunden werden geladen...</div>
     <div v-else-if="loadError" class="state-card error">{{ loadError }}</div>
     <div v-else class="schedule-grid">
       <section class="panel hero-panel">
-        <h2>Jetzt / Als Naechstes</h2>
+        <h2>Jetzt / Als Nächstes</h2>
         <div v-if="currentOrNextLesson" class="lesson-focus">
           <p class="eyebrow">{{ currentOrNextMode }}</p>
           <h3>{{ getClassName(currentOrNextLesson.classGroupId) }}</h3>
           <p>{{ formatLessonDateTime(currentOrNextLesson.date) }}</p>
           <div class="actions">
             <RouterLink :to="`/lessons/${currentOrNextLesson.id}/workspace`" class="ghost-link">
-              Workspace oeffnen
+              Arbeitsbereich öffnen
             </RouterLink>
             <RouterLink :to="`/attendance?classId=${currentOrNextLesson.classGroupId}&lessonId=${currentOrNextLesson.id}`" class="primary-link">
               Anwesenheit
@@ -42,13 +42,13 @@
           <strong>{{ getClassName(upcomingLesson.classGroupId) }}</strong>
           <span>{{ formatLessonDateTime(upcomingLesson.date) }}</span>
         </div>
-        <p v-else class="empty-text">Keine weitere Stunde fuer heute gefunden.</p>
+        <p v-else class="empty-text">Keine weitere Stunde für heute gefunden.</p>
       </section>
 
       <section class="panel full-width">
         <div class="panel-header">
           <h2>Heute</h2>
-          <span>{{ todayLessons.length }} Eintraege</span>
+          <span>{{ todayLessons.length }} Einträge</span>
         </div>
 
         <div v-if="todayLessons.length === 0" class="empty-text">Heute liegen noch keine Stunden in der Datenbasis.</div>
@@ -64,7 +64,7 @@
               <strong>{{ getClassName(lesson.classGroupId) }}</strong>
               <p>{{ formatLessonTime(lesson.date) }}</p>
             </div>
-            <span>oeffnen</span>
+            <span>öffnen</span>
           </RouterLink>
         </div>
       </section>
@@ -100,7 +100,7 @@ const currentOrNextMode = computed(() => {
     return 'Heute'
   }
 
-  return currentOrNextLesson.value.date.getTime() >= now.value ? 'Als Naechstes' : 'Zuletzt heute'
+  return currentOrNextLesson.value.date.getTime() >= now.value ? 'Als Nächstes' : 'Zuletzt heute'
 })
 
 const loadData = async () => {

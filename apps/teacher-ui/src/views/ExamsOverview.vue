@@ -2,20 +2,20 @@
   <section class="exams-overview">
     <header class="overview-header">
       <div>
-        <h1>Exams</h1>
-        <p class="subtitle">Build and manage simple exams for KBR.</p>
+        <h1>Prüfungen</h1>
+        <p class="subtitle">Prüfungen für KBR erstellen und verwalten.</p>
       </div>
       <button class="primary" type="button" @click="createNew">
-        New exam
+        Neue Prüfung
       </button>
     </header>
 
-    <div v-if="loading" class="state-card">Loading exams…</div>
+    <div v-if="loading" class="state-card">Prüfungen werden geladen…</div>
 
     <div v-else-if="exams.length === 0" class="state-card">
-      <h2>No exams yet</h2>
-      <p>Start with a simple structure: tasks, points, and criteria.</p>
-      <button class="primary" type="button" @click="createNew">Create your first exam</button>
+      <h2>Noch keine Prüfungen</h2>
+      <p>Starten Sie mit einer einfachen Struktur aus Aufgaben, Punkten und Kriterien.</p>
+      <button class="primary" type="button" @click="createNew">Erste Prüfung erstellen</button>
     </div>
 
     <div v-else class="exam-grid">
@@ -26,14 +26,14 @@
         </div>
         <p class="exam-desc" v-if="exam.description">{{ exam.description }}</p>
         <div class="exam-meta">
-          <span>{{ exam.structure.tasks.length }} tasks</span>
-          <span>{{ exam.structure.totalPoints }} points</span>
-          <span class="meta-date">Updated {{ formatDate(exam.lastModified) }}</span>
+          <span>{{ exam.structure.tasks.length }} Aufgaben</span>
+          <span>{{ exam.structure.totalPoints }} Punkte</span>
+          <span class="meta-date">Aktualisiert {{ formatDate(exam.lastModified) }}</span>
         </div>
         <div class="exam-actions">
-          <button class="ghost" type="button" @click="editExam(exam.id)">Open</button>
-          <button class="ghost" type="button" @click="openCorrection(exam.id)">Correct</button>
-          <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analyze</button>
+          <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+          <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
+          <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
         </div>
       </article>
     </div>
@@ -77,11 +77,11 @@ const openAnalysis = (id: string) => {
 const formatStatus = (status: ExamsTypes.Exam['status']) => {
   switch (status) {
     case 'in-progress':
-      return 'In progress'
+      return 'In Bearbeitung'
     case 'completed':
-      return 'Completed'
+      return 'Abgeschlossen'
     default:
-      return 'Draft'
+      return 'Entwurf'
   }
 }
 

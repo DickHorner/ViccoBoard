@@ -1,30 +1,30 @@
 <template>
   <section class="panel exam-details">
-    <h2>Exam details</h2>
+    <h2>Prüfungsdetails</h2>
 
     <div class="field">
-      <label for="title">Title <span class="required">*</span></label>
+      <label for="title">Titel <span class="required">*</span></label>
       <input
         id="title"
         v-model="store.title"
         type="text"
-        placeholder="Exam title"
+        placeholder="Prüfungstitel"
         required
       />
     </div>
 
     <div class="field">
-      <label for="description">Description</label>
+      <label for="description">Beschreibung</label>
       <textarea
         id="description"
         v-model="store.description"
         rows="4"
-        placeholder="Optional description for students"
+        placeholder="Optionale Beschreibung für Schüler"
       />
     </div>
 
     <div class="field">
-      <label for="classGroupId">Class group ID</label>
+      <label for="classGroupId">Klassen-ID</label>
       <input
         id="classGroupId"
         v-model="store.classGroupId"
@@ -34,7 +34,7 @@
     </div>
 
     <div class="field">
-      <label>Exam mode</label>
+      <label>Prüfungsmodus</label>
       <div class="mode-pills">
         <button
           type="button"
@@ -42,7 +42,7 @@
           :class="{ active: store.mode === 'simple' }"
           @click="store.setMode('simple')"
         >
-          Simple
+          Einfach
         </button>
         <button
           type="button"
@@ -50,15 +50,15 @@
           :class="{ active: store.mode === 'complex' }"
           @click="store.setMode('complex')"
         >
-          Complex
+          Komplex
         </button>
       </div>
       <p class="help-text">
         <template v-if="store.mode === 'simple'">
-          Simple mode: flat list of tasks with criteria
+          Einfacher Modus: flache Aufgabenliste mit Kriterien
         </template>
         <template v-else>
-          Complex mode: nested tasks (3 levels), exam parts, choice tasks
+          Komplexer Modus: verschachtelte Aufgaben (3 Ebenen), Prüfungsteile und Wahlaufgaben
         </template>
       </p>
     </div>

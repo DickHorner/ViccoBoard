@@ -3,19 +3,19 @@
     <header class="page-header">
       <div>
         <h1>KBR</h1>
-        <p class="subtitle">Arbeitsbereich fuer Pruefungen, Korrektur und Auswertung. Von hier aus sollen spaeter alle KBR-Teilbereiche konsistent erreichbar sein.</p>
+        <p class="subtitle">Arbeitsbereich für Prüfungen, Korrektur und Auswertung. Von hier aus sollen später alle KBR-Teilbereiche konsistent erreichbar sein.</p>
       </div>
-      <span class="summary-pill">{{ examCount }} Pruefungen</span>
+      <span class="summary-pill">{{ examCount }} Prüfungen</span>
     </header>
 
     <section class="metrics-grid">
       <article class="metric-card">
         <strong>{{ examCount }}</strong>
-        <span>Pruefungen</span>
+        <span>Prüfungen</span>
       </article>
       <article class="metric-card">
         <strong>{{ supportTipCount }}</strong>
-        <span>Foerdertipps</span>
+        <span>Fördertipps</span>
       </article>
       <article class="metric-card">
         <strong>{{ longTermNoteCount }}</strong>
@@ -25,15 +25,15 @@
 
     <div class="hub-grid">
       <RouterLink class="hub-card" to="/exams">
-        <p class="eyebrow">Uebersicht</p>
-        <h2>Pruefungen</h2>
-        <p>Bestehende Pruefungen ansehen, bearbeiten und in die Korrektur wechseln.</p>
+        <p class="eyebrow">Übersicht</p>
+        <h2>Prüfungen</h2>
+        <p>Bestehende Prüfungen ansehen, bearbeiten und in die Korrektur wechseln.</p>
       </RouterLink>
 
       <RouterLink class="hub-card" to="/exams/new">
-        <p class="eyebrow">Builder</p>
-        <h2>Neue Pruefung</h2>
-        <p>Direkter Einstieg in den KBR-Builder fuer einfache und komplexe Strukturen.</p>
+        <p class="eyebrow">Editor</p>
+        <h2>Neue Prüfung</h2>
+        <p>Direkter Einstieg in den KBR-Editor für einfache und komplexe Strukturen.</p>
       </RouterLink>
 
       <RouterLink class="hub-card" :to="analysisEntry.to">
@@ -48,8 +48,8 @@
         <h2>Zuletzt bearbeitet</h2>
       </div>
 
-      <div v-if="loading" class="state-card">Pruefungen werden geladen...</div>
-      <div v-else-if="recentExams.length === 0" class="state-card">Noch keine Pruefungen vorhanden.</div>
+      <div v-if="loading" class="state-card">Prüfungen werden geladen...</div>
+      <div v-else-if="recentExams.length === 0" class="state-card">Noch keine Prüfungen vorhanden.</div>
 
       <div v-else class="exam-list">
         <article v-for="exam in recentExams" :key="exam.id" class="exam-row">
@@ -58,7 +58,7 @@
             <p>{{ formatDate(exam.lastModified) }}</p>
           </div>
           <div class="row-actions">
-            <RouterLink :to="`/exams/${exam.id}`" class="ghost-link">Oeffnen</RouterLink>
+            <RouterLink :to="`/exams/${exam.id}`" class="ghost-link">Öffnen</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/correct`" class="ghost-link">Korrigieren</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/analysis`" class="ghost-link">Analyse</RouterLink>
           </div>
@@ -95,7 +95,7 @@ const analysisEntry = computed(() => {
     return {
       to: '/exams',
       title: 'Analyse vorbereiten',
-      description: 'Sobald Pruefungen vorhanden sind, oeffnet sich hier der direkte Weg in Statistik und Schwierigkeit.'
+      description: 'Sobald Prüfungen vorhanden sind, öffnet sich hier der direkte Weg in Statistik und Schwierigkeit.'
     }
   }
 

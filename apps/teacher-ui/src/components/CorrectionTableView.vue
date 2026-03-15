@@ -12,16 +12,16 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search candidates..."
+            placeholder="Schüler suchen..."
             class="search-input"
           />
           <select v-model="sortBy" class="sort-select">
-            <option value="name">Sort by Name</option>
-            <option value="total">Sort by Total Points</option>
-            <option value="percentage">Sort by Percentage</option>
-            <option value="grade">Sort by Grade</option>
+            <option value="name">Nach Name sortieren</option>
+            <option value="total">Nach Gesamtpunkten sortieren</option>
+            <option value="percentage">Nach Prozent sortieren</option>
+            <option value="grade">Nach Note sortieren</option>
             <option v-for="task in exam.structure.tasks" :key="`sort-task-${task.id}`" :value="`task:${task.id}`">
-              Sort by Task: {{ task.title }}
+              Nach Aufgabe sortieren: {{ task.title }}
             </option>
           </select>
         </div>
@@ -30,19 +30,19 @@
             :class="['view-btn', { active: viewMode === 'table' }]"
             @click="viewMode = 'table'"
           >
-            📋 Table View
+            📋 Tabellenansicht
           </button>
           <button
             :class="['view-btn', { active: viewMode === 'compact' }]"
             @click="viewMode = 'compact'"
           >
-            👤 Candidate View
+            👤 Schüleransicht
           </button>
           <button
             :class="['view-btn', { active: viewMode === 'awk' }]"
             @click="viewMode = 'awk'"
           >
-            ✏️ Task-by-Task (AWK)
+            ✏️ Aufgabe für Aufgabe (AWK)
           </button>
         </div>
       </div>
@@ -53,14 +53,14 @@
       <table class="correction-table">
         <thead>
           <tr>
-            <th class="sticky-col">Candidate</th>
+            <th class="sticky-col">Schüler</th>
             <th v-for="task in exam.structure.tasks" :key="task.id" class="task-col">
               <span class="task-header">{{ task.title }}</span>
               <span class="task-max">({{ task.points }})</span>
             </th>
-            <th class="sticky-col total-col">Total</th>
+            <th class="sticky-col total-col">Gesamt</th>
             <th class="sticky-col percent-col">%</th>
-            <th class="sticky-col grade-col">Grade</th>
+            <th class="sticky-col grade-col">Note</th>
           </tr>
         </thead>
         <tbody>
@@ -102,15 +102,15 @@
     <!-- Statistics Footer -->
     <div v-if="viewMode === 'table'" class="statistics">
       <div class="stat-item">
-        <span class="stat-label">Average Score:</span>
+        <span class="stat-label">Durchschnittspunktzahl:</span>
         <span class="stat-value">{{ averageScore.toFixed(1) }}/{{ exam.gradingKey.totalPoints }}</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Completed:</span>
+        <span class="stat-label">Abgeschlossen:</span>
         <span class="stat-value">{{ completedCount }}/{{ totalCandidates }}</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Average Grade:</span>
+        <span class="stat-label">Durchschnittsnote:</span>
         <span class="stat-value">{{ averageGrade }}</span>
       </div>
     </div>
@@ -118,11 +118,11 @@
     <!-- Task-by-Task (AWK) View -->
     <div v-if="viewMode === 'awk'" class="awk-view">
       <div class="awk-header">
-        <h3>Correct Task by Task (AWK)</h3>
+        <h3>Aufgabe für Aufgabe korrigieren (AWK)</h3>
         <select v-model="currentTaskId" class="task-selector">
-          <option value="">-- Select a task --</option>
+          <option value="">-- Aufgabe wählen --</option>
           <option v-for="task in exam.structure.tasks" :key="task.id" :value="task.id">
-            {{ task.title }} ({{ task.points }} points)
+            {{ task.title }} ({{ task.points }} Punkte)
           </option>
         </select>
       </div>
@@ -143,7 +143,7 @@
           </div>
           <div class="awk-actions">
             <button class="edit-btn" @click.stop="jumpToTaskForCandidate(candidate, currentTaskId)">
-              ✏️ Edit
+              ✏️ Bearbeiten
             </button>
           </div>
         </div>
@@ -153,27 +153,27 @@
     <!-- Comments Management Modal -->
     <div v-if="showCommentsModal" class="modal-overlay" @click.self="showCommentsModal = false">
       <div class="modal-content">
-        <h3>Manage Comments for {{ selectedCandidate?.firstName }} {{ selectedCandidate?.lastName }}<span v-if="commentTaskId"> — {{ exam.structure.tasks.find(t => t.id === commentTaskId)?.title }}</span></h3>
+        <h3>Kommentare verwalten für {{ selectedCandidate?.firstName }} {{ selectedCandidate?.lastName }}<span v-if="commentTaskId"> — {{ exam.structure.tasks.find(t => t.id === commentTaskId)?.title }}</span></h3>
         <div class="comments-editor">
           <div class="comment-item">
             <label>
-              <input v-model="editingComment.text" type="text" class="comment-text-input" placeholder="Enter comment..." />
+              <input v-model="editingComment.text" type="text" class="comment-text-input" placeholder="Kommentar eingeben..." />
             </label>
             <div class="comment-options">
               <label class="checkbox-label">
                 <input v-model="editingComment.printable" type="checkbox" />
-                Printable
+                Druckbar
               </label>
               <label class="checkbox-label">
                 <input v-model="editingComment.availableAfterReturn" type="checkbox" />
-                Available after return
+                Nach Rückgabe verfügbar
               </label>
             </div>
           </div>
         </div>
         <!-- Copy to other candidates -->
         <div v-if="candidates.length > 1" class="copy-section">
-          <p class="copy-label">Copy this comment to:</p>
+          <p class="copy-label">Diesen Kommentar kopieren zu:</p>
           <div class="copy-candidates">
             <label
               v-for="c in candidates.filter(c => c.id !== selectedCandidate?.id)"
@@ -190,8 +190,8 @@
           </div>
         </div>
         <div class="modal-buttons">
-          <button @click="saveComment" class="btn-primary">Save</button>
-          <button @click="showCommentsModal = false" class="btn-secondary">Cancel</button>
+          <button @click="saveComment" class="btn-primary">Speichern</button>
+          <button @click="showCommentsModal = false" class="btn-secondary">Abbrechen</button>
         </div>
       </div>
     </div>
@@ -268,7 +268,7 @@ const averageGrade = computed(() => {
     return parseInt(gradeStr) || 0;
   });
   const avg = grades.reduce((sum, g) => sum + g, 0) / props.candidates.length;
-  return isNaN(avg) ? 'N/A' : avg.toFixed(1);
+  return isNaN(avg) ? 'k. A.' : avg.toFixed(1);
 });
 
 // Helper methods
@@ -296,7 +296,7 @@ const getPercentage = (candidateId: string): number => {
 
 const getGrade = (candidateId: string): string => {
   const correction = props.corrections.get(candidateId);
-  return correction?.totalGrade?.toString() || 'N/A';
+  return correction?.totalGrade?.toString() || 'k. A.';
 };
 
 const getCorrectionStatus = (candidateId: string): string | null => {
