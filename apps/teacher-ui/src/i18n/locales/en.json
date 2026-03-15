@@ -118,7 +118,10 @@
     "save_result": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
-    "confirm_delete": "Delete tournament?"
+    "confirm_delete": "Delete tournament?",
+    "import_from_scoreboard": "Import from Scoreboard",
+    "select_scoreboard_session": "Select scoreboard session …",
+    "scoreboard_imported": "Scores imported from scoreboard session"
   },
   "TOURNAMENT": {
     "title": "Tournament",

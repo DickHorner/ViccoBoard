@@ -20,7 +20,7 @@
     <template v-else-if="lesson && classGroup">
       <header class="page-header">
         <div>
-          <p class="eyebrow">Stunden-Workspace</p>
+          <p class="eyebrow">Stundenarbeitsbereich</p>
           <h1>{{ classGroup.name }}</h1>
           <p class="subtitle">{{ formatLessonDateTime(lesson.date) }}</p>
         </div>
@@ -31,7 +31,7 @@
 
       <section v-if="workspaceSubject === 'generic'" class="notice-card">
         <strong>Fachprofil offen</strong>
-        <p>Fuer diese Klasse ist noch kein eindeutiges Fachprofil hinterlegt. Der Workspace bietet deshalb sowohl fachneutrale als auch fachbezogene Einstiege an.</p>
+        <p>Für diese Klasse ist noch kein eindeutiges Fachprofil hinterlegt. Der Arbeitsbereich bietet deshalb sowohl fachneutrale als auch fachbezogene Einstiege an.</p>
       </section>
 
       <div class="workspace-grid">
@@ -40,14 +40,14 @@
           <div class="link-grid">
             <RouterLink :to="`/lessons?classId=${classGroup.id}`" class="workspace-link">
               <strong>Stundenliste</strong>
-              <span>Diese Klasse im Stundenkontext oeffnen</span>
+              <span>Diese Klasse im Stundenkontext öffnen</span>
             </RouterLink>
             <RouterLink :to="`/classes/${classGroup.id}`" class="workspace-link">
               <strong>Klasse</strong>
-              <span>Klasseninformationen, Schueler und Statistiken</span>
+              <span>Klasseninformationen, Schüler und Statistiken</span>
             </RouterLink>
             <RouterLink :to="`/students`" class="workspace-link">
-              <strong>Schueler</strong>
+              <strong>Schüler</strong>
               <span>Zentrale Verwaltung und Profile</span>
             </RouterLink>
           </div>
@@ -70,7 +70,7 @@
 
         <section v-if="recentSessions.length > 0" class="panel full-width">
           <h2>Zuletzt gearbeitet</h2>
-          <p class="section-hint">Letzte Tool-Sessions fuer diese Klasse — Weitermachen mit einem Klick.</p>
+          <p class="section-hint">Letzte Tool-Sitzungen für diese Klasse. Mit einem Klick weiterarbeiten.</p>
           <div class="sessions-list">
             <RouterLink
               v-for="session in recentSessions"
@@ -151,15 +151,15 @@ const subjectEntries = computed(() => {
 
   if (workspaceSubject.value === 'kbr') {
     return [
-      { to: '/subjects/kbr', title: 'KBR-Hub', description: 'Pruefungen, Korrektur und Analyse ansteuern.' },
-      { to: '/exams', title: 'Pruefungen', description: 'Bestehende Pruefungen oeffnen oder neue erstellen.' },
+      { to: '/subjects/kbr', title: 'KBR-Hub', description: 'Prüfungen, Korrektur und Analyse ansteuern.' },
+      { to: '/exams', title: 'Prüfungen', description: 'Bestehende Prüfungen öffnen oder neue erstellen.' },
       { to: '/settings', title: 'Vorbereitung', description: 'Einstellungen und KBR-nahe Konfiguration im Blick behalten.' }
     ]
   }
 
   return [
-    { to: '/subjects/sport', title: 'Sport', description: 'Sport-Workspace fuer Bewertung, Tests und Tools.' },
-    { to: '/subjects/kbr', title: 'KBR', description: 'KBR-Workspace fuer Pruefungen und Korrektur.' },
+    { to: '/subjects/sport', title: 'Sport', description: 'Sport-Arbeitsbereich für Bewertung, Tests und Tools.' },
+    { to: '/subjects/kbr', title: 'KBR', description: 'KBR-Arbeitsbereich für Prüfungen und Korrektur.' },
     { to: '/schedule', title: 'Organisation', description: 'Fachneutral im Stundenplan und bei der Stunde bleiben.' }
   ]
 })
@@ -185,7 +185,7 @@ const loadData = async () => {
     const loadedClassGroup = await SportBridge.classGroupRepository.findById(loadedLesson.classGroupId)
 
     if (!loadedClassGroup) {
-      loadError.value = 'Die zugehoerige Klasse konnte nicht geladen werden.'
+      loadError.value = 'Die zugehörige Klasse konnte nicht geladen werden.'
       return
     }
 
@@ -205,7 +205,7 @@ const loadData = async () => {
       }))
   } catch (error) {
     console.error('Failed to load lesson workspace:', error)
-    loadError.value = 'Der Stunden-Workspace konnte nicht geladen werden.'
+    loadError.value = 'Der Stundenarbeitsbereich konnte nicht geladen werden.'
   } finally {
     loading.value = false
   }

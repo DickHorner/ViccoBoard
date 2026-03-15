@@ -2,14 +2,14 @@
   <section class="exam-builder">
     <div class="builder-header">
       <div class="title-area">
-        <h1>{{ store.isEditing ? 'Edit exam' : 'New exam' }}</h1>
+        <h1>{{ store.isEditing ? 'Prüfung bearbeiten' : 'Neue Prüfung' }}</h1>
         <p class="subtitle">
-          {{ store.mode === 'simple' ? 'Simple exam: flat task list' : 'Complex exam: nested tasks, parts' }}
+          {{ store.mode === 'simple' ? 'Einfache Prüfung: flache Aufgabenliste' : 'Komplexe Prüfung: verschachtelte Aufgaben und Prüfungsteile' }}
         </p>
       </div>
       <div class="header-actions">
-        <button type="button" @click="goBack">Back</button>
-        <button type="button" :disabled="!store.canSave" @click="handleSave">Save</button>
+        <button type="button" @click="goBack">Zurück</button>
+        <button type="button" :disabled="!store.canSave" @click="handleSave">Speichern</button>
       </div>
     </div>
 

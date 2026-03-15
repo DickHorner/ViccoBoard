@@ -142,7 +142,7 @@
 
       <!-- PDF Export -->
       <section class="card">
-        <h3>PDF Export</h3>
+        <h3>PDF-Export</h3>
         <button 
           class="btn-primary"
           @click="exportPdf"
