@@ -12,35 +12,25 @@
 
 - [docs/README.md](./docs/README.md)
 - [.motherlode/MOTHERLODE.md](./.motherlode/MOTHERLODE.md)
+- [docs/status/STATUS.md](./docs/status/STATUS.md)
 - [docs/planning/ROADMAP.md](./docs/planning/ROADMAP.md)
 - [docs/planning/ISSUES_TRACKER.md](./docs/planning/ISSUES_TRACKER.md)
-- [docs/status/STATUS.md](./docs/status/STATUS.md)
+- [docs/runbooks/local-first-operations.md](./docs/runbooks/local-first-operations.md)
 
-## Reviews and QA
+## Quality and Security
 
-- [docs/reviews/AI_CODE_REVIEW_INSTRUCTIONS.md](./docs/reviews/AI_CODE_REVIEW_INSTRUCTIONS.md)
-- [docs/reviews/CODE_REVIEW_FINDINGS.md](./docs/reviews/CODE_REVIEW_FINDINGS.md)
 - [docs/qa/SECURITY_AND_QA_CHECKLIST.md](./docs/qa/SECURITY_AND_QA_CHECKLIST.md)
+- [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
+- [docs/ossf-badge/CODE_REVIEW_LIFT_PLAYBOOK.md](./docs/ossf-badge/CODE_REVIEW_LIFT_PLAYBOOK.md)
 
-## Architecture and Migration Notes
+## Parity and Specs
 
-- [docs/architecture/MIGRATION_PROGRESS.md](./docs/architecture/MIGRATION_PROGRESS.md)
-- [docs/reviews/PHASE2_AUDIT_FOLLOW_UP.md](./docs/reviews/PHASE2_AUDIT_FOLLOW_UP.md)
+- [docs/parity-spec/sport-apk/README.md](./docs/parity-spec/sport-apk/README.md)
+- [docs/parity-spec/sport-apk/_ledger/PARITY_LEDGER.md](./docs/parity-spec/sport-apk/_ledger/PARITY_LEDGER.md)
+- [docs/parity-spec/kbr/_ledger/KBR_LEDGER.md](./docs/parity-spec/kbr/_ledger/KBR_LEDGER.md)
+- [docs/parity-spec/sport-apk/_evidence/FINAL_RUN_REPORT.md](./docs/parity-spec/sport-apk/_evidence/FINAL_RUN_REPORT.md)
 
-## Session Records
+## Notes
 
-- [docs/sessions/SESSION_CONTINUATION_PHASE3_READY.md](./docs/sessions/SESSION_CONTINUATION_PHASE3_READY.md)
-- [docs/sessions/SESSION_COMPLETE_CRITICAL_BLOCKER_FIXES.md](./docs/sessions/SESSION_COMPLETE_CRITICAL_BLOCKER_FIXES.md)
-- [docs/sessions/SESSION_COMPLETE_PHASE2_2026-02-08.md](./docs/sessions/SESSION_COMPLETE_PHASE2_2026-02-08.md)
-- [docs/sessions/PHASE2_COMPLETE_PHASE3_READY.md](./docs/sessions/PHASE2_COMPLETE_PHASE3_READY.md)
-
-## Verification
-
-- [docs/verification/SESSION_VERIFICATION_2026-02-10.md](./docs/verification/SESSION_VERIFICATION_2026-02-10.md)
-- [docs/verification/VERIFICATION_GAPS_ANALYSIS.md](./docs/verification/VERIFICATION_GAPS_ANALYSIS.md)
-
-## Parity Reports
-
-- [docs/parity-spec/reports/viccoboard_sport_parity_report.md](./docs/parity-spec/reports/viccoboard_sport_parity_report.md)
-- [docs/parity-spec/reports/viccoboard_sport_schema_parity.csv](./docs/parity-spec/reports/viccoboard_sport_schema_parity.csv)
+- Historical phase reports, session logs, and handoff notes were intentionally removed during the March 2026 documentation cleanup.
 
