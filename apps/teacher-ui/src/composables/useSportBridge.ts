@@ -38,6 +38,7 @@ import {
   SavePushupSessionUseCase,
   SaveScoreboardSessionUseCase,
   SaveMultistopSessionUseCase,
+  SaveSlowMotionSessionUseCase,
   SaveTableDefinitionUseCase,
   SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
@@ -114,6 +115,7 @@ interface SportBridge {
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
   savePushupSessionUseCase: SavePushupSessionUseCase;
+  saveSlowMotionSessionUseCase: SaveSlowMotionSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
   createTournamentUseCase: CreateTournamentUseCase;
   updateTournamentMatchUseCase: UpdateTournamentMatchUseCase;
@@ -196,6 +198,7 @@ export function initializeSportBridge(): SportBridge {
   );
   const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepository);
   const savePushupSessionUseCase = new SavePushupSessionUseCase(toolSessionRepository);
+  const saveSlowMotionSessionUseCase = new SaveSlowMotionSessionUseCase(toolSessionRepository);
   const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(
     tableDefinitionRepository
   );
@@ -259,6 +262,7 @@ export function initializeSportBridge(): SportBridge {
     saveCooperSessionUseCase,
     saveMultistopSessionUseCase,
     savePushupSessionUseCase,
+    saveSlowMotionSessionUseCase,
     importTableDefinitionUseCase,
     createTournamentUseCase,
     updateTournamentMatchUseCase,

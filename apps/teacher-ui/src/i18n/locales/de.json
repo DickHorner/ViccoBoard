@@ -217,6 +217,38 @@
         "partial": "Teilweise",
         "bad": "Schlecht"
       }
+    },
+    "basketball": {
+      "title": "Basketball Trefferquote",
+      "loading": "Kamera wird gestartet...",
+      "error-title": "Fehler",
+      "retry": "Erneut versuchen",
+      "define-zone": "Zielbereich festlegen",
+      "zone-hint": "Ziehe auf dem Kamerabild, um den Zielbereich zu markieren (z. B. Korb).",
+      "zone-defined": "Zielbereich festgelegt",
+      "clear-zone": "Bereich löschen",
+      "stats": {
+        "shots": "Treffer",
+        "session-time": "Zeit"
+      },
+      "status": {
+        "ready": "Zielbereich definieren, dann \"Start\" drücken.",
+        "running": "Tracking aktiv — auf das Ziel zielen!",
+        "stopped": "Tracking gestoppt."
+      },
+      "controls": {
+        "start": "Start",
+        "stop": "Stopp",
+        "reset": "Reset"
+      },
+      "sensitivity-label": "Empfindlichkeit:",
+      "sensitivity-low": "Niedrig",
+      "sensitivity-high": "Hoch",
+      "session-saved": "Session gespeichert.",
+      "no-zone-warning": "Bitte zuerst einen Zielbereich definieren.",
+      "start-camera": "Kamera starten",
+      "stop-camera": "Kamera stoppen",
+      "noCameraPermission": "Kamerazugriff verweigert. Bitte Kameraberechtigung in den Einstellungen aktivieren."
     }
   },
   "DATENSCHUTZERKLAERUNG": "Datenschutzerklärung",
@@ -1602,6 +1634,45 @@
     "toolLine": "Linie",
     "hint": "Kamera starten, um Live-Bild und verzögertes Bild gleichzeitig anzuzeigen.",
     "noCameraPermission": "Kamerazugriff verweigert. Bitte Kameraberechtigung in den Einstellungen aktivieren."
+  },
+  "SLOWMO": {
+    "title": "Slow Motion Analyse",
+    "sessions": "Sitzungen",
+    "newSession": "Neue Analyse",
+    "noSessions": "Noch keine Analysesitzungen gespeichert. Klicke auf 'Neue Analyse', um zu starten.",
+    "sessionName": "Sitzungsname",
+    "sessionNamePlaceholder": "z. B. Weitsprung – Max Muster",
+    "studentLabel": "Schüler / Gruppe",
+    "studentLabelPlaceholder": "z. B. Max Muster",
+    "exerciseName": "Übung / Bewegung",
+    "exerciseNamePlaceholder": "z. B. Absprung Weitsprung",
+    "videoFile": "Videodatei",
+    "chooseFile": "Datei auswählen",
+    "fileHint": "Videoformat nach Gerät (mp4, mov). Kein Upload – Datei bleibt lokal.",
+    "cancel": "Abbrechen",
+    "startAnalysis": "Analyse starten",
+    "save": "Sitzung speichern",
+    "saved": "✅ Sitzung gespeichert",
+    "keyframes": "Keyframes",
+    "markers": "Marker",
+    "modePlayback": "Wiedergabe",
+    "modeBiomechanics": "Biomechanik",
+    "noVideoHint": "Kein Video geladen. Bitte eine Videodatei auswählen.",
+    "speed": "Geschwindigkeit",
+    "frameBack": "1 Frame zurück",
+    "frameForward": "1 Frame vor",
+    "bodyPoint": "Körperpunkt",
+    "addKeyframe": "Keyframe setzen",
+    "clearMarkers": "Marker löschen",
+    "keyframeList": "Keyframes",
+    "noKeyframes": "Noch keine Keyframes. Scrubber positionieren und 'Keyframe setzen' klicken.",
+    "deleteKeyframe": "Keyframe löschen",
+    "angles": "Berechnete Winkel",
+    "addRefLine": "Referenzlinie zeichnen",
+    "cancelRefLine": "Referenzlinie abbrechen",
+    "clearRefLines": "Referenzlinien löschen",
+    "notes": "Notizen",
+    "notesPlaceholder": "Beobachtungen zur Bewegungsanalyse ..."
   },
   "ALERT": {
     "receive-new-password": "Neues Passwort erhalten",
