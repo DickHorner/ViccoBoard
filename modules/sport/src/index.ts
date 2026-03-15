@@ -180,6 +180,25 @@ export type {
 export { TableImportService } from './services/table-import.service.js';
 export type { TableImportResult, TableImportValidationError } from './services/table-import.service.js';
 
+export { PushupRepetitionCounter } from './services/pushup-repetition-counter.service.js';
+export type {
+  PushupQuality,
+  PushupPersonResult,
+} from './services/pushup-repetition-counter.service.js';
+export {
+  PUSHUP_MAX_PERSONS,
+  PUSHUP_DOWN_THRESHOLD,
+  PUSHUP_UP_THRESHOLD,
+  PUSHUP_GOOD_QUALITY_MAX,
+  PUSHUP_PARTIAL_QUALITY_MAX,
+} from './services/pushup-repetition-counter.service.js';
+
+export { SavePushupSessionUseCase } from './use-cases/save-pushup-session.use-case.js';
+export type {
+  SavePushupSessionInput,
+  PushupPersonData,
+} from './use-cases/save-pushup-session.use-case.js';
+
 // Plugins
 export { TimerToolPlugin } from './plugins/timer.plugin.js';
 

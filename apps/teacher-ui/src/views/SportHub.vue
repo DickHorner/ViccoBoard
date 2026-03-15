@@ -114,6 +114,10 @@ const entries = [
     description: 'Live-Kamerabild mit konfigurierbarem Delay und Annotations-Overlay fuer Bewegungsbeobachtung.'
   },
   {
+    to: '/tools/pushup-tracking',
+    eyebrow: 'Tool',
+    title: 'Liegestütze Tracking',
+    description: 'Liegestütze per Kamera in Echtzeit zählen – bis zu 4 Personen gleichzeitig mit Qualitätsanzeige.'
     to: '/tools/tracking-basketball',
     eyebrow: 'Tool',
     title: 'Basketball Trefferquote',

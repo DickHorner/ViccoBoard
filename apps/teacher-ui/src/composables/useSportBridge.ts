@@ -35,6 +35,7 @@ import {
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   SaveCooperSessionUseCase,
+  SavePushupSessionUseCase,
   SaveScoreboardSessionUseCase,
   SaveMultistopSessionUseCase,
   SaveSlowMotionSessionUseCase,
@@ -64,6 +65,8 @@ import {
   type RecordAttendanceInput,
   type RecordDiceRollInput,
   type RecordGradeInput,
+  type SavePushupSessionInput,
+  type PushupPersonData,
   type SaveTableDefinitionInput,
   type UpdateGradeCategoryInput
 } from '@viccoboard/sport';
@@ -111,6 +114,7 @@ interface SportBridge {
   saveScoreboardSessionUseCase: SaveScoreboardSessionUseCase;
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
+  savePushupSessionUseCase: SavePushupSessionUseCase;
   saveSlowMotionSessionUseCase: SaveSlowMotionSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
   createTournamentUseCase: CreateTournamentUseCase;
@@ -193,6 +197,7 @@ export function initializeSportBridge(): SportBridge {
     cooperTestConfigRepository
   );
   const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepository);
+  const savePushupSessionUseCase = new SavePushupSessionUseCase(toolSessionRepository);
   const saveSlowMotionSessionUseCase = new SaveSlowMotionSessionUseCase(toolSessionRepository);
   const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(
     tableDefinitionRepository
@@ -256,6 +261,7 @@ export function initializeSportBridge(): SportBridge {
     saveScoreboardSessionUseCase,
     saveCooperSessionUseCase,
     saveMultistopSessionUseCase,
+    savePushupSessionUseCase,
     saveSlowMotionSessionUseCase,
     importTableDefinitionUseCase,
     createTournamentUseCase,
@@ -352,9 +358,11 @@ export type {
   CreateLessonInput,
   DeleteGradeCategoryInput,
   DeleteGradeCategoryResult,
+  PushupPersonData,
   RecordAttendanceInput,
   RecordDiceRollInput,
   RecordGradeInput,
+  SavePushupSessionInput,
   SaveTableDefinitionInput,
   UpdateGradeCategoryInput
 };
