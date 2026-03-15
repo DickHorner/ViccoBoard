@@ -227,6 +227,29 @@
     <div v-if="scoreEntry.open" class="modal-overlay" @click.self="closeScoreEntry">
       <div class="modal-card">
         <h3>{{ t('TOURNAMENTS.enter_result') }}</h3>
+
+        <!-- Scoreboard session import -->
+        <div v-if="scoreboardSessions.length > 0" class="form-group scoreboard-import-group">
+          <label class="form-label">{{ t('TOURNAMENTS.import_from_scoreboard') }}</label>
+          <select
+            v-model="selectedScoreboardSessionId"
+            class="form-select"
+            @change="applyScoreboardSession(selectedScoreboardSessionId)"
+          >
+            <option value="">{{ t('TOURNAMENTS.select_scoreboard_session') }}</option>
+            <option
+              v-for="session in scoreboardSessions"
+              :key="session.id"
+              :value="session.id"
+            >
+              {{ scoreboardSessionLabel(session) }}
+            </option>
+          </select>
+          <p v-if="scoreboardImportHint" class="import-hint">
+            {{ t('TOURNAMENTS.scoreboard_imported') }}
+          </p>
+        </div>
+
         <div class="score-entry-row">
           <span class="team-name">{{ teamName(scoreEntry.match!.team1Id) }}</span>
           <input
@@ -263,6 +286,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import { TournamentService } from '@viccoboard/sport'
+import type { ScoreboardSessionMetadata } from '@viccoboard/sport'
 import type { Sport } from '@viccoboard/core'
 
 const { t } = useI18n()
@@ -300,6 +324,13 @@ const scoreEntry = ref<{
   score1: 0,
   score2: 0
 })
+
+/** Available scoreboard sessions loaded when the score entry modal opens. */
+const scoreboardSessions = ref<Sport.ToolSession[]>([])
+/** Currently selected scoreboard session id (for auto-fill). */
+const selectedScoreboardSessionId = ref('')
+/** Hint shown after a successful scoreboard import. */
+const scoreboardImportHint = ref(false)
 
 // -------------------------------------------------------------------------
 // Bridge
@@ -453,14 +484,66 @@ async function submitCreate() {
 // -------------------------------------------------------------------------
 // Score entry
 // -------------------------------------------------------------------------
-function openScoreEntry(match: Sport.Match) {
+async function openScoreEntry(match: Sport.Match): Promise<void> {
+  selectedScoreboardSessionId.value = ''
+  scoreboardImportHint.value = false
   scoreEntry.value = { open: true, match, score1: 0, score2: 0 }
   scoreError.value = ''
+  await loadScoreboardSessions()
 }
 
 function closeScoreEntry() {
   scoreEntry.value = { open: false, match: null, score1: 0, score2: 0 }
   scoreError.value = ''
+  scoreboardSessions.value = []
+  selectedScoreboardSessionId.value = ''
+  scoreboardImportHint.value = false
+}
+
+// -------------------------------------------------------------------------
+// Scoreboard handoff
+// -------------------------------------------------------------------------
+async function loadScoreboardSessions(): Promise<void> {
+  if (!bridge) return
+  const classGroupId = activeTournament.value?.classGroupId
+  // 'default' is the sentinel used when no real class group was selected at
+  // tournament creation time — fall back to loading all sessions in that case.
+  const all = classGroupId && classGroupId !== 'default'
+    ? await bridge.toolSessionRepository.findByClassGroup(classGroupId)
+    : await bridge.toolSessionRepository.findAll()
+  scoreboardSessions.value = [...all]
+    .filter(s => s.toolType === 'scoreboard')
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+}
+
+function applyScoreboardSession(sessionId: string): void {
+  if (!sessionId || !scoreEntry.value.match || !activeTournament.value) return
+  const session = scoreboardSessions.value.find(s => s.id === sessionId)
+  if (!session) return
+  const metadata = session.sessionMetadata as ScoreboardSessionMetadata
+  const result = tournamentService.mapScoreboardResultToMatch(
+    activeTournament.value.teams,
+    scoreEntry.value.match,
+    { teams: metadata.teams ?? [], scores: metadata.scores ?? {} }
+  )
+  scoreEntry.value.score1 = result.score1
+  scoreEntry.value.score2 = result.score2
+  scoreboardImportHint.value = true
+}
+
+function scoreboardSessionLabel(session: Sport.ToolSession): string {
+  const metadata = session.sessionMetadata as ScoreboardSessionMetadata
+  const teams = (metadata.teams ?? []).slice(0, 2)
+  const names = teams.map(t => t.name).join(' vs ')
+  const scores = teams.map(t => (metadata.scores ?? {})[t.id] ?? 0).join(':')
+  const date = session.createdAt.toLocaleString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+  return `${metadata.sessionName ?? names} · ${scores} · ${date}`
 }
 
 async function saveScore() {
@@ -496,7 +579,22 @@ async function deleteTournament() {
 // -------------------------------------------------------------------------
 // Lifecycle
 // -------------------------------------------------------------------------
-onMounted(loadTournaments)
+onMounted(() => {
+  loadTournaments();
+  const handoff = sessionStorage.getItem('scoreboard_handoff_teams');
+  if (handoff) {
+    sessionStorage.removeItem('scoreboard_handoff_teams');
+    try {
+      const teams: string[] = JSON.parse(handoff);
+      if (Array.isArray(teams) && teams.length >= 2) {
+        form.value = { name: '', type: 'round-robin', teams };
+        view.value = 'create';
+      }
+    } catch {
+      // ignore malformed data
+    }
+  }
+})
 </script>
 
 <style scoped>
@@ -917,5 +1015,31 @@ onMounted(loadTournaments)
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
+}
+
+.scoreboard-import-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  margin-bottom: 0.4rem;
+}
+
+.form-select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  padding: 0.7rem 0.9rem;
+  font-size: 1rem;
+}
+
+.import-hint {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: #15803d;
 }
 </style>

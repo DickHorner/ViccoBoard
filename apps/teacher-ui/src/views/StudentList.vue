@@ -118,7 +118,7 @@
               </div>
 
               <Button
-                label="Dashboard"
+                label="Start"
                 icon="pi pi-home"
                 severity="secondary"
                 text

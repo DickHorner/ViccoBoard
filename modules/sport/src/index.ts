@@ -127,7 +127,8 @@ export { TournamentService } from './services/tournament.service.js';
 export type {
   RoundRobinStanding,
   KnockoutBracket,
-  KnockoutRound
+  KnockoutRound,
+  ScoreboardLookup
 } from './services/tournament.service.js';
 export { TimeGradingService } from './services/time-grading.service.js';
 export type {

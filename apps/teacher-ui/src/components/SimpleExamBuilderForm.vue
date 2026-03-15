@@ -2,20 +2,20 @@
   <div class="simple-exam-builder">
     <!-- Header -->
     <div class="builder-header">
-      <h1>{{ isEditing ? 'Edit Exam' : 'Create Simple Exam' }}</h1>
-      <p class="subtitle">Build a simple exam with flat task list (no nested levels)</p>
+      <h1>{{ isEditing ? 'Prüfung bearbeiten' : 'Einfache Prüfung erstellen' }}</h1>
+      <p class="subtitle">Einfache Prüfung mit flacher Aufgabenliste ohne Verschachtelung</p>
     </div>
 
     <!-- Exam Title Section -->
     <section class="section exam-details">
-      <h2>Exam Details</h2>
+      <h2>Prüfungsdetails</h2>
       <div class="form-group">
-        <label for="exam-title" class="label-required">Exam Title</label>
+        <label for="exam-title" class="label-required">Prüfungstitel</label>
         <input
           id="exam-title"
           v-model="formData.title"
           type="text"
-          placeholder="e.g., Math Quiz, Biology Test"
+          placeholder="z. B. Mathetest, Biologiequiz"
           class="form-input"
           @blur="validateTitle"
         />
@@ -23,11 +23,11 @@
       </div>
 
       <div class="form-group">
-        <label for="exam-description">Description (Optional)</label>
+        <label for="exam-description">Beschreibung (optional)</label>
         <textarea
           id="exam-description"
           v-model="formData.description"
-          placeholder="Add notes about this exam"
+          placeholder="Notizen zu dieser Prüfung"
           class="form-textarea"
           rows="3"
         ></textarea>
@@ -37,15 +37,15 @@
     <!-- Tasks Section -->
     <section class="section tasks-section">
       <div class="section-header">
-        <h2>Tasks</h2>
+        <h2>Aufgaben</h2>
         <button @click="addTask" class="btn btn-primary btn-sm" :disabled="!canAddTask">
-          + Add Task
+          + Aufgabe hinzufügen
         </button>
       </div>
 
       <!-- Empty State -->
       <div v-if="formData.tasks.length === 0" class="empty-state">
-        <p>No tasks yet. Click "Add Task" to start building your exam.</p>
+        <p>Noch keine Aufgaben. Klicken Sie auf „Aufgabe hinzufügen“, um zu starten.</p>
       </div>
 
       <!-- Task List -->
@@ -61,16 +61,16 @@
             <input
               v-model="task.title"
               type="text"
-              placeholder="Task title (e.g., Task 1, Task 2a)"
+              placeholder="Aufgabentitel (z. B. Aufgabe 1, Aufgabe 2a)"
               class="task-title-input"
               @blur="validateTaskTitle(taskIndex)"
             />
             <button
               @click="removeTask(taskIndex)"
               class="btn btn-danger btn-sm"
-              :title="`Remove task ${taskIndex + 1}`"
+              :title="`Aufgabe ${taskIndex + 1} entfernen`"
             >
-              Remove
+              Entfernen
             </button>
           </div>
 
@@ -78,7 +78,7 @@
           <div class="task-details">
             <div class="form-group">
               <label :for="`task-points-${taskIndex}`" class="label-required">
-                Points
+                Punkte
               </label>
               <input
                 :id="`task-points-${taskIndex}`"
@@ -95,7 +95,7 @@
             </div>
 
             <div class="form-group">
-              <label :for="`task-bonus-${taskIndex}`">Bonus Points (Optional)</label>
+              <label :for="`task-bonus-${taskIndex}`">Bonuspunkte (optional)</label>
               <input
                 :id="`task-bonus-${taskIndex}`"
                 v-model.number="task.bonusPoints"
@@ -116,25 +116,25 @@
                 v-model="task.isChoice"
                 type="checkbox"
               />
-              <label :for="`task-choice-${taskIndex}`">Choice Task (e.g., 3a/3b)</label>
+              <label :for="`task-choice-${taskIndex}`">Wahlaufgabe (z. B. 3a/3b)</label>
             </div>
           </div>
 
           <!-- Criteria Section -->
           <div class="criteria-section">
             <div class="criteria-header">
-              <h3>Criteria</h3>
+              <h3>Kriterien</h3>
               <button
                 @click="addCriterion(taskIndex)"
                 class="btn btn-secondary btn-xs"
-                title="Add criterion to this task"
+                title="Kriterium zu dieser Aufgabe hinzufügen"
               >
-                + Add Criterion
+                + Kriterium hinzufügen
               </button>
             </div>
 
             <div v-if="task.criteria.length === 0" class="empty-criteria">
-              <p>No criteria defined. Add criteria to score this task.</p>
+              <p>Noch keine Kriterien. Fügen Sie Kriterien zur Bewertung dieser Aufgabe hinzu.</p>
             </div>
 
             <div v-else class="criteria-list">
@@ -146,7 +146,7 @@
                 <input
                   v-model="criterion.text"
                   type="text"
-                  placeholder="Criterion description"
+                  placeholder="Kriterium beschreiben"
                   class="criterion-input"
                   @blur="validateCriterion(taskIndex, critIndex)"
                 />
@@ -156,15 +156,15 @@
                   min="0"
                   step="0.5"
                   class="criterion-points-input"
-                  title="Points for this criterion"
-                  placeholder="Pts"
+                  title="Punkte für dieses Kriterium"
+                  placeholder="Pkt."
                 />
                 <button
                   @click="removeCriterion(taskIndex, critIndex)"
                   class="btn btn-danger btn-sm"
-                  :title="`Remove criterion ${critIndex + 1}`"
+                  :title="`Kriterium ${critIndex + 1} entfernen`"
                 >
-                  Remove
+                  Entfernen
                 </button>
               </div>
             </div>
@@ -175,43 +175,43 @@
 
     <!-- Preview Section -->
     <section class="section preview-section" v-if="formData.tasks.length > 0">
-      <h2>Preview & Summary</h2>
+      <h2>Vorschau und Zusammenfassung</h2>
       <div class="preview-grid">
         <div class="preview-item">
-          <span class="preview-label">Total Tasks</span>
+          <span class="preview-label">Aufgaben gesamt</span>
           <span class="preview-value">{{ formData.tasks.length }}</span>
         </div>
         <div class="preview-item">
-          <span class="preview-label">Total Points</span>
+          <span class="preview-label">Punkte gesamt</span>
           <span class="preview-value">{{ totalPoints }}</span>
         </div>
         <div class="preview-item">
-          <span class="preview-label">With Bonus</span>
+          <span class="preview-label">Mit Bonus</span>
           <span class="preview-value">{{ totalPointsWithBonus }}</span>
         </div>
         <div class="preview-item">
-          <span class="preview-label">Tasks with Criteria</span>
+          <span class="preview-label">Aufgaben mit Kriterien</span>
           <span class="preview-value">{{ tasksWithCriteria }}</span>
         </div>
       </div>
 
       <!-- Structure Preview -->
       <div class="structure-preview">
-        <h3>Exam Structure</h3>
+        <h3>Prüfungsstruktur</h3>
         <div class="task-preview-list">
           <div v-for="(task, idx) in formData.tasks" :key="task.id" class="task-preview">
             <div class="task-preview-title">
-              Task {{ idx + 1 }}: <strong>{{ task.title || '(no title)' }}</strong>
+              Aufgabe {{ idx + 1 }}: <strong>{{ task.title || '(ohne Titel)' }}</strong>
             </div>
             <div class="task-preview-info">
-              <span>📌 {{ task.points }} pts</span>
-              <span v-if="task.bonusPoints > 0">💫 +{{ task.bonusPoints }} bonus</span>
-              <span>📋 {{ task.criteria.length }} criteria</span>
-              <span v-if="task.isChoice">🔀 Choice</span>
+              <span>📌 {{ task.points }} Punkte</span>
+              <span v-if="task.bonusPoints > 0">💫 +{{ task.bonusPoints }} Bonus</span>
+              <span>📋 {{ task.criteria.length }} Kriterien</span>
+              <span v-if="task.isChoice">🔀 Wahlaufgabe</span>
             </div>
             <div v-if="task.criteria.length > 0" class="criteria-preview">
               <div v-for="crit in task.criteria" :key="crit.id" class="crit-preview">
-                • {{ crit.text || '(no text)' }} ({{ crit.points }} pts)
+                • {{ crit.text || '(ohne Text)' }} ({{ crit.points }} Punkte)
               </div>
             </div>
           </div>
@@ -225,12 +225,12 @@
         @click="saveExam"
         class="btn btn-primary btn-lg"
         :disabled="!canSave"
-        title="Save exam to database"
+        title="Prüfung speichern"
       >
-        {{ isSaving ? 'Saving...' : 'Save Exam' }}
+        {{ isSaving ? 'Wird gespeichert...' : 'Prüfung speichern' }}
       </button>
       <button @click="cancelEdit" class="btn btn-secondary btn-lg">
-        Cancel
+        Abbrechen
       </button>
     </section>
 
@@ -335,7 +335,7 @@ const canSave = computed(() => {
 // ============================================================================
 const createNewTask = (): TaskDraft => ({
   id: uuidv4(),
-  title: `Task ${formData.tasks.length + 1}`,
+  title: `Aufgabe ${formData.tasks.length + 1}`,
   points: 0,
   bonusPoints: 0,
   isChoice: false,
@@ -353,7 +353,7 @@ onMounted(async () => {
     try {
       if (!examRepository) {
         console.error('Exam repository is not available');
-        errorMessage.value = 'Unable to load exam for editing. Please try again later.';
+        errorMessage.value = 'Die Prüfung konnte zum Bearbeiten nicht geladen werden. Bitte später erneut versuchen.';
         return;
       }
       const examId = route.params.id as string;
@@ -377,7 +377,7 @@ onMounted(async () => {
       }
     } catch (err) {
       console.error('Failed to load exam:', err);
-      errorMessage.value = 'Failed to load exam for editing';
+      errorMessage.value = 'Fehler beim Laden der Prüfung zum Bearbeiten';
     }
   }
 });
@@ -416,7 +416,7 @@ const removeCriterion = (taskIndex: number, criterionIndex: number) => {
 const validateTitle = () => {
   errors.title = undefined;
   if (!formData.title.trim()) {
-    errors.title = 'Exam title is required';
+    errors.title = 'Ein Prüfungstitel ist erforderlich.';
   }
 };
 
@@ -426,7 +426,7 @@ const validateTaskTitle = (index: number) => {
 
   const task = formData.tasks[index];
   if (!task.title?.trim()) {
-    errors.tasks[index]!.title = 'Task title is required';
+    errors.tasks[index]!.title = 'Ein Aufgabentitel ist erforderlich.';
   } else {
     errors.tasks[index]!.title = undefined;
   }
@@ -438,7 +438,7 @@ const validateTaskPoints = (index: number) => {
 
   const task = formData.tasks[index];
   if (task.points < 0) {
-    errors.tasks[index]!.points = 'Points cannot be negative';
+    errors.tasks[index]!.points = 'Punkte dürfen nicht negativ sein.';
   } else {
     errors.tasks[index]!.points = undefined;
   }
@@ -450,7 +450,7 @@ const validateTaskBonusPoints = (index: number) => {
 
   const task = formData.tasks[index];
   if (task.bonusPoints < 0) {
-    errors.tasks[index]!.bonusPoints = 'Bonus points cannot be negative';
+    errors.tasks[index]!.bonusPoints = 'Bonuspunkte dürfen nicht negativ sein.';
   } else {
     errors.tasks[index]!.bonusPoints = undefined;
   }
@@ -460,7 +460,7 @@ const validateCriterion = (taskIndex: number, criterionIndex: number) => {
   const criterion = formData.tasks[taskIndex]?.criteria[criterionIndex];
   if (criterion && criterion.points < 0) {
     // Mark as error (could add to errors object if needed)
-    console.warn('Criterion points cannot be negative');
+    console.warn('Kriteriumspunkte dürfen nicht negativ sein');
   }
 };
 
@@ -481,7 +481,7 @@ const saveExam = async () => {
   });
 
   if (!canSave.value) {
-    errorMessage.value = 'Please fix the errors above before saving';
+    errorMessage.value = 'Bitte beheben Sie die oben markierten Fehler, bevor Sie speichern.';
     return;
   }
 
@@ -497,7 +497,7 @@ const saveExam = async () => {
       isChoice: task.isChoice,
       criteria: task.criteria.map(crit => ({
         id: crit.id,
-        text: crit.text.trim() || 'Criterion',
+        text: crit.text.trim() || 'Kriterium',
         formatting: {},
         points: crit.points,
         aspectBased: false
@@ -545,10 +545,10 @@ const saveExam = async () => {
     // Save via repository
     if (isEditing.value) {
       await examRepository.update(exam.id, exam);
-      successMessage.value = 'Exam updated successfully!';
+      successMessage.value = 'Prüfung erfolgreich aktualisiert.';
     } else {
       await examRepository.create(exam);
-      successMessage.value = 'Exam created successfully!';
+      successMessage.value = 'Prüfung erfolgreich erstellt.';
     }
 
     // Clear errors and navigate back after a short delay
@@ -557,7 +557,7 @@ const saveExam = async () => {
     }, 1500);
   } catch (err) {
     console.error('Failed to save exam:', err);
-    errorMessage.value = `Failed to save exam: ${err instanceof Error ? err.message : 'Unknown error'}`;
+    errorMessage.value = `Fehler beim Speichern der Prüfung: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`;
   } finally {
     isSaving.value = false;
   }

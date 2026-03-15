@@ -2,14 +2,14 @@
   <div class="correction-container">
     <div class="correction-header">
       <div class="header-info">
-        <h1>{{ exam?.title || 'Exam Correction' }}</h1>
-        <p v-if="exam" class="exam-meta">{{ candidates.length }} candidates | Total: {{ exam.gradingKey.totalPoints }} points</p>
+        <h1>{{ exam?.title || 'Prüfungskorrektur' }}</h1>
+        <p v-if="exam" class="exam-meta">{{ candidates.length }} Schüler | Gesamt: {{ exam.gradingKey.totalPoints }} Punkte</p>
       </div>
       <div class="header-actions">
         <button @click="saveCorrectionBatch" class="btn-primary" :disabled="!hasChanges">
-          {{ hasChanges ? 'Save All Changes' : 'All Saved' }}
+          {{ hasChanges ? 'Alle Änderungen speichern' : 'Alles gespeichert' }}
         </button>
-        <button @click="goBack" class="btn-secondary">Back to Exams</button>
+        <button @click="goBack" class="btn-secondary">Zurück zu den Prüfungen</button>
       </div>
     </div>
 
@@ -17,11 +17,11 @@
       <!-- Candidates List (Sidebar) -->
       <div class="candidates-sidebar">
         <div class="sidebar-header">
-          <h3>Candidates ({{ candidates.length }})</h3>
+          <h3>Schüler ({{ candidates.length }})</h3>
           <input
             v-model="candidateFilter"
             type="text"
-            placeholder="Search..."
+            placeholder="Suchen..."
             class="filter-input"
           />
         </div>
@@ -46,13 +46,13 @@
           <div class="candidate-header">
             <h2>{{ currentCandidate.firstName }} {{ currentCandidate.lastName }}</h2>
             <span class="status" :class="`status-${currentCorrection.status}`">
-              {{ currentCorrection.status }}
+              {{ formatCorrectionStatus(currentCorrection.status) }}
             </span>
           </div>
 
           <!-- Scoring Mode Selector -->
           <div class="scoring-mode-section">
-            <h3>Scoring Mode</h3>
+            <h3>Bewertungsmodus</h3>
             <div class="mode-selector">
               <label class="mode-option">
                 <input
@@ -61,7 +61,7 @@
                   value="numeric"
                   @change="onScoringModeChange"
                 />
-                <span>Numeric Points</span>
+                <span>Numerische Punkte</span>
               </label>
               <label class="mode-option">
                 <input
@@ -70,18 +70,18 @@
                   value="alternative"
                   @change="onScoringModeChange"
                 />
-                <span>Alternative Grading (++/+/0/-/--)</span>
+                <span>Alternative Bewertung (++/+/0/-/--)</span>
               </label>
             </div>
           </div>
 
           <!-- Task Scoring -->
           <div class="scoring-section">
-            <h3>Task Scores</h3>
+            <h3>Aufgabenbewertung</h3>
             <div v-for="task in exam.structure.tasks" :key="task.id" class="task-scoring">
               <div class="task-title">
                 <label>{{ task.title }}</label>
-                <span class="max-points">(max {{ task.points }})</span>
+                <span class="max-points">(max. {{ task.points }})</span>
               </div>
 
               <!-- Numeric Scoring Mode -->
@@ -96,7 +96,7 @@
                   @input="updateGrade"
                 />
                 <span class="points-to-next">
-                  {{ pointsToNextGrade }} points to next grade
+                  {{ pointsToNextGrade }} Punkte bis zur nächsten Note
                 </span>
               </div>
 
@@ -116,7 +116,7 @@
                 </div>
                 <div v-if="taskAlternativeGrades[task.id]" class="selected-grade-info">
                   <span class="grade-label">{{ getGradeLabel(taskAlternativeGrades[task.id]) }}</span>
-                  <span class="grade-points">(≈ {{ getAlternativeGradePoints(task.id, task.points) }} points)</span>
+                  <span class="grade-points">(≈ {{ getAlternativeGradePoints(task.id, task.points) }} Punkte)</span>
                 </div>
               </div>
 
@@ -124,7 +124,7 @@
               <div v-if="exam.structure.allowsComments" class="comment-box">
                 <textarea
                   v-model="taskComments[task.id]"
-                  :placeholder="`Comment for ${task.title}...`"
+                  :placeholder="`Kommentar zu ${task.title}...`"
                   class="comment-input"
                   rows="2"
                 ></textarea>
@@ -136,15 +136,15 @@
           <div class="total-score-section">
             <div class="score-display">
               <div class="score-item">
-                <label>Total Points</label>
+                <label>Gesamtpunkte</label>
                 <span class="score-value">{{ totalPoints }}/{{ exam.gradingKey.totalPoints }}</span>
               </div>
               <div class="score-item">
-                <label>Percentage</label>
+                <label>Prozent</label>
                 <span class="score-value">{{ percentageScore.toFixed(1) }}%</span>
               </div>
               <div class="score-item highlight">
-                <label>Grade</label>
+                <label>Note</label>
                 <span class="grade-value">{{ currentGrade }}</span>
               </div>
             </div>
@@ -152,10 +152,10 @@
 
           <!-- Support Tips -->
           <div v-if="exam.structure.allowsSupportTips" class="support-tips-section">
-            <h3>Support Tips</h3>
+            <h3>Fördertipps</h3>
             <div class="tips-input">
               <button @click="showTipsModal = true" class="btn-secondary-small">
-                + Assign Support Tips
+                + Fördertipps zuweisen
               </button>
             </div>
             <div v-if="currentCorrection.supportTips.length > 0" class="assigned-tips">
@@ -172,15 +172,15 @@
 
           <!-- Special Work Highlighting -->
           <div class="highlight-section">
-            <h3>Special Work</h3>
+            <h3>Besondere Leistung</h3>
             <label class="checkbox-label">
               <input v-model="markAsSpecial" type="checkbox" />
-              Mark this work as special/exceptional
+              Diese Arbeit als besonders markieren
             </label>
             <div v-if="markAsSpecial" class="special-input">
               <textarea
                 v-model="specialNotes"
-                placeholder="Notes about special aspects of this work..."
+                placeholder="Notizen zu besonderen Aspekten dieser Arbeit..."
                 class="comment-input"
                 rows="3"
               ></textarea>
@@ -194,30 +194,30 @@
               @click="selectCandidate(candidates[currentCandidateIndex - 1])"
               class="btn-nav"
             >
-              ← Previous
+              ← Vorherige
             </button>
             <button
               v-if="currentCandidateIndex < candidates.length - 1"
               @click="selectCandidate(candidates[currentCandidateIndex + 1])"
               class="btn-nav"
             >
-              Next →
+              Nächste →
             </button>
           </div>
 
           <!-- Save Button -->
           <div class="action-buttons">
             <button @click="saveCorrectionForCandidate" class="btn-primary">
-              Save & Next
+              Speichern und weiter
             </button>
             <button @click="finalizeCorrectionForCandidate" class="btn-success">
-              Mark Complete
+              Als abgeschlossen markieren
             </button>
           </div>
         </div>
 
         <div v-else class="no-candidate">
-          Select a candidate to start correcting.
+          Wählen Sie einen Schüler aus, um mit der Korrektur zu beginnen.
         </div>
       </div>
     </div>
@@ -225,11 +225,11 @@
     <!-- Support Tips Modal -->
     <div v-if="showTipsModal" class="modal-overlay" @click.self="showTipsModal = false">
       <div class="modal-content">
-        <h3>Assign Support Tips</h3>
+        <h3>Fördertipps zuweisen</h3>
         <input
           v-model="tipsSearchQuery"
           type="text"
-          placeholder="Search support tips..."
+          placeholder="Fördertipps suchen..."
           class="search-input"
         />
         <div class="tips-list">
@@ -246,8 +246,8 @@
           </div>
         </div>
         <div class="modal-buttons">
-          <button @click="applySelectedTips" class="btn-primary">Apply</button>
-          <button @click="showTipsModal = false" class="btn-secondary">Cancel</button>
+          <button @click="applySelectedTips" class="btn-primary">Übernehmen</button>
+          <button @click="showTipsModal = false" class="btn-secondary">Abbrechen</button>
         </div>
       </div>
     </div>
@@ -328,7 +328,7 @@ const percentageScore = computed(() => {
 });
 
 const currentGrade = computed(() => {
-  if (!exam.value) return 'N/A';
+  if (!exam.value) return 'k. A.';
   const result = GradingKeyService.calculateGrade(totalPoints.value, exam.value.gradingKey);
   return result.grade;
 });
@@ -337,6 +337,17 @@ const pointsToNextGrade = computed(() => {
   if (!exam.value) return 0;
   return GradingKeyService.pointsToNextGrade(totalPoints.value, exam.value.gradingKey);
 });
+
+const formatCorrectionStatus = (status: Exams.CorrectionEntry['status']): string => {
+  switch (status) {
+    case 'completed':
+      return 'abgeschlossen';
+    case 'in-progress':
+      return 'in Bearbeitung';
+    default:
+      return 'offen';
+  }
+};
 
 // Methods
 const selectCandidate = (candidate: Exams.Candidate) => {
@@ -502,7 +513,7 @@ const applySelectedTips = () => {
 
 const saveCorrectionBatch = async () => {
   // Save all corrections
-  console.log('Saving all corrections...', corrections.value);
+  console.log('Speichere alle Korrekturen...', corrections.value);
   hasChanges.value = false;
 };
 
@@ -528,7 +539,7 @@ onMounted(async () => {
   // For now, mock data
   exam.value = {
     id: 'exam-1',
-    title: 'Mathematics Test',
+    title: 'Mathetest',
     mode: Exams.ExamMode.Simple,
     structure: {
       parts: [],
@@ -537,7 +548,7 @@ onMounted(async () => {
           id: 'task-1',
           level: 1,
           order: 0,
-          title: 'Task 1',
+          title: 'Aufgabe 1',
           points: 10,
           isChoice: false,
           criteria: [],
@@ -550,7 +561,7 @@ onMounted(async () => {
           id: 'task-2',
           level: 1,
           order: 1,
-          title: 'Task 2',
+          title: 'Aufgabe 2',
           points: 15,
           isChoice: false,
           criteria: [],
