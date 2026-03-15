@@ -496,7 +496,22 @@ async function deleteTournament() {
 // -------------------------------------------------------------------------
 // Lifecycle
 // -------------------------------------------------------------------------
-onMounted(loadTournaments)
+onMounted(() => {
+  loadTournaments();
+  const handoff = sessionStorage.getItem('scoreboard_handoff_teams');
+  if (handoff) {
+    sessionStorage.removeItem('scoreboard_handoff_teams');
+    try {
+      const teams: string[] = JSON.parse(handoff);
+      if (Array.isArray(teams) && teams.length >= 2) {
+        form.value = { name: '', type: 'round-robin', teams };
+        view.value = 'create';
+      }
+    } catch {
+      // ignore malformed data
+    }
+  }
+})
 </script>
 
 <style scoped>
