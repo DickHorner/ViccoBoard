@@ -652,12 +652,10 @@
     "running": "Running",
     "swimming": "Swimming",
     "config": "Configuration",
-    "session-history": "Session history",
+    "session-history": "Test History",
     "session-new": "New session",
     "session-load": "Load",
     "session-count": "{count} students",
-    "no-sessions": "No sessions saved yet.",
-    "session-history": "Test History",
     "no-sessions": "No tests saved",
     "session-date": "Date"
   },
@@ -929,7 +927,11 @@
       "horn.mp3": "Horn",
       "tick.mp3": "Tick",
       "none": "No Sound"
-    }
+    },
+    "presets": "Presets",
+    "presenter": "Presenter",
+    "close-presenter": "Close",
+    "total-elapsed": "Total time"
   },
   "SORT": {
     "sortierung-nach": "Sort by",
