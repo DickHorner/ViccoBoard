@@ -22,7 +22,8 @@ import {
   IndexedDBTacticsSnapshotsSchemaMigration,
   IndexedDBTournamentSchemaMigration,
   IndexedDBLegacyStoreRepairMigration,
-  IndexedDBCatalogAndTableStoreRepairMigration
+  IndexedDBCatalogAndTableStoreRepairMigration,
+  IndexedDBGameDatabaseSchemaMigration
 } from '@viccoboard/storage/browser';
 import type { StorageAdapter } from '@viccoboard/storage/browser';
 
@@ -59,6 +60,7 @@ export async function initializeStorage(): Promise<StorageAdapter> {
   storage.registerMigration(new IndexedDBTournamentSchemaMigration());
   storage.registerMigration(new IndexedDBLegacyStoreRepairMigration());
   storage.registerMigration(new IndexedDBCatalogAndTableStoreRepairMigration());
+  storage.registerMigration(new IndexedDBGameDatabaseSchemaMigration());
 
   // Initialize with empty password (no encryption yet)
   // TODO: Implement proper encryption/password in Phase X

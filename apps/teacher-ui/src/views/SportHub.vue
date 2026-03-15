@@ -66,6 +66,12 @@ const entries = [
     description: 'Leistungstabellen importieren, aktivieren und als Bewertungsgrundlage hinterlegen.'
   },
   {
+    to: '/subjects/sport/games',
+    eyebrow: 'Datenbank',
+    title: 'Spieldatenbank',
+    description: 'Lokale Spiel- und Übungsdatenbank: suchen, filtern und im Unterricht nutzen.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Statistiken',
     title: 'Statistiken',

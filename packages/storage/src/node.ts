@@ -21,3 +21,4 @@ export * from './migrations/014_tool_sessions_schema.js';
 export * from './migrations/015_tactics_snapshots_schema.js';
 export * from './migrations/016_table_active_schema.js';
 export * from './migrations/016_tournament_schema.js';
+export * from './migrations/017_game_database_schema.js';

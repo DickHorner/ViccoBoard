@@ -20,6 +20,7 @@ import {
   DeleteGradeCategoryUseCase,
   DeleteTableDefinitionUseCase,
   FeedbackSessionRepository,
+  GameEntryRepository,
   GradeCategoryRepository,
   ImportShuttleRunConfigUseCase,
   ImportTableDefinitionUseCase,
@@ -86,6 +87,7 @@ interface SportBridge {
   SportabzeichenResultRepository: SportabzeichenResultRepository;
   tacticsSnapshotRepository: TacticsSnapshotRepository;
   tournamentRepository: TournamentRepository;
+  gameEntryRepository: GameEntryRepository;
 
   createClassUseCase: CreateClassUseCase;
   createLessonUseCase: CreateLessonUseCase;
@@ -145,6 +147,7 @@ export function initializeSportBridge(): SportBridge {
   const feedbackSessionRepository = new FeedbackSessionRepository(toolSessionRepository);
   const tacticsSnapshotRepository = new TacticsSnapshotRepository(adapter);
   const tournamentRepository = new TournamentRepository(adapter);
+  const gameEntryRepository = new GameEntryRepository(adapter);
 
   const createClassUseCase = new CreateClassUseCase(classGroupRepository);
   const createLessonUseCase = new CreateLessonUseCase(lessonRepository);
@@ -227,6 +230,7 @@ export function initializeSportBridge(): SportBridge {
     SportabzeichenResultRepository: sportabzeichenResultRepository,
     tacticsSnapshotRepository,
     tournamentRepository,
+    gameEntryRepository,
 
     createClassUseCase,
     createLessonUseCase,
