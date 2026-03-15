@@ -6,6 +6,7 @@
 
 import { Sport } from '@viccoboard/core';
 import type { ToolSessionRepository } from '../repositories/tool-session.repository.js';
+import type { TeamAlgorithm, TeamBasis, TeamConstraints } from '../services/team-builder.service.js';
 
 export interface SaveTeamAssignmentInput {
   /** The class this team assignment belongs to (required for context). */
@@ -15,28 +16,39 @@ export interface SaveTeamAssignmentInput {
   /** Human-readable name for the saved session (e.g. "Volleyball 14.03."). */
   sessionName: string;
   /** Algorithm that was used to generate the teams. */
-  algorithm: 'random' | 'gender-balanced';
+  algorithm: TeamAlgorithm;
+  /** Basis used for homogeneous/heterogeneous distribution. */
+  basis?: TeamBasis;
   /** Label prefix used for team names. */
   teamLabel: string;
+  /** Role names that were assigned (if any). */
+  roles?: string[];
+  /** Hard constraints that were applied. */
+  constraints?: TeamConstraints;
   /** The generated teams. */
   teams: Array<{
     id: string;
     name: string;
     studentIds: string[];
     color?: string;
+    roles?: Record<string, string>;
   }>;
 }
 
 /** Shape of sessionMetadata stored for a team session. */
 export interface TeamSessionMetadata {
   sessionName: string;
-  algorithm: 'random' | 'gender-balanced';
+  algorithm: TeamAlgorithm;
+  basis?: TeamBasis;
   teamLabel: string;
+  roles?: string[];
+  constraints?: TeamConstraints;
   teams: Array<{
     id: string;
     name: string;
     studentIds: string[];
     color?: string;
+    roles?: Record<string, string>;
   }>;
 }
 
@@ -53,8 +65,9 @@ export class SaveTeamAssignmentUseCase {
     if (!input.sessionName || !input.sessionName.trim()) {
       throw new Error('sessionName is required');
     }
-    if (!['random', 'gender-balanced'].includes(input.algorithm)) {
-      throw new Error('algorithm must be one of: random, gender-balanced');
+    const validAlgorithms: TeamAlgorithm[] = ['random', 'gender-balanced', 'homogeneous', 'heterogeneous'];
+    if (!validAlgorithms.includes(input.algorithm)) {
+      throw new Error(`algorithm must be one of: ${validAlgorithms.join(', ')}`);
     }
 
     return this.toolSessionRepository.create({
@@ -64,7 +77,10 @@ export class SaveTeamAssignmentUseCase {
       sessionMetadata: {
         sessionName: input.sessionName.trim(),
         algorithm: input.algorithm,
+        basis: input.basis,
         teamLabel: input.teamLabel,
+        roles: input.roles,
+        constraints: input.constraints,
         teams: input.teams
       }
     });
