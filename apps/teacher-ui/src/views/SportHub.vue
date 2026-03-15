@@ -114,6 +114,12 @@ const entries = [
     description: 'Live-Kamerabild mit konfigurierbarem Delay und Annotations-Overlay fuer Bewegungsbeobachtung.'
   },
   {
+    to: '/tools/tracking-basketball',
+    eyebrow: 'Tool',
+    title: 'Basketball Trefferquote',
+    description: 'Echtzeit-Trefferzähler: Zielbereich im Kamerabild definieren und Treffer automatisch zählen.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Auswertung',
     title: 'Statistiken',
