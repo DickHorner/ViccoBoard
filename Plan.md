@@ -241,6 +241,25 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] **Taktikboard**: Top-Down-Ansicht + Sportartspezifische Annotation/Markierungen.
 - [ ] **Würfeln**: Zahlenbereich wählen + Ergebnisse loggen.
 
+### 6.6-Video Sport — Video Delay für Live-Bewegungsbeobachtung
+Ref: GitHub Issue #182 [Sport] Video Delay mit Live-Feed, Delay-Puffer und Annotationen umsetzen
+
+- [x] Eigener Tool-Einstieg für Video Delay. – `apps/teacher-ui/src/views/VideoDelay.vue`, Route `/tools/video-delay`
+- [x] Einstiegskarte im Sport-Hub. – `apps/teacher-ui/src/views/SportHub.vue`
+- [x] Live-Kamera-Feed via getUserMedia (Safari/iPad-kompatibel). – `VideoDelay.vue`
+- [x] Side-by-Side Ansicht: Live-Feed + verzögertes Bild. – `VideoDelay.vue`
+- [x] Konfigurierbarer Delay (0–10 Sekunden, Slider). – `VideoDelay.vue`
+- [x] Frame-Puffer mit ImageBitmap (Safari 15+). – `VideoDelay.vue`
+- [x] FPS-Auswahl (15/24/30 fps). – `VideoDelay.vue`
+- [x] Auflösung-Auswahl (SD 640×360, HD 1280×720). – `VideoDelay.vue`
+- [x] Annotations-Overlay auf verzögertem Bild (Canvas). – `VideoDelay.vue`
+- [x] Annotations-Werkzeuge: Stift, Pfeil, Kreis, Linie. – `VideoDelay.vue`
+- [x] Farb-Auswahl für Annotationen (5 Farben). – `VideoDelay.vue`
+- [x] Touch-Support für Annotations (iPad). – `VideoDelay.vue`
+- [x] Annotationen löschen. – `VideoDelay.vue`
+- [x] Klare Abgrenzung zu Slow Motion (Live-orientiert statt Clip-basiert). – separate Route + separates View
+- [x] i18n-Einträge (de/en) unter `DELAY`. – `apps/teacher-ui/src/i18n/locales/de.json`, `en.json`
+
 ### 6.6a Sport — Slow Motion Analyse & Biomechanik
 Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer Biomechanik umsetzen (DickHorner/ViccoBoard#187-Epic)
 

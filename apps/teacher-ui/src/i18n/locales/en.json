@@ -1427,6 +1427,7 @@
     "no-assigned-events": "No assigned events available.",
     "send-to-mittelstrecke": "Send to distance run grading",
     "send-error": "Error during handoff."
+  },
   "SLOWMO": {
     "title": "Slow Motion Analysis",
     "sessions": "Sessions",
