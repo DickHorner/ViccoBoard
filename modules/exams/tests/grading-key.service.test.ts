@@ -43,6 +43,11 @@ describe('GradingKeyService', () => {
       expect(result.grade).toBe('6');
     });
 
+    it('should calculate grade 1 for a perfect score (100 out of 100)', () => {
+      const result = GradingKeyService.calculateGrade(100, gradingKey);
+      expect(result.grade).toBe('1');
+    });
+
     it('should handle boundary cases correctly', () => {
       // Exactly at 92 should be grade 1
       const at92 = GradingKeyService.calculateGrade(92, gradingKey);
@@ -131,6 +136,25 @@ describe('GradingKeyService', () => {
       expect(GERMAN_1_6_PRESET.boundaries).toHaveLength(6);
       expect(GERMAN_1_6_PRESET.boundaries[0].grade).toBe(1);
       expect(GERMAN_1_6_PRESET.boundaries[5].grade).toBe(6);
+    });
+  });
+
+  describe('generatePointsBoundaries', () => {
+    it('should assign grade 1 for a perfect score via points-based grading', () => {
+      const pointsBoundaries = GradingKeyService.generatePointsBoundaries(GERMAN_1_6_PRESET, 100);
+      const pointsKey: Exams.GradingKey = {
+        id: 'pts-key',
+        name: 'Points Key',
+        type: Exams.GradingKeyType.Points,
+        totalPoints: 100,
+        gradeBoundaries: pointsBoundaries,
+        roundingRule: { type: 'nearest', decimalPlaces: 1 },
+        errorPointsToGrade: false,
+        customizable: true,
+        modifiedAfterCorrection: false
+      };
+      const result = GradingKeyService.calculateGrade(100, pointsKey);
+      expect(result.grade).toBe('1');
     });
   });
 
