@@ -114,6 +114,12 @@ const entries = [
     description: 'Live-Kamerabild mit konfigurierbarem Delay und Annotations-Overlay fuer Bewegungsbeobachtung.'
   },
   {
+    to: '/tools/slow-motion',
+    eyebrow: 'Tool',
+    title: 'Slow Motion Analyse',
+    description: 'Clips framegenau analysieren, Biomechanik-Marker setzen und Winkel berechnen.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Auswertung',
     title: 'Statistiken',

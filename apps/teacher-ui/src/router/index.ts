@@ -269,6 +269,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Video Delay', parent: '/subjects/sport' }
   },
   {
+    path: '/tools/slow-motion',
+    name: 'slow-motion',
+    component: () => import('../views/SlowMotionAnalysis.vue'),
+    meta: { title: 'Slow Motion Analyse', parent: '/subjects/sport' }
+  },
+  {
     path: '/settings/sport',
     name: 'settings-sport',
     component: () => import('../views/SportSettingsView.vue'),

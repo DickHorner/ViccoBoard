@@ -241,6 +241,30 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] **Taktikboard**: Top-Down-Ansicht + Sportartspezifische Annotation/Markierungen.
 - [ ] **Würfeln**: Zahlenbereich wählen + Ergebnisse loggen.
 
+### 6.6a Sport — Slow Motion Analyse & Biomechanik
+Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer Biomechanik umsetzen (DickHorner/ViccoBoard#187-Epic)
+
+#### Phase 1: Slow Motion Analyse
+- [x] Eigener Tool-Einstieg für Slow-Motion-Analyse. – `apps/teacher-ui/src/views/SlowMotionAnalysis.vue`, Route `/tools/slow-motion`
+- [x] Einstiegskarte im Sport-Hub. – `apps/teacher-ui/src/views/SportHub.vue`
+- [x] Video kann über `<input type="file">` geladen werden (Safari/iPad-kompatibel, kein File System Access API). – `SlowMotionAnalysis.vue`
+- [x] Verlangsamte Wiedergabe (0.1×, 0.25×, 0.5×, 1×). – `SlowMotionAnalysis.vue`
+- [x] Frame-by-Frame-Navigation (1-Frame-Schritte). – `SlowMotionAnalysis.vue`
+- [x] Scrubber + Einzelbildnavigation. – `SlowMotionAnalysis.vue`
+- [x] Lokal gespeicherte Analysesitzungen (ToolSession, toolType = 'slow-motion'). – `modules/sport/src/use-cases/save-slow-motion-session.use-case.ts`
+- [x] Klare Abgrenzung zu Video Delay (eigener Einstieg, Clip-orientiert statt Live-Feed). – separate Route + separates View
+- [x] Domain-Datentypen `BodyPoint`, `BiomechanicsMarker`, `BiomechanicsKeyframe`, `SlowMotionSessionMetadata`. – `packages/core/src/interfaces/sport.types.ts`
+
+#### Phase 2: Biomechanik (manuell/semi-automatisch)
+- [x] Manuelle Marker für Körperpunkte (Schulter, Hüfte, Knie, Sprunggelenk, Ellenbogen, …). – `SlowMotionAnalysis.vue`
+- [x] Canvas-Overlay: Marker per Klick/Touch auf Video-Frame setzen. – `SlowMotionAnalysis.vue`
+- [x] Winkelberechnung zwischen Markerketten (Arm L/R, Bein L/R, Rumpf L/R). – `SlowMotionAnalysis.vue` (calculatedAngles)
+- [x] Hilfslinien (Referenzlinien) zeichnen und löschen. – `SlowMotionAnalysis.vue`
+- [x] Keyframes statt Marker in jedem einzelnen Frame. – `SlowMotionAnalysis.vue`
+- [x] Lineare Interpolation zwischen Keyframes zur semi-automatischen Nachführung. – `SlowMotionAnalysis.vue` (currentFrameMarkers computed)
+- [x] Speicherung der Analyse pro Sitzung (Name, Schüler, Übung, Datum, Keyframes, Notizen). – `save-slow-motion-session.use-case.ts`
+- [x] i18n-Einträge (de/en). – `apps/teacher-ui/src/i18n/locales/de.json`, `en.json`
+
 ### 6.7 Sport — Feedback & Statistiken
 - [ ] **Feedback**: mehrere Methoden, direkt am Lehrertablet.
 - [ ] **Statistiken**: Überblick über geleistete Arbeit/Nutzung.
