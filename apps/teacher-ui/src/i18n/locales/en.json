@@ -228,6 +228,38 @@
         "partial": "Partial",
         "bad": "Bad"
       }
+    },
+    "basketball": {
+      "title": "Basketball Shot Tracking",
+      "loading": "Starting camera...",
+      "error-title": "Error",
+      "retry": "Try again",
+      "define-zone": "Define target zone",
+      "zone-hint": "Drag on the video to mark the target area (e.g. basket).",
+      "zone-defined": "Target zone defined",
+      "clear-zone": "Clear zone",
+      "stats": {
+        "shots": "Shots",
+        "session-time": "Time"
+      },
+      "status": {
+        "ready": "Define the target zone, then press \"Start\".",
+        "running": "Tracking active — aim at the target!",
+        "stopped": "Tracking stopped."
+      },
+      "controls": {
+        "start": "Start",
+        "stop": "Stop",
+        "reset": "Reset"
+      },
+      "sensitivity-label": "Sensitivity:",
+      "sensitivity-low": "Low",
+      "sensitivity-high": "High",
+      "session-saved": "Session saved.",
+      "no-zone-warning": "Please define a target zone first.",
+      "start-camera": "Start Camera",
+      "stop-camera": "Stop Camera",
+      "noCameraPermission": "Camera access denied. Please enable camera permission in your device settings."
     }
   },
   "DATENSCHUTZERKLAERUNG": "Privacy",
@@ -1395,5 +1427,43 @@
     "no-assigned-events": "No assigned events available.",
     "send-to-mittelstrecke": "Send to distance run grading",
     "send-error": "Error during handoff."
+  "SLOWMO": {
+    "title": "Slow Motion Analysis",
+    "sessions": "Sessions",
+    "newSession": "New Analysis",
+    "noSessions": "No analysis sessions saved yet. Click 'New Analysis' to get started.",
+    "sessionName": "Session name",
+    "sessionNamePlaceholder": "e.g. Long Jump – Max Muster",
+    "studentLabel": "Student / Group",
+    "studentLabelPlaceholder": "e.g. Max Muster",
+    "exerciseName": "Exercise / Movement",
+    "exerciseNamePlaceholder": "e.g. Long Jump Take-off",
+    "videoFile": "Video file",
+    "chooseFile": "Choose file",
+    "fileHint": "Video format depends on device (mp4, mov). No upload – file stays local.",
+    "cancel": "Cancel",
+    "startAnalysis": "Start analysis",
+    "save": "Save session",
+    "saved": "✅ Session saved",
+    "keyframes": "Keyframes",
+    "markers": "markers",
+    "modePlayback": "Playback",
+    "modeBiomechanics": "Biomechanics",
+    "noVideoHint": "No video loaded. Please select a video file.",
+    "speed": "Speed",
+    "frameBack": "1 frame back",
+    "frameForward": "1 frame forward",
+    "bodyPoint": "Body point",
+    "addKeyframe": "Add keyframe",
+    "clearMarkers": "Clear markers",
+    "keyframeList": "Keyframes",
+    "noKeyframes": "No keyframes yet. Position the scrubber and click 'Add keyframe'.",
+    "deleteKeyframe": "Delete keyframe",
+    "angles": "Calculated angles",
+    "addRefLine": "Draw reference line",
+    "cancelRefLine": "Cancel reference line",
+    "clearRefLines": "Clear reference lines",
+    "notes": "Notes",
+    "notesPlaceholder": "Observations about the movement analysis ..."
   }
 }

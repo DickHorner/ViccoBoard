@@ -100,6 +100,14 @@ export { SaveMultistopSessionUseCase } from './use-cases/save-multistop-session.
 export type { SaveMultistopSessionInput, MultistopStudentResult } from './use-cases/save-multistop-session.use-case.js';
 export { SaveFinishCameraSessionUseCase } from './use-cases/save-finish-camera-session.use-case.js';
 export type { SaveFinishCameraSessionInput, FinishCameraEvent } from './use-cases/save-finish-camera-session.use-case.js';
+export { SaveSlowMotionSessionUseCase } from './use-cases/save-slow-motion-session.use-case.js';
+export type {
+  SaveSlowMotionSessionInput,
+  SlowMotionSessionMetadata,
+  BiomechanicsMarkerInput,
+  BiomechanicsKeyframeInput,
+  ReferenceLineInput
+} from './use-cases/save-slow-motion-session.use-case.js';
 
 export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
 export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';
@@ -173,6 +181,25 @@ export type {
 
 export { TableImportService } from './services/table-import.service.js';
 export type { TableImportResult, TableImportValidationError } from './services/table-import.service.js';
+
+export { PushupRepetitionCounter } from './services/pushup-repetition-counter.service.js';
+export type {
+  PushupQuality,
+  PushupPersonResult,
+} from './services/pushup-repetition-counter.service.js';
+export {
+  PUSHUP_MAX_PERSONS,
+  PUSHUP_DOWN_THRESHOLD,
+  PUSHUP_UP_THRESHOLD,
+  PUSHUP_GOOD_QUALITY_MAX,
+  PUSHUP_PARTIAL_QUALITY_MAX,
+} from './services/pushup-repetition-counter.service.js';
+
+export { SavePushupSessionUseCase } from './use-cases/save-pushup-session.use-case.js';
+export type {
+  SavePushupSessionInput,
+  PushupPersonData,
+} from './use-cases/save-pushup-session.use-case.js';
 
 // Plugins
 export { TimerToolPlugin } from './plugins/timer.plugin.js';

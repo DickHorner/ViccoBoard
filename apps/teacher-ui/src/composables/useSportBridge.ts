@@ -35,9 +35,11 @@ import {
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   SaveCooperSessionUseCase,
+  SavePushupSessionUseCase,
   SaveScoreboardSessionUseCase,
   SaveMultistopSessionUseCase,
   SaveFinishCameraSessionUseCase,
+  SaveSlowMotionSessionUseCase,
   SaveTableDefinitionUseCase,
   SaveTacticsSnapshotUseCase,
   SaveTeamAssignmentUseCase,
@@ -64,6 +66,8 @@ import {
   type RecordAttendanceInput,
   type RecordDiceRollInput,
   type RecordGradeInput,
+  type SavePushupSessionInput,
+  type PushupPersonData,
   type SaveTableDefinitionInput,
   type UpdateGradeCategoryInput
 } from '@viccoboard/sport';
@@ -112,6 +116,8 @@ interface SportBridge {
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
   saveFinishCameraSessionUseCase: SaveFinishCameraSessionUseCase;
+  savePushupSessionUseCase: SavePushupSessionUseCase;
+  saveSlowMotionSessionUseCase: SaveSlowMotionSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
   createTournamentUseCase: CreateTournamentUseCase;
   updateTournamentMatchUseCase: UpdateTournamentMatchUseCase;
@@ -194,6 +200,8 @@ export function initializeSportBridge(): SportBridge {
   );
   const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepository);
   const saveFinishCameraSessionUseCase = new SaveFinishCameraSessionUseCase(toolSessionRepository);
+  const savePushupSessionUseCase = new SavePushupSessionUseCase(toolSessionRepository);
+  const saveSlowMotionSessionUseCase = new SaveSlowMotionSessionUseCase(toolSessionRepository);
   const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(
     tableDefinitionRepository
   );
@@ -257,6 +265,8 @@ export function initializeSportBridge(): SportBridge {
     saveCooperSessionUseCase,
     saveMultistopSessionUseCase,
     saveFinishCameraSessionUseCase,
+    savePushupSessionUseCase,
+    saveSlowMotionSessionUseCase,
     importTableDefinitionUseCase,
     createTournamentUseCase,
     updateTournamentMatchUseCase,
@@ -352,9 +362,11 @@ export type {
   CreateLessonInput,
   DeleteGradeCategoryInput,
   DeleteGradeCategoryResult,
+  PushupPersonData,
   RecordAttendanceInput,
   RecordDiceRollInput,
   RecordGradeInput,
+  SavePushupSessionInput,
   SaveTableDefinitionInput,
   UpdateGradeCategoryInput
 };
