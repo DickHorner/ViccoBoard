@@ -8,7 +8,7 @@
 
 This ledger tracks functional and options parity between the Sport APK and ViccoBoard implementation.
 
-**Status (March 2026):** Partial parity. Core grading, measurements, and basic tools are implemented. Open gaps remain in calendar, video-delay, tracking, table management, full persistence for teams/scoreboard/tactics, and security/backup. See Phase Status table in §7.  
+**Status (March 2026):** Partial parity. Core grading, measurements, and basic tools are implemented. Open gaps remain in calendar, tracking, table management, full persistence for teams/scoreboard/tactics, and security/backup. See Phase Status table in §7.  
 **WOW Status:** Explicitly excluded from scope v2 (`excluded_by_scope_v2`)
 
 ---
@@ -187,7 +187,7 @@ This ledger tracks functional and options parity between the Sport APK and Vicco
 | Timer | TIMER | in_scope_v2 | ✅ Implemented (`Timer.vue`, `record-timer-result.use-case.ts`) |
 | Scoreboard | SCORES | in_scope_v2 | ✅ Basic UI (`Scoreboard.vue`); session model open (#140) |
 | Tactics Board | TACTICS | in_scope_v2 | ✅ Basic UI (`TacticsBoard.vue`); snapshots open (#143) |
-| Video Delay | DELAY | in_scope_v2 | ⚠️ GAP (not yet implemented) |
+| Video Delay | DELAY | in_scope_v2 | ✅ Implemented (`VideoDelay.vue`, `/tools/video-delay`) |
 | Tracking | TRACKING | in_scope_v2 | ⚠️ GAP (not yet implemented) |
 | Statistics | ANALYTICS | in_scope_v2 | ✅ In codebase (`SportStatistics.vue`, `/subjects/sport/statistics`); issue #147 open |
 | Sport Settings | SETTINGS | in_scope_v2 | ✅ In codebase (`SportSettingsView.vue`, `/settings/sport`); issue #148 open |
@@ -246,7 +246,7 @@ See `PARITY_ASSERTIONS.md` for definitions of "parity" and test strategies.
 | Phase 2 | KBR Ledger | ✅ Done (2026-02-07) |
 | Phase 3 | i18n Infrastructure | ⚠️ GAP (no vue-i18n, strings still hardcoded in components) |
 | Phase 4 | Schema Parity | ✅ Partial (core schemas implemented; schema roundtrip tests in modules/sport/tests/) |
-| Phase 5 | Sport Workflows/UI | ✅ Partial (see workflow table above; open gaps: Calendar, Video Delay, Tracking, King Tournament, Table management, full persistence for Teams/Scoreboard/Tactics) |
+| Phase 5 | Sport Workflows/UI | ✅ Partial (see workflow table above; open gaps: Calendar, Tracking, King Tournament, Table management, full persistence for Teams/Scoreboard/Tactics) |
 | Phase 6 | KBR Data Layer + Builder | ✅ Done (P5-1, P5-2, P5-3 complete) |
 | Phase 7 | KBR Correction + Grading | ✅ Done (P6-1..P6-4 complete) |
 | Phase 8 | KBR Fördertipps/Export/Mail | ⏳ Pending (KBR advanced features) |

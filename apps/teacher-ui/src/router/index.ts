@@ -257,6 +257,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Wuerfeln', parent: '/subjects/sport' }
   },
   {
+    path: '/tools/video-delay',
+    name: 'video-delay',
+    component: () => import('../views/VideoDelay.vue'),
+    meta: { title: 'Video Delay', parent: '/subjects/sport' }
+  },
+  {
     path: '/settings/sport',
     name: 'settings-sport',
     component: () => import('../views/SportSettingsView.vue'),
