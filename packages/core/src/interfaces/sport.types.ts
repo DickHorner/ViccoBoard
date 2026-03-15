@@ -595,6 +595,73 @@ export type GameDifficulty = 'anfaenger' | 'fortgeschrittene' | 'profis';
 
 export type GamePhase = 'erwaermung' | 'hauptteil' | 'schluss';
 
+// ---------------------------------------------------------------------------
+// Slow Motion Analysis & Biomechanics
+// ---------------------------------------------------------------------------
+
+/** Named body landmark that can be marked on a video frame. */
+export type BodyPoint =
+  | 'head'
+  | 'neck'
+  | 'shoulder-left'
+  | 'shoulder-right'
+  | 'elbow-left'
+  | 'elbow-right'
+  | 'wrist-left'
+  | 'wrist-right'
+  | 'hip-left'
+  | 'hip-right'
+  | 'knee-left'
+  | 'knee-right'
+  | 'ankle-left'
+  | 'ankle-right';
+
+/**
+ * A single biomechanics marker placed on a video frame.
+ * Coordinates are normalised to the range [0, 1] relative to the video canvas.
+ */
+export interface BiomechanicsMarker {
+  bodyPoint: BodyPoint;
+  /** Normalised x position (0 = left, 1 = right). */
+  x: number;
+  /** Normalised y position (0 = top, 1 = bottom). */
+  y: number;
+  /** Optional override colour for this marker. */
+  color?: string;
+}
+
+/**
+ * A keyframe in the biomechanics analysis.
+ * Stores marker positions at a specific video time.
+ * Interpolation between keyframes produces semi-automatic tracking.
+ */
+export interface BiomechanicsKeyframe {
+  id: string;
+  /** Video time in seconds. */
+  timeSec: number;
+  markers: BiomechanicsMarker[];
+}
+
+/**
+ * Metadata stored with a slow-motion analysis ToolSession
+ * (toolType = 'slow-motion').
+ */
+export interface SlowMotionSessionMetadata {
+  sessionName: string;
+  /** Optional student or group label. */
+  studentLabel?: string;
+  /** Exercise / movement name (e.g. "Sprint", "Weitsprung-Absprung"). */
+  exerciseName?: string;
+  /** Total video duration in seconds (informational). */
+  videoDurationSec?: number;
+  /** Keyframes with marker positions for biomechanics analysis. */
+  keyframes: BiomechanicsKeyframe[];
+  /** Free-text notes from the teacher. */
+  notes?: string;
+  /** Reference lines drawn by the teacher (SVG-like path data, optional). */
+  referenceLines?: Array<{ id: string; x1: number; y1: number; x2: number; y2: number; color?: string }>;
+}
+
 export interface GameEntry {
   id: string;
   name: string;
