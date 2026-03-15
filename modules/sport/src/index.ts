@@ -123,13 +123,14 @@ export type {
 } from './grading/criteria-grading.engine.js';
 
 // Services
-export { TeamBuilderService } from './services/team-builder.service.js';
-export type { TeamBuildInput, BuiltTeam } from './services/team-builder.service.js';
+export { TeamBuilderService, TeamConstraintError } from './services/team-builder.service.js';
+export type { TeamBuildInput, TeamStudent, TeamAlgorithm, TeamBasis, TeamConstraints, TeamConstraintConflict, BuiltTeam } from './services/team-builder.service.js';
 export { TournamentService } from './services/tournament.service.js';
 export type {
   RoundRobinStanding,
   KnockoutBracket,
-  KnockoutRound
+  KnockoutRound,
+  ScoreboardLookup
 } from './services/tournament.service.js';
 export { TimeGradingService } from './services/time-grading.service.js';
 export type {

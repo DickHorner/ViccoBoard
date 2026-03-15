@@ -14,7 +14,7 @@ const routes: RouteRecordRaw[] = [
     name: 'dashboard',
     component: () => import('../views/Dashboard.vue'),
     alias: '/dashboard',
-    meta: { title: 'Dashboard' }
+    meta: { title: 'Start' }
   },
   {
     path: '/schedule',
@@ -74,37 +74,37 @@ const routes: RouteRecordRaw[] = [
     path: '/exams',
     name: 'exams',
     component: () => import('../views/ExamsOverview.vue'),
-    meta: { title: 'KBR Pruefungen', parent: '/subjects/kbr' }
+    meta: { title: 'KBR-Prüfungen', parent: '/subjects/kbr' }
   },
   {
     path: '/exams/new',
     name: 'exam-new',
     component: () => import('../views/KBRExamBuilder.vue'),
-    meta: { title: 'New Exam', parent: '/exams' }
+    meta: { title: 'Neue Prüfung', parent: '/exams' }
   },
   {
     path: '/exams/simple/new',
     name: 'simple-exam-new',
     component: () => import('../views/SimpleExamBuilder.vue'),
-    meta: { title: 'Create Simple Exam', parent: '/exams' }
+    meta: { title: 'Einfache Prüfung erstellen', parent: '/exams' }
   },
   {
     path: '/exams/simple/:id',
     name: 'simple-exam-edit',
     component: () => import('../views/SimpleExamBuilder.vue'),
-    meta: { title: 'Edit Simple Exam', parent: '/exams' }
+    meta: { title: 'Einfache Prüfung bearbeiten', parent: '/exams' }
   },
   {
     path: '/exams/:id',
     name: 'exam-edit',
     component: () => import('../views/KBRExamBuilder.vue'),
-    meta: { title: 'Exam Builder', parent: '/exams' }
+    meta: { title: 'Prüfungseditor', parent: '/exams' }
   },
   {
     path: '/exams/:id/correct',
     name: 'exam-correct',
     component: () => import('../views/CorrectionCompactUI_v2.vue'),
-    meta: { title: 'Exam Correction', parent: '/exams' }
+    meta: { title: 'Prüfungskorrektur', parent: '/exams' }
   },
   {
     path: '/exams/:id/analysis',
@@ -122,13 +122,13 @@ const routes: RouteRecordRaw[] = [
     path: '/students',
     name: 'students',
     component: () => import('../views/StudentList.vue'),
-    meta: { title: 'Schueler', parent: '/' }
+    meta: { title: 'Schüler', parent: '/' }
   },
   {
     path: '/students/:id',
     name: 'student-profile',
     component: () => import('../views/StudentProfile.vue'),
-    meta: { title: 'Student Profile', parent: '/students' }
+    meta: { title: 'Schülerprofil', parent: '/students' }
   },
   {
     path: '/attendance',
@@ -146,7 +146,7 @@ const routes: RouteRecordRaw[] = [
     path: '/lessons/:id/workspace',
     name: 'lesson-workspace',
     component: () => import('../views/LessonWorkspace.vue'),
-    meta: { title: 'Stunden-Workspace', parent: '/lessons' }
+    meta: { title: 'Stundenarbeitsbereich', parent: '/lessons' }
   },
   {
     path: '/grading',
@@ -158,31 +158,31 @@ const routes: RouteRecordRaw[] = [
     path: '/grading/criteria/:id',
     name: 'criteria-grading',
     component: () => import('../views/CriteriaGradingEntry.vue'),
-    meta: { title: 'Criteria Grading', parent: '/grading' }
+    meta: { title: 'Kriterienbewertung', parent: '/grading' }
   },
   {
     path: '/grading/time/:id',
     name: 'time-grading',
     component: () => import('../views/TimeGradingEntry.vue'),
-    meta: { title: 'Time-Based Grading', parent: '/grading' }
+    meta: { title: 'Zeitbewertung', parent: '/grading' }
   },
   {
     path: '/grading/cooper/:id',
     name: 'cooper-grading',
     component: () => import('../views/CooperGradingEntry.vue'),
-    meta: { title: 'Cooper Grading', parent: '/grading' }
+    meta: { title: 'Cooper-Bewertung', parent: '/grading' }
   },
   {
     path: '/grading/shuttle/:id',
     name: 'shuttle-grading',
     component: () => import('../views/ShuttleGradingEntry.vue'),
-    meta: { title: 'Shuttle Grading', parent: '/grading' }
+    meta: { title: 'Shuttle-Run-Bewertung', parent: '/grading' }
   },
   {
     path: '/grading/mittelstrecke/:id',
     name: 'mittelstrecke-grading',
     component: () => import('../views/MittelstreckeGradingEntry.vue'),
-    meta: { title: 'Mittelstrecke Grading', parent: '/grading' }
+    meta: { title: 'Mittelstrecken-Bewertung', parent: '/grading' }
   },
   {
     path: '/grading/Sportabzeichen/:id',
@@ -212,7 +212,7 @@ const routes: RouteRecordRaw[] = [
     path: '/grading/history/:id',
     name: 'grade-history',
     component: () => import('../views/GradeHistory.vue'),
-    meta: { title: 'Grade History', parent: '/grading' }
+    meta: { title: 'Notenverlauf', parent: '/grading' }
   },
   {
     path: '/tools/timer',
@@ -230,7 +230,7 @@ const routes: RouteRecordRaw[] = [
     path: '/tools/scoreboard',
     name: 'scoreboard',
     component: () => import('../views/Scoreboard.vue'),
-    meta: { title: 'Scoreboard', parent: '/subjects/sport' }
+    meta: { title: 'Anzeigetafel', parent: '/subjects/sport' }
   },
   {
     path: '/tools/teams',
@@ -242,13 +242,13 @@ const routes: RouteRecordRaw[] = [
     path: '/tools/tournaments',
     name: 'tournaments',
     component: () => import('../views/Tournaments.vue'),
-    meta: { title: 'Tournaments', parent: '/subjects/sport' }
+    meta: { title: 'Turniere', parent: '/subjects/sport' }
   },
   {
     path: '/tools/tactics',
     name: 'tactics',
     component: () => import('../views/TacticsBoard.vue'),
-    meta: { title: 'Tactics', parent: '/subjects/sport' }
+    meta: { title: 'Taktik', parent: '/subjects/sport' }
   },
   {
     path: '/tools/feedback',
@@ -260,7 +260,7 @@ const routes: RouteRecordRaw[] = [
     path: '/tools/dice',
     name: 'dice',
     component: () => import('../views/DiceTool.vue'),
-    meta: { title: 'Wuerfeln', parent: '/subjects/sport' }
+    meta: { title: 'Würfeln', parent: '/subjects/sport' }
   },
   {
     path: '/settings/sport',

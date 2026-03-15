@@ -1,14 +1,14 @@
 <template>
   <div class="dashboard-view">
     <div class="page-header">
-      <p class="dashboard-eyebrow">Landing Page</p>
-      <h2>Dashboard</h2>
+      <p class="dashboard-eyebrow">Startseite</p>
+      <h2>Start</h2>
       <p class="page-description">Schneller Einstieg in die aktuelle Arbeit: Stunde, Organisation und Fachbereiche.</p>
     </div>
 
     <div class="focus-grid">
       <section class="card focus-card focus-card-primary">
-        <h3>Jetzt / Als Naechstes</h3>
+        <h3>Jetzt / Als Nächstes</h3>
         <div v-if="currentOrNextLesson" class="focus-content">
           <p class="focus-meta">{{ currentOrNextMode }}</p>
           <h4>{{ getClassName(currentOrNextLesson.classGroupId) }}</h4>
@@ -16,7 +16,7 @@
 
           <div class="focus-actions">
             <RouterLink :to="`/lessons/${currentOrNextLesson.id}/workspace`" class="action-button action-button-inline">
-              Workspace oeffnen
+              Arbeitsbereich öffnen
             </RouterLink>
             <RouterLink :to="`/attendance?classId=${currentOrNextLesson.classGroupId}&lessonId=${currentOrNextLesson.id}`" class="action-button action-button-inline">
               Anwesenheit
@@ -28,9 +28,9 @@
           </p>
         </div>
         <div v-else class="empty-state">
-          <p>Fuer heute ist noch keine Stunde hinterlegt.</p>
+          <p>Für heute ist noch keine Stunde hinterlegt.</p>
           <RouterLink to="/schedule" class="action-button action-button-inline">
-            Stundenplan oeffnen
+            Stundenplan öffnen
           </RouterLink>
         </div>
       </section>
@@ -173,8 +173,8 @@
                 <button 
                   @click.stop="confirmDeleteClass(cls)" 
                   class="action-btn action-btn-danger"
-                  :title="`Delete class ${cls.name}`"
-                  :aria-label="`Delete class ${cls.name}`"
+                  :title="`Klasse ${cls.name} löschen`"
+                  :aria-label="`Klasse ${cls.name} löschen`"
                 >
                   🗑️
                 </button>
@@ -311,13 +311,13 @@
     <div v-if="showEditModal" class="modal-overlay" @click="closeEditModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
-          <h3>Edit Class</h3>
+          <h3>Klasse bearbeiten</h3>
           <button class="modal-close" @click="closeEditModal">✕</button>
         </div>
         
         <form @submit.prevent="handleUpdateClass" class="modal-form">
           <div class="form-group">
-            <label for="editClassName">Class Name *</label>
+            <label for="editClassName">Klassenname *</label>
             <input
               id="editClassName"
               v-model="editClassData.name"
@@ -328,7 +328,7 @@
           </div>
           
           <div class="form-group">
-            <label for="editSchoolYear">School Year *</label>
+            <label for="editSchoolYear">Schuljahr *</label>
             <input
               id="editSchoolYear"
               v-model="editClassData.schoolYear"
@@ -365,10 +365,10 @@
           
           <div class="modal-actions">
             <button type="button" @click="closeEditModal" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button type="submit" :disabled="updating" class="btn-primary">
-              {{ updating ? 'Updating...' : 'Update Class' }}
+              {{ updating ? 'Wird aktualisiert...' : 'Klasse aktualisieren' }}
             </button>
           </div>
         </form>
@@ -379,13 +379,13 @@
     <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
       <div class="modal modal-small" @click.stop>
         <div class="modal-header">
-          <h3>Delete Class</h3>
+          <h3>Klasse löschen</h3>
           <button class="modal-close" @click="closeDeleteModal">✕</button>
         </div>
         
         <div class="modal-content">
-          <p>Are you sure you want to delete <strong>{{ classToDelete?.name }}</strong>?</p>
-          <p class="warning-text">This action cannot be undone.</p>
+          <p>Möchten Sie <strong>{{ classToDelete?.name }}</strong> wirklich löschen?</p>
+          <p class="warning-text">Diese Aktion kann nicht rückgängig gemacht werden.</p>
           
           <div v-if="deleteError" class="error-message">
             {{ deleteError }}
@@ -393,10 +393,10 @@
           
           <div class="modal-actions">
             <button type="button" @click="closeDeleteModal" class="btn-secondary">
-              Cancel
+              Abbrechen
             </button>
             <button @click="handleDeleteClass" :disabled="deleting" class="btn-danger">
-              {{ deleting ? 'Deleting...' : 'Delete Class' }}
+              {{ deleting ? 'Wird gelöscht...' : 'Klasse löschen' }}
             </button>
           </div>
         </div>
@@ -464,15 +464,15 @@ const classColorOptions = [
   { value: 'grey', label: 'Grau' }
 ]
 const organizationLinks = [
-  { to: '/schedule', title: 'Stundenplan', description: 'Tagesuebersicht und Spaeter Wochenraster' },
+  { to: '/schedule', title: 'Stundenplan', description: 'Tagesübersicht und später Wochenraster' },
   { to: '/classes', title: 'Klassen', description: 'Klassenverwaltung fachneutral steuern' },
-  { to: '/students', title: 'Schueler', description: 'Zentrale Schuelerverwaltung' },
+  { to: '/students', title: 'Schüler', description: 'Zentrale Schülerverwaltung' },
   { to: '/settings', title: 'Einstellungen', description: 'Sicherheit, Backups und Konfiguration' }
 ]
 
 const subjectLinks = [
   { to: '/subjects/sport', title: 'Sport', description: 'Bewertung, Tests und Live-Tools' },
-  { to: '/subjects/kbr', title: 'KBR', description: 'Pruefungen, Korrektur und Auswertung' }
+  { to: '/subjects/kbr', title: 'KBR', description: 'Prüfungen, Korrektur und Auswertung' }
 ]
 
 // Computed
@@ -491,7 +491,7 @@ const currentOrNextMode = computed(() => {
     return 'Heute'
   }
 
-  return currentOrNextLesson.value.date.getTime() >= Date.now() ? 'Als Naechstes' : 'Zuletzt heute'
+  return currentOrNextLesson.value.date.getTime() >= Date.now() ? 'Als Nächstes' : 'Zuletzt heute'
 })
 
 const filteredClasses = computed(() => {
@@ -534,7 +534,7 @@ const loadData = async () => {
     })
   } catch (err) {
     console.error('Failed to load data:', err)
-    loadError.value = 'Fehler beim Laden der Uebersichtsdaten. Bitte aktualisieren Sie die Seite.'
+    loadError.value = 'Fehler beim Laden der Übersichtsdaten. Bitte aktualisieren Sie die Seite.'
   } finally {
     loading.value = false
   }
@@ -628,7 +628,7 @@ const handleUpdateClass = async () => {
     showEditModal.value = false
   } catch (err) {
     console.error('Failed to update class:', err)
-    editError.value = err instanceof Error ? err.message : 'Failed to update class'
+    editError.value = err instanceof Error ? err.message : 'Fehler beim Aktualisieren der Klasse.'
   } finally {
     updating.value = false
   }
@@ -678,7 +678,7 @@ const handleDeleteClass = async () => {
     classToDelete.value = null
   } catch (err) {
     console.error('Failed to delete class:', err)
-    deleteError.value = err instanceof Error ? err.message : 'Failed to delete class'
+    deleteError.value = err instanceof Error ? err.message : 'Fehler beim Löschen der Klasse.'
   } finally {
     deleting.value = false
   }

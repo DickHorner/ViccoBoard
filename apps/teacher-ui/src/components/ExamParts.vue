@@ -1,14 +1,14 @@
 <template>
   <section v-if="store.mode === 'complex'" class="panel exam-parts">
     <div class="panel-header">
-      <h2>Exam parts</h2>
+      <h2>Prüfungsteile</h2>
       <button class="ghost" type="button" @click="store.addPart()">
-        Add part
+        Teil hinzufügen
       </button>
     </div>
 
     <div v-if="store.parts.length === 0" class="empty">
-      No parts yet. Add parts to group tasks into sections.
+      Noch keine Teile. Fügen Sie Teile hinzu, um Aufgaben in Abschnitte zu gruppieren.
     </div>
 
     <div
@@ -17,9 +17,9 @@
       class="part-card"
     >
       <div class="part-header">
-        <h3>Part {{ index + 1 }}</h3>
+        <h3>Teil {{ index + 1 }}</h3>
         <button class="ghost" type="button" @click="store.removePart(part.id)">
-          Remove
+          Entfernen
         </button>
       </div>
 
@@ -29,12 +29,12 @@
           :id="`part-name-${part.id}`"
           v-model="part.name"
           type="text"
-          placeholder="Part name"
+          placeholder="Teilname"
         />
       </div>
 
       <div class="field">
-        <label :for="`part-description-${part.id}`">Description</label>
+        <label :for="`part-description-${part.id}`">Beschreibung</label>
         <textarea
           :id="`part-description-${part.id}`"
           v-model="part.description"
@@ -46,27 +46,27 @@
       <div class="field-grid">
         <label class="choice-toggle">
           <input v-model="part.calculateSubScore" type="checkbox" />
-          Calculate sub score
+          Teilnote berechnen
         </label>
         <label class="choice-toggle">
           <input v-model="part.printable" type="checkbox" />
-          Printable
+          Druckbar
         </label>
       </div>
 
       <div class="field-grid">
         <label class="choice-toggle">
           <input v-model="part.scoreType" type="radio" value="points" />
-          Points
+          Punkte
         </label>
         <label class="choice-toggle">
           <input v-model="part.scoreType" type="radio" value="grade" />
-          Grade
+          Note
         </label>
       </div>
 
       <div class="field">
-        <label>Included tasks</label>
+        <label>Enthaltene Aufgaben</label>
         <div class="chip-grid">
           <label
             v-for="task in store.flatTasks"
@@ -82,7 +82,7 @@
           </label>
         </div>
         <p v-if="part.taskIds.length === 0" class="help-text">
-          Select at least one task for this part
+          Wählen Sie mindestens eine Aufgabe für diesen Teil.
         </p>
       </div>
     </div>

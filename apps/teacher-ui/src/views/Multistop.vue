@@ -148,7 +148,7 @@
           class="btn-success"
           :disabled="!hasStoppedTimers"
         >
-          💾 {{ t('COMMON.save-all') || 'Save All' }}
+          💾 {{ t('COMMON.save-all') || 'Alles speichern' }}
         </button>
       </div>
     </div>
@@ -159,7 +159,7 @@
         <h3>{{ t('MULTISTOP.captured-times') }}</h3>
         <div class="header-actions">
           <button @click="exportTimes" class="btn-secondary btn-small">
-            📊 {{ t('COMMON.export') || 'Export' }}
+            📊 {{ t('COMMON.export') || 'Exportieren' }}
           </button>
         </div>
       </div>

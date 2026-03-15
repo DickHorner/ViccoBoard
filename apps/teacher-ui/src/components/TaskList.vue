@@ -1,14 +1,14 @@
 <template>
   <section class="panel task-list">
     <div class="panel-header">
-      <h2>Tasks</h2>
+      <h2>Aufgaben</h2>
       <button class="ghost" type="button" @click="store.addTask()">
-        Add task
+        Aufgabe hinzufügen
       </button>
     </div>
 
     <div v-if="store.tasks.length === 0" class="empty">
-      Add at least one task to get started
+      Fügen Sie mindestens eine Aufgabe hinzu, um zu starten.
     </div>
 
     <TaskEditor

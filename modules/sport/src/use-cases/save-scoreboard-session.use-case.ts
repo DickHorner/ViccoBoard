@@ -20,6 +20,14 @@ export interface ScoreEventInput {
   timestamp?: string;
 }
 
+/** Snapshot of the inline timer state stored alongside a scoreboard session. */
+export interface InlineTimerState {
+  /** Accumulated elapsed time in milliseconds. */
+  elapsedMs: number;
+  /** Whether the timer was actively running when the session was saved. */
+  running: boolean;
+}
+
 export interface SaveScoreboardSessionInput {
   sessionId?: string;
   classGroupId?: string;
@@ -30,6 +38,10 @@ export interface SaveScoreboardSessionInput {
   history: ScoreEventInput[];
   linkedTeamSessionId?: string;
   linkedTimerSessionId?: string;
+  /** Number of active team slots shown (2 or 4). */
+  layout?: 2 | 4;
+  /** Inline timer state persisted with the session. */
+  inlineTimer?: InlineTimerState;
 }
 
 export interface ScoreboardSessionMetadata {
@@ -39,6 +51,10 @@ export interface ScoreboardSessionMetadata {
   history: Array<ScoreEventInput & { timestamp: string }>;
   linkedTeamSessionId?: string;
   linkedTimerSessionId?: string;
+  /** Number of active team slots shown (2 or 4). */
+  layout?: 2 | 4;
+  /** Inline timer state persisted with the session. */
+  inlineTimer?: InlineTimerState;
 }
 
 export class SaveScoreboardSessionUseCase {
@@ -62,7 +78,9 @@ export class SaveScoreboardSessionUseCase {
         timestamp: entry.timestamp ?? new Date().toISOString()
       })),
       linkedTeamSessionId: input.linkedTeamSessionId,
-      linkedTimerSessionId: input.linkedTimerSessionId
+      linkedTimerSessionId: input.linkedTimerSessionId,
+      layout: input.layout,
+      inlineTimer: input.inlineTimer
     };
 
     if (input.sessionId) {

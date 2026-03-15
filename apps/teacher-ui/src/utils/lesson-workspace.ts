@@ -62,12 +62,12 @@ export function buildSportToolEntries(ctx: LessonContext): LessonToolEntry[] {
     {
       to: appendLessonContext('/subjects/sport', ctx),
       title: 'Sport-Hub',
-      description: 'Bewertung, Tests und Tools fuer diese Stunde.',
+      description: 'Bewertung, Tests und Tools für diese Stunde.',
     },
     {
       to: appendLessonContext('/grading', ctx),
       title: 'Sport-Bewertung',
-      description: 'Kategorien und Leistungserfassung oeffnen.',
+      description: 'Kategorien und Leistungserfassung öffnen.',
     },
     {
       to: appendLessonContext(SPORT_TOOL_ROUTES.timer, ctx),
