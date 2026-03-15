@@ -118,6 +118,10 @@ const entries = [
     eyebrow: 'Tool',
     title: 'Basketball Trefferquote',
     description: 'Echtzeit-Trefferzähler: Zielbereich im Kamerabild definieren und Treffer automatisch zählen.'
+    to: '/tools/slow-motion',
+    eyebrow: 'Tool',
+    title: 'Slow Motion Analyse',
+    description: 'Clips framegenau analysieren, Biomechanik-Marker setzen und Winkel berechnen.'
   },
   {
     to: '/subjects/sport/statistics',
