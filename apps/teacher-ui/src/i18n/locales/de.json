@@ -217,6 +217,38 @@
         "partial": "Teilweise",
         "bad": "Schlecht"
       }
+    },
+    "basketball": {
+      "title": "Basketball Trefferquote",
+      "loading": "Kamera wird gestartet...",
+      "error-title": "Fehler",
+      "retry": "Erneut versuchen",
+      "define-zone": "Zielbereich festlegen",
+      "zone-hint": "Ziehe auf dem Kamerabild, um den Zielbereich zu markieren (z. B. Korb).",
+      "zone-defined": "Zielbereich festgelegt",
+      "clear-zone": "Bereich löschen",
+      "stats": {
+        "shots": "Treffer",
+        "session-time": "Zeit"
+      },
+      "status": {
+        "ready": "Zielbereich definieren, dann \"Start\" drücken.",
+        "running": "Tracking aktiv — auf das Ziel zielen!",
+        "stopped": "Tracking gestoppt."
+      },
+      "controls": {
+        "start": "Start",
+        "stop": "Stopp",
+        "reset": "Reset"
+      },
+      "sensitivity-label": "Empfindlichkeit:",
+      "sensitivity-low": "Niedrig",
+      "sensitivity-high": "Hoch",
+      "session-saved": "Session gespeichert.",
+      "no-zone-warning": "Bitte zuerst einen Zielbereich definieren.",
+      "start-camera": "Kamera starten",
+      "stop-camera": "Kamera stoppen",
+      "noCameraPermission": "Kamerazugriff verweigert. Bitte Kameraberechtigung in den Einstellungen aktivieren."
     }
   },
   "DATENSCHUTZERKLAERUNG": "Datenschutzerklärung",
