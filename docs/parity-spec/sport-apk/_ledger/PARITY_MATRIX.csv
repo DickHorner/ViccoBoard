@@ -242,7 +242,7 @@ workflow,calendar_event_create,yes,in_scope_v2,no,N/A,N/A
 workflow,timer_tool,yes,in_scope_v2,yes,"apps/teacher-ui/src/views/Timer.vue (UI controls + save); modules/sport/src/use-cases/record-timer-result.use-case.ts (persistence)","modules/sport/tests/record-timer-result.use-case.test.ts;apps/teacher-ui/tests/precision-timer.test.ts"
 workflow,scoreboard_tool,yes,in_scope_v2,yes,apps/teacher-ui/src/views/Scoreboard.vue,N/A
 workflow,tactics_board_tool,yes,in_scope_v2,yes,apps/teacher-ui/src/views/TacticsBoard.vue,N/A
-workflow,video_delay_tool,yes,in_scope_v2,no,N/A,N/A
+workflow,video_delay_tool,yes,in_scope_v2,yes,apps/teacher-ui/src/views/VideoDelay.vue,N/A
 workflow,tracking_pushups,yes,in_scope_v2,no,N/A,N/A
 workflow,export_csv,yes,in_scope_v2,no,N/A,N/A
 workflow,backup_create,yes,in_scope_v2,no,N/A,N/A

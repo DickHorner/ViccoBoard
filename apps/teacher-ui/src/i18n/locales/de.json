@@ -1582,7 +1582,22 @@
   "DELAY": {
     "title": "Video Delay",
     "delay": "Verzögerung in Sek.",
-    "seconds": "Sek."
+    "seconds": "Sek.",
+    "startCamera": "Kamera starten",
+    "stopCamera": "Kamera stoppen",
+    "liveView": "Live",
+    "delayedView": "Verzögert",
+    "resolution": "Auflösung",
+    "fps": "Bilder/Sek.",
+    "annotate": "Annotation",
+    "clearAnnotations": "Annotationen löschen",
+    "color": "Farbe",
+    "toolPen": "Stift",
+    "toolArrow": "Pfeil",
+    "toolCircle": "Kreis",
+    "toolLine": "Linie",
+    "hint": "Kamera starten, um Live-Bild und verzögertes Bild gleichzeitig anzuzeigen.",
+    "noCameraPermission": "Kamerazugriff verweigert. Bitte Kameraberechtigung in den Einstellungen aktivieren."
   },
   "ALERT": {
     "receive-new-password": "Neues Passwort erhalten",

@@ -108,6 +108,12 @@ const entries = [
     description: 'Zufallszahlen mit konfigurierbarem Bereich würfeln und Ergebnisse protokollieren.'
   },
   {
+    to: '/tools/video-delay',
+    eyebrow: 'Tool',
+    title: 'Video Delay',
+    description: 'Live-Kamerabild mit konfigurierbarem Delay und Annotations-Overlay fuer Bewegungsbeobachtung.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Auswertung',
     title: 'Statistiken',
