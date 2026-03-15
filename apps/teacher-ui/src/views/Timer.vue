@@ -140,7 +140,7 @@
           {{ formatTime(elapsedTime) }}
         </div>
         <div class="timer-controls">
-          <button class="btn-primary btn-touch btn-large" @click="startStopwatch" v-if="!isRunning && !isPaused">
+          <button class="btn-primary btn-touch btn-large" @click="startStopwatch" v-if="!isRunning">
             ▶️ {{ t('COMMON.start') || 'Start' }}
           </button>
           <button class="btn-secondary btn-touch" @click="pauseTimer" v-if="isRunning && !isPaused">
@@ -652,7 +652,10 @@ function stopTimer() {
 
 function playBeep() {
   try {
-    const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+    const AudioCtx =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const audioContext = new AudioCtx()
     const oscillator = audioContext.createOscillator()
     const gainNode = audioContext.createGain()
 
