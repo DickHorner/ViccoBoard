@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    <a class="skip-link" href="#main-content">Skip to content</a>
+    <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
 
     <header class="app-header">
       <button
@@ -10,20 +10,20 @@
         aria-controls="primary-navigation"
         @click="toggleSidebar"
       >
-        Menu
+        Menü
       </button>
 
       <div class="brand">
         <div class="brand-mark">VB</div>
         <div class="brand-text">
           <h1 class="brand-title">ViccoBoard</h1>
-          <p class="brand-subtitle">Teacher workspace</p>
+          <p class="brand-subtitle">Lehrkraft-Arbeitsbereich</p>
         </div>
       </div>
 
       <div class="header-meta">
         <div class="page-title">{{ pageTitle }}</div>
-        <div class="status-pill">Offline-ready</div>
+        <div class="status-pill">Offline bereit</div>
       </div>
     </header>
 
@@ -32,7 +32,7 @@
         id="primary-navigation"
         class="app-sidebar"
         :class="{ open: isSidebarOpen }"
-        aria-label="Primary"
+        aria-label="Hauptnavigation"
       >
         <nav class="nav-menu">
           <section
@@ -59,7 +59,7 @@
         <div class="sidebar-footer">
           <div class="sidebar-card">
             <p class="sidebar-card-title">Arbeitsprinzip</p>
-            <p class="sidebar-card-body">Organisation bleibt fachneutral. Fachtools oeffnen wir erst im passenden Workspace.</p>
+            <p class="sidebar-card-body">Organisation bleibt fachneutral. Fachtools öffnen wir erst im passenden Arbeitsbereich.</p>
           </div>
         </div>
       </aside>
@@ -68,7 +68,7 @@
         v-if="isCompact && isSidebarOpen"
         class="sidebar-backdrop"
         type="button"
-        aria-label="Close navigation"
+        aria-label="Navigation schließen"
         @click="closeSidebar"
       ></button>
 
@@ -97,7 +97,7 @@ const pageTitle = computed(() => {
   if (typeof metaTitle === 'string' && metaTitle.trim().length > 0) {
     return metaTitle
   }
-  return 'Dashboard'
+  return 'Start'
 })
 
 const compactWidth = 900

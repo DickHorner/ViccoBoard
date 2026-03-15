@@ -3,7 +3,7 @@
     <header class="page-header">
       <div>
         <h1>Sport</h1>
-        <p class="subtitle">Fachspezifischer Arbeitsbereich fuer Bewertung, Tests, Tools und Statistiken. Klassen, Stunden und Anwesenheit bleiben fachneutral organisiert.</p>
+        <p class="subtitle">Fachspezifischer Arbeitsbereich für Bewertung, Tests, Tools und Statistiken. Klassen, Stunden und Anwesenheit bleiben fachneutral organisiert.</p>
       </div>
       <span class="summary-pill">{{ classCount }} aktive Klassen</span>
     </header>
@@ -66,6 +66,12 @@ const entries = [
     description: 'Leistungstabellen importieren, aktivieren und als Bewertungsgrundlage hinterlegen.'
   },
   {
+    to: '/subjects/sport/games',
+    eyebrow: 'Datenbank',
+    title: 'Spieldatenbank',
+    description: 'Lokale Spiel- und Übungsdatenbank: suchen, filtern und im Unterricht nutzen.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Statistiken',
     title: 'Statistiken',
@@ -81,25 +87,25 @@ const entries = [
     to: '/tools/scoreboard',
     eyebrow: 'Tool',
     title: 'Scoreboard',
-    description: 'Spielstaende live erfassen und praesentieren.'
+    description: 'Spielstände live erfassen und präsentieren.'
   },
   {
     to: '/tools/teams',
     eyebrow: 'Tool',
     title: 'Teams & Turniere',
-    description: 'Gruppen fair einteilen und Turnierplaene im Unterricht nutzen.'
+    description: 'Gruppen fair einteilen und Turnierpläne im Unterricht nutzen.'
   },
   {
     to: '/tools/tactics',
     eyebrow: 'Tool',
     title: 'Taktik & Feedback',
-    description: 'Taktikboard und Feedbackmethoden fuer den laufenden Unterricht.'
+    description: 'Taktikboard und Feedbackmethoden für den laufenden Unterricht.'
   },
   {
     to: '/tools/dice',
     eyebrow: 'Tool',
-    title: 'Wuerfeln',
-    description: 'Zufallszahlen mit konfigurierbarem Bereich wuerfeln und Ergebnisse protokollieren.'
+    title: 'Würfeln',
+    description: 'Zufallszahlen mit konfigurierbarem Bereich würfeln und Ergebnisse protokollieren.'
   },
   {
     to: '/tools/video-delay',
@@ -122,7 +128,7 @@ onMounted(async () => {
     classes.value = await classGroups.findAll()
     loadError.value = null
   } catch (error) {
-    loadError.value = error instanceof Error ? error.message : 'Failed to load classes'
+    loadError.value = error instanceof Error ? error.message : 'Fehler beim Laden der Klassen.'
     classes.value = []
   }
 

@@ -22,20 +22,20 @@ export const primaryNavSections: NavSection[] = [
     id: 'organisation',
     title: 'Organisation',
     items: [
-      { to: '/schedule', label: 'Stundenplan', hint: 'Tages- und Stundenuebersicht' },
+      { to: '/schedule', label: 'Stundenplan', hint: 'Tages- und Stundenübersicht' },
       { to: '/classes', label: 'Klassen', hint: 'Klassen und Gruppen' },
-      { to: '/students', label: 'Schueler', hint: 'Zentrale Verwaltung' },
-      { to: '/lessons', label: 'Stunden', hint: 'Eintraege und Verlauf' },
+      { to: '/students', label: 'Schüler', hint: 'Zentrale Verwaltung' },
+      { to: '/lessons', label: 'Stunden', hint: 'Einträge und Verlauf' },
       { to: '/attendance', label: 'Anwesenheit', hint: 'Status und Dokumentation' },
       { to: '/settings', label: 'Einstellungen', hint: 'App und Konfiguration' }
     ]
   },
   {
     id: 'subjects',
-    title: 'Faecher',
+    title: 'Fächer',
     items: [
       { to: '/subjects/sport', label: 'Sport', hint: 'Bewertung, Tests, Tools' },
-      { to: '/subjects/kbr', label: 'KBR', hint: 'Pruefungen und Korrektur' }
+      { to: '/subjects/kbr', label: 'KBR', hint: 'Prüfungen und Korrektur' }
     ]
   }
 ]

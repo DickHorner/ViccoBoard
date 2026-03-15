@@ -16,6 +16,15 @@ import { v4 as uuidv4 } from 'uuid';
 // Standings types
 // ---------------------------------------------------------------------------
 
+/**
+ * Minimal representation of a saved scoreboard session needed for score mapping.
+ * Callers (e.g. the UI) cast their concrete metadata type to this interface.
+ */
+export interface ScoreboardLookup {
+  teams: Array<{ id: string; name: string }>;
+  scores: Record<string, number>;
+}
+
 export interface RoundRobinStanding {
   teamId: string;
   teamName: string;
@@ -303,5 +312,48 @@ export class TournamentService {
    */
   isTournamentComplete(matches: Sport.Match[]): boolean {
     return matches.length > 0 && matches.every(m => m.status === 'completed');
+  }
+
+  /**
+   * Derive match scores from a saved scoreboard session.
+   *
+   * Matching strategy (applied in order):
+   * 1. **Name-based** (case-insensitive): if both tournament match teams can be
+   *    found by name in the scoreboard session, their individual scores are used.
+   * 2. **Positional fallback**: used when either team name has no match in the
+   *    scoreboard session (including partial matches where only one name is
+   *    found). The first scoreboard team maps to `score1` and the second to
+   *    `score2`.
+   *
+   * Returns `{ score1: 0, score2: 0 }` when the lookup has no teams.
+   */
+  mapScoreboardResultToMatch(
+    tournamentTeams: Sport.Team[],
+    match: Sport.Match,
+    scoreboard: ScoreboardLookup
+  ): { score1: number; score2: number } {
+    const team1 = tournamentTeams.find(t => t.id === match.team1Id);
+    const team2 = tournamentTeams.find(t => t.id === match.team2Id);
+
+    const team1Name = team1?.name.toLowerCase() ?? '';
+    const team2Name = team2?.name.toLowerCase() ?? '';
+
+    const sbTeam1 = scoreboard.teams.find(t => t.name.toLowerCase() === team1Name);
+    const sbTeam2 = scoreboard.teams.find(t => t.name.toLowerCase() === team2Name);
+
+    if (sbTeam1 && sbTeam2) {
+      return {
+        score1: scoreboard.scores[sbTeam1.id] ?? 0,
+        score2: scoreboard.scores[sbTeam2.id] ?? 0
+      };
+    }
+
+    // Positional fallback
+    const firstTeam = scoreboard.teams[0];
+    const secondTeam = scoreboard.teams[1];
+    return {
+      score1: firstTeam ? (scoreboard.scores[firstTeam.id] ?? 0) : 0,
+      score2: secondTeam ? (scoreboard.scores[secondTeam.id] ?? 0) : 0
+    };
   }
 }

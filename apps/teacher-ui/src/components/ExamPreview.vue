@@ -1,43 +1,43 @@
 <template>
   <aside class="panel exam-preview">
     <div class="preview-header">
-      <h2>Preview</h2>
-      <span class="pill">{{ store.totalPoints }} points</span>
+      <h2>Vorschau</h2>
+      <span class="pill">{{ store.totalPoints }} Punkte</span>
     </div>
 
     <div class="preview-meta">
-      <p><strong>{{ store.title || 'Untitled exam' }}</strong></p>
+      <p><strong>{{ store.title || 'Unbenannte Prüfung' }}</strong></p>
       <p v-if="store.description">{{ store.description }}</p>
       <p v-else class="muted">
-        Add a description if you want students to see context.
+        Fügen Sie eine Beschreibung hinzu, wenn Schüler zusätzlichen Kontext sehen sollen.
       </p>
     </div>
 
     <ol v-if="store.tasks.length > 0" class="preview-tasks">
       <li v-for="task in store.tasks" :key="task.id">
         <div class="task-line">
-          <span>{{ task.title || 'Untitled task' }}</span>
-          <span class="pill">{{ task.points }} pts</span>
+          <span>{{ task.title || 'Unbenannte Aufgabe' }}</span>
+          <span class="pill">{{ task.points }} Punkte</span>
         </div>
         <ul v-if="task.subtasks.length" class="criteria-list">
           <li v-for="subtask in task.subtasks" :key="subtask.id">
-            {{ subtask.title || 'Subtask' }} ({{ subtask.points }} pts)
+            {{ subtask.title || 'Teilaufgabe' }} ({{ subtask.points }} Punkte)
             <ul v-if="subtask.subtasks.length" class="criteria-list">
               <li v-for="leaf in subtask.subtasks" :key="leaf.id">
-                {{ leaf.title || 'Subtask' }} ({{ leaf.points }} pts)
+                {{ leaf.title || 'Teilaufgabe' }} ({{ leaf.points }} Punkte)
               </li>
             </ul>
           </li>
         </ul>
       </li>
     </ol>
-    <p v-else class="empty">No tasks added yet</p>
+    <p v-else class="empty">Noch keine Aufgaben hinzugefügt</p>
 
     <div v-if="store.mode === 'complex' && store.parts.length > 0" class="preview-meta">
-      <h3>Exam parts</h3>
+      <h3>Prüfungsteile</h3>
       <ul>
         <li v-for="part in store.parts" :key="part.id">
-          {{ part.name || 'Unnamed part' }} — {{ part.taskIds.length }} tasks
+          {{ part.name || 'Unbenannter Teil' }} — {{ part.taskIds.length }} Aufgaben
         </li>
       </ul>
     </div>

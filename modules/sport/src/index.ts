@@ -13,6 +13,8 @@ export { PerformanceEntryRepository } from './repositories/performance-entry.rep
 export { ToolSessionRepository } from './repositories/tool-session.repository.js';
 export { FeedbackSessionRepository } from './repositories/feedback-session.repository.js';
 export { TableDefinitionRepository } from './repositories/table-definition.repository.js';
+export { GameEntryRepository } from './repositories/game-entry.repository.js';
+export type { CreateGameEntryInput } from './repositories/game-entry.repository.js';
 export { TacticsSnapshotRepository } from './repositories/tactics-snapshot.repository.js';
 export type {
   CreateTacticsSnapshotInput,
@@ -121,13 +123,14 @@ export type {
 } from './grading/criteria-grading.engine.js';
 
 // Services
-export { TeamBuilderService } from './services/team-builder.service.js';
-export type { TeamBuildInput, BuiltTeam } from './services/team-builder.service.js';
+export { TeamBuilderService, TeamConstraintError } from './services/team-builder.service.js';
+export type { TeamBuildInput, TeamStudent, TeamAlgorithm, TeamBasis, TeamConstraints, TeamConstraintConflict, BuiltTeam } from './services/team-builder.service.js';
 export { TournamentService } from './services/tournament.service.js';
 export type {
   RoundRobinStanding,
   KnockoutBracket,
-  KnockoutRound
+  KnockoutRound,
+  ScoreboardLookup
 } from './services/tournament.service.js';
 export { TimeGradingService } from './services/time-grading.service.js';
 export type {

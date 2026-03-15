@@ -251,6 +251,18 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [ ] Lehrkraft ruft Ergebnisse/Fortschritt ab.
 - [ ] WOW-Übersichten in App (auch pro Schüler).
 
+### 6.8a Sport — Spieldatenbank (lokale Übungs- und Spielesuche)
+- [x] Datenmodell `GameEntry` (Kategorie, Schwierigkeit, Phase, Dauer, Altersgruppe, Material, Ziel, Beschreibung, Variation, Hinweise). – `packages/core/src/interfaces/sport.types.ts`
+- [x] Lokaler Seed-Datenbestand (30 Spiele/Übungen). – `apps/teacher-ui/src/data/game-seed-data.ts`
+- [x] `GameEntryRepository` zur IndexedDB-Persistenz. – `modules/sport/src/repositories/game-entry.repository.ts`
+- [x] IndexedDB-Migration (Version 19). – `packages/storage/src/migrations/indexeddb/019_game_database_schema.ts`
+- [x] Ansicht `GameDatabaseView.vue` mit Suchfeld, Kategorie-Filter-Chips, Phase-/Schwierigkeits-/Sortier-Filter, Kartenansicht und aufklappbarer Detailansicht. – `apps/teacher-ui/src/views/GameDatabaseView.vue`
+- [x] Route `/subjects/sport/games`. – `apps/teacher-ui/src/router/index.ts`
+- [x] Einstiegskarte im Sport-Hub. – `apps/teacher-ui/src/views/SportHub.vue`
+- [x] i18n-Einträge (de/en). – `apps/teacher-ui/src/i18n/locales/de.json`, `en.json`
+- [x] Offline-first (IndexedDB, kein Backend nötig).
+- Ref: GitHub Issue [Sport] Spieldatenbank als lokale Übungs- und Spielesuche umsetzen
+
 ### 6.9 KBR — Prüfungen anlegen (Strukturen)
 - [ ] Prüfungen mit Unteraufgaben und komplexen Bausteinen (Darstellungsleistung, Schreibaufgabe, Kriterien, Unterkriterien, Wahlaufgaben, Kommentare, Prüfungsteile, Bonuspunkte).
 - [ ] **Einfacher vs. komplexer Aufgabenmodus**:

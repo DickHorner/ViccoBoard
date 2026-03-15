@@ -93,8 +93,8 @@
               <RouterLink 
                 :to="`/lessons/${lesson.id}/workspace`"
                 class="action-btn action-btn-workspace"
-                title="Workspace oeffnen"
-                aria-label="Workspace öffnen"
+                title="Arbeitsbereich öffnen"
+                aria-label="Arbeitsbereich öffnen"
               >
                 →
               </RouterLink>

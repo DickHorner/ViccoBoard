@@ -2,38 +2,38 @@
   <section class="correction-compact">
     <header class="correction-header">
       <div>
-        <h1>Compact Correction</h1>
-        <p class="subtitle">Tab through points, see totals in real time.</p>
+        <h1>Kompaktkorrektur</h1>
+        <p class="subtitle">Punkte per Tab erfassen und Summen in Echtzeit sehen.</p>
       </div>
       <div class="header-actions">
-        <button class="ghost" type="button" @click="goBack">Back</button>
+        <button class="ghost" type="button" @click="goBack">Zurück</button>
         <button class="primary" type="button" :disabled="!canSave" @click="saveCorrection">
-          Save correction
+          Korrektur speichern
         </button>
       </div>
     </header>
 
     <div class="panel">
       <div class="panel-header">
-        <h2>Exam</h2>
+        <h2>Prüfung</h2>
         <span class="pill" v-if="exam">{{ exam.title }}</span>
       </div>
       <div class="grid-two">
         <div class="field">
-          <label for="candidate-select">Candidate</label>
+          <label for="candidate-select">Schüler</label>
           <select id="candidate-select" v-model="selectedCandidateId">
-            <option value="">Select candidate</option>
+            <option value="">Schüler wählen</option>
             <option v-for="candidate in candidates" :key="candidate.id" :value="candidate.id">
               {{ candidate.firstName }} {{ candidate.lastName }}
             </option>
           </select>
         </div>
         <div class="field">
-          <label>Quick add candidate</label>
+          <label>Schüler schnell hinzufügen</label>
           <div class="candidate-add">
-            <input v-model="candidateFirstName" type="text" placeholder="First name" />
-            <input v-model="candidateLastName" type="text" placeholder="Last name" />
-            <button class="ghost" type="button" @click="addCandidate">Add</button>
+            <input v-model="candidateFirstName" type="text" placeholder="Vorname" />
+            <input v-model="candidateLastName" type="text" placeholder="Nachname" />
+            <button class="ghost" type="button" @click="addCandidate">Hinzufügen</button>
           </div>
         </div>
       </div>
@@ -41,24 +41,24 @@
 
     <div class="panel">
       <div class="panel-header">
-        <h2>Points</h2>
+        <h2>Punkte</h2>
         <div class="summary">
-          <span>{{ totalPoints }} / {{ maxPoints }} pts</span>
+          <span>{{ totalPoints }} / {{ maxPoints }} Punkte</span>
           <span class="pill">{{ percentageScore.toFixed(1) }}%</span>
         </div>
       </div>
 
       <label class="choice-toggle">
         <input type="checkbox" v-model="useAlternativeGrading" />
-        Alternative grading (++/+/0/-/--)
+        Alternative Bewertung (++/+/0/-/--)
       </label>
 
-      <div v-if="tasks.length === 0" class="empty">No tasks found for this exam.</div>
+      <div v-if="tasks.length === 0" class="empty">Für diese Prüfung wurden keine Aufgaben gefunden.</div>
       <div v-else class="task-grid">
         <div v-for="(task, taskIndex) in tasks" :key="task.id" class="task-row">
           <div class="task-info">
             <strong>{{ task.title }}</strong>
-            <span class="muted">Max {{ task.points }} pts</span>
+            <span class="muted">Max. {{ task.points }} Punkte</span>
           </div>
           <div class="task-score">
             <div v-if="useAlternativeGrading" class="alt-grade-group">
@@ -83,7 +83,7 @@
               step="0.5"
               class="score-input"
               :tabindex="taskIndex + 1"
-              :aria-label="`Points for ${task.title} (max ${task.points})`"
+              :aria-label="`Punkte für ${task.title} (maximal ${task.points})`"
               @focus="($event.target as HTMLInputElement).select()"
               @keydown="onScoreKeydown($event, taskIndex)"
             />
@@ -95,12 +95,12 @@
     <div class="panel summary-panel">
       <div class="summary">
         <div>
-          <h3>Total</h3>
-          <p class="muted">Points to next grade: {{ pointsToNextGrade }}</p>
+          <h3>Gesamt</h3>
+          <p class="muted">Punkte bis zur nächsten Note: {{ pointsToNextGrade }}</p>
         </div>
         <div class="summary-value">
           <span>{{ totalPoints }}</span>
-          <span class="muted">/{{ maxPoints }} pts</span>
+          <span class="muted">/{{ maxPoints }} Punkte</span>
         </div>
       </div>
     </div>
@@ -199,9 +199,9 @@ const percentageScore = computed(() =>
 
 const pointsToNextGrade = computed(() => {
   const gradingKey = exam.value?.gradingKey
-  if (!gradingKey) return 'n/a'
+  if (!gradingKey) return 'k. A.'
   const pts = gradingKeyService?.pointsToNextGrade(totalPoints.value, gradingKey)
-  if (pts === undefined || pts === null) return 'n/a'
+  if (pts === undefined || pts === null) return 'k. A.'
   return pts.toFixed(1)
 })
 
@@ -212,14 +212,14 @@ const canSave = computed(() => {
 const loadExam = async () => {
   const examId = route.params.id as string
   if (!examId) {
-    error('No exam ID provided.')
+    error('Keine Prüfungs-ID angegeben.')
     router.push('/exams')
     return
   }
 
   const data = await examRepository?.findById(examId) ?? null
   if (!data) {
-    error('Exam not found.')
+    error('Prüfung nicht gefunden.')
     router.push('/exams')
     return
   }
@@ -237,7 +237,7 @@ const loadExam = async () => {
 const addCandidate = async () => {
   if (!exam.value) return
   if (!candidateFirstName.value.trim() || !candidateLastName.value.trim()) {
-    error('Provide first and last name.')
+    error('Bitte Vor- und Nachnamen angeben.')
     return
   }
 
@@ -254,7 +254,7 @@ const addCandidate = async () => {
   selectedCandidateId.value = candidate.id
   candidateFirstName.value = ''
   candidateLastName.value = ''
-  success('Candidate added.')
+  success('Schüler hinzugefügt.')
 }
 
 const saveCorrection = async () => {
@@ -281,7 +281,7 @@ const saveCorrection = async () => {
   }
 
   await recordCorrectionUseCase?.execute(entry)
-  success('Correction saved.')
+  success('Korrektur gespeichert.')
 }
 
 const goBack = () => router.push('/exams')
