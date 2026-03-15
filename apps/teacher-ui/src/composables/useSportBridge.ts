@@ -35,6 +35,7 @@ import {
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   SaveCooperSessionUseCase,
+  SavePushupSessionUseCase,
   SaveScoreboardSessionUseCase,
   SaveMultistopSessionUseCase,
   SaveTableDefinitionUseCase,
@@ -63,6 +64,8 @@ import {
   type RecordAttendanceInput,
   type RecordDiceRollInput,
   type RecordGradeInput,
+  type SavePushupSessionInput,
+  type PushupPersonData,
   type SaveTableDefinitionInput,
   type UpdateGradeCategoryInput
 } from '@viccoboard/sport';
@@ -110,6 +113,7 @@ interface SportBridge {
   saveScoreboardSessionUseCase: SaveScoreboardSessionUseCase;
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
+  savePushupSessionUseCase: SavePushupSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
   createTournamentUseCase: CreateTournamentUseCase;
   updateTournamentMatchUseCase: UpdateTournamentMatchUseCase;
@@ -191,6 +195,7 @@ export function initializeSportBridge(): SportBridge {
     cooperTestConfigRepository
   );
   const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepository);
+  const savePushupSessionUseCase = new SavePushupSessionUseCase(toolSessionRepository);
   const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(
     tableDefinitionRepository
   );
@@ -253,6 +258,7 @@ export function initializeSportBridge(): SportBridge {
     saveScoreboardSessionUseCase,
     saveCooperSessionUseCase,
     saveMultistopSessionUseCase,
+    savePushupSessionUseCase,
     importTableDefinitionUseCase,
     createTournamentUseCase,
     updateTournamentMatchUseCase,
@@ -348,9 +354,11 @@ export type {
   CreateLessonInput,
   DeleteGradeCategoryInput,
   DeleteGradeCategoryResult,
+  PushupPersonData,
   RecordAttendanceInput,
   RecordDiceRollInput,
   RecordGradeInput,
+  SavePushupSessionInput,
   SaveTableDefinitionInput,
   UpdateGradeCategoryInput
 };

@@ -269,6 +269,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Video Delay', parent: '/subjects/sport' }
   },
   {
+    path: '/tools/pushup-tracking',
+    name: 'pushup-tracking',
+    component: () => import('../views/PushupTracking.vue'),
+    meta: { title: 'Liegestütze Tracking', parent: '/subjects/sport' }
+  },
+  {
     path: '/settings/sport',
     name: 'settings-sport',
     component: () => import('../views/SportSettingsView.vue'),
