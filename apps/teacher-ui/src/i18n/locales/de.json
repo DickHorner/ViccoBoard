@@ -1117,7 +1117,11 @@
       "horn.mp3": "Horn",
       "tick.mp3": "Tick",
       "none": "Kein Sound"
-    }
+    },
+    "presets": "Voreinstellungen",
+    "presenter": "Presenter",
+    "close-presenter": "Schließen",
+    "total-elapsed": "Gesamtzeit"
   },
   "SORT": {
     "sortierung-nach": "Sortierung nach",

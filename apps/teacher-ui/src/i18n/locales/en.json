@@ -992,7 +992,11 @@
       "horn.mp3": "Horn",
       "tick.mp3": "Tick",
       "none": "No Sound"
-    }
+    },
+    "presets": "Presets",
+    "presenter": "Presenter",
+    "close-presenter": "Close",
+    "total-elapsed": "Total time"
   },
   "SORT": {
     "sortierung-nach": "Sort by",
