@@ -103,7 +103,10 @@
     "save_result": "Speichern",
     "cancel": "Abbrechen",
     "delete": "Löschen",
-    "confirm_delete": "Turnier wirklich löschen?"
+    "confirm_delete": "Turnier wirklich löschen?",
+    "import_from_scoreboard": "Aus Scoreboard übernehmen",
+    "select_scoreboard_session": "Scoreboard-Session auswählen …",
+    "scoreboard_imported": "Ergebnis aus Scoreboard-Session übernommen"
   },
   "TOURNAMENT": {
     "title": "Turnier",
