@@ -273,14 +273,20 @@ const routes: RouteRecordRaw[] = [
     name: 'finish-camera',
     component: () => import('../views/FinishCamera.vue'),
     meta: { title: 'Zielkamera', parent: '/subjects/sport' }
+  },
+  {
     path: '/tools/pushup-tracking',
     name: 'pushup-tracking',
     component: () => import('../views/PushupTracking.vue'),
     meta: { title: 'Liegestütze Tracking', parent: '/subjects/sport' }
+  },
+  {
     path: '/tools/tracking-basketball',
     name: 'tracking-basketball',
     component: () => import('../views/TrackingBasketball.vue'),
     meta: { title: 'Basketball Trefferquote', parent: '/subjects/sport' }
+  },
+  {
     path: '/tools/slow-motion',
     name: 'slow-motion',
     component: () => import('../views/SlowMotionAnalysis.vue'),
