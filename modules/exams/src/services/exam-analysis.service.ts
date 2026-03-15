@@ -193,10 +193,6 @@ export class ExamAnalysisService {
         suggestedPoints = Math.round(task.points * 1.15);
       }
 
-      // Maintain proportions by normalizing
-      const proportionAdjustment = totalCurrentPoints > 0 ? (task.points / totalCurrentPoints) : 0;
-      suggestedPoints = Math.round(suggestedPoints * proportionAdjustment * totalCurrentPoints / suggestedPoints);
-
       suggestedDistribution[task.id] = suggestedPoints;
       totalSuggestedPoints += suggestedPoints;
 

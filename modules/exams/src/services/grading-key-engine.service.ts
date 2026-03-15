@@ -307,7 +307,7 @@ export class GradingKeyEngine {
   /**
    * Export grading key history as report
    */
-  static exportchangeHistory(keyId: string): string {
+  static exportChangeHistory(keyId: string): string {
     const history = this.getChangeHistory(keyId);
     if (history.length === 0) {
       return 'No changes recorded';

@@ -24,11 +24,17 @@ export class GradingKeyService {
       if (gradingKey.type === Exams.GradingKeyType.Percentage) {
         const minPct = b.minPercentage ?? 0;
         const maxPct = b.maxPercentage ?? 100;
-        return percentage >= minPct && percentage < maxPct;
+        // Use inclusive upper bound when no explicit maxPercentage is set (open-ended top grade)
+        return b.maxPercentage !== undefined
+          ? percentage >= minPct && percentage < maxPct
+          : percentage >= minPct && percentage <= maxPct;
       } else if (gradingKey.type === Exams.GradingKeyType.Points) {
         const minPts = b.minPoints ?? 0;
         const maxPts = b.maxPoints ?? gradingKey.totalPoints;
-        return points >= minPts && points < maxPts;
+        // Use inclusive upper bound when no explicit maxPoints is set (open-ended top grade)
+        return b.maxPoints !== undefined
+          ? points >= minPts && points < maxPts
+          : points >= minPts && points <= maxPts;
       }
       return false;
     });
@@ -92,10 +98,14 @@ export class GradingKeyService {
     return preset.boundaries.map(b => {
       const minPct = b.minPercentage ?? 0;
       const maxPct = b.maxPercentage ?? 100;
+      // For 100% upper bound, add 1 so a perfect score satisfies the exclusive `< maxPoints` check
+      const maxPoints = maxPct >= 100
+        ? totalPoints + 1
+        : Math.ceil((maxPct / 100) * totalPoints);
       return {
         ...b,
         minPoints: Math.ceil((minPct / 100) * totalPoints),
-        maxPoints: Math.ceil((maxPct / 100) * totalPoints)
+        maxPoints
       };
     });
   }
