@@ -98,6 +98,8 @@ export type {
 } from './use-cases/save-cooper-session.use-case.js';
 export { SaveMultistopSessionUseCase } from './use-cases/save-multistop-session.use-case.js';
 export type { SaveMultistopSessionInput, MultistopStudentResult } from './use-cases/save-multistop-session.use-case.js';
+export { SaveFinishCameraSessionUseCase } from './use-cases/save-finish-camera-session.use-case.js';
+export type { SaveFinishCameraSessionInput, FinishCameraEvent } from './use-cases/save-finish-camera-session.use-case.js';
 
 export { SaveSportClassUseCase } from './use-cases/save-sport-class.use-case.js';
 export { SaveSportCategoryUseCase } from './use-cases/save-sport-category.use-case.js';
