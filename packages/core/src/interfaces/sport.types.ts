@@ -574,3 +574,54 @@ export interface WorkoutProgress {
   totalExercises: number;
   lastActivity: Date;
 }
+
+// ============================================================================
+// Game / Exercise Database (Spiel- und Übungsdatenbank)
+// ============================================================================
+
+export type GameCategory =
+  | 'erwaermung'
+  | 'ballspiel'
+  | 'reaktionsspiel'
+  | 'laufspiel'
+  | 'koordination'
+  | 'kooperation'
+  | 'entspannung'
+  | 'kraft'
+  | 'ausdauer'
+  | 'sonstiges';
+
+export type GameDifficulty = 'anfaenger' | 'fortgeschrittene' | 'profis';
+
+export type GamePhase = 'erwaermung' | 'hauptteil' | 'schluss';
+
+export interface GameEntry {
+  id: string;
+  name: string;
+  /** Primary category (Kategorie) */
+  category: GameCategory;
+  /** Lesson phase */
+  phase: GamePhase;
+  /** Difficulty level */
+  difficulty: GameDifficulty;
+  /** Duration in minutes */
+  duration: number;
+  /** Target school level / age group (e.g. "Klasse 5-7", "Oberstufe") */
+  ageGroup: string;
+  /** Required materials */
+  material?: string;
+  /** Learning / training goal */
+  goal: string;
+  /** Short description */
+  description: string;
+  /** Variations / extensions */
+  variation?: string;
+  /** Important notes / safety hints */
+  notes?: string;
+  /** Sport discipline / theme (Sportart/Thema) */
+  sportType?: string;
+  /** Whether this is a user-created entry (false = seed data) */
+  isCustom: boolean;
+  createdAt: Date;
+  lastModified: Date;
+}
