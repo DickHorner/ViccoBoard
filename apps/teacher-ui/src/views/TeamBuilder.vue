@@ -117,7 +117,7 @@
             >
               <div class="rule-students">
                 <select
-                  v-for="(sid, si) in rule"
+                  v-for="(_sid, si) in rule"
                   :key="si"
                   v-model="neverTogetherRules[idx][si]"
                   class="form-input rule-select"
@@ -145,7 +145,7 @@
             >
               <div class="rule-students">
                 <select
-                  v-for="(sid, si) in rule"
+                  v-for="(_sid, si) in rule"
                   :key="si"
                   v-model="alwaysTogetherRules[idx][si]"
                   class="form-input rule-select"
