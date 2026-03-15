@@ -269,6 +269,10 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Video Delay', parent: '/subjects/sport' }
   },
   {
+    path: '/tools/finish-camera',
+    name: 'finish-camera',
+    component: () => import('../views/FinishCamera.vue'),
+    meta: { title: 'Zielkamera', parent: '/subjects/sport' }
     path: '/tools/pushup-tracking',
     name: 'pushup-tracking',
     component: () => import('../views/PushupTracking.vue'),

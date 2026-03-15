@@ -114,6 +114,10 @@ const entries = [
     description: 'Live-Kamerabild mit konfigurierbarem Delay und Annotations-Overlay fuer Bewegungsbeobachtung.'
   },
   {
+    to: '/tools/finish-camera',
+    eyebrow: 'Tool',
+    title: 'Zielkamera',
+    description: 'Kamera auf die Ziellinie richten, Zielübertritte automatisch erfassen und schnell Schülern zuordnen.'
     to: '/tools/pushup-tracking',
     eyebrow: 'Tool',
     title: 'Liegestütze Tracking',

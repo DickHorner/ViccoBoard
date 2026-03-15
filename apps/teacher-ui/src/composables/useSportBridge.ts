@@ -38,6 +38,7 @@ import {
   SavePushupSessionUseCase,
   SaveScoreboardSessionUseCase,
   SaveMultistopSessionUseCase,
+  SaveFinishCameraSessionUseCase,
   SaveSlowMotionSessionUseCase,
   SaveTableDefinitionUseCase,
   SaveTacticsSnapshotUseCase,
@@ -114,6 +115,7 @@ interface SportBridge {
   saveScoreboardSessionUseCase: SaveScoreboardSessionUseCase;
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
+  saveFinishCameraSessionUseCase: SaveFinishCameraSessionUseCase;
   savePushupSessionUseCase: SavePushupSessionUseCase;
   saveSlowMotionSessionUseCase: SaveSlowMotionSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
@@ -197,6 +199,7 @@ export function initializeSportBridge(): SportBridge {
     cooperTestConfigRepository
   );
   const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepository);
+  const saveFinishCameraSessionUseCase = new SaveFinishCameraSessionUseCase(toolSessionRepository);
   const savePushupSessionUseCase = new SavePushupSessionUseCase(toolSessionRepository);
   const saveSlowMotionSessionUseCase = new SaveSlowMotionSessionUseCase(toolSessionRepository);
   const importTableDefinitionUseCase = new ImportTableDefinitionUseCase(
@@ -261,6 +264,7 @@ export function initializeSportBridge(): SportBridge {
     saveScoreboardSessionUseCase,
     saveCooperSessionUseCase,
     saveMultistopSessionUseCase,
+    saveFinishCameraSessionUseCase,
     savePushupSessionUseCase,
     saveSlowMotionSessionUseCase,
     importTableDefinitionUseCase,

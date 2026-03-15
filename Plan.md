@@ -287,6 +287,18 @@ Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer B
 - [x] Offline-first (IndexedDB, kein Backend nötig).
 - Ref: GitHub Issue [Sport] Spieldatenbank als lokale Übungs- und Spielesuche umsetzen
 
+### 6.8b Sport — Zielkamera & Langstreckenlauf-Zeitnahme
+- [x] `SaveFinishCameraSessionUseCase` zur Persistenz von Zielkamera-Sitzungen. – `modules/sport/src/use-cases/save-finish-camera-session.use-case.ts`
+- [x] Export aus `modules/sport`. – `modules/sport/src/index.ts`
+- [x] Eintrag im Sport-Bridge. – `apps/teacher-ui/src/composables/useSportBridge.ts`
+- [x] Ansicht `FinishCamera.vue` mit Kamera-Feed, virtueller Ziellinie (Klick/Touch), Stoppuhr, Bewegungserkennung, Ereignisliste, Schülerzuordnung und Export. – `apps/teacher-ui/src/views/FinishCamera.vue`
+- [x] Route `/tools/finish-camera`. – `apps/teacher-ui/src/router/index.ts`
+- [x] Einstiegskarte im Sport-Hub. – `apps/teacher-ui/src/views/SportHub.vue`
+- [x] i18n-Einträge (de/en) unter `FINISH_CAMERA`. – `apps/teacher-ui/src/i18n/locales/de.json`, `en.json`
+- [x] Übergabe an Mittelstrecke-Bewertung via Router-Query (`finishCameraSessionId`).
+- [x] Lokal + iPad-/Safari-kompatibel (Canvas, MediaDevices, kein File System Access API).
+- Ref: GitHub Issue #184 [Sport] Zielkamera fuer Langstreckenlauf mit Zeitmarken und assistierter Zuordnung umsetzen
+
 ### 6.9 KBR — Prüfungen anlegen (Strukturen)
 - [ ] Prüfungen mit Unteraufgaben und komplexen Bausteinen (Darstellungsleistung, Schreibaufgabe, Kriterien, Unterkriterien, Wahlaufgaben, Kommentare, Prüfungsteile, Bonuspunkte).
 - [ ] **Einfacher vs. komplexer Aufgabenmodus**:
