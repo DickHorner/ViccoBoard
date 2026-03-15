@@ -267,4 +267,99 @@ describe('TournamentService', () => {
       expect(service.isTournamentComplete(done)).toBe(true);
     });
   });
+
+  // -------------------------------------------------------------------------
+  // Scoreboard result mapping
+  // -------------------------------------------------------------------------
+  describe('mapScoreboardResultToMatch', () => {
+    const makeMatch = (team1Id: string, team2Id: string): Sport.Match => ({
+      id: 'm1',
+      tournamentId: 't1',
+      team1Id,
+      team2Id,
+      round: 1,
+      sequence: 1,
+      status: 'scheduled'
+    });
+
+    it('should map scores by team name when names match exactly', () => {
+      const teams = makeTeams(['Alpha', 'Beta']);
+      const match = makeMatch('t1', 't2');
+      const result = service.mapScoreboardResultToMatch(teams, match, {
+        teams: [
+          { id: 'sb-a', name: 'Alpha' },
+          { id: 'sb-b', name: 'Beta' }
+        ],
+        scores: { 'sb-a': 3, 'sb-b': 1 }
+      });
+      expect(result.score1).toBe(3);
+      expect(result.score2).toBe(1);
+    });
+
+    it('should match names case-insensitively', () => {
+      const teams = makeTeams(['alpha', 'BETA']);
+      const match = makeMatch('t1', 't2');
+      const result = service.mapScoreboardResultToMatch(teams, match, {
+        teams: [
+          { id: 'sb-a', name: 'ALPHA' },
+          { id: 'sb-b', name: 'beta' }
+        ],
+        scores: { 'sb-a': 5, 'sb-b': 2 }
+      });
+      expect(result.score1).toBe(5);
+      expect(result.score2).toBe(2);
+    });
+
+    it('should use positional fallback when names do not match', () => {
+      const teams = makeTeams(['Gamma', 'Delta']);
+      const match = makeMatch('t1', 't2');
+      const result = service.mapScoreboardResultToMatch(teams, match, {
+        teams: [
+          { id: 'sb-x', name: 'Unrelated' },
+          { id: 'sb-y', name: 'Other' }
+        ],
+        scores: { 'sb-x': 4, 'sb-y': 0 }
+      });
+      // Positional: first scoreboard team → score1
+      expect(result.score1).toBe(4);
+      expect(result.score2).toBe(0);
+    });
+
+    it('should fall back to positional when only one name matches', () => {
+      const teams = makeTeams(['Alpha', 'Delta']);
+      const match = makeMatch('t1', 't2');
+      const result = service.mapScoreboardResultToMatch(teams, match, {
+        teams: [
+          { id: 'sb-a', name: 'Alpha' }, // matches team1
+          { id: 'sb-b', name: 'NoMatch' }
+        ],
+        scores: { 'sb-a': 3, 'sb-b': 2 }
+      });
+      // Partial match → positional fallback
+      expect(result.score1).toBe(3);
+      expect(result.score2).toBe(2);
+    });
+
+    it('should return zeros when the scoreboard has no teams', () => {
+      const teams = makeTeams(['A', 'B']);
+      const match = makeMatch('t1', 't2');
+      const result = service.mapScoreboardResultToMatch(teams, match, {
+        teams: [],
+        scores: {}
+      });
+      expect(result.score1).toBe(0);
+      expect(result.score2).toBe(0);
+    });
+
+    it('should return zeros for missing score entries', () => {
+      const teams = makeTeams(['A', 'B']);
+      const match = makeMatch('t1', 't2');
+      const result = service.mapScoreboardResultToMatch(teams, match, {
+        teams: [{ id: 'sb-a', name: 'A' }, { id: 'sb-b', name: 'B' }],
+        scores: {} // scores missing
+      });
+      expect(result.score1).toBe(0);
+      expect(result.score2).toBe(0);
+    });
+  });
 });
