@@ -9,31 +9,33 @@
  */
 
 describe('i18n - Sport Locale Parity', () => {
+  const loadDe = () => import('@/i18n/locales/de');
+  const loadEn = () => import('@/i18n/locales/en');
   
   describe('1. Locale Files Loading', () => {
     it('should load German locale without errors', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       expect(de).toBeDefined();
       expect(typeof de.default).toBe('object');
     });
 
     it('should load English locale without errors', async () => {
-      const en = await import('../src/i18n/locales/en.json');
+      const en = await loadEn();
       expect(en).toBeDefined();
       expect(typeof en.default).toBe('object');
     });
 
     it('should have both locales loaded', async () => {
-      const de = await import('../src/i18n/locales/de.json');
-      const en = await import('../src/i18n/locales/en.json');
+      const de = await loadDe();
+      const en = await loadEn();
       
       expect(Object.keys(de.default).length).toBeGreaterThan(40);
       expect(Object.keys(en.default).length).toBeGreaterThan(40);
     });
 
     it('PARITY_ISSUE: English and German locales have different key structures', async () => {
-      const de = await import('../src/i18n/locales/de.json');
-      const en = await import('../src/i18n/locales/en.json');
+      const de = await loadDe();
+      const en = await loadEn();
       
       const deKeys = Object.keys(de.default).sort();
       const enKeys = Object.keys(en.default).sort();
@@ -53,34 +55,34 @@ describe('i18n - Sport Locale Parity', () => {
   describe('2. Required Sport Keys', () => {
     
     it('should have HELLO key in both locales', async () => {
-      const de = await import('../src/i18n/locales/de.json');
-      const en = await import('../src/i18n/locales/en.json');
+      const de = await loadDe();
+      const en = await loadEn();
       expect(de.default.HELLO).toBeDefined();
       expect(en.default.HELLO).toBeDefined();
     });
 
     it('should have ENCRYPTION section in German', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       expect(de.default.ENCRYPTION).toBeDefined();
       expect(typeof de.default.ENCRYPTION).toBe('object');
       expect(de.default.ENCRYPTION['setup-title']).toBeDefined();
     });
 
     it('should have MENU section', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       expect(de.default.MENU).toBeDefined();
       expect(typeof de.default.MENU).toBe('object');
       expect(de.default.MENU.tables).toBeDefined();
     });
 
     it('should have KLASSEN section (German)', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       expect(de.default.KLASSEN).toBeDefined();
       expect(de.default.KLASSEN.title).toBeDefined();
     });
 
     it('should have CLASSES section (English)', async () => {
-      const en = await import('../src/i18n/locales/en.json');
+      const en = await loadEn();
       // Note: English locale file structure found to have CLASSES
       // If not found, this indicates locale file mismatch that needs reconciliation
       if (en.default.CLASSES) {
@@ -95,12 +97,12 @@ describe('i18n - Sport Locale Parity', () => {
     });
 
     it('should have GRADES section', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       expect(de.default.GRADES || de.default.NOTEN).toBeDefined();
     });
 
     it('should have SETTINGS section', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       expect(de.default.SETTINGS).toBeDefined();
       expect(de.default.SETTINGS.title).toBeDefined();
     });
@@ -109,20 +111,20 @@ describe('i18n - Sport Locale Parity', () => {
   describe('3. Key Count Statistics', () => {
     
     it('should have at least 50 top-level keys', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       const topLevelKeys = Object.keys(de.default);
       expect(topLevelKeys.length).toBeGreaterThanOrEqual(50);
     });
 
     it('should have nested keys in major sections', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       const encryption = de.default.ENCRYPTION;
       const encryptionKeys = Object.keys(encryption);
       expect(encryptionKeys.length).toBeGreaterThan(10);
     });
 
     it('should have WOW section (excluded by scope v2 but preserved)', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       expect(de.default.WOW).toBeDefined();
       // WOW is present but marked as excluded_by_scope_v2 in parity matrix
     });
@@ -131,14 +133,14 @@ describe('i18n - Sport Locale Parity', () => {
   describe('4. Language-Specific Keys', () => {
     
     it('should have German KLASSEN (not in English)', async () => {
-      const de = await import('../src/i18n/locales/de.json');
-      const en = await import('../src/i18n/locales/en.json');
+      const de = await loadDe();
+      const en = await loadEn();
       expect(de.default.KLASSEN).toBeDefined();
       expect(en.default.KLASSEN).toBeDefined(); // Both have both sections
     });
 
     it('should have English LOGIN section', async () => {
-      const en = await import('../src/i18n/locales/en.json');
+      const en = await loadEn();
       expect(en.default.LOGIN).toBeDefined();
       expect(en.default.LOGIN.signin).toBeDefined();
     });
@@ -162,7 +164,7 @@ describe('i18n - Sport Locale Parity', () => {
   describe('6. Snapshot Tests (Sample Sections)', () => {
     
     it('should have stable ENCRYPTION keys snapshot (DE)', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       const snapshot = {
         setupTitle: de.default.ENCRYPTION['setup-title'],
         unlockTitle: de.default.ENCRYPTION['unlock-title'],
@@ -172,7 +174,7 @@ describe('i18n - Sport Locale Parity', () => {
     });
 
     it('should have stable MENU keys snapshot (DE)', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       const snapshot = {
         lock: de.default.MENU.lock,
         tables: de.default.MENU.tables,
@@ -183,7 +185,7 @@ describe('i18n - Sport Locale Parity', () => {
     });
 
     it('should have stable GRADES keys snapshot (DE)', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       const snapshot = {
         mainCategory: de.default.GRADES['main-category'],
         criteria: de.default.GRADES['criteria-title'],
@@ -194,7 +196,7 @@ describe('i18n - Sport Locale Parity', () => {
     });
 
     it('should have stable AUTH keys snapshot (EN)', async () => {
-      const en = await import('../src/i18n/locales/en.json');
+      const en = await loadEn();
       const snapshot = {
         signin: en.default.LOGIN.signin,
         password: en.default.LOGIN.password,
@@ -207,7 +209,7 @@ describe('i18n - Sport Locale Parity', () => {
   describe('7. Parity Matrix Coverage', () => {
     
     it('should cover all in_scope_v2 i18n keys from PARITY_MATRIX', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       
       // Sample critical keys from PARITY_MATRIX
       const criticalKeys = [
@@ -234,7 +236,7 @@ describe('i18n - Sport Locale Parity', () => {
     });
 
     it('should NOT have WOW keys mixed with in_scope items', async () => {
-      const de = await import('../src/i18n/locales/de.json');
+      const de = await loadDe();
       const wowSection = de.default.WOW;
       expect(wowSection).toBeDefined();
       // WOW exists (preserved for future scope), but marked as excluded_by_scope_v2
