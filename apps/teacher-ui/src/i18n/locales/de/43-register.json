@@ -1,0 +1,13 @@
+{
+  "REGISTER": {
+    "subtitle": "Erstelle deinen kostenlosen Account",
+    "password-required": "Bitte ein Passwort eingeben",
+    "password-minlength": "Das Passwort muss mindestens 6 Zeichen haben",
+    "accept-terms": "Ich akzeptiere die ",
+    "terms-link-text": "Allgemeinen Geschäftsbedingungen (AGB)",
+    "accept-privacy": "Ich habe die ",
+    "privacy-link-text": "Datenschutzerklärung",
+    "accept-privacy2": " gelesen.",
+    "must-accept": "Bitte AGB und Datenschutzerklärung bestätigen"
+  }
+}

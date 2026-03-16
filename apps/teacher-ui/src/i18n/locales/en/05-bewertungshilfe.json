@@ -1,0 +1,19 @@
+{
+  "BEWERTUNGSHILFE": {
+    "bewertungshilfen": "Evaluation tools",
+    "intro1": "Evaluation errors are almost unavoidable, but knowing them can at least help to keep them as small as possible!",
+    "intro2": "Therefore here once again the most important ones:",
+    "logisch": "Logical errors",
+    "logisch-text": "The teacher tries to deduce from one characteristic to another. However, a good handball player is not automatically a good gymnast.",
+    "halo": "Halo effect",
+    "halo-text": "In the Halo effect, students' partial achievements are assessed based on a general impression (appearance, clothing, language, etc.). Students who make a good impression are therefore given a better score than those who make a bad impression, even though it is not related to the performance.",
+    "reihung": "Ranking effect",
+    "reihung-text": "A ranking effect results from previous evaluations. If a teacher corrects a bad work after a very good work, the work will appear much worse due to the contrast effect. The teacher is also reluctant to give a 'very good' mark to several immediately consecutive pieces of work, as this is usually rare.",
+    "beurteilung": "Assessment tendencies",
+    "beurteilung-text": "Teachers have varying degrees of rigor, but personal tendencies can lead to misjudgements. There are those who judge too harshly or too leniently, but there are also some who avoid extreme grades and seek a tendency towards a grade average.",
+    "projektion": "Projection errors",
+    "projektion-text": "A teacher transfers own wishes, motives, mistakes and problems to the students and believes to perceive them.",
+    "wissen": "‚Know-the-consequences-errors‘",
+    "wissen-text": "The teacher's assessment is milder because he is aware that the student's future (e.g. transfer) depends on his judgment."
+  }
+}

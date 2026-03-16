@@ -1,0 +1,21 @@
+{
+  "BEWERTUNGSHILFE": {
+    "bewertungshilfen": "Bewertungshilfen",
+    "intro1": "Bewertungsfehler sind nahezu unumgänglich, doch das wissen um sie kann zumindest dabei helfen sie so gering als möglich zu halten!",
+    "intro2": "Daher hier noch einmal die Wichtigsten:",
+    "logisch": "Logische Fehler",
+    "logisch-text": "Der Lehrer versucht ausgehend von einem Merkmal auf andere zu schließen. Allerdings ist beispielsweise ein guter Handballer nicht automatisch ein guter Turner.",
+    "halo": "Halo-Effekt",
+    "halo-text": "Beim Halo-Effekt werden Teilleistungen der Schüler aufgrund eines allgemeinen Eindrucks (Auftreten, Kleidung, Sprache etc.) beurteilt. Schüler die einen guten Eindruck hinterlassen bekommen demnach eine bessere Bewertung als diejenigen,welche einen schlechten Eindruck hinterlassen, obwohl dieser nicht im Zusammenhang mit der erbrachten Leistung steht.",
+    "reihung": "Reihungseffekt",
+    "reihung-text": "Ein Reihungseffekt ergibt sich aus vorangegangenen Bewertungen. Korrigiert ein Lehrer eine schlechte Arbeit nach einer sehr guten Arbeit, so kommt ihm diese aufgrund des Kontrasteffekts wesentlich schlechter vor. Auch widerstrebt es dem Lehrer mehrere unmittelbar aufeinanderfolgende Leistungen mit ‚sehr gut‘ zu beurteilen, da dies in der Regel selten vorkommt.",
+    "beurteilung": "Beurteilungstendenzen",
+    "beurteilung-text": "Lehrer beurteilen verschieden streng, aber lassen sich durch persönliche Tendenzen zu Fehleinschätzungen leiten. Es gibt jene, die zu streng oder zu milde bewerten, jedoch auch einige die Extremnoten vermeiden und eine Tendenz zu einem Notenmittelmaß suchen.",
+    "projektion": "Projektionsfehler",
+    "projektion-text": "Ein Lehrer überträgt eigene Wünsche, Motive, Fehler und Problemeauf die Schüler und glaubt sie an ihnen wahrzunehmen.",
+    "wissen": "‚Wissen-um-die-Folgen-Fehler‘",
+    "wissen-text": "Die Beurteilung des Lehrers fällt milder aus, da er sich bewusst ist, dass von seinem Urteil die Zukunft des Schülers (z.B. Versetzung) abhängig ist.",
+    "perseveration": "Perseveration",
+    "perseveration-text": "Der Lehrer hält starr ein einem einmal gefälltem Urteil fest (z.B. Note)."
+  }
+}

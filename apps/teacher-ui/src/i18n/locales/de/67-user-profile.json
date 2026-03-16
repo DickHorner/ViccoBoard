@@ -1,0 +1,27 @@
+{
+  "USER_PROFILE": {
+    "BASIC_INFO": "Grundlegende Informationen",
+    "FIRST_NAME": "Vorname",
+    "LAST_NAME": "Nachname",
+    "EMAIL": "E-Mail",
+    "ROLE": "Rolle",
+    "SETTINGS": "Einstellungen",
+    "DARK_MODE": "Dunkelmodus",
+    "LANGUAGE": "Sprache",
+    "AUTO_LOCK": "Automatische Sperre",
+    "AUTO_LOCK_DELAY": "Automatische Sperre Verzögerung (Minuten)",
+    "PIN": "PIN-Code",
+    "SORT_CLASSES_BY": "Sortieren nach Klassen",
+    "NAME": "Name",
+    "DATE": "Datum",
+    "ADDONS": "Erweiterungen",
+    "ADD_CLASSES": "Klassen hinzufügen",
+    "ADD_TABLES": "Tabellen hinzufügen",
+    "LICENSES": "Lizenzen",
+    "PURCHASE_DATE": "Kaufdatum",
+    "EXPIRY_DATE": "Ablaufdatum",
+    "STATUS": "Status",
+    "SAVE": "Speichern",
+    "SORT_STUDENTS_BY": "Sortieren nach Schülern"
+  }
+}

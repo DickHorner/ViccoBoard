@@ -1,0 +1,12 @@
+{
+  "SELECT": {
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "start": "Start",
+    "color": "Farbe",
+    "selected-color": "Ausgewählte Farbe",
+    "version:": "Version auswählen",
+    "table": "Tabelle auswählen",
+    "grade": "Note auswählen"
+  }
+}

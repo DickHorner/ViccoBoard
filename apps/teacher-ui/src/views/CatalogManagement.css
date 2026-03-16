@@ -1,0 +1,361 @@
+.catalog-management {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+.subtitle {
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0f766e;
+  font-weight: 600;
+  padding: 0;
+  white-space: nowrap;
+}
+
+/* Context tabs */
+.context-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  border-radius: 99px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #475569;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab-btn.active {
+  background: #0f766e;
+  color: white;
+  border-color: #0f766e;
+}
+
+/* Class selector */
+.class-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.form-select {
+  flex: 1;
+  max-width: 320px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* Card */
+.card {
+  background: white;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 99px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+  padding: 0 0.35rem;
+}
+
+/* Status list */
+.status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  transition: opacity 0.15s;
+}
+
+.status-row.inactive {
+  opacity: 0.45;
+}
+
+.status-swatch {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.status-code {
+  font-weight: 700;
+  font-size: 0.8rem;
+  min-width: 2.5rem;
+  text-align: center;
+  background: #f1f5f9;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  letter-spacing: 0.04em;
+}
+
+.status-name {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.status-desc {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.active-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.active-badge.active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.active-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: background 0.1s;
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Buttons */
+.btn-primary {
+  background: #0f766e;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: white;
+  color: #374151;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.btn-small {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* Loading / empty */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: #64748b;
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #e2e8f0;
+  border-top-color: #0f766e;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state,
+.empty-state-text {
+  text-align: center;
+  color: #94a3b8;
+  padding: 1.5rem;
+}
+
+.error-banner {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0 0.25rem;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-input {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.form-color {
+  width: 4rem;
+  height: 2.25rem;
+  padding: 0.15rem;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}

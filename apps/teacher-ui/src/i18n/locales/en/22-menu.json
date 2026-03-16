@@ -1,0 +1,26 @@
+{
+  "MENU": {
+    "lock": "Lock",
+    "theme": "Theme",
+    "logout": "Logout",
+    "tables": "Tables",
+    "analytics": "Analytics",
+    "tournaments": "Tournaments",
+    "scoreboard": "Scoreboard",
+    "tacticboard": "Tacticboard",
+    "taktikboard": "Tacticboard",
+    "timer": "Timer",
+    "uebungen": "Exercises",
+    "stundenplan": "Schedule",
+    "einstellungen": "Settings",
+    "infos": "Info",
+    "toolbox": "Toolbox",
+    "video-delay": "Video Delay",
+    "tracking": "Exercise Tracking",
+    "tracking-pushups": "Push-up Tracking",
+    "tracking-basketball": "Basketball Shot Tracking",
+    "settings": "Settings",
+    "users": "Users",
+    "admin-dashboard": "Admin Dashboard"
+  }
+}

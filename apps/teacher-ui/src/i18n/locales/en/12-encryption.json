@@ -1,0 +1,27 @@
+{
+  "ENCRYPTION": {
+    "setup-title": "Setup Encryption",
+    "setup-description": "Protect your student data with secure PIN-based encryption. This PIN will be used across all your devices.",
+    "enter-pin": "Enter PIN",
+    "pin-description": "Choose a 4-digit PIN for encryption",
+    "confirm-pin": "Confirm PIN",
+    "confirm-description": "Enter your PIN again to confirm",
+    "setting-up": "Setting up encryption...",
+    "success": "Success!",
+    "setup-complete": "Encryption has been successfully set up. Your student names will now be securely encrypted.",
+    "error": "Error",
+    "pin-mismatch": "The entered PINs do not match. Please try again.",
+    "setup-failed": "Encryption could not be set up. Please try again.",
+    "note-privacy": "All student names are stored encrypted - never in plain text",
+    "note-security": "Your PIN is used for key derivation with state-of-the-art cryptography",
+    "note-sharing": "You can securely share encrypted classes with other teachers",
+    "skip": "Skip (Not recommended)",
+    "skip-warning": "WARNING: Without encryption, student names will be stored unprotected. This is not privacy compliant!",
+    "skip-anyway": "Skip anyway",
+    "unlock-title": "Unlock",
+    "unlock-description": "Enter your PIN to access encrypted data",
+    "unlocking": "Unlocking encryption...",
+    "unlock-failed": "Failed to unlock encryption. Please check your PIN.",
+    "encryption-unlock-notice": "Encryption Unlock"
+  }
+}

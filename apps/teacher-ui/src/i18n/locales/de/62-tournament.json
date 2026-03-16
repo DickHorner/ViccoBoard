@@ -1,0 +1,47 @@
+{
+  "TOURNAMENT": {
+    "title": "Turnier",
+    "overview": "Übersicht",
+    "matches": "Spiele",
+    "table": "Tabelle",
+    "teams": "Teams",
+    "fields": "Felder",
+    "match": "Spiel",
+    "break": "Pause",
+    "home_away": "Hin- & Rückspiel",
+    "generate_schedule": "Spielplan erzeugen",
+    "filter": {
+      "all": "Alle",
+      "pending": "Offen",
+      "running": "Laufend",
+      "finished": "Fertig"
+    },
+    "live_table": "Blitztabelle",
+    "rounds": "Runden",
+    "slots_per_round": "Slots pro Runde",
+    "estimated_duration": "Dauer (geschätzt)",
+    "next_up": "Als Nächstes",
+    "round": "Runde",
+    "field": "Feld",
+    "team": "Team",
+    "team_schedule": "Spielplan nach Team",
+    "no_matches": "Keine Spiele für dieses Team",
+    "slot": "Slot",
+    "table_cols": {
+      "team": "Team",
+      "student": "Schüler",
+      "played": "Sp",
+      "wins": "S",
+      "draws": "U",
+      "losses": "N",
+      "goals": "Tore",
+      "points": "Pkt"
+    },
+    "explain": {
+      "round_def": "Runde: Ein Spieltag. Alle Paarungen dieser Runde sollen gespielt werden.",
+      "slot_def": "Slot: Eine Welle innerhalb einer Runde, wenn mehr Spiele als Felder vorhanden sind. Pro Slot laufen parallel so viele Spiele wie Felder."
+    },
+    "students": "Schüler",
+    "students_per_team": "Schüler pro Team"
+  }
+}

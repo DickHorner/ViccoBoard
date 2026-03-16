@@ -1,0 +1,19 @@
+{
+  "DICE": {
+    "title": "Dice",
+    "roll": "Roll",
+    "min": "Minimum",
+    "max": "Maximum",
+    "result": "Result",
+    "log": "Log",
+    "no-log": "No rolls yet in this session.",
+    "rolled": "Rolled",
+    "range": "Range",
+    "context": "Context (optional)",
+    "class": "Class",
+    "lesson": "Lesson",
+    "save-success": "Result saved.",
+    "save-error": "Error saving result.",
+    "invalid-range": "Minimum and maximum must be integers, and minimum must not be greater than maximum."
+  }
+}

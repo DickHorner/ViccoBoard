@@ -1,0 +1,28 @@
+{
+  "TURNIER": {
+    "title": "Turniere",
+    "spielplan": "Spielplan",
+    "tabelle": "Tabelle",
+    "spiel": "Spiel",
+    "gruppe": "Gruppe",
+    "gruppen": "Gruppen",
+    "pl": "Pl.",
+    "sp": "Sp.",
+    "tore": "Tore",
+    "diff": "Diff.",
+    "punkte": "Punkte",
+    "turnier-erstellen": "Turnier erstellen",
+    "name": "Name",
+    "punkte-sieg": "Punkte für Sieg",
+    "punkte-unentschieden": "Punkte für unentschieden",
+    "spiellaenge": "Spiellänge in Minuten",
+    "pause": "Pausenlänge in Minuten",
+    "hin-rueck": "Hin- und Rückrunde",
+    "endrunde": "Endrunde mit Halbfinale und Finale",
+    "anzahl-mannschaften": "Anzahl Mannschaften",
+    "notes": "Bemerkungen",
+    "spiele": "Spiele",
+    "spielzeit": "Spielzeit",
+    "dauer": "Spieldauer"
+  }
+}

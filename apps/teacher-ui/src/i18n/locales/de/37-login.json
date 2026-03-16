@@ -1,0 +1,20 @@
+{
+  "LOGIN": {
+    "signin": "Login",
+    "reset-password": "Passwort zurücksetzen",
+    "email": "Email",
+    "password": "Passwort",
+    "register": "Registrieren",
+    "create-account": "Account erstellen",
+    "valid-email": "Bitte eine gültige Email-Adresse eingeben.",
+    "please-insert-email": "Bitte Email-Adresse eingeben.",
+    "forgot-password": "Passwort vergessen?",
+    "failed": "Login fehlgeschlagen",
+    "invalid-credentials": "Ungültige Zugangsdaten.",
+    "unlock-title": "Entsperren",
+    "unlock-description": "Gib deine PIN ein, um die App zu entsperren",
+    "please-pin": "Bitte gib deine PIN ein",
+    "pin": "PIN für Bildschirm-Sperre",
+    "screen-lock-notice": "Bildschirm-Sperre"
+  }
+}

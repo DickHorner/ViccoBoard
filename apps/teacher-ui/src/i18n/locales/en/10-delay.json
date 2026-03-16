@@ -1,0 +1,22 @@
+{
+  "DELAY": {
+    "title": "Video Delay",
+    "delay": "Delay in sec.",
+    "seconds": "sec.",
+    "startCamera": "Start Camera",
+    "stopCamera": "Stop Camera",
+    "liveView": "Live",
+    "delayedView": "Delayed",
+    "resolution": "Resolution",
+    "fps": "Frames/sec.",
+    "annotate": "Annotate",
+    "clearAnnotations": "Clear Annotations",
+    "color": "Color",
+    "toolPen": "Pen",
+    "toolArrow": "Arrow",
+    "toolCircle": "Circle",
+    "toolLine": "Line",
+    "hint": "Start the camera to show the live view and delayed view side by side.",
+    "noCameraPermission": "Camera access denied. Please enable camera permission in your device settings."
+  }
+}

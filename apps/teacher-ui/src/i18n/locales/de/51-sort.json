@@ -1,0 +1,12 @@
+{
+  "SORT": {
+    "sortierung-nach": "Sortierung nach",
+    "nachname-az": "Nachname A-Z",
+    "nachname-za": "Nachname Z-A",
+    "vorname-az": "Vorname A-Z",
+    "vorname-za": "Vorname Z-A",
+    "geschlecht-mw": "Geschlecht m-w",
+    "geschlecht-wm": "Geschlecht w-m",
+    "teilklassen": "Teilklassen"
+  }
+}

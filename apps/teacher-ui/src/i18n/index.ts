@@ -1,8 +1,8 @@
 import { createI18n } from 'vue-i18n';
 import type { I18n, I18nOptions } from 'vue-i18n';
 
-import deLang from './locales/de.json';
-import enLang from './locales/en.json';
+import deLang from './locales/de/index.js';
+import enLang from './locales/en/index.js';
 
 /**
  * Locale messages — directly from Sport APK parity-spec

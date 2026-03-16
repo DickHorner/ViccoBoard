@@ -1,0 +1,15 @@
+{
+  "LICENSES": {
+    "sport-all": "Sport 365",
+    "free": "Free",
+    "pro": "Pro",
+    "supporter": "Supporter",
+    "free-desc": "Basisfunktionen kostenlos",
+    "not-active": "Nicht aktiv",
+    "active": "Aktiv",
+    "start": "Startdatum",
+    "end": "Gültig bis",
+    "remaining-days": "Verbleibende Tage",
+    "days": "Tage"
+  }
+}

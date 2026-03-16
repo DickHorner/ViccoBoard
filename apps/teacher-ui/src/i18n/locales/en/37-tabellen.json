@@ -1,0 +1,33 @@
+{
+  "TABELLEN": {
+    "tabelle-hinzu": "Add table",
+    "name": "Name",
+    "fuer": "Table for",
+    "cooper": "Cooper-Test",
+    "shuttle": "Shuttle-Run (beep-test)",
+    "tabellenbewertung": "table evaluation",
+    "einfache-tabellenbewertung": "simple table evaluation",
+    "multistop": "multistop",
+    "mittelstrecke": "Middle distance",
+    "relativleistung": "relative",
+    "verbalbeurteilung": "verbal",
+    "laufen": "running",
+    "schwimmen": "swimming",
+    "becken": "Pool-length",
+    "bahnlaenge": "Round length",
+    "alter": "Age of the students",
+    "notenschema": "Grade scheme",
+    "bemerkungen": "Notes",
+    "datei": "Choose file",
+    "demo-hinzu": "Insert demo-tables",
+    "bearbeiten": "Edit table",
+    "note": "Grade",
+    "demo-importieren": "Import demo tables",
+    "lokale-importieren": "Import local table",
+    "eigene-importieren": "Import own table",
+    "Sportabzeichen": "German Sport Badge",
+    "bundesjugendspiele": "Bundesjugendspiele",
+    "tabellen": "Tables",
+    "typ": "Type"
+  }
+}

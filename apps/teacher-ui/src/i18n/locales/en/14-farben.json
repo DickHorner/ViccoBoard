@@ -1,0 +1,16 @@
+{
+  "FARBEN": {
+    "weiss": "white",
+    "gruen": "green",
+    "hellgruen": "lightgreen",
+    "rot": "red",
+    "blau": "blue",
+    "hellblau": "lightblue",
+    "aqua": "aqua",
+    "fuchsia": "fuchsia",
+    "orange": "orange",
+    "lime": "lime",
+    "grau": "gray",
+    "hellgrau": "lightgray"
+  }
+}

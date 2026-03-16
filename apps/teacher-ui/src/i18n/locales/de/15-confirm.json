@@ -1,0 +1,20 @@
+{
+  "CONFIRM": {
+    "attention": "Achtung",
+    "cancel": "Abbrechen",
+    "ok": "OK",
+    "delete-student": "Möchtest du diesen Schüler wirklich löschen?",
+    "delete-class": "Möchtest du diese Klasse wirklich löschen?",
+    "delete-table": "Möchtest du diese Tabelle wirklich löschen?",
+    "delete-grade": "Möchtest du diese Note wirklich löschen?",
+    "delete-main-category": "Möchtest du diese Oberkategorie wirklich löschen?",
+    "delete-category": "Möchtest du diese Kategorie wirklich löschen?",
+    "delete-team": "Möchtest du dieses Team wirklich löschen?",
+    "delete-tournament": "Möchtest du dieses Turnier wirklich löschen?",
+    "delete-wow": "Möchtest du dieses WOW wirklich löschen?",
+    "delete-feedback": "Möchtest du dieses Feedback wirklich löschen?",
+    "delete-event": "Möchtest du dieses Event wirklich löschen?",
+    "delete-uebung": "Möchtest du diese Übung wirklich löschen?",
+    "delete-lesson": "Möchtest du diese Stunde wirklich löschen?"
+  }
+}

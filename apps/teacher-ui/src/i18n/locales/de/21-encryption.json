@@ -1,0 +1,28 @@
+{
+  "ENCRYPTION": {
+    "setup-title": "Verschlüsselung einrichten",
+    "setup-description": "Schütze die Schülerdaten mit einer sicheren PIN-Verschlüsselung. Diese PIN wird auf allen Ihren Geräten verwendet.",
+    "enter-pin": "PIN eingeben",
+    "pin-description": "Wähle eine 4-stellige PIN für die Verschlüsselung",
+    "confirm-pin": "PIN bestätigen",
+    "confirm-description": "Gib deine PIN zur Bestätigung erneut ein",
+    "setting-up": "Verschlüsselung wird eingerichtet...",
+    "success": "Erfolgreich!",
+    "setup-complete": "Verschlüsselung wurde erfolgreich eingerichtet. Ihre Schülernamen werden ab sofort sicher verschlüsselt.",
+    "error": "Fehler",
+    "pin-mismatch": "Die eingegebenen PINs stimmen nicht überein. Bitte versuche es erneut.",
+    "setup-failed": "Die Verschlüsselung konnte nicht eingerichtet werden. Bitte versuche es erneut.",
+    "note-privacy": "Alle Schülernamen werden verschlüsselt gespeichert - niemals im Klartext",
+    "note-security": "Deine PIN wird zur Ver- und Entschlüsselung mit modernster Kryptografie verwendet",
+    "note-sharing": "Du kannst verschlüsselte Klassen sicher mit anderen Lehrern teilen",
+    "skip": "Überspringen (Nicht empfohlen)",
+    "skip-warning": "WARNUNG: Ohne Verschlüsselung werden Schülernamen ungeschützt gespeichert. Dies ist nicht datenschutzkonform!",
+    "skip-anyway": "Trotzdem überspringen",
+    "unlock-title": "Entsperren",
+    "unlock-description": "Gib deine PIN ein, um die App zu entsperren",
+    "unlocking": "Verschlüsselung wird entsperrt...",
+    "unlock-failed": "Verschlüsselung konnte nicht entsperrt werden. Überprüfe deine PIN.",
+    "encryption-unlock-notice": "Verschlüsselungs-Entsperrung",
+    "recipient_missing_public_key": "Empfänger hat noch keinen öffentlichen Schlüssel hinterlegt. Teilen ist erst möglich, wenn der Empfänger die Verschlüsselung einrichtet."
+  }
+}

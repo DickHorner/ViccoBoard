@@ -1,0 +1,12 @@
+{
+  "COMMON": {
+    "syncing": "Syncing...",
+    "open": "Open",
+    "delete": "Delete",
+    "info": "Info",
+    "loading": "Loading...",
+    "fill_all_fields": "Please fill all fields",
+    "error": "Error",
+    "success": "Success"
+  }
+}

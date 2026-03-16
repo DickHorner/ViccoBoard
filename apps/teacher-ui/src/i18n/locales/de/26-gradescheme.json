@@ -1,0 +1,12 @@
+{
+  "GRADESCHEME": {
+    "viertel16": "Viertelnoten: 1-6",
+    "drittel16": "Drittelnoten: 1-6",
+    "viertel61": "Schweiz Viertelnoten: 6-1",
+    "abi": "Abi: 0-15",
+    "hundert": "0-100",
+    "zehntel16": "Zehntel: 1-6",
+    "ganz15": "Österreich ganze Noten: 1-5",
+    "ganz16": "Bayern ganze Noten: 1-6"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "SORT": {
+    "sortierung-nach": "Sort by",
+    "nachname-az": "last name A-Z",
+    "nachname-za": "last name Z-A",
+    "vorname-az": "first name A-Z",
+    "vorname-za": "first name Z-A",
+    "geschlecht-mw": "gender m-w",
+    "geschlecht-wm": "gender w-m",
+    "teilklassen": "subclasses"
+  }
+}

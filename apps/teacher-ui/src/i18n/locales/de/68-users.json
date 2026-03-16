@@ -1,0 +1,17 @@
+{
+  "USERS": {
+    "LICENSE": {
+      "FREE": "Free",
+      "PRO": "Pro",
+      "SUPPORTER": "Supporter"
+    },
+    "IMPERSONATION": {
+      "SUCCESS": "Als Benutzer eingeloggt",
+      "ERROR": "Fehler beim Einloggen als Benutzer",
+      "STOPPED": "Impersonation beendet",
+      "STOP_ERROR": "Fehler beim Beenden der Impersonation",
+      "DATA_LOADED": "Benutzerdaten erfolgreich geladen",
+      "DATA_LOAD_ERROR": "Fehler beim Laden der Benutzerdaten"
+    }
+  }
+}

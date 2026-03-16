@@ -1,0 +1,12 @@
+{
+  "NOTENSCHEMA": {
+    "viertel16": "Quarter marks: 1-6",
+    "drittel16": "Third marks: 1-6",
+    "viertel61": "Suisse Quarter marks: 6-1",
+    "abi": "Abi: 0-15",
+    "hundert": "0-100",
+    "zehntel": "Tenth: 1-6",
+    "ganz15": "Austria whole marks: 1-5",
+    "ganz16": "Bavaria whole marks: 1-6"
+  }
+}

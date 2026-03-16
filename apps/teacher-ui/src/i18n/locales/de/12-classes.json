@@ -1,0 +1,21 @@
+{
+  "CLASSES": {
+    "class": "Klasse",
+    "add": "Klasse hinzufügen",
+    "edit": "Klasse bearbeiten",
+    "name": "Name",
+    "no-pupils": "Es gibt noch keine Schüler in dieser Klasse",
+    "school-year": "Schuljahr",
+    "delete": "Klasse löschen",
+    "grade-scheme": "Notenschema",
+    "share_with_others": "Share class with other teachers",
+    "access_list": "Zugriff verwalten",
+    "save": "Speichern",
+    "general": "Allgemein",
+    "sort": "Anzeigenreihenfolge",
+    "generate-lessons": "Stunden anlegen",
+    "select-state": "Bundesland auswählen",
+    "weekdays": "Wochentage",
+    "readonly-shared": "Geteilte Klasse: Du hast nur Leserechte"
+  }
+}

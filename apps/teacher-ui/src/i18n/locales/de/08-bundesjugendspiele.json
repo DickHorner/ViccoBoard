@@ -1,0 +1,17 @@
+{
+  "BUNDESJUGENDSPIELE": {
+    "sprint": "Sprint",
+    "sprung": "Sprung",
+    "wurf": "Wurf/Stoß",
+    "ausdauer": "Ausdauer",
+    "punkte": "Punkte",
+    "teilnahmeurkunde": "Teilnahmeurkunde",
+    "siegerurkunde": "Siegerurkunde",
+    "ehrenurkunde": "Ehrenurkunde",
+    "info-titel": "Infos zu den Bundesjugendspielen",
+    "link": "Nähere Infos unter www.bundesjugendspiele.de",
+    "info1": "Jede Schülerin und jeder Schüler tritt bei den Bundesjugendspielen in vier Disziplinen an und bekommt für seine Leistungen Punkte.",
+    "info2": "Diese Punkte werden zu einer Gesamtpunktzahl aufaddiert, die dann zu einer Teilnahme-, Siger- oder sogar Ehrenurkunde führt.",
+    "disziplinen-einzeln": "Disziplinen einzeln"
+  }
+}

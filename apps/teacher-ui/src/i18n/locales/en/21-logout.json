@@ -1,0 +1,7 @@
+{
+  "LOGOUT": {
+    "confirm_title": "Sign Out?",
+    "confirm_message": "Are you sure you want to sign out? All unsynchronized data will be deleted.",
+    "confirm_button": "Sign Out"
+  }
+}

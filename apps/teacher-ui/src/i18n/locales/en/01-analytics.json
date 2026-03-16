@@ -1,0 +1,25 @@
+{
+  "ANALYTICS": {
+    "total-classes": "Classes",
+    "total-students": "Students",
+    "total-lessons": "Lessons",
+    "total-grades": "Grades",
+    "avg-grade": "Average grade",
+    "attendance": "Attendance",
+    "attendance-present": "Present",
+    "attendance-passive": "Passive present",
+    "attendance-absent": "Absent",
+    "teams": "Teams",
+    "team-sets": "Team sets",
+    "total-teams": "Total teams",
+    "avg-team-size": "Avg. team size",
+    "wows": "WOWs",
+    "total-wows": "Total WOWs",
+    "total-wow-results": "WOW results",
+    "wow-completion": "WOW completion rate",
+    "by-class": "By class",
+    "upgrade-title": "Analytics are disabled on Free",
+    "upgrade-text": "Please upgrade to Pro or Supporter in Settings to unlock full analytics.",
+    "note-beta": "This dashboard is in beta and will be expanded."
+  }
+}

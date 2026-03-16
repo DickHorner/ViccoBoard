@@ -1,0 +1,28 @@
+{
+  "TURNIER": {
+    "title": "Tournaments",
+    "spielplan": "Schedule",
+    "tabelle": "Table",
+    "spiel": "game",
+    "gruppe": "group",
+    "gruppen": "groups",
+    "pl": "Pl.",
+    "sp": "Ga.",
+    "tore": "Goals",
+    "diff": "Diff.",
+    "punkte": "Points",
+    "turnier-erstellen": "Create tournament",
+    "name": "Name",
+    "punkte-sieg": "points per win",
+    "punkte-unentschieden": "points per draw",
+    "spiellaenge": "duration in minutes",
+    "pause": "pause in minutes",
+    "hin-rueck": "first and second leg",
+    "endrunde": "finals with half final",
+    "anzahl-mannschaften": "quantity of teams",
+    "notes": "Notes",
+    "spiele": "games",
+    "spielzeit": "Play-Duration",
+    "dauer": "Duration"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "ANWESENHEIT": {
+    "liste": "Anwesenheitsliste vom",
+    "von": "von",
+    "present": "anwesend",
+    "absent": "abwesend",
+    "reason": "Grund",
+    "medical_certificate": "ärztliches Attest",
+    "selbst": "selbst entschuldigt",
+    "unexcused": "unentschuldigt",
+    "sick": "krank",
+    "verspaetet": "verspätet",
+    "minutes": "Min.",
+    "active": "aktiv",
+    "passive": "passiv",
+    "forgot_Sportswear": "Sportsachen vergessen",
+    "menstruation": "Menstruation",
+    "other": "Sonstiges",
+    "date": "Datum",
+    "status": "Status",
+    "late": "Verspätung",
+    "presents": "anwesend",
+    "absents": "abwesend",
+    "active-present": "aktiv anwesend",
+    "passive-present": "passiv anwesend",
+    "notes": "Bemerkungen"
+  }
+}

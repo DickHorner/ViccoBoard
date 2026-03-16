@@ -1,0 +1,17 @@
+{
+  "ALERT": {
+    "receive-new-password": "Neues Passwort erhalten",
+    "insert-email": "Bitte gib deine Email-Adresse ein:",
+    "reset-password": "Passwort zurücksetzen",
+    "success": "Hervorragend!",
+    "check-email": "Bitte überprüfe deine Email",
+    "failed": "Da ging leider etwas schief.",
+    "cancel": "Abbrechen",
+    "signup-success": "Registrierung erfolgreich",
+    "signup-failed": "Registrierung fehlgeschlagen",
+    "confirm-email": "Bitte bestätige deine Email-Adresse",
+    "attention": "Achtung!",
+    "new-version": "Update verfügbar. Neu laden, um die neueste Version zu erhalten?",
+    "delete": "Löschen"
+  }
+}

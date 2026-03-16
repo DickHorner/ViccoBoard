@@ -1,0 +1,9 @@
+{
+  "USERS": {
+    "LICENSE": {
+      "FREE": "Free",
+      "PRO": "Pro",
+      "SUPPORTER": "Supporter"
+    }
+  }
+}

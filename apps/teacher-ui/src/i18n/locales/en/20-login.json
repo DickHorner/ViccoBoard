@@ -1,0 +1,20 @@
+{
+  "LOGIN": {
+    "signin": "Sign In",
+    "reset-password": "Reset Password",
+    "email": "Email",
+    "password": "Password",
+    "register": "Register",
+    "create-account": "Create Account",
+    "valid-email": "Please enter a valid email address.",
+    "please-insert-email": "Please insert email address.",
+    "forgot-password": "Forgot password?",
+    "failed": "Login failed",
+    "invalid-credentials": "Invalid credentials.",
+    "unlock-title": "Unlock",
+    "unlock-description": "Enter your PIN to unlock the app",
+    "please-pin": "Please enter your PIN",
+    "pin": "Screen lock PIN",
+    "screen-lock-notice": "Screen Lock"
+  }
+}

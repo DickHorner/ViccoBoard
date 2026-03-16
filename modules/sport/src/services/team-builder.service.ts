@@ -20,64 +20,21 @@
  *   neverTogether  – pairs/groups where no two students may share a team
  */
 
-export type TeamAlgorithm = 'random' | 'gender-balanced' | 'homogeneous' | 'heterogeneous';
-export type TeamBasis = 'gender' | 'performance' | 'performanceRating';
-
-export interface TeamStudent {
-  id: string;
-  gender?: string | null;
-  /** Numeric grade or performance score used for homogeneous/heterogeneous distribution. */
-  performanceScore?: number | null;
-  /** Self-assessed rating used for homogeneous/heterogeneous distribution. */
-  performanceRating?: number | null;
-}
-
-export interface TeamConstraints {
-  /** Each inner array is a group of student IDs that must all end up in the same team. */
-  alwaysTogether?: string[][];
-  /** Each inner array is a group/pair of student IDs where no two members may share a team. */
-  neverTogether?: string[][];
-}
-
-export interface TeamConstraintConflict {
-  type: 'alwaysTogether-group-too-large' | 'direct-contradiction' | 'neverTogether-unsatisfiable';
-  message: string;
-  studentIds?: string[];
-}
-
-export class TeamConstraintError extends Error {
-  readonly conflicts: TeamConstraintConflict[];
-  constructor(message: string, conflicts: TeamConstraintConflict[]) {
-    super(message);
-    this.name = 'TeamConstraintError';
-    this.conflicts = conflicts;
-  }
-}
-
-export interface TeamBuildInput {
-  /** Students to distribute. */
-  students: TeamStudent[];
-  /** Number of teams to create (≥ 2). */
-  teamCount: number;
-  /** Human-readable label prefix ("Team", "Gruppe", …). */
-  teamLabel: string;
-  /** Distribution algorithm. Defaults to 'random'. */
-  algorithm?: TeamAlgorithm;
-  /** Basis used when algorithm is 'homogeneous' or 'heterogeneous'. */
-  basis?: TeamBasis;
-  /** Role names to assign cyclically to each team member (optional). */
-  roles?: string[];
-  /** Hard pair/group constraints. */
-  constraints?: TeamConstraints;
-}
-
-export interface BuiltTeam {
-  id: string;
-  name: string;
-  studentIds: string[];
-  /** Optional role assignments: studentId → role name. */
-  roles?: Record<string, string>;
-}
+import { TeamConstraintError } from './team-builder.types';
+import type {
+  BuiltTeam,
+  TeamAlgorithm,
+  TeamBasis,
+  TeamBuildInput,
+  TeamConstraintConflict,
+  TeamConstraints,
+  TeamStudent,
+} from './team-builder.types';
+import {
+  mergeAlwaysTogether,
+  resolveNeverTogether,
+  validateConstraints
+} from './team-builder.constraints';
 
 export class TeamBuilderService {
   /**
@@ -104,8 +61,8 @@ export class TeamBuilderService {
     }
 
     // Validate and resolve constraints
-    const resolvedAlwaysTogether = this.mergeAlwaysTogether(constraints.alwaysTogether ?? []);
-    this.validateConstraints(students, resolvedAlwaysTogether, constraints.neverTogether ?? [], teamCount);
+    const resolvedAlwaysTogether = mergeAlwaysTogether(constraints.alwaysTogether ?? []);
+    validateConstraints(students, resolvedAlwaysTogether, constraints.neverTogether ?? [], teamCount);
 
     // Produce ordered list of student IDs according to the algorithm
     let orderedIds: string[];
@@ -145,101 +102,6 @@ export class TeamBuilderService {
    * "must be together" relationships are respected.
    * e.g. [[A,B],[B,C]] → [[A,B,C]]
    */
-  private mergeAlwaysTogether(groups: string[][]): string[][] {
-    if (groups.length === 0) return [];
-
-    // Collect all student IDs mentioned in alwaysTogether rules
-    const parent: Map<string, string> = new Map();
-    const find = (id: string): string => {
-      if (!parent.has(id)) parent.set(id, id);
-      const p = parent.get(id)!;
-      if (p !== id) {
-        parent.set(id, find(p));
-      }
-      return parent.get(id)!;
-    };
-    const union = (a: string, b: string) => {
-      parent.set(find(a), find(b));
-    };
-
-    for (const group of groups) {
-      for (let i = 1; i < group.length; i++) {
-        union(group[0], group[i]);
-      }
-    }
-
-    // Collect merged groups
-    const merged: Map<string, string[]> = new Map();
-    for (const [id] of parent) {
-      const root = find(id);
-      if (!merged.has(root)) merged.set(root, []);
-      merged.get(root)!.push(id);
-    }
-
-    return Array.from(merged.values()).filter(g => g.length > 1);
-  }
-
-  /**
-   * Validate hard constraints and throw TeamConstraintError listing all
-   * conflicts if they cannot be satisfied.
-   */
-  private validateConstraints(
-    students: TeamStudent[],
-    alwaysTogether: string[][],
-    neverTogether: string[][],
-    teamCount: number
-  ): void {
-    const conflicts: TeamConstraintConflict[] = [];
-    const studentIds = new Set(students.map(s => s.id));
-    const maxTeamSize = Math.ceil(students.length / teamCount);
-
-    // Check each alwaysTogether group does not exceed maximum team size
-    for (const group of alwaysTogether) {
-      if (group.length > maxTeamSize) {
-        conflicts.push({
-          type: 'alwaysTogether-group-too-large',
-          message: `An "always together" group of ${group.length} students cannot fit into a team (max team size: ${maxTeamSize})`,
-          studentIds: group
-        });
-      }
-    }
-
-    // Check for direct contradictions: same pair in both alwaysTogether and neverTogether
-    for (const alwaysGroup of alwaysTogether) {
-      const alwaysSet = new Set(alwaysGroup);
-      for (const neverGroup of neverTogether) {
-        const commonIds = neverGroup.filter(id => alwaysSet.has(id));
-        if (commonIds.length >= 2) {
-          conflicts.push({
-            type: 'direct-contradiction',
-            message: `Students [${commonIds.join(', ')}] must be both together and separated – this is impossible`,
-            studentIds: commonIds
-          });
-        }
-      }
-    }
-
-    // Check neverTogether feasibility: if a neverTogether group is larger
-    // than the number of teams, it cannot be satisfied
-    for (const group of neverTogether) {
-      // Only consider students that exist in our roster
-      const validIds = group.filter(id => studentIds.has(id));
-      if (validIds.length > teamCount) {
-        conflicts.push({
-          type: 'neverTogether-unsatisfiable',
-          message: `A "never together" group has ${validIds.length} members but only ${teamCount} teams exist – some pair must share a team`,
-          studentIds: validIds
-        });
-      }
-    }
-
-    if (conflicts.length > 0) {
-      throw new TeamConstraintError(
-        `Team constraints cannot be satisfied (${conflicts.length} conflict${conflicts.length > 1 ? 's' : ''})`,
-        conflicts
-      );
-    }
-  }
 
   // -------------------------------------------------------------------------
   // Ordering strategies
@@ -367,7 +229,7 @@ export class TeamBuilderService {
     }
 
     // Resolve neverTogether violations via swapping
-    this.resolveNeverTogether(teams, neverTogether);
+    resolveNeverTogether(teams, neverTogether);
 
     return teams;
   }
@@ -376,100 +238,6 @@ export class TeamBuilderService {
    * Attempt to resolve neverTogether violations by swapping students
    * between teams. This is a best-effort greedy resolution.
    */
-  private resolveNeverTogether(teams: BuiltTeam[], neverTogether: string[][]): void {
-    if (neverTogether.length === 0) return;
-
-    // Build lookup: studentId → team index
-    const teamOf = new Map<string, number>();
-    teams.forEach((t, ti) => t.studentIds.forEach(id => teamOf.set(id, ti)));
-
-    let changed = true;
-    let iterations = 0;
-    const maxIterations = teams.length * Math.max(1, ...teams.map(t => t.studentIds.length)) * neverTogether.length + 10;
-
-    while (changed && iterations < maxIterations) {
-      changed = false;
-      iterations++;
-
-      for (const group of neverTogether) {
-        // Find all pairs from this group that share a team
-        for (let i = 0; i < group.length; i++) {
-          for (let j = i + 1; j < group.length; j++) {
-            const idA = group[i];
-            const idB = group[j];
-            const tiA = teamOf.get(idA);
-            const tiB = teamOf.get(idB);
-            if (tiA === undefined || tiB === undefined || tiA !== tiB) continue;
-
-            // Violation: A and B are in the same team – try to swap A with
-            // a student from another team that won't create new violations
-            const swapped = this.trySwap(idA, teams, neverTogether, teamOf);
-            if (swapped) {
-              changed = true;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Try to swap `targetId` with a student in another team such that the swap
-   * resolves the neverTogether violation without creating new ones.
-   * Returns true if a successful swap was found.
-   */
-  private trySwap(
-    targetId: string,
-    teams: BuiltTeam[],
-    neverTogether: string[][],
-    teamOf: Map<string, number>
-  ): boolean {
-    const sourceTeamIdx = teamOf.get(targetId);
-    if (sourceTeamIdx === undefined) return false;
-
-    // Build neverTogether partner sets
-    const neverPartnersOf = (id: string): Set<string> => {
-      const partners = new Set<string>();
-      for (const group of neverTogether) {
-        if (group.includes(id)) {
-          group.forEach(p => { if (p !== id) partners.add(p); });
-        }
-      }
-      return partners;
-    };
-
-    const targetNeverPartners = neverPartnersOf(targetId);
-
-    for (let ti = 0; ti < teams.length; ti++) {
-      if (ti === sourceTeamIdx) continue;
-      const targetTeam = teams[ti];
-
-      // Try swapping targetId with each member of the other team
-      for (const candidateId of targetTeam.studentIds) {
-        const candidateNeverPartners = neverPartnersOf(candidateId);
-
-        // Check: would moving targetId to teams[ti] and candidateId to sourceTeam create violations?
-        const targetTeamMembers = new Set(targetTeam.studentIds.filter(id => id !== candidateId));
-        const sourceTeamMembers = new Set(teams[sourceTeamIdx].studentIds.filter(id => id !== targetId));
-
-        const newViolationForTarget = [...targetTeamMembers].some(m => targetNeverPartners.has(m));
-        const newViolationForCandidate = [...sourceTeamMembers].some(m => candidateNeverPartners.has(m));
-
-        if (!newViolationForTarget && !newViolationForCandidate) {
-          // Perform the swap
-          teams[sourceTeamIdx].studentIds = teams[sourceTeamIdx].studentIds.filter(id => id !== targetId);
-          teams[sourceTeamIdx].studentIds.push(candidateId);
-          targetTeam.studentIds = targetTeam.studentIds.filter(id => id !== candidateId);
-          targetTeam.studentIds.push(targetId);
-          teamOf.set(targetId, ti);
-          teamOf.set(candidateId, sourceTeamIdx);
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   // -------------------------------------------------------------------------
   // Role assignment
   // -------------------------------------------------------------------------
@@ -504,3 +272,14 @@ export class TeamBuilderService {
     return array;
   }
 }
+
+export { TeamConstraintError };
+export type {
+  BuiltTeam,
+  TeamAlgorithm,
+  TeamBasis,
+  TeamBuildInput,
+  TeamConstraintConflict,
+  TeamConstraints,
+  TeamStudent,
+};

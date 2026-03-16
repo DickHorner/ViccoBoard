@@ -1,0 +1,11 @@
+{
+  "EXPORT": {
+    "schueler-noten": "alle Schüler mit Noten",
+    "schueler-noten-leistungen": "alle Schüler mit Noten und Leistungen",
+    "fehlzeiten": "alle Fehlzeiten",
+    "achtung1": "Achtung: CSV Dateien werden",
+    "achtung2": "nicht verschlüsselt!",
+    "toast-erfolgreich": "Export erfolgreich.",
+    "stunden-alles": "alle Stunden"
+  }
+}

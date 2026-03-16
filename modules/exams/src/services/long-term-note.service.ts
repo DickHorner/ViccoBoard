@@ -4,41 +4,14 @@
  */
 
 import type { StudentLongTermNote, DevelopmentNote, CompetencyArea } from '../repositories/student-long-term-note.repository';
-
-export interface CompetencyProgress {
-  competencyId: string;
-  competencyName: string;
-  assessments: Array<{
-    date: Date;
-    score: number;
-    examId?: string;
-  }>;
-  trend: 'improving' | 'stable' | 'declining' | 'new';
-  averageScore: number;
-  latestScore: number;
-  previousScore?: number;
-  trendPercentage: number; // Improvement/decline as percentage
-}
-
-export interface StudentGrowthAnalysis {
-  studentId: string;
-  totalNotes: number;
-  competenciesTracked: number;
-  improvingCount: number;
-  stableCount: number;
-  decliningCount: number;
-  averageTrend: number; // Positive = improving, negative = declining
-  strengths: string[];
-  focusAreas: string[];
-  recentAchievements: Array<{
-    achievement: string;
-    date: Date;
-  }>;
-  recentChallenges: Array<{
-    challenge: string;
-    date: Date;
-  }>;
-}
+import { LongTermNoteUIHelper } from './long-term-note.types';
+import type { CompetencyProgress, StudentGrowthAnalysis } from './long-term-note.types';
+import {
+  calculateCompetencyProgress,
+  compareCompetencyAcrossStudents,
+  generateProgressSummary,
+  identifyStudentsNeedingSupport
+} from './long-term-note.analytics';
 
 export class LongTermNoteManagementService {
   /**
@@ -279,54 +252,7 @@ export class LongTermNoteManagementService {
     competency: CompetencyArea,
     assessments: Array<{ date: Date; score: number; examId?: string }>
   ): CompetencyProgress {
-    if (assessments.length === 0) {
-      return {
-        competencyId: competency.id,
-        competencyName: competency.name,
-        assessments: [],
-        trend: competency.trend,
-        averageScore: 0,
-        latestScore: 0,
-        trendPercentage: 0
-      };
-    }
-
-    // Sort by date
-    const sortedAssessments = [...assessments].sort((a, b) => a.date.getTime() - b.date.getTime());
-
-    const scores = sortedAssessments.map((a) => a.score);
-    const averageScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-    const latestScore = scores[scores.length - 1];
-    const previousScore = scores.length > 1 ? scores[scores.length - 2] : undefined;
-
-    // Calculate trend percentage
-    let trendPercentage = 0;
-    if (previousScore !== undefined) {
-      trendPercentage = ((latestScore - previousScore) / previousScore) * 100;
-    }
-
-    // Determine trend
-    let trend: 'improving' | 'stable' | 'declining' | 'new' = competency.trend;
-    if (scores.length > 1) {
-      if (trendPercentage > 5) {
-        trend = 'improving';
-      } else if (trendPercentage < -5) {
-        trend = 'declining';
-      } else {
-        trend = 'stable';
-      }
-    }
-
-    return {
-      competencyId: competency.id,
-      competencyName: competency.name,
-      assessments: sortedAssessments,
-      trend,
-      averageScore,
-      latestScore,
-      previousScore,
-      trendPercentage
-    };
+    return calculateCompetencyProgress(competency, assessments);
   }
 
   /**
@@ -415,21 +341,7 @@ export class LongTermNoteManagementService {
     notes: Map<string, StudentLongTermNote>,
     competencyName: string
   ): Array<{ studentId: string; studentName: string; averageScore: number; trend: string }> {
-    const results: Array<{ studentId: string; studentName: string; averageScore: number; trend: string }> = [];
-
-    for (const [studentId, note] of notes) {
-      const competency = note.competencyAreas.find((c: CompetencyArea) => c.name === competencyName);
-      if (competency) {
-        results.push({
-          studentId,
-          studentName: studentId, // Would resolve to actual name via students module
-          averageScore: 0, // Would calculate from assessments
-          trend: competency.trend
-        });
-      }
-    }
-
-    return results;
+    return compareCompetencyAcrossStudents(notes, competencyName);
   }
 
   /**
@@ -443,21 +355,7 @@ export class LongTermNoteManagementService {
       hasChallenges?: boolean;
     }
   ): StudentLongTermNote[] {
-    return notes.filter((note) => {
-      const criteria = criteriaOptions || { minFocusAreas: 2, maxImprovingCompetencies: 2, hasChallenges: true };
-
-      let needsSupport = false;
-
-      if (criteria.minFocusAreas && note.focusAreas.length >= criteria.minFocusAreas) {
-        needsSupport = true;
-      }
-
-      if (criteria.hasChallenges && note.developmentNotes.some((n: DevelopmentNote) => n.category === 'challenge')) {
-        needsSupport = true;
-      }
-
-      return needsSupport;
-    });
+    return identifyStudentsNeedingSupport(notes, criteriaOptions);
   }
 
   /**
@@ -467,104 +365,9 @@ export class LongTermNoteManagementService {
     note: StudentLongTermNote,
     growth: StudentGrowthAnalysis
   ): string {
-    const lines: string[] = [];
-
-    lines.push(`Long-Term Development Summary`);
-    lines.push(`School Year: ${note.schoolYear}`);
-    lines.push(`Total Assessments: ${growth.totalNotes}`);
-    lines.push(`Competencies Tracked: ${growth.competenciesTracked}`);
-    lines.push('');
-
-    lines.push(`Progress Overview:`);
-    lines.push(`  • Improving: ${growth.improvingCount}`);
-    lines.push(`  • Stable: ${growth.stableCount}`);
-    lines.push(`  • Declining: ${growth.decliningCount}`);
-    lines.push(`  • Average Trend: ${growth.averageTrend > 0 ? '+' : ''}${growth.averageTrend.toFixed(1)}%`);
-    lines.push('');
-
-    if (note.strengths.length > 0) {
-      lines.push(`Strengths:`);
-      note.strengths.forEach((s: string) => lines.push(`  • ${s}`));
-      lines.push('');
-    }
-
-    if (note.focusAreas.length > 0) {
-      lines.push(`Areas for Development:`);
-      note.focusAreas.forEach((a: string) => lines.push(`  • ${a}`));
-      lines.push('');
-    }
-
-    if (growth.recentAchievements.length > 0) {
-      lines.push(`Recent Achievements:`);
-      growth.recentAchievements.forEach((a) => lines.push(`  • ${a.achievement} (${a.date.toLocaleDateString()})`));
-      lines.push('');
-    }
-
-    if (note.internalNotes) {
-      lines.push(`Notes:`);
-      lines.push(note.internalNotes);
-    }
-
-    return lines.join('\n');
+    return generateProgressSummary(note, growth);
   }
 }
 
-/**
- * Helper class for UI rendering
- */
-export class LongTermNoteUIHelper {
-  /**
-   * Format trend as icon and text
-   */
-  static formatTrend(trend: 'improving' | 'stable' | 'declining' | 'new'): { icon: string; text: string; color: string } {
-    switch (trend) {
-      case 'improving':
-        return { icon: '📈', text: 'Improving', color: '#28a745' };
-      case 'stable':
-        return { icon: '➡️', text: 'Stable', color: '#ffc107' };
-      case 'declining':
-        return { icon: '📉', text: 'Declining', color: '#dc3545' };
-      case 'new':
-        return { icon: '🆕', text: 'New', color: '#17a2b8' };
-      default:
-        return { icon: '❓', text: 'Unknown', color: '#999' };
-    }
-  }
-
-  /**
-   * Get color for trend percentage
-   */
-  static getTrendColor(percentage: number): string {
-    if (percentage > 10) return '#28a745'; // Green
-    if (percentage > 0) return '#90ee90'; // Light green
-    if (percentage > -10) return '#ffc107'; // Yellow
-    return '#dc3545'; // Red
-  }
-
-  /**
-   * Format note category as display text
-   */
-  static formatCategory(category: 'achievement' | 'challenge' | 'support' | 'observation'): { icon: string; label: string } {
-    switch (category) {
-      case 'achievement':
-        return { icon: '⭐', label: 'Achievement' };
-      case 'challenge':
-        return { icon: '⚠️', label: 'Challenge' };
-      case 'support':
-        return { icon: '🤝', label: 'Support' };
-      case 'observation':
-        return { icon: '👀', label: 'Observation' };
-      default:
-        return { icon: '📝', label: 'Note' };
-    }
-  }
-
-  /**
-   * Get badge color for growth analysis
-   */
-  static getGrowthBadgeColor(value: number): string {
-    if (value > 5) return '#28a745'; // Green (improving)
-    if (value > -5) return '#ffc107'; // Yellow (stable)
-    return '#dc3545'; // Red (declining)
-  }
-}
+export { LongTermNoteUIHelper };
+export type { CompetencyProgress, StudentGrowthAnalysis };

@@ -1,0 +1,25 @@
+{
+  "ANALYTICS": {
+    "total-classes": "Klassen",
+    "total-students": "Schüler",
+    "total-lessons": "Stunden",
+    "total-grades": "Noten",
+    "avg-grade": "Durchschnittsnote",
+    "attendance": "Anwesenheit",
+    "attendance-present": "Anwesend",
+    "attendance-passive": "Passiv anwesend",
+    "attendance-absent": "Abwesend",
+    "teams": "Teams",
+    "team-sets": "Team-Sets",
+    "total-teams": "Gesamt Teams",
+    "avg-team-size": "Ø Teamgröße",
+    "wows": "WOWs",
+    "total-wows": "Anzahl WOWs",
+    "total-wow-results": "WOW-Ergebnisse",
+    "wow-completion": "WOW Abschlussquote",
+    "by-class": "Nach Klasse",
+    "upgrade-title": "Analytics sind im Free-Account deaktiviert",
+    "upgrade-text": "Bitte upgrade auf Pro oder Supporter in den Einstellungen, um alle Analysen freizuschalten.",
+    "note-beta": "Dieses Dashboard ist in Beta und wird erweitert."
+  }
+}

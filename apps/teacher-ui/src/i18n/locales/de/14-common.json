@@ -1,0 +1,15 @@
+{
+  "COMMON": {
+    "syncing": "Synchronisiere...",
+    "open": "Öffnen",
+    "delete": "Löschen",
+    "info": "Info",
+    "loading": "Laden...",
+    "fehlt": "fehlt",
+    "back": "Zurück",
+    "save": "Speichern",
+    "fill_all_fields": "Bitte alle Felder ausfüllen",
+    "error": "Fehler",
+    "success": "Erfolgreich"
+  }
+}

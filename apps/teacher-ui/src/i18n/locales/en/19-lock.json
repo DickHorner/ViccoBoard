@@ -1,0 +1,6 @@
+{
+  "LOCK": {
+    "sperren": "Lock",
+    "pin-required": "Please set a PIN in Settings first."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "KALENDER": {
+    "title": "Kalender",
+    "add-title": "Termin hinzufügen",
+    "event-title": "Name",
+    "all-day": "ganztägig?",
+    "add-event": "Termin hinzufügen",
+    "no-events": "Keine Termine",
+    "today": "Heute",
+    "week": "Woche",
+    "month": "Monat",
+    "day": "Tag",
+    "start": "Anfang",
+    "end": "Ende",
+    "event-notes": "Beschreibung"
+  }
+}

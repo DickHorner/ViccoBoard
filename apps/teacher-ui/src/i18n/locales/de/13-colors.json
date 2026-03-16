@@ -1,0 +1,15 @@
+{
+  "COLORS": {
+    "white": "weiß",
+    "green": "grün",
+    "red": "rot",
+    "blue": "blau",
+    "cyan": "cyan",
+    "magenta": "magenta",
+    "orange": "orange",
+    "grey": "grau",
+    "lightgrey": "hellgrau",
+    "black": "schwarz",
+    "yellow": "gelb"
+  }
+}

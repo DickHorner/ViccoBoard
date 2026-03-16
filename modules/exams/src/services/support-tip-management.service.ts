@@ -7,16 +7,8 @@
 import { Exams } from '@viccoboard/core';
 import QRCode from 'qrcode';
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * QR Code generator options
- * In production, would use a library like 'qrcode'
- */
-interface QRCodeOptions {
-  size?: number;
-  level?: 'L' | 'M' | 'Q' | 'H';
-  margin?: number;
-}
+import { SupportTipUIHelper } from './support-tip-management.types';
+import type { QRCodeOptions } from './support-tip-management.types';
 
 export class SupportTipManagementService {
   /**
@@ -417,61 +409,4 @@ export class SupportTipManagementService {
   }
 }
 
-/**
- * UI Helper for support tips
- */
-export class SupportTipUIHelper {
-  /**
-   * Format support tip for display
-   */
-  static formatTipForDropdown(tip: Exams.SupportTip): {
-    label: string;
-    description: string;
-    metadata: string;
-    icon: string;
-  } {
-    const usageText = tip.usageCount === 0 ? 'NEW' : `Used ${tip.usageCount}x`;
-    const category = tip.category ? `[${tip.category}]` : '';
-
-    return {
-      label: `${tip.title}`,
-      description: tip.shortDescription,
-      metadata: `${usageText} ${category}`,
-      icon: tip.usageCount >= 5 ? '⭐' : tip.usageCount > 0 ? '📌' : '+'
-    };
-  }
-
-  /**
-   * Get color indicator for weight
-   */
-  static getWeightColor(weight: number): string {
-    if (weight >= 8) return '#dc3545'; // Red - high priority
-    if (weight >= 5) return '#ffc107'; // Orange - medium priority
-    return '#28a745'; // Green - low priority
-  }
-
-  /**
-   * Format weight as visual indicator
-   */
-  static formatWeight(weight: number): string {
-    return '★'.repeat(weight) + '☆'.repeat(10 - weight);
-  }
-
-  /**
-   * Get link type icon
-   */
-  static getLinkTypeIcon(linkType: string): string {
-    switch (linkType) {
-      case 'video':
-        return '▶️';
-      case 'article':
-        return '📄';
-      case 'exercise':
-        return '✏️';
-      case 'tool':
-        return '🛠️';
-      default:
-        return '🔗';
-    }
-  }
-}
+export { SupportTipUIHelper };

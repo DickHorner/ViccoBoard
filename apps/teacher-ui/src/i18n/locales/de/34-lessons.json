@@ -1,0 +1,25 @@
+{
+  "LESSONS": {
+    "title": "Stundenübersicht",
+    "lesson": "Stunde",
+    "date": "Datum",
+    "topic": "Thema",
+    "content": "Inhalt",
+    "absentees": "Abwesende",
+    "add": "Stunde hinzufügen",
+    "edit": "Stunde bearbeiten",
+    "delete": "Stunde löschen",
+    "lesson-length": "Stunden",
+    "subject": "Fach",
+    "room": "Raum",
+    "start": "Start",
+    "end": "Ende",
+    "no-lessons": "Es gibt noch keine Stunden in diesem Stundenplan",
+    "save": "Speichern",
+    "absences": "Abwesenheiten",
+    "attendees": "Anwesende",
+    "participants": "Teilnehmer",
+    "absent": "Abwesend",
+    "present": "Anwesenheit"
+  }
+}

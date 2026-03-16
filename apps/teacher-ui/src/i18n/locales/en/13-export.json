@@ -1,0 +1,11 @@
+{
+  "EXPORT": {
+    "schueler-alles": "all students with marks",
+    "fehlzeiten": "all absence times",
+    "achtung1": "Attention: CSV files are",
+    "achtung2": "not encrypted!",
+    "toast-erfolgreich": "Export succesful.",
+    "toast-fehler": "Export failed.",
+    "stunden-alles": "all lessons"
+  }
+}

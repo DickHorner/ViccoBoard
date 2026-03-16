@@ -1,0 +1,41 @@
+{
+  "KING": {
+    "title": "Kaiserturnier",
+    "end": "Ende",
+    "wait-position": "Warteposition",
+    "wait-strong": "Stark wartet",
+    "wait-weak": "Schwach wartet",
+    "next-round": "Nächste Runde",
+    "start": "Start",
+    "swap": "Seiten tauschen",
+    "swap-sides": "Seiten tauschen",
+    "save-grades": "Noten speichern",
+    "gender-note": "Hinweis: Beim Kaiserturnier wird nicht nach m/w unterschieden.",
+    "info": {
+      "title": "Info: Kaiserturnier",
+      "heading": "Kurz-Anleitung",
+      "prep": {
+        "title": "1) Vorbereitung",
+        "item1": "Warteposition wählen: leistungsstark/leistungsschwach.",
+        "item2": "Schüler per Drag&Drop vorsortieren, Teilnehmer auswählen."
+      },
+      "rounds": {
+        "title": "2) Runden spielen",
+        "item1": "Pro Feld Gewinner antippen (links/rechts).",
+        "item2": "Mit ‚Seiten tauschen‘ Plätze wechseln.",
+        "item3": "‚Nächste Runde‘ erst, wenn alle Felder entschieden sind."
+      },
+      "points": {
+        "title": "3) Punkte & Rotation",
+        "item1": "Punkte je nach Feldposition; Warteposition steuert Bias.",
+        "item2": "Gewinner rücken nach oben, Verlierer nach unten."
+      },
+      "finish": {
+        "title": "4) Abschluss & Noten",
+        "item1": "‚Ende‘ zeigt Ranking mit Punkten und berechneter Note.",
+        "item2": "Noten sind editierbar und speicherbar.",
+        "item3": "Beim erneuten Öffnen landest du wieder im Ranking."
+      }
+    }
+  }
+}

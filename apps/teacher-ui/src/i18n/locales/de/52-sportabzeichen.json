@@ -1,0 +1,32 @@
+{
+  "SportABZEICHEN": {
+    "info-titel": "Infos zum Sportabzeichen",
+    "link": "Nähere Infos unter www.deutsches-Sportabzeichen.de",
+    "title": "Sportabzeichen",
+    "ausdauer": "Ausdauer",
+    "kraft": "Kraft",
+    "schnelligkeit": "Schnelligkeit",
+    "koordination": "Koordination",
+    "bronze": "Bronze",
+    "silber": "Silber",
+    "gold": "Gold",
+    "disziplin": "Disziplin",
+    "leistung": "Leistung",
+    "explainer": "Für das Sportabzeichen musst du in einem Kalenderjahr (01.01.–31.12.) in den vier Gruppen Ausdauer, Kraft, Schnelligkeit und Koordination jeweils eine der angebotenen Übungen mindestens auf der Leistungsstufe Bronze bestehen und einen Schwimmnachweis erbringen. Die Leistungsanforderung richtet sich nach Alter, Geschlecht und ggf. Behinderung. Du findest sie hier: Materialien oder individualisiert unter Sportabzeichen-digital.de. Die Leistungsanforderungen sind abgestuft in Bronze, Silber und Gold-Leistungen.",
+    "info1": "Beim Deutschen Sportabzeichen handelt es sich um ein Ehrenzeichen der Bundesrepublik Deutschland mit Ordenscharakter (Bundesgesetzblatt Teil I, 1958, S. 422); es darf nur getragen werden, wenn es ordnungsgemäß verliehen worden ist und der Beliehene hierfür eine Verleihungsurkunde oder ein Besitzzeugnis innehat (§ 8 des Ordensgesetzes).",
+    "info2": "Die individuell erbrachten Leistungen in den einzelnen Disziplinen werden auf Grundlage des Leistungskatalogs den drei Leistungsebenen zugeordnet. Je nach Zuordnung zu einer der drei Leistungsebenen ergibt sich je Leistung und Disziplingruppe ein Punktwert:",
+    "bronze-1": "- Bronze: 1 Punkt",
+    "silber-2": "- Silber: 2 Punkte",
+    "gold-3": "- Gold: 3 Punkte",
+    "info3": "Um das Sportabzeichen zu erwerben, müssen vier Leistungen (eine Disziplin pro Disziplingruppe) mindestens in Bronze (je 1 Punkt = 4 Punkte) erbracht werden. Die erreichten Punkte werden addiert und aus dem Gesamtpunktwert ergibt sich die Verleihung in Bronze, Silber oder Gold:",
+    "bronze-g": "- Bronze: 4-7 Punkte",
+    "silber-g": "- Silber: 8-10 Punkte",
+    "gold-g": "- Gold: 11-12 Punkte",
+    "schwimmfertigkeit": "Der Nachweis der Schwimmfertigkeit ist notwendige Voraussetzung für den Erwerb des DSA.",
+    "werte-importieren": "Werte importieren",
+    "importieren": "Importieren",
+    "disziplingruppe": "Disziplingruppe",
+    "gesamtergebnis": "Gesamtergebnis",
+    "gesamtpunkte": "Gesamtpunkte"
+  }
+}

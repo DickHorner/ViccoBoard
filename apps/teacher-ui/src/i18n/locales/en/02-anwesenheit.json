@@ -1,0 +1,18 @@
+{
+  "ANWESENHEIT": {
+    "liste": "List of presence from",
+    "von": "of",
+    "anwesend": "present",
+    "grund": "Reason",
+    "attest": "medical certificate",
+    "selbst": "self-excused",
+    "unentschuldigt": "unexcused",
+    "krank": "ill",
+    "verspaetet": "too late",
+    "minuten": "minutes",
+    "passiv": "passive",
+    "vergessen": "no Sport stuff",
+    "menstruation": "menstruation",
+    "sonstiges": "others"
+  }
+}

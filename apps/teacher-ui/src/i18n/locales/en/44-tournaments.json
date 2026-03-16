@@ -1,0 +1,50 @@
+{
+  "TOURNAMENTS": {
+    "title": "Tournaments",
+    "teams": "Teams",
+    "fields": "Fields",
+    "mode": {
+      "round_robin": "Round robin",
+      "knockout": "Knockout",
+      "groups_playoff": "Groups + Playoffs",
+      "fields_bracket": "Fields → Finals",
+      "random_students": "Random Teams"
+    },
+    "mode_info": {
+      "title": "Modes explained:",
+      "round_robin": "Round robin: All teams play each other once (optional home & away). Final table decides.",
+      "knockout": "Knockout: Losers are eliminated, winners advance. Optional third-place match.",
+      "groups_playoff": "Groups + Playoffs: Group stage (round robin) followed by knockout for top teams.",
+      "fields_bracket": "Fields → Finals: Phase 1: On each field, mini-brackets determine field winners. Phase 2: Field winners play the overall winner; field losers play placement matches.",
+      "random_students": "Random Teams: Each round, students are randomly assigned to teams. Individual student points are awarded based on team results."
+    },
+    "empty": "No tournaments yet. Tap + to create one.",
+    "new": "New Tournament",
+    "create": "Create Tournament",
+    "name_label": "Name",
+    "name_placeholder": "e.g. Volleyball Tournament",
+    "format_label": "Format",
+    "teams_label": "Teams",
+    "add_team": "Add Team",
+    "team_name_placeholder": "e.g. Team 1",
+    "min_teams": "At least 2 teams required",
+    "status": {
+      "planning": "Planning",
+      "in-progress": "In Progress",
+      "completed": "Completed"
+    },
+    "back": "Back to overview",
+    "standings": "Standings",
+    "bracket": "Bracket",
+    "enter_result": "Enter result",
+    "round_label": "Round",
+    "vs": "vs.",
+    "save_result": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm_delete": "Delete tournament?",
+    "import_from_scoreboard": "Import from Scoreboard",
+    "select_scoreboard_session": "Select scoreboard session …",
+    "scoreboard_imported": "Scores imported from scoreboard session"
+  }
+}

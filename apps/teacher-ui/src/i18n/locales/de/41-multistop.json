@@ -1,0 +1,31 @@
+{
+  "MULTISTOP": {
+    "bewerte": "Bewerte",
+    "tabelle": "Tabelle",
+    "schueler": "Schüler",
+    "speichern": "Speichern",
+    "schueler-anzahl": "Anzahl an Schülern",
+    "timer": "Timer",
+    "capture-time": "Zeit aufzeichnen",
+    "captured-times": "Aufgezeichnete Zeiten",
+    "time": "Zeit",
+    "select-student-hint": "Wähle einen Schüler aus, um Zeiten zuzuweisen",
+    "student-history": "Schüler-Historie",
+    "assigned-at": "Zugewiesen am",
+    "best-time": "Beste Zeit",
+    "from": "aus",
+    "times": "Versuchen",
+    "enable-video": "Video-Aufzeichnung aktivieren",
+    "video-description": "Zeichnet den Lauf auf, um Zeiten später präzise anzupassen. Timer hängt zu Beginn kurz, Zeit wird aber richtig erfasst.",
+    "recording": "Aufzeichnung",
+    "video-review": "Video-Überprüfung",
+    "speed": "Geschwindigkeit",
+    "adjust-times": "Zeiten anpassen",
+    "set-time": "Zeit setzen",
+    "session-saved": "Sitzung gespeichert",
+    "send-to-mittelstrecke": "An Mittelstrecken-Bewertung übergeben",
+    "select-category": "Kategorie auswählen",
+    "session-history": "Sitzungs-Historie",
+    "no-sessions": "Keine Sitzungen vorhanden"
+  }
+}

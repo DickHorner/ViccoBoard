@@ -1,0 +1,46 @@
+{
+  "TOURNAMENT": {
+    "title": "Tournament",
+    "overview": "Overview",
+    "matches": "Matches",
+    "table": "Table",
+    "teams": "Teams",
+    "fields": "Fields",
+    "match": "match",
+    "break": "break",
+    "home_away": "Home & Away",
+    "generate_schedule": "Generate schedule",
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "running": "Running",
+      "finished": "Finished"
+    },
+    "live_table": "Live table",
+    "rounds": "Rounds",
+    "slots_per_round": "Slots per round",
+    "estimated_duration": "Estimated duration",
+    "next_up": "Up next",
+    "round": "Round",
+    "field": "Field",
+    "team": "Team",
+    "team_schedule": "Schedule by team",
+    "no_matches": "No matches for this team",
+    "slot": "Slot",
+    "table_cols": {
+      "team": "Team",
+      "student": "Student",
+      "played": "P",
+      "wins": "W",
+      "draws": "D",
+      "losses": "L",
+      "goals": "Goals",
+      "points": "Pts"
+    },
+    "explain": {
+      "round_def": "Round: A match day. All pairings of this round are to be played.",
+      "slot_def": "Slot: A wave within a round when there are more matches than fields. Each slot runs as many matches in parallel as there are fields."
+    },
+    "students_per_team": "Students per team"
+  }
+}

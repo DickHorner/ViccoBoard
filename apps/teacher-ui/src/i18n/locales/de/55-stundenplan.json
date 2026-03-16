@@ -1,0 +1,12 @@
+{
+  "STUNDENPLAN": {
+    "stunde-hinzu": "Stunde hinzufügen",
+    "fach": "Fach",
+    "klasse": "Klasse",
+    "hinzu": "Speichern",
+    "zeiten": "Zeiten",
+    "edit-zeiten": "Zeiten ändern",
+    "loeschen": "Löschen",
+    "raum": "Raum"
+  }
+}

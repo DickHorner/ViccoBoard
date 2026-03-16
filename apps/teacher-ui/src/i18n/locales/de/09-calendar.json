@@ -1,0 +1,24 @@
+{
+  "CALENDAR": {
+    "add-event": "Ereignis hinzufügen",
+    "edit-event": "Ereignis bearbeiten",
+    "title": "Titel",
+    "start": "Start",
+    "end": "Ende",
+    "all-day": "Ganztägig",
+    "description": "Beschreibung",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "show-lessons": "Stunden anzeigen",
+    "lesson": "Stunde",
+    "calendar": "Kalender",
+    "view": "Ansicht",
+    "month": "Monat",
+    "week": "Woche",
+    "day": "Tag",
+    "list-week": "Liste (Woche)",
+    "list-month": "Liste (Monat)",
+    "list-year": "Liste (Jahr)"
+  }
+}

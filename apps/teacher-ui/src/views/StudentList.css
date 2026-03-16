@@ -1,0 +1,171 @@
+.student-list-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.student-list-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.student-list-page__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.student-list-page__header h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.student-list-page__intro {
+  max-width: 54rem;
+  margin: 0.6rem 0 0;
+  color: var(--color-muted);
+}
+
+.student-list-page__toolbar,
+.student-list-page__table-card {
+  padding: 1.1rem 1.15rem;
+}
+
+.student-list-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.student-list-page__filters {
+  display: flex;
+  flex: 1 1 44rem;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.student-list-page__field,
+.student-list-page__input {
+  flex: 1 1 14rem;
+  min-width: 12rem;
+}
+
+.student-list-page__toolbar-side {
+  display: grid;
+  gap: 0.85rem;
+  justify-items: end;
+}
+
+.student-list-page__content {
+  display: grid;
+  gap: 1rem;
+}
+
+.student-list-page__table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.student-list-page__empty {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.student-list-page__empty h3,
+.student-list-page__empty p {
+  margin: 0;
+}
+
+.student-list-page__empty p {
+  max-width: 34rem;
+  color: var(--color-muted);
+}
+
+.student-list-page__name-cell {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.student-list-page__name {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.student-list-page__name-cell small {
+  color: var(--color-subtle);
+}
+
+.student-list-page__row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.student-list-page__stats {
+  padding-bottom: 0.2rem;
+}
+
+.student-list-page__dialog-form {
+  padding-top: 0.35rem;
+}
+
+.student-list-page__dialog-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.student-list-page__textarea {
+  width: 100%;
+}
+
+.student-list-page__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.student-list-page :deep(.student-list-page__input),
+.student-list-page :deep(.student-list-page__field),
+.student-list-page :deep(.student-list-page__textarea) {
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .student-list-page__dialog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-list-page__toolbar-side {
+    justify-items: stretch;
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .student-list-page__toolbar,
+  .student-list-page__table-card {
+    padding: 1rem;
+  }
+
+  .student-list-page__dialog-actions,
+  .student-list-page__row-actions,
+  .student-list-page__header {
+    align-items: stretch;
+  }
+}

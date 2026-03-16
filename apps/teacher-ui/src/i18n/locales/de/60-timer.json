@@ -1,0 +1,40 @@
+{
+  "TIMER": {
+    "set": "Timer einstellen",
+    "minutes": "Minuten",
+    "seconds": "Sekunden",
+    "workout-time": "Arbeitszeit",
+    "pause-time": "Pausenzeit",
+    "gesamtlaenge": "Gesamtlänge",
+    "noch": "Noch",
+    "beep": "Beep-Ton",
+    "round": "Runde",
+    "rounds": "Runden",
+    "finished": "Timer beendet",
+    "settings": "Einstellungen",
+    "rest": "Pause",
+    "remaining-time": "Verbleibende Zeit",
+    "next": "Nächste Phase",
+    "workout": "Workout",
+    "sound-settings": "Sound-Einstellungen",
+    "enable-sounds": "Sounds aktivieren",
+    "round-start-sound": "Rundenstart-Sound",
+    "pause-sound": "Pause-Sound",
+    "halftime-sound": "Halbzeit-Sound",
+    "countdown-sound": "Countdown-Sound",
+    "sound-names": {
+      "beep-maxi.mp3": "Beep Maxi",
+      "beep-mini.mp3": "Beep Mini",
+      "bell.mp3": "Glocke",
+      "fanfare.mp3": "Fanfare",
+      "gong.mp3": "Gong",
+      "horn.mp3": "Horn",
+      "tick.mp3": "Tick",
+      "none": "Kein Sound"
+    },
+    "presets": "Voreinstellungen",
+    "presenter": "Presenter",
+    "close-presenter": "Schließen",
+    "total-elapsed": "Gesamtzeit"
+  }
+}

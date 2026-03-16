@@ -1,0 +1,33 @@
+{
+  "TACTICS": {
+    "title": "Taktikboard",
+    "newSnapshot": "Neuen Snapshot speichern",
+    "loadSnapshot": "Snapshot laden",
+    "snapshots": "Gespeicherte Snapshots",
+    "noSnapshots": "Keine Snapshots gespeichert.",
+    "snapshotTitle": "Snapshot-Titel",
+    "snapshotTitlePlaceholder": "z.B. Angriff Phase 1",
+    "background": "Spielfeld",
+    "backgroundField": "Fußball",
+    "backgroundCourt": "Basketball",
+    "backgroundPitch": "Rugby/Handball",
+    "backgroundCustom": "Leer",
+    "save": "Speichern",
+    "saveSuccess": "Snapshot gespeichert.",
+    "delete": "Löschen",
+    "clearBoard": "Board leeren",
+    "tools": "Werkzeuge",
+    "toolPlayer": "Spieler",
+    "toolBall": "Ball",
+    "toolArrow": "Pfeil",
+    "toolLine": "Linie",
+    "toolCircle": "Kreis",
+    "toolText": "Text",
+    "selectTool": "Werkzeug wählen",
+    "teamRed": "Team Rot",
+    "teamBlue": "Team Blau",
+    "createdAt": "Erstellt am",
+    "reopen": "Öffnen",
+    "sport": "Sportart (optional)"
+  }
+}

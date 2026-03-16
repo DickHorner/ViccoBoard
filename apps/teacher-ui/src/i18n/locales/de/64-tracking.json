@@ -1,0 +1,64 @@
+{
+  "TRACKING": {
+    "upgrade-title": "Tracking ist im Free-Account deaktiviert",
+    "upgrade-text": "Bitte upgrade auf Pro oder Supporter in den Einstellungen, um alle Tracking-Funktionen freizuschalten.",
+    "pushups": {
+      "title": "Liegestütze Tracking",
+      "fps-label": "FPS:",
+      "persons-label": "Max. Personen:",
+      "loading": "Tracking-Modul wird geladen...",
+      "error-title": "Fehler",
+      "retry": "Erneut versuchen",
+      "stats": {
+        "total-reps": "Gesamt-Wiederholungen",
+        "average": "Durchschnitt",
+        "fps": "FPS"
+      },
+      "status": {
+        "ready": "Drücke \"Start\" um das Tracking zu beginnen"
+      },
+      "controls": {
+        "start": "Tracking starten",
+        "stop": "Tracking stoppen",
+        "reset": "Zähler zurücksetzen"
+      },
+      "quality": {
+        "good": "Gut",
+        "partial": "Teilweise",
+        "bad": "Schlecht"
+      }
+    },
+    "basketball": {
+      "title": "Basketball Trefferquote",
+      "loading": "Kamera wird gestartet...",
+      "error-title": "Fehler",
+      "retry": "Erneut versuchen",
+      "define-zone": "Zielbereich festlegen",
+      "zone-hint": "Ziehe auf dem Kamerabild, um den Zielbereich zu markieren (z. B. Korb).",
+      "zone-defined": "Zielbereich festgelegt",
+      "clear-zone": "Bereich löschen",
+      "stats": {
+        "shots": "Treffer",
+        "session-time": "Zeit"
+      },
+      "status": {
+        "ready": "Zielbereich definieren, dann \"Start\" drücken.",
+        "running": "Tracking aktiv — auf das Ziel zielen!",
+        "stopped": "Tracking gestoppt."
+      },
+      "controls": {
+        "start": "Start",
+        "stop": "Stopp",
+        "reset": "Reset"
+      },
+      "sensitivity-label": "Empfindlichkeit:",
+      "sensitivity-low": "Niedrig",
+      "sensitivity-high": "Hoch",
+      "session-saved": "Session gespeichert.",
+      "no-zone-warning": "Bitte zuerst einen Zielbereich definieren.",
+      "start-camera": "Kamera starten",
+      "stop-camera": "Kamera stoppen",
+      "noCameraPermission": "Kamerazugriff verweigert. Bitte Kameraberechtigung in den Einstellungen aktivieren."
+    }
+  }
+}

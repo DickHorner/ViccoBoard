@@ -1,0 +1,25 @@
+{
+  "COOPER": {
+    "bewerte-cooper": "Grade Cooper-Test from",
+    "tabelle": "Table",
+    "noten-neu": "Recalculate marks",
+    "alle-schueler": "All students",
+    "runde": "Round",
+    "runden": "Rounds",
+    "bahn": "Lane",
+    "bahnen": "Lanes",
+    "meter": "m",
+    "gesamt": "Total",
+    "note": "Mark",
+    "Sportart": "Sport Type",
+    "running": "Running",
+    "swimming": "Swimming",
+    "config": "Configuration",
+    "session-history": "Test History",
+    "session-new": "New session",
+    "session-load": "Load",
+    "session-count": "{count} students",
+    "no-sessions": "No tests saved",
+    "session-date": "Date"
+  }
+}
