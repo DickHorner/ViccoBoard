@@ -16,12 +16,18 @@ describe('router fallback navigation', () => {
   it('uses the parent fallback when no internal history target exists', () => {
     const route = router.resolve('/settings/catalogs')
 
-    expect(getSafeBackNavigationTarget(route, false)).toBe('/settings')
+    expect(getSafeBackNavigationTarget(route, null)).toBe('/settings')
   })
 
   it('keeps browser back behavior when an internal history target exists', () => {
     const route = router.resolve('/settings/catalogs')
 
-    expect(getSafeBackNavigationTarget(route, true)).toBeNull()
+    expect(getSafeBackNavigationTarget(route, '/settings')).toBeNull()
+  })
+
+  it('falls back to the route parent when the recorded back target equals the current route', () => {
+    const route = router.resolve('/tools/scoreboard')
+
+    expect(getSafeBackNavigationTarget(route, route.fullPath)).toBe('/subjects/sport')
   })
 })

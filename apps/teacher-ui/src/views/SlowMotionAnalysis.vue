@@ -93,17 +93,62 @@
 
       <div class="form-group">
         <label class="form-label">{{ t('SLOWMO.videoFile') }}</label>
-        <label class="file-pick-btn btn btn-secondary">
-          📁 {{ videoFileName || t('SLOWMO.chooseFile') }}
-          <input
-            ref="fileInputRef"
-            type="file"
-            accept="video/*"
-            class="hidden-file-input"
-            @change="onFileSelected"
-          />
-        </label>
+        <div class="source-actions">
+          <label class="file-pick-btn btn btn-secondary">
+            📁 {{ videoFileName || t('SLOWMO.chooseFile') }}
+            <input
+              ref="fileInputRef"
+              type="file"
+              accept="video/*"
+              class="hidden-file-input"
+              @change="onFileSelected"
+            />
+          </label>
+          <button class="btn btn-secondary" type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
+            {{ cameraPreviewActive ? `🛑 ${t('SLOWMO.closeCamera')}` : `📷 ${t('SLOWMO.openCamera')}` }}
+          </button>
+        </div>
         <p class="field-hint">{{ t('SLOWMO.fileHint') }}</p>
+      </div>
+
+      <div v-if="cameraPreviewActive || downloadableVideoBlob || captureError" class="capture-panel card">
+        <div class="capture-header">
+          <strong>{{ t('SLOWMO.recordVideo') }}</strong>
+          <span v-if="recordingActive" class="recording-badge">
+            {{ t('SLOWMO.recording') }} {{ formatTime(recordingElapsedSec) }}
+          </span>
+          <span v-else-if="downloadableVideoBlob" class="meta-tag">{{ t('SLOWMO.recordingReady') }}</span>
+        </div>
+        <p class="field-hint">{{ captureError || t('SLOWMO.captureHint') }}</p>
+        <div v-if="cameraPreviewActive" class="capture-preview">
+          <video ref="captureVideoEl" class="capture-video" autoplay muted playsinline />
+        </div>
+        <div class="form-actions">
+          <button
+            v-if="cameraPreviewActive && !recordingActive"
+            class="btn btn-primary"
+            type="button"
+            @click="startRecording"
+          >
+            ⏺ {{ t('SLOWMO.startRecording') }}
+          </button>
+          <button
+            v-if="recordingActive"
+            class="btn btn-danger"
+            type="button"
+            @click="stopRecording"
+          >
+            ⏹ {{ t('SLOWMO.stopRecording') }}
+          </button>
+          <button
+            v-if="cameraPreviewActive && !recordingActive"
+            class="btn btn-secondary"
+            type="button"
+            @click="stopCapturePreview"
+          >
+            {{ t('SLOWMO.closeCamera') }}
+          </button>
+        </div>
       </div>
 
       <div class="form-actions">
@@ -146,16 +191,69 @@
       <!-- No video hint -->
       <div v-if="!videoLoaded" class="idle-hint card">
         <p>{{ t('SLOWMO.noVideoHint') }}</p>
-        <label class="file-pick-btn btn btn-primary">
-          📁 {{ t('SLOWMO.chooseFile') }}
-          <input
-            ref="fileInputRefInAnalyze"
-            type="file"
-            accept="video/*"
-            class="hidden-file-input"
-            @change="onFileSelected"
-          />
-        </label>
+        <div class="source-actions source-actions--centered">
+          <label class="file-pick-btn btn btn-primary">
+            📁 {{ t('SLOWMO.chooseFile') }}
+            <input
+              ref="fileInputRefInAnalyze"
+              type="file"
+              accept="video/*"
+              class="hidden-file-input"
+              @change="onFileSelected"
+            />
+          </label>
+          <button class="btn btn-secondary" type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
+            {{ cameraPreviewActive ? `🛑 ${t('SLOWMO.closeCamera')}` : `📷 ${t('SLOWMO.openCamera')}` }}
+          </button>
+        </div>
+        <div v-if="cameraPreviewActive || downloadableVideoBlob || captureError" class="capture-panel card">
+          <div class="capture-header">
+            <strong>{{ t('SLOWMO.recordVideo') }}</strong>
+            <span v-if="recordingActive" class="recording-badge">
+              {{ t('SLOWMO.recording') }} {{ formatTime(recordingElapsedSec) }}
+            </span>
+            <span v-else-if="downloadableVideoBlob" class="meta-tag">{{ t('SLOWMO.recordingReady') }}</span>
+          </div>
+          <p class="field-hint">{{ captureError || t('SLOWMO.captureHint') }}</p>
+          <div v-if="cameraPreviewActive" class="capture-preview">
+            <video ref="captureVideoEl" class="capture-video" autoplay muted playsinline />
+          </div>
+          <div class="form-actions">
+            <button
+              v-if="cameraPreviewActive && !recordingActive"
+              class="btn btn-primary"
+              type="button"
+              @click="startRecording"
+            >
+              ⏺ {{ t('SLOWMO.startRecording') }}
+            </button>
+            <button
+              v-if="recordingActive"
+              class="btn btn-danger"
+              type="button"
+              @click="stopRecording"
+            >
+              ⏹ {{ t('SLOWMO.stopRecording') }}
+            </button>
+            <button
+              v-if="cameraPreviewActive && !recordingActive"
+              class="btn btn-secondary"
+              type="button"
+              @click="stopCapturePreview"
+            >
+              {{ t('SLOWMO.closeCamera') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="videoLoaded" class="video-source-actions card">
+        <button v-if="downloadableVideoBlob" class="btn btn-secondary" type="button" @click="downloadCurrentVideo">
+          💾 {{ t('SLOWMO.keepVideoLocal') }}
+        </button>
+        <button class="btn btn-secondary" type="button" @click="deleteCurrentVideo">
+          🗑 {{ t('SLOWMO.deleteVideo') }}
+        </button>
       </div>
 
       <!-- Video + canvas area -->
@@ -319,12 +417,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import { v4 as uuidv4 } from 'uuid'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Sport } from '@viccoboard/core'
 
 const { t } = useI18n()
 const bridge = getSportBridge()
+const route = useRoute()
 
 // ---------------------------------------------------------------------------
 // Types
@@ -404,6 +504,8 @@ const studentLabel = ref('')
 const exerciseName = ref('')
 const videoFileName = ref('')
 const saveMessage = ref('')
+const captureVideoEl = ref<HTMLVideoElement | null>(null)
+const captureError = ref('')
 
 // ---------------------------------------------------------------------------
 // State – video
@@ -417,6 +519,19 @@ const playbackRate = ref(0.5)
 const speedOptions = [0.1, 0.25, 0.5, 1.0]
 const nominalFps = DEFAULT_FPS
 const scrubStep = computed(() => 1 / nominalFps)
+const cameraPreviewActive = ref(false)
+const recordingActive = ref(false)
+const recordingElapsedSec = ref(0)
+const currentVideoSourceKind = ref<'upload' | 'recorded' | null>(null)
+const downloadableVideoBlob = ref<Blob | null>(null)
+
+let captureStream: MediaStream | null = null
+let mediaRecorder: MediaRecorder | null = null
+let recordingChunks: Blob[] = []
+let recordingTimerHandle: ReturnType<typeof setInterval> | null = null
+let recordingStartedAt = 0
+let activeVideoUrl: string | null = null
+let pendingVideoSource: { url: string; fileName: string; sourceKind: 'upload' | 'recorded'; blob: Blob | null } | null = null
 
 // ---------------------------------------------------------------------------
 // State – canvas
@@ -506,6 +621,16 @@ const calculatedAngles = computed<AngleResult[]>(() => {
     result.push({ label: chain.label, deg })
   }
   return result
+})
+
+const routeClassGroupId = computed(() => {
+  const value = route.query.classGroupId
+  return typeof value === 'string' && value.length > 0 ? value : undefined
+})
+
+const routeLessonId = computed(() => {
+  const value = route.query.lessonId
+  return typeof value === 'string' && value.length > 0 ? value : undefined
 })
 
 // ---------------------------------------------------------------------------
@@ -714,14 +839,80 @@ function clearRefLines() {
 // ---------------------------------------------------------------------------
 // Video handling
 // ---------------------------------------------------------------------------
+function pickRecordingMimeType(): string | undefined {
+  if (typeof MediaRecorder === 'undefined') return undefined
+
+  const preferredTypes = [
+    'video/mp4;codecs=h264,mp4a.40.2',
+    'video/mp4',
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp8,opus',
+    'video/webm'
+  ]
+
+  return preferredTypes.find(type => MediaRecorder.isTypeSupported(type))
+}
+
+function revokeActiveVideoUrl() {
+  if (!activeVideoUrl) return
+  URL.revokeObjectURL(activeVideoUrl)
+  activeVideoUrl = null
+}
+
+function resetLoadedVideoState() {
+  if (videoEl.value) {
+    videoEl.value.pause()
+    videoEl.value.removeAttribute('src')
+    videoEl.value.load()
+  }
+  isPlaying.value = false
+  videoLoaded.value = false
+  videoDuration.value = 0
+  currentTime.value = 0
+}
+
+function clearSelectedVideo() {
+  pendingVideoSource = null
+  revokeActiveVideoUrl()
+  resetLoadedVideoState()
+  videoFileName.value = ''
+  downloadableVideoBlob.value = null
+  currentVideoSourceKind.value = null
+}
+
+function queueVideoSource(
+  url: string,
+  fileName: string,
+  sourceKind: 'upload' | 'recorded',
+  blob: Blob | null
+) {
+  revokeActiveVideoUrl()
+  activeVideoUrl = url
+  pendingVideoSource = { url, fileName, sourceKind, blob }
+  videoFileName.value = fileName
+  downloadableVideoBlob.value = blob
+  currentVideoSourceKind.value = sourceKind
+}
+
+function attachQueuedVideoSource() {
+  if (!pendingVideoSource || !videoEl.value) return
+  resetLoadedVideoState()
+  videoEl.value.src = pendingVideoSource.url
+  videoEl.value.load()
+  pendingVideoSource = null
+}
+
 function onFileSelected(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
-  if (!file || !videoEl.value) return
-  videoFileName.value = file.name
-  const url = URL.createObjectURL(file)
-  videoEl.value.src = url
-  videoEl.value.load()
+  if (!file) return
+
+  queueVideoSource(URL.createObjectURL(file), file.name, 'upload', null)
+  input.value = ''
+
+  if (activeTab.value === 'analyze') {
+    nextTick(attachQueuedVideoSource)
+  }
 }
 
 function onVideoLoaded() {
@@ -785,6 +976,134 @@ function onScrub(event: Event) {
   currentTime.value = val
 }
 
+async function startCapturePreview() {
+  if (cameraPreviewActive.value) return
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    captureError.value = t('SLOWMO.captureUnsupported')
+    return
+  }
+
+  try {
+    captureError.value = ''
+    captureStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    })
+    cameraPreviewActive.value = true
+    await nextTick()
+    if (captureVideoEl.value) {
+      captureVideoEl.value.srcObject = captureStream
+      await captureVideoEl.value.play()
+    }
+  } catch (error) {
+    captureError.value = error instanceof Error ? error.message : t('SLOWMO.captureFailed')
+    stopCapturePreview()
+  }
+}
+
+function stopCapturePreview() {
+  if (recordingActive.value) {
+    stopRecording()
+  }
+
+  captureStream?.getTracks().forEach(track => track.stop())
+  captureStream = null
+  if (captureVideoEl.value) {
+    captureVideoEl.value.srcObject = null
+  }
+  cameraPreviewActive.value = false
+}
+
+function startRecordingTimer() {
+  recordingStartedAt = Date.now()
+  recordingElapsedSec.value = 0
+  if (recordingTimerHandle) clearInterval(recordingTimerHandle)
+  recordingTimerHandle = setInterval(() => {
+    recordingElapsedSec.value = (Date.now() - recordingStartedAt) / 1000
+  }, 100)
+}
+
+function stopRecordingTimer() {
+  if (recordingTimerHandle) {
+    clearInterval(recordingTimerHandle)
+    recordingTimerHandle = null
+  }
+}
+
+async function startRecording() {
+  if (recordingActive.value) return
+  if (!cameraPreviewActive.value || !captureStream) {
+    await startCapturePreview()
+  }
+  if (!captureStream) return
+  if (typeof MediaRecorder === 'undefined') {
+    captureError.value = t('SLOWMO.captureUnsupported')
+    return
+  }
+
+  const mimeType = pickRecordingMimeType()
+
+  try {
+    recordingChunks = []
+    mediaRecorder = mimeType
+      ? new MediaRecorder(captureStream, { mimeType })
+      : new MediaRecorder(captureStream)
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        recordingChunks.push(event.data)
+      }
+    }
+    mediaRecorder.onstop = () => {
+      stopRecordingTimer()
+      recordingActive.value = false
+      const finalMimeType = mediaRecorder?.mimeType || mimeType || 'video/webm'
+      const blob = new Blob(recordingChunks, { type: finalMimeType })
+      const extension = finalMimeType.includes('mp4') ? 'mp4' : 'webm'
+      const baseName = (sessionName.value.trim() || studentLabel.value.trim() || exerciseName.value.trim() || 'slowmo-aufnahme')
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'slowmo-aufnahme'
+      const fileName = `${baseName}.${extension}`
+      queueVideoSource(URL.createObjectURL(blob), fileName, 'recorded', blob)
+      if (activeTab.value === 'analyze') {
+        nextTick(attachQueuedVideoSource)
+      }
+    }
+    mediaRecorder.start()
+    recordingActive.value = true
+    startRecordingTimer()
+  } catch (error) {
+    captureError.value = error instanceof Error ? error.message : t('SLOWMO.captureFailed')
+  }
+}
+
+function stopRecording() {
+  if (!recordingActive.value || !mediaRecorder) return
+  mediaRecorder.stop()
+}
+
+function downloadCurrentVideo() {
+  if (!downloadableVideoBlob.value) return
+  const downloadUrl = URL.createObjectURL(downloadableVideoBlob.value)
+  const link = document.createElement('a')
+  link.href = downloadUrl
+  link.download = videoFileName.value || 'slowmo-aufnahme.webm'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
+}
+
+function deleteCurrentVideo() {
+  clearSelectedVideo()
+  showSaveMessage(t('SLOWMO.videoDeleted'))
+}
+
 // ---------------------------------------------------------------------------
 // Session persistence
 // ---------------------------------------------------------------------------
@@ -801,6 +1120,8 @@ async function saveSession() {
   try {
     await bridge.saveSlowMotionSessionUseCase.execute({
       sessionId: currentSessionId.value,
+      classGroupId: routeClassGroupId.value,
+      lessonId: routeLessonId.value,
       sessionName: sessionName.value,
       studentLabel: studentLabel.value || undefined,
       exerciseName: exerciseName.value || undefined,
@@ -822,6 +1143,8 @@ async function saveSession() {
 }
 
 function loadExistingSession(s: SessionRecord) {
+  stopCapturePreview()
+  clearSelectedVideo()
   currentSessionId.value = s.id
   sessionName.value = s.sessionMetadata.sessionName
   studentLabel.value = s.sessionMetadata.studentLabel ?? ''
@@ -838,20 +1161,23 @@ function loadExistingSession(s: SessionRecord) {
 // Navigation helpers
 // ---------------------------------------------------------------------------
 function goToSessions() {
+  stopCapturePreview()
   activeTab.value = 'sessions'
   loadSessions()
 }
 
 function startNewSession() {
+  stopCapturePreview()
+  clearSelectedVideo()
   currentSessionId.value = undefined
   sessionName.value = ''
   studentLabel.value = ''
   exerciseName.value = ''
-  videoFileName.value = ''
   keyframes.value = []
   referenceLines.value = []
   notes.value = ''
-  videoLoaded.value = false
+  captureError.value = ''
+  recordingElapsedSec.value = 0
   activeTab.value = 'setup'
 }
 
@@ -859,6 +1185,7 @@ function startAnalysis() {
   if (!sessionName.value.trim()) return
   activeTab.value = 'analyze'
   analysisMode.value = 'playback'
+  nextTick(attachQueuedVideoSource)
 }
 
 // ---------------------------------------------------------------------------
@@ -885,9 +1212,9 @@ function showSaveMessage(msg: string) {
 
 onUnmounted(() => {
   if (saveTimer) clearTimeout(saveTimer)
-  if (videoEl.value?.src) {
-    URL.revokeObjectURL(videoEl.value.src)
-  }
+  stopCapturePreview()
+  stopRecordingTimer()
+  revokeActiveVideoUrl()
 })
 
 // Load sessions on mount

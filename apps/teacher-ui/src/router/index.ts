@@ -306,9 +306,9 @@ export function resolveBackFallbackPath(route: RouteLocationNormalizedLoaded): s
 
 export function getSafeBackNavigationTarget(
   route: RouteLocationNormalizedLoaded,
-  hasInternalBackTarget: boolean
+  internalBackTarget?: string | null
 ): string | null {
-  if (hasInternalBackTarget) {
+  if (internalBackTarget && internalBackTarget !== route.fullPath) {
     return null
   }
 
@@ -333,9 +333,12 @@ const router = createRouter({
 const originalBack = router.back.bind(router)
 
 router.back = () => {
-  const hasInternalBackTarget = typeof window !== 'undefined' && Boolean(window.history.state?.back)
+  const internalBackTarget =
+    typeof window !== 'undefined' && typeof window.history.state?.back === 'string'
+      ? window.history.state.back
+      : null
 
-  const target = getSafeBackNavigationTarget(router.currentRoute.value, hasInternalBackTarget)
+  const target = getSafeBackNavigationTarget(router.currentRoute.value, internalBackTarget)
   if (target === null) {
     originalBack()
     return

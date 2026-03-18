@@ -37,6 +37,12 @@ const SPORT_TOOL_LABELS: Record<string, string> = {
   tournaments: 'Turnier',
   tactics: 'Taktikboard',
   feedback: 'Feedback',
+  dice: 'Wuerfeln',
+  'video-delay': 'Video Delay',
+  'finish-camera': 'Zielkamera',
+  'pushup-tracking': 'Liegestuetze Tracking',
+  'tracking-basketball': 'Basketball Trefferquote',
+  'slow-motion': 'Slow Motion Analyse',
 }
 
 export function formatToolLabel(toolType: string): string {
@@ -55,6 +61,12 @@ export const SPORT_TOOL_ROUTES: Record<string, string> = {
   tournaments: '/tools/tournaments',
   tactics: '/tools/tactics',
   feedback: '/tools/feedback',
+  dice: '/tools/dice',
+  'video-delay': '/tools/video-delay',
+  'finish-camera': '/tools/finish-camera',
+  'pushup-tracking': '/tools/pushup-tracking',
+  'tracking-basketball': '/tools/tracking-basketball',
+  'slow-motion': '/tools/slow-motion',
 }
 
 export function buildSportToolEntries(ctx: LessonContext): LessonToolEntry[] {

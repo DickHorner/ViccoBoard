@@ -1,4 +1,9 @@
-import { resolveLessonWorkspaceSubject, buildSportToolEntries, formatToolLabel } from '../src/utils/lesson-workspace'
+import {
+  resolveLessonWorkspaceSubject,
+  buildSportToolEntries,
+  formatToolLabel,
+  SPORT_TOOL_ROUTES
+} from '../src/utils/lesson-workspace'
 
 describe('lesson workspace subject resolution', () => {
   it('maps known subject profiles to sport or kbr', () => {
@@ -56,6 +61,9 @@ describe('formatToolLabel', () => {
     expect(formatToolLabel('tactics')).toBe('Taktikboard')
     expect(formatToolLabel('feedback')).toBe('Feedback')
     expect(formatToolLabel('multistop')).toBe('Multistop')
+    expect(formatToolLabel('slow-motion')).toBe('Slow Motion Analyse')
+    expect(formatToolLabel('video-delay')).toBe('Video Delay')
+    expect(formatToolLabel('finish-camera')).toBe('Zielkamera')
   })
 
   it('is case-insensitive', () => {
@@ -65,5 +73,16 @@ describe('formatToolLabel', () => {
 
   it('falls back to the raw toolType for unknown types', () => {
     expect(formatToolLabel('unknown-tool')).toBe('unknown-tool')
+  })
+})
+
+describe('SPORT_TOOL_ROUTES', () => {
+  it('contains resume routes for the newer sport tools', () => {
+    expect(SPORT_TOOL_ROUTES['dice']).toBe('/tools/dice')
+    expect(SPORT_TOOL_ROUTES['video-delay']).toBe('/tools/video-delay')
+    expect(SPORT_TOOL_ROUTES['finish-camera']).toBe('/tools/finish-camera')
+    expect(SPORT_TOOL_ROUTES['pushup-tracking']).toBe('/tools/pushup-tracking')
+    expect(SPORT_TOOL_ROUTES['tracking-basketball']).toBe('/tools/tracking-basketball')
+    expect(SPORT_TOOL_ROUTES['slow-motion']).toBe('/tools/slow-motion')
   })
 })
