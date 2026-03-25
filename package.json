@@ -50,6 +50,6 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/sql.js": "^1.4.9"
+    "@types/sql.js": "^1.4.10"
   }
 }
