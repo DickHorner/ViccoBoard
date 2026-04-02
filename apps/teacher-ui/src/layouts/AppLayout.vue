@@ -39,20 +39,34 @@
             v-for="section in navSections"
             :key="section.id"
             class="nav-section"
+            :class="{ 'nav-section-collapsible': section.collapsible }"
           >
-            <p class="nav-section-title">{{ section.title }}</p>
-            <RouterLink
-              v-for="item in section.items"
-              :key="item.to"
-              :to="item.to"
-              class="nav-item"
-              :class="{ active: isNavItemActive(item.to) }"
-              @click="handleNavClick"
+            <button
+              v-if="section.collapsible"
+              class="nav-section-toggle"
+              type="button"
+              :aria-expanded="isSectionExpanded(section.id)"
+              @click="toggleSection(section.id)"
             >
-              <span class="nav-dot" aria-hidden="true"></span>
-              <span class="nav-label">{{ item.label }}</span>
-              <span class="nav-hint">{{ item.hint }}</span>
-            </RouterLink>
+              <span class="nav-section-title">{{ section.title }}</span>
+              <span class="nav-section-chevron" :class="{ expanded: isSectionExpanded(section.id) }" aria-hidden="true">▾</span>
+            </button>
+            <p v-else class="nav-section-title">{{ section.title }}</p>
+
+            <div v-show="!section.collapsible || isSectionExpanded(section.id)" class="nav-section-items">
+              <RouterLink
+                v-for="item in section.items"
+                :key="item.to"
+                :to="item.to"
+                class="nav-item"
+                :class="{ active: isNavItemActive(item.to) }"
+                @click="handleNavClick"
+              >
+                <span class="nav-dot" aria-hidden="true"></span>
+                <span class="nav-label">{{ item.label }}</span>
+                <span class="nav-hint">{{ item.hint }}</span>
+              </RouterLink>
+            </div>
           </section>
         </nav>
 
@@ -91,6 +105,13 @@ import { primaryNavSections } from '../navigation'
 const route = useRoute()
 
 const navSections = primaryNavSections
+const sectionState = ref<Record<string, boolean>>(
+  Object.fromEntries(
+    primaryNavSections
+      .filter((section) => section.collapsible)
+      .map((section) => [section.id, section.defaultExpanded ?? false])
+  )
+)
 
 const pageTitle = computed(() => {
   const metaTitle = route.meta?.title
@@ -136,6 +157,22 @@ const closeSidebar = () => {
 const handleNavClick = () => {
   if (isCompact.value) {
     isSidebarOpen.value = false
+  }
+}
+
+const isSectionExpanded = (sectionId: string) => {
+  const section = navSections.find((entry) => entry.id === sectionId)
+  if (section?.items.some((item) => isNavItemActive(item.to))) {
+    return true
+  }
+
+  return sectionState.value[sectionId] ?? true
+}
+
+const toggleSection = (sectionId: string) => {
+  sectionState.value = {
+    ...sectionState.value,
+    [sectionId]: !isSectionExpanded(sectionId)
   }
 }
 

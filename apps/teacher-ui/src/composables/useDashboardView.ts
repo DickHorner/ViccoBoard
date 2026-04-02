@@ -58,15 +58,15 @@ export function useDashboardView() {
     { value: 'yellow', label: 'Gelb' },
     { value: 'grey', label: 'Grau' }
   ];
+  const instructionLinks = [
+    { to: '/subjects/sport', title: 'Sport', description: 'Bewertung, Tests und Live-Tools' },
+    { to: '/subjects/kbr', title: 'KBR', description: 'Prüfungen, Korrektur und Auswertung' }
+  ];
   const organizationLinks = [
     { to: '/schedule', title: 'Stundenplan', description: 'Tagesübersicht und später Wochenraster' },
     { to: '/classes', title: 'Klassen', description: 'Klassenverwaltung fachneutral steuern' },
     { to: '/students', title: 'Schüler', description: 'Zentrale Schülerverwaltung' },
     { to: '/settings', title: 'Einstellungen', description: 'Sicherheit, Backups und Konfiguration' }
-  ];
-  const subjectLinks = [
-    { to: '/subjects/sport', title: 'Sport', description: 'Bewertung, Tests und Live-Tools' },
-    { to: '/subjects/kbr', title: 'KBR', description: 'Prüfungen, Korrektur und Auswertung' }
   ];
 
   const classesById = computed(() => new Map(classes.value.map((cls) => [cls.id, cls])));
@@ -335,7 +335,7 @@ export function useDashboardView() {
     gradingSchemes,
     classColorOptions,
     organizationLinks,
-    subjectLinks,
+    instructionLinks,
     schoolYears,
     todayLessons,
     currentOrNextLesson,

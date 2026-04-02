@@ -98,6 +98,16 @@ input[type="number"] {
   font-size: 1rem;
 }
 
+.input-derived {
+  background: var(--color-background-subtle, #f3f6f8);
+  color: var(--color-text-muted, #666);
+}
+
+.field-hint {
+  color: var(--color-text-muted, #777);
+  font-size: 0.8rem;
+}
+
 .criteria-block,
 .subtasks {
   display: flex;

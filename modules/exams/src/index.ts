@@ -55,6 +55,11 @@ export {
   type CompetencyProgress,
   type StudentGrowthAnalysis
 } from './services/long-term-note.service.js';
+export {
+  getCorrectionRelevantTaskNodes,
+  getRootTaskNodes,
+  getTotalRootTaskPoints
+} from './utils/task-tree.js';
 
 // Use cases
 export * from './use-cases/create-exam.use-case.js';

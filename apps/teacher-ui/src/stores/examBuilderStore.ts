@@ -50,7 +50,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
   const flatTasks = computed(() => flattenTasks(tasks.value))
 
   const totalPoints = computed(() =>
-    flatTasks.value.reduce((sum, task) => sum + (Number(task.points) || 0), 0)
+    tasks.value.reduce((sum, task) => sum + resolveTaskPoints(task), 0)
   )
 
   const canSave = computed(() => title.value.trim().length > 0 && tasks.value.length > 0)
@@ -84,9 +84,32 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     order: parts.value.length + 1
   })
 
+  const resolveTaskPoints = (task: TaskDraft): number => {
+    if (task.subtasks.length > 0) {
+      return task.subtasks.reduce((sum, subtask) => sum + resolveTaskPoints(subtask), 0)
+    }
+
+    if (task.criteria.length > 0) {
+      return task.criteria.reduce((sum, criterion) => sum + (Number(criterion.points) || 0), 0)
+    }
+
+    return Number(task.points) || 0
+  }
+
+  const syncTaskBranch = (task: TaskDraft): number => {
+    task.subtasks.forEach(syncTaskBranch)
+    task.points = resolveTaskPoints(task)
+    return task.points
+  }
+
+  const recalculateTaskPoints = (): void => {
+    tasks.value.forEach(syncTaskBranch)
+  }
+
   const flattenTasks = (items: TaskDraft[], level: 1 | 2 | 3 = 1, parentId?: string): ExamsTypes.TaskNode[] => {
     const output: ExamsTypes.TaskNode[] = []
     items.forEach((task, index) => {
+      const taskPoints = resolveTaskPoints(task)
       output.push({
         id: task.id,
         parentId,
@@ -94,7 +117,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
         order: index + 1,
         title: task.title.trim() || `Task ${index + 1}`,
         description: undefined,
-        points: Number(task.points) || 0,
+        points: taskPoints,
         bonusPoints: Number(task.bonusPoints) || 0,
         isChoice: task.isChoice,
         choiceGroup: task.choiceGroup || undefined,
@@ -127,24 +150,29 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
         task.subtasks = []
       })
     }
+    recalculateTaskPoints()
   }
 
   const addTask = (): void => {
     tasks.value.push(newTask())
+    recalculateTaskPoints()
   }
 
   const addSubtask = (task: TaskDraft, level: 2 | 3): void => {
     if (level === 2 || level === 3) {
       task.subtasks.push(newTask())
     }
+    recalculateTaskPoints()
   }
 
   const removeTask = (id: string): void => {
     tasks.value = tasks.value.filter(task => task.id !== id)
+    recalculateTaskPoints()
   }
 
   const removeNestedTask = (parent: TaskDraft, id: string): void => {
     parent.subtasks = parent.subtasks.filter(task => task.id !== id)
+    recalculateTaskPoints()
   }
 
   const moveTask = (list: TaskDraft[], index: number, delta: number): void => {
@@ -156,10 +184,12 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
 
   const addCriterion = (task: TaskDraft): void => {
     task.criteria.push(newCriterion())
+    recalculateTaskPoints()
   }
 
   const removeCriterion = (task: TaskDraft, id: string): void => {
     task.criteria = task.criteria.filter(criterion => criterion.id !== id)
+    recalculateTaskPoints()
   }
 
   const addPart = (): void => {
@@ -172,6 +202,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
 
   const buildExam = (): ExamsTypes.Exam => {
     const now = new Date()
+    recalculateTaskPoints()
     const taskNodes = flattenTasks(tasks.value)
     const exam: ExamsTypes.Exam = {
       id: examId.value ?? createUuid(),
@@ -213,7 +244,86 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
       lastModified: now
     }
 
-    return exam
+      return exam
+  }
+
+  const hydrateFromExam = (exam: ExamsTypes.Exam): void => {
+    examId.value = exam.id
+    isEditing.value = true
+    createdAt.value = exam.createdAt
+    title.value = exam.title
+    description.value = exam.description ?? ''
+    classGroupId.value = exam.classGroupId ?? ''
+    mode.value = exam.mode
+    parts.value = exam.structure.parts.map((part, index) => ({
+      id: part.id,
+      name: part.name,
+      description: part.description ?? '',
+      taskIds: part.taskIds,
+      calculateSubScore: part.calculateSubScore,
+      scoreType: part.scoreType,
+      printable: part.printable,
+      order: index + 1
+    }))
+
+    if (exam.mode === 'simple') {
+      tasks.value = exam.structure.tasks
+        .filter(task => task.level === 1)
+        .sort((a, b) => a.order - b.order)
+        .map(task => ({
+          id: task.id,
+          title: task.title,
+          points: task.points,
+          bonusPoints: task.bonusPoints ?? 0,
+          isChoice: task.isChoice,
+          choiceGroup: task.choiceGroup ?? '',
+          criteria: task.criteria.map(criterion => ({
+            id: criterion.id,
+            text: criterion.text,
+            points: criterion.points
+          })),
+          subtasks: []
+        }))
+      recalculateTaskPoints()
+      return
+    }
+
+    const byId = new Map<string, TaskDraft>()
+    exam.structure.tasks.forEach(task => {
+      byId.set(task.id, {
+        id: task.id,
+        title: task.title,
+        points: task.points,
+        bonusPoints: task.bonusPoints ?? 0,
+        isChoice: task.isChoice,
+        choiceGroup: task.choiceGroup ?? '',
+        criteria: task.criteria.map(criterion => ({
+          id: criterion.id,
+          text: criterion.text,
+          points: criterion.points
+        })),
+        subtasks: []
+      })
+    })
+
+    const root: TaskDraft[] = []
+    exam.structure.tasks
+      .sort((a, b) => a.order - b.order)
+      .forEach(task => {
+        const draft = byId.get(task.id)
+        if (!draft) return
+        if (!task.parentId) {
+          root.push(draft)
+        } else {
+          const parent = byId.get(task.parentId)
+          if (parent) {
+            parent.subtasks.push(draft)
+          }
+        }
+      })
+
+    tasks.value = root
+    recalculateTaskPoints()
   }
 
   const saveExam = async (): Promise<void> => {
@@ -257,80 +367,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
         return
       }
 
-      examId.value = id
-      isEditing.value = true
-      createdAt.value = exam.createdAt
-      title.value = exam.title
-      description.value = exam.description ?? ''
-      classGroupId.value = exam.classGroupId ?? ''
-      mode.value = exam.mode
-      parts.value = exam.structure.parts.map((part, index) => ({
-        id: part.id,
-        name: part.name,
-        description: part.description ?? '',
-        taskIds: part.taskIds,
-        calculateSubScore: part.calculateSubScore,
-        scoreType: part.scoreType,
-        printable: part.printable,
-        order: index + 1
-      }))
-
-      if (exam.mode === 'simple') {
-        tasks.value = exam.structure.tasks
-          .filter(task => task.level === 1)
-          .sort((a, b) => a.order - b.order)
-          .map(task => ({
-            id: task.id,
-            title: task.title,
-            points: task.points,
-            bonusPoints: task.bonusPoints ?? 0,
-            isChoice: task.isChoice,
-            choiceGroup: task.choiceGroup ?? '',
-            criteria: task.criteria.map(criterion => ({
-              id: criterion.id,
-              text: criterion.text,
-              points: criterion.points
-            })),
-            subtasks: []
-          }))
-        return
-      }
-
-      const byId = new Map<string, TaskDraft>()
-      exam.structure.tasks.forEach(task => {
-        byId.set(task.id, {
-          id: task.id,
-          title: task.title,
-          points: task.points,
-          bonusPoints: task.bonusPoints ?? 0,
-          isChoice: task.isChoice,
-          choiceGroup: task.choiceGroup ?? '',
-          criteria: task.criteria.map(criterion => ({
-            id: criterion.id,
-            text: criterion.text,
-            points: criterion.points
-          })),
-          subtasks: []
-        })
-      })
-
-      const root: TaskDraft[] = []
-      exam.structure.tasks
-        .sort((a, b) => a.order - b.order)
-        .forEach(task => {
-          const draft = byId.get(task.id)
-          if (!draft) return
-          if (!task.parentId) {
-            root.push(draft)
-          } else {
-            const parent = byId.get(task.parentId)
-            if (parent) {
-              parent.subtasks.push(draft)
-            }
-          }
-        })
-
-      tasks.value = root
+      hydrateFromExam(exam)
     } catch (err) {
       showError(err instanceof Error ? err.message : 'Failed to load exam.')
       router.push('/exams')
@@ -377,7 +414,9 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     removeCriterion,
     addPart,
     removePart,
+    recalculateTaskPoints,
     buildExam,
+    hydrateFromExam,
     saveExam,
     loadExam,
     reset

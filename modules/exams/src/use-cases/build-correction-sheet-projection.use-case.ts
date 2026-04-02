@@ -2,6 +2,7 @@ import { Exams } from '@viccoboard/core';
 import type { CorrectionEntryRepository } from '../repositories/correction-entry.repository';
 import type { ExamRepository } from '../repositories/exam.repository';
 import { GetCorrectionSheetPresetUseCase } from './get-correction-sheet-preset.use-case';
+import { getCorrectionRelevantTaskNodes } from '../utils/task-tree';
 
 function resolveCandidateName(candidate: Exams.Candidate): string {
   return `${candidate.firstName} ${candidate.lastName}`.trim();
@@ -60,8 +61,7 @@ export class BuildCorrectionSheetProjectionUseCase {
 
     const preset = await this.getCorrectionSheetPresetUseCase.execute(examId);
 
-    const taskRows = [...exam.structure.tasks]
-      .sort((left, right) => left.order - right.order)
+    const taskRows = getCorrectionRelevantTaskNodes(exam.structure.tasks)
       .map((task) => {
         const score = correction.taskScores.find((entry) => entry.taskId === task.id);
         return {

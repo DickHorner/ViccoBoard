@@ -82,7 +82,7 @@
 
           <div class="scoring-section">
             <h3>Aufgabenbewertung</h3>
-            <div v-for="task in exam.structure.tasks" :key="task.id" class="task-scoring">
+            <div v-for="task in correctionTasks" :key="task.id" class="task-scoring">
               <div class="task-title">
                 <label>{{ task.title }}</label>
                 <span class="max-points">(max. {{ task.points }})</span>
@@ -215,6 +215,7 @@ import {
   AlternativeGradingService,
   AlternativeGradingUIHelper,
   STANDARD_ALTERNATIVE_SCALE,
+  getCorrectionRelevantTaskNodes,
   type AlternativeGradeType,
 } from '@viccoboard/exams';
 import { useExamsBridge } from '../composables/useExamsBridge';
@@ -247,6 +248,9 @@ const alternativeGrades = computed(() =>
 );
 
 const candidates = computed(() => exam.value?.candidates ?? []);
+const correctionTasks = computed(() => (
+  exam.value ? getCorrectionRelevantTaskNodes(exam.value.structure.tasks) : []
+));
 
 const filteredCandidates = computed(() => {
   const filter = candidateFilter.value.toLowerCase();
@@ -275,7 +279,7 @@ const totalPoints = computed(() => {
   if (scoringMode.value === 'numeric') {
     return Object.values(taskScores.value).reduce((sum, pts) => sum + (pts || 0), 0);
   }
-  return exam.value.structure.tasks.reduce((sum, task) => {
+  return correctionTasks.value.reduce((sum, task) => {
     const grade = taskAlternativeGrades.value[task.id];
     if (!grade) {
       return sum;
@@ -364,7 +368,7 @@ function hydrateCandidateState(candidateId: string): void {
   taskComments.value = {};
   generalComment.value = '';
 
-  for (const task of exam.value.structure.tasks) {
+  for (const task of correctionTasks.value) {
     const score = correction?.taskScores.find((entry) => entry.taskId === task.id);
     taskScores.value[task.id] = score?.points ?? 0;
     if (score?.alternativeGrading) {
@@ -388,7 +392,7 @@ function onScoringModeChange(): void {
   }
 
   if (scoringMode.value === 'alternative') {
-    for (const task of exam.value.structure.tasks) {
+    for (const task of correctionTasks.value) {
       const numericPoints = taskScores.value[task.id] || 0;
       taskAlternativeGrades.value[task.id] = AlternativeGradingService.fromNumericPoints(
         numericPoints,
@@ -397,7 +401,7 @@ function onScoringModeChange(): void {
       );
     }
   } else {
-    for (const task of exam.value.structure.tasks) {
+    for (const task of correctionTasks.value) {
       const grade = taskAlternativeGrades.value[task.id];
       if (grade) {
         taskScores.value[task.id] = AlternativeGradingService.toNumericPoints(
@@ -433,7 +437,7 @@ async function saveCurrentCandidate(finalize: boolean): Promise<void> {
     return;
   }
 
-  const taskScoresPayload: Exams.TaskScore[] = exam.value.structure.tasks.map((task) => {
+  const taskScoresPayload: Exams.TaskScore[] = correctionTasks.value.map((task) => {
     const payload: Exams.TaskScore = {
       taskId: task.id,
       points: scoringMode.value === 'numeric'
@@ -487,7 +491,7 @@ function correctionPercentage(candidateId: string): number {
   const correction = corrections.value.get(candidateId);
   if (!correction || !exam.value) return 0;
   const scoredTasks = correction.taskScores.filter(score => score.points > 0 || score.comment).length;
-  const totalTasks = exam.value.structure.tasks.length;
+  const totalTasks = correctionTasks.value.length;
   return totalTasks > 0 ? Math.round((scoredTasks / totalTasks) * 100) : 0;
 }
 
