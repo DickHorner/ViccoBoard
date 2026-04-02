@@ -13,6 +13,13 @@ describe('router fallback navigation', () => {
     expect(resolveBackFallbackPath(route)).toBe('/subjects/sport')
   })
 
+  it('resolves the new KBR export route back to the exams overview', () => {
+    const route = router.resolve('/exams/demo/export')
+
+    expect(route.name).toBe('exam-export')
+    expect(resolveBackFallbackPath(route)).toBe('/exams')
+  })
+
   it('uses the parent fallback when no internal history target exists', () => {
     const route = router.resolve('/settings/catalogs')
 

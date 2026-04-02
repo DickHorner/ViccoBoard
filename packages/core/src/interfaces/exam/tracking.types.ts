@@ -92,6 +92,7 @@ export interface PrintPreset {
   content: FeedbackContent;
   footer: Partial<FeedbackFooter>;
   isDefault: boolean;
+  metadata?: Record<string, unknown>;
 }
 
 export interface EmailTemplate {

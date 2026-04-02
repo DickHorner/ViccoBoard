@@ -24,6 +24,7 @@ export * from './migrations/indexeddb/015_tactics_snapshots_schema.js';
 export * from './migrations/indexeddb/016_tournament_schema.js';
 export * from './migrations/indexeddb/017_legacy_store_repair.js';
 export * from './migrations/indexeddb/018_catalog_and_table_store_repair.js';
+export * from './migrations/indexeddb/020_kbr_feedback_workflow.js';
 export * from './indexeddb.storage.js';
 
 // Version

@@ -6,13 +6,13 @@
         <p v-if="exam">{{ exam.mode === 'simple' ? 'Einfach: flache Aufgabenliste' : 'Komplex: verschachtelte Aufgaben (3 Ebenen)' }}</p>
       </div>
       <div class="actions">
+        <button v-if="isEditing && exam" @click="openExportPage" class="btn-secondary">Export</button>
         <button @click="goBack" class="btn-secondary">Abbrechen</button>
         <button @click="saveExam" class="btn-primary" :disabled="!canSave">Prüfung speichern</button>
       </div>
     </div>
 
     <div v-if="exam" class="builder-content">
-      <!-- Exam Details Section -->
       <section class="section">
         <h2>Prüfungsdetails</h2>
         <div class="form-group">
@@ -24,6 +24,10 @@
           <textarea v-model="exam.description" placeholder="Optionale Prüfungsbeschreibung"></textarea>
         </div>
         <div class="form-row">
+          <div class="form-group">
+            <label>Prüfungsdatum</label>
+            <input v-model="examDateValue" type="date" />
+          </div>
           <div class="form-group">
             <label>Modus</label>
             <select v-model="exam.mode" @change="handleModeChange">
@@ -42,7 +46,37 @@
         </div>
       </section>
 
-      <!-- Tasks Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2>Kandidaten</h2>
+          <button @click="addCandidate" class="btn-small">+ Kandidat hinzufügen</button>
+        </div>
+
+        <div v-if="exam.candidates.length === 0" class="empty-state">
+          Noch keine Kandidaten. Für die Korrektur und den PDF-Export wird mindestens ein Prüfling benötigt.
+        </div>
+
+        <div v-else class="candidate-list">
+          <div v-for="(candidate, index) in exam.candidates" :key="candidate.id" class="candidate-card">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Vorname</label>
+                <input v-model="candidate.firstName" type="text" placeholder="Vorname" />
+              </div>
+              <div class="form-group">
+                <label>Nachname</label>
+                <input v-model="candidate.lastName" type="text" placeholder="Nachname" />
+              </div>
+              <div class="form-group">
+                <label>Kennung (optional)</label>
+                <input v-model="candidate.externalId" type="text" placeholder="z. B. Sitznummer" />
+              </div>
+            </div>
+            <button @click="removeCandidate(index)" class="btn-danger-small">Entfernen</button>
+          </div>
+        </div>
+      </section>
+
       <section class="section">
         <div class="section-header">
           <h2>Aufgaben</h2>
@@ -67,7 +101,7 @@
           <div class="task-details">
             <div class="form-group">
               <label>Punkte</label>
-              <input v-model.number="task.points" type="number" min="0" step="1" />
+              <input v-model.number="task.points" type="number" min="0" step="1" @input="updateTotalPoints" />
             </div>
             <div class="form-group">
               <label>Bonuspunkte</label>
@@ -86,7 +120,6 @@
             </div>
           </div>
 
-          <!-- Criteria for this task -->
           <div v-if="task.criteria.length > 0" class="criteria-list">
             <h4>Kriterien</h4>
             <div v-for="(criterion, cidx) in task.criteria" :key="criterion.id" class="criterion-item">
@@ -97,7 +130,6 @@
           </div>
           <button @click="addCriterion(idx)" class="btn-secondary-small">+ Kriterium hinzufügen</button>
 
-          <!-- Subtasks for complex mode -->
           <div v-if="exam.mode === 'complex' && task.subtasks.length > 0" class="subtasks-section">
             <h4>Teilaufgaben</h4>
             <div v-for="(subtaskId, sidx) in task.subtasks" :key="subtaskId" class="subtask-row">
@@ -109,7 +141,6 @@
         </div>
       </section>
 
-      <!-- Exam Parts Section -->
       <section class="section">
         <div class="section-header">
           <h2>Prüfungsteile</h2>
@@ -136,7 +167,10 @@
         </div>
       </section>
 
-      <!-- Grading Key Section -->
+      <section class="section">
+        <CorrectionSheetPresetForm v-model="preset" />
+      </section>
+
       <section class="section">
         <h2>Notenschlüssel</h2>
         <div class="form-group">
@@ -183,10 +217,13 @@
         </div>
       </section>
 
-      <!-- Summary -->
       <section class="section summary">
         <h2>Zusammenfassung</h2>
         <div class="summary-grid">
+          <div class="summary-item">
+            <span class="label">Kandidaten</span>
+            <span class="value">{{ exam.candidates.length }}</span>
+          </div>
           <div class="summary-item">
             <span class="label">Aufgaben gesamt</span>
             <span class="value">{{ exam.structure.tasks.length }}</span>
@@ -203,6 +240,10 @@
             <span class="label">Modus</span>
             <span class="value">{{ exam.mode === 'simple' ? 'Einfach' : 'Komplex' }}</span>
           </div>
+          <div class="summary-item">
+            <span class="label">Bogenlayout</span>
+            <span class="value">{{ preset.layoutMode === 'compact' ? 'Kompakt' : 'Standard' }}</span>
+          </div>
         </div>
       </section>
     </div>
@@ -216,24 +257,78 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Exams } from '@viccoboard/core';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  createDefaultCorrectionSheetPreset
+} from '@viccoboard/exams';
 import { useExamsBridge } from '../composables/useExamsBridge';
+import CorrectionSheetPresetForm from '../components/CorrectionSheetPresetForm.vue';
 
 const router = useRouter();
 const route = useRoute();
-const { examRepository } = useExamsBridge();
+const {
+  examRepository,
+  getCorrectionSheetPreset,
+  saveCorrectionSheetPreset
+} = useExamsBridge();
 
 const exam = ref<Exams.Exam | null>(null);
+const preset = ref<Exams.CorrectionSheetPreset>(createDefaultCorrectionSheetPreset('draft'));
+const examDateValue = ref('');
 const isEditing = computed(() => !!route.params.id);
 
 const canSave = computed(() => {
-  return exam.value && exam.value.title && exam.value.structure.tasks.length > 0;
+  return Boolean(
+    exam.value &&
+    exam.value.title.trim().length > 0 &&
+    exam.value.structure.tasks.length > 0 &&
+    exam.value.candidates.length > 0 &&
+    exam.value.candidates.every((candidate) => candidate.firstName.trim() && candidate.lastName.trim())
+  );
+});
+
+const toDateInput = (value?: Date): string => {
+  if (!value) {
+    return '';
+  }
+
+  const date = new Date(value);
+  return date.toISOString().slice(0, 10);
+};
+
+const createEmptyExam = (): Exams.Exam => ({
+  id: uuidv4(),
+  title: '',
+  mode: Exams.ExamMode.Simple,
+  date: undefined,
+  structure: {
+    parts: [],
+    tasks: [],
+    allowsComments: false,
+    allowsSupportTips: false,
+    totalPoints: 0
+  },
+  gradingKey: {
+    id: uuidv4(),
+    name: 'Standard',
+    type: Exams.GradingKeyType.Points,
+    totalPoints: 0,
+    gradeBoundaries: [],
+    roundingRule: { type: 'nearest', decimalPlaces: 1 },
+    errorPointsToGrade: false,
+    customizable: true,
+    modifiedAfterCorrection: false
+  },
+  printPresets: [],
+  candidates: [],
+  status: 'draft',
+  createdAt: new Date(),
+  lastModified: new Date()
 });
 
 const handleModeChange = () => {
   if (!exam.value) return;
-  // Clear subtasks if switching from complex to simple
   if (exam.value.mode === Exams.ExamMode.Simple) {
-    exam.value.structure.tasks.forEach(task => {
+    exam.value.structure.tasks.forEach((task) => {
       task.subtasks = [];
     });
   }
@@ -241,7 +336,7 @@ const handleModeChange = () => {
 
 const addTask = () => {
   if (!exam.value) return;
-  const newTask: Exams.TaskNode = {
+  exam.value.structure.tasks.push({
     id: uuidv4(),
     level: 1,
     order: exam.value.structure.tasks.length,
@@ -253,8 +348,7 @@ const addTask = () => {
     allowSupportTips: exam.value.structure.allowsSupportTips,
     commentBoxEnabled: false,
     subtasks: []
-  };
-  exam.value.structure.tasks.push(newTask);
+  });
   updateTotalPoints();
 };
 
@@ -265,8 +359,7 @@ const removeTask = (idx: number) => {
 };
 
 const addCriterion = (taskIdx: number) => {
-  if (!exam.value) return;
-  const task = exam.value.structure.tasks[taskIdx];
+  const task = exam.value?.structure.tasks[taskIdx];
   if (!task) return;
   task.criteria.push({
     id: uuidv4(),
@@ -278,22 +371,19 @@ const addCriterion = (taskIdx: number) => {
 };
 
 const removeCriterion = (taskIdx: number, critIdx: number) => {
-  if (!exam.value) return;
-  const task = exam.value.structure.tasks[taskIdx];
+  const task = exam.value?.structure.tasks[taskIdx];
   if (!task) return;
   task.criteria.splice(critIdx, 1);
 };
 
 const addSubtask = (taskIdx: number) => {
-  if (!exam.value) return;
-  const task = exam.value.structure.tasks[taskIdx];
+  const task = exam.value?.structure.tasks[taskIdx];
   if (!task) return;
   task.subtasks.push(uuidv4());
 };
 
 const removeSubtask = (taskIdx: number, subtaskIdx: number) => {
-  if (!exam.value) return;
-  const task = exam.value.structure.tasks[taskIdx];
+  const task = exam.value?.structure.tasks[taskIdx];
   if (!task) return;
   task.subtasks.splice(subtaskIdx, 1);
 };
@@ -316,20 +406,65 @@ const removePart = (idx: number) => {
   exam.value.structure.parts.splice(idx, 1);
 };
 
+const addCandidate = () => {
+  if (!exam.value) return;
+  exam.value.candidates.push({
+    id: uuidv4(),
+    examId: exam.value.id,
+    firstName: '',
+    lastName: '',
+    externalId: ''
+  });
+};
+
+const removeCandidate = (index: number) => {
+  if (!exam.value) return;
+  exam.value.candidates.splice(index, 1);
+};
+
 const updateTotalPoints = () => {
   if (!exam.value) return;
-  const taskPoints = exam.value.structure.tasks.reduce((sum, task) => sum + task.points, 0);
-  exam.value.gradingKey.totalPoints = taskPoints;
+  exam.value.structure.totalPoints = exam.value.structure.tasks.reduce((sum, task) => sum + task.points, 0);
+  exam.value.gradingKey.totalPoints = exam.value.structure.totalPoints;
 };
+
+async function persistExam(currentExam: Exams.Exam): Promise<Exams.Exam> {
+  const nextExam: Exams.Exam = {
+    ...currentExam,
+    date: examDateValue.value ? new Date(`${examDateValue.value}T00:00:00`) : undefined
+  };
+
+  if (isEditing.value) {
+    await examRepository?.update(nextExam.id, nextExam);
+    return (await examRepository?.findById(nextExam.id)) ?? nextExam;
+  }
+
+  const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...createInput } = nextExam;
+  const created = await examRepository?.create(createInput);
+  if (!created) {
+    throw new Error('Prüfung konnte nicht erstellt werden');
+  }
+  return created;
+}
 
 const saveExam = async () => {
   if (!exam.value || !canSave.value) return;
+
   try {
-    if (isEditing.value) {
-      await examRepository?.update(exam.value.id, exam.value);
-    } else {
-      await examRepository?.create(exam.value);
-    }
+    const savedExam = await persistExam(exam.value);
+    exam.value = {
+      ...savedExam,
+      candidates: savedExam.candidates.map((candidate) => ({
+        ...candidate,
+        examId: savedExam.id
+      }))
+    };
+
+    await saveCorrectionSheetPreset?.({
+      ...preset.value,
+      examId: savedExam.id
+    });
+
     router.push('/exams');
   } catch (error) {
     console.error('Failed to save exam:', error);
@@ -340,45 +475,27 @@ const goBack = () => {
   router.push('/exams');
 };
 
+const openExportPage = () => {
+  if (!exam.value) return;
+  router.push(`/exams/${exam.value.id}/export`);
+};
+
 onMounted(async () => {
   if (isEditing.value) {
-    // Load existing exam
     const id = route.params.id as string;
     const loaded = await examRepository?.findById(id);
     if (loaded) {
       exam.value = loaded;
+      examDateValue.value = toDateInput(loaded.date);
+      preset.value = await getCorrectionSheetPreset?.(loaded.id) ?? createDefaultCorrectionSheetPreset(loaded.id);
+      return;
     }
-  } else {
-    // Create new exam
-    exam.value = {
-      id: uuidv4(),
-      title: '',
-      mode: Exams.ExamMode.Simple,
-      structure: {
-        parts: [],
-        tasks: [],
-        allowsComments: false,
-        allowsSupportTips: false,
-        totalPoints: 0
-      },
-      gradingKey: {
-        id: uuidv4(),
-        name: 'Standard',
-        type: Exams.GradingKeyType.Points,
-        totalPoints: 0,
-        gradeBoundaries: [],
-        roundingRule: { type: 'nearest', decimalPlaces: 1 },
-        errorPointsToGrade: false,
-        customizable: true,
-        modifiedAfterCorrection: false
-      },
-      printPresets: [],
-      candidates: [],
-      status: 'draft',
-      createdAt: new Date(),
-      lastModified: new Date()
-    };
   }
+
+  const draftExam = createEmptyExam();
+  exam.value = draftExam;
+  preset.value = createDefaultCorrectionSheetPreset(draftExam.id);
+  examDateValue.value = '';
 });
 </script>
 

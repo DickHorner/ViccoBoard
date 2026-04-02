@@ -25,6 +25,7 @@ export class ExamRepository extends AdapterRepository<Exams.Exam> {
       id: row.id,
       title: row.title,
       description: row.description ?? undefined,
+      date: row.exam_date ? new Date(row.exam_date) : undefined,
       classGroupId: row.class_group_id ?? undefined,
       mode: row.mode,
       structure: safeJsonParse(row.structure, emptyStructure, 'Exam.structure'),
@@ -53,6 +54,7 @@ export class ExamRepository extends AdapterRepository<Exams.Exam> {
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.title !== undefined) row.title = entity.title;
     if (entity.description !== undefined) row.description = entity.description;
+    if (entity.date !== undefined) row.exam_date = entity.date.toISOString();
     if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
     if (entity.mode !== undefined) row.mode = entity.mode;
     if (entity.structure !== undefined) row.structure = safeJsonStringify(entity.structure, 'Exam.structure');

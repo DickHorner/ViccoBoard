@@ -62,22 +62,23 @@ export class RecordCorrectionUseCase {
     correction.percentageScore = gradeResult.percentage;
 
     // Add comments if provided
-    if (input.comments && input.comments.length > 0) {
-      correction.comments = [
-        ...correction.comments,
-        ...input.comments.map(c => ({
-          id: uuidv4(),
-          ...c,
-          timestamp: new Date()
-        }))
-      ];
+    if (input.comments) {
+      correction.comments = input.comments.map(c => ({
+        id: c.id ?? uuidv4(),
+        taskId: c.taskId,
+        level: c.level,
+        text: c.text,
+        printable: c.printable,
+        availableAfterReturn: c.availableAfterReturn,
+        timestamp: c.timestamp ?? new Date()
+      }));
     }
 
     // Assign support tips if provided
-    if (input.supportTips && input.supportTips.length > 0) {
+    if (input.supportTips) {
       correction.supportTips = input.supportTips.map(st => ({
         ...st,
-        assignedAt: new Date()
+        assignedAt: st.assignedAt ?? new Date()
       }));
     }
 
@@ -104,7 +105,7 @@ export interface RecordCorrectionInput {
   examId: string;
   candidateId: string;
   taskScores?: Exams.TaskScore[];
-  comments?: Omit<Exams.CorrectionComment, 'id' | 'timestamp'>[];
-  supportTips?: Omit<Exams.AssignedSupportTip, 'assignedAt'>[];
+  comments?: Array<Partial<Pick<Exams.CorrectionComment, 'id' | 'timestamp'>> & Omit<Exams.CorrectionComment, 'id' | 'timestamp'>>;
+  supportTips?: Array<Partial<Pick<Exams.AssignedSupportTip, 'assignedAt'>> & Omit<Exams.AssignedSupportTip, 'assignedAt'>>;
   finalizeCorrection?: boolean;
 }

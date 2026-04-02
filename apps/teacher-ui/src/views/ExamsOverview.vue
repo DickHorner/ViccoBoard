@@ -34,6 +34,7 @@
           <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
           <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
           <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
+          <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
         </div>
       </article>
     </div>
@@ -72,6 +73,10 @@ const openCorrection = (id: string) => {
 
 const openAnalysis = (id: string) => {
   router.push(`/exams/${id}/analysis`)
+}
+
+const openExport = (id: string) => {
+  router.push(`/exams/${id}/export`)
 }
 
 const formatStatus = (status: ExamsTypes.Exam['status']) => {
@@ -197,6 +202,9 @@ onMounted(() => {
 
 .exam-actions {
   margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .ghost {

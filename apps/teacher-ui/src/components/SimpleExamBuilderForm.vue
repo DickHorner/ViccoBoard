@@ -1,12 +1,10 @@
 <template>
   <div class="simple-exam-builder">
-    <!-- Header -->
     <div class="builder-header">
       <h1>{{ isEditing ? 'Prüfung bearbeiten' : 'Einfache Prüfung erstellen' }}</h1>
       <p class="subtitle">Einfache Prüfung mit flacher Aufgabenliste ohne Verschachtelung</p>
     </div>
 
-    <!-- Exam Title Section -->
     <section class="section exam-details">
       <h2>Prüfungsdetails</h2>
       <div class="form-group">
@@ -22,19 +20,24 @@
         <p v-if="errors.title" class="error-message">{{ errors.title }}</p>
       </div>
 
-      <div class="form-group">
-        <label for="exam-description">Beschreibung (optional)</label>
-        <textarea
-          id="exam-description"
-          v-model="formData.description"
-          placeholder="Notizen zu dieser Prüfung"
-          class="form-textarea"
-          rows="3"
-        ></textarea>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="exam-date">Prüfungsdatum</label>
+          <input id="exam-date" v-model="formData.date" type="date" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label for="exam-description">Beschreibung (optional)</label>
+          <textarea
+            id="exam-description"
+            v-model="formData.description"
+            placeholder="Notizen zu dieser Prüfung"
+            class="form-textarea"
+            rows="3"
+          ></textarea>
+        </div>
       </div>
     </section>
 
-    <!-- Tasks Section -->
     <section class="section tasks-section">
       <div class="section-header">
         <h2>Aufgaben</h2>
@@ -43,14 +46,11 @@
         </button>
       </div>
 
-      <!-- Empty State -->
       <div v-if="formData.tasks.length === 0" class="empty-state">
         <p>Noch keine Aufgaben. Klicken Sie auf „Aufgabe hinzufügen“, um zu starten.</p>
       </div>
 
-      <!-- Task List -->
       <div v-else class="task-list">
-        <!-- Add some spacing/visual hierarchy -->
         <div
           v-for="(task, taskIndex) in formData.tasks"
           :key="task.id"
@@ -74,7 +74,6 @@
             </button>
           </div>
 
-          <!-- Task Details (Points) -->
           <div class="task-details">
             <div class="form-group">
               <label :for="`task-points-${taskIndex}`" class="label-required">
@@ -120,7 +119,6 @@
             </div>
           </div>
 
-          <!-- Criteria Section -->
           <div class="criteria-section">
             <div class="criteria-header">
               <h3>Kriterien</h3>
@@ -173,13 +171,62 @@
       </div>
     </section>
 
-    <!-- Preview Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2>Kandidaten</h2>
+        <button @click="addCandidate" class="btn btn-primary btn-sm">+ Kandidat hinzufügen</button>
+      </div>
+
+      <div v-if="formData.candidates.length === 0" class="empty-state">
+        <p>Für die Korrektur und den PDF-Export wird mindestens ein Kandidat benötigt.</p>
+      </div>
+
+      <div v-else class="task-list">
+        <div
+          v-for="(candidate, candidateIndex) in formData.candidates"
+          :key="candidate.id"
+          class="task-card"
+        >
+          <div class="task-header">
+            <div class="task-number">{{ candidateIndex + 1 }}</div>
+            <input
+              v-model="candidate.firstName"
+              type="text"
+              placeholder="Vorname"
+              class="task-title-input"
+            />
+            <input
+              v-model="candidate.lastName"
+              type="text"
+              placeholder="Nachname"
+              class="task-title-input"
+            />
+            <button
+              @click="removeCandidate(candidateIndex)"
+              class="btn btn-danger btn-sm"
+              :title="`Kandidat ${candidateIndex + 1} entfernen`"
+            >
+              Entfernen
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <CorrectionSheetPresetForm v-model="formData.preset" />
+    </section>
+
     <section class="section preview-section" v-if="formData.tasks.length > 0">
       <h2>Vorschau und Zusammenfassung</h2>
       <div class="preview-grid">
         <div class="preview-item">
           <span class="preview-label">Aufgaben gesamt</span>
           <span class="preview-value">{{ formData.tasks.length }}</span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Kandidaten</span>
+          <span class="preview-value">{{ formData.candidates.length }}</span>
         </div>
         <div class="preview-item">
           <span class="preview-label">Punkte gesamt</span>
@@ -193,9 +240,12 @@
           <span class="preview-label">Aufgaben mit Kriterien</span>
           <span class="preview-value">{{ tasksWithCriteria }}</span>
         </div>
+        <div class="preview-item">
+          <span class="preview-label">Bogenlayout</span>
+          <span class="preview-value">{{ formData.preset.layoutMode === 'compact' ? 'Kompakt' : 'Standard' }}</span>
+        </div>
       </div>
 
-      <!-- Structure Preview -->
       <div class="structure-preview">
         <h3>Prüfungsstruktur</h3>
         <div class="task-preview-list">
@@ -204,22 +254,16 @@
               Aufgabe {{ idx + 1 }}: <strong>{{ task.title || '(ohne Titel)' }}</strong>
             </div>
             <div class="task-preview-info">
-              <span>📌 {{ task.points }} Punkte</span>
-              <span v-if="task.bonusPoints > 0">💫 +{{ task.bonusPoints }} Bonus</span>
-              <span>📋 {{ task.criteria.length }} Kriterien</span>
-              <span v-if="task.isChoice">🔀 Wahlaufgabe</span>
-            </div>
-            <div v-if="task.criteria.length > 0" class="criteria-preview">
-              <div v-for="crit in task.criteria" :key="crit.id" class="crit-preview">
-                • {{ crit.text || '(ohne Text)' }} ({{ crit.points }} Punkte)
-              </div>
+              <span>{{ task.points }} Punkte</span>
+              <span v-if="task.bonusPoints > 0">+{{ task.bonusPoints }} Bonus</span>
+              <span>{{ task.criteria.length }} Kriterien</span>
+              <span v-if="task.isChoice">Wahlaufgabe</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Action Buttons -->
     <section class="section actions-section">
       <button
         @click="saveExam"
@@ -232,9 +276,15 @@
       <button @click="cancelEdit" class="btn btn-secondary btn-lg">
         Abbrechen
       </button>
+      <button
+        v-if="isEditing && route.params.id"
+        @click="openExport"
+        class="btn btn-secondary btn-lg"
+      >
+        Export
+      </button>
     </section>
 
-    <!-- Status Messages -->
     <div v-if="successMessage" class="alert alert-success">
       ✅ {{ successMessage }}
     </div>
@@ -249,18 +299,14 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import type { Exams } from '@viccoboard/core';
+import { createDefaultCorrectionSheetPreset } from '@viccoboard/exams';
 import { useExamsBridge } from '../composables/useExamsBridge';
+import CorrectionSheetPresetForm from './CorrectionSheetPresetForm.vue';
 
-// ============================================================================
-// Router
-// ============================================================================
 const router = useRouter();
 const route = useRoute();
-const { examRepository } = useExamsBridge();
+const { examRepository, getCorrectionSheetPreset, saveCorrectionSheetPreset } = useExamsBridge();
 
-// ============================================================================
-// State
-// ============================================================================
 interface TaskDraft {
   id: string;
   title: string;
@@ -276,14 +322,27 @@ interface CriterionDraft {
   points: number;
 }
 
+interface CandidateDraft {
+  id: string;
+  firstName: string;
+  lastName: string;
+  externalId?: string;
+}
+
 const formData = reactive<{
   title: string;
   description: string;
+  date: string;
   tasks: TaskDraft[];
+  candidates: CandidateDraft[];
+  preset: Exams.CorrectionSheetPreset;
 }>({
   title: '',
   description: '',
-  tasks: []
+  date: '',
+  tasks: [],
+  candidates: [],
+  preset: createDefaultCorrectionSheetPreset('draft')
 });
 
 const errors = reactive<{
@@ -296,9 +355,6 @@ const successMessage = ref('');
 const errorMessage = ref('');
 const isEditing = computed(() => !!route.params.id);
 
-// ============================================================================
-// Computed Properties
-// ============================================================================
 const totalPoints = computed(() =>
   formData.tasks.reduce((sum, task) => sum + (task.points || 0), 0)
 );
@@ -315,7 +371,6 @@ const tasksWithCriteria = computed(() =>
 );
 
 const canAddTask = computed(() => {
-  // Can add task if current tasks are valid
   return !formData.tasks.some(task => !task.title?.trim() || task.points < 0);
 });
 
@@ -323,6 +378,8 @@ const canSave = computed(() => {
   return (
     formData.title.trim().length > 0 &&
     formData.tasks.length > 0 &&
+    formData.candidates.length > 0 &&
+    formData.candidates.every(candidate => candidate.firstName.trim() && candidate.lastName.trim()) &&
     formData.tasks.every(
       task => task.title?.trim().length > 0 && task.points >= 0
     ) &&
@@ -330,9 +387,6 @@ const canSave = computed(() => {
   );
 });
 
-// ============================================================================
-// Methods - Initialization
-// ============================================================================
 const createNewTask = (): TaskDraft => ({
   id: uuidv4(),
   title: `Aufgabe ${formData.tasks.length + 1}`,
@@ -348,20 +402,25 @@ const createNewCriterion = (): CriterionDraft => ({
   points: 0
 });
 
+const createNewCandidate = (): CandidateDraft => ({
+  id: uuidv4(),
+  firstName: '',
+  lastName: '',
+  externalId: ''
+});
+
 onMounted(async () => {
   if (isEditing.value && route.params.id) {
     try {
       if (!examRepository) {
-        console.error('Exam repository is not available');
-        errorMessage.value = 'Die Prüfung konnte zum Bearbeiten nicht geladen werden. Bitte später erneut versuchen.';
-        return;
+        throw new Error('Exam repository is not available');
       }
       const examId = route.params.id as string;
       const exam = await examRepository.findById(examId);
       if (exam && exam.mode === 'simple') {
         formData.title = exam.title;
         formData.description = exam.description || '';
-        // Convert exam structure back to draft format
+        formData.date = exam.date ? new Date(exam.date).toISOString().slice(0, 10) : '';
         formData.tasks = exam.structure.tasks.map(task => ({
           id: task.id,
           title: task.title,
@@ -374,17 +433,23 @@ onMounted(async () => {
             points: crit.points
           }))
         }));
+        formData.candidates = exam.candidates.map(candidate => ({
+          id: candidate.id,
+          firstName: candidate.firstName,
+          lastName: candidate.lastName,
+          externalId: candidate.externalId
+        }));
+        formData.preset = await getCorrectionSheetPreset?.(exam.id) ?? createDefaultCorrectionSheetPreset(exam.id);
       }
     } catch (err) {
       console.error('Failed to load exam:', err);
       errorMessage.value = 'Fehler beim Laden der Prüfung zum Bearbeiten';
     }
+  } else {
+    formData.preset = createDefaultCorrectionSheetPreset(uuidv4());
   }
 });
 
-// ============================================================================
-// Methods - Task Management
-// ============================================================================
 const addTask = () => {
   formData.tasks.push(createNewTask());
 };
@@ -393,9 +458,14 @@ const removeTask = (index: number) => {
   formData.tasks.splice(index, 1);
 };
 
-// ============================================================================
-// Methods - Criterion Management
-// ============================================================================
+const addCandidate = () => {
+  formData.candidates.push(createNewCandidate());
+};
+
+const removeCandidate = (index: number) => {
+  formData.candidates.splice(index, 1);
+};
+
 const addCriterion = (taskIndex: number) => {
   const task = formData.tasks[taskIndex];
   if (task) {
@@ -410,9 +480,6 @@ const removeCriterion = (taskIndex: number, criterionIndex: number) => {
   }
 };
 
-// ============================================================================
-// Methods - Validation
-// ============================================================================
 const validateTitle = () => {
   errors.title = undefined;
   if (!formData.title.trim()) {
@@ -459,20 +526,14 @@ const validateTaskBonusPoints = (index: number) => {
 const validateCriterion = (taskIndex: number, criterionIndex: number) => {
   const criterion = formData.tasks[taskIndex]?.criteria[criterionIndex];
   if (criterion && criterion.points < 0) {
-    // Mark as error (could add to errors object if needed)
     console.warn('Kriteriumspunkte dürfen nicht negativ sein');
   }
 };
 
-// ============================================================================
-// Methods - Save & Cancel
-// ============================================================================
 const saveExam = async () => {
-  // Clear previous messages
   errorMessage.value = '';
   successMessage.value = '';
 
-  // Validate before save
   validateTitle();
   formData.tasks.forEach((_, index) => {
     validateTaskTitle(index);
@@ -502,9 +563,9 @@ const saveExam = async () => {
         points: crit.points,
         aspectBased: false
       })),
-      allowComments: false,
+      allowComments: formData.preset.showTaskComments || formData.preset.showGeneralComment,
       allowSupportTips: false,
-      commentBoxEnabled: false,
+      commentBoxEnabled: formData.preset.showTaskComments,
       subtasks: []
     }));
 
@@ -512,15 +573,16 @@ const saveExam = async () => {
       throw new Error('Exam repository is not initialized');
     }
 
-    const exam: Exams.Exam = {
+    const examInput: Exams.Exam = {
       id: isEditing.value ? (route.params.id as string) : uuidv4(),
       title: formData.title.trim(),
       description: formData.description.trim() || undefined,
+      date: formData.date ? new Date(`${formData.date}T00:00:00`) : undefined,
       mode: 'simple' as Exams.ExamMode,
       structure: {
         parts: [],
         tasks,
-        allowsComments: false,
+        allowsComments: formData.preset.showTaskComments || formData.preset.showGeneralComment,
         allowsSupportTips: false,
         totalPoints: totalPoints.value
       },
@@ -536,25 +598,37 @@ const saveExam = async () => {
         modifiedAfterCorrection: false
       },
       printPresets: [],
-      candidates: [],
+      candidates: formData.candidates.map(candidate => ({
+        id: candidate.id,
+        examId: isEditing.value ? (route.params.id as string) : 'draft',
+        firstName: candidate.firstName.trim(),
+        lastName: candidate.lastName.trim(),
+        externalId: candidate.externalId?.trim() || undefined
+      })),
       status: 'draft',
       createdAt: new Date(),
       lastModified: new Date()
     };
 
-    // Save via repository
+    let savedExam: Exams.Exam;
     if (isEditing.value) {
-      await examRepository.update(exam.id, exam);
+      await examRepository.update(examInput.id, examInput);
+      savedExam = (await examRepository.findById(examInput.id)) ?? examInput;
       successMessage.value = 'Prüfung erfolgreich aktualisiert.';
     } else {
-      await examRepository.create(exam);
+      const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...createInput } = examInput;
+      savedExam = await examRepository.create(createInput);
       successMessage.value = 'Prüfung erfolgreich erstellt.';
     }
 
-    // Clear errors and navigate back after a short delay
+    await saveCorrectionSheetPreset?.({
+      ...formData.preset,
+      examId: savedExam.id
+    });
+
     setTimeout(() => {
-      router.back();
-    }, 1500);
+      router.push('/exams');
+    }, 600);
   } catch (err) {
     console.error('Failed to save exam:', err);
     errorMessage.value = `Fehler beim Speichern der Prüfung: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`;
@@ -565,6 +639,13 @@ const saveExam = async () => {
 
 const cancelEdit = () => {
   router.back();
+};
+
+const openExport = () => {
+  if (!route.params.id) {
+    return;
+  }
+  router.push(`/exams/${route.params.id}/export`);
 };
 </script>
 

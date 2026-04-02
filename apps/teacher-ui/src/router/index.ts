@@ -113,6 +113,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'KBR Analyse', parent: '/exams' }
   },
   {
+    path: '/exams/:id/export',
+    name: 'exam-export',
+    component: () => import('../views/KBRExportPage.vue'),
+    meta: { title: 'Rückmeldebögen exportieren', parent: '/exams' }
+  },
+  {
     path: '/classes/:id',
     name: 'class-detail',
     component: () => import('../views/ClassDetail.vue'),

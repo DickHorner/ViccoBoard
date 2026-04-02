@@ -3,18 +3,22 @@
     <div class="correction-header">
       <div class="header-info">
         <h1>{{ exam?.title || 'Prüfungskorrektur' }}</h1>
-        <p v-if="exam" class="exam-meta">{{ candidates.length }} Schüler | Gesamt: {{ exam.gradingKey.totalPoints }} Punkte</p>
+        <p v-if="exam" class="exam-meta">
+          {{ candidates.length }} Prüflinge | Gesamt: {{ exam.gradingKey.totalPoints }} Punkte
+        </p>
       </div>
       <div class="header-actions">
-        <button @click="saveCorrectionBatch" class="btn-primary" :disabled="!hasChanges">
-          {{ hasChanges ? 'Alle Änderungen speichern' : 'Alles gespeichert' }}
+        <button @click="saveCurrentCandidate(false)" class="btn-primary" :disabled="!hasChanges || !currentCandidate">
+          {{ hasChanges ? 'Aktuellen Stand speichern' : 'Alles gespeichert' }}
         </button>
+        <button @click="openExportPage" class="btn-secondary" :disabled="!exam">Export</button>
         <button @click="goBack" class="btn-secondary">Zurück zu den Prüfungen</button>
       </div>
     </div>
 
-    <div v-if="exam" class="correction-layout">
-      <!-- Candidates List (Sidebar) -->
+    <div v-if="loadError" class="no-candidate">{{ loadError }}</div>
+
+    <div v-else-if="exam" class="correction-layout">
       <div class="candidates-sidebar">
         <div class="sidebar-header">
           <h3>Schüler ({{ candidates.length }})</h3>
@@ -25,7 +29,10 @@
             class="filter-input"
           />
         </div>
-        <div class="candidates-list">
+        <div v-if="filteredCandidates.length === 0" class="no-candidate">
+          Keine passenden Prüflinge.
+        </div>
+        <div v-else class="candidates-list">
           <button
             v-for="candidate in filteredCandidates"
             :key="candidate.id"
@@ -40,17 +47,15 @@
         </div>
       </div>
 
-      <!-- Correction Panel -->
       <div class="correction-panel">
-        <div v-if="currentCandidate && currentCorrection && exam" class="correction-form">
+        <div v-if="currentCandidate && exam" class="correction-form">
           <div class="candidate-header">
             <h2>{{ currentCandidate.firstName }} {{ currentCandidate.lastName }}</h2>
-            <span class="status" :class="`status-${currentCorrection.status}`">
-              {{ formatCorrectionStatus(currentCorrection.status) }}
+            <span class="status" :class="`status-${currentCorrectionStatus}`">
+              {{ formatCorrectionStatus(currentCorrectionStatus) }}
             </span>
           </div>
 
-          <!-- Scoring Mode Selector -->
           <div class="scoring-mode-section">
             <h3>Bewertungsmodus</h3>
             <div class="mode-selector">
@@ -75,7 +80,6 @@
             </div>
           </div>
 
-          <!-- Task Scoring -->
           <div class="scoring-section">
             <h3>Aufgabenbewertung</h3>
             <div v-for="task in exam.structure.tasks" :key="task.id" class="task-scoring">
@@ -84,7 +88,6 @@
                 <span class="max-points">(max. {{ task.points }})</span>
               </div>
 
-              <!-- Numeric Scoring Mode -->
               <div v-if="scoringMode === 'numeric'" class="score-input-group">
                 <input
                   v-model.number="taskScores[task.id]"
@@ -93,14 +96,13 @@
                   :max="task.points"
                   step="0.5"
                   class="score-input"
-                  @input="updateGrade"
+                  @input="markDirty"
                 />
                 <span class="points-to-next">
-                  {{ pointsToNextGrade }} Punkte bis zur nächsten Note
+                  {{ pointsToNextGrade }} Punkte bis zur nächsten Notenstufe
                 </span>
               </div>
 
-              <!-- Alternative Scoring Mode -->
               <div v-else class="alternative-score-group">
                 <div class="grade-buttons">
                   <button
@@ -120,19 +122,18 @@
                 </div>
               </div>
 
-              <!-- Task Comment (optional) -->
               <div v-if="exam.structure.allowsComments" class="comment-box">
                 <textarea
                   v-model="taskComments[task.id]"
                   :placeholder="`Kommentar zu ${task.title}...`"
                   class="comment-input"
                   rows="2"
+                  @input="markDirty"
                 ></textarea>
               </div>
             </div>
           </div>
 
-          <!-- Total Score & Grade -->
           <div class="total-score-section">
             <div class="score-display">
               <div class="score-item">
@@ -150,44 +151,17 @@
             </div>
           </div>
 
-          <!-- Support Tips -->
-          <div v-if="exam.structure.allowsSupportTips" class="support-tips-section">
-            <h3>Fördertipps</h3>
-            <div class="tips-input">
-              <button @click="showTipsModal = true" class="btn-secondary-small">
-                + Fördertipps zuweisen
-              </button>
-            </div>
-            <div v-if="currentCorrection.supportTips.length > 0" class="assigned-tips">
-              <div
-                v-for="tip in currentCorrection.supportTips"
-                :key="tip.supportTipId"
-                class="tip-badge"
-              >
-                {{ tip.supportTipId }}
-                <button @click="removeSupportTip(tip.supportTipId)" class="btn-remove">×</button>
-              </div>
-            </div>
+          <div class="comment-box">
+            <label>Allgemeiner Endkommentar</label>
+            <textarea
+              v-model="generalComment"
+              class="comment-input"
+              rows="4"
+              placeholder="Zusammenfassende Rückmeldung für den Prüfling..."
+              @input="markDirty"
+            ></textarea>
           </div>
 
-          <!-- Special Work Highlighting -->
-          <div class="highlight-section">
-            <h3>Besondere Leistung</h3>
-            <label class="checkbox-label">
-              <input v-model="markAsSpecial" type="checkbox" />
-              Diese Arbeit als besonders markieren
-            </label>
-            <div v-if="markAsSpecial" class="special-input">
-              <textarea
-                v-model="specialNotes"
-                placeholder="Notizen zu besonderen Aspekten dieser Arbeit..."
-                class="comment-input"
-                rows="3"
-              ></textarea>
-            </div>
-          </div>
-
-          <!-- Tab Navigation Enhancement -->
           <div class="nav-buttons">
             <button
               v-if="currentCandidateIndex > 0"
@@ -205,12 +179,20 @@
             </button>
           </div>
 
-          <!-- Save Button -->
           <div class="action-buttons">
-            <button @click="saveCorrectionForCandidate" class="btn-primary">
-              Speichern und weiter
+            <button @click="openPreviewForCurrentCandidate" class="btn-secondary">
+              Bogenvorschau
             </button>
-            <button @click="finalizeCorrectionForCandidate" class="btn-success">
+            <button @click="exportCurrentCandidate" class="btn-secondary">
+              Aktuellen Bogen exportieren
+            </button>
+            <button @click="exportAllCandidates" class="btn-secondary">
+              Alle Bögen exportieren
+            </button>
+            <button @click="saveCurrentCandidate(false)" class="btn-primary">
+              Speichern
+            </button>
+            <button @click="saveCurrentCandidate(true)" class="btn-success">
               Als abgeschlossen markieren
             </button>
           </div>
@@ -221,44 +203,13 @@
         </div>
       </div>
     </div>
-
-    <!-- Support Tips Modal -->
-    <div v-if="showTipsModal" class="modal-overlay" @click.self="showTipsModal = false">
-      <div class="modal-content">
-        <h3>Fördertipps zuweisen</h3>
-        <input
-          v-model="tipsSearchQuery"
-          type="text"
-          placeholder="Fördertipps suchen..."
-          class="search-input"
-        />
-        <div class="tips-list">
-          <div v-for="tip in allSupportTips" :key="tip.id" class="tip-item">
-            <label class="checkbox-label">
-              <input
-                :checked="selectedTipsIds.includes(tip.id)"
-                type="checkbox"
-                @change="toggleTipSelection(tip.id)"
-              />
-              {{ tip.title }}
-            </label>
-            <p class="tip-description">{{ tip.shortDescription }}</p>
-          </div>
-        </div>
-        <div class="modal-buttons">
-          <button @click="applySelectedTips" class="btn-primary">Übernehmen</button>
-          <button @click="showTipsModal = false" class="btn-secondary">Abbrechen</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { Exams } from '@viccoboard/core';
-import { v4 as uuidv4 } from 'uuid';
 import {
   GradingKeyService,
   AlternativeGradingService,
@@ -266,60 +217,71 @@ import {
   STANDARD_ALTERNATIVE_SCALE,
   type AlternativeGradeType,
 } from '@viccoboard/exams';
+import { useExamsBridge } from '../composables/useExamsBridge';
+import { downloadBytes } from '../utils/download';
 
 const router = useRouter();
+const route = useRoute();
+const {
+  getExam,
+  findCorrectionsByExam,
+  recordCorrectionUseCase,
+  exportCurrentCorrectionSheetPdf,
+  exportAllCorrectionSheetsPdf
+} = useExamsBridge();
 
-// Props/State
 const exam = ref<Exams.Exam | null>(null);
-const candidates = ref<Exams.Candidate[]>([]);
 const corrections = ref<Map<string, Exams.CorrectionEntry>>(new Map());
 const currentCandidate = ref<Exams.Candidate | null>(null);
-const currentCorrection = ref<Exams.CorrectionEntry | null>(null);
-
-// UI State
+const loadError = ref('');
 const candidateFilter = ref('');
 const scoringMode = ref<'numeric' | 'alternative'>('numeric');
 const taskScores = ref<Record<string, number>>({});
 const taskAlternativeGrades = ref<Record<string, AlternativeGradeType>>({});
 const taskComments = ref<Record<string, string>>({});
-const markAsSpecial = ref(false);
-const specialNotes = ref('');
-const showTipsModal = ref(false);
-const tipsSearchQuery = ref('');
-const selectedTipsIds = ref<string[]>([]);
-const allSupportTips = ref<Exams.SupportTip[]>([]);
+const generalComment = ref('');
 const hasChanges = ref(false);
 
-// Alternative grading configuration
 const alternativeGrades = computed(() =>
   AlternativeGradingUIHelper.getAllGradeButtons(STANDARD_ALTERNATIVE_SCALE)
 );
 
+const candidates = computed(() => exam.value?.candidates ?? []);
+
 const filteredCandidates = computed(() => {
   const filter = candidateFilter.value.toLowerCase();
-  return candidates.value.filter(c =>
-    `${c.firstName} ${c.lastName}`.toLowerCase().includes(filter)
+  return candidates.value.filter((candidate) =>
+    `${candidate.firstName} ${candidate.lastName}`.toLowerCase().includes(filter)
   );
 });
 
 const currentCandidateIndex = computed(() =>
-  candidates.value.findIndex(c => c.id === currentCandidate.value?.id)
+  candidates.value.findIndex(candidate => candidate.id === currentCandidate.value?.id)
+);
+
+const currentCorrection = computed(() => {
+  if (!currentCandidate.value) {
+    return null;
+  }
+  return corrections.value.get(currentCandidate.value.id) ?? null;
+});
+
+const currentCorrectionStatus = computed(() =>
+  currentCorrection.value?.status ?? 'not-started'
 );
 
 const totalPoints = computed(() => {
+  if (!exam.value) return 0;
   if (scoringMode.value === 'numeric') {
-    return Object.values(taskScores.value).reduce((sum, pts) => sum + pts, 0);
-  } else {
-    // Calculate from alternative grades
-    if (!exam.value) return 0;
-    return exam.value.structure.tasks.reduce((sum, task) => {
-      const grade = taskAlternativeGrades.value[task.id];
-      if (grade) {
-        return sum + AlternativeGradingService.toNumericPoints(grade, task.points, STANDARD_ALTERNATIVE_SCALE);
-      }
-      return sum;
-    }, 0);
+    return Object.values(taskScores.value).reduce((sum, pts) => sum + (pts || 0), 0);
   }
+  return exam.value.structure.tasks.reduce((sum, task) => {
+    const grade = taskAlternativeGrades.value[task.id];
+    if (!grade) {
+      return sum;
+    }
+    return sum + AlternativeGradingService.toNumericPoints(grade, task.points, STANDARD_ALTERNATIVE_SCALE);
+  }, 0);
 });
 
 const percentageScore = computed(() => {
@@ -329,8 +291,7 @@ const percentageScore = computed(() => {
 
 const currentGrade = computed(() => {
   if (!exam.value) return 'k. A.';
-  const result = GradingKeyService.calculateGrade(totalPoints.value, exam.value.gradingKey);
-  return result.grade;
+  return GradingKeyService.calculateGrade(totalPoints.value, exam.value.gradingKey).grade;
 });
 
 const pointsToNextGrade = computed(() => {
@@ -338,7 +299,7 @@ const pointsToNextGrade = computed(() => {
   return GradingKeyService.pointsToNextGrade(totalPoints.value, exam.value.gradingKey);
 });
 
-const formatCorrectionStatus = (status: Exams.CorrectionEntry['status']): string => {
+function formatCorrectionStatus(status: Exams.CorrectionEntry['status'] | 'not-started'): string {
   switch (status) {
     case 'completed':
       return 'abgeschlossen';
@@ -347,268 +308,233 @@ const formatCorrectionStatus = (status: Exams.CorrectionEntry['status']): string
     default:
       return 'offen';
   }
-};
+}
 
-// Methods
-const selectCandidate = (candidate: Exams.Candidate) => {
-  saveCorrectionForCandidate();
-  currentCandidate.value = candidate;
-  loadCorrectionForCandidate(candidate);
-};
+function markDirty(): void {
+  hasChanges.value = true;
+}
 
-const loadCorrectionForCandidate = async (candidate: Exams.Candidate) => {
-  // Simulate loading - in real implementation, fetch from repository
-  let correction = corrections.value.get(candidate.id);
-  if (!correction && exam.value) {
-    correction = {
-      id: uuidv4(),
-      examId: exam.value.id,
-      candidateId: candidate.id,
-      taskScores: [],
-      totalPoints: 0,
-      totalGrade: 'N/A',
-      percentageScore: 0,
-      comments: [],
-      supportTips: [],
-      status: 'in-progress',
-      lastModified: new Date()
-    };
-    corrections.value.set(candidate.id, correction);
+async function loadExamData(): Promise<void> {
+  try {
+    const examId = String(route.params.id);
+    const loadedExam = await getExam(examId);
+    if (!loadedExam) {
+      loadError.value = 'Die angeforderte Prüfung wurde nicht gefunden.';
+      return;
+    }
+
+    exam.value = loadedExam;
+    const loadedCorrections = await findCorrectionsByExam(examId);
+    corrections.value = new Map(loadedCorrections.map((entry) => [entry.candidateId, entry]));
+
+    if (loadedExam.candidates.length > 0) {
+      await selectCandidate(loadedExam.candidates[0]);
+      return;
+    }
+
+    loadError.value = 'Diese Prüfung enthält noch keine Prüflinge.';
+  } catch (error) {
+    console.error('Failed to load correction page:', error);
+    loadError.value = 'Die Korrekturansicht konnte nicht geladen werden.';
   }
-  currentCorrection.value = correction || null;
+}
 
-  // Load task scores
+async function selectCandidate(candidate: Exams.Candidate): Promise<void> {
+  if (currentCandidate.value?.id === candidate.id) {
+    return;
+  }
+
+  if (hasChanges.value) {
+    await saveCurrentCandidate(false);
+  }
+
+  currentCandidate.value = candidate;
+  hydrateCandidateState(candidate.id);
+  hasChanges.value = false;
+}
+
+function hydrateCandidateState(candidateId: string): void {
+  if (!exam.value) {
+    return;
+  }
+
+  const correction = corrections.value.get(candidateId);
   taskScores.value = {};
   taskAlternativeGrades.value = {};
   taskComments.value = {};
-  if (exam.value) {
-    exam.value.structure.tasks.forEach(task => {
-      const score = correction?.taskScores.find(ts => ts.taskId === task.id);
-      taskScores.value[task.id] = score?.points || 0;
-      if (score?.alternativeGrading) {
-        taskAlternativeGrades.value[task.id] = score.alternativeGrading.type;
-      }
-      taskComments.value[task.id] = score?.comment || '';
-    });
-  }
-};
+  generalComment.value = '';
 
-const onScoringModeChange = () => {
-  // When switching modes, convert scores
-  if (scoringMode.value === 'alternative' && exam.value) {
-    // Convert numeric to alternative
-    exam.value.structure.tasks.forEach(task => {
+  for (const task of exam.value.structure.tasks) {
+    const score = correction?.taskScores.find((entry) => entry.taskId === task.id);
+    taskScores.value[task.id] = score?.points ?? 0;
+    if (score?.alternativeGrading) {
+      taskAlternativeGrades.value[task.id] = score.alternativeGrading.type;
+    }
+    taskComments.value[task.id] = score?.comment ?? '';
+  }
+
+  const examComment = correction?.comments
+    ?.filter((comment) => comment.level === 'exam')
+    ?.sort((left, right) => new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime())
+  const latestExamComment = examComment?.[examComment.length - 1];
+
+  generalComment.value = latestExamComment?.text ?? '';
+  scoringMode.value = Object.keys(taskAlternativeGrades.value).length > 0 ? 'alternative' : 'numeric';
+}
+
+function onScoringModeChange(): void {
+  if (!exam.value) {
+    return;
+  }
+
+  if (scoringMode.value === 'alternative') {
+    for (const task of exam.value.structure.tasks) {
       const numericPoints = taskScores.value[task.id] || 0;
-      const grade = AlternativeGradingService.fromNumericPoints(
+      taskAlternativeGrades.value[task.id] = AlternativeGradingService.fromNumericPoints(
         numericPoints,
         task.points,
         STANDARD_ALTERNATIVE_SCALE
       );
-      taskAlternativeGrades.value[task.id] = grade;
-    });
-  } else if (scoringMode.value === 'numeric' && exam.value) {
-    // Convert alternative to numeric (already handled by computed totalPoints)
-    exam.value.structure.tasks.forEach(task => {
+    }
+  } else {
+    for (const task of exam.value.structure.tasks) {
       const grade = taskAlternativeGrades.value[task.id];
       if (grade) {
-        const points = AlternativeGradingService.toNumericPoints(
+        taskScores.value[task.id] = AlternativeGradingService.toNumericPoints(
           grade,
           task.points,
           STANDARD_ALTERNATIVE_SCALE
         );
-        taskScores.value[task.id] = points;
       }
-    });
+    }
   }
-};
 
-const setAlternativeGrade = (taskId: string, grade: AlternativeGradeType) => {
+  markDirty();
+}
+
+function setAlternativeGrade(taskId: string, grade: AlternativeGradeType): void {
   taskAlternativeGrades.value[taskId] = grade;
-  updateGrade();
-};
+  markDirty();
+}
 
-const getGradeLabel = (grade: AlternativeGradeType): string => {
+function getGradeLabel(grade: AlternativeGradeType): string {
   const config = AlternativeGradingService.getGradeConfig(grade, STANDARD_ALTERNATIVE_SCALE);
   return `${config.emoji} ${config.label}`;
-};
+}
 
-const getAlternativeGradePoints = (taskId: string, maxPoints: number): number => {
+function getAlternativeGradePoints(taskId: string, maxPoints: number): number {
   const grade = taskAlternativeGrades.value[taskId];
   if (!grade) return 0;
   return AlternativeGradingService.toNumericPoints(grade, maxPoints, STANDARD_ALTERNATIVE_SCALE);
-};
+}
 
-const saveCorrectionForCandidate = async () => {
-  if (!currentCandidate.value || !currentCorrection.value || !exam.value) return;
+async function saveCurrentCandidate(finalize: boolean): Promise<void> {
+  if (!exam.value || !currentCandidate.value || !recordCorrectionUseCase) {
+    return;
+  }
 
-  const taskScoresArray: Exams.TaskScore[] = exam.value.structure.tasks.map(task => {
-    const score: Exams.TaskScore = {
+  const taskScoresPayload: Exams.TaskScore[] = exam.value.structure.tasks.map((task) => {
+    const payload: Exams.TaskScore = {
       taskId: task.id,
-      points: scoringMode.value === 'numeric' ? (taskScores.value[task.id] || 0) : getAlternativeGradePoints(task.id, task.points),
+      points: scoringMode.value === 'numeric'
+        ? (taskScores.value[task.id] || 0)
+        : getAlternativeGradePoints(task.id, task.points),
       maxPoints: task.points,
-      comment: taskComments.value[task.id],
+      comment: taskComments.value[task.id] || undefined,
       timestamp: new Date()
     };
 
-    // Add alternative grading info if in alternative mode
     if (scoringMode.value === 'alternative' && taskAlternativeGrades.value[task.id]) {
-      score.alternativeGrading = AlternativeGradingService.createAlternativeGrading(
+      payload.alternativeGrading = AlternativeGradingService.createAlternativeGrading(
         taskAlternativeGrades.value[task.id],
         task.points,
         STANDARD_ALTERNATIVE_SCALE
       );
     }
 
-    return score;
+    return payload;
   });
 
-  currentCorrection.value.taskScores = taskScoresArray;
-  currentCorrection.value.totalPoints = totalPoints.value;
-  currentCorrection.value.totalGrade = currentGrade.value;
-  currentCorrection.value.percentageScore = percentageScore.value;
-  currentCorrection.value.lastModified = new Date();
+  const comments: Array<Partial<Pick<Exams.CorrectionComment, 'id' | 'timestamp'>> & Omit<Exams.CorrectionComment, 'id' | 'timestamp'>> =
+    generalComment.value.trim()
+      ? [{
+          level: 'exam',
+          text: generalComment.value.trim(),
+          printable: true,
+          availableAfterReturn: true
+        }]
+      : [];
 
-  corrections.value.set(currentCandidate.value.id, currentCorrection.value);
-  hasChanges.value = true;
-};
+  const saved = await recordCorrectionUseCase.execute({
+    examId: exam.value.id,
+    candidateId: currentCandidate.value.id,
+    taskScores: taskScoresPayload,
+    comments,
+    finalizeCorrection: finalize
+  });
 
-const finalizeCorrectionForCandidate = async () => {
-  if (!currentCorrection.value) return;
-  currentCorrection.value.status = 'completed';
-  currentCorrection.value.correctedAt = new Date();
-  await saveCorrectionForCandidate();
-};
-
-const updateGrade = () => {
-  // Grade updates automatically via computed properties
-};
-
-const removeSupportTip = (tipId: string) => {
-  if (!currentCorrection.value) return;
-  currentCorrection.value.supportTips = currentCorrection.value.supportTips.filter(
-    st => st.supportTipId !== tipId
-  );
-  hasChanges.value = true;
-};
-
-const toggleTipSelection = (tipId: string) => {
-  const idx = selectedTipsIds.value.indexOf(tipId);
-  if (idx >= 0) {
-    selectedTipsIds.value.splice(idx, 1);
-  } else {
-    selectedTipsIds.value.push(tipId);
-  }
-};
-
-const applySelectedTips = () => {
-  if (!currentCorrection.value) return;
-  const newTips = selectedTipsIds.value.map(id => ({
-    supportTipId: id,
-    assignedAt: new Date()
-  }));
-  currentCorrection.value.supportTips = newTips;
-  showTipsModal.value = false;
-  hasChanges.value = true;
-};
-
-const saveCorrectionBatch = async () => {
-  // Save all corrections
-  console.log('Speichere alle Korrekturen...', corrections.value);
+  corrections.value = new Map(corrections.value).set(currentCandidate.value.id, saved);
   hasChanges.value = false;
-};
+  hydrateCandidateState(currentCandidate.value.id);
+}
 
-const getCorrectionStatus = (candidateId: string): string | null => {
+function getCorrectionStatus(candidateId: string): string | null {
   const correction = corrections.value.get(candidateId);
   return correction ? correction.status : null;
-};
+}
 
-const correctionPercentage = (candidateId: string): number => {
+function correctionPercentage(candidateId: string): number {
   const correction = corrections.value.get(candidateId);
   if (!correction || !exam.value) return 0;
-  const scoredTasks = correction.taskScores.filter(ts => ts.points > 0).length;
+  const scoredTasks = correction.taskScores.filter(score => score.points > 0 || score.comment).length;
   const totalTasks = exam.value.structure.tasks.length;
   return totalTasks > 0 ? Math.round((scoredTasks / totalTasks) * 100) : 0;
-};
+}
 
-const goBack = () => {
-  router.push('/exams');
-};
-
-onMounted(async () => {
-  // Load exam and candidates from route params
-  // For now, mock data
-  exam.value = {
-    id: 'exam-1',
-    title: 'Mathetest',
-    mode: Exams.ExamMode.Simple,
-    structure: {
-      parts: [],
-      tasks: [
-        {
-          id: 'task-1',
-          level: 1,
-          order: 0,
-          title: 'Aufgabe 1',
-          points: 10,
-          isChoice: false,
-          criteria: [],
-          allowComments: true,
-          allowSupportTips: true,
-          commentBoxEnabled: true,
-          subtasks: []
-        },
-        {
-          id: 'task-2',
-          level: 1,
-          order: 1,
-          title: 'Aufgabe 2',
-          points: 15,
-          isChoice: false,
-          criteria: [],
-          allowComments: true,
-          allowSupportTips: true,
-          commentBoxEnabled: true,
-          subtasks: []
-        }
-      ],
-      allowsComments: true,
-      allowsSupportTips: true,
-      totalPoints: 25
-    },
-    gradingKey: {
-      id: 'key-1',
-      name: 'Standard',
-      type: Exams.GradingKeyType.Percentage,
-      totalPoints: 25,
-      gradeBoundaries: [
-        { grade: 1, minPercentage: 92, displayValue: '1' },
-        { grade: 2, minPercentage: 81, displayValue: '2' },
-        { grade: 3, minPercentage: 70, displayValue: '3' },
-        { grade: 4, minPercentage: 60, displayValue: '4' },
-        { grade: 5, minPercentage: 50, displayValue: '5' },
-        { grade: 6, minPercentage: 0, displayValue: '6' }
-      ],
-      roundingRule: { type: 'nearest', decimalPlaces: 1 },
-      errorPointsToGrade: false,
-      customizable: true,
-      modifiedAfterCorrection: false
-    },
-    printPresets: [],
-    candidates: [],
-    status: 'in-progress',
-    createdAt: new Date(),
-    lastModified: new Date()
-  };
-
-  candidates.value = [
-    { id: '1', examId: 'exam-1', firstName: 'Alice', lastName: 'Smith' },
-    { id: '2', examId: 'exam-1', firstName: 'Bob', lastName: 'Johnson' },
-    { id: '3', examId: 'exam-1', firstName: 'Charlie', lastName: 'Brown' }
-  ];
-
-  if (candidates.value.length > 0) {
-    selectCandidate(candidates.value[0]);
+async function exportCurrentCandidate(): Promise<void> {
+  if (!exam.value || !currentCandidate.value || !exportCurrentCorrectionSheetPdf) {
+    return;
   }
+
+  await saveCurrentCandidate(false);
+  const pdfDocument = await exportCurrentCorrectionSheetPdf(exam.value.id, currentCandidate.value.id);
+  downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+}
+
+async function exportAllCandidates(): Promise<void> {
+  if (!exam.value || !exportAllCorrectionSheetsPdf) {
+    return;
+  }
+
+  await saveCurrentCandidate(false);
+  const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id);
+  downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+}
+
+function openPreviewForCurrentCandidate(): void {
+  if (!exam.value || !currentCandidate.value) {
+    return;
+  }
+
+  router.push({
+    path: `/exams/${exam.value.id}/export`,
+    query: { candidateId: currentCandidate.value.id }
+  });
+}
+
+function openExportPage(): void {
+  if (!exam.value) {
+    return;
+  }
+  router.push(`/exams/${exam.value.id}/export`);
+}
+
+function goBack(): void {
+  router.push('/exams');
+}
+
+onMounted(() => {
+  loadExamData();
 });
 </script>
 
