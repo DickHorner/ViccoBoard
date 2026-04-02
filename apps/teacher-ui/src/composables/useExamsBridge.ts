@@ -6,7 +6,7 @@
  * All exam-related data access must go through this bridge.
  */
 
-import { ref, computed } from 'vue';
+import { shallowRef, computed, type ComputedRef, type ShallowRef } from 'vue';
 import {
   ExamRepository,
   TaskNodeRepository,
@@ -75,6 +75,41 @@ interface ExamsBridge {
   exportAllCorrectionSheetsPdf(examId: string): Promise<any>;
 
   initialized: boolean;
+}
+
+interface UseExamsBridgeResult {
+  examsBridge: ShallowRef<ExamsBridge | null>;
+  isInitialized: ComputedRef<boolean>;
+  readonly examRepository: ExamsBridge['examRepository'] | undefined;
+  readonly taskNodeRepository: ExamsBridge['taskNodeRepository'] | undefined;
+  readonly criterionRepository: ExamsBridge['criterionRepository'] | undefined;
+  readonly correctionEntryRepository: ExamsBridge['correctionEntryRepository'] | undefined;
+  readonly supportTipRepository: ExamsBridge['supportTipRepository'] | undefined;
+  readonly studentLongTermNoteRepository: ExamsBridge['studentLongTermNoteRepository'] | undefined;
+  readonly correctionSheetPresetRepository: ExamsBridge['correctionSheetPresetRepository'] | undefined;
+  readonly createExamPayload: ExamsBridge['createExamPayload'] | undefined;
+  readonly recordCorrectionUseCase: ExamsBridge['recordCorrectionUseCase'] | undefined;
+  readonly calculateGradeUseCase: ExamsBridge['calculateGradeUseCase'] | undefined;
+  readonly getCorrectionSheetPresetUseCase: ExamsBridge['getCorrectionSheetPresetUseCase'] | undefined;
+  readonly saveCorrectionSheetPresetUseCase: ExamsBridge['saveCorrectionSheetPresetUseCase'] | undefined;
+  readonly buildCorrectionSheetProjectionUseCase: ExamsBridge['buildCorrectionSheetProjectionUseCase'] | undefined;
+  readonly exportCorrectionSheetsPdfUseCase: ExamsBridge['exportCorrectionSheetsPdfUseCase'] | undefined;
+  readonly gradingKeyService: ExamsBridge['gradingKeyService'] | undefined;
+  readonly gradingKeyEngine: ExamsBridge['gradingKeyEngine'] | undefined;
+  readonly alternativeGradingService: ExamsBridge['alternativeGradingService'] | undefined;
+  readonly commentManagementService: ExamsBridge['commentManagementService'] | undefined;
+  readonly supportTipManagementService: ExamsBridge['supportTipManagementService'] | undefined;
+  readonly examAnalysisService: ExamsBridge['examAnalysisService'] | undefined;
+  readonly longTermNoteManagementService: ExamsBridge['longTermNoteManagementService'] | undefined;
+  listExams(): Promise<any[]>;
+  getExam(examId: string): Promise<any | null>;
+  findCorrectionsByExam(examId: string): Promise<any[]>;
+  findCorrectionByExamAndCandidate(examId: string, candidateId: string): Promise<any | null>;
+  getCorrectionSheetPreset(examId: string): Promise<any> | undefined;
+  saveCorrectionSheetPreset(input: any): Promise<any> | undefined;
+  buildCorrectionSheetPreview(examId: string, candidateId: string): Promise<any> | undefined;
+  exportCurrentCorrectionSheetPdf(examId: string, candidateId: string): Promise<any> | undefined;
+  exportAllCorrectionSheetsPdf(examId: string): Promise<any> | undefined;
 }
 
 /**
@@ -177,8 +212,8 @@ export function getExamsBridge(): ExamsBridge {
  * Vue composable for exams module access
  * Provides reactive access to exams bridge
  */
-export function useExamsBridge() {
-  const bridge = ref<ExamsBridge | null>(examsBridgeInstance);
+export function useExamsBridge(): UseExamsBridgeResult {
+  const bridge = shallowRef<ExamsBridge | null>(examsBridgeInstance);
 
   const isInitialized = computed(() => bridge.value !== null);
 
