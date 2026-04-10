@@ -60,6 +60,7 @@ export * from './utils/pagination.js';
 export * from './utils/type-guards.js';
 export * from './utils/retry-policy.js';
 export * from './utils/safe-json.js';
+export * from './utils/student-helpers.js';
 
 // Version
 export const VERSION = '0.1.0';

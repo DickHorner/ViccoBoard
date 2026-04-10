@@ -86,7 +86,7 @@
               <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
               <div class="student-info">
                 <h4>{{ student.firstName }} {{ student.lastName }}</h4>
-                <p v-if="student.birthYear">Geb.: {{ student.birthYear }}</p>
+                <p v-if="student.dateOfBirth">Geb.: {{ student.dateOfBirth }}</p>
               </div>
               <div class="student-arrow">→</div>
             </RouterLink>
@@ -179,14 +179,11 @@
           </div>
           
           <div class="form-group">
-            <label for="birthYear">Geburtsjahr</label>
+            <label for="dateOfBirth">Geburtsdatum</label>
             <input
-              id="birthYear"
-              v-model.number="newStudent.birthYear"
-              type="number"
-              placeholder="z.B. 2010"
-              min="1900"
-              :max="new Date().getFullYear()"
+              id="dateOfBirth"
+              v-model="newStudent.dateOfBirth"
+              type="date"
               class="form-input"
             />
           </div>
@@ -195,9 +192,8 @@
             <label for="gender">Geschlecht</label>
             <select id="gender" v-model="newStudent.gender" class="form-input">
               <option value="">Nicht angegeben</option>
-              <option value="male">Männlich</option>
-              <option value="female">Weiblich</option>
-              <option value="diverse">Divers</option>
+              <option value="m">Männlich</option>
+              <option value="f">Weiblich</option>
             </select>
           </div>
           
@@ -258,8 +254,8 @@ const sportWorkAreas = ref(buildSportWorkAreas(''))
 const newStudent = ref({
   firstName: '',
   lastName: '',
-  birthYear: undefined as number | undefined,
-  gender: '' as '' | 'male' | 'female' | 'diverse',
+  dateOfBirth: '',
+  gender: '' as '' | 'm' | 'f',
   email: ''
 })
 
@@ -323,7 +319,7 @@ const handleAddStudent = async () => {
       firstName: newStudent.value.firstName.trim(),
       lastName: newStudent.value.lastName.trim(),
       classGroupId: classId,
-      birthYear: newStudent.value.birthYear,
+      dateOfBirth: newStudent.value.dateOfBirth,
       gender: newStudent.value.gender || undefined,
       email: newStudent.value.email.trim() || undefined
     })
@@ -348,7 +344,7 @@ const handleAddStudent = async () => {
 const closeAddStudentModal = () => {
   showAddStudentModal.value = false
   addStudentError.value = ''
-  newStudent.value = { firstName: '', lastName: '', birthYear: undefined, gender: '', email: '' }
+  newStudent.value = { firstName: '', lastName: '', dateOfBirth: '', gender: '', email: '' }
 }
 
 const formatDate = (date: Date): string => {

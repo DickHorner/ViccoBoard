@@ -10,13 +10,23 @@ import { ref, computed } from 'vue';
 import {
   StudentRepository,
   AddStudentUseCase,
+  SportStudentProfileRepository,
   StatusCatalogRepository,
   AddStatusUseCase,
   UpdateStatusUseCase,
-  ReorderStatusUseCase
+  ReorderStatusUseCase,
+  ImportBatchRepository,
+  ImportBatchItemRepository,
+  StudentCsvImportUseCase
 } from '@viccoboard/students';
 import type { AddStudentInput } from '@viccoboard/students';
-import type { AddStatusInput, UpdateStatusInput, ReorderStatusInput } from '@viccoboard/students';
+import type {
+  AddStatusInput,
+  UpdateStatusInput,
+  ReorderStatusInput,
+  StudentCsvFile
+} from '@viccoboard/students';
+import { ClassGroupRepository } from '@viccoboard/sport';
 import { getStorageAdapter } from '../services/storage.service';
 
 /**
@@ -27,7 +37,11 @@ let studentsBridgeInstance: StudentsBridge | null = null;
 interface StudentsBridge {
   studentRepository: StudentRepository;
   addStudentUseCase: AddStudentUseCase;
+  sportStudentProfileRepository: SportStudentProfileRepository;
   statusCatalogRepository: StatusCatalogRepository;
+  importBatchRepository: ImportBatchRepository;
+  importBatchItemRepository: ImportBatchItemRepository;
+  studentCsvImportUseCase: StudentCsvImportUseCase;
   addStatusUseCase: AddStatusUseCase;
   updateStatusUseCase: UpdateStatusUseCase;
   reorderStatusUseCase: ReorderStatusUseCase;
@@ -46,10 +60,20 @@ export function initializeStudentsBridge(): StudentsBridge {
 
   // Initialize repositories
   const studentRepo = new StudentRepository(adapter);
+  const sportStudentProfileRepository = new SportStudentProfileRepository(adapter);
   const statusCatalogRepo = new StatusCatalogRepository(adapter);
+  const importBatchRepository = new ImportBatchRepository(adapter);
+  const importBatchItemRepository = new ImportBatchItemRepository(adapter);
+  const classGroupRepository = new ClassGroupRepository(adapter);
 
   // Initialize use cases
   const addStudentUseCase = new AddStudentUseCase(studentRepo);
+  const studentCsvImportUseCase = new StudentCsvImportUseCase(
+    studentRepo,
+    classGroupRepository,
+    importBatchRepository,
+    importBatchItemRepository
+  );
   const addStatusUseCase = new AddStatusUseCase(statusCatalogRepo);
   const updateStatusUseCase = new UpdateStatusUseCase(statusCatalogRepo);
   const reorderStatusUseCase = new ReorderStatusUseCase(statusCatalogRepo);
@@ -57,7 +81,11 @@ export function initializeStudentsBridge(): StudentsBridge {
   studentsBridgeInstance = {
     studentRepository: studentRepo,
     addStudentUseCase,
+    sportStudentProfileRepository,
     statusCatalogRepository: statusCatalogRepo,
+    importBatchRepository,
+    importBatchItemRepository,
+    studentCsvImportUseCase,
     addStatusUseCase,
     updateStatusUseCase,
     reorderStatusUseCase
@@ -94,7 +122,11 @@ export function useStudents() {
     // Convenience accessors
     repository: computed(() => bridge.value?.studentRepository),
     addStudentUseCase: computed(() => bridge.value?.addStudentUseCase),
+    sportStudentProfileRepository: computed(() => bridge.value?.sportStudentProfileRepository),
     statusCatalogRepository: computed(() => bridge.value?.statusCatalogRepository),
+    importBatchRepository: computed(() => bridge.value?.importBatchRepository),
+    importBatchItemRepository: computed(() => bridge.value?.importBatchItemRepository),
+    studentCsvImportUseCase: computed(() => bridge.value?.studentCsvImportUseCase),
     addStatusUseCase: computed(() => bridge.value?.addStatusUseCase),
     updateStatusUseCase: computed(() => bridge.value?.updateStatusUseCase),
     reorderStatusUseCase: computed(() => bridge.value?.reorderStatusUseCase)
@@ -102,6 +134,20 @@ export function useStudents() {
 }
 
 // Re-exports for convenience
-export { StudentRepository, AddStudentUseCase, StatusCatalogRepository };
+export {
+  StudentRepository,
+  AddStudentUseCase,
+  SportStudentProfileRepository,
+  StatusCatalogRepository,
+  ImportBatchRepository,
+  ImportBatchItemRepository,
+  StudentCsvImportUseCase
+};
 export { AddStatusUseCase, UpdateStatusUseCase, ReorderStatusUseCase };
-export type { AddStudentInput, AddStatusInput, UpdateStatusInput, ReorderStatusInput };
+export type {
+  AddStudentInput,
+  AddStatusInput,
+  UpdateStatusInput,
+  ReorderStatusInput,
+  StudentCsvFile
+};

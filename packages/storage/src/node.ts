@@ -23,3 +23,4 @@ export * from './migrations/016_table_active_schema.js';
 export * from './migrations/016_tournament_schema.js';
 export * from './migrations/017_game_database_schema.js';
 export * from './migrations/018_kbr_feedback_workflow.js';
+export * from './migrations/021_student_import_batches.js';

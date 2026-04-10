@@ -14,8 +14,8 @@ export interface AddStudentInput {
   firstName: string;
   lastName: string;
   classGroupId: string;
-  birthYear?: number;
-  gender?: 'male' | 'female' | 'diverse';
+  dateOfBirth: string;
+  gender?: 'm' | 'f';
   email?: string;
   parentEmail?: string;
   phone?: string;
@@ -36,7 +36,7 @@ export class AddStudentUseCase {
       firstName: input.firstName,
       lastName: input.lastName,
       classGroupId: input.classGroupId,
-      birthYear: input.birthYear,
+      dateOfBirth: input.dateOfBirth,
       gender: input.gender,
       contactInfo: {
         email: input.email,
@@ -69,12 +69,17 @@ export class AddStudentUseCase {
       }
     }
 
-    // Validate birth year if provided
-    if (input.birthYear !== undefined) {
-      const currentYear = new Date().getFullYear();
-      if (input.birthYear < 1900 || input.birthYear > currentYear) {
-        throw new Error(`Birth year must be between 1900 and ${currentYear}`);
-      }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(input.dateOfBirth)) {
+      throw new Error('Date of birth must use YYYY-MM-DD');
+    }
+
+    const parsedDate = new Date(`${input.dateOfBirth}T00:00:00.000Z`);
+    if (Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== input.dateOfBirth) {
+      throw new Error('Date of birth must be a valid calendar date');
+    }
+
+    if (input.gender && input.gender !== 'm' && input.gender !== 'f') {
+      throw new Error('Gender must be m or f');
     }
 
     // Validate email format if provided

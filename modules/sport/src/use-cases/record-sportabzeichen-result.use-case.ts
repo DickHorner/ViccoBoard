@@ -11,7 +11,7 @@ import { SportabzeichenService } from '../services/sportabzeichen.service.js';
 export interface RecordSportabzeichenResultInput {
   studentId: string;
   disciplineId: string;
-  birthYear: number;
+  dateOfBirth: string;
   gender: Sport.SportabzeichenGender;
   performanceValue: number;
   unit: string;
@@ -36,8 +36,8 @@ export class RecordSportabzeichenResultUseCase {
     if (!input.disciplineId) {
       throw new Error('Discipline ID is required');
     }
-    if (!input.birthYear || !Number.isFinite(input.birthYear)) {
-      throw new Error('Valid birth year is required');
+    if (!input.dateOfBirth || !/^\d{4}-\d{2}-\d{2}$/.test(input.dateOfBirth)) {
+      throw new Error('Valid date of birth is required');
     }
     if (!input.gender) {
       throw new Error('Gender is required');
@@ -56,7 +56,7 @@ export class RecordSportabzeichenResultUseCase {
     const resultData = this.SportabzeichenService.buildResult({
       studentId: input.studentId,
       disciplineId: input.disciplineId,
-      birthYear: input.birthYear,
+      dateOfBirth: input.dateOfBirth,
       gender: input.gender,
       performanceValue: input.performanceValue,
       unit: input.unit,

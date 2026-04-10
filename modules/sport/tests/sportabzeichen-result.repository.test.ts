@@ -45,8 +45,8 @@ describe('SportabzeichenResultRepository', () => {
       firstName: 'Jamie',
       lastName: 'Doe',
       classGroupId: classGroup.id,
-      birthYear: 2012,
-      gender: 'diverse'
+      dateOfBirth: '2012-04-05',
+      gender: 'f'
     });
 
     const created = await resultRepository.create({
@@ -76,8 +76,8 @@ describe('SportabzeichenResultRepository', () => {
       firstName: 'Alex',
       lastName: 'Lee',
       classGroupId: classGroup.id,
-      birthYear: 2012,
-      gender: 'diverse'
+      dateOfBirth: '2012-09-11',
+      gender: 'm'
     });
 
     await resultRepository.create({

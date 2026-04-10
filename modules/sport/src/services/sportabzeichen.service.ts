@@ -37,16 +37,24 @@ export class SportabzeichenService {
   /**
    * Calculates the age from a birth year relative to a test date.
    * 
-   * @param birthYear - The year of birth as a number
+   * @param dateOfBirth - The full date of birth in YYYY-MM-DD format
    * @param testDate - The reference date for age calculation (defaults to today)
    * @returns The calculated age as a non-negative integer
-   * @throws {Error} If birthYear is not a finite number
+   * @throws {Error} If dateOfBirth is not a valid date string
    */
-  calculateAgeFromBirthYear(birthYear: number, testDate: Date = new Date()): number {
-    if (!Number.isFinite(birthYear)) {
-      throw new Error('Birth year must be a number');
+  calculateAgeFromDateOfBirth(dateOfBirth: string, testDate: Date = new Date()): number {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
+      throw new Error('Date of birth must use YYYY-MM-DD');
     }
-    const age = testDate.getFullYear() - birthYear;
+    const birthDate = new Date(`${dateOfBirth}T00:00:00.000Z`);
+    if (Number.isNaN(birthDate.getTime())) {
+      throw new Error('Date of birth must be a valid date');
+    }
+    let age = testDate.getUTCFullYear() - birthDate.getUTCFullYear();
+    const monthDelta = testDate.getUTCMonth() - birthDate.getUTCMonth();
+    if (monthDelta < 0 || (monthDelta === 0 && testDate.getUTCDate() < birthDate.getUTCDate())) {
+      age -= 1;
+    }
     return Math.max(0, age);
   }
 
@@ -92,14 +100,14 @@ export class SportabzeichenService {
   /**
    * Builds a Sportabzeichen result from student performance data.
    * 
-   * Calculates the student's age from their birth year at the test date,
+   * Calculates the student's age from their date of birth at the test date,
    * evaluates their performance against applicable standards, and returns
    * a complete result object with all relevant metadata.
    * 
    * @param params - The parameters object containing:
    *   - studentId: Unique identifier for the student
    *   - disciplineId: Unique identifier for the discipline
-   *   - birthYear: The year of birth as a number
+   *   - dateOfBirth: Full date of birth in YYYY-MM-DD format
    *   - gender: The student's gender (SportabzeichenGender)
    *   - performanceValue: The numeric performance value achieved
    *   - unit: The unit of measurement for the performance (e.g., 'seconds', 'meters')
@@ -112,7 +120,7 @@ export class SportabzeichenService {
   buildResult(params: {
     studentId: string;
     disciplineId: string;
-    birthYear: number;
+    dateOfBirth: string;
     gender: Sport.SportabzeichenGender;
     performanceValue: number;
     unit: string;
@@ -120,7 +128,7 @@ export class SportabzeichenService {
     standards: Sport.SportabzeichenStandard[];
   }): Omit<Sport.SportabzeichenResult, 'id' | 'createdAt' | 'lastModified'> {
     const testDate = params.testDate ?? new Date();
-    const ageAtTest = this.calculateAgeFromBirthYear(params.birthYear, testDate);
+    const ageAtTest = this.calculateAgeFromDateOfBirth(params.dateOfBirth, testDate);
     const achievedLevel = this.evaluatePerformance(params.standards, {
       disciplineId: params.disciplineId,
       gender: params.gender,

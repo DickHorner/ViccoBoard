@@ -43,6 +43,7 @@ describe('Verbal assessment persistence', () => {
     const student = await studentRepo.create({
       firstName: 'Max',
       lastName: 'Mustermann',
+      dateOfBirth: '2012-02-10',
       classGroupId: classGroup.id,
     });
     studentId = student.id;
@@ -119,6 +120,7 @@ describe('Verbal assessment persistence', () => {
     const student2 = await studentRepo.create({
       firstName: 'Lisa',
       lastName: 'Muster',
+      dateOfBirth: '2012-08-14',
       classGroupId: cat!.classGroupId,
     });
 

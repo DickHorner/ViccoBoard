@@ -4,6 +4,7 @@
  */
 
 import type { Student, ContactInfo } from '../interfaces/core.types.js';
+import { isValidDateOnlyString } from '../utils/student-helpers.js';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -13,15 +14,15 @@ export interface ValidationResult {
 export interface StudentValidationOptions {
   maxNameLength?: number;
   maxEmailLength?: number;
-  minBirthYear?: number;
-  maxBirthYear?: number;
+  minDateOfBirth?: string;
+  maxDateOfBirth?: string;
 }
 
 const DEFAULT_OPTIONS: Required<StudentValidationOptions> = {
   maxNameLength: 200,
   maxEmailLength: 320, // RFC 5321 standard
-  minBirthYear: 1900,
-  maxBirthYear: new Date().getFullYear() + 10
+  minDateOfBirth: '1900-01-01',
+  maxDateOfBirth: `${new Date().getFullYear() + 10}-12-31`
 };
 
 export class StudentValidator {
@@ -57,16 +58,21 @@ export class StudentValidator {
     }
 
     // Gender validation (if provided)
-    if (data.gender && !['male', 'female', 'diverse'].includes(data.gender)) {
-      errors.push('Gender must be one of: male, female, diverse');
+    if (data.gender && !['m', 'f'].includes(data.gender)) {
+      errors.push('Gender must be one of: m, f');
     }
 
-    // Birth year validation (if provided)
-    if (data.birthYear !== undefined) {
-      if (typeof data.birthYear !== 'number') {
-        errors.push('Birth year must be a number');
-      } else if (data.birthYear < this.options.minBirthYear || data.birthYear > this.options.maxBirthYear) {
-        errors.push(`Birth year must be between ${this.options.minBirthYear} and ${this.options.maxBirthYear}`);
+    // Date of birth validation
+    if (data.dateOfBirth === undefined) {
+      errors.push('Date of birth is required');
+    } else if (data.dateOfBirth !== null) {
+      if (typeof data.dateOfBirth !== 'string' || !isValidDateOnlyString(data.dateOfBirth)) {
+        errors.push('Date of birth must be a valid date in YYYY-MM-DD format');
+      } else if (
+        data.dateOfBirth < this.options.minDateOfBirth ||
+        data.dateOfBirth > this.options.maxDateOfBirth
+      ) {
+        errors.push(`Date of birth must be between ${this.options.minDateOfBirth} and ${this.options.maxDateOfBirth}`);
       }
     }
 

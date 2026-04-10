@@ -2,12 +2,13 @@
  * Sport schema roundtrip tests
  */
 
-import { SportSchema } from '@viccoboard/core';
+import { SportSchema, type SportStudentProfile } from '@viccoboard/core';
 import {
   SQLiteStorage,
   InitialSchemaMigration,
   GradingSchemaMigration,
-  SportSchemaMigration
+  SportSchemaMigration,
+  StudentImportBatchesMigration
 } from '@viccoboard/storage/node';
 import {
   SportClassRepository,
@@ -18,12 +19,13 @@ import {
   SportNewDayDataRepository,
   SportUserDataRepository
 } from '../src/index.js';
-import { SportStudentRepository } from '@viccoboard/students';
+import { SportStudentProfileRepository, StudentRepository } from '@viccoboard/students';
 
 describe('Sport schema roundtrip', () => {
   let storage: SQLiteStorage;
   let classRepository: SportClassRepository;
-  let studentRepository: SportStudentRepository;
+  let coreStudentRepository: StudentRepository;
+  let studentRepository: SportStudentProfileRepository;
   let categoryRepository: SportCategoryRepository;
   let gradeRepository: SportGradeRepository;
   let tableRepository: SportTableRepository;
@@ -40,11 +42,13 @@ describe('Sport schema roundtrip', () => {
     storage.registerMigration(new InitialSchemaMigration(storage));
     storage.registerMigration(new GradingSchemaMigration(storage));
     storage.registerMigration(new SportSchemaMigration(storage));
+    storage.registerMigration(new StudentImportBatchesMigration(storage));
     await storage.migrate();
 
     const adapter = storage.getAdapter();
     classRepository = new SportClassRepository(adapter);
-    studentRepository = new SportStudentRepository(adapter);
+    coreStudentRepository = new StudentRepository(adapter);
+    studentRepository = new SportStudentProfileRepository(adapter);
     categoryRepository = new SportCategoryRepository(adapter);
     gradeRepository = new SportGradeRepository(adapter);
     tableRepository = new SportTableRepository(adapter);
@@ -82,7 +86,7 @@ describe('Sport schema roundtrip', () => {
     expect(loaded).toEqual(original);
   });
 
-  test('student schema roundtrip', async () => {
+  test('sport student profile roundtrip', async () => {
     await classRepository.save({
       id: 'cls2',
       name: 'Class 6B',
@@ -90,24 +94,25 @@ describe('Sport schema roundtrip', () => {
       teacher_id: 't1'
     });
 
-    const original: SportSchema.SportStudent = {
-      id: 'stu1',
-      class_id: 'cls2',
-      first_name: 'Lena',
-      last_name: 'Schmidt',
-      teacher_id: 't1',
-      gender: 'female',
-      is_dirty: 1,
-      public_code: 'ABC123',
-      settings: { needsHelp: true },
-      stats: { absences: 1 },
-      version: 2
+    const coreStudent = await coreStudentRepository.create({
+      firstName: 'Alex',
+      lastName: 'Beispiel',
+      dateOfBirth: '2012-04-11',
+      classGroupId: 'cls2'
+    });
+
+    const original: Omit<SportStudentProfile, 'id' | 'createdAt' | 'lastModified'> = {
+      studentId: coreStudent.id,
+      moduleKey: 'sport',
+      medicalNotes: 'Inhaler required',
+      asthma: true,
+      swimmingCapable: true
     };
 
-    await studentRepository.save(original);
-    const loaded = await studentRepository.findById(original.id);
+    const createdProfile = await studentRepository.create(original);
+    const loaded = await studentRepository.findById(createdProfile.id);
 
-    expect(loaded).toEqual(original);
+    expect(loaded).toMatchObject(original);
   });
 
   test('category schema roundtrip', async () => {

@@ -3,7 +3,11 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import type { ClassGroup, Student } from '@viccoboard/core';
+import type { StudentCsvFile, StudentImportPreview } from '@viccoboard/students';
 
+import demoStudents7a from '../assets/demo-import/students-7a.csv?raw';
+import demoStudents9b from '../assets/demo-import/students-9b.csv?raw';
+import demoStudents12a from '../assets/demo-import/students-12a.csv?raw';
 import { getSportBridge, initializeSportBridge } from './useSportBridge';
 import { getStudentsBridge, initializeStudentsBridge } from './useStudentsBridge';
 import { useToast } from './useToast';
@@ -12,7 +16,8 @@ export interface StudentFormState {
   firstName: string;
   lastName: string;
   classGroupId: string | null;
-  gender: 'm' | 'w' | null;
+  gender: 'm' | 'f' | null;
+  dateOfBirth: string;
   email: string;
   parentEmail: string;
   phone: string;
@@ -24,9 +29,16 @@ export interface StudentRow {
   lastName: string;
   className: string;
   genderLabel: string;
-  birthYear?: number;
+  dateOfBirth: string | null;
+  legacyFlag: boolean;
   original: Student;
 }
+
+const DEMO_IMPORT_FILES: StudentCsvFile[] = [
+  { fileName: 'students-7a.csv', content: demoStudents7a },
+  { fileName: 'students-9b.csv', content: demoStudents9b },
+  { fileName: 'students-12a.csv', content: demoStudents12a }
+];
 
 export function useStudentListView() {
   const { t } = useI18n();
@@ -46,29 +58,31 @@ export function useStudentListView() {
 
   const searchQuery = ref('');
   const filterClass = ref<string | null>(null);
-  const filterGender = ref<'m' | 'w' | null>(null);
+  const filterGender = ref<'m' | 'f' | null>(null);
   const selectedStudents = ref<StudentRow[]>([]);
 
   const showEditor = ref(false);
   const showImportDialog = ref(false);
   const editingStudent = ref<Student | null>(null);
   const saving = ref(false);
-
-  const currentYear = new Date().getFullYear();
+  const importBusy = ref(false);
+  const pendingImportFiles = ref<StudentCsvFile[]>([]);
+  const importPreview = ref<StudentImportPreview | null>(null);
+  const importLabel = ref('');
+  const importSourceType = ref<'demo' | 'live'>('live');
 
   const defaultStudentForm = (): StudentFormState => ({
     firstName: '',
     lastName: '',
     classGroupId: null,
     gender: null,
+    dateOfBirth: '',
     email: '',
     parentEmail: '',
     phone: ''
   });
 
   const studentForm = ref<StudentFormState>(defaultStudentForm());
-  const birthYearInput = ref('');
-  const csvData = ref('');
 
   const classOptions = computed(() =>
     classes.value.map((classGroup) => ({
@@ -79,7 +93,7 @@ export function useStudentListView() {
 
   const genderOptions = computed(() => [
     { label: t('SCHUELER.maennlich'), value: 'm' as const },
-    { label: t('SCHUELER.weiblich'), value: 'w' as const }
+    { label: t('SCHUELER.weiblich'), value: 'f' as const }
   ]);
 
   const classNameById = computed(() =>
@@ -93,7 +107,8 @@ export function useStudentListView() {
       lastName: student.lastName,
       className: classNameById.value.get(student.classGroupId) ?? '-',
       genderLabel: getGenderDisplay(student.gender),
-      birthYear: student.birthYear,
+      dateOfBirth: student.dateOfBirth,
+      legacyFlag: Boolean(student.legacyDateOfBirthMissing),
       original: student
     }))
   );
@@ -104,11 +119,11 @@ export function useStudentListView() {
     return studentRows.value.filter((student) => {
       const matchesQuery = query.length === 0
         || `${student.firstName} ${student.lastName}`.toLowerCase().includes(query)
-        || student.className.toLowerCase().includes(query);
+        || student.className.toLowerCase().includes(query)
+        || (student.dateOfBirth ?? '').includes(query);
 
       const matchesClass = !filterClass.value || student.original.classGroupId === filterClass.value;
-      const matchesGender = !filterGender.value
-        || student.original.gender === (filterGender.value === 'm' ? 'male' : 'female');
+      const matchesGender = !filterGender.value || student.original.gender === filterGender.value;
 
       return matchesQuery && matchesClass && matchesGender;
     });
@@ -127,8 +142,8 @@ export function useStudentListView() {
   });
 
   const genderStats = computed(() => ({
-    male: filteredStudents.value.filter((student) => student.original.gender === 'male').length,
-    female: filteredStudents.value.filter((student) => student.original.gender === 'female').length
+    male: filteredStudents.value.filter((student) => student.original.gender === 'm').length,
+    female: filteredStudents.value.filter((student) => student.original.gender === 'f').length
   }));
 
   async function loadData() {
@@ -151,16 +166,14 @@ export function useStudentListView() {
     }
   }
 
-  function getGenderDisplay(gender?: 'male' | 'female' | 'diverse'): string {
-    if (gender === 'male') return t('SCHUELER.maennlich');
-    if (gender === 'female') return t('SCHUELER.weiblich');
-    if (gender === 'diverse') return 'Divers';
+  function getGenderDisplay(gender?: 'm' | 'f'): string {
+    if (gender === 'm') return t('SCHUELER.maennlich');
+    if (gender === 'f') return t('SCHUELER.weiblich');
     return '-';
   }
 
   function resetForm() {
     studentForm.value = defaultStudentForm();
-    birthYearInput.value = '';
   }
 
   function resetFilters() {
@@ -181,12 +194,12 @@ export function useStudentListView() {
       firstName: student.firstName,
       lastName: student.lastName,
       classGroupId: student.classGroupId,
-      gender: student.gender === 'male' ? 'm' : student.gender === 'female' ? 'w' : null,
+      gender: student.gender ?? null,
+      dateOfBirth: student.dateOfBirth ?? '',
       email: student.contactInfo?.email || '',
       parentEmail: student.contactInfo?.parentEmail || '',
       phone: student.contactInfo?.phone || ''
     };
-    birthYearInput.value = student.birthYear ? String(student.birthYear) : '';
     showEditor.value = true;
   }
 
@@ -200,49 +213,28 @@ export function useStudentListView() {
     void router.push(`/students/${studentId}`);
   }
 
-  function parseBirthYear(): number | undefined {
-    const rawValue = birthYearInput.value.trim();
-
-    if (!rawValue) {
-      return undefined;
-    }
-
-    const parsed = Number.parseInt(rawValue, 10);
-
-    if (Number.isNaN(parsed) || parsed < 1900 || parsed > currentYear) {
-      throw new Error(`Geburtsjahr muss zwischen 1900 und ${currentYear} liegen.`);
-    }
-
-    return parsed;
-  }
-
   async function saveStudent() {
     const firstName = studentForm.value.firstName.trim();
     const lastName = studentForm.value.lastName.trim();
     const classGroupId = studentForm.value.classGroupId;
+    const dateOfBirth = studentForm.value.dateOfBirth.trim();
 
-    if (!firstName || !lastName || !classGroupId) {
-      toast.error('Bitte Vorname, Nachname und Klasse ausfüllen.');
+    if (!firstName || !lastName || !classGroupId || !dateOfBirth) {
+      toast.error('Bitte Vorname, Nachname, Klasse und Geburtsdatum ausfüllen.');
       return;
     }
 
     try {
       saving.value = true;
 
-      const birthYear = parseBirthYear();
-      const gender = studentForm.value.gender === 'm'
-        ? 'male'
-        : studentForm.value.gender === 'w'
-          ? 'female'
-          : undefined;
-
       if (editingStudent.value) {
         await studentsBridge.studentRepository.update(editingStudent.value.id, {
           firstName,
           lastName,
           classGroupId,
-          birthYear,
-          gender,
+          dateOfBirth,
+          gender: studentForm.value.gender ?? undefined,
+          legacyDateOfBirthMissing: false,
           contactInfo: {
             email: studentForm.value.email || undefined,
             parentEmail: studentForm.value.parentEmail || undefined,
@@ -255,8 +247,8 @@ export function useStudentListView() {
           firstName,
           lastName,
           classGroupId,
-          birthYear,
-          gender,
+          dateOfBirth,
+          gender: studentForm.value.gender ?? undefined,
           email: studentForm.value.email || undefined,
           parentEmail: studentForm.value.parentEmail || undefined,
           phone: studentForm.value.phone || undefined
@@ -316,50 +308,90 @@ export function useStudentListView() {
     toast.warning('Sammelverschiebung ist noch nicht umgesetzt.');
   }
 
-  async function importCSV() {
-    if (!csvData.value.trim()) {
-      toast.error('Keine Daten zum Importieren');
+  function resetImportState() {
+    pendingImportFiles.value = [];
+    importPreview.value = null;
+    importLabel.value = '';
+    importSourceType.value = 'live';
+  }
+
+  async function previewImport(files: StudentCsvFile[], sourceType: 'demo' | 'live', label: string) {
+    try {
+      importBusy.value = true;
+      pendingImportFiles.value = files;
+      importSourceType.value = sourceType;
+      importLabel.value = label;
+      importPreview.value = await studentsBridge.studentCsvImportUseCase.preview(files, sourceType, label);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Fehler bei der Importvorschau');
+    } finally {
+      importBusy.value = false;
+    }
+  }
+
+  async function handleCsvFileSelection(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files ? Array.from(input.files) : [];
+    if (files.length === 0) {
+      return;
+    }
+
+    const csvFiles = await Promise.all(files.map(async (file) => ({
+      fileName: file.name,
+      content: await file.text()
+    })));
+
+    await previewImport(csvFiles, 'live', 'Live-CSV-Import');
+    input.value = '';
+  }
+
+  async function previewDemoImport() {
+    await previewImport(DEMO_IMPORT_FILES, 'demo', 'RC-Demo-Import');
+  }
+
+  async function executeImport() {
+    if (!pendingImportFiles.value.length || !importPreview.value) {
+      toast.error('Keine Importvorschau vorhanden.');
       return;
     }
 
     try {
-      const lines = csvData.value.trim().split('\n');
-      let imported = 0;
-
-      for (const line of lines) {
-        const [firstName, lastName, className, gender, birthYearValue] = line.split(',').map((part) => part.trim());
-
-        if (!firstName || !lastName || !className) {
-          continue;
-        }
-
-        let classGroup = classes.value.find((entry) => entry.name === className);
-
-        if (!classGroup) {
-          classGroup = await sportBridge.classGroupRepository.create({
-            name: className,
-            schoolYear: String(currentYear)
-          });
-          classes.value.push(classGroup);
-        }
-
-        await studentsBridge.addStudentUseCase.execute({
-          firstName,
-          lastName,
-          classGroupId: classGroup.id,
-          gender: gender === 'm' ? 'male' : gender === 'w' ? 'female' : undefined,
-          birthYear: birthYearValue ? Number.parseInt(birthYearValue, 10) : undefined
-        });
-
-        imported += 1;
-      }
-
-      toast.success(`${imported} Schüler importiert`);
-      csvData.value = '';
+      importBusy.value = true;
+      const result = await studentsBridge.studentCsvImportUseCase.execute(
+        pendingImportFiles.value,
+        importSourceType.value,
+        importLabel.value
+      );
+      toast.success(
+        `${result.summary.imported} importiert, ${result.summary.skipped} übersprungen, ${result.summary.conflicts} Konflikte`
+      );
       showImportDialog.value = false;
+      resetImportState();
       await loadData();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Fehler beim Importieren');
+    } finally {
+      importBusy.value = false;
+    }
+  }
+
+  async function deleteDemoData() {
+    const confirmed = window.confirm('Alle importierten Demo-Daten wirklich löschen?');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      importBusy.value = true;
+      const result = await studentsBridge.studentCsvImportUseCase.deleteDemoData();
+      toast.success(
+        `${result.deletedStudents} Demo-Schüler und ${result.deletedClassGroups} Demo-Klassen gelöscht`
+      );
+      await loadData();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Fehler beim Löschen der Demo-Daten');
+    } finally {
+      importBusy.value = false;
     }
   }
 
@@ -380,16 +412,15 @@ export function useStudentListView() {
     showImportDialog,
     editingStudent,
     saving,
-    currentYear,
+    importBusy,
     studentForm,
-    birthYearInput,
-    csvData,
     classOptions,
     genderOptions,
     filteredStudents,
     hasActiveFilters,
     emptyStateMessage,
     genderStats,
+    importPreview,
     loadData,
     resetFilters,
     openCreateDialog,
@@ -400,6 +431,10 @@ export function useStudentListView() {
     deleteStudent,
     bulkDelete,
     bulkMoveToClass,
-    importCSV
+    handleCsvFileSelection,
+    previewDemoImport,
+    executeImport,
+    deleteDemoData,
+    resetImportState
   };
 }

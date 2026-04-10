@@ -100,8 +100,8 @@ describe('SaveCooperSessionUseCase', () => {
       classGroupId,
       firstName: 'Anna',
       lastName: 'Müller',
-      gender: 'female',
-      birthYear: 2009
+      gender: 'f',
+      dateOfBirth: '2009-05-14'
     });
     student1Id = s1.id;
 
@@ -109,8 +109,8 @@ describe('SaveCooperSessionUseCase', () => {
       classGroupId,
       firstName: 'Ben',
       lastName: 'Schmidt',
-      gender: 'male',
-      birthYear: 2009
+      gender: 'm',
+      dateOfBirth: '2009-02-09'
     });
     student2Id = s2.id;
   });

@@ -163,6 +163,7 @@ import { useSportBridge } from '../composables/useSportBridge';
 import { useStudents } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import type { Sport} from '@viccoboard/core';
+import { calculateAgeFromDateOfBirth } from '@viccoboard/core';
 import type { SportabzeichenReportEntry } from '@viccoboard/sport';
 
 const { t } = useI18n();
@@ -258,8 +259,7 @@ async function onPerformanceChange(studentId: string) {
   }
 
   const student = students.value.find(s => s.id === studentId);
-  if (!student || !student.birthYear) {
-    // If no birth year, cannot calculate age-based level
+  if (!student?.dateOfBirth) {
     levels.value[studentId] = 'none';
     return;
   }
@@ -271,8 +271,12 @@ async function onPerformanceChange(studentId: string) {
     return;
   }
 
-  const age = service.calculateAgeFromBirthYear(student.birthYear, new Date());
-  const gender: Sport.SportabzeichenGender = student.gender || 'diverse';
+  const age = calculateAgeFromDateOfBirth(student.dateOfBirth, new Date());
+  if (age === null) {
+    levels.value[studentId] = 'none';
+    return;
+  }
+  const gender: Sport.SportabzeichenGender = student.gender === 'm' ? 'male' : 'female';
 
   // Evaluate performance using service with all standards
   const achievedLevel = service.evaluatePerformance(allStandards.value, {
@@ -312,8 +316,8 @@ async function saveAll() {
         continue;
       }
 
-      if (!student.birthYear) {
-        console.warn(`Student ${student.id} has no birth year, skipping`);
+      if (!student.dateOfBirth) {
+        console.warn(`Student ${student.id} has no date of birth, skipping`);
         continue;
       }
 
@@ -323,13 +327,13 @@ async function saveAll() {
         continue;
       }
 
-      const gender: Sport.SportabzeichenGender = student.gender || 'diverse';
+      const gender: Sport.SportabzeichenGender = student.gender === 'm' ? 'male' : 'female';
 
       // Save result using use case
       const result = await useCase.execute({
         studentId: student.id,
         disciplineId,
-        birthYear: student.birthYear,
+        dateOfBirth: student.dateOfBirth,
         gender,
         performanceValue: performance,
         unit: discipline.measurementUnit,
@@ -369,8 +373,8 @@ async function exportPdf() {
     // Build report data
     const entries: SportabzeichenReportEntry[] = students.value.map(student => {
       const results = studentResults.value[student.id] || [];
-      const age = student.birthYear ? service.calculateAgeFromBirthYear(student.birthYear) : 0;
-      const gender: Sport.SportabzeichenGender = student.gender || 'diverse';
+      const age = calculateAgeFromDateOfBirth(student.dateOfBirth, new Date()) ?? 0;
+      const gender: Sport.SportabzeichenGender = student.gender === 'm' ? 'male' : 'female';
       const overallLevel = getOverallLevel(student.id);
 
       return {
