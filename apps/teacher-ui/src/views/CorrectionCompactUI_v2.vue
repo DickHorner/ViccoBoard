@@ -219,10 +219,12 @@ import {
   type AlternativeGradeType,
 } from '@viccoboard/exams';
 import { useExamsBridge } from '../composables/useExamsBridge';
+import { useToast } from '../composables/useToast';
 import { downloadBytes } from '../utils/download';
 
 const router = useRouter();
 const route = useRoute();
+const toast = useToast();
 const {
   getExam,
   findCorrectionsByExam,
@@ -500,7 +502,12 @@ async function exportCurrentCandidate(): Promise<void> {
     return;
   }
 
-  await saveCurrentCandidate(false);
+  const correction = corrections.value.get(currentCandidate.value.id);
+  if (correction?.status !== 'completed') {
+    toast.warning('Diese Korrektur ist noch nicht abgeschlossen. Bitte schließen Sie die Korrektur ab, bevor Sie exportieren.');
+    return;
+  }
+
   const pdfDocument = await exportCurrentCorrectionSheetPdf(exam.value.id, currentCandidate.value.id);
   downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
 }
@@ -510,7 +517,12 @@ async function exportAllCandidates(): Promise<void> {
     return;
   }
 
-  await saveCurrentCandidate(false);
+  const completedCount = [...corrections.value.values()].filter((c) => c.status === 'completed').length;
+  if (completedCount === 0) {
+    toast.warning('Es gibt noch keine abgeschlossenen Korrekturen. Der Sammel-Export erfordert mindestens eine abgeschlossene Korrektur.');
+    return;
+  }
+
   const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id);
   downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
 }

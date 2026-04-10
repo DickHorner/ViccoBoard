@@ -58,7 +58,8 @@ describe('KBR correction sheet workflow', () => {
     );
     exportSheetsUseCase = new ExportCorrectionSheetsPdfUseCase(
       examRepository,
-      buildProjectionUseCase
+      buildProjectionUseCase,
+      correctionRepository
     );
   });
 
@@ -320,5 +321,138 @@ describe('KBR correction sheet workflow', () => {
     expect(allPdf.fileName).toContain('rueckmeldeboegen');
     expect(allPdf.candidateCount).toBe(2);
     expect(allDocument.getPageCount()).toBe(2);
+  });
+
+  test('single export is blocked when correction is in-progress', async () => {
+    const exam = await createExam();
+
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 5, maxPoints: 10, comment: '', timestamp: new Date() },
+        { taskId: 'task-2', points: 8, maxPoints: 15, comment: '', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: false
+    });
+
+    await expect(
+      exportSheetsUseCase.exportCurrentCandidatePdf(exam.id, 'cand-1')
+    ).rejects.toThrow(/noch nicht abgeschlossen/);
+  });
+
+  test('single export is blocked when no correction exists', async () => {
+    const exam = await createExam();
+
+    await expect(
+      exportSheetsUseCase.exportCurrentCandidatePdf(exam.id, 'cand-1')
+    ).rejects.toThrow(/Keine Korrektur/);
+  });
+
+  test('bulk export only includes completed corrections in mixed exam', async () => {
+    const exam = await createExam();
+
+    await savePresetUseCase.execute({
+      ...createDefaultCorrectionSheetPreset(exam.id),
+      examId: exam.id
+    });
+
+    // cand-1: completed
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 9, maxPoints: 10, comment: 'Gut', timestamp: new Date() },
+        { taskId: 'task-2', points: 13, maxPoints: 15, comment: 'Sehr gut', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: true
+    });
+
+    // cand-2: in-progress, not finalized
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-2',
+      taskScores: [
+        { taskId: 'task-1', points: 4, maxPoints: 10, comment: '', timestamp: new Date() },
+        { taskId: 'task-2', points: 6, maxPoints: 15, comment: '', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: false
+    });
+
+    const allPdf = await exportSheetsUseCase.exportAllCandidatesPdf(exam.id);
+    const allDocument = await PDFDocument.load(allPdf.bytes);
+
+    // Only cand-1 (completed) must appear
+    expect(allPdf.candidateCount).toBe(1);
+    expect(allDocument.getPageCount()).toBe(1);
+  });
+
+  test('bulk export throws when no completed corrections exist', async () => {
+    const exam = await createExam();
+
+    // Both candidates have in-progress corrections
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 5, maxPoints: 10, comment: '', timestamp: new Date() },
+        { taskId: 'task-2', points: 7, maxPoints: 15, comment: '', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: false
+    });
+
+    await expect(
+      exportSheetsUseCase.exportAllCandidatesPdf(exam.id)
+    ).rejects.toThrow(/mindestens eine abgeschlossene Korrektur/);
+  });
+
+  test('bulk export throws when no corrections exist at all', async () => {
+    const exam = await createExam();
+
+    await expect(
+      exportSheetsUseCase.exportAllCandidatesPdf(exam.id)
+    ).rejects.toThrow(/mindestens eine abgeschlossene Korrektur/);
+  });
+
+  test('projection use case rejects non-completed correction by default', async () => {
+    const exam = await createExam();
+
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 5, maxPoints: 10, comment: '', timestamp: new Date() },
+        { taskId: 'task-2', points: 7, maxPoints: 15, comment: '', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: false
+    });
+
+    await expect(
+      buildProjectionUseCase.execute(exam.id, 'cand-1')
+    ).rejects.toThrow(/noch nicht abgeschlossen/);
+  });
+
+  test('projection use case allows non-completed correction with allowIncomplete option', async () => {
+    const exam = await createExam();
+
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 5, maxPoints: 10, comment: '', timestamp: new Date() },
+        { taskId: 'task-2', points: 7, maxPoints: 15, comment: '', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: false
+    });
+
+    const projection = await buildProjectionUseCase.execute(exam.id, 'cand-1', { allowIncomplete: true });
+    expect(projection.candidateId).toBe('cand-1');
+    expect(projection.totalPoints).toBe(12);
   });
 });

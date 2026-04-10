@@ -30,6 +30,11 @@ function resolveGeneralComment(
   return latestComment?.text?.trim() || undefined;
 }
 
+export interface BuildCorrectionSheetProjectionOptions {
+  /** When true, allows building projections for non-completed corrections (for preview only). Default: false. */
+  allowIncomplete?: boolean;
+}
+
 export class BuildCorrectionSheetProjectionUseCase {
   constructor(
     private readonly examRepository: ExamRepository,
@@ -39,7 +44,8 @@ export class BuildCorrectionSheetProjectionUseCase {
 
   async execute(
     examId: string,
-    candidateId: string
+    candidateId: string,
+    options: BuildCorrectionSheetProjectionOptions = {}
   ): Promise<Exams.CorrectionSheetProjection> {
     const exam = await this.examRepository.findById(examId);
     if (!exam) {
@@ -57,6 +63,12 @@ export class BuildCorrectionSheetProjectionUseCase {
     );
     if (!correction) {
       throw new Error(`Correction for candidate ${candidateId} not found`);
+    }
+
+    if (!options.allowIncomplete && correction.status !== 'completed') {
+      throw new Error(
+        `Korrektur für Prüfling ${candidateId} ist noch nicht abgeschlossen (Status: ${correction.status}). Nur abgeschlossene Korrekturen können als Druckbogen ausgegeben werden.`
+      );
     }
 
     const preset = await this.getCorrectionSheetPresetUseCase.execute(examId);

@@ -1,4 +1,5 @@
 import { Exams } from '@viccoboard/core';
+import type { CorrectionEntryRepository } from '../repositories/correction-entry.repository';
 import type { ExamRepository } from '../repositories/exam.repository';
 import { BuildCorrectionSheetProjectionUseCase } from './build-correction-sheet-projection.use-case';
 import {
@@ -10,6 +11,7 @@ export class ExportCorrectionSheetsPdfUseCase {
   constructor(
     private readonly examRepository: ExamRepository,
     private readonly buildCorrectionSheetProjectionUseCase: BuildCorrectionSheetProjectionUseCase,
+    private readonly correctionEntryRepository: CorrectionEntryRepository,
     private readonly renderer: CorrectionSheetPdfRenderer = new CorrectionSheetPdfRenderer()
   ) {}
 
@@ -17,6 +19,23 @@ export class ExportCorrectionSheetsPdfUseCase {
     examId: string,
     candidateId: string
   ): Promise<Exams.CorrectionSheetPdfDocument> {
+    const correction = await this.correctionEntryRepository.findByExamAndCandidate(
+      examId,
+      candidateId
+    );
+
+    if (!correction) {
+      throw new Error(
+        `Keine Korrektur für Prüfling ${candidateId} vorhanden. Export nicht möglich.`
+      );
+    }
+
+    if (correction.status !== 'completed') {
+      throw new Error(
+        `Die Korrektur für Prüfling ${candidateId} ist noch nicht abgeschlossen (Status: ${correction.status}). Nur abgeschlossene Korrekturen können exportiert werden.`
+      );
+    }
+
     const projection = await this.buildCorrectionSheetProjectionUseCase.execute(
       examId,
       candidateId
@@ -44,8 +63,25 @@ export class ExportCorrectionSheetsPdfUseCase {
       throw new Error('Exam has no candidates');
     }
 
+    const allCorrections = await this.correctionEntryRepository.findByExam(examId);
+    const completedCandidateIds = new Set(
+      allCorrections
+        .filter((c) => c.status === 'completed')
+        .map((c) => c.candidateId)
+    );
+
+    const completedCandidates = exam.candidates.filter((candidate) =>
+      completedCandidateIds.has(candidate.id)
+    );
+
+    if (completedCandidates.length === 0) {
+      throw new Error(
+        'Keine abgeschlossenen Korrekturen vorhanden. Der Sammel-Export erfordert mindestens eine abgeschlossene Korrektur.'
+      );
+    }
+
     const projections: Exams.CorrectionSheetProjection[] = [];
-    for (const candidate of exam.candidates) {
+    for (const candidate of completedCandidates) {
       projections.push(
         await this.buildCorrectionSheetProjectionUseCase.execute(examId, candidate.id)
       );
