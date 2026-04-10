@@ -219,10 +219,12 @@ import {
   type AlternativeGradeType,
 } from '@viccoboard/exams';
 import { useExamsBridge } from '../composables/useExamsBridge';
+import { useToast } from '../composables/useToast';
 import { downloadBytes } from '../utils/download';
 
 const router = useRouter();
 const route = useRoute();
+const toast = useToast();
 const {
   getExam,
   findCorrectionsByExam,
@@ -502,7 +504,7 @@ async function exportCurrentCandidate(): Promise<void> {
 
   const correction = corrections.value.get(currentCandidate.value.id);
   if (correction?.status !== 'completed') {
-    alert('Diese Korrektur ist noch nicht abgeschlossen. Bitte schließen Sie die Korrektur ab, bevor Sie exportieren.');
+    toast.warning('Diese Korrektur ist noch nicht abgeschlossen. Bitte schließen Sie die Korrektur ab, bevor Sie exportieren.');
     return;
   }
 
@@ -517,7 +519,7 @@ async function exportAllCandidates(): Promise<void> {
 
   const completedCount = [...corrections.value.values()].filter((c) => c.status === 'completed').length;
   if (completedCount === 0) {
-    alert('Es gibt noch keine abgeschlossenen Korrekturen. Der Sammel-Export erfordert mindestens eine abgeschlossene Korrektur.');
+    toast.warning('Es gibt noch keine abgeschlossenen Korrekturen. Der Sammel-Export erfordert mindestens eine abgeschlossene Korrektur.');
     return;
   }
 
