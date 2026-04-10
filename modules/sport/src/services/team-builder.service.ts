@@ -112,10 +112,10 @@ export class TeamBuilderService {
    * a subsequent round-robin assignment gives each team a proportional mix.
    */
   private orderGenderBalanced(students: TeamStudent[]): string[] {
-    const males   = this.shuffle(students.filter(s => s.gender === 'male').map(s => s.id));
-    const females = this.shuffle(students.filter(s => s.gender === 'female').map(s => s.id));
+    const males   = this.shuffle(students.filter(s => s.gender === 'm').map(s => s.id));
+    const females = this.shuffle(students.filter(s => s.gender === 'f').map(s => s.id));
     const others  = this.shuffle(
-      students.filter(s => !s.gender || (s.gender !== 'male' && s.gender !== 'female')).map(s => s.id)
+      students.filter(s => !s.gender || (s.gender !== 'm' && s.gender !== 'f')).map(s => s.id)
     );
 
     const interleaved: string[] = [];
