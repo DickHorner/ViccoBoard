@@ -144,7 +144,8 @@ export function initializeExamsBridge(): ExamsBridge {
   );
   const exportCorrectionSheetsPdfUseCase = new ExportCorrectionSheetsPdfUseCase(
     examRepo,
-    buildCorrectionSheetProjectionUseCase
+    buildCorrectionSheetProjectionUseCase,
+    correctionEntryRepo
   );
 
   examsBridgeInstance = {
@@ -184,7 +185,7 @@ export function initializeExamsBridge(): ExamsBridge {
     saveCorrectionSheetPreset: (input) =>
       saveCorrectionSheetPresetUseCase.execute(input),
     buildCorrectionSheetPreview: (examId, candidateId) =>
-      buildCorrectionSheetProjectionUseCase.execute(examId, candidateId),
+      buildCorrectionSheetProjectionUseCase.execute(examId, candidateId, { allowIncomplete: true }),
     exportCurrentCorrectionSheetPdf: (examId, candidateId) =>
       exportCorrectionSheetsPdfUseCase.exportCurrentCandidatePdf(examId, candidateId),
     exportAllCorrectionSheetsPdf: (examId) =>

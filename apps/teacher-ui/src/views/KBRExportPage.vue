@@ -5,7 +5,7 @@
         <h1>Rückmeldebögen exportieren</h1>
         <p v-if="exam" class="subtitle">
           {{ exam.title }} · {{ exam.candidates.length }} Prüflinge ·
-          {{ correctedCandidateCount }} korrigiert
+          {{ completedCandidateCount }} abgeschlossen
         </p>
       </div>
       <div class="header-actions">
@@ -26,8 +26,8 @@
         <div class="panel-header">
           <h2>Prüflinge</h2>
           <p class="panel-copy">
-            Einzelbögen funktionieren für bereits gespeicherte Korrekturen. Der Sammel-Export wird aktiv,
-            sobald alle Prüflinge mindestens einen Korrekturstand haben.
+            Einzelbögen können nur für abgeschlossene Korrekturen exportiert werden. Der Sammel-Export
+            wird aktiv, sobald mindestens eine Korrektur abgeschlossen ist.
           </p>
         </div>
 
@@ -43,8 +43,8 @@
               <strong>{{ candidate.firstName }} {{ candidate.lastName }}</strong>
               <p v-if="candidate.externalId" class="candidate-meta">{{ candidate.externalId }}</p>
             </div>
-            <span :class="['candidate-status', hasCorrection(candidate.id) ? 'ready' : 'missing']">
-              {{ hasCorrection(candidate.id) ? 'bereit' : 'offen' }}
+            <span :class="['candidate-status', candidateStatusClass(candidate.id)]">
+              {{ candidateStatusLabel(candidate.id) }}
             </span>
           </button>
         </div>
@@ -177,15 +177,19 @@ const selectedCandidate = computed(() =>
   exam.value?.candidates.find((candidate) => candidate.id === selectedCandidateId.value) ?? null
 )
 
-const correctedCandidateCount = computed(() => corrections.value.size)
+const completedCandidateCount = computed(() =>
+  [...corrections.value.values()].filter((c) => c.status === 'completed').length
+)
 const canExportCurrent = computed(() => {
-  return Boolean(exam.value && selectedCandidate.value && corrections.value.has(selectedCandidate.value.id))
+  if (!exam.value || !selectedCandidate.value) return false
+  const correction = corrections.value.get(selectedCandidate.value.id)
+  return correction?.status === 'completed'
 })
 const canExportAll = computed(() => {
   return Boolean(
     exam.value &&
     exam.value.candidates.length > 0 &&
-    exam.value.candidates.every((candidate) => corrections.value.has(candidate.id))
+    [...corrections.value.values()].some((c) => c.status === 'completed')
   )
 })
 
@@ -201,8 +205,22 @@ const formattedExamDate = computed(() => {
   }).format(new Date(projection.value.examDate))
 })
 
-function hasCorrection(candidateId: string): boolean {
-  return corrections.value.has(candidateId)
+function correctionStatus(candidateId: string): Exams.CorrectionEntry['status'] | null {
+  return corrections.value.get(candidateId)?.status ?? null
+}
+
+function candidateStatusClass(candidateId: string): string {
+  const status = correctionStatus(candidateId)
+  if (status === 'completed') return 'completed'
+  if (status === 'in-progress') return 'in-progress'
+  return 'missing'
+}
+
+function candidateStatusLabel(candidateId: string): string {
+  const status = correctionStatus(candidateId)
+  if (status === 'completed') return 'abgeschlossen'
+  if (status === 'in-progress') return 'in Bearbeitung'
+  return 'offen'
 }
 
 async function loadPreview(candidateId: string): Promise<void> {
@@ -213,8 +231,17 @@ async function loadPreview(candidateId: string): Promise<void> {
     return
   }
 
-  if (!corrections.value.has(candidateId)) {
-    previewError.value = 'Für diesen Prüfling gibt es noch keine gespeicherte Korrektur.'
+  const correction = corrections.value.get(candidateId)
+  if (!correction) {
+    previewError.value = 'Für diesen Prüfling gibt es noch keine Korrektur.'
+    return
+  }
+
+  if (correction.status !== 'completed') {
+    previewError.value =
+      correction.status === 'in-progress'
+        ? 'Die Korrektur dieses Prüflings ist noch nicht abgeschlossen. Erst nach dem Abschluss kann ein Druckbogen exportiert werden.'
+        : 'Für diesen Prüfling wurde noch keine Korrektur begonnen.'
     return
   }
 
@@ -262,7 +289,7 @@ async function loadPage(): Promise<void> {
       : ''
     const fallbackCandidate =
       loadedExam.candidates.find((candidate: ExamCandidate) => candidate.id === requestedCandidateId) ??
-      loadedExam.candidates.find((candidate: ExamCandidate) => corrections.value.has(candidate.id)) ??
+      loadedExam.candidates.find((candidate: ExamCandidate) => corrections.value.get(candidate.id)?.status === 'completed') ??
       loadedExam.candidates[0]
 
     if (fallbackCandidate) {
@@ -441,9 +468,14 @@ onMounted(() => {
   font-weight: 700;
 }
 
-.candidate-status.ready {
+.candidate-status.completed {
   background: rgba(22, 163, 74, 0.16);
   color: #166534;
+}
+
+.candidate-status.in-progress {
+  background: rgba(234, 179, 8, 0.16);
+  color: #854d0e;
 }
 
 .candidate-status.missing {
