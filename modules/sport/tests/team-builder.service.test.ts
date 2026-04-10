@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from '@jest/globals';
 import { TeamBuilderService, TeamConstraintError } from '../src/services/team-builder.service';
 import type { TeamStudent } from '../src/services/team-builder.service';
 
-const makeStudents = (specs: Array<{ id: string; gender?: string; performanceScore?: number }>) =>
+const makeStudents = (specs: Array<{ id: string; gender?: 'm' | 'f'; performanceScore?: number }>) =>
   specs.map(s => ({ id: s.id, gender: s.gender, performanceScore: s.performanceScore }));
 
 describe('TeamBuilderService', () => {
@@ -95,10 +95,10 @@ describe('TeamBuilderService', () => {
   describe('gender-balanced algorithm', () => {
     it('should create the requested number of teams', () => {
       const students = makeStudents([
-        { id: 'm1', gender: 'male' },
-        { id: 'f1', gender: 'female' },
-        { id: 'm2', gender: 'male' },
-        { id: 'f2', gender: 'female' }
+        { id: 'm1', gender: 'm' },
+        { id: 'f1', gender: 'f' },
+        { id: 'm2', gender: 'm' },
+        { id: 'f2', gender: 'f' }
       ]);
       const teams = service.buildTeams({
         students,
@@ -111,10 +111,10 @@ describe('TeamBuilderService', () => {
 
     it('should assign every student exactly once', () => {
       const students = makeStudents([
-        { id: 'm1', gender: 'male' },
-        { id: 'm2', gender: 'male' },
-        { id: 'f1', gender: 'female' },
-        { id: 'f2', gender: 'female' },
+        { id: 'm1', gender: 'm' },
+        { id: 'm2', gender: 'm' },
+        { id: 'f1', gender: 'f' },
+        { id: 'f2', gender: 'f' },
         { id: 'o1' }
       ]);
       const teams = service.buildTeams({
@@ -129,10 +129,10 @@ describe('TeamBuilderService', () => {
 
     it('should spread males evenly across teams', () => {
       const students = makeStudents([
-        { id: 'm1', gender: 'male' },
-        { id: 'm2', gender: 'male' },
-        { id: 'm3', gender: 'male' },
-        { id: 'm4', gender: 'male' }
+        { id: 'm1', gender: 'm' },
+        { id: 'm2', gender: 'm' },
+        { id: 'm3', gender: 'm' },
+        { id: 'm4', gender: 'm' }
       ]);
       const teams = service.buildTeams({
         students,
@@ -148,11 +148,11 @@ describe('TeamBuilderService', () => {
 
     it('should give each team at most 1 more student than another', () => {
       const students = makeStudents([
-        { id: 'm1', gender: 'male' },
-        { id: 'm2', gender: 'male' },
-        { id: 'f1', gender: 'female' },
-        { id: 'f2', gender: 'female' },
-        { id: 'f3', gender: 'female' }
+        { id: 'm1', gender: 'm' },
+        { id: 'm2', gender: 'm' },
+        { id: 'f1', gender: 'f' },
+        { id: 'f2', gender: 'f' },
+        { id: 'f3', gender: 'f' }
       ]);
       const teams = service.buildTeams({
         students,
@@ -166,9 +166,9 @@ describe('TeamBuilderService', () => {
 
     it('should handle all-same-gender input gracefully', () => {
       const students = makeStudents([
-        { id: 'm1', gender: 'male' },
-        { id: 'm2', gender: 'male' },
-        { id: 'm3', gender: 'male' }
+        { id: 'm1', gender: 'm' },
+        { id: 'm2', gender: 'm' },
+        { id: 'm3', gender: 'm' }
       ]);
       const teams = service.buildTeams({
         students,

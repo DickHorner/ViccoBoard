@@ -3,7 +3,7 @@ export type TeamBasis = 'gender' | 'performance' | 'performanceRating';
 
 export interface TeamStudent {
   id: string;
-  gender?: string | null;
+  gender?: 'm' | 'f' | null;
   performanceScore?: number | null;
   performanceRating?: number | null;
 }
