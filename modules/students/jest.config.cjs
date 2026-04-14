@@ -12,6 +12,8 @@ module.exports = {
       {
         useESM: false,
         tsconfig: {
+          lib: ['ES2020', 'DOM'],
+          types: ['jest', 'node'],
           allowSyntheticDefaultImports: true,
           esModuleInterop: true
         }

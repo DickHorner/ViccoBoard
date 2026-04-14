@@ -461,7 +461,7 @@ describe('LongTermNoteManagementService', () => {
         growth
       );
 
-      expect(result).toContain('Long-Term Development Summary');
+      expect(result).toContain('Langzeitentwicklungsübersicht');
       expect(result).toContain('2024-2025');
       expect(result).toContain('Logical thinking');
       expect(result).toContain('Geometry');
