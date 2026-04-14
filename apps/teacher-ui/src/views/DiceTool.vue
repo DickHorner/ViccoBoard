@@ -77,6 +77,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { ClassGroup } from '@viccoboard/core'
+import { formatGermanTime } from '../utils/locale-format'
 
 const { t } = useI18n()
 
@@ -139,7 +140,7 @@ async function roll() {
 }
 
 function formatTime(date: Date): string {
-  return date.toLocaleTimeString()
+  return formatGermanTime(date)
 }
 
 onMounted(async () => {

@@ -17,7 +17,12 @@ export { StudentLongTermNoteRepository } from './repositories/student-long-term-
 export type { StudentLongTermNote, CompetencyArea, DevelopmentNote } from './repositories/student-long-term-note.repository.js';
 
 // Services
-export { GradingKeyService, GERMAN_1_6_PRESET, GERMAN_0_15_PRESET } from './services/grading-key.service.js';
+export {
+  GradingKeyService,
+  GERMAN_1_6_PRESET,
+  GERMAN_0_15_PRESET,
+  KBR_GRADING_PRESETS
+} from './services/grading-key.service.js';
 export {
   GradingKeyEngine,
   GradingKeyUIHelper,

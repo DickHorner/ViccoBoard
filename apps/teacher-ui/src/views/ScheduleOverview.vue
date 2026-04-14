@@ -78,6 +78,7 @@ import { RouterLink } from 'vue-router'
 import { useClassGroups, useLessons } from '../composables/useSportBridge'
 import { getDashboardLessonState } from '../utils/dashboard-workspace'
 import type { ClassGroup, Lesson } from '@viccoboard/core'
+import { formatGermanDateTime, formatGermanTime } from '../utils/locale-format'
 
 const classGroups = useClassGroups()
 const lessonsRepository = useLessons()
@@ -143,13 +144,11 @@ const getClassName = (classGroupId: string): string =>
   classesById.value.get(classGroupId)?.name ?? 'Unbekannte Klasse'
 
 const formatLessonTime = (date: Date): string =>
-  new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  formatGermanTime(date)
 
 const formatLessonDateTime = (date: Date): string =>
-  new Date(date).toLocaleString([], {
-    weekday: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
+  formatGermanDateTime(date, {
+    weekday: 'short'
   })
 
 onMounted(() => {

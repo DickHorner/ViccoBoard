@@ -578,6 +578,7 @@ const saveExam = async () => {
       title: formData.title.trim(),
       description: formData.description.trim() || undefined,
       date: formData.date ? new Date(`${formData.date}T00:00:00`) : undefined,
+      assessmentFormat: 'klausur',
       mode: 'simple' as Exams.ExamMode,
       structure: {
         parts: [],
@@ -605,6 +606,7 @@ const saveExam = async () => {
         lastName: candidate.lastName.trim(),
         externalId: candidate.externalId?.trim() || undefined
       })),
+      candidateGroups: [],
       status: 'draft',
       createdAt: new Date(),
       lastModified: new Date()

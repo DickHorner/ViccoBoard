@@ -279,7 +279,7 @@ const handleDrop = (event: DragEvent) => {
     // Attempt reordering based on context
     if (props.level === 1 && fromLevel === 1) {
       // Root level reorder
-      const fromPos = store.tasks.findIndex(t => t.id === taskId)
+      const fromPos = store.tasks.findIndex((t: TaskDraft) => t.id === taskId)
       if (fromPos !== -1) {
         store.moveTask(store.tasks, fromPos, props.index - fromPos)
       }
@@ -290,7 +290,7 @@ const handleDrop = (event: DragEvent) => {
         toast.warning('Aufgaben können nicht zwischen verschiedenen Teilaufgabenlisten verschoben werden.')
         return
       }
-      const fromPos = props.parentTask.subtasks.findIndex(t => t.id === taskId)
+      const fromPos = props.parentTask.subtasks.findIndex((t: TaskDraft) => t.id === taskId)
       if (fromPos !== -1) {
         store.moveTask(props.parentTask.subtasks, fromPos, props.index - fromPos)
       }

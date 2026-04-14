@@ -27,7 +27,7 @@
           <div class="student-avatar">{{ initials }}</div>
           <div class="student-info">
             <h3>{{ student.firstName }} {{ student.lastName }}</h3>
-            <p v-if="student.dateOfBirth" class="meta">Geburtsdatum {{ student.dateOfBirth }}</p>
+            <p v-if="student.dateOfBirth" class="meta">Geburtsdatum {{ formatGermanDateOfBirth(student.dateOfBirth) }}</p>
             <p v-if="student.contactInfo?.email" class="meta">{{ student.contactInfo.email }}</p>
             <p v-if="className" class="meta class-badge">{{ className }}</p>
           </div>
@@ -83,7 +83,7 @@
             :key="record.id"
             class="attendance-row"
           >
-            <span class="record-date">{{ formatDateDe(record.timestamp) }}</span>
+            <span class="record-date">{{ formatDateTimeDe(record.timestamp) }}</span>
             <span :class="['record-status', attendanceStatusClass(record.status)]">
               {{ attendanceStatusLabel(record.status) }}
             </span>
@@ -104,7 +104,7 @@
             :key="entry.id"
             class="performance-row"
           >
-            <span class="record-date">{{ formatDateDe(entry.timestamp) }}</span>
+            <span class="record-date">{{ formatDateTimeDe(entry.timestamp) }}</span>
             <span class="category-name">{{ getCategoryName(entry.categoryId) }}</span>
             <span v-if="entry.calculatedGrade !== undefined && entry.calculatedGrade !== null" class="grade-badge">
               Note: {{ entry.calculatedGrade }}
@@ -133,10 +133,12 @@ import {
   buildAttendanceSummary,
   buildPerformanceSummary,
   formatDateDe,
+  formatDateTimeDe,
   getStudentInitials,
   attendanceStatusLabel,
   attendanceStatusClass
 } from '../utils/student-profile'
+import { formatGermanDateOfBirth } from '../utils/locale-format'
 import type { Student, AttendanceRecord } from '@viccoboard/core'
 import type { Sport } from '@viccoboard/core'
 

@@ -56,6 +56,23 @@ export class ExamValidator {
       errors.push('Mode must be either "simple" or "complex"');
     }
 
+    if (
+      data.assessmentFormat &&
+      ![
+        'klausur',
+        'test',
+        'mappenkorrektur',
+        'portfolio',
+        'referat',
+        'referatsrueckmeldung',
+        'facharbeit',
+        'muendliche-pruefung',
+        'gruppenarbeit'
+      ].includes(data.assessmentFormat)
+    ) {
+      errors.push('Assessment format is invalid');
+    }
+
     // Structure validation
     if (data.structure) {
       const structureErrors = this.validateStructure(data.structure);
@@ -78,15 +95,18 @@ export class ExamValidator {
         if (!candidate.id || typeof candidate.id !== 'string') {
           errors.push(`Candidate at index ${index}: ID is required and must be a string`);
         }
-        if (!candidate.name || typeof candidate.name !== 'string') {
-          errors.push(`Candidate at index ${index}: Name is required and must be a string`);
+        if (!candidate.firstName || typeof candidate.firstName !== 'string') {
+          errors.push(`Candidate at index ${index}: First name is required and must be a string`);
+        }
+        if (!candidate.lastName || typeof candidate.lastName !== 'string') {
+          errors.push(`Candidate at index ${index}: Last name is required and must be a string`);
         }
       });
     }
 
     // Status validation
-    if (data.status && !['draft', 'active', 'archived'].includes(data.status)) {
-      errors.push('Status must be one of: draft, active, archived');
+    if (data.status && !['draft', 'in-progress', 'completed'].includes(data.status)) {
+      errors.push('Status must be one of: draft, in-progress, completed');
     }
 
     return {
@@ -125,11 +145,11 @@ export class ExamValidator {
         if (!part.id || typeof part.id !== 'string') {
           errors.push(`Part at index ${index}: ID is required and must be a string`);
         }
-        if (!part.title || typeof part.title !== 'string') {
-          errors.push(`Part at index ${index}: Title is required and must be a string`);
+        if (!part.name || typeof part.name !== 'string') {
+          errors.push(`Part at index ${index}: Name is required and must be a string`);
         }
-        if (part.title && part.title.length > 200) {
-          errors.push(`Part at index ${index}: Title must not exceed 200 characters`);
+        if (part.name && part.name.length > 200) {
+          errors.push(`Part at index ${index}: Name must not exceed 200 characters`);
         }
       });
     }
@@ -154,8 +174,8 @@ export class ExamValidator {
 
     // Validate each grade boundary
     gradingKey.gradeBoundaries.forEach((boundary: any, index: number) => {
-      if (!boundary.grade || typeof boundary.grade !== 'string') {
-        errors.push(`Grade boundary at index ${index}: Grade is required and must be a string`);
+      if (boundary.grade === undefined || (typeof boundary.grade !== 'string' && typeof boundary.grade !== 'number')) {
+        errors.push(`Grade boundary at index ${index}: Grade is required and must be a string or number`);
       }
       if (typeof boundary.minPercentage !== 'number') {
         errors.push(`Grade boundary at index ${index}: minPercentage must be a number`);

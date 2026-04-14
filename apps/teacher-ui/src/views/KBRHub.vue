@@ -74,6 +74,7 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
+import { formatGermanDate } from '../utils/locale-format'
 
 const { examRepository } = useExamsBridge()
 const { supportTipRepository, studentLongTermNoteRepository } = useExamsBridge()
@@ -122,11 +123,7 @@ const loadData = async () => {
 }
 
 const formatDate = (date: Date): string =>
-  new Date(date).toLocaleDateString([], {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
+  formatGermanDate(date)
 
 onMounted(() => {
   loadData()

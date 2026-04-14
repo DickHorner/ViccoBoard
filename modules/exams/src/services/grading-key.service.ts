@@ -157,25 +157,25 @@ export class GradingKeyService {
 
 // German grading presets
 export const GERMAN_1_6_PRESET: Exams.GradingPreset = {
-  id: 'german-1-6-standard',
-  name: 'German 1-6 (Standard)',
-  description: 'Standard German grading system (1-6)',
+  id: 'german-1-6-sekundarstufe-1',
+  name: 'Sekundarstufe I (1-6)',
+  description: 'Herkömmliches deutsches Notensystem für die Mittelstufe',
   system: 'german-1-6',
   boundaries: [
-    { grade: 1, minPercentage: 92, displayValue: '1' },
-    { grade: 2, minPercentage: 81, displayValue: '2' },
-    { grade: 3, minPercentage: 70, displayValue: '3' },
-    { grade: 4, minPercentage: 60, displayValue: '4' },
-    { grade: 5, minPercentage: 50, displayValue: '5' },
+    { grade: 1, minPercentage: 96, displayValue: '1' },
+    { grade: 2, minPercentage: 80, displayValue: '2' },
+    { grade: 3, minPercentage: 60, displayValue: '3' },
+    { grade: 4, minPercentage: 45, displayValue: '4' },
+    { grade: 5, minPercentage: 16, displayValue: '5' },
     { grade: 6, minPercentage: 0, displayValue: '6' }
   ],
-  defaultRounding: { type: 'nearest', decimalPlaces: 1 }
+  defaultRounding: { type: 'nearest', decimalPlaces: 0 }
 };
 
 export const GERMAN_0_15_PRESET: Exams.GradingPreset = {
-  id: 'german-0-15-standard',
-  name: 'German 0-15 (Advanced)',
-  description: 'German grading system for upper-level classes (0-15 points)',
+  id: 'german-0-15-gymnasiale-oberstufe',
+  name: 'Gymnasiale Oberstufe (0-15 NP)',
+  description: 'KMK-/Wikipedia-Schwellen für das Punktesystem der gymnasialen Oberstufe',
   system: 'german-0-15',
   boundaries: [
     { grade: 15, minPercentage: 95, displayValue: '15' },
@@ -188,7 +188,17 @@ export const GERMAN_0_15_PRESET: Exams.GradingPreset = {
     { grade: 8, minPercentage: 60, displayValue: '8' },
     { grade: 7, minPercentage: 55, displayValue: '7' },
     { grade: 6, minPercentage: 50, displayValue: '6' },
-    { grade: 5, minPercentage: 0, displayValue: '5' }
+    { grade: 5, minPercentage: 45, displayValue: '5' },
+    { grade: 4, minPercentage: 40, displayValue: '4' },
+    { grade: 3, minPercentage: 33, displayValue: '3' },
+    { grade: 2, minPercentage: 27, displayValue: '2' },
+    { grade: 1, minPercentage: 20, displayValue: '1' },
+    { grade: 0, minPercentage: 0, displayValue: '0' }
   ],
   defaultRounding: { type: 'nearest', decimalPlaces: 0 }
 };
+
+export const KBR_GRADING_PRESETS: Exams.GradingPreset[] = [
+  GERMAN_1_6_PRESET,
+  GERMAN_0_15_PRESET
+];

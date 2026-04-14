@@ -6,6 +6,7 @@ import { TeamConstraintError, type TeamAlgorithm, type TeamBasis, type TeamSessi
 
 import { getSportBridge, initializeSportBridge } from './useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from './useStudentsBridge'
+import { formatGermanDate } from '../utils/locale-format'
 
 interface DisplayTeam {
   id: string
@@ -235,7 +236,7 @@ export function useTeamBuilderView() {
   }
 
   function formatDate(date: Date): string {
-    return date.toLocaleDateString()
+    return formatGermanDate(date)
   }
 
   loadClasses()

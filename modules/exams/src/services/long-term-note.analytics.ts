@@ -1,6 +1,13 @@
 import type { StudentLongTermNote, DevelopmentNote, CompetencyArea } from '../repositories/student-long-term-note.repository'
 import type { CompetencyProgress, StudentGrowthAnalysis } from './long-term-note.types'
 
+const formatGermanDate = (date: Date): string =>
+  new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(date)
+
 export function calculateCompetencyProgress(
   competency: CompetencyArea,
   assessments: Array<{ date: Date; score: number; examId?: string }>
@@ -90,35 +97,35 @@ export function generateProgressSummary(
   growth: StudentGrowthAnalysis
 ): string {
   const lines: string[] = []
-  lines.push('Long-Term Development Summary')
-  lines.push(`School Year: ${note.schoolYear}`)
-  lines.push(`Total Assessments: ${growth.totalNotes}`)
-  lines.push(`Competencies Tracked: ${growth.competenciesTracked}`)
+  lines.push('Langzeitentwicklungsübersicht')
+  lines.push(`Schuljahr: ${note.schoolYear}`)
+  lines.push(`Erfasste Beobachtungen: ${growth.totalNotes}`)
+  lines.push(`Verfolgte Kompetenzen: ${growth.competenciesTracked}`)
   lines.push('')
-  lines.push('Progress Overview:')
-  lines.push(`  • Improving: ${growth.improvingCount}`)
-  lines.push(`  • Stable: ${growth.stableCount}`)
-  lines.push(`  • Declining: ${growth.decliningCount}`)
-  lines.push(`  • Average Trend: ${growth.averageTrend > 0 ? '+' : ''}${growth.averageTrend.toFixed(1)}%`)
+  lines.push('Verlaufsübersicht:')
+  lines.push(`  • Verbessernd: ${growth.improvingCount}`)
+  lines.push(`  • Stabil: ${growth.stableCount}`)
+  lines.push(`  • Rückläufig: ${growth.decliningCount}`)
+  lines.push(`  • Durchschnittlicher Trend: ${growth.averageTrend > 0 ? '+' : ''}${growth.averageTrend.toFixed(1)}%`)
   lines.push('')
 
   if (note.strengths.length > 0) {
-    lines.push('Strengths:')
+    lines.push('Stärken:')
     note.strengths.forEach((strength: string) => lines.push(`  • ${strength}`))
     lines.push('')
   }
   if (note.focusAreas.length > 0) {
-    lines.push('Areas for Development:')
+    lines.push('Entwicklungsfelder:')
     note.focusAreas.forEach((area: string) => lines.push(`  • ${area}`))
     lines.push('')
   }
   if (growth.recentAchievements.length > 0) {
-    lines.push('Recent Achievements:')
-    growth.recentAchievements.forEach((achievement) => lines.push(`  • ${achievement.achievement} (${achievement.date.toLocaleDateString()})`))
+    lines.push('Aktuelle Erfolge:')
+    growth.recentAchievements.forEach((achievement) => lines.push(`  • ${achievement.achievement} (${formatGermanDate(achievement.date)})`))
     lines.push('')
   }
   if (note.internalNotes) {
-    lines.push('Notes:')
+    lines.push('Notizen:')
     lines.push(note.internalNotes)
   }
   return lines.join('\n')

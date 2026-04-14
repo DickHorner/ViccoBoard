@@ -6,6 +6,7 @@ import type { ClassGroup, Student, Sport } from '@viccoboard/core'
 
 import { getSportBridge, initializeSportBridge } from './useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from './useStudentsBridge'
+import { formatGermanDateTime } from '../utils/locale-format'
 
 interface Timer {
   studentId: string
@@ -86,7 +87,7 @@ export function useMultistopView() {
     try {
       classes.value = await sportBridge.classGroupRepository.findAll()
     } catch (error) {
-      showToast('Error loading classes', 'error')
+      showToast('Klassen konnten nicht geladen werden.', 'error')
       console.error(error)
     }
   }
@@ -105,7 +106,7 @@ export function useMultistopView() {
       await loadMittelstreckeCategories()
       await loadSessionHistory()
     } catch (error) {
-      showToast('Error loading students', 'error')
+      showToast('Schüler konnten nicht geladen werden.', 'error')
       console.error(error)
     }
   }
@@ -205,7 +206,7 @@ export function useMultistopView() {
       timestamp: Date.now(),
       laps: [...timer.laps]
     })
-    showToast(`Time saved: ${getStudentName(timer.studentId)} - ${formatTime(timer.time)}`, 'success')
+    showToast(`Zeit gespeichert: ${getStudentName(timer.studentId)} - ${formatTime(timer.time)}`, 'success')
     resetTimer(index)
   }
 
@@ -218,7 +219,7 @@ export function useMultistopView() {
       }
     })
     if (saved > 0) {
-      showToast(`${saved} times saved`, 'success')
+      showToast(`${saved} Zeiten gespeichert`, 'success')
       await persistSession()
     }
   }
@@ -263,7 +264,7 @@ export function useMultistopView() {
 
   function deleteRecord(index: number) {
     capturedTimes.value.splice(index, 1)
-    showToast('Record deleted', 'success')
+    showToast('Eintrag entfernt', 'success')
   }
 
   function formatTime(ms: number): string {
@@ -276,13 +277,7 @@ export function useMultistopView() {
   }
 
   function formatSessionDate(date: Date): string {
-    return date.toLocaleString('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatGermanDateTime(date)
   }
 
   function exportTimes() {
@@ -290,7 +285,7 @@ export function useMultistopView() {
     const csv = [
       'Student,Time (mm:ss.ms),Timestamp',
       ...capturedTimes.value.map(record =>
-        `"${record.studentName}","${formatTime(record.time)}","${new Date(record.timestamp).toLocaleString()}"`
+        `"${record.studentName}","${formatTime(record.time)}","${formatGermanDateTime(new Date(record.timestamp))}"`
       )
     ].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
@@ -300,7 +295,7 @@ export function useMultistopView() {
     anchor.download = `multistop-times-${new Date().toISOString().slice(0, 10)}.csv`
     anchor.click()
     URL.revokeObjectURL(url)
-    showToast('Times exported', 'success')
+    showToast('Zeiten exportiert', 'success')
   }
 
   function showToast(message: string, type: 'success' | 'error' = 'success') {

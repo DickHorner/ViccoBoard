@@ -27,6 +27,7 @@ export class ExamRepository extends AdapterRepository<Exams.Exam> {
       description: row.description ?? undefined,
       date: row.exam_date ? new Date(row.exam_date) : undefined,
       classGroupId: row.class_group_id ?? undefined,
+      assessmentFormat: row.assessment_format ?? 'klausur',
       mode: row.mode,
       structure: safeJsonParse(row.structure, emptyStructure, 'Exam.structure'),
       gradingKey: safeJsonParse(row.grading_key, {
@@ -42,6 +43,7 @@ export class ExamRepository extends AdapterRepository<Exams.Exam> {
       } as Exams.GradingKey, 'Exam.gradingKey'),
       printPresets: safeJsonParse(row.print_presets, [], 'Exam.printPresets'),
       candidates: safeJsonParse(row.candidates, [], 'Exam.candidates'),
+      candidateGroups: safeJsonParse(row.candidate_groups, [], 'Exam.candidateGroups'),
       status: row.status,
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
@@ -56,11 +58,13 @@ export class ExamRepository extends AdapterRepository<Exams.Exam> {
     if (entity.description !== undefined) row.description = entity.description;
     if (entity.date !== undefined) row.exam_date = entity.date.toISOString();
     if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
+    if (entity.assessmentFormat !== undefined) row.assessment_format = entity.assessmentFormat;
     if (entity.mode !== undefined) row.mode = entity.mode;
     if (entity.structure !== undefined) row.structure = safeJsonStringify(entity.structure, 'Exam.structure');
     if (entity.gradingKey !== undefined) row.grading_key = safeJsonStringify(entity.gradingKey, 'Exam.gradingKey');
     if (entity.printPresets !== undefined) row.print_presets = safeJsonStringify(entity.printPresets, 'Exam.printPresets');
     if (entity.candidates !== undefined) row.candidates = safeJsonStringify(entity.candidates, 'Exam.candidates');
+    if (entity.candidateGroups !== undefined) row.candidate_groups = safeJsonStringify(entity.candidateGroups, 'Exam.candidateGroups');
     if (entity.status !== undefined) row.status = entity.status;
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();

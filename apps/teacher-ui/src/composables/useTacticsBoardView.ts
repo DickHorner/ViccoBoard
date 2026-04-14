@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { Sport } from '@viccoboard/core'
 
 import { getSportBridge, initializeSportBridge } from './useSportBridge'
+import { formatGermanDateTime } from '../utils/locale-format'
 
 type ToolType = Sport.TacticsMarking['type']
 
@@ -249,7 +250,7 @@ export function useTacticsBoardView() {
     } else if (activeTool.value === 'circle') {
       props = { ...props, radius: Math.max(10, Math.hypot(ex - sx, ey - sy)) }
     } else if (activeTool.value === 'text') {
-      props = { ...props, label: window.prompt('Text eingeben / Enter text:') || '?' }
+      props = { ...props, label: window.prompt('Text eingeben:') || '?' }
     }
     markings.value.push({
       id,
@@ -306,13 +307,7 @@ export function useTacticsBoardView() {
   }
 
   function formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString(undefined, {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatGermanDateTime(date)
   }
 
   watch(background, () => redraw())

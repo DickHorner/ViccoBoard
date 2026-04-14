@@ -6,6 +6,11 @@ import type { AttendanceRecord, ClassGroup, Lesson } from '@viccoboard/core';
 import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading';
 import { useAttendance, useClassGroups, useLessons } from './useSportBridge';
 import { getDashboardLessonState } from '../utils/dashboard-workspace';
+import {
+  formatGermanDate,
+  formatGermanDateTime,
+  formatGermanTime
+} from '../utils/locale-format';
 
 export function useDashboardView() {
   const { t } = useI18n();
@@ -136,13 +141,11 @@ export function useDashboardView() {
     classesById.value.get(classGroupId)?.name ?? 'Unbekannte Klasse';
 
   const formatLessonTime = (date: Date): string =>
-    new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    formatGermanTime(date);
 
   const formatLessonDateTime = (date: Date): string =>
-    new Date(date).toLocaleString([], {
-      weekday: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
+    formatGermanDateTime(date, {
+      weekday: 'short'
     });
 
   const handleCreateClass = async () => {
@@ -303,7 +306,7 @@ export function useDashboardView() {
     if (diffHours < 24) return `vor ${diffHours} Stunde${diffHours > 1 ? 'n' : ''}`;
     if (diffDays < 7) return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`;
 
-    return recordDate.toLocaleDateString();
+    return formatGermanDate(recordDate);
   };
 
   onMounted(() => {

@@ -4,7 +4,12 @@
 
 import { describe, it, expect } from '@jest/globals';
 import { Exams } from '@viccoboard/core';
-import { GradingKeyService, GERMAN_1_6_PRESET, GERMAN_0_15_PRESET } from '../src/services/grading-key.service';
+import {
+  GradingKeyService,
+  GERMAN_1_6_PRESET,
+  GERMAN_0_15_PRESET,
+  KBR_GRADING_PRESETS
+} from '../src/services/grading-key.service';
 
 describe('GradingKeyService', () => {
   describe('calculateGrade', () => {
@@ -136,6 +141,8 @@ describe('GradingKeyService', () => {
       expect(GERMAN_1_6_PRESET.boundaries).toHaveLength(6);
       expect(GERMAN_1_6_PRESET.boundaries[0].grade).toBe(1);
       expect(GERMAN_1_6_PRESET.boundaries[5].grade).toBe(6);
+      expect(GERMAN_1_6_PRESET.boundaries[0].minPercentage).toBe(96);
+      expect(GERMAN_1_6_PRESET.boundaries[4].minPercentage).toBe(16);
     });
   });
 
@@ -161,9 +168,19 @@ describe('GradingKeyService', () => {
   describe('GERMAN_0_15_PRESET', () => {
     it('should have correct structure', () => {
       expect(GERMAN_0_15_PRESET.system).toBe('german-0-15');
-      expect(GERMAN_0_15_PRESET.boundaries).toHaveLength(11);
+      expect(GERMAN_0_15_PRESET.boundaries).toHaveLength(16);
       expect(GERMAN_0_15_PRESET.boundaries[0].grade).toBe(15);
-      expect(GERMAN_0_15_PRESET.boundaries[10].grade).toBe(5);
+      expect(GERMAN_0_15_PRESET.boundaries[15].grade).toBe(0);
+      expect(GERMAN_0_15_PRESET.boundaries[12].minPercentage).toBe(33);
+    });
+  });
+
+  describe('KBR_GRADING_PRESETS', () => {
+    it('should expose both KBR presets for the UI', () => {
+      expect(KBR_GRADING_PRESETS.map((preset) => preset.id)).toEqual([
+        'german-1-6-sekundarstufe-1',
+        'german-0-15-gymnasiale-oberstufe'
+      ]);
     });
   });
 });

@@ -46,6 +46,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
+import { formatGermanDate } from '../utils/locale-format'
 
 const router = useRouter()
 const { examRepository } = useExamsBridge()
@@ -90,7 +91,7 @@ const formatStatus = (status: ExamsTypes.Exam['status']) => {
   }
 }
 
-const formatDate = (date: Date) => new Date(date).toLocaleDateString()
+const formatDate = (date: Date) => formatGermanDate(date)
 
 onMounted(() => {
   loadExams()

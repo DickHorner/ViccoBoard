@@ -2,6 +2,8 @@
  * Shared utility functions for student management
  */
 
+import { formatGermanDate } from './locale-format'
+
 /**
  * Get initials from first and last name
  */
@@ -14,11 +16,7 @@ export const getInitials = (firstName: string, lastName: string): string => {
  */
 export const formatDate = (date: Date | string): string => {
   const d = typeof date === 'string' ? new Date(date) : date
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit'
-  })
+  return formatGermanDate(d)
 }
 
 /**

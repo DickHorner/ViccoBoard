@@ -66,17 +66,20 @@ describe('ExamRepository', () => {
       title: 'Midterm',
       description: 'Algebra',
       classGroupId: classId,
+      assessmentFormat: 'test',
       mode: Exams.ExamMode.Simple,
       structure,
       gradingKey,
       printPresets: [],
       candidates: [],
+      candidateGroups: [],
       status: 'draft'
     });
 
     const found = await repository.findById(created.id);
     expect(found).not.toBeNull();
     expect(found?.title).toBe('Midterm');
+    expect(found?.assessmentFormat).toBe('test');
   });
 
   test('filters by class group and status', async () => {
@@ -93,22 +96,32 @@ describe('ExamRepository', () => {
 
     await repository.create({
       title: 'Quiz',
+      assessmentFormat: 'gruppenarbeit',
       mode: Exams.ExamMode.Simple,
       structure,
       gradingKey,
       printPresets: [],
       candidates: [],
+      candidateGroups: [
+        {
+          id: 'group-1',
+          name: 'Gruppe Blau',
+          memberCandidateIds: ['candidate-1']
+        }
+      ],
       status: 'draft',
       classGroupId: classId
     });
 
     await repository.create({
       title: 'Final',
+      assessmentFormat: 'facharbeit',
       mode: Exams.ExamMode.Simple,
       structure,
       gradingKey,
       printPresets: [],
       candidates: [],
+      candidateGroups: [],
       status: 'completed'
     });
 
@@ -118,5 +131,6 @@ describe('ExamRepository', () => {
     const byStatus = await repository.findByStatus('completed');
     expect(byStatus).toHaveLength(1);
     expect(byStatus[0].title).toBe('Final');
+    expect(byClass[0].candidateGroups[0]?.name).toBe('Gruppe Blau');
   });
 });

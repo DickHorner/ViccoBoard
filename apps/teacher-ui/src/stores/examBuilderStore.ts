@@ -34,14 +34,24 @@ export interface PartDraft {
   order: number
 }
 
+export interface CandidateGroupDraft {
+  id: string
+  name: string
+  memberCandidateIds: string[]
+  topic?: string
+  notes?: string
+}
+
 export const useExamBuilderStore = defineStore('examBuilder', () => {
   // ============ State ============
   const title = ref('')
   const description = ref('')
   const classGroupId = ref('')
+  const assessmentFormat = ref<ExamsTypes.ExamAssessmentFormat>('klausur')
   const mode = ref<'simple' | 'complex'>('simple')
   const tasks = ref<TaskDraft[]>([])
   const parts = ref<PartDraft[]>([])
+  const candidateGroups = ref<CandidateGroupDraft[]>([])
   const isEditing = ref(false)
   const createdAt = ref<Date | null>(null)
   const examId = ref<string | undefined>(undefined)
@@ -209,6 +219,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
       title: title.value.trim(),
       description: description.value.trim() || undefined,
       classGroupId: classGroupId.value.trim() || undefined,
+      assessmentFormat: assessmentFormat.value,
       mode: mode.value as ExamsTypes.ExamMode,
       structure: {
         parts: parts.value.map((part, index) => ({
@@ -239,6 +250,13 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
       },
       printPresets: [],
       candidates: [],
+      candidateGroups: candidateGroups.value.map((group) => ({
+        id: group.id,
+        name: group.name.trim() || 'Neue Gruppe',
+        memberCandidateIds: [...group.memberCandidateIds],
+        topic: group.topic?.trim() || undefined,
+        notes: group.notes?.trim() || undefined
+      })),
       status: 'draft',
       createdAt: createdAt.value ?? now,
       lastModified: now
@@ -254,7 +272,15 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     title.value = exam.title
     description.value = exam.description ?? ''
     classGroupId.value = exam.classGroupId ?? ''
+    assessmentFormat.value = exam.assessmentFormat ?? 'klausur'
     mode.value = exam.mode
+    candidateGroups.value = (exam.candidateGroups ?? []).map((group) => ({
+      id: group.id,
+      name: group.name,
+      memberCandidateIds: [...group.memberCandidateIds],
+      topic: group.topic,
+      notes: group.notes
+    }))
     parts.value = exam.structure.parts.map((part, index) => ({
       id: part.id,
       name: part.name,
@@ -332,7 +358,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     const { success, error: showError } = useToast()
 
     if (!canSave.value) {
-      showError('Add a title and at least one task before saving.')
+      showError('Bitte geben Sie einen Titel ein und legen Sie mindestens eine Aufgabe an.')
       return
     }
 
@@ -340,17 +366,17 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     try {
       if (isEditing.value && examId.value) {
         await examRepository?.update(examId.value, exam)
-        success('Exam updated.')
+        success('Prüfung aktualisiert.')
       } else {
         const created = await examRepository?.create?.(exam)
         if (created) {
           examId.value = created.id
         }
-        success('Exam saved.')
+        success('Prüfung gespeichert.')
       }
       router.push('/exams')
     } catch (err) {
-      showError(err instanceof Error ? err.message : 'Failed to save exam.')
+      showError(err instanceof Error ? err.message : 'Die Prüfung konnte nicht gespeichert werden.')
     }
   }
 
@@ -362,14 +388,14 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     try {
       const exam = await examRepository?.findById(id)
       if (!exam) {
-        showError('Exam not found.')
+        showError('Die Prüfung wurde nicht gefunden.')
         router.push('/exams')
         return
       }
 
       hydrateFromExam(exam)
     } catch (err) {
-      showError(err instanceof Error ? err.message : 'Failed to load exam.')
+      showError(err instanceof Error ? err.message : 'Die Prüfung konnte nicht geladen werden.')
       router.push('/exams')
     }
   }
@@ -381,9 +407,11 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     title.value = ''
     description.value = ''
     classGroupId.value = ''
+    assessmentFormat.value = 'klausur'
     mode.value = 'simple'
     tasks.value = []
     parts.value = []
+    candidateGroups.value = []
   }
 
   return {
@@ -391,9 +419,11 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     title,
     description,
     classGroupId,
+    assessmentFormat,
     mode,
     tasks,
     parts,
+    candidateGroups,
     isEditing,
     createdAt,
     examId,

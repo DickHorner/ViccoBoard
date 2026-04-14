@@ -123,6 +123,7 @@ import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import { resolveLessonWorkspaceSubject, buildSportToolEntries, formatToolLabel, SPORT_TOOL_ROUTES } from '../utils/lesson-workspace'
 import type { ClassGroup, Lesson, Sport } from '@viccoboard/core'
+import { formatGermanDateTime } from '../utils/locale-format'
 
 const route = useRoute()
 const SportBridge = getSportBridge()
@@ -212,13 +213,8 @@ const loadData = async () => {
 }
 
 const formatLessonDateTime = (date: Date): string =>
-  new Date(date).toLocaleString([], {
-    weekday: 'long',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  formatGermanDateTime(date, {
+    weekday: 'long'
   })
 
 onMounted(() => {

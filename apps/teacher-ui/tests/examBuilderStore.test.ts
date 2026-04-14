@@ -299,4 +299,51 @@ describe('P5-3: examBuilderStore', () => {
       expect(savedSubtask?.criteria[0]?.points).toBe(5)
     })
   })
+
+  describe('KBR-specific metadata', () => {
+    it('preserves assessment format and candidate groups in buildExam', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Gruppenpruefung'
+      store.assessmentFormat = 'gruppenarbeit'
+      store.addTask()
+      store.candidateGroups.push({
+        id: 'group-1',
+        name: 'Gruppe A',
+        memberCandidateIds: ['candidate-1'],
+        topic: 'Praesentation',
+        notes: 'Mit Medien'
+      })
+
+      const exam = store.buildExam()
+
+      expect(exam.assessmentFormat).toBe('gruppenarbeit')
+      expect(exam.candidateGroups).toHaveLength(1)
+      expect(exam.candidateGroups[0].name).toBe('Gruppe A')
+      expect(exam.candidateGroups[0].memberCandidateIds).toEqual(['candidate-1'])
+    })
+
+    it('hydrates assessment format and candidate groups from an existing exam', () => {
+      const store = useExamBuilderStore()
+      const exam = store.buildExam()
+
+      store.hydrateFromExam({
+        ...exam,
+        title: 'Portfolio',
+        assessmentFormat: 'portfolio',
+        candidateGroups: [
+          {
+            id: 'group-2',
+            name: 'Portfolio-Team',
+            memberCandidateIds: ['candidate-2'],
+            topic: 'Recherche',
+            notes: 'Partnerarbeit'
+          }
+        ]
+      })
+
+      expect(store.assessmentFormat).toBe('portfolio')
+      expect(store.candidateGroups).toHaveLength(1)
+      expect(store.candidateGroups[0].topic).toBe('Recherche')
+    })
+  })
 })

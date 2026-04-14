@@ -123,7 +123,7 @@
             <span class="record-time">{{ formatTime(record.time) }}</span>
           </div>
           <div class="record-meta">
-            <small>{{ new Date(record.timestamp).toLocaleTimeString() }}</small>
+            <small>{{ formatGermanTime(new Date(record.timestamp)) }}</small>
             <button class="btn-icon btn-danger btn-small" @click="deleteRecord(index)">
               🗑️
             </button>
@@ -174,6 +174,7 @@
 import { useI18n } from 'vue-i18n'
 
 import { useMultistopView } from '../composables/useMultistopView'
+import { formatGermanTime } from '../utils/locale-format'
 
 const { t } = useI18n()
 

@@ -5,6 +5,10 @@
 
 import type { AttendanceRecord, Student } from '@viccoboard/core'
 import type { Sport } from '@viccoboard/core'
+import {
+  formatGermanDate,
+  formatGermanDateTime
+} from './locale-format'
 
 // ---------------------------------------------------------------------------
 // Attendance summary
@@ -74,22 +78,11 @@ export function buildPerformanceSummary(
 // ---------------------------------------------------------------------------
 
 export function formatDateDe(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat('de-DE', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(d)
+  return formatGermanDate(date)
 }
 
 export function formatDateTimeDe(date: Date): string {
-  return new Intl.DateTimeFormat('de-DE', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date)
+  return formatGermanDateTime(date)
 }
 
 export function getStudentInitials(student: Pick<Student, 'firstName' | 'lastName'>): string {

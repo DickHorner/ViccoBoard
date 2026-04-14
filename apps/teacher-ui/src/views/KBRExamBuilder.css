@@ -108,6 +108,81 @@
   gap: 1rem;
 }
 
+.import-panel,
+.candidate-card,
+.group-card {
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 6px;
+  padding: 1rem;
+  background: white;
+}
+
+.import-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.import-panel p {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-muted, #666);
+}
+
+.import-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.student-import-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.student-import-list.compact {
+  margin-bottom: 0;
+}
+
+.student-import-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 6px;
+  background: var(--color-surface, #f9f9f9);
+}
+
+.student-import-item input[type="checkbox"] {
+  width: auto;
+  align-self: flex-start;
+}
+
+.student-import-item small,
+.candidate-card-header small,
+.grading-preset-hint {
+  color: var(--color-text-muted, #666);
+}
+
+.candidate-list,
+.group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.candidate-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
 .task-header {
   display: flex;
   gap: 1rem;
@@ -318,6 +393,10 @@
   .task-header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .import-panel {
+    flex-direction: column;
   }
 
   .task-title-input {

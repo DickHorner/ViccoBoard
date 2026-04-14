@@ -29,6 +29,23 @@
             <input v-model="examDateValue" type="date" />
           </div>
           <div class="form-group">
+            <label>Klasse</label>
+            <select v-model="store.classGroupId">
+              <option value="">Keine Klasse zugeordnet</option>
+              <option v-for="classGroup in classGroups" :key="classGroup.id" :value="classGroup.id">
+                {{ classGroup.name }} ({{ classGroup.schoolYear }})
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Format</label>
+            <select v-model="store.assessmentFormat">
+              <option v-for="format in assessmentFormats" :key="format.value" :value="format.value">
+                {{ format.label }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
             <label>Modus</label>
             <select v-model="store.mode" @change="handleModeChange">
               <option value="simple">Einfach (flach)</option>
@@ -49,7 +66,48 @@
       <section class="section">
         <div class="section-header">
           <h2>Kandidaten</h2>
-          <button @click="addCandidate" class="btn-small">+ Kandidat hinzufügen</button>
+          <button @click="addCandidate" class="btn-small">+ Kandidat manuell hinzufügen</button>
+        </div>
+
+        <div class="import-panel">
+          <div>
+            <strong>Zentrale Schülerdatenbank</strong>
+            <p v-if="store.classGroupId">
+              {{ classStudents.length }} Schüler in {{ selectedClassLabel }}
+            </p>
+            <p v-else>Wählen Sie oben eine Klasse aus, um Schüler oder komplette Klassen zu übernehmen.</p>
+          </div>
+          <div class="import-actions">
+            <button
+              class="btn-secondary-small"
+              @click="importWholeClass"
+              :disabled="!store.classGroupId || classStudents.length === 0"
+            >
+              Ganze Klasse übernehmen
+            </button>
+            <button
+              class="btn-secondary-small"
+              @click="importSelectedStudents"
+              :disabled="selectedStudentIds.length === 0"
+            >
+              Auswahl übernehmen
+            </button>
+          </div>
+        </div>
+
+        <div v-if="availableImportStudents.length > 0" class="student-import-list">
+          <label
+            v-for="student in availableImportStudents"
+            :key="student.id"
+            class="student-import-item"
+          >
+            <input v-model="selectedStudentIds" type="checkbox" :value="student.id" />
+            <span>{{ student.firstName }} {{ student.lastName }}</span>
+            <small>{{ student.dateOfBirth ? formatGermanDateOfBirth(student.dateOfBirth) : 'Geburtsdatum fehlt' }}</small>
+          </label>
+        </div>
+        <div v-else-if="store.classGroupId" class="empty-state">
+          Alle Schüler der gewählten Klasse sind bereits als Prüflinge angelegt.
         </div>
 
         <div v-if="candidates.length === 0" class="empty-state">
@@ -58,6 +116,10 @@
 
         <div v-else class="candidate-list">
           <div v-for="(candidate, index) in candidates" :key="candidate.id" class="candidate-card">
+            <div class="candidate-card-header">
+              <strong>{{ candidate.firstName || 'Neuer' }} {{ candidate.lastName || 'Prüfling' }}</strong>
+              <small v-if="candidate.studentId">Aus Schülerdatenbank verknüpft</small>
+            </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Vorname</label>
@@ -73,6 +135,50 @@
               </div>
             </div>
             <button @click="removeCandidate(index)" class="btn-danger-small">Entfernen</button>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="store.assessmentFormat === 'gruppenarbeit'" class="section">
+        <div class="section-header">
+          <h2>Gruppenarbeiten</h2>
+          <button @click="addCandidateGroup" class="btn-small">+ Gruppe hinzufügen</button>
+        </div>
+
+        <div v-if="store.candidateGroups.length === 0" class="empty-state">
+          Legen Sie Gruppen an und ordnen Sie den Prüflingen ihre Gruppenarbeit zu.
+        </div>
+
+        <div v-else class="group-list">
+          <div v-for="(group, index) in store.candidateGroups" :key="group.id" class="group-card">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Gruppenname</label>
+                <input v-model="group.name" type="text" :placeholder="`Gruppe ${index + 1}`" />
+              </div>
+              <div class="form-group">
+                <label>Thema</label>
+                <input v-model="group.topic" type="text" placeholder="Thema oder Auftrag" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Mitglieder</label>
+              <div class="student-import-list compact">
+                <label
+                  v-for="candidate in candidates"
+                  :key="`${group.id}-${candidate.id}`"
+                  class="student-import-item"
+                >
+                  <input v-model="group.memberCandidateIds" type="checkbox" :value="candidate.id" />
+                  <span>{{ candidate.firstName }} {{ candidate.lastName }}</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Notizen</label>
+              <textarea v-model="group.notes" placeholder="Optionale Hinweise zur Gruppenarbeit"></textarea>
+            </div>
+            <button @click="removeCandidateGroup(index)" class="btn-danger-small">Gruppe entfernen</button>
           </div>
         </div>
       </section>
@@ -111,26 +217,40 @@
 
       <section class="section">
         <h2>Notenschlüssel</h2>
-        <div class="form-group">
-          <label>Schlüsseltyp</label>
-          <select v-model="gradingKeyType">
-            <option value="percentage">Prozent</option>
-            <option value="points">Punkte</option>
-            <option value="error-points">Fehlerpunkte</option>
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Vorgabe</label>
+            <select v-model="selectedGradingPresetId" @change="applySelectedGradingPreset">
+              <option value="">Keine Vorgabe</option>
+              <option v-for="presetOption in gradingPresets" :key="presetOption.id" :value="presetOption.id">
+                {{ presetOption.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Schlüsseltyp</label>
+            <select v-model="gradingKeyType">
+              <option value="percentage">Prozent</option>
+              <option value="points">Punkte</option>
+              <option value="error-points">Fehlerpunkte</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Gesamtpunkte</label>
+            <input :value="store.totalPoints" type="number" min="0" step="1" readonly />
+          </div>
+          <div class="form-group">
+            <label>Rundung</label>
+            <select v-model="roundingRuleType">
+              <option value="up">Aufrunden</option>
+              <option value="down">Abrunden</option>
+              <option value="nearest">Kaufmännisch</option>
+              <option value="none">Keine Rundung</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Gesamtpunkte</label>
-          <input :value="store.totalPoints" type="number" min="0" step="1" readonly />
-        </div>
-        <div class="form-group">
-          <label>Rundung</label>
-          <select v-model="roundingRuleType">
-            <option value="up">Aufrunden</option>
-            <option value="down">Abrunden</option>
-            <option value="nearest">Kaufmännisch</option>
-            <option value="none">Keine Rundung</option>
-          </select>
+        <div v-if="selectedGradingPresetDescription" class="grading-preset-hint">
+          {{ selectedGradingPresetDescription }}
         </div>
         <div v-if="gradeBoundaries.length > 0">
           <h3>Notengrenzen</h3>
@@ -163,6 +283,10 @@
             <span class="value">{{ candidates.length }}</span>
           </div>
           <div class="summary-item">
+            <span class="label">Gruppen</span>
+            <span class="value">{{ store.candidateGroups.length }}</span>
+          </div>
+          <div class="summary-item">
             <span class="label">Aufgaben gesamt</span>
             <span class="value">{{ store.flatTasks.length }}</span>
           </div>
@@ -179,6 +303,10 @@
             <span class="value">{{ store.mode === 'simple' ? 'Einfach' : 'Komplex' }}</span>
           </div>
           <div class="summary-item">
+            <span class="label">Format</span>
+            <span class="value">{{ selectedAssessmentFormatLabel }}</span>
+          </div>
+          <div class="summary-item">
             <span class="label">Bogenlayout</span>
             <span class="value">{{ preset.layoutMode === 'compact' ? 'Kompakt' : 'Standard' }}</span>
           </div>
@@ -191,13 +319,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { Exams } from '@viccoboard/core';
+import { Exams, type ClassGroup, type Student } from '@viccoboard/core';
+import {
+  KBR_GRADING_PRESETS,
+  GradingKeyService,
+  createDefaultCorrectionSheetPreset
+} from '@viccoboard/exams';
 import { v4 as uuidv4 } from 'uuid';
-import { createDefaultCorrectionSheetPreset } from '@viccoboard/exams';
+import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge';
+import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge';
 import { useExamsBridge } from '../composables/useExamsBridge';
 import { useExamBuilderStore } from '../stores/examBuilderStore';
+import {
+  createCandidateGroup,
+  mapStudentToExamCandidate,
+  mergeImportedCandidates,
+  synchronizeCandidateGroups
+} from '../utils/exam-candidates';
+import { formatGermanDateOfBirth } from '../utils/locale-format';
 import CorrectionSheetPresetForm from '../components/CorrectionSheetPresetForm.vue';
 import TaskEditor from '../components/TaskEditor.vue';
 import ExamParts from '../components/ExamParts.vue';
@@ -205,9 +346,20 @@ import ExamParts from '../components/ExamParts.vue';
 const router = useRouter();
 const route = useRoute();
 const store = useExamBuilderStore();
+
+initializeSportBridge();
+initializeStudentsBridge();
+
+const sportBridge = getSportBridge();
+const studentsBridge = getStudentsBridge();
 const { examRepository, getCorrectionSheetPreset, saveCorrectionSheetPreset } = useExamsBridge();
 
+const classGroups = ref<ClassGroup[]>([]);
+const classStudents = ref<Student[]>([]);
+const selectedStudentIds = ref<string[]>([]);
 const candidates = ref<Exams.Candidate[]>([]);
+const gradingPresets = KBR_GRADING_PRESETS;
+const selectedGradingPresetId = ref('');
 const preset = ref<Exams.CorrectionSheetPreset>(createDefaultCorrectionSheetPreset('draft'));
 const examDateValue = ref('');
 const allowsComments = ref(false);
@@ -219,14 +371,44 @@ const examStatus = ref<Exams.Exam['status']>('draft');
 const printPresets = ref<Exams.Exam['printPresets']>([]);
 const isLoading = ref(true);
 
+const assessmentFormats: Array<{ value: Exams.ExamAssessmentFormat; label: string }> = [
+  { value: 'klausur', label: 'Klausur' },
+  { value: 'test', label: 'Test' },
+  { value: 'mappenkorrektur', label: 'Mappenkorrektur' },
+  { value: 'portfolio', label: 'Portfolio' },
+  { value: 'referat', label: 'Referat' },
+  { value: 'referatsrueckmeldung', label: 'Referatsrückmeldung' },
+  { value: 'facharbeit', label: 'Facharbeit' },
+  { value: 'muendliche-pruefung', label: 'Mündliche Prüfung' },
+  { value: 'gruppenarbeit', label: 'Gruppenarbeit' }
+];
+
 const isEditing = computed(() => !!route.params.id);
+const selectedClassLabel = computed(() => {
+  const classGroup = classGroups.value.find((entry) => entry.id === store.classGroupId);
+  return classGroup ? `${classGroup.name} (${classGroup.schoolYear})` : 'keine Klasse';
+});
+const selectedAssessmentFormatLabel = computed(() =>
+  assessmentFormats.find((format) => format.value === store.assessmentFormat)?.label ?? 'Klausur'
+);
+const selectedGradingPresetDescription = computed(() =>
+  gradingPresets.find((presetOption: Exams.GradingPreset) => presetOption.id === selectedGradingPresetId.value)?.description ?? ''
+);
+const availableImportStudents = computed(() => {
+  const existingStudentIds = new Set(
+    candidates.value.map((candidate) => candidate.studentId).filter((studentId): studentId is string => Boolean(studentId))
+  );
+  return classStudents.value.filter((student) => !existingStudentIds.has(student.id));
+});
 
 const canSave = computed(() => {
-  return Boolean(
-    store.canSave &&
-    candidates.value.length > 0 &&
-    candidates.value.every((candidate) => candidate.firstName.trim() && candidate.lastName.trim())
+  const hasValidCandidates = candidates.value.length > 0 &&
+    candidates.value.every((candidate) => candidate.firstName.trim() && candidate.lastName.trim());
+  const hasValidGroups = store.assessmentFormat !== 'gruppenarbeit' || store.candidateGroups.every((group: Exams.CandidateGroup) =>
+    group.name.trim().length > 0 && group.memberCandidateIds.length > 0
   );
+
+  return Boolean(store.canSave && hasValidCandidates && hasValidGroups);
 });
 
 const toDateInput = (value?: Date): string => {
@@ -246,19 +428,111 @@ const createDraftCandidate = (): Exams.Candidate => ({
   externalId: ''
 });
 
+const matchPresetByBoundaries = (boundaries: Exams.GradeBoundary[]): string => {
+  const serializedBoundaries = JSON.stringify(
+    boundaries.map((boundary: Exams.GradeBoundary) => ({
+      grade: boundary.grade,
+      minPercentage: boundary.minPercentage,
+      maxPercentage: boundary.maxPercentage,
+      displayValue: boundary.displayValue
+    }))
+  );
+
+  return gradingPresets.find((presetOption: Exams.GradingPreset) =>
+    JSON.stringify(
+      presetOption.boundaries.map((boundary: Exams.GradeBoundary) => ({
+        grade: boundary.grade,
+        minPercentage: boundary.minPercentage,
+        maxPercentage: boundary.maxPercentage,
+        displayValue: boundary.displayValue
+      }))
+    ) === serializedBoundaries
+  )?.id ?? '';
+};
+
+const syncGroupAssignments = () => {
+  if (store.assessmentFormat !== 'gruppenarbeit') {
+    store.candidateGroups = [];
+    return;
+  }
+
+  store.candidateGroups = synchronizeCandidateGroups(store.candidateGroups, candidates.value);
+};
+
+const loadClassGroups = async () => {
+  classGroups.value = await sportBridge.classGroupRepository.findAll();
+};
+
+const loadStudentsForSelectedClass = async () => {
+  selectedStudentIds.value = [];
+
+  if (!store.classGroupId) {
+    classStudents.value = [];
+    return;
+  }
+
+  classStudents.value = await studentsBridge.studentRepository.findByClassGroup(store.classGroupId);
+};
+
 const handleModeChange = () => {
   store.setMode(store.mode);
 };
 
 const addCandidate = () => {
   candidates.value.push(createDraftCandidate());
+  syncGroupAssignments();
 };
 
 const removeCandidate = (index: number) => {
   candidates.value.splice(index, 1);
+  syncGroupAssignments();
+};
+
+const importStudents = (studentsToImport: Student[]) => {
+  const mappedCandidates = studentsToImport.map((student) =>
+    mapStudentToExamCandidate(student, store.examId ?? 'draft')
+  );
+  candidates.value = mergeImportedCandidates(candidates.value, mappedCandidates).map((candidate) => ({
+    ...candidate,
+    examId: store.examId ?? 'draft'
+  }));
+  selectedStudentIds.value = [];
+  syncGroupAssignments();
+};
+
+const importWholeClass = () => {
+  importStudents(availableImportStudents.value);
+};
+
+const importSelectedStudents = () => {
+  const selectedStudents = availableImportStudents.value.filter((student) =>
+    selectedStudentIds.value.includes(student.id)
+  );
+  importStudents(selectedStudents);
+};
+
+const addCandidateGroup = () => {
+  store.candidateGroups.push(createCandidateGroup(`Gruppe ${store.candidateGroups.length + 1}`));
+};
+
+const removeCandidateGroup = (index: number) => {
+  store.candidateGroups.splice(index, 1);
+};
+
+const applySelectedGradingPreset = () => {
+  const selectedPreset = gradingPresets.find((presetOption: Exams.GradingPreset) => presetOption.id === selectedGradingPresetId.value);
+  if (!selectedPreset) {
+    return;
+  }
+
+  gradeBoundaries.value = GradingKeyService.generatePercentageBoundaries(selectedPreset);
+  gradingKeyType.value = Exams.GradingKeyType.Percentage;
+  roundingRuleType.value = selectedPreset.defaultRounding.type;
 };
 
 async function persistExam(): Promise<Exams.Exam> {
+  syncGroupAssignments();
+
   const builtExam = store.buildExam();
   const examId = builtExam.id;
   const nextExam: Exams.Exam = {
@@ -285,6 +559,9 @@ async function persistExam(): Promise<Exams.Exam> {
       ...candidate,
       examId
     })),
+    candidateGroups: store.assessmentFormat === 'gruppenarbeit'
+      ? synchronizeCandidateGroups(store.candidateGroups, candidates.value)
+      : [],
     status: examStatus.value
   };
 
@@ -315,6 +592,7 @@ const saveExam = async () => {
     }));
     examStatus.value = savedExam.status;
     printPresets.value = savedExam.printPresets;
+    selectedGradingPresetId.value = matchPresetByBoundaries(savedExam.gradingKey.gradeBoundaries);
 
     await saveCorrectionSheetPreset?.({
       ...preset.value,
@@ -338,8 +616,21 @@ const openExportPage = () => {
   router.push(`/exams/${store.examId}/export`);
 };
 
+watch(() => store.classGroupId, async () => {
+  await loadStudentsForSelectedClass();
+});
+
+watch(() => store.assessmentFormat, () => {
+  syncGroupAssignments();
+});
+
+watch(candidates, () => {
+  syncGroupAssignments();
+}, { deep: true });
+
 onMounted(async () => {
   store.reset();
+  await loadClassGroups();
 
   if (isEditing.value) {
     const id = route.params.id as string;
@@ -356,9 +647,11 @@ onMounted(async () => {
       gradingKeyType.value = loaded.gradingKey.type;
       roundingRuleType.value = loaded.gradingKey.roundingRule.type;
       gradeBoundaries.value = loaded.gradingKey.gradeBoundaries;
+      selectedGradingPresetId.value = matchPresetByBoundaries(loaded.gradingKey.gradeBoundaries);
       examStatus.value = loaded.status;
       printPresets.value = loaded.printPresets;
       preset.value = await getCorrectionSheetPreset?.(loaded.id) ?? createDefaultCorrectionSheetPreset(loaded.id);
+      await loadStudentsForSelectedClass();
       isLoading.value = false;
       return;
     }
@@ -371,9 +664,11 @@ onMounted(async () => {
   gradingKeyType.value = Exams.GradingKeyType.Points;
   roundingRuleType.value = 'nearest';
   gradeBoundaries.value = [];
+  selectedGradingPresetId.value = '';
   examStatus.value = 'draft';
   printPresets.value = [];
   candidates.value = [];
+  await loadStudentsForSelectedClass();
   isLoading.value = false;
 });
 

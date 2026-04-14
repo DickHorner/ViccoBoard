@@ -10,15 +10,28 @@ export interface Exam {
   description?: string;
   date?: Date;
   classGroupId?: string;
+  assessmentFormat: ExamAssessmentFormat;
   mode: ExamMode;
   structure: ExamStructure;
   gradingKey: GradingKey;
   printPresets: PrintPreset[];
   candidates: Candidate[];
+  candidateGroups: CandidateGroup[];
   status: 'draft' | 'in-progress' | 'completed';
   createdAt: Date;
   lastModified: Date;
 }
+
+export type ExamAssessmentFormat =
+  | 'klausur'
+  | 'test'
+  | 'mappenkorrektur'
+  | 'portfolio'
+  | 'referat'
+  | 'referatsrueckmeldung'
+  | 'facharbeit'
+  | 'muendliche-pruefung'
+  | 'gruppenarbeit';
 
 export enum ExamMode {
   Simple = 'simple',
@@ -93,7 +106,15 @@ export interface Candidate {
   firstName: string;
   lastName: string;
   externalId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
+}
+
+export interface CandidateGroup {
+  id: string;
+  name: string;
+  memberCandidateIds: string[];
+  topic?: string;
+  notes?: string;
 }
 
 export interface GradingKey {

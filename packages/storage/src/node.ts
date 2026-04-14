@@ -24,3 +24,4 @@ export * from './migrations/016_tournament_schema.js';
 export * from './migrations/017_game_database_schema.js';
 export * from './migrations/018_kbr_feedback_workflow.js';
 export * from './migrations/021_student_import_batches.js';
+export * from './migrations/022_exam_assessment_format_schema.js';

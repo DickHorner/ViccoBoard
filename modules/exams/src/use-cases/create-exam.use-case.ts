@@ -5,6 +5,7 @@ export function createExamPayload(title: string): Exams.Exam {
   const exam: Exams.Exam = {
     id: uuidv4(),
     title,
+    assessmentFormat: 'klausur',
     mode: Exams.ExamMode.Simple,
     structure: {
       parts: [],
@@ -26,6 +27,7 @@ export function createExamPayload(title: string): Exams.Exam {
     },
     printPresets: [],
     candidates: [],
+    candidateGroups: [],
     status: 'draft',
     createdAt: new Date(),
     lastModified: new Date(),
