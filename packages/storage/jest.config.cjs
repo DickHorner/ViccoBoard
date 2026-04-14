@@ -12,6 +12,7 @@ module.exports = {
     '^.+\\.tsx?$': ['ts-jest', {
       useESM: false,
       tsconfig: {
+        types: ['jest', 'node'],
         allowSyntheticDefaultImports: true,
         esModuleInterop: true
       }

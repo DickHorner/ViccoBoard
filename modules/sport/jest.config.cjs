@@ -22,6 +22,8 @@ module.exports = {
     '^.+\\.tsx?$': ['ts-jest', {
       useESM: false,
       tsconfig: {
+        lib: ['ES2020', 'DOM'],
+        types: ['jest', 'node'],
         allowSyntheticDefaultImports: true,
         esModuleInterop: true
       }
