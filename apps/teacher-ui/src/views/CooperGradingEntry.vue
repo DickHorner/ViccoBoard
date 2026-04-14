@@ -148,6 +148,7 @@ import { useI18n } from 'vue-i18n'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import type { Student, Sport } from '@viccoboard/core'
+import { calculateAgeFromDateOfBirth } from '@viccoboard/core'
 import type { CooperSessionMetadata } from '@viccoboard/sport'
 
 const { t } = useI18n()
@@ -205,14 +206,14 @@ function sessionIdOf(entry: Sport.PerformanceEntry): string | undefined {
 }
 
 function buildContext(student: Student): Record<string, unknown> {
-  const genderShort = student.gender === 'male' ? 'm' : student.gender === 'female' ? 'w' : 'd'
-  const age = student.birthYear ? new Date().getFullYear() - student.birthYear : undefined
+  const genderShort = student.gender
+  const age = calculateAgeFromDateOfBirth(student.dateOfBirth) ?? undefined
 
   return {
     gender: genderShort,
-    genderLong: student.gender,
+    genderLong: student.gender === 'm' ? 'male' : student.gender === 'f' ? 'female' : undefined,
     age,
-    birthYear: student.birthYear,
+    dateOfBirth: student.dateOfBirth,
     SportType: selectedSportType.value
   }
 }

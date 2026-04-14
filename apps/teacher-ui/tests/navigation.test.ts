@@ -1,12 +1,21 @@
 import { primaryNavSections } from '../src/navigation'
 
 describe('primary navigation', () => {
-  it('organizes the app into start, organisation, and subjects', () => {
+  it('organizes the app into start, unterricht, and organisation', () => {
     expect(primaryNavSections.map((section) => section.id)).toEqual([
       'start',
-      'organisation',
-      'subjects'
+      'subjects',
+      'organisation'
     ])
+  })
+
+  it('keeps organisation as a collapsed summary section by default', () => {
+    const organization = primaryNavSections.find((section) => section.id === 'organisation')
+
+    expect(organization).toEqual(expect.objectContaining({
+      collapsible: true,
+      defaultExpanded: false
+    }))
   })
 
   it('includes the new top-level workspace entry points', () => {

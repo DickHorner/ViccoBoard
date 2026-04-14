@@ -18,6 +18,7 @@
       :index="index"
       :level="1"
       :mode="store.mode"
+      :numbering-path="String(index + 1)"
       @remove="store.removeTask(task.id)"
       @moveUp="store.moveTask(store.tasks, index, -1)"
       @moveDown="store.moveTask(store.tasks, index, 1)"

@@ -12,7 +12,7 @@
 
       <div class="app-actions-row">
         <Button
-          label="CSV-Import"
+          label="CSV-Datei importieren"
           icon="pi pi-upload"
           severity="secondary"
           outlined
@@ -159,12 +159,14 @@
 
           <Column field="genderLabel" :header="t('SCHUELER.geschlecht')" sortable />
 
-          <Column field="birthYear" :header="t('SCHUELER.geburtsjahr')" sortable>
+          <Column field="dateOfBirth" header="Geburtsdatum" sortable>
             <template #body="{ data }">
-              {{ data.birthYear ?? '-' }}
+              <div class="student-list-page__name-cell">
+                <span>{{ data.dateOfBirth ?? '—' }}</span>
+                <small v-if="data.legacyFlag" class="app-data-note">Legacy-Datum fehlt</small>
+              </div>
             </template>
           </Column>
-
           <Column header="Aktionen" :exportable="false" headerStyle="width: 10rem">
             <template #body="{ data }">
               <div class="student-list-page__row-actions">
@@ -270,15 +272,14 @@
           </div>
 
           <div class="app-field">
-            <label for="student-birth-year">{{ t('SCHUELER.geburtsjahr') }}</label>
+            <label for="student-date-of-birth">Geburtsdatum *</label>
             <InputText
-              id="student-birth-year"
-              v-model="birthYearInput"
+              id="student-date-of-birth"
+              v-model="studentForm.dateOfBirth"
               class="student-list-page__input"
-              inputmode="numeric"
-              :placeholder="String(currentYear)"
+              placeholder="YYYY-MM-DD"
             />
-            <p class="app-field-hint">{{ t('SCHUELER.geburt-hinweis') }}</p>
+            <p class="app-field-hint">Vollständiges Datum im Format YYYY-MM-DD</p>
           </div>
 
           <div class="app-field">
@@ -339,18 +340,59 @@
     >
       <div class="app-form-grid">
         <div class="app-field">
-          <label for="student-csv-import">CSV-Daten</label>
-          <Textarea
+          <label for="student-csv-import">CSV-Datei auswählen</label>
+          <input
             id="student-csv-import"
-            v-model="csvData"
-            class="student-list-page__textarea"
-            rows="10"
-            autoResize
-            placeholder="Max,Mustermann,10a,m,2010&#10;Anna,Schmidt,10a,w,2009"
+            type="file"
+            accept=".csv,text/csv"
+            @change="handleCsvFileSelection"
           />
           <p class="app-field-hint">
-            Format: Vorname,Nachname,Klasse,Geschlecht (m/w),Geburtsjahr
+            Pflichtspalten: Vorname, Nachname, Klasse, Teilklasse, Geburtsdatum, Geschlecht, E-Mail
           </p>
+        </div>
+
+        <div class="app-actions-row">
+          <Button
+            type="button"
+            label="RC-Demo-CSV-Paket laden"
+            icon="pi pi-database"
+            severity="secondary"
+            outlined
+            :loading="importBusy"
+            @click="previewDemoImport"
+          />
+          <Button
+            type="button"
+            label="Demo-Daten löschen"
+            icon="pi pi-trash"
+            severity="danger"
+            outlined
+            :loading="importBusy"
+            @click="deleteDemoData"
+          />
+        </div>
+
+        <div v-if="importPreview" class="app-card">
+          <h3 class="app-section-title">Importvorschau</h3>
+          <p class="app-section-copy">
+            {{ importPreview.summary.read }} gelesen,
+            {{ importPreview.summary.valid }} gültig,
+            {{ importPreview.summary.imported }} bereit zum Import,
+            {{ importPreview.summary.skipped }} Überspringen,
+            {{ importPreview.summary.conflicts }} Konflikte,
+            {{ importPreview.summary.errors }} Fehler.
+          </p>
+
+          <ul v-if="importPreview.issues.length > 0" class="error-list" role="alert">
+            <li
+              v-for="issue in importPreview.issues"
+              :key="`${issue.rowNumber}-${issue.field}-${issue.message}`"
+              class="error-item"
+            >
+              Zeile {{ issue.rowNumber }} · {{ issue.field }} · {{ issue.message }}
+            </li>
+          </ul>
         </div>
 
         <div class="student-list-page__dialog-actions">
@@ -359,14 +401,15 @@
             :label="t('COMMON.cancel') || 'Abbrechen'"
             severity="secondary"
             text
-            @click="showImportDialog = false"
+            @click="showImportDialog = false; resetImportState()"
           />
           <Button
             type="button"
-            label="Importieren"
+            label="Import ausführen"
             icon="pi pi-upload"
-            :disabled="!csvData.trim()"
-            @click="importCSV"
+            :disabled="!importPreview || importBusy || importPreview.summary.imported === 0"
+            :loading="importBusy"
+            @click="executeImport"
           />
         </div>
       </div>
@@ -385,7 +428,6 @@ import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
 import ProgressSpinner from 'primevue/progressspinner'
 import Select from 'primevue/select'
-import Textarea from 'primevue/textarea'
 import { useStudentListView } from '../composables/useStudentListView'
 
 const {
@@ -401,16 +443,15 @@ const {
   showImportDialog,
   editingStudent,
   saving,
-  currentYear,
+  importBusy,
   studentForm,
-  birthYearInput,
-  csvData,
   classOptions,
   genderOptions,
   filteredStudents,
   hasActiveFilters,
   emptyStateMessage,
   genderStats,
+  importPreview,
   loadData,
   resetFilters,
   openCreateDialog,
@@ -421,7 +462,11 @@ const {
   deleteStudent,
   bulkDelete,
   bulkMoveToClass,
-  importCSV
+  handleCsvFileSelection,
+  previewDemoImport,
+  executeImport,
+  deleteDemoData,
+  resetImportState
 } = useStudentListView()
 </script>
 

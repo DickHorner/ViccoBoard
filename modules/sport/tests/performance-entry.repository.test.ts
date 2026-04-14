@@ -44,6 +44,7 @@ describe('PerformanceEntryRepository', () => {
     const student = await studentRepository.create({
       firstName: 'John',
       lastName: 'Doe',
+      dateOfBirth: '2012-01-15',
       classGroupId: classGroup.id
     });
     testStudentId = student.id;
@@ -158,6 +159,7 @@ describe('PerformanceEntryRepository', () => {
       const student2 = await studentRepository.create({
         firstName: 'Jane',
         lastName: 'Smith',
+        dateOfBirth: '2012-04-21',
         classGroupId: (await classGroupRepository.findAll())[0].id
       });
 

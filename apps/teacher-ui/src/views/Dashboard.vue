@@ -3,7 +3,7 @@
     <div class="page-header">
       <p class="dashboard-eyebrow">Startseite</p>
       <h2>Start</h2>
-      <p class="page-description">Schneller Einstieg in die aktuelle Arbeit: Stunde, Organisation und Fachbereiche.</p>
+      <p class="page-description">Schneller Einstieg in die aktuelle Arbeit: Stunde, Unterricht und Organisation.</p>
     </div>
 
     <div class="focus-grid">
@@ -36,9 +36,9 @@
       </section>
 
       <section class="card focus-card">
-        <h3>Organisation</h3>
+        <h3>Unterricht</h3>
         <div class="card-links">
-          <RouterLink v-for="link in organizationLinks" :key="link.to" :to="link.to" class="dashboard-link">
+          <RouterLink v-for="link in instructionLinks" :key="link.to" :to="link.to" class="dashboard-link">
             <strong>{{ link.title }}</strong>
             <span>{{ link.description }}</span>
           </RouterLink>
@@ -46,9 +46,9 @@
       </section>
 
       <section class="card focus-card">
-        <h3>Fachbereiche</h3>
+        <h3>Organisation</h3>
         <div class="card-links">
-          <RouterLink v-for="link in subjectLinks" :key="link.to" :to="link.to" class="dashboard-link">
+          <RouterLink v-for="link in organizationLinks" :key="link.to" :to="link.to" class="dashboard-link">
             <strong>{{ link.title }}</strong>
             <span>{{ link.description }}</span>
           </RouterLink>
@@ -384,8 +384,8 @@ const {
   deleting,
   gradingSchemes,
   classColorOptions,
+  instructionLinks,
   organizationLinks,
-  subjectLinks,
   schoolYears,
   todayLessons,
   currentOrNextLesson,

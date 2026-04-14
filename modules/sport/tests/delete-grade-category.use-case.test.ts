@@ -50,8 +50,18 @@ describe('DeleteGradeCategoryUseCase', () => {
     });
     classGroupId = classGroup.id;
 
-    const s1 = await studentRepository.create({ firstName: 'Anna', lastName: 'Müller', classGroupId });
-    const s2 = await studentRepository.create({ firstName: 'Ben', lastName: 'Schmidt', classGroupId });
+    const s1 = await studentRepository.create({
+      firstName: 'Anna',
+      lastName: 'Müller',
+      dateOfBirth: '2012-03-10',
+      classGroupId
+    });
+    const s2 = await studentRepository.create({
+      firstName: 'Ben',
+      lastName: 'Schmidt',
+      dateOfBirth: '2012-07-18',
+      classGroupId
+    });
     studentId1 = s1.id;
     studentId2 = s2.id;
   });

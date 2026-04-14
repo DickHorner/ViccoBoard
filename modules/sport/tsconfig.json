@@ -15,6 +15,9 @@
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
+      "@viccoboard/core": ["../../packages/core/src/index.ts"],
+      "@viccoboard/storage": ["../../packages/storage/src/index.ts"],
+      "@viccoboard/students": ["../../modules/students/src/index.ts"],
       "@viccoboard/storage/node": ["../../packages/storage/src/node.ts"],
       "@viccoboard/*": ["../../packages/*/src", "../../modules/*/src"]
     }

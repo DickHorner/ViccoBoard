@@ -255,5 +255,48 @@ describe('P5-3: examBuilderStore', () => {
       store.addTask()
       expect(store.canSave).toBe(true)
     })
+
+    it('rolls criterion points up into the parent task automatically', () => {
+      const store = useExamBuilderStore()
+      store.addTask()
+      const task = store.tasks[0]
+
+      store.addCriterion(task)
+      store.addCriterion(task)
+      task.criteria[0].points = 3.5
+      task.criteria[1].points = 4.5
+      store.recalculateTaskPoints()
+
+      expect(task.points).toBe(8)
+      expect(store.totalPoints).toBe(8)
+    })
+
+    it('rolls subtask points up through the hierarchy automatically', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Komplexe Klausur'
+      store.setMode('complex')
+      store.addTask()
+
+      const root = store.tasks[0]
+      root.title = 'Aufgabe 1'
+      store.addSubtask(root, 2)
+      const subtask = root.subtasks[0]
+      subtask.title = 'Aufgabe 1a'
+      store.addCriterion(subtask)
+      subtask.criteria[0].text = 'Inhalt'
+      subtask.criteria[0].points = 5
+      store.recalculateTaskPoints()
+
+      const exam = store.buildExam()
+      const savedRoot = exam.structure.tasks.find((task) => task.id === root.id)
+      const savedSubtask = exam.structure.tasks.find((task) => task.id === subtask.id)
+
+      expect(root.points).toBe(5)
+      expect(store.totalPoints).toBe(5)
+      expect(savedRoot?.points).toBe(5)
+      expect(savedSubtask?.title).toBe('Aufgabe 1a')
+      expect(savedSubtask?.criteria[0]?.text).toBe('Inhalt')
+      expect(savedSubtask?.criteria[0]?.points).toBe(5)
+    })
   })
 })

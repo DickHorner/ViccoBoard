@@ -5,6 +5,7 @@
  */
 
 import { Exams } from '@viccoboard/core';
+import { getCorrectionRelevantTaskNodes, getTotalRootTaskPoints } from '../utils/task-tree';
 
 export interface DifficultyAnalysis {
   taskId: string;
@@ -101,7 +102,8 @@ export class ExamAnalysisService {
     exam: Exams.Exam,
     corrections: Exams.CorrectionEntry[]
   ): ExamStatistics {
-    const taskDifficulties = exam.structure.tasks.map(task =>
+    const relevantTasks = getCorrectionRelevantTaskNodes(exam.structure.tasks);
+    const taskDifficulties = relevantTasks.map(task =>
       this.analyzeDifficulty(task.id, task.title, task.points, corrections)
     );
 
@@ -174,10 +176,11 @@ export class ExamAnalysisService {
     }> = [];
 
     // Calculate suggested point adjustments
-    const totalCurrentPoints = exam.structure.tasks.reduce((sum, t) => sum + t.points, 0);
+    const relevantTasks = getCorrectionRelevantTaskNodes(exam.structure.tasks);
+    const totalCurrentPoints = getTotalRootTaskPoints(exam.structure.tasks);
     let totalSuggestedPoints = 0;
 
-    for (const task of exam.structure.tasks) {
+    for (const task of relevantTasks) {
       const difficulty = analysis.taskDifficulties.find(t => t.taskId === task.id);
       if (!difficulty) continue;
 

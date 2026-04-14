@@ -92,8 +92,8 @@ describe('Cooper Test Workflow Integration', () => {
         classGroupId: classGroupId,
         firstName: 'Test',
         lastName: 'Student',
-        gender: 'male',
-        birthYear: 2008
+        gender: 'm',
+        dateOfBirth: '2008-03-20'
       });
     });
 
@@ -210,8 +210,8 @@ describe('Cooper Test Workflow Integration', () => {
         classGroupId: classGroupId,
         firstName: 'Swimmer',
         lastName: 'Student',
-        gender: 'female',
-        birthYear: 2008
+        gender: 'f',
+        dateOfBirth: '2008-08-12'
       });
     });
 
@@ -426,8 +426,8 @@ describe('Cooper Test Workflow Integration', () => {
         classGroupId: classGroupId,
         firstName: 'Persist',
         lastName: 'Test',
-        gender: 'male',
-        birthYear: 2008
+        gender: 'm',
+        dateOfBirth: '2008-11-30'
       });
 
       const entry = await performanceRepository.create({

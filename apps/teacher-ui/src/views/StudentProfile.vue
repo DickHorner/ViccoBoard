@@ -27,7 +27,7 @@
           <div class="student-avatar">{{ initials }}</div>
           <div class="student-info">
             <h3>{{ student.firstName }} {{ student.lastName }}</h3>
-            <p v-if="student.birthYear" class="meta">Jahrgang {{ student.birthYear }}</p>
+            <p v-if="student.dateOfBirth" class="meta">Geburtsdatum {{ student.dateOfBirth }}</p>
             <p v-if="student.contactInfo?.email" class="meta">{{ student.contactInfo.email }}</p>
             <p v-if="className" class="meta class-badge">{{ className }}</p>
           </div>

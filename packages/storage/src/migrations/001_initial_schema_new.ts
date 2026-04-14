@@ -55,16 +55,68 @@ export class InitialSchemaMigration implements Migration {
         id TEXT PRIMARY KEY,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
-        birth_year INTEGER,
+        date_of_birth TEXT,
         gender TEXT,
         photo_uri TEXT,
         email TEXT,
         parent_email TEXT,
         phone TEXT,
         class_group_id TEXT NOT NULL,
+        legacy_dob_missing INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         last_modified TEXT NOT NULL,
         FOREIGN KEY (class_group_id) REFERENCES class_groups(id) ON DELETE CASCADE
+      )
+    `);
+
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS sport_student_profiles (
+        id TEXT PRIMARY KEY,
+        student_id TEXT NOT NULL,
+        module_key TEXT NOT NULL,
+        medical_notes TEXT,
+        asthma INTEGER,
+        diabetes INTEGER,
+        hemiplegia INTEGER,
+        exempt_from TEXT,
+        exempt_until TEXT,
+        disadvantage_compensation TEXT,
+        swimming_capable INTEGER,
+        created_at TEXT NOT NULL,
+        last_modified TEXT NOT NULL,
+        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+      )
+    `);
+
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS import_batches (
+        id TEXT PRIMARY KEY,
+        source_type TEXT NOT NULL,
+        import_type TEXT NOT NULL,
+        label TEXT NOT NULL,
+        summary_read INTEGER NOT NULL DEFAULT 0,
+        summary_valid INTEGER NOT NULL DEFAULT 0,
+        summary_imported INTEGER NOT NULL DEFAULT 0,
+        summary_skipped INTEGER NOT NULL DEFAULT 0,
+        summary_conflicts INTEGER NOT NULL DEFAULT 0,
+        summary_errors INTEGER NOT NULL DEFAULT 0,
+        metadata TEXT,
+        created_at TEXT NOT NULL,
+        last_modified TEXT NOT NULL
+      )
+    `);
+
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS import_batch_items (
+        id TEXT PRIMARY KEY,
+        batch_id TEXT NOT NULL,
+        entity_type TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        payload TEXT,
+        created_at TEXT NOT NULL,
+        last_modified TEXT NOT NULL,
+        FOREIGN KEY (batch_id) REFERENCES import_batches(id) ON DELETE CASCADE
       )
     `);
 
@@ -141,6 +193,10 @@ export class InitialSchemaMigration implements Migration {
     // Create indexes for better query performance
     db.exec(`
       CREATE INDEX IF NOT EXISTS idx_students_class_group ON students(class_group_id);
+      CREATE INDEX IF NOT EXISTS idx_students_email ON students(email);
+      CREATE INDEX IF NOT EXISTS idx_sport_student_profiles_student ON sport_student_profiles(student_id);
+      CREATE INDEX IF NOT EXISTS idx_import_batches_source_type ON import_batches(source_type);
+      CREATE INDEX IF NOT EXISTS idx_import_batch_items_batch ON import_batch_items(batch_id);
       CREATE INDEX IF NOT EXISTS idx_lessons_class_group ON lessons(class_group_id);
       CREATE INDEX IF NOT EXISTS idx_lessons_date ON lessons(date);
       CREATE INDEX IF NOT EXISTS idx_attendance_lesson ON attendance_records(lesson_id);
@@ -155,6 +211,9 @@ export class InitialSchemaMigration implements Migration {
       DROP TABLE IF EXISTS attendance_records;
       DROP TABLE IF EXISTS lesson_parts;
       DROP TABLE IF EXISTS lessons;
+      DROP TABLE IF EXISTS import_batch_items;
+      DROP TABLE IF EXISTS import_batches;
+      DROP TABLE IF EXISTS sport_student_profiles;
       DROP TABLE IF EXISTS students;
       DROP TABLE IF EXISTS class_groups;
       DROP TABLE IF EXISTS teacher_accounts;

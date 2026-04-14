@@ -9,7 +9,7 @@
     <div class="task-header">
       <div
         class="drag-handle"
-aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss        draggable="true"
+        draggable="true"
         :title="`Aufgabe ${taskNumber} zum Umordnen ziehen`"
         :aria-label="`Ziehpunkt für Aufgabe ${taskNumber}. Mit Alt+Pfeil hoch oder Alt+Pfeil runter per Tastatur umordnen.`"
         role="button"
@@ -67,7 +67,14 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
           type="number"
           min="0"
           step="0.5"
+          :readonly="isPointsDerived"
+          :disabled="isPointsDerived"
+          :class="{ 'input-derived': isPointsDerived }"
+          @input="store.recalculateTaskPoints()"
         />
+        <small v-if="isPointsDerived" class="field-hint">
+          {{ pointsHint }}
+        </small>
       </div>
       <div class="field">
         <label :for="`task-bonus-${task.id}`">Bonuspunkte</label>
@@ -119,6 +126,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
           type="number"
           min="0"
           step="0.5"
+          @input="store.recalculateTaskPoints()"
         />
         <button
           class="ghost"
@@ -149,7 +157,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssssssssssssssssssssssssssss
         :index="subIndex"
         :level="nextLevel"
         :mode="mode"
-        :parent-index="index"
+        :numbering-path="`${taskNumber}.${subIndex + 1}`"
         :parent-task="task"
         :is-last="subIndex === task.subtasks.length - 1"
         @remove="store.removeNestedTask(task, subtask.id)"
@@ -170,13 +178,12 @@ interface Props {
   index: number
   level: 1 | 2 | 3
   mode: 'simple' | 'complex'
-  parentIndex?: number
+  numberingPath: string
   isLast?: boolean
   parentTask?: TaskDraft
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  parentIndex: 0,
   isLast: false
 })
 
@@ -193,12 +200,18 @@ const isDragOver = ref(false)
 
 const canAddSubtasks = computed(() => props.mode === 'complex' && props.level < 3)
 const nextLevel = computed(() => (props.level + 1) as 2 | 3)
-
-const taskNumber = computed(() => {
-  if (props.level === 1) return `${props.index + 1}`
-  if (props.level === 2) return `${props.parentIndex + 1}.${props.index + 1}`
-  return `${props.parentIndex + 1}.?.${props.index + 1}`
+const isPointsDerived = computed(() => props.task.subtasks.length > 0 || props.task.criteria.length > 0)
+const pointsHint = computed(() => {
+  if (props.task.subtasks.length > 0) {
+    return 'Wird automatisch aus den Teilaufgaben berechnet.'
+  }
+  if (props.task.criteria.length > 0) {
+    return 'Wird automatisch aus den Kriterien berechnet.'
+  }
+  return ''
 })
+
+const taskNumber = computed(() => props.numberingPath)
 
 const headerTag = computed(() => {
   if (props.level === 1) return 'h3'

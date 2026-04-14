@@ -28,7 +28,21 @@ export class IndexedDBInitialSchemaMigration implements IndexedDBMigration {
     ]);
 
     createStore('students', [
-      { name: 'class_group_id', keyPath: 'class_group_id' }
+      { name: 'class_group_id', keyPath: 'class_group_id' },
+      { name: 'email', keyPath: 'email' }
+    ]);
+
+    createStore('sport_student_profiles', [
+      { name: 'student_id', keyPath: 'student_id', unique: true }
+    ]);
+
+    createStore('import_batches', [
+      { name: 'source_type', keyPath: 'source_type' }
+    ]);
+
+    createStore('import_batch_items', [
+      { name: 'batch_id', keyPath: 'batch_id' },
+      { name: 'entity', keyPath: ['entity_type', 'entity_id'] }
     ]);
 
     createStore('lessons', [

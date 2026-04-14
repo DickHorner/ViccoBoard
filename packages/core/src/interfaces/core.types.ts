@@ -60,15 +60,18 @@ export interface ClassGroup {
   lastModified: Date;
 }
 
+export type StudentGender = 'm' | 'f';
+
 export interface Student {
   id: string;
   firstName: string;
   lastName: string;
-  birthYear?: number;
-  gender?: 'male' | 'female' | 'diverse';
+  dateOfBirth: string | null;
+  gender?: StudentGender;
   photoUri?: string;
   contactInfo?: ContactInfo;
   classGroupId: string;
+  legacyDateOfBirthMissing?: boolean;
   createdAt: Date;
   lastModified: Date;
 }
@@ -77,6 +80,57 @@ export interface ContactInfo {
   email?: string;
   parentEmail?: string;
   phone?: string;
+}
+
+export interface StudentModuleProfile {
+  id: string;
+  studentId: string;
+  moduleKey: string;
+  createdAt: Date;
+  lastModified: Date;
+}
+
+export interface SportStudentProfile extends StudentModuleProfile {
+  moduleKey: 'sport';
+  medicalNotes?: string;
+  asthma?: boolean;
+  diabetes?: boolean;
+  hemiplegia?: boolean;
+  exemptFrom?: string | null;
+  exemptUntil?: string | null;
+  disadvantageCompensation?: string;
+  swimmingCapable?: boolean;
+}
+
+export interface ImportBatchSummary {
+  read: number;
+  valid: number;
+  imported: number;
+  skipped: number;
+  conflicts: number;
+  errors: number;
+}
+
+export interface ImportBatch {
+  id: string;
+  sourceType: 'demo' | 'live';
+  importType: 'student_csv';
+  label: string;
+  summary: ImportBatchSummary;
+  metadata?: Record<string, unknown>;
+  createdAt: Date;
+  lastModified: Date;
+}
+
+export interface ImportBatchItem {
+  id: string;
+  batchId: string;
+  entityType: 'student' | 'class_group';
+  entityId: string;
+  action: 'created' | 'reused' | 'skipped' | 'conflict';
+  payload?: Record<string, unknown>;
+  createdAt: Date;
+  lastModified: Date;
 }
 
 export interface Lesson {

@@ -8,6 +8,7 @@ export interface Exam {
   id: string;
   title: string;
   description?: string;
+  date?: Date;
   classGroupId?: string;
   mode: ExamMode;
   structure: ExamStructure;

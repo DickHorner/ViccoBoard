@@ -44,6 +44,7 @@ describe('RecordGradeUseCase', () => {
     const student = await studentRepository.create({
       firstName: 'Jane',
       lastName: 'Doe',
+      dateOfBirth: '2012-05-11',
       classGroupId: classGroup.id
     });
     testStudentId = student.id;

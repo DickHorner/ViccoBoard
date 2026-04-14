@@ -57,9 +57,9 @@ describe('SportabzeichenService', () => {
     }
   ];
 
-  test('calculates age from birth year', () => {
+  test('calculates age from date of birth', () => {
     const service = new SportabzeichenService();
-    const age = service.calculateAgeFromBirthYear(2012, new Date('2026-06-01T00:00:00.000Z'));
+    const age = service.calculateAgeFromDateOfBirth('2012-05-15', new Date('2026-06-01T00:00:00.000Z'));
     expect(age).toBe(14);
   });
 
