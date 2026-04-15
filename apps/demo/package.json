@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@viccoboard/core": "*",
-    "@viccoboard/students": "*",
     "@viccoboard/sport": "*",
-    "@viccoboard/storage": "*"
+    "@viccoboard/storage": "*",
+    "@viccoboard/students": "*"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",
