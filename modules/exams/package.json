@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./rule-packs": {
+      "types": "./dist/rule-packs/index.d.ts",
+      "import": "./dist/rule-packs/index.js"
     }
   },
   "scripts": {
@@ -22,7 +26,8 @@
     "@viccoboard/storage": "*",
     "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

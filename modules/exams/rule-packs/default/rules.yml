@@ -1,0 +1,24 @@
+rulePackId: default
+taskSelection: leaf-only
+scoring:
+  aggregation: scoring-unit
+  allowPartialPoints: true
+  allowAlternativeGrading: true
+  allowManualScoringUnits: false
+evidence:
+  required: false
+  supportedKinds:
+    - text
+    - quote
+    - annotation
+    - link
+    - attachment
+    - structured
+  allowMultipleEvidenceItems: true
+imports:
+  mergeStrategy: merge
+  allowUnmappedScores: false
+  preserveManualComments: true
+  preserveExistingEvidence: true
+metadata:
+  policy: generic-default

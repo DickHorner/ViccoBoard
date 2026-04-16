@@ -1,0 +1,18 @@
+id: default
+schemaVersion: "1"
+version: 1.0.0
+name: Default correction session rule pack
+description: Generic default resources for external correction-session contracts and imports.
+target: correction-session
+resources:
+  rules: rules.yml
+  contractTemplate: contract.template.md
+  promptTemplate: prompt.template.md
+  importBundleSchema: import-bundle.schema.json
+compatibility:
+  contractType: correction-session
+  contractVersion: "1"
+  importBundleType: correction-import-bundle
+  importBundleVersion: "1"
+metadata:
+  audience: generic-correction-session

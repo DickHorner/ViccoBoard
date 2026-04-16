@@ -136,13 +136,36 @@ export interface KbrCorrectionSessionMap {
  */
 export interface RulePackManifest {
   id: string;
+  schemaVersion: string;
   version: string;
   name: string;
   description?: string;
   chatRef?: string;
   target: 'correction-session';
+  resources: RulePackManifestResources;
+  compatibility?: RulePackCompatibility;
   checksum?: string;
   metadata?: Record<string, unknown>;
+}
+
+/**
+ * Runtime resource file references contained in a rule pack manifest.
+ */
+export interface RulePackManifestResources {
+  rules: string;
+  contractTemplate: string;
+  promptTemplate: string;
+  importBundleSchema: string;
+}
+
+/**
+ * Optional compatibility metadata for versioned rule packs.
+ */
+export interface RulePackCompatibility {
+  contractType: 'correction-session';
+  contractVersion: string;
+  importBundleType: 'correction-import-bundle';
+  importBundleVersion: string;
 }
 
 /**
@@ -218,4 +241,37 @@ export interface KbrCorrectionImportBundle {
   importedTaskScores: KbrCorrectionImportedTaskScore[];
   evidence?: KbrCorrectionEvidence[];
   metadata?: Record<string, unknown>;
+}
+
+/**
+ * Generic markdown templates bundled with a correction-session rule pack.
+ */
+export interface CorrectionSessionTemplateSet {
+  contract: string;
+  prompt: string;
+}
+
+/**
+ * Minimal JSON schema document shape used for import bundle validation.
+ */
+export interface CorrectionSessionImportBundleSchemaDocument {
+  $schema?: string;
+  $id?: string;
+  title?: string;
+  description?: string;
+  type: 'object';
+  properties?: Record<string, unknown>;
+  required?: string[];
+  additionalProperties?: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Loaded correction-session rule pack with resources already resolved.
+ */
+export interface CorrectionSessionRulePack {
+  manifest: RulePackManifest;
+  rules: CorrectionSessionRules;
+  templates: CorrectionSessionTemplateSet;
+  importBundleSchema: CorrectionSessionImportBundleSchemaDocument;
 }
