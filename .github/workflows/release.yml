@@ -50,17 +50,10 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Build demo app
-        run: npm run build --workspace=@viccoboard/demo
-        continue-on-error: true
-        env:
-          NODE_ENV: production
-
       - name: Create release directory
         run: |
           mkdir -p release-artifacts
           mkdir -p release-artifacts/teacher-ui
-          mkdir -p release-artifacts/demo
 
       - name: Copy teacher UI build artifacts
         run: |
@@ -69,15 +62,6 @@ jobs:
             echo "Teacher UI built successfully" >> release-artifacts/BUILD_INFO.txt
           else
             echo "⚠️  Teacher UI build not found" >> release-artifacts/BUILD_INFO.txt
-          fi
-
-      - name: Copy demo build artifacts
-        run: |
-          if [ -d "apps/demo/dist" ]; then
-            cp -r apps/demo/dist/* release-artifacts/demo/
-            echo "Demo app built successfully" >> release-artifacts/BUILD_INFO.txt
-          else
-            echo "⚠️  Demo build not found" >> release-artifacts/BUILD_INFO.txt
           fi
 
       - name: Create build metadata
@@ -126,11 +110,6 @@ jobs:
           - Data stored locally in browser (IndexedDB)
           - Regular backups recommended (export feature in app)
 
-          ## Demo App
-
-          The `demo/` directory contains a demonstration/testing version.
-          Follow similar deployment steps as Teacher UI.
-
           ## Support
 
           For issues and documentation, visit: https://github.com/DickHorner/ViccoBoard
@@ -164,7 +143,6 @@ jobs:
             ### 📱 What's Included
 
             - **Teacher UI**: Full-featured teacher interface for Sport + KBR
-            - **Demo App**: Demonstration/testing version
             - **Documentation**: Deployment instructions and build info
 
             ### 🚀 Quick Start

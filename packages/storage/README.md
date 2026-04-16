@@ -1,6 +1,6 @@
 # @viccoboard/storage
 
-Storage implementations for ViccoBoard. The browser-first runtime targets **IndexedDB** (encrypted options planned) and includes an `IndexedDBStorage` adapter. A Node-focused **SQLite** adapter (`SQLiteStorage`) is provided for local CLI demos and testing (SQLCipher-ready).
+Storage implementations for ViccoBoard. The browser-first runtime targets **IndexedDB** (encrypted options planned) and includes an `IndexedDBStorage` adapter. A Node-focused **SQLite** adapter (`SQLiteStorage`) is provided for tests and maintenance tooling (SQLCipher-ready).
 
 ## Features
 

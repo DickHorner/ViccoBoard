@@ -118,7 +118,7 @@ graph LR
 | Weitere Live-Tools | Taktikboard, Turniere, Feedback | In Arbeit | `TacticsBoard.vue`, `Tournaments.vue`, `FeedbackTool.vue` |
 | Pruefungsaufbau (KBR) | Exam-Builder-Flows (einfach/komplex) + Persistenzgrundlage | Verfuegbar | `KBRExamBuilder.vue`, `SimpleExamBuilder.vue`, `modules/exams/src/repositories/*` |
 | Korrektur (KBR) | Kompakte Korrektur-Views und Regelbausteine vorhanden | Teilweise | `CorrectionCompact.vue`, `CorrectionCompactUI_v2.vue`, `modules/exams/src/services/*` |
-| Local-first Datenhaltung | IndexedDB-Storage mit Migrationen (Browser), SQLite-Demo fuer CLI | Verfuegbar | `apps/teacher-ui/src/services/storage.service.ts`, `packages/storage/src/*`, `apps/demo/src/index.ts` |
+| Local-first Datenhaltung | IndexedDB-Storage mit Migrationen (Browser) plus Node-seitige SQLite-Unterstuetzung fuer Tests/Wartung | Verfuegbar | `apps/teacher-ui/src/services/storage.service.ts`, `packages/storage/src/*` |
 
 [Zurueck nach oben](#top)
 
@@ -177,7 +177,6 @@ Weitere nuetzliche Kommandos:
 npm run lint:docs
 npm run typecheck
 npm run test
-npm run demo
 ```
 
 Mehr Kontext:

@@ -52,10 +52,6 @@ npm run dev
 # Teacher UI - production preview
 npm run build
 npm run preview
-
-# Demo CLI app (optional)
-cd apps/demo
-npm run dev
 ```
 
 ## Project Structure
@@ -73,13 +69,12 @@ ViccoBoard/
 │   ├── export/          # PDF/CSV exports
 │   └── integrations/    # External integrations
 ├── apps/                 # Applications
-│   ├── teacher-ui/      # Main teacher app (Vue 3, web-only)
-│   └── demo/            # CLI demo (Node-only)
+│   └── teacher-ui/      # Main teacher app (Vue 3, web-only)
 ├── Plan.md              # Feature specification
 ├── agents.md            # Agent guidelines
 ├── README.md            # Project overview
 ├── INDEX.md             # Documentation index
-└── docs/                # Planning, reviews, QA, status, demo docs
+└── docs/                # Planning, reviews, QA, and status docs
 ```
 
 ## Development Workflow
@@ -487,7 +482,7 @@ export { LocalType };
 
 ### Storage Notes
 
-By default, ViccoBoard targets **IndexedDB** for browser/runtime storage (encrypted storage + migrations). For local CLI development and the demo runner we keep a SQLite adapter (Node-only). Add `IndexedDB` migrations and adapters under `packages/storage` and prefer them for web apps. iPadOS Safari can evict local storage after inactivity: always surface backup status/reminders and support export/import via download + file picker (no File System Access API).
+By default, ViccoBoard targets **IndexedDB** for browser/runtime storage (encrypted storage + migrations). For Node-side tests and maintenance tooling we keep a SQLite adapter (Node-only). Add `IndexedDB` migrations and adapters under `packages/storage` and prefer them for web apps. iPadOS Safari can evict local storage after inactivity: always surface backup status/reminders and support export/import via download + file picker (no File System Access API).
 
 ### SQLite Database
 
