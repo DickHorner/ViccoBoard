@@ -1,5 +1,5 @@
 /**
- * Fachagnostic contracts for persisting and exchanging correction sessions that
+ * Domain-agnostic contracts for persisting and exchanging correction sessions that
  * were assisted by an external chat system.
  */
 
@@ -133,7 +133,8 @@ export interface KbrCorrectionSessionContract {
  */
 export interface KbrCorrectionImportBundle {
   /**
-   * Payload schema version for compatibility checks.
+   * Payload schema version for compatibility checks (for example semantic
+   * versioning such as `1.0.0`).
    */
   version: string;
 
