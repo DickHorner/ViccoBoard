@@ -16,7 +16,7 @@
     "useDefineForClassFields": true,
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@viccoboard/core": ["../../packages/core/src"],
