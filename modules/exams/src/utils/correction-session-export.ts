@@ -128,12 +128,6 @@ export function buildExamReference(exam: Exams.Exam): string {
   return `exam-${sanitizeReferenceToken(exam.title, 'pruefung')}`;
 }
 
-export function buildCandidateReference(candidate: Exams.Candidate, index: number): string {
-  const name = `${candidate.firstName} ${candidate.lastName}`.trim();
-  const nameToken = sanitizeReferenceToken(name, `candidate-${index + 1}`);
-  return `candidate-${String(index + 1).padStart(2, '0')}-${nameToken}`;
-}
-
 export function buildCorrectionSessionReferenceMaps(exam: Exams.Exam): CorrectionSessionReferenceMaps {
   const examRef = buildExamReference(exam);
   const partRefById: Record<string, string> = {};

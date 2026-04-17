@@ -25,6 +25,8 @@ import {
 } from '../utils/correction-session-export.js';
 import { renderTemplate } from '../utils/template-renderer.js';
 
+const CHAT_REF_PADDING_LENGTH = 4;
+
 export interface CorrectionSessionExportFileArtifact {
   fileName: string;
   content: string;
@@ -134,7 +136,7 @@ export class ExportCorrectionSessionArtifactsUseCase {
     const renderedRules = renderCorrectionSessionRules(rulePack.rules);
     const sessionMap: Record<string, string> = {};
     const chatRefs = selectedCandidates.map((candidate, index) => {
-      const chatRef = `chat-${String(index + 1).padStart(4, '0')}`;
+      const chatRef = `chat-${String(index + 1).padStart(CHAT_REF_PADDING_LENGTH, '0')}`;
       sessionMap[chatRef] = candidate.id;
       return chatRef;
     });

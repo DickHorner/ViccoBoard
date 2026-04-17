@@ -15,7 +15,7 @@
     "chatRef": {
       "type": "string",
       "minLength": 1,
-      "pattern": "^chat-[0-9]{4}$",
+      "pattern": "^chat-[0-9]+$",
       "description": "Session-local opaque chat reference of the corrected Leistung."
     },
     "rulePack": {
