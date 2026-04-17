@@ -18,9 +18,13 @@ describe('correction session rule pack loader', () => {
     expect(rulePack.manifest.id).toBe('default');
     expect(rulePack.manifest.resources.rules).toBe('rules.yml');
     expect(rulePack.rules.rulePackId).toBe('default');
+    expect(rulePack.rules.scoring.aggregation).toBe('task');
     expect(rulePack.templates.contract).toContain('{{session.chatRef}}');
+    expect(rulePack.templates.contract).toContain('{{render.chatRefs}}');
+    expect(rulePack.templates.contract).not.toContain('{{session.candidateRef}}');
     expect(rulePack.templates.prompt).toContain('{{contractMarkdown}}');
     expect(rulePack.importBundleSchema.type).toBe('object');
+    expect(rulePack.importBundleSchema.properties?.sessionMap).toBeUndefined();
   });
 
   it('resolves the default rule pack directory inside the exams package', () => {

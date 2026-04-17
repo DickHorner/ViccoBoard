@@ -3,9 +3,12 @@
 - Session ID: `{{session.id}}`
 - Chat Reference: `{{session.chatRef}}`
 - Title: `{{session.title}}`
-- Exam Reference: `{{session.examId}}`
-- Candidate Reference: `{{session.candidateId}}`
+- Exam Reference: `{{session.examRef}}`
 - Rule Pack: `{{rulePack.manifest.id}}@{{rulePack.manifest.version}}`
+
+## Chat References
+
+{{render.chatRefs}}
 
 ## Parts
 

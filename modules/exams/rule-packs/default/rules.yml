@@ -1,7 +1,7 @@
 rulePackId: default
 taskSelection: leaf-only
 scoring:
-  aggregation: scoring-unit
+  aggregation: task
   allowPartialPoints: true
   allowAlternativeGrading: true
   allowManualScoringUnits: false

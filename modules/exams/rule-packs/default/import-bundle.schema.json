@@ -12,10 +12,6 @@
       "required": ["id", "chatRef", "title", "parts", "taskTree", "scoringUnits", "rules"],
       "additionalProperties": true
     },
-    "sessionMap": {
-      "type": "object",
-      "additionalProperties": true
-    },
     "rulePack": {
       "type": "object",
       "additionalProperties": true
