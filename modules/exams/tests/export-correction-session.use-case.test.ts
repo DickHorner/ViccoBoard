@@ -139,12 +139,12 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(result.sessionId).toBe('session-2026-04-17');
     expect(result.artifact.sessionChatRef).toBe('session-session-2026-04-17');
     expect(result.artifact.chatRefs).toEqual([
-      'chat-session-2026-04-17-candidate-01-mia-muster',
-      'chat-session-2026-04-17-candidate-02-noah-beispiel'
+      'chat-0001',
+      'chat-0002'
     ]);
     expect(result.sessionMap).toEqual({
-      'chat-session-2026-04-17-candidate-01-mia-muster': 'candidate-internal-1',
-      'chat-session-2026-04-17-candidate-02-noah-beispiel': 'candidate-internal-2'
+      'chat-0001': 'candidate-internal-1',
+      'chat-0002': 'candidate-internal-2'
     });
 
     const artifact = result.artifact;
@@ -182,12 +182,12 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     });
 
     expect(artifact.contractFile.content).toContain('Exam Reference: `exam-deutsch-klassenarbeit-1`');
-    expect(artifact.contractFile.content).toContain(
-      '- chat-session-2026-04-17-candidate-01-mia-muster'
-    );
+    expect(artifact.contractFile.content).toContain('- chat-0001');
     expect(artifact.contractFile.content).not.toContain('Candidate Reference');
     expect(artifact.contractFile.content).not.toContain('exam-internal-id');
     expect(artifact.contractFile.content).not.toContain('candidate-internal-1');
+    expect(artifact.contractFile.content).not.toContain('mia-muster');
+    expect(artifact.contractFile.content).not.toContain('noah-beispiel');
     expect(artifact.promptFile.content).toContain(artifact.contractFile.content);
     expect(artifact.localReferenceMap.taskIdByRef['task-1.1']).toBe('task-leaf-a');
     expect(artifact.localReferenceMap.scoringUnitKeyByRef['task-1.1.score']).toBe(

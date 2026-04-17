@@ -5,12 +5,18 @@
   "description": "Generic import bundle for externally corrected task scores and linked evidence.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["contract", "importedTaskScores"],
+  "required": ["contract", "chatRef", "importedTaskScores"],
   "properties": {
     "contract": {
       "type": "object",
       "required": ["id", "chatRef", "title", "parts", "taskTree", "scoringUnits", "rules"],
       "additionalProperties": true
+    },
+    "chatRef": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^chat-[0-9]{4}$",
+      "description": "Session-local opaque chat reference of the corrected Leistung."
     },
     "rulePack": {
       "type": "object",

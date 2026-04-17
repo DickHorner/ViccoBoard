@@ -22,3 +22,12 @@ imports:
   preserveExistingEvidence: true
 metadata:
   policy: generic-default
+  deductionGovernance:
+    applyWhenPointsBelowMaxPoints: true
+    requireDefectStatement: true
+    requireEvidence: true
+    requireExplanationForAnyNonFullScore: true
+    rejectUnjustifiedDeductions: true
+    minimumDeductionStepRequiresJustification: true
+    onMissingDefect: reject-deduction
+    onMissingEvidence: reject-deduction
