@@ -8,6 +8,8 @@ Session workflow (generic and strict):
 - keep each Leistung isolated; do not mix data between Leistungen
 - use only `chatRef` as external reference
 - do not use names, candidate IDs, student IDs, or other personal identifiers
+- use only the supplied contract structure for all structured outputs
+- do not invent assessment metadata, fields, labels, scoring dimensions, or identifiers that are not present in the loaded contract or rules
 - emit importable task scores and evidence only when supported by the loaded rules
 - keep comments and evidence tied to explicit task or scoring-unit references
 
