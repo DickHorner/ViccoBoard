@@ -10,6 +10,7 @@ Session workflow (generic and strict):
 - do not use names, candidate IDs, student IDs, or other personal identifiers
 - emit importable task scores and evidence only when supported by the loaded rules
 - keep comments and evidence tied to explicit task or scoring-unit references
+- treat `evidence.required` as global evidence policy and `deductionGovernance.requireEvidenceForDeductions` as deduction-specific policy
 
 Control commands in this session:
 - `Zwischenexport`: output current result state for the active `chatRef`

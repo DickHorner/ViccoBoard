@@ -40,6 +40,42 @@ function optionalRecord(value: unknown): Record<string, unknown> | undefined {
   return value === undefined ? undefined : expectPlainObject(value, 'metadata');
 }
 
+function expectEnumString<T extends string>(
+  value: unknown,
+  label: string,
+  supportedValues: readonly T[]
+): T {
+  const parsed = expectString(value, label);
+  if (!supportedValues.includes(parsed as T)) {
+    throw new Error(`${label} must be one of: ${supportedValues.join(', ')}.`);
+  }
+
+  return parsed as T;
+}
+
+function rejectDeductionGovernanceMetadataShadow(metadata: Record<string, unknown> | undefined): void {
+  if (!metadata) {
+    return;
+  }
+
+  const shadowKeys = [
+    // Legacy nested metadata path replaced by first-class rules.deductionGovernance.
+    'deductionGovernance',
+    // Legacy metadata switches replaced by first-class deductionGovernance fields.
+    'requireEvidence',
+    'requireExplanationForAnyNonFullScore',
+    'rejectUnjustifiedDeductions',
+    'minimumDeductionStepRequiresJustification',
+    'onMissingDefectRejectDeduction',
+    'onMissingEvidenceRejectDeduction'
+  ] as const;
+
+  const foundKey = shadowKeys.find((key) => key in metadata);
+  if (foundKey) {
+    throw new Error(`Correction session metadata must not define deduction governance key "${foundKey}".`);
+  }
+}
+
 export function validateRulePackManifest(input: unknown): Exams.RulePackManifest {
   const manifest = expectPlainObject(input, 'Rule pack manifest');
   const resourcesInput = expectPlainObject(manifest.resources, 'Rule pack manifest resources');
@@ -99,22 +135,40 @@ export function validateCorrectionSessionRules(input: unknown): Exams.Correction
   const rules = expectPlainObject(input, 'Correction session rules');
   const scoring = expectPlainObject(rules.scoring, 'Correction session scoring rules');
   const evidence = expectPlainObject(rules.evidence, 'Correction session evidence rules');
+  const deductionGovernance = expectPlainObject(
+    rules.deductionGovernance,
+    'Correction session deduction governance rules'
+  );
   const imports = expectPlainObject(rules.imports, 'Correction session import rules');
+  const metadata = optionalRecord(rules.metadata);
 
-  const taskSelection = expectString(rules.taskSelection, 'Correction session taskSelection');
-  if (!['leaf-only', 'all-nodes', 'mapped-only'].includes(taskSelection)) {
-    throw new Error(`Unsupported taskSelection "${taskSelection}".`);
-  }
+  const taskSelection = expectEnumString(rules.taskSelection, 'Correction session taskSelection', [
+    'leaf-only',
+    'all-nodes',
+    'mapped-only'
+  ] as const);
+  const aggregation = expectEnumString(scoring.aggregation, 'Correction session scoring aggregation', [
+    'task',
+    'scoring-unit',
+    'external'
+  ] as const);
+  const mergeStrategy = expectEnumString(imports.mergeStrategy, 'Correction session import mergeStrategy', [
+    'replace',
+    'merge',
+    'append'
+  ] as const);
+  const onMissingDefect = expectEnumString(
+    deductionGovernance.onMissingDefect,
+    'Correction session deduction governance onMissingDefect',
+    ['reject-deduction', 'allow-deduction'] as const
+  );
+  const onMissingEvidence = expectEnumString(
+    deductionGovernance.onMissingEvidence,
+    'Correction session deduction governance onMissingEvidence',
+    ['reject-deduction', 'allow-deduction'] as const
+  );
 
-  const aggregation = expectString(scoring.aggregation, 'Correction session scoring aggregation');
-  if (!['task', 'scoring-unit', 'external'].includes(aggregation)) {
-    throw new Error(`Unsupported scoring aggregation "${aggregation}".`);
-  }
-
-  const mergeStrategy = expectString(imports.mergeStrategy, 'Correction session import mergeStrategy');
-  if (!['replace', 'merge', 'append'].includes(mergeStrategy)) {
-    throw new Error(`Unsupported mergeStrategy "${mergeStrategy}".`);
-  }
+  rejectDeductionGovernanceMetadataShadow(metadata);
 
   return {
     rulePackId: rules.rulePackId === undefined ? undefined : expectString(rules.rulePackId, 'Correction session rulePackId'),
@@ -137,13 +191,41 @@ export function validateCorrectionSessionRules(input: unknown): Exams.Correction
         }),
       allowMultipleEvidenceItems: expectBoolean(evidence.allowMultipleEvidenceItems, 'Correction session evidence allowMultipleEvidenceItems')
     },
+    deductionGovernance: {
+      applyWhenPointsBelowMaxPoints: expectBoolean(
+        deductionGovernance.applyWhenPointsBelowMaxPoints,
+        'Correction session deduction governance applyWhenPointsBelowMaxPoints'
+      ),
+      requireDefectStatement: expectBoolean(
+        deductionGovernance.requireDefectStatement,
+        'Correction session deduction governance requireDefectStatement'
+      ),
+      requireEvidenceForDeductions: expectBoolean(
+        deductionGovernance.requireEvidenceForDeductions,
+        'Correction session deduction governance requireEvidenceForDeductions'
+      ),
+      requireExplanationForAnyNonFullScore: expectBoolean(
+        deductionGovernance.requireExplanationForAnyNonFullScore,
+        'Correction session deduction governance requireExplanationForAnyNonFullScore'
+      ),
+      rejectUnjustifiedDeductions: expectBoolean(
+        deductionGovernance.rejectUnjustifiedDeductions,
+        'Correction session deduction governance rejectUnjustifiedDeductions'
+      ),
+      minimumDeductionStepRequiresJustification: expectBoolean(
+        deductionGovernance.minimumDeductionStepRequiresJustification,
+        'Correction session deduction governance minimumDeductionStepRequiresJustification'
+      ),
+      onMissingDefect,
+      onMissingEvidence
+    },
     imports: {
       mergeStrategy: mergeStrategy as Exams.CorrectionSessionImportRules['mergeStrategy'],
       allowUnmappedScores: expectBoolean(imports.allowUnmappedScores, 'Correction session import allowUnmappedScores'),
       preserveManualComments: expectBoolean(imports.preserveManualComments, 'Correction session import preserveManualComments'),
       preserveExistingEvidence: expectBoolean(imports.preserveExistingEvidence, 'Correction session import preserveExistingEvidence')
     },
-    metadata: optionalRecord(rules.metadata)
+    metadata
   };
 }
 

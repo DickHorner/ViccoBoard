@@ -8,6 +8,7 @@ import {
   loadCorrectionSessionRulePackFromDirectory,
   loadDefaultCorrectionSessionRulePack,
   resolveDefaultCorrectionSessionRulePackDirectory,
+  validateCorrectionSessionRules,
   validateRulePackManifest
 } from '../src/rule-packs/index';
 
@@ -19,6 +20,18 @@ describe('correction session rule pack loader', () => {
     expect(rulePack.manifest.resources.rules).toBe('rules.yml');
     expect(rulePack.rules.rulePackId).toBe('default');
     expect(rulePack.rules.scoring.aggregation).toBe('task');
+    expect(rulePack.rules.evidence.required).toBe(false);
+    expect(rulePack.rules.deductionGovernance).toEqual({
+      applyWhenPointsBelowMaxPoints: true,
+      requireDefectStatement: true,
+      requireEvidenceForDeductions: true,
+      requireExplanationForAnyNonFullScore: true,
+      rejectUnjustifiedDeductions: true,
+      minimumDeductionStepRequiresJustification: true,
+      onMissingDefect: 'reject-deduction',
+      onMissingEvidence: 'reject-deduction'
+    });
+    expect(rulePack.rules.metadata?.deductionGovernance).toBeUndefined();
     expect(rulePack.templates.contract).toContain('{{session.chatRef}}');
     expect(rulePack.templates.contract).toContain('{{render.chatRefs}}');
     expect(rulePack.templates.contract).not.toContain('{{session.candidateRef}}');
@@ -70,5 +83,70 @@ describe('correction session rule pack loader', () => {
     });
 
     expect(manifest.resources.promptTemplate).toBe('prompt.template.md');
+  });
+
+  it('rejects correction rules without first-class deduction governance', () => {
+    expect(() =>
+      validateCorrectionSessionRules({
+        taskSelection: 'leaf-only',
+        scoring: {
+          aggregation: 'task',
+          allowPartialPoints: true,
+          allowAlternativeGrading: true,
+          allowManualScoringUnits: false
+        },
+        evidence: {
+          required: false,
+          supportedKinds: ['text'],
+          allowMultipleEvidenceItems: true
+        },
+        imports: {
+          mergeStrategy: 'merge',
+          allowUnmappedScores: false,
+          preserveManualComments: true,
+          preserveExistingEvidence: true
+        }
+      })
+    ).toThrow('Correction session deduction governance rules must be an object.');
+  });
+
+  it('rejects deduction governance shadow keys in metadata', () => {
+    expect(() =>
+      validateCorrectionSessionRules({
+        taskSelection: 'leaf-only',
+        scoring: {
+          aggregation: 'task',
+          allowPartialPoints: true,
+          allowAlternativeGrading: true,
+          allowManualScoringUnits: false
+        },
+        evidence: {
+          required: false,
+          supportedKinds: ['text'],
+          allowMultipleEvidenceItems: true
+        },
+        deductionGovernance: {
+          applyWhenPointsBelowMaxPoints: true,
+          requireDefectStatement: true,
+          requireEvidenceForDeductions: true,
+          requireExplanationForAnyNonFullScore: true,
+          rejectUnjustifiedDeductions: true,
+          minimumDeductionStepRequiresJustification: true,
+          onMissingDefect: 'reject-deduction',
+          onMissingEvidence: 'reject-deduction'
+        },
+        imports: {
+          mergeStrategy: 'merge',
+          allowUnmappedScores: false,
+          preserveManualComments: true,
+          preserveExistingEvidence: true
+        },
+        metadata: {
+          deductionGovernance: {
+            requireEvidence: true
+          }
+        }
+      })
+    ).toThrow('Correction session metadata must not define deduction governance key "deductionGovernance".');
   });
 });
