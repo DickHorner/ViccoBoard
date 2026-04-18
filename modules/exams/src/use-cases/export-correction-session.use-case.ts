@@ -11,7 +11,6 @@ import type {
   LoadedCorrectionSessionRulePack
 } from '../rule-packs/types.js';
 import {
-  buildCandidateReference,
   buildCorrectionSessionParts,
   buildCorrectionSessionReferenceMaps,
   buildCorrectionSessionScoringUnits,
@@ -25,6 +24,8 @@ import {
   type CorrectionSessionReferenceMaps
 } from '../utils/correction-session-export.js';
 import { renderTemplate } from '../utils/template-renderer.js';
+
+const CHAT_REF_PADDING_LENGTH = 4;
 
 export interface CorrectionSessionExportFileArtifact {
   fileName: string;
@@ -135,8 +136,7 @@ export class ExportCorrectionSessionArtifactsUseCase {
     const renderedRules = renderCorrectionSessionRules(rulePack.rules);
     const sessionMap: Record<string, string> = {};
     const chatRefs = selectedCandidates.map((candidate, index) => {
-      const candidateRef = buildCandidateReference(candidate, index);
-      const chatRef = `chat-${sessionId}-${candidateRef}`;
+      const chatRef = `chat-${String(index + 1).padStart(CHAT_REF_PADDING_LENGTH, '0')}`;
       sessionMap[chatRef] = candidate.id;
       return chatRef;
     });
