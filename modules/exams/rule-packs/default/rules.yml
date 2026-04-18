@@ -25,9 +25,9 @@ metadata:
   deductionGovernance:
     applyWhenPointsBelowMaxPoints: true
     requireDefectStatement: true
-  requireEvidence: true
-  requireExplanationForAnyNonFullScore: true
-  rejectUnjustifiedDeductions: true
-  minimumDeductionStepRequiresJustification: true
-  onMissingDefectRejectDeduction: true
-  onMissingEvidenceRejectDeduction: true
+    requireEvidence: true
+    requireExplanationForAnyNonFullScore: true
+    rejectUnjustifiedDeductions: true
+    minimumDeductionStepRequiresJustification: true
+    onMissingDefectRejectDeduction: true
+    onMissingEvidenceRejectDeduction: true
