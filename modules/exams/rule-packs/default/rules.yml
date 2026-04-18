@@ -15,6 +15,15 @@ evidence:
     - attachment
     - structured
   allowMultipleEvidenceItems: true
+deductionGovernance:
+  applyWhenPointsBelowMaxPoints: true
+  requireDefectStatement: true
+  requireEvidenceForDeductions: true
+  requireExplanationForAnyNonFullScore: true
+  rejectUnjustifiedDeductions: true
+  minimumDeductionStepRequiresJustification: true
+  onMissingDefect: reject-deduction
+  onMissingEvidence: reject-deduction
 imports:
   mergeStrategy: merge
   allowUnmappedScores: false

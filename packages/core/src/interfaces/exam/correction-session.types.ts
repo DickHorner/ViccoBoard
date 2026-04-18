@@ -188,6 +188,21 @@ export interface CorrectionSessionEvidenceRules {
 }
 
 /**
+ * Rules that govern deduction validation and evidence requirements for
+ * non-full scores.
+ */
+export interface CorrectionSessionDeductionGovernanceRules {
+  applyWhenPointsBelowMaxPoints: boolean;
+  requireDefectStatement: boolean;
+  requireEvidenceForDeductions: boolean;
+  requireExplanationForAnyNonFullScore: boolean;
+  rejectUnjustifiedDeductions: boolean;
+  minimumDeductionStepRequiresJustification: boolean;
+  onMissingDefect: 'reject-deduction' | 'allow-deduction';
+  onMissingEvidence: 'reject-deduction' | 'allow-deduction';
+}
+
+/**
  * Rules for how imported scores should be merged into an existing session.
  */
 export interface CorrectionSessionImportRules {
@@ -205,6 +220,7 @@ export interface CorrectionSessionRules {
   taskSelection: 'leaf-only' | 'all-nodes' | 'mapped-only';
   scoring: CorrectionSessionScoringRules;
   evidence: CorrectionSessionEvidenceRules;
+  deductionGovernance: CorrectionSessionDeductionGovernanceRules;
   imports: CorrectionSessionImportRules;
   metadata?: Record<string, unknown>;
 }
