@@ -75,5 +75,7 @@ export * from './use-cases/save-correction-sheet-preset.use-case.js';
 export * from './use-cases/build-correction-sheet-projection.use-case.js';
 export * from './use-cases/export-correction-sheets-pdf.use-case.js';
 export * from './use-cases/export-correction-session.use-case.js';
+export * from './use-cases/import-kbr-correction-bundle.use-case.js';
 export { RecordCorrectionUseCase } from './use-cases/record-correction.use-case-v2.js';
 export type { RecordCorrectionInput } from './use-cases/record-correction.use-case-v2.js';
+export * from './validators/correction-import-bundle.validator.js';
