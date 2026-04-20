@@ -8,6 +8,10 @@ import {
   getDefaultCorrectionImportBundleSchema,
   validateCorrectionImportBundle
 } from '../validators/correction-import-bundle.validator.js';
+import {
+  buildDeductionManualReviewComment,
+  reviewImportedDeduction
+} from '../validators/deduction-justification.validator.js';
 
 const EPSILON = 1e-6;
 
@@ -22,7 +26,8 @@ export type CorrectionImportUncertaintyCode =
   | 'task-id-unmapped-skipped'
   | 'imported-max-points-exceeds-task-max'
   | 'missing-local-task-map-entry'
-  | 'general-comment-unrecognized';
+  | 'general-comment-unrecognized'
+  | 'deduction-requires-manual-review';
 
 export interface CorrectionImportUncertainty {
   code: CorrectionImportUncertaintyCode;
@@ -157,6 +162,25 @@ function buildExamLevelComment(text: string): Exams.CorrectionComment {
   };
 }
 
+function mergeUniqueComments(commentGroups: Exams.CorrectionComment[][]): Exams.CorrectionComment[] {
+  const merged: Exams.CorrectionComment[] = [];
+  const seen = new Set<string>();
+
+  for (const group of commentGroups) {
+    for (const comment of group) {
+      const key = `${comment.level}:${comment.taskId ?? ''}:${comment.text}`;
+      if (seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      merged.push(comment);
+    }
+  }
+
+  return merged;
+}
+
 function mergeTaskScores(
   existingTaskScores: Exams.TaskScore[],
   importedTaskScores: Exams.TaskScore[],
@@ -203,8 +227,10 @@ export class ImportKbrCorrectionBundleUseCase {
     const uncertainties: CorrectionImportUncertainty[] = [];
     const step = resolveAllowedPointStep(exam);
     const taskById = new Map(exam.structure.tasks.map((task) => [task.id, task]));
+    const evidenceById = new Map((bundle.evidence ?? []).map((evidence) => [evidence.id, evidence]));
     const importedRules = bundle.contract.rules.imports;
     const mappedTaskScores: Exams.TaskScore[] = [];
+    const manualReviewComments: Exams.CorrectionComment[] = [];
     let skippedTaskScoreCount = 0;
 
     for (const importedTaskScore of bundle.importedTaskScores) {
@@ -256,6 +282,16 @@ export class ImportKbrCorrectionBundleUseCase {
 
       assertPointStep(importedTaskScore.points, step, mappedTaskId);
 
+      const deductionReview = reviewImportedDeduction(importedTaskScore, task.points, step, evidenceById);
+      if (deductionReview?.requiresManualReview) {
+        uncertainties.push({
+          code: 'deduction-requires-manual-review',
+          message: `Task "${mappedTaskId}" was marked for manual review: ${deductionReview.message}`,
+          reference: mappedTaskId
+        });
+        manualReviewComments.push(buildDeductionManualReviewComment(mappedTaskId, deductionReview));
+      }
+
       mappedTaskScores.push({
         taskId: mappedTaskId,
         points: importedTaskScore.points,
@@ -279,7 +315,7 @@ export class ImportKbrCorrectionBundleUseCase {
     const existingComments = importedRules.preserveManualComments
       ? (existingCorrection?.comments ?? [])
       : [];
-    const allComments = [...existingComments, ...importedExamComments];
+    const allComments = mergeUniqueComments([existingComments, importedExamComments, manualReviewComments]);
 
     const correction = await this.recordCorrectionUseCase.execute({
       examId: input.examId,

@@ -1,0 +1,40 @@
+
+ PASS  tests/import-kbr-correction-bundle.use-case.test.ts
+  ImportKbrCorrectionBundleUseCase
+    √ imports task scores via chatRef + local session map and stores exam-level comments (47 ms)
+    √ accepts a deduction with defect statement and linked evidence (8 ms)
+    √ marks a deduction without evidence for manual review (8 ms)
+    √ marks the smallest deduction step without evidence for manual review (8 ms)
+    √ treats full points as unproblematic without extra justification (7 ms)
+    √ rejects unresolved chatRef mappings (17 ms)
+    √ rejects points that violate configured point-step increments (8 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        1.556 s, estimated 3 s
+Ran all test suites matching /tests\\import-kbr-correction-bundle.use-case.test.ts/i.
+╭─    ViccoBoard   main≡   ?2 ~4   1                     2.512s   24.7.0   07:35:41  ─╮
+╰─ Write-Host "hello"; Write-Host "__DONE__ $LASTEXITCODE"                                            ─╯
+hello
+__DONE__ 0
+╭─    ViccoBoard   main≡   ?2 ~3   1                                24.7.0   07:36:57  ─╮
+╰─ Write-Host "helper"; Write-Host "__DONE__ $LASTEXITCODE"                                           ─╯
+helper
+__DONE__ 0
+╭─    ViccoBoard   main≡   ?2 ~3   1                                24.7.0   07:38:12  ─╮
+╰─ Write-Host "helper2"; Write-Host "__DONE__ $LASTEXITCODE"                                          ─╯
+helper2
+__DONE__ 0
+╭─    ViccoBoard   main≡   ?2 ~3   1                                24.7.0   07:38:17  ─╮
+╰─                                                                                                    ─╯
+╭─    ViccoBoard   main≡   ?2 ~3   1                                24.7.0   07:38:34  ─╮
+╰─ function Invoke-VBCheck { param([string]$Label,[string]$FilePath,[string]]]$ArgumentList,[string]$WorkingDirectory) $safe = ($Label -replace '[^A-Za-z0-9_-]','_'); $out = Join-Path $env:TEMP ("$safe.out.txt"); $err = Join-Path $env:TEMP ("$safe.err.txt"); Remove-Item $out,$err -ErrorAction SilentlyContinue; $p = Start-Process -FilePath $FilePath -ArgumentList $ArgumentList -WorkingDirectory $WorkingDirectory -NoNewWindow -Wait -PassThru -RedirectStandardOutput $out -RedirectStandardError $err; $code = $p.ExitCode; Write-Host "COMMAND: $Label"; Write-Host "STATUS: $(if)$code -eq 0){'PASS'}else{'FAIL'})"; if ($code -ne 0) } Write-Host 'EXCERPT:'; if ()Test-Path $err) -and (Get-Item $err).Length -gt 0) { Get-Content $err -Tail 2 }; if ()Test-Path $out) -and (Get-Item $out).Length -gt 0) { Get-Content $out -Tail 2 } }; Write-Host "__DONE__ $code" }
+> 
+> 
+> }
+> Get-Content 'c:\Users\jaspe\AppData\Roaming\Code - Insiders\User\workspaceStorage\a89069372a8b40735a0b26585d98d6ae\GitHub.copilot-chat\chat-session-resources\804b1ef6-00d5-472c-b4c4-09d1282cbe99\call_9l4hCW3lIikBnoWeioZWoLVC__vscode-1776662886744\content.txt' | Select-Object -First 200
+> Get-Location
+> Get-Content "c:\Users\jaspe\AppData\Roaming\Code - Insiders\User\workspaceStorage\a89069372a8b40735a0b26585d98d6ae\GitHub.copilot-chat\chat-session-resources\804b1ef6-00d5-472c-b4c4-09d1282cbe99\call_OxkYEkyKKDRolWYZbjYeh8iO__vscode-1776662886786\content.txt" -Tail 80
+> cmd /c "cd /d c:\Users\jaspe\OneDrive\Coding\ViccoBoard && npm.cmd run test --workspace=@viccoboard/exams"
+> 

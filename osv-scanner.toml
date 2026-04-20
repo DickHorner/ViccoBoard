@@ -1,0 +1,3 @@
+[[IgnoredVulns]]
+id = "GHSA-vpq2-c234-7xj6"
+reason = "Dev-only Jest jsdom dependency used for teacher-ui tests; not shipped in the production browser bundle."

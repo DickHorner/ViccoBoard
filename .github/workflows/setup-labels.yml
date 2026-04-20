@@ -9,15 +9,17 @@ on:
       - '.github/workflows/setup-labels.yml'
 
 permissions:
-  issues: write
+  contents: read
 
 jobs:
   setup-labels:
     name: Create required labels
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Create labels
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             const labels = [

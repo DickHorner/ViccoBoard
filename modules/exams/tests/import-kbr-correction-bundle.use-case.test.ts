@@ -148,7 +148,7 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
         importedTaskScores: [
           {
             taskId: 'task-1',
-            points: 7.5,
+            points: 10,
             maxPoints: 10,
             comment: 'Teilweise korrekt'
           }
@@ -166,6 +166,194 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
     expect(result.correction.taskScores[0].taskId).toBe('task-internal-1');
     expect(result.correction.comments.some((comment) => comment.level === 'exam')).toBe(true);
     expect(result.correction.comments.find((comment) => comment.level === 'exam')?.text).toBe('Gute Gesamtleistung.');
+  });
+
+  it('accepts a deduction with defect statement and linked evidence', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 9,
+            maxPoints: 10,
+            comment: 'Ein Nachweis fehlt im Antwortteil.',
+            evidenceIds: ['evidence-1']
+          }
+        ],
+        evidence: [
+          {
+            id: 'evidence-1',
+            kind: 'quote',
+            value: 'Antwortzeile 3 bleibt ohne Beleg.'
+          }
+        ]
+      }
+    });
+
+    expect(result.uncertainties.find((entry) => entry.code === 'deduction-requires-manual-review')).toBeUndefined();
+    expect(result.correction.comments.find((comment) => comment.text.includes('Manuelle Prüfung erforderlich'))).toBeUndefined();
+  });
+
+  it('marks a deduction without evidence for manual review', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 9,
+            maxPoints: 10,
+            comment: 'Die Begründung bleibt unvollständig.'
+          }
+        ]
+      }
+    });
+
+    expect(result.uncertainties).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'deduction-requires-manual-review',
+          reference: 'task-internal-1'
+        })
+      ])
+    );
+    expect(result.correction.comments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          taskId: 'task-internal-1',
+          level: 'task',
+          text: expect.stringContaining('Manuelle Prüfung erforderlich')
+        })
+      ])
+    );
+  });
+
+  it('marks the smallest deduction step without evidence for manual review', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 9.9,
+            maxPoints: 10,
+            comment: 'Kleiner Mangel ohne Nachweis.'
+          }
+        ]
+      }
+    });
+
+    expect(result.uncertainties).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'deduction-requires-manual-review',
+          message: expect.stringContaining('kleinste zulässige Abzugsschritt')
+        })
+      ])
+    );
+  });
+
+  it('treats full points as unproblematic without extra justification', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 10,
+            maxPoints: 10
+          }
+        ]
+      }
+    });
+
+    expect(result.uncertainties.find((entry) => entry.code === 'deduction-requires-manual-review')).toBeUndefined();
+    expect(result.correction.comments.find((comment) => comment.text.includes('Manuelle Prüfung erforderlich'))).toBeUndefined();
   });
 
   it('rejects unresolved chatRef mappings', async () => {
