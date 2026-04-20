@@ -14,4 +14,5 @@ export interface LoadedCorrectionSessionRulePack extends Exams.CorrectionSession
 export interface CorrectionSessionRulePackSource {
   id?: string;
   directoryPath?: string;
+  loadedRulePack?: LoadedCorrectionSessionRulePack;
 }

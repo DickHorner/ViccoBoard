@@ -1,11 +1,7 @@
 import { Exams } from '@viccoboard/core';
 import { v4 as uuidv4 } from 'uuid';
 
-import {
-  loadCorrectionSessionRulePack,
-  loadCorrectionSessionRulePackFromDirectory,
-  loadDefaultCorrectionSessionRulePack
-} from '../rule-packs/index.js';
+import { getEmbeddedDefaultCorrectionSessionRulePack } from '../rule-packs/default-pack.js';
 import type {
   CorrectionSessionRulePackSource,
   LoadedCorrectionSessionRulePack
@@ -63,22 +59,28 @@ export interface ExportCorrectionSessionArtifactsInput {
   rulePackSource?: CorrectionSessionRulePackSource;
 }
 
+export type CorrectionSessionRulePackResolver = (
+  source?: CorrectionSessionRulePackSource
+) => LoadedCorrectionSessionRulePack;
+
 function resolveRulePack(
-  source: CorrectionSessionRulePackSource | undefined
+  source: CorrectionSessionRulePackSource | undefined,
+  resolver?: CorrectionSessionRulePackResolver
 ): LoadedCorrectionSessionRulePack {
-  if (!source) {
-    return loadDefaultCorrectionSessionRulePack();
+  if (source?.loadedRulePack) {
+    return source.loadedRulePack;
   }
 
-  if (source.directoryPath) {
-    return loadCorrectionSessionRulePackFromDirectory(source.directoryPath);
+  if (source?.directoryPath || source?.id) {
+    if (!resolver) {
+      throw new Error(
+        'Rule pack resolution for directoryPath/id sources requires an explicit resolver in this runtime.'
+      );
+    }
+    return resolver(source);
   }
 
-  if (source.id) {
-    return loadCorrectionSessionRulePack(source.id);
-  }
-
-  return loadDefaultCorrectionSessionRulePack();
+  return resolver?.(source) ?? getEmbeddedDefaultCorrectionSessionRulePack();
 }
 
 function buildBaseFileName(examTitle: string, chatRef: string): string {
@@ -115,10 +117,14 @@ function cloneReferenceMap(
 }
 
 export class ExportCorrectionSessionArtifactsUseCase {
+  constructor(
+    private readonly rulePackResolver?: CorrectionSessionRulePackResolver
+  ) {}
+
   execute(
     input: ExportCorrectionSessionArtifactsInput
   ): ExportCorrectionSessionArtifactsResult {
-    const rulePack = resolveRulePack(input.rulePackSource);
+    const rulePack = resolveRulePack(input.rulePackSource, this.rulePackResolver);
     const selectedCandidates = input.candidates ?? input.exam.candidates;
 
     if (selectedCandidates.length === 0) {
