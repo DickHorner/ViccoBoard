@@ -83,9 +83,9 @@ function resolveRulePack(
   return resolver?.(source) ?? getEmbeddedDefaultCorrectionSessionRulePack();
 }
 
-function buildBaseFileName(examTitle: string, chatRef: string): string {
-  const examToken = buildExamReference({ title: examTitle } as Exams.Exam).replace(/^exam-/, '');
-  return `${examToken || 'pruefung'}-${chatRef}`;
+function buildBaseFileName(sessionId: string): string {
+  const normalizedSessionId = sessionId.replace(/^session-/, '') || sessionId;
+  return `kbr-correction-session-${normalizedSessionId}`;
 }
 
 function buildPromptArtifacts(
@@ -181,7 +181,7 @@ export class ExportCorrectionSessionArtifactsUseCase {
     });
 
     const promptMarkdown = buildPromptArtifacts(rulePack, contractMarkdown, contract);
-    const fileNameBase = buildBaseFileName(input.exam.title, sessionId);
+    const fileNameBase = buildBaseFileName(sessionId);
 
     return {
       sessionId,

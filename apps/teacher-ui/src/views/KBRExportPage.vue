@@ -151,7 +151,7 @@
           <div class="ai-actions">
             <div class="ai-action-group">
               <h4>1. Export</h4>
-              <p class="panel-copy">Laden Sie den Korrekturvertrag und den Prompt herunter.</p>
+              <p class="panel-copy">Der Export liefert drei getrennte Dateien: Contract, Prompt und Session-Map (intern).</p>
               <button 
                 class="ghost-button" 
                 type="button" 
@@ -187,6 +187,22 @@
           <div v-if="aiSuccess" class="state-card success mt-4">
             {{ aiSuccess }}
           </div>
+          <div v-if="aiExportArtifacts.length" class="state-card mt-4">
+            <h4>Zuletzt exportierte Dateien</h4>
+            <div class="export-artifact-list">
+              <article
+                v-for="artifact in aiExportArtifacts"
+                :key="artifact.fileName"
+                class="export-artifact-card"
+              >
+                <div>
+                  <p class="export-artifact-label">{{ artifact.label }}</p>
+                  <p class="panel-copy">{{ artifact.description }}</p>
+                </div>
+                <p class="export-artifact-name">{{ artifact.fileName }}</p>
+              </article>
+            </div>
+          </div>
         </section>
       </div>
     </div>
@@ -199,6 +215,10 @@ import { useRoute, useRouter } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { downloadBytes, downloadText } from '../utils/download'
+import {
+  buildCorrectionSessionDownloads,
+  type CorrectionSessionDownloadArtifact
+} from '../utils/kbr-correction-export'
 
 const route = useRoute()
 const router = useRouter()
@@ -225,34 +245,34 @@ const aiExporting = ref(false)
 const aiImporting = ref(false)
 const aiError = ref('')
 const aiSuccess = ref('')
+const aiExportArtifacts = ref<CorrectionSessionDownloadArtifact[]>([])
 
 async function exportAISession(): Promise<void> {
   if (!exam.value || !exportCorrectionSession) return
   
   aiError.value = ''
   aiSuccess.value = ''
+  aiExportArtifacts.value = []
   aiExporting.value = true
   
   try {
     const result = await exportCorrectionSession({ exam: exam.value })
-    
-    // Download Prompt (Main file for ChatGPT)
-    downloadText(result.artifact.promptFile.content, result.artifact.promptFile.fileName)
-    
-    // Download Session Map (Needed for re-import)
-    const sessionMapJson = JSON.stringify({
-      examId: exam.value.id,
-      sessionId: result.sessionId,
-      candidateIdByChatRef: result.artifact.localReferenceMap.candidateIdByChatRef,
-      taskIdByRef: result.artifact.localReferenceMap.taskIdByRef
-    }, null, 2)
-    
-    downloadText(sessionMapJson, `session-map-${result.sessionId}.json`)
-    
-    aiSuccess.value = 'KI-Sitzungsdateien erfolgreich exportiert. Nutzen Sie den Prompt in ChatGPT und speichern Sie die Antwort als JSON.'
-    
-    // Persist session map for later import in local storage or state
-    localStorage.setItem(`viccoboard_session_map_${exam.value.id}`, sessionMapJson)
+
+    const downloads = buildCorrectionSessionDownloads(result, exam.value.id)
+    downloads.forEach((artifact) => {
+      downloadText(artifact.content, artifact.fileName)
+    })
+
+    aiExportArtifacts.value = downloads
+
+    const sessionMapArtifact = downloads.find((artifact) => artifact.audience === 'internal')
+    if (!sessionMapArtifact) {
+      throw new Error('Session-Map konnte fur den Re-Import nicht erstellt werden.')
+    }
+
+    aiSuccess.value = 'KI-Sitzungsdateien erfolgreich exportiert. ChatGPT-Dateien: Contract und Prompt. Session-Map wird getrennt als internes Hilfsartefakt gespeichert.'
+
+    localStorage.setItem(`viccoboard_session_map_${exam.value.id}`, sessionMapArtifact.content)
   } catch (error: any) {
     console.error('AI Export failed:', error)
     aiError.value = `Export fehlgeschlagen: ${error.message}`
@@ -732,6 +752,40 @@ onMounted(() => {
   font-size: 1rem;
 }
 
+.export-artifact-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.export-artifact-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.export-artifact-label,
+.export-artifact-name {
+  margin: 0;
+}
+
+.export-artifact-label {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.export-artifact-name {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.85rem;
+  color: #334155;
+  text-align: right;
+}
+
 .import-controls {
   margin-top: 0.5rem;
 }
@@ -758,6 +812,14 @@ onMounted(() => {
 @media (max-width: 900px) {
   .export-layout {
     grid-template-columns: 1fr;
+  }
+
+  .export-artifact-card {
+    flex-direction: column;
+  }
+
+  .export-artifact-name {
+    text-align: left;
   }
   
   .ai-actions {
