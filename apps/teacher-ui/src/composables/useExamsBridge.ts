@@ -28,7 +28,9 @@ import {
   GetCorrectionSheetPresetUseCase,
   SaveCorrectionSheetPresetUseCase,
   BuildCorrectionSheetProjectionUseCase,
-  ExportCorrectionSheetsPdfUseCase
+  ExportCorrectionSheetsPdfUseCase,
+  ExportCorrectionSessionArtifactsUseCase,
+  ImportKbrCorrectionBundleUseCase
 } from '@viccoboard/exams';
 import { getStorageAdapter } from '../services/storage.service';
 
@@ -55,6 +57,8 @@ interface ExamsBridge {
   saveCorrectionSheetPresetUseCase: SaveCorrectionSheetPresetUseCase;
   buildCorrectionSheetProjectionUseCase: BuildCorrectionSheetProjectionUseCase;
   exportCorrectionSheetsPdfUseCase: ExportCorrectionSheetsPdfUseCase;
+  exportCorrectionSessionArtifactsUseCase: ExportCorrectionSessionArtifactsUseCase;
+  importKbrCorrectionBundleUseCase: ImportKbrCorrectionBundleUseCase;
 
   // Services
   gradingKeyService: typeof GradingKeyService;
@@ -73,6 +77,8 @@ interface ExamsBridge {
   buildCorrectionSheetPreview(examId: string, candidateId: string): Promise<any>;
   exportCurrentCorrectionSheetPdf(examId: string, candidateId: string): Promise<any>;
   exportAllCorrectionSheetsPdf(examId: string): Promise<any>;
+  exportCorrectionSession(input: any): any;
+  importCorrectionBundle(input: any): Promise<any>;
 
   initialized: boolean;
 }
@@ -94,6 +100,8 @@ interface UseExamsBridgeResult {
   readonly saveCorrectionSheetPresetUseCase: ExamsBridge['saveCorrectionSheetPresetUseCase'] | undefined;
   readonly buildCorrectionSheetProjectionUseCase: ExamsBridge['buildCorrectionSheetProjectionUseCase'] | undefined;
   readonly exportCorrectionSheetsPdfUseCase: ExamsBridge['exportCorrectionSheetsPdfUseCase'] | undefined;
+  readonly exportCorrectionSessionArtifactsUseCase: ExamsBridge['exportCorrectionSessionArtifactsUseCase'] | undefined;
+  readonly importKbrCorrectionBundleUseCase: ExamsBridge['importKbrCorrectionBundleUseCase'] | undefined;
   readonly gradingKeyService: ExamsBridge['gradingKeyService'] | undefined;
   readonly gradingKeyEngine: ExamsBridge['gradingKeyEngine'] | undefined;
   readonly alternativeGradingService: ExamsBridge['alternativeGradingService'] | undefined;
@@ -110,6 +118,8 @@ interface UseExamsBridgeResult {
   buildCorrectionSheetPreview(examId: string, candidateId: string): Promise<any> | undefined;
   exportCurrentCorrectionSheetPdf(examId: string, candidateId: string): Promise<any> | undefined;
   exportAllCorrectionSheetsPdf(examId: string): Promise<any> | undefined;
+  exportCorrectionSession(input: any): any;
+  importCorrectionBundle(input: any): Promise<any>;
 }
 
 /**
@@ -147,6 +157,12 @@ export function initializeExamsBridge(): ExamsBridge {
     buildCorrectionSheetProjectionUseCase,
     correctionEntryRepo
   );
+  const exportCorrectionSessionArtifactsUseCase = new ExportCorrectionSessionArtifactsUseCase();
+  const importKbrCorrectionBundleUseCase = new ImportKbrCorrectionBundleUseCase(
+    examRepo,
+    correctionEntryRepo,
+    recordCorrectionUseCase
+  );
 
   examsBridgeInstance = {
     // Repositories
@@ -166,6 +182,8 @@ export function initializeExamsBridge(): ExamsBridge {
     saveCorrectionSheetPresetUseCase,
     buildCorrectionSheetProjectionUseCase,
     exportCorrectionSheetsPdfUseCase,
+    exportCorrectionSessionArtifactsUseCase,
+    importKbrCorrectionBundleUseCase,
 
     // Services (static classes are referenced directly)
     gradingKeyService: GradingKeyService,
@@ -190,6 +208,10 @@ export function initializeExamsBridge(): ExamsBridge {
       exportCorrectionSheetsPdfUseCase.exportCurrentCandidatePdf(examId, candidateId),
     exportAllCorrectionSheetsPdf: (examId) =>
       exportCorrectionSheetsPdfUseCase.exportAllCandidatesPdf(examId),
+    exportCorrectionSession: (input) =>
+      exportCorrectionSessionArtifactsUseCase.execute(input),
+    importCorrectionBundle: (input) =>
+      importKbrCorrectionBundleUseCase.execute(input),
 
     initialized: true
   };
@@ -236,6 +258,8 @@ export function useExamsBridge(): UseExamsBridgeResult {
     get saveCorrectionSheetPresetUseCase() { return bridge.value?.saveCorrectionSheetPresetUseCase; },
     get buildCorrectionSheetProjectionUseCase() { return bridge.value?.buildCorrectionSheetProjectionUseCase; },
     get exportCorrectionSheetsPdfUseCase() { return bridge.value?.exportCorrectionSheetsPdfUseCase; },
+    get exportCorrectionSessionArtifactsUseCase() { return bridge.value?.exportCorrectionSessionArtifactsUseCase; },
+    get importKbrCorrectionBundleUseCase() { return bridge.value?.importKbrCorrectionBundleUseCase; },
     get gradingKeyService() { return bridge.value?.gradingKeyService; },
     get gradingKeyEngine() { return bridge.value?.gradingKeyEngine; },
     get alternativeGradingService() { return bridge.value?.alternativeGradingService; },
@@ -258,6 +282,10 @@ export function useExamsBridge(): UseExamsBridgeResult {
     exportCurrentCorrectionSheetPdf: (examId: string, candidateId: string) =>
       bridge.value?.exportCurrentCorrectionSheetPdf(examId, candidateId),
     exportAllCorrectionSheetsPdf: (examId: string) =>
-      bridge.value?.exportAllCorrectionSheetsPdf(examId)
+      bridge.value?.exportAllCorrectionSheetsPdf(examId),
+    exportCorrectionSession: (input: any) =>
+      bridge.value?.exportCorrectionSession(input),
+    importCorrectionBundle: (input: any) =>
+      bridge.value?.importCorrectionBundle(input) ?? Promise.reject(new Error('Bridge not initialized'))
   };
 }
