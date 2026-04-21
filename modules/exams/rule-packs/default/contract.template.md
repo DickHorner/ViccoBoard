@@ -29,6 +29,6 @@
 ## Export Target Format (Binding)
 
 - Export targets for `Zwischenexport` and `Ende Korrektur` must be JSON only.
-- The JSON output must conform to the loaded `import-bundle.schema.json`.
+- The JSON output must conform to the loaded `import-bundle.schema.json` (resolved from the active rule-pack metadata field `importBundleSchema`).
 - Required top-level fields for export are defined by the import schema (including `contract`, `chatRef`, and `importedTaskScores`).
 - Do not emit substitute formats (e.g. YAML/CSV/Markdown tables/free text) for export commands.

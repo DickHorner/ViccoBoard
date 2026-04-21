@@ -24,18 +24,18 @@ Output format requirements (binding):
 - For "Zwischenexport", output exactly one JSON object for the currently active "chatRef".
 - For "Ende Korrektur", output exactly one JSON object for the final export.
 - The output format must be JSON only.
-- The JSON structure must conform to the loaded "import-bundle.schema.json".
+- The JSON structure must conform to the loaded "import-bundle.schema.json" (the active rule-pack import schema referenced by `importBundleSchema` in rule-pack metadata).
 - Do not output YAML, CSV, Markdown tables, prose summaries, or any substitute export format.
 - Do not invent fallback structures if required fields or schema details are missing.
 - Only use fields that are supported by the loaded contract, loaded rules, and loaded import schema.
-- If the requested export cannot be produced without inventing unsupported fields or structure, state the missing prerequisite briefly and stop instead of emitting a substitute format.
+- If the requested export cannot be produced without inventing unsupported fields or structure, output one brief prerequisite-missing error line and stop (do not emit a substitute export object or alternate export format).
 
 Required export behavior:
 
 - Always include the active contract reference exactly as required by the import schema.
 - Always include the active "chatRef".
 - Always include "importedTaskScores" in the schema-compliant structure.
-- Include optional fields such as "rulePack", "evidence", or "metadata" only if they are supported by the loaded contract/rules/schema and are actually available.
+- Include optional fields such as "rulePack", "evidence", or "metadata" only if they are supported by the loaded contract/rules/schema and are actually available in the current correction state (present with concrete values).
 - Never emit names, candidate IDs, student IDs, or other personal identifiers.
 
 Formatting constraints:
