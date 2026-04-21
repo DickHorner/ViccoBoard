@@ -19,6 +19,40 @@ Control commands in this session:
 - `Ende Korrektur`: finish the session cleanly after current Leistung
 - `Verwirf letzte Arbeit`: discard only the last processed Leistung for the active `chatRef`
 
+Output format requirements (binding):
+
+- For "Zwischenexport", output exactly one JSON object for the currently active "chatRef".
+- For "Ende Korrektur", output exactly one JSON object for the final export.
+- The output format must be JSON only.
+- The JSON structure must conform to the loaded "import-bundle.schema.json".
+- Do not output YAML, CSV, Markdown tables, prose summaries, or any substitute export format.
+- Do not invent fallback structures if required fields or schema details are missing.
+- Only use fields that are supported by the loaded contract, loaded rules, and loaded import schema.
+- If the requested export cannot be produced without inventing unsupported fields or structure, state the missing prerequisite briefly and stop instead of emitting a substitute format.
+
+Required export behavior:
+
+- Always include the active contract reference exactly as required by the import schema.
+- Always include the active "chatRef".
+- Always include "importedTaskScores" in the schema-compliant structure.
+- Include optional fields such as "rulePack", "evidence", or "metadata" only if they are supported by the loaded contract/rules/schema and are actually available.
+- Never emit names, candidate IDs, student IDs, or other personal identifiers.
+
+Formatting constraints:
+
+- Return raw JSON only.
+- Do not wrap the JSON in Markdown code fences.
+- Do not prepend or append explanatory text when an export command is executed.
+- Do not emit multiple alternative versions of the export.
+
+Command-specific behavior:
+
+- "Zwischenexport":
+  Return the current correction state for the active "chatRef" as one schema-compliant JSON object only.
+
+- "Ende Korrektur":
+  Return the final correction export as one schema-compliant JSON object only.
+
 ## Contract
 
 {{contractMarkdown}}
