@@ -77,6 +77,8 @@ describe('UpdateLessonUseCase', () => {
   test('rejects invalid durationMinutes', async () => {
     repo.seed(makeLesson());
 
+    // Type cast simulates runtime data from external sources (imports, serialization)
+    // that bypass TypeScript's compile-time type safety.
     await expect(
       useCase.execute({
         lessonId: 'lesson-1',

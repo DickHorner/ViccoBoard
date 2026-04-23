@@ -40,9 +40,9 @@ export class UpdateLessonUseCase {
       throw new Error('Duration must be 45 or 90 minutes');
     }
 
-    if (input.startTime !== undefined) {
-      this.parseStartTimeToMinutes(input.startTime);
-    }
+    // Parse once, reuse in the overlap check below
+    const parsedStartMinutes =
+      input.startTime !== undefined ? this.parseStartTimeToMinutes(input.startTime) : undefined;
 
     // Only run overlap check when schedule-relevant fields are touched
     if (input.startTime !== undefined || input.date !== undefined || input.durationMinutes !== undefined) {
@@ -53,8 +53,8 @@ export class UpdateLessonUseCase {
 
       const updatedDate = input.date ?? existing.date;
       const updatedStart =
-        input.startTime !== undefined
-          ? this.parseStartTimeToMinutes(input.startTime)
+        parsedStartMinutes !== undefined
+          ? parsedStartMinutes
           : this.resolveLessonStartMinutes(existing);
       const updatedDuration = input.durationMinutes ?? existing.durationMinutes;
       const updatedEnd = updatedStart + updatedDuration;

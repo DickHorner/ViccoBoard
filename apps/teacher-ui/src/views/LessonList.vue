@@ -381,8 +381,8 @@ const handleSaveLesson = async () => {
         date: dateTime,
         startTime: lessonForm.value.startTime,
         durationMinutes: lessonForm.value.durationMinutes,
-        title: lessonForm.value.title || undefined,
-        room: lessonForm.value.room || undefined
+        title: lessonForm.value.title.trim() || undefined,
+        room: lessonForm.value.room.trim() || undefined
       })
     } else {
       // Create new lesson
@@ -391,8 +391,8 @@ const handleSaveLesson = async () => {
         date: dateTime,
         startTime: lessonForm.value.startTime,
         durationMinutes: lessonForm.value.durationMinutes,
-        title: lessonForm.value.title || undefined,
-        room: lessonForm.value.room || undefined
+        title: lessonForm.value.title.trim() || undefined,
+        room: lessonForm.value.room.trim() || undefined
       })
     }
 
