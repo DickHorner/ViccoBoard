@@ -11,7 +11,9 @@ module.exports = {
     '^@viccoboard/storage/node$': '<rootDir>/../../packages/storage/src/node.ts',
     '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src/index.ts',
     '^@viccoboard/students$': '<rootDir>/../../modules/students/src/index.ts',
-    '^@viccoboard/sport$': '<rootDir>/../../modules/sport/src/index.ts'
+    '^@viccoboard/sport$': '<rootDir>/../../modules/sport/src/index.ts',
+    // Map uuid to a CJS-compatible stub (uuid v11 is ESM-only in dist-node/)
+    '^uuid$': '<rootDir>/tests/__mocks__/uuid.cjs'
   },
   transform: {
     '^.+\\.tsx?$': [

@@ -9,15 +9,6 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/index.ts'
   ],
-  moduleNameMapper: {
-    '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
-    '^@viccoboard/storage/node$': '<rootDir>/../../packages/storage/src/node.ts',
-    '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',
-    '^@viccoboard/plugins$': '<rootDir>/../../packages/plugins/src',
-    '^@viccoboard/students$': '<rootDir>/../../modules/students/src',
-    // Handle .js extensions in TypeScript imports (resolve to .ts)
-    '^(\\.{1,2}/.*)\\.js$': '$1'
-  },
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       useESM: false,
@@ -28,5 +19,16 @@ module.exports = {
         esModuleInterop: true
       }
     }]
+  },
+  moduleNameMapper: {
+    '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
+    '^@viccoboard/storage/node$': '<rootDir>/../../packages/storage/src/node.ts',
+    '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',
+    '^@viccoboard/plugins$': '<rootDir>/../../packages/plugins/src',
+    '^@viccoboard/students$': '<rootDir>/../../modules/students/src',
+    // Handle .js extensions in TypeScript imports (resolve to .ts)
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    // Map uuid to a CJS-compatible stub (uuid v11 is ESM-only in dist-node/)
+    '^uuid$': '<rootDir>/tests/__mocks__/uuid.cjs'
   }
 };
