@@ -11,7 +11,9 @@ module.exports = {
     '^@viccoboard/storage/node$': '<rootDir>/../../packages/storage/src/node.ts',
     '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src/index.ts',
     '^@viccoboard/students$': '<rootDir>/../../modules/students/src/index.ts',
-    '^@viccoboard/sport$': '<rootDir>/../../modules/sport/src/index.ts'
+    '^@viccoboard/sport$': '<rootDir>/../../modules/sport/src/index.ts',
+    // uuid v14 is ESM-only; provide a CJS-compatible stub for Jest
+    '^uuid$': '<rootDir>/tests/__mocks__/uuid.cjs'
   },
   transform: {
     '^.+\\.tsx?$': [
