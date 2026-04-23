@@ -5,7 +5,7 @@
  */
 
 import { Lesson } from '@viccoboard/core';
-import { LessonRepository } from '../repositories/lesson.repository.js';
+import type { LessonRepository } from '../repositories/lesson.repository.js';
 
 const DEFAULT_LESSON_START_MINUTES = 8 * 60;
 

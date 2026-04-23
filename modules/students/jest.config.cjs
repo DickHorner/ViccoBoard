@@ -20,13 +20,6 @@ module.exports = {
       }
     ]
   },
-  moduleNameMapper: {
-    '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
-    '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-    // Map uuid to a CJS-compatible stub (uuid v11 is ESM-only in dist-node/)
-    '^uuid$': '<rootDir>/tests/__mocks__/uuid.cjs'
-  },
   testMatch: ['**/tests/**/*.test.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   moduleFileExtensions: ['ts', 'js', 'json'],
