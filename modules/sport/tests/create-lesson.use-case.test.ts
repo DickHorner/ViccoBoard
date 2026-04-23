@@ -58,7 +58,7 @@ describe('CreateLessonUseCase', () => {
         classGroupId,
         date: new Date('2026-09-01T00:00:00.000Z'),
         startTime: '08:00',
-        durationMinutes: 60 as 45
+        durationMinutes: 60 as unknown as 45 | 90
       })
     ).rejects.toThrow('Duration must be 45 or 90 minutes');
   });

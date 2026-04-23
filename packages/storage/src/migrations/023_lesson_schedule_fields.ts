@@ -10,6 +10,9 @@ type TableInfoRow = {
   name: string;
 };
 
+const DEFAULT_LESSON_START_TIME = '08:00';
+const DEFAULT_LESSON_DURATION_MINUTES = 45;
+
 export class LessonScheduleFieldsMigration implements Migration {
   version = 23;
   name = 'lesson_schedule_fields';
@@ -22,11 +25,13 @@ export class LessonScheduleFieldsMigration implements Migration {
     const existingColumns = new Set(tableInfo.map((column) => column.name));
 
     if (!existingColumns.has('start_time')) {
-      db.exec("ALTER TABLE lessons ADD COLUMN start_time TEXT NOT NULL DEFAULT '08:00';");
+      db.exec(`ALTER TABLE lessons ADD COLUMN start_time TEXT NOT NULL DEFAULT '${DEFAULT_LESSON_START_TIME}';`);
     }
 
     if (!existingColumns.has('duration_minutes')) {
-      db.exec('ALTER TABLE lessons ADD COLUMN duration_minutes INTEGER NOT NULL DEFAULT 45;');
+      db.exec(
+        `ALTER TABLE lessons ADD COLUMN duration_minutes INTEGER NOT NULL DEFAULT ${DEFAULT_LESSON_DURATION_MINUTES};`
+      );
     }
 
     if (!existingColumns.has('title')) {

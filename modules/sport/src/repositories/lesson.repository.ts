@@ -7,6 +7,8 @@ import { AdapterRepository } from '@viccoboard/storage';
 import { Lesson } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
+const DEFAULT_LESSON_START_TIME = '08:00';
+
 export class LessonRepository extends AdapterRepository<Lesson> {
   constructor(adapter: StorageAdapter) {
     super(adapter, 'lessons');
@@ -103,12 +105,27 @@ export class LessonRepository extends AdapterRepository<Lesson> {
       return rawStartTime;
     }
 
-    const hours = lessonDate.getHours().toString().padStart(2, '0');
-    const minutes = lessonDate.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    if (lessonDate.getHours() !== 0 || lessonDate.getMinutes() !== 0) {
+      const hours = lessonDate.getHours().toString().padStart(2, '0');
+      const minutes = lessonDate.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+
+    return DEFAULT_LESSON_START_TIME;
   }
 
   private resolveDurationMinutes(rawDuration: unknown): 45 | 90 {
-    return rawDuration === 90 ? 90 : 45;
+    if (rawDuration === 45 || rawDuration === '45') {
+      return 45;
+    }
+    if (rawDuration === 90 || rawDuration === '90') {
+      return 90;
+    }
+
+    if (rawDuration !== null && rawDuration !== undefined) {
+      throw new Error(`Invalid lesson duration value "${String(rawDuration)}" in persistence layer`);
+    }
+
+    return 45;
   }
 }

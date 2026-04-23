@@ -6,6 +6,8 @@
 import { Lesson } from '@viccoboard/core';
 import { LessonRepository } from '../repositories/lesson.repository.js';
 
+const DEFAULT_LESSON_START_MINUTES = 8 * 60;
+
 export interface CreateLessonInput {
   classGroupId: string;
   date: Date;
@@ -100,15 +102,30 @@ export class CreateLessonUseCase {
   }
 
   private resolveLessonStartMinutes(lesson: Lesson): number {
-    if (lesson.startTime) {
-      try {
-        return this.parseStartTimeToMinutes(lesson.startTime);
-      } catch {
-        // Fall back to lesson date time for legacy rows with malformed startTime.
-      }
+    const parsedStartTime = this.parseStartTimeToMinutesOrNull(lesson.startTime);
+    if (parsedStartTime !== null) {
+      return parsedStartTime;
     }
 
-    return lesson.date.getHours() * 60 + lesson.date.getMinutes();
+    const dateDerivedMinutes = lesson.date.getHours() * 60 + lesson.date.getMinutes();
+    if (dateDerivedMinutes > 0) {
+      return dateDerivedMinutes;
+    }
+
+    return DEFAULT_LESSON_START_MINUTES;
+  }
+
+  private parseStartTimeToMinutesOrNull(startTime: string | undefined): number | null {
+    if (!startTime || !/^(\d{2}):(\d{2})$/.test(startTime)) {
+      return null;
+    }
+
+    const [hours, minutes] = startTime.split(':').map((value) => Number(value));
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      return null;
+    }
+
+    return hours * 60 + minutes;
   }
 
   private isSameCalendarDay(left: Date, right: Date): boolean {
