@@ -38,7 +38,7 @@
     "bcryptjs": "^3.0.3",
     "crypto-js": "^4.2.0",
     "sql.js": "^1.14.1",
-    "uuid": "^9.0.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
@@ -51,6 +51,6 @@
     "fake-indexeddb": "^6.2.0",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.9",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.3"
   }
 }
