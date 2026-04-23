@@ -6,6 +6,7 @@
 // Repositories
 export { ClassGroupRepository } from './repositories/class-group.repository.js';
 export { LessonRepository } from './repositories/lesson.repository.js';
+export { LessonPartRepository } from './repositories/lesson-part.repository.js';
 export { AttendanceRepository } from './repositories/attendance.repository.js';
 export { GradeSchemeRepository } from './repositories/grade-scheme.repository.js';
 export { GradeCategoryRepository } from './repositories/grade-category.repository.js';

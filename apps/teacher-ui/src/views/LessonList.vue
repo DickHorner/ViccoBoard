@@ -87,6 +87,9 @@
                     {{ part.description }}{{ idx < lesson.lessonParts!.length - 1 ? ', ' : '' }}
                   </span>
                 </div>
+                <div v-if="lesson.shortcuts && lesson.shortcuts.length > 0" class="lesson-shortcuts">
+                  <span v-for="tag in lesson.shortcuts" :key="tag" class="lesson-shortcut-tag">{{ tag }}</span>
+                </div>
               </div>
             </div>
             <div class="lesson-actions">
@@ -168,6 +171,51 @@
               class="form-input"
             />
           </div>
+
+          <div class="form-group">
+            <label for="lesson-shortcuts" class="form-label">Kürzel / Tags</label>
+            <input
+              id="lesson-shortcuts"
+              type="text"
+              v-model="lessonForm.shortcuts"
+              class="form-input"
+              placeholder="z. B. Aufwärmen, Sprint, Teamspiel (kommagetrennt)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Stundenteile</label>
+            <div
+              v-for="(part, idx) in lessonForm.lessonParts"
+              :key="idx"
+              class="lesson-part-row"
+            >
+              <input
+                type="text"
+                v-model="part.description"
+                class="form-input lesson-part-description"
+                placeholder="Beschreibung"
+              />
+              <input
+                type="number"
+                v-model="part.duration"
+                class="form-input lesson-part-duration"
+                placeholder="Min."
+                min="1"
+              />
+              <button
+                type="button"
+                class="lesson-part-remove"
+                @click="lessonForm.lessonParts.splice(idx, 1)"
+                title="Teil entfernen"
+              >×</button>
+            </div>
+            <button
+              type="button"
+              class="btn-secondary lesson-part-add"
+              @click="lessonForm.lessonParts.push({ description: '', duration: '', type: '' })"
+            >+ Stundenteil hinzufügen</button>
+          </div>
           
           <div v-if="saveError" class="error-message">
             {{ saveError }}
@@ -217,12 +265,16 @@ interface LessonForm {
   classGroupId: string
   date: string
   time: string
+  shortcuts: string
+  lessonParts: { description: string; duration: string; type: string }[]
 }
 
 const lessonForm = ref<LessonForm>({
   classGroupId: '',
   date: new Date().toISOString().split('T')[0],
-  time: '08:00'
+  time: '08:00',
+  shortcuts: '',
+  lessonParts: []
 })
 
 // Computed
@@ -249,6 +301,12 @@ const filteredLessons = computed(() => {
 })
 
 // Methods
+const enrichWithParts = async (lessonList: Lesson[]) => {
+  for (const lesson of lessonList) {
+    lesson.lessonParts = await SportBridge.lessonPartRepository.findByLesson(lesson.id)
+  }
+}
+
 const loadData = async () => {
   loading.value = true
   error.value = ''
@@ -272,6 +330,9 @@ const loadData = async () => {
       }
       lessons.value = allLessons
     }
+
+    // Populate lessonParts for each lesson so the list can display them
+    await enrichWithParts(lessons.value)
   } catch (err) {
     console.error('Failed to load lessons:', err)
     error.value = 'Fehler beim Laden der Stunden'
@@ -292,18 +353,26 @@ const onClassChange = async () => {
   } else {
     lessons.value = await SportBridge.lessonRepository.findByClassGroup(selectedClassId.value)
   }
+  await enrichWithParts(lessons.value)
 }
 
 const onDateFilterChange = () => {
   // Filtering happens automatically via computed property
 }
 
-const handleEditLesson = (lesson: Lesson) => {
+const handleEditLesson = async (lesson: Lesson) => {
+  const parts = await SportBridge.lessonPartRepository.findByLesson(lesson.id)
   lessonForm.value = {
     id: lesson.id,
     classGroupId: lesson.classGroupId,
     date: lesson.date.toISOString().split('T')[0],
-    time: lesson.date.toTimeString().split(' ')[0].substring(0, 5)
+    time: lesson.date.toTimeString().split(' ')[0].substring(0, 5),
+    shortcuts: (lesson.shortcuts ?? []).join(', '),
+    lessonParts: parts.map(p => ({
+      description: p.description,
+      duration: p.duration != null ? String(p.duration) : '',
+      type: p.type ?? ''
+    }))
   }
   showEditLessonModal.value = true
 }
@@ -330,17 +399,56 @@ const handleSaveLesson = async () => {
     // Combine date and time
     const dateTime = new Date(`${lessonForm.value.date}T${lessonForm.value.time}:00`)
 
+    // Parse shortcuts from comma-separated string
+    const shortcuts = lessonForm.value.shortcuts
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0)
+
     if (showEditLessonModal.value && lessonForm.value.id) {
       // Update existing lesson
       await SportBridge.lessonRepository.update(lessonForm.value.id, {
-        date: dateTime
+        date: dateTime,
+        shortcuts
       })
+      // Replace lesson parts: delete old, create new
+      await SportBridge.lessonPartRepository.deleteByLesson(lessonForm.value.id)
+      for (let i = 0; i < lessonForm.value.lessonParts.length; i++) {
+        const p = lessonForm.value.lessonParts[i]
+        if (p.description.trim()) {
+          await SportBridge.lessonPartRepository.createPart(
+            lessonForm.value.id,
+            {
+              description: p.description.trim(),
+              duration: p.duration ? Number(p.duration) : undefined,
+              type: p.type.trim() || undefined
+            },
+            i
+          )
+        }
+      }
     } else {
       // Create new lesson
-      await SportBridge.createLessonUseCase.execute({
+      const created = await SportBridge.createLessonUseCase.execute({
         classGroupId: lessonForm.value.classGroupId,
-        date: dateTime
+        date: dateTime,
+        shortcuts
       })
+      // Create lesson parts
+      for (let i = 0; i < lessonForm.value.lessonParts.length; i++) {
+        const p = lessonForm.value.lessonParts[i]
+        if (p.description.trim()) {
+          await SportBridge.lessonPartRepository.createPart(
+            created.id,
+            {
+              description: p.description.trim(),
+              duration: p.duration ? Number(p.duration) : undefined,
+              type: p.type.trim() || undefined
+            },
+            i
+          )
+        }
+      }
     }
 
     closeModals()
@@ -364,7 +472,9 @@ const closeModals = () => {
   lessonForm.value = {
     classGroupId: selectedClassId.value || '',
     date: new Date().toISOString().split('T')[0],
-    time: '08:00'
+    time: '08:00',
+    shortcuts: '',
+    lessonParts: []
   }
 }
 
