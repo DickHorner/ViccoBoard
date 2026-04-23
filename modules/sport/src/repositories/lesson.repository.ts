@@ -16,10 +16,16 @@ export class LessonRepository extends AdapterRepository<Lesson> {
    * Map database row to Lesson entity
    */
   mapToEntity(row: any): Lesson {
+    const lessonDate = new Date(row.date);
+
     return {
       id: row.id,
       classGroupId: row.class_group_id,
-      date: new Date(row.date),
+      date: lessonDate,
+      startTime: this.resolveStartTime(row.start_time, lessonDate),
+      durationMinutes: this.resolveDurationMinutes(row.duration_minutes),
+      title: row.title || undefined,
+      room: row.room || undefined,
       lessonParts: [], // Loaded separately via LessonPartRepository
       shortcuts: row.shortcuts ? JSON.parse(row.shortcuts) : undefined,
       randomStudentSeed: row.random_student_seed || undefined,
@@ -39,6 +45,10 @@ export class LessonRepository extends AdapterRepository<Lesson> {
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
     if (entity.date !== undefined) row.date = entity.date.toISOString();
+    if (entity.startTime !== undefined) row.start_time = entity.startTime;
+    if (entity.durationMinutes !== undefined) row.duration_minutes = entity.durationMinutes;
+    if (entity.title !== undefined) row.title = entity.title;
+    if (entity.room !== undefined) row.room = entity.room;
     if (entity.shortcuts !== undefined) row.shortcuts = JSON.stringify(entity.shortcuts);
     if (entity.randomStudentSeed !== undefined) row.random_student_seed = entity.randomStudentSeed;
     if (entity.randomStudentHistory !== undefined) row.random_student_history = JSON.stringify(entity.randomStudentHistory);
@@ -86,5 +96,19 @@ export class LessonRepository extends AdapterRepository<Lesson> {
 
     lessons.sort((a, b) => b.date.getTime() - a.date.getTime());
     return lessons[0];
+  }
+
+  private resolveStartTime(rawStartTime: unknown, lessonDate: Date): string {
+    if (typeof rawStartTime === 'string' && /^\d{2}:\d{2}$/.test(rawStartTime)) {
+      return rawStartTime;
+    }
+
+    const hours = lessonDate.getHours().toString().padStart(2, '0');
+    const minutes = lessonDate.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  private resolveDurationMinutes(rawDuration: unknown): 45 | 90 {
+    return rawDuration === 90 ? 90 : 45;
   }
 }

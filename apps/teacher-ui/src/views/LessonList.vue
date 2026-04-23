@@ -303,7 +303,7 @@ const handleEditLesson = (lesson: Lesson) => {
     id: lesson.id,
     classGroupId: lesson.classGroupId,
     date: lesson.date.toISOString().split('T')[0],
-    time: lesson.date.toTimeString().split(' ')[0].substring(0, 5)
+    time: lesson.startTime || lesson.date.toTimeString().split(' ')[0].substring(0, 5)
   }
   showEditLessonModal.value = true
 }
@@ -333,13 +333,16 @@ const handleSaveLesson = async () => {
     if (showEditLessonModal.value && lessonForm.value.id) {
       // Update existing lesson
       await SportBridge.lessonRepository.update(lessonForm.value.id, {
-        date: dateTime
+        date: dateTime,
+        startTime: lessonForm.value.time
       })
     } else {
       // Create new lesson
       await SportBridge.createLessonUseCase.execute({
         classGroupId: lessonForm.value.classGroupId,
-        date: dateTime
+        date: dateTime,
+        startTime: lessonForm.value.time,
+        durationMinutes: 45
       })
     }
 

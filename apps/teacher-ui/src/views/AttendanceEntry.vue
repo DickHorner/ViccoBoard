@@ -321,7 +321,9 @@ const handleSaveAttendance = async () => {
     } else {
       const lesson = await SportBridge.createLessonUseCase.execute({
         classGroupId: selectedClassId.value,
-        date: new Date()
+        date: new Date(),
+        startTime: new Date().toTimeString().split(' ')[0].slice(0, 5),
+        durationMinutes: 45
       })
       lessonId = lesson.id
       currentLessonId.value = lessonId
