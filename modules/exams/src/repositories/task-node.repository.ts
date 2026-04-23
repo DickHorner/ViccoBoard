@@ -6,7 +6,7 @@
 import { AdapterRepository } from '@viccoboard/storage';
 import { Exams, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-import { v4 as uuidv4 } from 'uuid';
+
 
 export class TaskNodeRepository extends AdapterRepository<Exams.TaskNode> {
   constructor(adapter: StorageAdapter) {
@@ -58,7 +58,7 @@ export class TaskNodeRepository extends AdapterRepository<Exams.TaskNode> {
 
 
   async createForExam(examId: string, task: Omit<Exams.TaskNode, 'id'>): Promise<Exams.TaskNode> {
-    const id = uuidv4();
+    const id = crypto.randomUUID();
     const now = new Date();
     const entity: Exams.TaskNode = {
       ...task,

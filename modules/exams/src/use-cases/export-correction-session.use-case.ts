@@ -1,5 +1,5 @@
 import { Exams } from '@viccoboard/core';
-import { v4 as uuidv4 } from 'uuid';
+
 
 import { getEmbeddedDefaultCorrectionSessionRulePack } from '../rule-packs/default-pack.js';
 import type {
@@ -131,7 +131,7 @@ export class ExportCorrectionSessionArtifactsUseCase {
       throw new Error('Cannot export a correction session without at least one candidate.');
     }
 
-    const sessionId = input.sessionId ?? uuidv4();
+    const sessionId = input.sessionId ?? crypto.randomUUID();
     const references = buildCorrectionSessionReferenceMaps(input.exam);
     const parts = buildCorrectionSessionParts(input.exam, references, rulePack.rules);
     const scoringUnits = buildCorrectionSessionScoringUnits(input.exam, references, rulePack.rules);

@@ -6,7 +6,7 @@ import {
 } from '@viccoboard/storage/node';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import { Exams } from '@viccoboard/core';
-import { v4 as uuidv4 } from 'uuid';
+
 
 describe('ExamRepository', () => {
   let storage: SQLiteStorage;
@@ -51,7 +51,7 @@ describe('ExamRepository', () => {
   });
 
   test('creates and reads an exam', async () => {
-    const classId = uuidv4();
+    const classId = crypto.randomUUID();
     const now = new Date().toISOString();
     await storage.getAdapter().insert('class_groups', {
       id: classId,
@@ -83,7 +83,7 @@ describe('ExamRepository', () => {
   });
 
   test('filters by class group and status', async () => {
-    const classId = uuidv4();
+    const classId = crypto.randomUUID();
     const now = new Date().toISOString();
     await storage.getAdapter().insert('class_groups', {
       id: classId,

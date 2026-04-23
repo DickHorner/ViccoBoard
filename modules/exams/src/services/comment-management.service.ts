@@ -4,7 +4,7 @@
  */
 
 import { Exams } from '@viccoboard/core';
-import { v4 as uuidv4 } from 'uuid';
+
 
 export interface CommentTemplate {
   id: string;
@@ -29,7 +29,7 @@ export class CommentManagementService {
     availableAfterReturn: boolean = true
   ): Exams.CorrectionComment {
     return {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       taskId,
       level,
       text,
@@ -102,7 +102,7 @@ export class CommentManagementService {
     category?: string
   ): CommentTemplate {
     const template: CommentTemplate = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       text: comment.text,
       category,
       usageCount: 1,
@@ -212,7 +212,7 @@ export class CommentManagementService {
 
     const copies: Exams.CorrectionComment[] = toCopy.map(c => ({
       ...c,
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       timestamp: new Date()
     }));
 

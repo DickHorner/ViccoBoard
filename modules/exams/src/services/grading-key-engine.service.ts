@@ -8,7 +8,7 @@
  */
 
 import { Exams } from '@viccoboard/core';
-import { v4 as uuidv4 } from 'uuid';
+
 import { GradingKeyService } from './grading-key.service';
 
 export interface GradingKeyChange {
@@ -48,7 +48,7 @@ export class GradingKeyEngine {
     });
 
     return {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       name,
       type: Exams.GradingKeyType.Percentage,
       totalPoints,
@@ -96,7 +96,7 @@ export class GradingKeyEngine {
 
     // Record change
     const change: GradingKeyChange = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       timestamp: new Date(),
       previousKey: oldKey,
       newKey: modifiedKey,
@@ -242,7 +242,7 @@ export class GradingKeyEngine {
     defaultRounding: Exams.RoundingRule
   ): Exams.GradingPreset {
     return {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       name,
       description,
       system,
@@ -261,7 +261,7 @@ export class GradingKeyEngine {
     return {
       ...sourceKey,
       ...modifications,
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       modifiedAfterCorrection: false
     };
   }
