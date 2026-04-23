@@ -182,6 +182,8 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     });
 
     expect(artifact.contractFile.content).toContain('Exam Reference: `exam-deutsch-klassenarbeit-1`');
+    expect(artifact.contractFile.fileName).toBe('kbr-correction-session-2026-04-17-contract.md');
+    expect(artifact.promptFile.fileName).toBe('kbr-correction-session-2026-04-17-prompt.md');
     expect(artifact.contractFile.content).toContain('- chat-0001');
     expect(artifact.contractFile.content).not.toContain('Candidate Reference');
     expect(artifact.contractFile.content).not.toContain('exam-internal-id');

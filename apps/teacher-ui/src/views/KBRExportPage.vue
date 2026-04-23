@@ -141,6 +141,69 @@
         <div v-else class="state-card">
           Wählen Sie einen Prüfling aus, um die Rückmeldebogen-Vorschau zu sehen.
         </div>
+
+        <section class="sheet-section ai-correction-section">
+          <header class="section-header">
+            <h3>Externe KI-Korrektur</h3>
+            <p class="sheet-copy">Exportieren Sie die Prüfungsdaten für eine externe KI-Unterstützung (z.B. ChatGPT) und importieren Sie die Ergebnisse zurück.</p>
+          </header>
+
+          <div class="ai-actions">
+            <div class="ai-action-group">
+              <h4>1. Export</h4>
+              <p class="panel-copy">Der Export liefert drei getrennte Dateien: Contract, Prompt und Session-Map (intern).</p>
+              <button 
+                class="ghost-button" 
+                type="button" 
+                @click="exportAISession" 
+                :disabled="!exam || aiExporting"
+              >
+                {{ aiExporting ? 'Exportiert...' : 'KI-Sitzung exportieren' }}
+              </button>
+            </div>
+
+            <div class="ai-action-group">
+              <h4>2. Import</h4>
+              <p class="panel-copy">Laden Sie die Ergebnis-JSON-Datei des KI-Bundles hoch.</p>
+              <div class="import-controls">
+                <input
+                  type="file"
+                  id="ai-import-file"
+                  accept=".json"
+                  class="hidden-input"
+                  @change="handleAIImport"
+                  :disabled="aiImporting"
+                />
+                <label for="ai-import-file" class="primary-button" :class="{ disabled: aiImporting }">
+                  {{ aiImporting ? 'Importiert...' : 'KI-Ergebnisse importieren' }}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="aiError" class="state-card error mt-4">
+            {{ aiError }}
+          </div>
+          <div v-if="aiSuccess" class="state-card success mt-4">
+            {{ aiSuccess }}
+          </div>
+          <div v-if="aiExportArtifacts.length" class="state-card mt-4">
+            <h4>Zuletzt exportierte Dateien</h4>
+            <div class="export-artifact-list">
+              <article
+                v-for="artifact in aiExportArtifacts"
+                :key="artifact.fileName"
+                class="export-artifact-card"
+              >
+                <div>
+                  <p class="export-artifact-label">{{ artifact.label }}</p>
+                  <p class="panel-copy">{{ artifact.description }}</p>
+                </div>
+                <p class="export-artifact-name">{{ artifact.fileName }}</p>
+              </article>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </section>
@@ -151,7 +214,11 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
 import { useExamsBridge } from '../composables/useExamsBridge'
-import { downloadBytes } from '../utils/download'
+import { downloadBytes, downloadText } from '../utils/download'
+import {
+  buildCorrectionSessionDownloads,
+  type CorrectionSessionDownloadArtifact
+} from '../utils/kbr-correction-export'
 
 const route = useRoute()
 const router = useRouter()
@@ -160,7 +227,9 @@ const {
   findCorrectionsByExam,
   buildCorrectionSheetPreview,
   exportCurrentCorrectionSheetPdf,
-  exportAllCorrectionSheetsPdf
+  exportAllCorrectionSheetsPdf,
+  exportCorrectionSession,
+  importCorrectionBundle
 } = useExamsBridge()
 
 const loading = ref(true)
@@ -170,6 +239,92 @@ const exam = ref<Exams.Exam | null>(null)
 const corrections = ref<Map<string, Exams.CorrectionEntry>>(new Map())
 const projection = ref<Exams.CorrectionSheetProjection | null>(null)
 const selectedCandidateId = ref('')
+
+// AI Correction State
+const aiExporting = ref(false)
+const aiImporting = ref(false)
+const aiError = ref('')
+const aiSuccess = ref('')
+const aiExportArtifacts = ref<CorrectionSessionDownloadArtifact[]>([])
+
+async function exportAISession(): Promise<void> {
+  if (!exam.value || !exportCorrectionSession) return
+  
+  aiError.value = ''
+  aiSuccess.value = ''
+  aiExportArtifacts.value = []
+  aiExporting.value = true
+  
+  try {
+    const result = await exportCorrectionSession({ exam: exam.value })
+
+    const downloads = buildCorrectionSessionDownloads(result, exam.value.id)
+    downloads.forEach((artifact) => {
+      downloadText(artifact.content, artifact.fileName)
+    })
+
+    aiExportArtifacts.value = downloads
+
+    const sessionMapArtifact = downloads.find((artifact) => artifact.audience === 'internal')
+    if (!sessionMapArtifact) {
+      throw new Error('Session-Map konnte fur den Re-Import nicht erstellt werden.')
+    }
+
+    aiSuccess.value = 'KI-Sitzungsdateien erfolgreich exportiert. ChatGPT-Dateien: Contract und Prompt. Session-Map wird getrennt als internes Hilfsartefakt gespeichert.'
+
+    localStorage.setItem(`viccoboard_session_map_${exam.value.id}`, sessionMapArtifact.content)
+  } catch (error: any) {
+    console.error('AI Export failed:', error)
+    aiError.value = `Export fehlgeschlagen: ${error.message}`
+  } finally {
+    aiExporting.value = false
+  }
+}
+
+async function handleAIImport(event: Event): Promise<void> {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file || !exam.value || !importCorrectionBundle) return
+
+  aiError.value = ''
+  aiSuccess.value = ''
+  aiImporting.value = true
+
+  try {
+    const content = await file.text()
+    const bundle = JSON.parse(content)
+    
+    // Retrieve session map
+    const storedMap = localStorage.getItem(`viccoboard_session_map_${exam.value.id}`)
+    if (!storedMap) {
+      throw new Error('Keine zugehörige Sitzungs-Map gefunden. Bitte exportieren Sie die Sitzung zuerst erneut.')
+    }
+    
+    const sessionMap = JSON.parse(storedMap)
+    
+    await importCorrectionBundle({
+      examId: exam.value.id,
+      sessionId: sessionMap.sessionId,
+      sessionMap,
+      bundle
+    })
+    
+    aiSuccess.value = 'KI-Ergebnisse erfolgreich importiert.'
+    
+    // Reload corrections and preview
+    const loadedCorrections = await findCorrectionsByExam(exam.value.id)
+    corrections.value = new Map(loadedCorrections.map((entry) => [entry.candidateId, entry]))
+    if (selectedCandidateId.value) {
+      await loadPreview(selectedCandidateId.value)
+    }
+  } catch (error: any) {
+    console.error('AI Import failed:', error)
+    aiError.value = `Import fehlgeschlagen: ${error.message}`
+  } finally {
+    aiImporting.value = false
+    target.value = '' // Reset input
+  }
+}
 
 type ExamCandidate = Exams.Exam['candidates'][number]
 
@@ -571,9 +726,105 @@ onMounted(() => {
   color: #475569;
 }
 
+.ai-correction-section {
+  margin-top: 2rem;
+  border: 2px dashed rgba(15, 23, 42, 0.1);
+}
+
+.section-header {
+  margin-bottom: 1.5rem;
+}
+
+.ai-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.ai-action-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ai-action-group h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.export-artifact-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.export-artifact-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.export-artifact-label,
+.export-artifact-name {
+  margin: 0;
+}
+
+.export-artifact-label {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.export-artifact-name {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.85rem;
+  color: #334155;
+  text-align: right;
+}
+
+.import-controls {
+  margin-top: 0.5rem;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.primary-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.state-card.success {
+  color: #166534;
+  background: #f0fdf4;
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
 @media (max-width: 900px) {
   .export-layout {
     grid-template-columns: 1fr;
+  }
+
+  .export-artifact-card {
+    flex-direction: column;
+  }
+
+  .export-artifact-name {
+    text-align: left;
+  }
+  
+  .ai-actions {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
