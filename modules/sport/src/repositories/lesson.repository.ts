@@ -101,7 +101,7 @@ export class LessonRepository extends AdapterRepository<Lesson> {
   }
 
   private resolveStartTime(rawStartTime: unknown, lessonDate: Date): string {
-    if (typeof rawStartTime === 'string' && /^\d{2}:\d{2}$/.test(rawStartTime)) {
+    if (typeof rawStartTime === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(rawStartTime)) {
       return rawStartTime;
     }
 

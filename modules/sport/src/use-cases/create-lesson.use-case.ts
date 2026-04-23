@@ -32,7 +32,7 @@ export class CreateLessonUseCase {
     const lesson = await this.lessonRepo.create({
       classGroupId: input.classGroupId,
       date: input.date,
-      startTime: input.startTime,
+      startTime: input.startTime.trim(),
       durationMinutes: input.durationMinutes,
       title: input.title,
       room: input.room,
