@@ -5,7 +5,7 @@
 
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-import { v4 as uuidv4 } from 'uuid';
+
 
 export interface CreateTacticsSnapshotInput {
   lessonId?: string;
@@ -44,7 +44,7 @@ export class TacticsSnapshotRepository {
   async create(input: CreateTacticsSnapshotInput): Promise<Sport.TacticsBoardSnapshot> {
     const now = new Date();
     const snapshot: Sport.TacticsBoardSnapshot = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       lessonId: input.lessonId,
       sport: input.sport ?? '',
       title: input.title,

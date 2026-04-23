@@ -6,7 +6,7 @@
 
 import { Sport} from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-import { v4 as uuidv4 } from 'uuid';
+
 
 export interface CreateToolSessionInput {
   toolType: string;
@@ -47,7 +47,7 @@ export class ToolSessionRepository {
   async create(input: CreateToolSessionInput): Promise<Sport.ToolSession> {
     const now = new Date();
     const session: Sport.ToolSession = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       toolType: input.toolType,
       classGroupId: input.classGroupId,
       lessonId: input.lessonId,

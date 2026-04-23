@@ -6,7 +6,6 @@
 import { AdapterRepository } from '@viccoboard/storage';
 import { LessonPart } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Internal row type used when persisting lesson parts.
@@ -62,7 +61,7 @@ export class LessonPartRepository extends AdapterRepository<LessonPart> {
     input: Omit<LessonPart, 'id'>,
     orderIndex: number
   ): Promise<LessonPart> {
-    const id = uuidv4();
+    const id = this.generateId();
     const row: LessonPartRow = {
       id,
       lesson_id: lessonId,
@@ -84,5 +83,13 @@ export class LessonPartRepository extends AdapterRepository<LessonPart> {
     for (const part of parts) {
       await this.adapter.delete('lesson_parts', part.id);
     }
+  }
+
+  private generateId(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 }
