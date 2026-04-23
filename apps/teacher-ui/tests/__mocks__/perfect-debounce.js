@@ -1,11 +1,13 @@
 // CJS stub for perfect-debounce (ESM-only package) for Jest test environments
 function debounce(fn, delay) {
   let timer;
-  function debounced(...args) {
+  function debounced() {
+    const args = arguments;
+    const ctx = this;
     clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), delay);
+    timer = setTimeout(function() { fn.apply(ctx, args); }, delay);
   }
-  debounced.cancel = () => clearTimeout(timer);
+  debounced.cancel = function() { clearTimeout(timer); };
   return debounced;
 }
 
