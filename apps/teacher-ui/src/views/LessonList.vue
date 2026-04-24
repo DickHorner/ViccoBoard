@@ -163,12 +163,46 @@
           </div>
           
           <div class="form-group">
-            <label for="lesson-time" class="form-label">Uhrzeit</label>
+            <label for="lesson-time" class="form-label">Uhrzeit*</label>
             <input 
               id="lesson-time" 
               type="time" 
-              v-model="lessonForm.time" 
+              v-model="lessonForm.startTime" 
               class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="lesson-duration" class="form-label">Dauer*</label>
+            <select
+              id="lesson-duration"
+              v-model="lessonForm.durationMinutes"
+              class="form-input"
+            >
+              <option :value="45">45 Minuten</option>
+              <option :value="90">90 Minuten</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="lesson-title" class="form-label">Titel</label>
+            <input 
+              id="lesson-title" 
+              type="text" 
+              v-model="lessonForm.title"
+              class="form-input"
+              placeholder="z. B. Sprinttraining"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="lesson-room" class="form-label">Raum / Ort</label>
+            <input 
+              id="lesson-room" 
+              type="text" 
+              v-model="lessonForm.room"
+              class="form-input"
+              placeholder="z. B. Sporthalle 1"
             />
           </div>
 
@@ -227,7 +261,7 @@
           <button 
             class="btn-primary" 
             @click="handleSaveLesson"
-            :disabled="!lessonForm.classGroupId || !lessonForm.date || saving"
+            :disabled="!lessonForm.classGroupId || !lessonForm.date || !lessonForm.startTime || saving"
           >
             {{ saving ? 'Wird gespeichert...' : (showEditLessonModal ? 'Speichern' : 'Erstellen') }}
           </button>
@@ -264,7 +298,10 @@ interface LessonForm {
   id?: string
   classGroupId: string
   date: string
-  time: string
+  startTime: string
+  durationMinutes: 45 | 90
+  title: string
+  room: string
   shortcuts: string
   lessonParts: { description: string; duration: string; type: string }[]
 }
@@ -272,7 +309,10 @@ interface LessonForm {
 const lessonForm = ref<LessonForm>({
   classGroupId: '',
   date: new Date().toISOString().split('T')[0],
-  time: '08:00',
+  startTime: '08:00',
+  durationMinutes: 45,
+  title: '',
+  room: '',
   shortcuts: '',
   lessonParts: []
 })
@@ -366,7 +406,10 @@ const handleEditLesson = async (lesson: Lesson) => {
     id: lesson.id,
     classGroupId: lesson.classGroupId,
     date: lesson.date.toISOString().split('T')[0],
-    time: lesson.date.toTimeString().split(' ')[0].substring(0, 5),
+    startTime: lesson.date.toTimeString().split(' ')[0].substring(0, 5),
+    durationMinutes: 45,
+    title: '',
+    room: '',
     shortcuts: (lesson.shortcuts ?? []).join(', '),
     lessonParts: parts.map(p => ({
       description: p.description,
@@ -397,7 +440,7 @@ const handleSaveLesson = async () => {
 
   try {
     // Combine date and time
-    const dateTime = new Date(`${lessonForm.value.date}T${lessonForm.value.time}:00`)
+    const dateTime = new Date(`${lessonForm.value.date}T${lessonForm.value.startTime}:00`)
 
     // Parse shortcuts from comma-separated string
     const shortcuts = lessonForm.value.shortcuts
@@ -472,7 +515,10 @@ const closeModals = () => {
   lessonForm.value = {
     classGroupId: selectedClassId.value || '',
     date: new Date().toISOString().split('T')[0],
-    time: '08:00',
+    startTime: '08:00',
+    durationMinutes: 45,
+    title: '',
+    room: '',
     shortcuts: '',
     lessonParts: []
   }
