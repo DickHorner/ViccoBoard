@@ -81,7 +81,8 @@
               </div>
               <div class="lesson-info">
                 <h4>{{ getClassName(lesson.classGroupId) }}</h4>
-                <p class="lesson-time">{{ formatTime(lesson.date) }}</p>
+                <p class="lesson-time">{{ lesson.startTime }} Uhr · {{ lesson.durationMinutes }} min{{ lesson.room ? ` · ${lesson.room}` : '' }}</p>
+                <p v-if="lesson.title" class="lesson-title">{{ lesson.title }}</p>
                 <div v-if="lesson.lessonParts && lesson.lessonParts.length > 0" class="lesson-parts">
                   <span v-for="(part, idx) in lesson.lessonParts" :key="part.id" class="lesson-part">
                     {{ part.description }}{{ idx < lesson.lessonParts!.length - 1 ? ', ' : '' }}
@@ -213,7 +214,7 @@
               type="text"
               v-model="lessonForm.shortcuts"
               class="form-input"
-              placeholder="z. B. Aufwärmen, Sprint, Teamspiel (kommagetrennt)"
+              placeholder="z. B. Aufwärmen, Sprint (kommagetrennt)"
             />
           </div>
 
@@ -250,7 +251,7 @@
               @click="lessonForm.lessonParts.push({ description: '', duration: '', type: '' })"
             >+ Stundenteil hinzufügen</button>
           </div>
-          
+
           <div v-if="saveError" class="error-message">
             {{ saveError }}
           </div>
@@ -371,7 +372,6 @@ const loadData = async () => {
       lessons.value = allLessons
     }
 
-    // Populate lessonParts for each lesson so the list can display them
     await enrichWithParts(lessons.value)
   } catch (err) {
     console.error('Failed to load lessons:', err)
@@ -406,10 +406,10 @@ const handleEditLesson = async (lesson: Lesson) => {
     id: lesson.id,
     classGroupId: lesson.classGroupId,
     date: lesson.date.toISOString().split('T')[0],
-    startTime: lesson.date.toTimeString().split(' ')[0].substring(0, 5),
-    durationMinutes: 45,
-    title: '',
-    room: '',
+    startTime: lesson.startTime || lesson.date.toTimeString().split(' ')[0].substring(0, 5),
+    durationMinutes: lesson.durationMinutes,
+    title: lesson.title || '',
+    room: lesson.room || '',
     shortcuts: (lesson.shortcuts ?? []).join(', '),
     lessonParts: parts.map(p => ({
       description: p.description,
@@ -439,59 +439,48 @@ const handleSaveLesson = async () => {
   saving.value = true
 
   try {
-    // Combine date and time
-    const dateTime = new Date(`${lessonForm.value.date}T${lessonForm.value.startTime}:00`)
+    // Construct date from separate components to avoid locale/timezone ambiguity
+    const [year, month, day] = lessonForm.value.date.split('-').map(Number)
+    const [hours, minutes] = lessonForm.value.startTime.split(':').map(Number)
+    const dateTime = new Date(year, month - 1, day, hours, minutes, 0, 0)
 
-    // Parse shortcuts from comma-separated string
     const shortcuts = lessonForm.value.shortcuts
       .split(',')
       .map(s => s.trim())
       .filter(s => s.length > 0)
 
+    const partsInput = lessonForm.value.lessonParts
+      .filter(p => p.description.trim())
+      .map(p => ({
+        description: p.description.trim(),
+        duration: p.duration ? Number(p.duration) : undefined,
+        type: p.type.trim() || undefined
+      }))
+
     if (showEditLessonModal.value && lessonForm.value.id) {
-      // Update existing lesson
-      await SportBridge.lessonRepository.update(lessonForm.value.id, {
+      // Update existing lesson via validated use-case
+      await SportBridge.updateLessonUseCase.execute({
+        lessonId: lessonForm.value.id,
         date: dateTime,
+        startTime: lessonForm.value.startTime,
+        durationMinutes: lessonForm.value.durationMinutes,
+        title: lessonForm.value.title.trim() || undefined,
+        room: lessonForm.value.room.trim() || undefined,
         shortcuts
       })
-      // Replace lesson parts: delete old, create new
-      await SportBridge.lessonPartRepository.deleteByLesson(lessonForm.value.id)
-      for (let i = 0; i < lessonForm.value.lessonParts.length; i++) {
-        const p = lessonForm.value.lessonParts[i]
-        if (p.description.trim()) {
-          await SportBridge.lessonPartRepository.createPart(
-            lessonForm.value.id,
-            {
-              description: p.description.trim(),
-              duration: p.duration ? Number(p.duration) : undefined,
-              type: p.type.trim() || undefined
-            },
-            i
-          )
-        }
-      }
+      await SportBridge.lessonPartRepository.replacePartsForLesson(lessonForm.value.id, partsInput)
     } else {
       // Create new lesson
       const created = await SportBridge.createLessonUseCase.execute({
         classGroupId: lessonForm.value.classGroupId,
         date: dateTime,
+        startTime: lessonForm.value.startTime,
+        durationMinutes: lessonForm.value.durationMinutes,
+        title: lessonForm.value.title.trim() || undefined,
+        room: lessonForm.value.room.trim() || undefined,
         shortcuts
       })
-      // Create lesson parts
-      for (let i = 0; i < lessonForm.value.lessonParts.length; i++) {
-        const p = lessonForm.value.lessonParts[i]
-        if (p.description.trim()) {
-          await SportBridge.lessonPartRepository.createPart(
-            created.id,
-            {
-              description: p.description.trim(),
-              duration: p.duration ? Number(p.duration) : undefined,
-              type: p.type.trim() || undefined
-            },
-            i
-          )
-        }
-      }
+      await SportBridge.lessonPartRepository.replacePartsForLesson(created.id, partsInput)
     }
 
     closeModals()
@@ -536,10 +525,6 @@ const formatDay = (date: Date): string => {
 const formatMonth = (date: Date): string => {
   const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
   return months[date.getMonth()]
-}
-
-const formatTime = (date: Date): string => {
-  return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
 }
 
 // Lifecycle

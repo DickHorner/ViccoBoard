@@ -10,7 +10,7 @@
  */
 
 import { Sport } from '@viccoboard/core';
-
+import { v4 as uuidv4 } from 'uuid';
 
 // ---------------------------------------------------------------------------
 // Standings types
@@ -108,7 +108,7 @@ export class TournamentService {
           continue;
         }
         matches.push({
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           tournamentId,
           team1Id: a,
           team2Id: b,
@@ -151,7 +151,7 @@ export class TournamentService {
       const a = seeds[i];
       const b = seeds[slotCount - 1 - i];
       matches.push({
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         tournamentId,
         team1Id: a === '__BYE__' ? '' : a,
         team2Id: b === '__BYE__' ? '' : b,
@@ -169,7 +169,7 @@ export class TournamentService {
       const count = slotCount / Math.pow(2, round);
       for (let seq = 1; seq <= count; seq++) {
         matches.push({
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           tournamentId,
           team1Id: '',
           team2Id: '',

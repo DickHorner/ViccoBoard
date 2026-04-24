@@ -137,6 +137,10 @@ export interface Lesson {
   id: string;
   classGroupId: string;
   date: Date;
+  startTime: string;
+  durationMinutes: 45 | 90;
+  title?: string;
+  room?: string;
   lessonParts?: LessonPart[];
   shortcuts?: string[];
   randomStudentSeed?: string;

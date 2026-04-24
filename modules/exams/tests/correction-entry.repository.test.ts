@@ -8,7 +8,7 @@ import {
 import { CorrectionEntryRepository } from '../src/repositories/correction-entry.repository';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import { Exams } from '@viccoboard/core';
-
+import { v4 as uuidv4 } from 'uuid';
 
 describe('CorrectionEntryRepository', () => {
   let storage: SQLiteStorage;
@@ -69,11 +69,11 @@ describe('CorrectionEntryRepository', () => {
       status: 'in-progress'
     });
 
-    const candidateId = crypto.randomUUID();
+    const candidateId = uuidv4();
     const now = new Date();
 
     const entry: Exams.CorrectionEntry = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       examId: exam.id,
       candidateId,
       taskScores: [
@@ -123,11 +123,11 @@ describe('CorrectionEntryRepository', () => {
     });
 
     const now = new Date();
-    const candidate1 = crypto.randomUUID();
-    const candidate2 = crypto.randomUUID();
+    const candidate1 = uuidv4();
+    const candidate2 = uuidv4();
 
     await repository.createEntry({
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       examId: exam.id,
       candidateId: candidate1,
       taskScores: [
@@ -150,7 +150,7 @@ describe('CorrectionEntryRepository', () => {
     });
 
     await repository.createEntry({
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       examId: exam.id,
       candidateId: candidate2,
       taskScores: [
@@ -198,11 +198,11 @@ describe('CorrectionEntryRepository', () => {
       status: 'completed'
     });
 
-    const candidateId = crypto.randomUUID();
+    const candidateId = uuidv4();
     const now = new Date();
 
     await repository.createEntry({
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       examId: exam1.id,
       candidateId,
       taskScores: [
@@ -225,7 +225,7 @@ describe('CorrectionEntryRepository', () => {
     });
 
     await repository.createEntry({
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       examId: exam2.id,
       candidateId,
       taskScores: [
@@ -263,7 +263,7 @@ describe('CorrectionEntryRepository', () => {
       status: 'completed'
     });
 
-    const candidateId = crypto.randomUUID();
+    const candidateId = uuidv4();
     const now = new Date();
 
     const created = await repository.create({
@@ -304,7 +304,7 @@ describe('CorrectionEntryRepository', () => {
       status: 'draft'
     });
 
-    const found = await repository.findByExamAndCandidate(exam.id, crypto.randomUUID());
+    const found = await repository.findByExamAndCandidate(exam.id, uuidv4());
     expect(found).toBeNull();
   });
 });

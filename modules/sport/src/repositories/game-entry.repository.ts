@@ -5,7 +5,7 @@
 
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-
+import { v4 as uuidv4 } from 'uuid';
 
 export interface CreateGameEntryInput {
   name: string;
@@ -50,7 +50,7 @@ export class GameEntryRepository {
   async create(input: CreateGameEntryInput): Promise<Sport.GameEntry> {
     const now = new Date();
     const entry: Sport.GameEntry = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       name: input.name,
       category: input.category,
       phase: input.phase,

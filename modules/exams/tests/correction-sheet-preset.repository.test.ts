@@ -5,7 +5,7 @@ import {
   ExamSchemaMigration,
   KbrFeedbackWorkflowMigration
 } from '@viccoboard/storage/node';
-
+import { v4 as uuidv4 } from 'uuid';
 import { Exams } from '@viccoboard/core';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import {
@@ -86,7 +86,7 @@ describe('CorrectionSheetPresetRepository', () => {
       printPresets: [],
       candidates: [
         {
-          id: crypto.randomUUID(),
+          id: uuidv4(),
           examId: 'draft',
           firstName: 'Lea',
           lastName: 'Meyer'

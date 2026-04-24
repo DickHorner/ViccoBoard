@@ -1,5 +1,5 @@
 import { Exams } from '@viccoboard/core';
-
+import { v4 as uuidv4 } from 'uuid';
 import { CorrectionEntryRepository } from '../repositories/correction-entry.repository.js';
 import { CalculateGradeUseCase } from './calculate-grade.use-case.js';
 
@@ -28,7 +28,7 @@ export class RecordCorrectionUseCase {
 
     const now = new Date();
     const entry: Exams.CorrectionEntry = {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       examId: input.examId,
       candidateId: input.candidateId,
       taskScores: input.taskScores,

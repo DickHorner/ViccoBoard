@@ -1,4 +1,4 @@
-
+import { v4 as uuidv4 } from 'uuid';
 import { Exams } from '@viccoboard/core';
 
 import { ExamRepository } from '../repositories/exam.repository.js';
@@ -153,7 +153,7 @@ function assertPointStep(points: number, step: number, taskId: string): void {
 
 function buildExamLevelComment(text: string): Exams.CorrectionComment {
   return {
-    id: crypto.randomUUID(),
+    id: uuidv4(),
     level: 'exam',
     text,
     printable: true,

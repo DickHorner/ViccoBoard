@@ -1,9 +1,9 @@
 import { Exams } from '@viccoboard/core';
-
+import { v4 as uuidv4 } from 'uuid';
 
 export function createExamPayload(title: string): Exams.Exam {
   const exam: Exams.Exam = {
-    id: crypto.randomUUID(),
+    id: uuidv4(),
     title,
     assessmentFormat: 'klausur',
     mode: Exams.ExamMode.Simple,
@@ -15,7 +15,7 @@ export function createExamPayload(title: string): Exams.Exam {
       totalPoints: 0
     } as Exams.ExamStructure,
     gradingKey: {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       name: 'default',
       type: Exams.GradingKeyType.Points,
       totalPoints: 0,

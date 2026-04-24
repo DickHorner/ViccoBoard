@@ -6,7 +6,7 @@
 import { AdapterRepository } from '@viccoboard/storage';
 import { Exams, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-
+import { v4 as uuidv4 } from 'uuid';
 
 export class CriterionRepository extends AdapterRepository<Exams.Criterion> {
   constructor(adapter: StorageAdapter) {
@@ -46,7 +46,7 @@ export class CriterionRepository extends AdapterRepository<Exams.Criterion> {
     taskId: string,
     criterion: Omit<Exams.Criterion, 'id'>
   ): Promise<Exams.Criterion> {
-    const id = crypto.randomUUID();
+    const id = uuidv4();
     const now = new Date();
     const entity = { ...criterion, id };
 

@@ -4,7 +4,7 @@
  */
 
 import { Exams } from '@viccoboard/core';
-
+import { v4 as uuidv4 } from 'uuid';
 import { GradingKeyService } from '../services/grading-key.service';
 import type { CorrectionEntryRepository } from '../repositories/correction-entry.repository';
 import type { ExamRepository } from '../repositories/exam.repository';
@@ -31,7 +31,7 @@ export class RecordCorrectionUseCase {
     // Create new if doesn't exist
     if (!correction) {
       correction = {
-        id: crypto.randomUUID(),
+        id: uuidv4(),
         examId: input.examId,
         candidateId: input.candidateId,
         taskScores: [],
@@ -64,7 +64,7 @@ export class RecordCorrectionUseCase {
     // Add comments if provided
     if (input.comments) {
       correction.comments = input.comments.map(c => ({
-        id: c.id ?? crypto.randomUUID(),
+        id: c.id ?? uuidv4(),
         taskId: c.taskId,
         level: c.level,
         text: c.text,

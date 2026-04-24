@@ -6,7 +6,7 @@
 
 import { Exams } from '@viccoboard/core';
 import QRCode from 'qrcode';
-
+import { v4 as uuidv4 } from 'uuid';
 import { SupportTipUIHelper } from './support-tip-management.types';
 import type { QRCodeOptions } from './support-tip-management.types';
 
@@ -26,7 +26,7 @@ export class SupportTipManagementService {
     } = {}
   ): Exams.SupportTip {
     return {
-      id: crypto.randomUUID(),
+      id: uuidv4(),
       title,
       shortDescription,
       category: options.category,

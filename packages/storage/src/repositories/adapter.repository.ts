@@ -5,6 +5,7 @@
 
 import { Repository, QueryOptions, QueryCriteria } from '@viccoboard/core';
 import { StorageAdapter } from '../adapters/storage-adapter.interface.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export abstract class AdapterRepository<T> implements Repository<T> {
   protected adapter: StorageAdapter;
@@ -60,7 +61,7 @@ export abstract class AdapterRepository<T> implements Repository<T> {
   }
 
   async create(entity: Omit<T, 'id' | 'createdAt' | 'lastModified'>): Promise<T> {
-    const id = crypto.randomUUID();
+    const id = uuidv4();
     const now = new Date();
 
     const entityWithMeta = {
