@@ -4,6 +4,8 @@ module.exports = {
   moduleNameMapper: {
     '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
     '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',
+    // uuid v14 is ESM-only; provide a CJS-compatible stub for Jest
+    '^uuid$': '<rootDir>/tests/__mocks__/uuid.cjs',
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   transform: {

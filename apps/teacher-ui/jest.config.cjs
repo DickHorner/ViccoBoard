@@ -13,6 +13,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^perfect-debounce$': '<rootDir>/tests/__mocks__/perfect-debounce.js',
   },
   collectCoverageFrom: [
     'src/**/*.{ts,vue}',
