@@ -151,7 +151,8 @@ const lessonsByDay = computed(() => {
         key,
         isToday: key === todayKey.value,
         label: formatGermanDateTime(date, { weekday: 'long', day: 'numeric', month: 'long' }),
-        lessons: [...dayLessons].sort((a, b) => a.startTime.localeCompare(b.startTime))
+        // startTime is guaranteed to be 'HH:MM' (validated by CreateLessonUseCase / UpdateLessonUseCase)
+        lessons: [...dayLessons].sort((a, b) => (a.startTime ?? '').localeCompare(b.startTime ?? ''))
       }
     })
 })
@@ -169,6 +170,7 @@ const loadData = async () => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
+    // Show 7 days back (recent lessons) and 14 days forward (upcoming lessons)
     const startDate = new Date(today)
     startDate.setDate(startDate.getDate() - 7)
 
