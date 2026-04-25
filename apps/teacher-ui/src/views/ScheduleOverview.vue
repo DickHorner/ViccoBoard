@@ -91,6 +91,9 @@
                 <div>
                   <strong>{{ getLessonTitle(lesson) }}</strong>
                   <p>{{ getClassName(lesson.classGroupId) }}{{ getLessonMeta(lesson) }}</p>
+                  <p v-if="getLessonHourSlotLabel(lesson)" class="lesson-slot">
+                    {{ getLessonHourSlotLabel(lesson) }}
+                  </p>
                 </div>
                 <span>öffnen</span>
               </RouterLink>
@@ -113,6 +116,7 @@ import {
   getScheduleCalendarMarkers,
   type ResolvedScheduleCalendarMarker
 } from './schedule-calendar-markers'
+import { getScheduleHourSlot } from './schedule-hour-grid'
 
 interface ScheduleDay {
   key: string
@@ -235,6 +239,9 @@ const getLessonWorkspaceUrl = (lesson: Lesson): string =>
 const getAttendanceUrl = (lesson: Lesson): string =>
   '/attendance?classId=' + lesson.classGroupId + '&lessonId=' + lesson.id
 
+const getLessonHourSlotLabel = (lesson: Lesson): string =>
+  getScheduleHourSlot(lesson.startTime, lesson.durationMinutes)?.label ?? ''
+
 const formatLessonTime = (lesson: Lesson): string =>
   lesson.startTime || formatGermanTime(lesson.date)
 
@@ -346,7 +353,8 @@ onMounted(() => {
 .empty-text,
 .mini-lesson span,
 .day-header span,
-.lesson-row p {
+.lesson-row p,
+.lesson-slot {
   color: #64748b;
 }
 
@@ -478,6 +486,11 @@ onMounted(() => {
 
 .lesson-row div {
   flex: 1;
+}
+
+.lesson-slot {
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
 }
 
 .empty-text.compact {
