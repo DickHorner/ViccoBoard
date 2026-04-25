@@ -217,6 +217,57 @@
   color: #999;
 }
 
+.lesson-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.lesson-shortcut-tag {
+  background: #e8f0fe;
+  color: #3b5bdb;
+  border-radius: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.lesson-part-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.lesson-part-description {
+  flex: 1;
+}
+
+.lesson-part-duration {
+  width: 5rem;
+  flex-shrink: 0;
+}
+
+.lesson-part-remove {
+  background: none;
+  border: none;
+  color: #c92a2a;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.lesson-part-remove:hover {
+  color: #a61e1e;
+}
+
+.lesson-part-add {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+}
+
 .lesson-actions {
   display: flex;
   gap: 0.5rem;
@@ -409,69 +460,6 @@
   color: #c62828;
   border: 1px solid #f44336;
   font-size: 0.95rem;
-}
-
-.lesson-shortcuts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
-}
-
-.lesson-shortcut-tag {
-  background: #e8f0fe;
-  color: #3a56d4;
-  border-radius: 12px;
-  padding: 0.15rem 0.55rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-}
-
-.lesson-part-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.lesson-part-description {
-  flex: 1;
-}
-
-.lesson-part-duration {
-  width: 80px;
-  flex-shrink: 0;
-}
-
-.lesson-part-remove {
-  background: transparent;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  color: #999;
-  cursor: pointer;
-  font-size: 1.1rem;
-  line-height: 1;
-  min-width: 32px;
-  min-height: 32px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.lesson-part-remove:hover {
-  border-color: #f44336;
-  color: #f44336;
-  background: #ffebee;
-}
-
-.lesson-part-add {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  min-height: 36px;
-  margin-top: 0.25rem;
 }
 
 /* Responsive */

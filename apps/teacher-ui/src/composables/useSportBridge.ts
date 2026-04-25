@@ -58,7 +58,6 @@ import {
   TournamentRepository,
   TournamentService,
   UpdateGradeCategoryUseCase,
-  UpdateLessonUseCase,
   UpdateTournamentMatchUseCase,
   type CreateClassInput,
   type CreateGradeCategoryInput,
@@ -71,8 +70,7 @@ import {
   type SavePushupSessionInput,
   type PushupPersonData,
   type SaveTableDefinitionInput,
-  type UpdateGradeCategoryInput,
-  type UpdateLessonInput
+  type UpdateGradeCategoryInput
 } from '@viccoboard/sport';
 import { getStorageAdapter } from '../services/storage.service';
 
@@ -100,7 +98,6 @@ interface SportBridge {
 
   createClassUseCase: CreateClassUseCase;
   createLessonUseCase: CreateLessonUseCase;
-  updateLessonUseCase: UpdateLessonUseCase;
   recordAttendanceUseCase: RecordAttendanceUseCase;
   createGradeCategoryUseCase: CreateGradeCategoryUseCase;
   updateGradeCategoryUseCase: UpdateGradeCategoryUseCase;
@@ -165,7 +162,6 @@ export function initializeSportBridge(): SportBridge {
 
   const createClassUseCase = new CreateClassUseCase(classGroupRepository);
   const createLessonUseCase = new CreateLessonUseCase(lessonRepository);
-  const updateLessonUseCase = new UpdateLessonUseCase(lessonRepository);
   const recordAttendanceUseCase = new RecordAttendanceUseCase(attendanceRepository);
   const createGradeCategoryUseCase = new CreateGradeCategoryUseCase(gradeCategoryRepository);
   const updateGradeCategoryUseCase = new UpdateGradeCategoryUseCase(gradeCategoryRepository);
@@ -253,7 +249,6 @@ export function initializeSportBridge(): SportBridge {
 
     createClassUseCase,
     createLessonUseCase,
-    updateLessonUseCase,
     recordAttendanceUseCase,
     createGradeCategoryUseCase,
     updateGradeCategoryUseCase,
@@ -364,8 +359,7 @@ export {
   SaveTableDefinitionUseCase,
   SportStatisticsService,
   TimeGradingService,
-  UpdateGradeCategoryUseCase,
-  UpdateLessonUseCase
+  UpdateGradeCategoryUseCase
 };
 export type {
   CreateClassInput,
@@ -379,6 +373,5 @@ export type {
   RecordGradeInput,
   SavePushupSessionInput,
   SaveTableDefinitionInput,
-  UpdateGradeCategoryInput,
-  UpdateLessonInput
+  UpdateGradeCategoryInput
 };

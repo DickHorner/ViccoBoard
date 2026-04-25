@@ -54,9 +54,7 @@ describe('RecordAttendanceUseCase', () => {
 
     const lesson = await createLessonUseCase.execute({
       classGroupId: classGroup.id,
-      date: new Date('2024-09-01'),
-      startTime: '08:00',
-      durationMinutes: 45
+      date: new Date('2024-09-01')
     });
     testLessonId = lesson.id;
   });
