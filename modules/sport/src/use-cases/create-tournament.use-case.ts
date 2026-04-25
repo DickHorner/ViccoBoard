@@ -46,8 +46,7 @@ export class CreateTournamentUseCase {
       color: t.color
     }));
 
-    const { v4: uuidv4 } = await import('uuid');
-    const tournamentId = uuidv4();
+    const tournamentId = crypto.randomUUID();
 
     let matches: Sport.Match[];
     if (input.type === 'round-robin') {

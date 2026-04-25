@@ -7,7 +7,7 @@ import {
   KbrFeedbackWorkflowMigration
 } from '@viccoboard/storage/node';
 import { PDFDocument } from 'pdf-lib';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 import { Exams } from '@viccoboard/core';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import { CorrectionEntryRepository } from '../src/repositories/correction-entry.repository';

@@ -1,5 +1,5 @@
 import { Exams } from '@viccoboard/core';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 
 export function createExamPayload(title: string): Exams.Exam {
   const exam: Exams.Exam = {

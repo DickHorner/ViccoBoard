@@ -6,7 +6,7 @@
 import { AdapterRepository } from '@viccoboard/storage';
 import { Exams, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 
 export class TaskNodeRepository extends AdapterRepository<Exams.TaskNode> {
   constructor(adapter: StorageAdapter) {

@@ -1,6 +1,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { v4 as uuidv4 } from 'uuid'
+import { createUuid as uuidv4 } from '@/utils/uuid'
 
 import type { Sport, StatusOption } from '@viccoboard/core'
 
