@@ -297,7 +297,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { v4 as uuidv4 } from 'uuid';
+import { createUuid as uuidv4 } from '@/utils/uuid';
 import type { Exams } from '@viccoboard/core';
 import { createDefaultCorrectionSheetPreset } from '@viccoboard/exams';
 import { useExamsBridge } from '../composables/useExamsBridge';

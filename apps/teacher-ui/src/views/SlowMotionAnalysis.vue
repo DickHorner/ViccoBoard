@@ -418,7 +418,7 @@
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { v4 as uuidv4 } from 'uuid'
+import { createUuid as uuidv4 } from '@/utils/uuid'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Sport } from '@viccoboard/core'
 

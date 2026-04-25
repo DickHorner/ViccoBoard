@@ -5,7 +5,7 @@
 
 import { Repository, QueryOptions, QueryCriteria } from '@viccoboard/core';
 import { SQLiteStorage } from '../storage.js';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 
 export abstract class BaseRepository<T> implements Repository<T> {
   protected storage: SQLiteStorage;

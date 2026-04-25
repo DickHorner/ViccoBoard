@@ -8,7 +8,7 @@
  */
 
 import { Exams } from '@viccoboard/core';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 import { GradingKeyService } from './grading-key.service';
 
 export interface GradingKeyChange {

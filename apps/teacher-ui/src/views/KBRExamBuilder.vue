@@ -327,7 +327,7 @@ import {
   GradingKeyService,
   createDefaultCorrectionSheetPreset
 } from '@viccoboard/exams';
-import { v4 as uuidv4 } from 'uuid';
+import { createUuid as uuidv4 } from '@/utils/uuid';
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge';
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge';
 import { useExamsBridge } from '../composables/useExamsBridge';

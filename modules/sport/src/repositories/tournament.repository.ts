@@ -5,7 +5,7 @@
 
 import { Sport } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 
 export interface CreateTournamentInput {
   /** Optional pre-generated ID — useful when the caller needs to embed the ID in matches before persisting. */

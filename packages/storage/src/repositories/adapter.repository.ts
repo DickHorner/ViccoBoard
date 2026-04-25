@@ -5,7 +5,7 @@
 
 import { Repository, QueryOptions, QueryCriteria } from '@viccoboard/core';
 import { StorageAdapter } from '../adapters/storage-adapter.interface.js';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 
 export abstract class AdapterRepository<T> implements Repository<T> {
   protected adapter: StorageAdapter;

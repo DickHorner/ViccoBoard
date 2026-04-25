@@ -146,9 +146,8 @@ export function useTournamentsView() {
 
     saving.value = true;
     try {
-      const { v4: uuidv4 } = await import('uuid');
       const teams = filledTeams.map(name => ({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         name,
         studentIds: [] as string[]
       }));

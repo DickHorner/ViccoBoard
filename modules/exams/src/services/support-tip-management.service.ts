@@ -6,7 +6,7 @@
 
 import { Exams } from '@viccoboard/core';
 import QRCode from 'qrcode';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => crypto.randomUUID();
 import { SupportTipUIHelper } from './support-tip-management.types';
 import type { QRCodeOptions } from './support-tip-management.types';
 
