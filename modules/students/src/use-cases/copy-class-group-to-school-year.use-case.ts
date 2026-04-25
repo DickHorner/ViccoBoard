@@ -1,10 +1,9 @@
 import type { ClassGroup, Student } from '@viccoboard/core';
+import type { ClassGroupGateway } from './student-csv-import.use-case.js';
 import { StudentRepository } from '../repositories/student.repository.js';
 
-export interface CopyClassGroupGateway {
+export interface CopyClassGroupGateway extends ClassGroupGateway {
   getById(id: string): Promise<ClassGroup | null>;
-  findBySchoolYear(schoolYear: string): Promise<ClassGroup[]>;
-  create(input: Omit<ClassGroup, 'id' | 'createdAt' | 'lastModified'>): Promise<ClassGroup>;
 }
 
 export interface CopyClassGroupToSchoolYearInput {
