@@ -32,5 +32,11 @@ export type {
   StudentImportPreview,
   StudentImportExecutionResult
 } from './use-cases/student-csv-import.use-case.js';
+export { CopyClassGroupToSchoolYearUseCase } from './use-cases/copy-class-group-to-school-year.use-case.js';
+export type {
+  CopyClassGroupGateway,
+  CopyClassGroupToSchoolYearInput,
+  CopyClassGroupToSchoolYearResult
+} from './use-cases/copy-class-group-to-school-year.use-case.js';
 
 export const STUDENTS_MODULE_VERSION = '0.1.0';
