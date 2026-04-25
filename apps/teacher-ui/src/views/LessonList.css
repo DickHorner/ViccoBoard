@@ -217,6 +217,57 @@
   color: #999;
 }
 
+.lesson-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.lesson-shortcut-tag {
+  background: #e8f0fe;
+  color: #3b5bdb;
+  border-radius: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.lesson-part-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.lesson-part-description {
+  flex: 1;
+}
+
+.lesson-part-duration {
+  width: 5rem;
+  flex-shrink: 0;
+}
+
+.lesson-part-remove {
+  background: none;
+  border: none;
+  color: #c92a2a;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.lesson-part-remove:hover {
+  color: #a61e1e;
+}
+
+.lesson-part-add {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+}
+
 .lesson-actions {
   display: flex;
   gap: 0.5rem;

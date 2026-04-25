@@ -24,6 +24,7 @@ import {
   GradeCategoryRepository,
   ImportShuttleRunConfigUseCase,
   ImportTableDefinitionUseCase,
+  LessonPartRepository,
   LessonRepository,
   PerformanceEntryRepository,
   RecordAttendanceUseCase,
@@ -80,6 +81,7 @@ let sportBridgeInstance: SportBridge | null = null;
 interface SportBridge {
   classGroupRepository: ClassGroupRepository;
   lessonRepository: LessonRepository;
+  lessonPartRepository: LessonPartRepository;
   gradeCategoryRepository: GradeCategoryRepository;
   performanceEntryRepository: PerformanceEntryRepository;
   attendanceRepository: AttendanceRepository;
@@ -146,6 +148,7 @@ export function initializeSportBridge(): SportBridge {
 
   const classGroupRepository = new ClassGroupRepository(adapter);
   const lessonRepository = new LessonRepository(adapter);
+  const lessonPartRepository = new LessonPartRepository(adapter);
   const gradeCategoryRepository = new GradeCategoryRepository(adapter);
   const performanceEntryRepository = new PerformanceEntryRepository(adapter);
   const attendanceRepository = new AttendanceRepository(adapter);
@@ -231,6 +234,7 @@ export function initializeSportBridge(): SportBridge {
   sportBridgeInstance = {
     classGroupRepository,
     lessonRepository,
+    lessonPartRepository,
     gradeCategoryRepository,
     performanceEntryRepository,
     attendanceRepository,
@@ -352,6 +356,7 @@ export {
   DeleteGradeCategoryUseCase,
   DeleteTableDefinitionUseCase,
   GradeCategoryRepository,
+  LessonPartRepository,
   LessonRepository,
   PerformanceEntryRepository,
   RecordAttendanceUseCase,
