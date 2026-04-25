@@ -81,7 +81,8 @@
               </div>
               <div class="lesson-info">
                 <h4>{{ getClassName(lesson.classGroupId) }}</h4>
-                <p class="lesson-time">{{ formatTime(lesson.date) }}</p>
+                <p class="lesson-time">{{ lesson.startTime }} Uhr · {{ lesson.durationMinutes }} min{{ lesson.room ? ` · ${lesson.room}` : '' }}</p>
+                <p v-if="lesson.title" class="lesson-title">{{ lesson.title }}</p>
                 <div v-if="lesson.lessonParts && lesson.lessonParts.length > 0" class="lesson-parts">
                   <span v-for="(part, idx) in lesson.lessonParts" :key="part.id" class="lesson-part">
                     {{ part.description }}{{ idx < lesson.lessonParts!.length - 1 ? ', ' : '' }}
@@ -163,11 +164,11 @@
           </div>
           
           <div class="form-group">
-            <label for="lesson-time" class="form-label">Uhrzeit</label>
+            <label for="lesson-time" class="form-label">Uhrzeit*</label>
             <input 
               id="lesson-time" 
               type="time" 
-              v-model="lessonForm.time" 
+              v-model="lessonForm.startTime" 
               class="form-input"
             />
           </div>
@@ -227,7 +228,7 @@
           <button 
             class="btn-primary" 
             @click="handleSaveLesson"
-            :disabled="!lessonForm.classGroupId || !lessonForm.date || saving"
+            :disabled="!lessonForm.classGroupId || !lessonForm.date || !lessonForm.startTime || saving"
           >
             {{ saving ? 'Wird gespeichert...' : (showEditLessonModal ? 'Speichern' : 'Erstellen') }}
           </button>
@@ -264,17 +265,19 @@ interface LessonForm {
   id?: string
   classGroupId: string
   date: string
-  time: string
-  shortcuts: string
-  lessonParts: { description: string; duration: string; type: string }[]
+  startTime: string
+  durationMinutes: 45 | 90
+  title: string
+  room: string
 }
 
 const lessonForm = ref<LessonForm>({
   classGroupId: '',
   date: new Date().toISOString().split('T')[0],
-  time: '08:00',
-  shortcuts: '',
-  lessonParts: []
+  startTime: '08:00',
+  durationMinutes: 45,
+  title: '',
+  room: ''
 })
 
 // Computed
@@ -365,13 +368,10 @@ const handleEditLesson = async (lesson: Lesson) => {
     id: lesson.id,
     classGroupId: lesson.classGroupId,
     date: lesson.date.toISOString().split('T')[0],
-    time: lesson.date.toTimeString().split(' ')[0].substring(0, 5),
-    shortcuts: (lesson.shortcuts ?? []).join(', '),
-    lessonParts: parts.map(p => ({
-      description: p.description,
-      duration: p.duration != null ? String(p.duration) : '',
-      type: p.type ?? ''
-    }))
+    startTime: lesson.startTime || lesson.date.toTimeString().split(' ')[0].substring(0, 5),
+    durationMinutes: lesson.durationMinutes,
+    title: lesson.title || '',
+    room: lesson.room || ''
   }
   showEditLessonModal.value = true
 }
@@ -395,29 +395,18 @@ const handleSaveLesson = async () => {
   saving.value = true
 
   try {
-    // Construct date from separate components to avoid locale/timezone ambiguity
-    const [year, month, day] = lessonForm.value.date.split('-').map(Number)
-    const [hours, minutes] = lessonForm.value.time.split(':').map(Number)
-    const dateTime = new Date(year, month - 1, day, hours, minutes, 0, 0)
-
-    const shortcuts = lessonForm.value.shortcuts
-      .split(',')
-      .map(s => s.trim())
-      .filter(s => s.length > 0)
-
-    const partsInput = lessonForm.value.lessonParts
-      .filter(p => p.description.trim())
-      .map(p => ({
-        description: p.description.trim(),
-        duration: p.duration ? Number(p.duration) : undefined,
-        type: p.type.trim() || undefined
-      }))
+    // Combine date and time for the lesson date field
+    const dateTime = new Date(`${lessonForm.value.date}T${lessonForm.value.startTime}:00`)
 
     if (showEditLessonModal.value && lessonForm.value.id) {
-      // Update existing lesson
-      await SportBridge.lessonRepository.update(lessonForm.value.id, {
+      // Update existing lesson via validated use-case
+      await SportBridge.updateLessonUseCase.execute({
+        lessonId: lessonForm.value.id,
         date: dateTime,
-        shortcuts
+        startTime: lessonForm.value.startTime,
+        durationMinutes: lessonForm.value.durationMinutes,
+        title: lessonForm.value.title.trim() || undefined,
+        room: lessonForm.value.room.trim() || undefined
       })
       await SportBridge.lessonPartRepository.replacePartsForLesson(lessonForm.value.id, partsInput)
     } else {
@@ -425,7 +414,10 @@ const handleSaveLesson = async () => {
       const created = await SportBridge.createLessonUseCase.execute({
         classGroupId: lessonForm.value.classGroupId,
         date: dateTime,
-        shortcuts
+        startTime: lessonForm.value.startTime,
+        durationMinutes: lessonForm.value.durationMinutes,
+        title: lessonForm.value.title.trim() || undefined,
+        room: lessonForm.value.room.trim() || undefined
       })
       await SportBridge.lessonPartRepository.replacePartsForLesson(created.id, partsInput)
     }
@@ -451,9 +443,10 @@ const closeModals = () => {
   lessonForm.value = {
     classGroupId: selectedClassId.value || '',
     date: new Date().toISOString().split('T')[0],
-    time: '08:00',
-    shortcuts: '',
-    lessonParts: []
+    startTime: '08:00',
+    durationMinutes: 45,
+    title: '',
+    room: ''
   }
 }
 
@@ -469,10 +462,6 @@ const formatDay = (date: Date): string => {
 const formatMonth = (date: Date): string => {
   const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
   return months[date.getMonth()]
-}
-
-const formatTime = (date: Date): string => {
-  return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
 }
 
 // Lifecycle

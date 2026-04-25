@@ -27,3 +27,4 @@ export * from './migrations/indexeddb/018_catalog_and_table_store_repair.js';
 export * from './migrations/indexeddb/019_game_database_schema.js';
 export * from './migrations/indexeddb/020_kbr_feedback_workflow.js';
 export * from './migrations/indexeddb/021_student_import_batches.js';
+export * from './migrations/indexeddb/022_lesson_schedule_fields.js';
