@@ -3,72 +3,96 @@
     <header class="page-header">
       <div>
         <h1>Stundenplan</h1>
-        <p class="subtitle">Zentrale Stunden- und Tagesübersicht. Die volle Stundenplanlogik folgt, vorhandene Stunden sind bereits eingebunden.</p>
+        <p class="subtitle">Stunden nach Kalendertag gruppiert, sortiert nach Startzeit.</p>
       </div>
       <RouterLink class="primary-link" to="/lessons">
         Stunden verwalten
       </RouterLink>
     </header>
 
-    <section class="notice-card">
-      <strong>Hinweis zum Ausbaustand</strong>
-      <p>Die Stundenplan-Startseite zeigt bereits heutige und anstehende Stunden. Automatische Stundenplanerzeugung und Wochenraster werden im nächsten Schritt ausgebaut.</p>
-    </section>
-
     <div v-if="loading" class="state-card">Stunden werden geladen...</div>
     <div v-else-if="loadError" class="state-card error">{{ loadError }}</div>
-    <div v-else class="schedule-grid">
-      <section class="panel hero-panel">
-        <h2>Jetzt / Als Nächstes</h2>
-        <div v-if="currentOrNextLesson" class="lesson-focus">
-          <p class="eyebrow">{{ currentOrNextMode }}</p>
-          <h3>{{ getClassName(currentOrNextLesson.classGroupId) }}</h3>
-          <p>{{ formatLessonDateTime(currentOrNextLesson.date) }}</p>
-          <div class="actions">
-            <RouterLink :to="`/lessons/${currentOrNextLesson.id}/workspace`" class="ghost-link">
-              Arbeitsbereich öffnen
-            </RouterLink>
-            <RouterLink :to="`/attendance?classId=${currentOrNextLesson.classGroupId}&lessonId=${currentOrNextLesson.id}`" class="primary-link">
-              Anwesenheit
-            </RouterLink>
+
+    <template v-else>
+      <div class="schedule-grid">
+        <section class="panel hero-panel">
+          <h2>Jetzt / Als Nächstes</h2>
+          <div v-if="currentOrNextLesson" class="lesson-focus">
+            <p class="eyebrow">{{ currentOrNextMode }}</p>
+            <h3>{{ getClassName(currentOrNextLesson.classGroupId) }}</h3>
+            <p v-if="currentOrNextLesson.title" class="lesson-title">{{ currentOrNextLesson.title }}</p>
+            <div class="lesson-meta-row">
+              <span>{{ currentOrNextLesson.startTime }}</span>
+              <span>{{ currentOrNextLesson.durationMinutes }}&nbsp;min</span>
+              <span v-if="currentOrNextLesson.room">{{ currentOrNextLesson.room }}</span>
+            </div>
+            <div class="actions">
+              <RouterLink :to="`/lessons/${currentOrNextLesson.id}/workspace`" class="ghost-link">
+                Arbeitsbereich öffnen
+              </RouterLink>
+              <RouterLink :to="`/attendance?classId=${currentOrNextLesson.classGroupId}&lessonId=${currentOrNextLesson.id}`" class="primary-link">
+                Anwesenheit
+              </RouterLink>
+            </div>
           </div>
-        </div>
-        <p v-else class="empty-text">Heute sind noch keine Stunden eingetragen.</p>
-      </section>
+          <p v-else class="empty-text">Heute sind noch keine Stunden eingetragen.</p>
+        </section>
+
+        <section class="panel">
+          <h2>Danach</h2>
+          <div v-if="upcomingLesson" class="mini-lesson">
+            <strong>{{ getClassName(upcomingLesson.classGroupId) }}</strong>
+            <span v-if="upcomingLesson.title">{{ upcomingLesson.title }}</span>
+            <span>{{ upcomingLesson.startTime }} · {{ upcomingLesson.durationMinutes }}&nbsp;min</span>
+            <span v-if="upcomingLesson.room">{{ upcomingLesson.room }}</span>
+          </div>
+          <p v-else class="empty-text">Keine weitere Stunde für heute gefunden.</p>
+        </section>
+      </div>
 
       <section class="panel">
-        <h2>Danach</h2>
-        <div v-if="upcomingLesson" class="mini-lesson">
-          <strong>{{ getClassName(upcomingLesson.classGroupId) }}</strong>
-          <span>{{ formatLessonDateTime(upcomingLesson.date) }}</span>
-        </div>
-        <p v-else class="empty-text">Keine weitere Stunde für heute gefunden.</p>
-      </section>
-
-      <section class="panel full-width">
         <div class="panel-header">
-          <h2>Heute</h2>
-          <span>{{ todayLessons.length }} Einträge</span>
+          <h2>Kalenderansicht</h2>
+          <span>{{ totalLessons }} Einträge</span>
         </div>
 
-        <div v-if="todayLessons.length === 0" class="empty-text">Heute liegen noch keine Stunden in der Datenbasis.</div>
+        <div v-if="lessonsByDay.length === 0" class="empty-text">
+          Keine Stunden in der Datenbasis.
+        </div>
 
-        <div v-else class="today-list">
-          <RouterLink
-            v-for="lesson in todayLessons"
-            :key="lesson.id"
-            :to="`/lessons/${lesson.id}/workspace`"
-            class="today-item"
+        <div v-else class="calendar-days">
+          <div
+            v-for="dayGroup in lessonsByDay"
+            :key="dayGroup.key"
+            class="day-group"
+            :class="{ 'day-today': dayGroup.isToday }"
           >
-            <div>
-              <strong>{{ getClassName(lesson.classGroupId) }}</strong>
-              <p>{{ formatLessonTime(lesson.date) }}</p>
+            <div class="day-label">
+              <strong>{{ dayGroup.label }}</strong>
+              <span class="day-count">{{ dayGroup.lessons.length }}</span>
             </div>
-            <span>öffnen</span>
-          </RouterLink>
+            <div class="day-lessons">
+              <RouterLink
+                v-for="lesson in dayGroup.lessons"
+                :key="lesson.id"
+                :to="`/lessons/${lesson.id}/workspace`"
+                class="lesson-row"
+              >
+                <span class="lesson-time">{{ lesson.startTime }}</span>
+                <div class="lesson-body">
+                  <span class="lesson-class">{{ getClassName(lesson.classGroupId) }}</span>
+                  <span v-if="lesson.title" class="lesson-title-small">{{ lesson.title }}</span>
+                </div>
+                <div class="lesson-details">
+                  <span>{{ lesson.durationMinutes }}&nbsp;min</span>
+                  <span v-if="lesson.room" class="lesson-room">{{ lesson.room }}</span>
+                </div>
+              </RouterLink>
+            </div>
+          </div>
         </div>
       </section>
-    </div>
+    </template>
   </section>
 </template>
 
@@ -78,7 +102,7 @@ import { RouterLink } from 'vue-router'
 import { useClassGroups, useLessons } from '../composables/useSportBridge'
 import { getDashboardLessonState } from '../utils/dashboard-workspace'
 import type { ClassGroup, Lesson } from '@viccoboard/core'
-import { formatGermanDateTime, formatGermanTime } from '../utils/locale-format'
+import { formatGermanDateTime } from '../utils/locale-format'
 
 const classGroups = useClassGroups()
 const lessonsRepository = useLessons()
@@ -92,7 +116,6 @@ const now = ref(Date.now())
 const classesById = computed(() => new Map(classes.value.map((classGroup) => [classGroup.id, classGroup])))
 
 const lessonState = computed(() => getDashboardLessonState(lessons.value, new Date(now.value)))
-const todayLessons = computed(() => lessonState.value.todayLessons)
 const currentOrNextLesson = computed(() => lessonState.value.currentOrNextLesson)
 const upcomingLesson = computed(() => lessonState.value.upcomingLesson)
 
@@ -100,9 +123,40 @@ const currentOrNextMode = computed(() => {
   if (!currentOrNextLesson.value) {
     return 'Heute'
   }
-
   return currentOrNextLesson.value.date.getTime() >= now.value ? 'Als Nächstes' : 'Zuletzt heute'
 })
+
+const toDateKey = (date: Date): string =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+const todayKey = computed(() => toDateKey(new Date(now.value)))
+
+const lessonsByDay = computed(() => {
+  const groups = new Map<string, Lesson[]>()
+  for (const lesson of lessons.value) {
+    const key = toDateKey(lesson.date)
+    const group = groups.get(key)
+    if (group) {
+      group.push(lesson)
+    } else {
+      groups.set(key, [lesson])
+    }
+  }
+
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, dayLessons]) => {
+      const date = dayLessons[0].date
+      return {
+        key,
+        isToday: key === todayKey.value,
+        label: formatGermanDateTime(date, { weekday: 'long', day: 'numeric', month: 'long' }),
+        lessons: [...dayLessons].sort((a, b) => a.startTime.localeCompare(b.startTime))
+      }
+    })
+})
+
+const totalLessons = computed(() => lessons.value.length)
 
 const loadData = async () => {
   loading.value = true
@@ -112,20 +166,19 @@ const loadData = async () => {
     const loadedClasses = await classGroups.findAll()
     classes.value = loadedClasses
 
-    // Fetch only today's and upcoming lessons to reduce IO and memory
-    // instead of loading full lesson histories for each class
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    
-    // Look ahead 7 days to catch upcoming lessons
+
+    const startDate = new Date(today)
+    startDate.setDate(startDate.getDate() - 7)
+
     const endDate = new Date(today)
-    endDate.setDate(endDate.getDate() + 7)
+    endDate.setDate(endDate.getDate() + 14)
 
     const allLessons = await Promise.all(
       loadedClasses.map((classGroup) => {
-        // Try to use date-range fetching if available, otherwise fallback to full fetch
         if (typeof lessonsRepository.findByDateRange === 'function') {
-          return lessonsRepository.findByDateRange(classGroup.id, today, endDate)
+          return lessonsRepository.findByDateRange(classGroup.id, startDate, endDate)
         }
         return lessonsRepository.findByClassGroup(classGroup.id)
       })
@@ -142,14 +195,6 @@ const loadData = async () => {
 
 const getClassName = (classGroupId: string): string =>
   classesById.value.get(classGroupId)?.name ?? 'Unbekannte Klasse'
-
-const formatLessonTime = (date: Date): string =>
-  formatGermanTime(date)
-
-const formatLessonDateTime = (date: Date): string =>
-  formatGermanDateTime(date, {
-    weekday: 'short'
-  })
 
 onMounted(() => {
   loadData()
@@ -179,23 +224,18 @@ onMounted(() => {
 }
 
 .subtitle,
-.notice-card p,
 .empty-text,
 .mini-lesson span,
-.today-item p {
+.lesson-title-small,
+.lesson-room {
   color: #64748b;
 }
 
 .primary-link,
-.ghost-link,
-.today-item {
+.ghost-link {
   min-height: 44px;
   border-radius: 16px;
   text-decoration: none;
-}
-
-.primary-link,
-.ghost-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -213,17 +253,12 @@ onMounted(() => {
   color: #0f172a;
 }
 
-.notice-card,
 .state-card,
 .panel {
   background: white;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 18px;
   padding: 1.25rem;
-}
-
-.notice-card {
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(14, 165, 233, 0.08));
 }
 
 .state-card.error {
@@ -238,10 +273,6 @@ onMounted(() => {
 
 .hero-panel {
   min-height: 220px;
-}
-
-.full-width {
-  grid-column: 1 / -1;
 }
 
 .eyebrow {
@@ -259,28 +290,137 @@ onMounted(() => {
   gap: 0.75rem;
 }
 
-.today-list {
-  display: grid;
-  gap: 0.75rem;
+.lesson-title {
+  color: #475569;
+  margin: 0;
 }
 
-.today-item {
+.lesson-meta-row {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.mini-lesson {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mini-lesson strong {
+  display: block;
+}
+
+/* Calendar grouped view */
+.calendar-days {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.day-group {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.day-today {
+  border-color: #0f766e;
+}
+
+.day-label {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  color: #0f172a;
+  padding: 0.5rem 1rem;
+  background: rgba(15, 23, 42, 0.03);
+  font-size: 0.875rem;
 }
 
-.today-item strong,
-.mini-lesson strong {
-  display: block;
+.day-today .day-label {
+  background: rgba(13, 148, 136, 0.08);
+  color: #0f766e;
+}
+
+.day-count {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.06);
+  border-radius: 99px;
+  padding: 0.1rem 0.5rem;
+}
+
+.day-lessons {
+  display: flex;
+  flex-direction: column;
+}
+
+.lesson-row {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.05);
+  text-decoration: none;
+  color: #0f172a;
+  transition: background 0.1s;
+}
+
+.lesson-row:hover {
+  background: rgba(15, 23, 42, 0.03);
+}
+
+.lesson-time {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.lesson-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.lesson-class {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-title-small {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  font-size: 0.8125rem;
+  white-space: nowrap;
 }
 
 @media (max-width: 820px) {
   .schedule-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lesson-row {
+    grid-template-columns: 3rem 1fr;
+  }
+
+  .lesson-details {
+    display: none;
   }
 }
 </style>
