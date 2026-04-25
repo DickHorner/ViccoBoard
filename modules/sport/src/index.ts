@@ -41,6 +41,9 @@ export type { CreateClassInput } from './use-cases/create-class.use-case.js';
 export { CreateLessonUseCase } from './use-cases/create-lesson.use-case.js';
 export type { CreateLessonInput } from './use-cases/create-lesson.use-case.js';
 
+export { UpdateLessonUseCase } from './use-cases/update-lesson.use-case.js';
+export type { UpdateLessonInput } from './use-cases/update-lesson.use-case.js';
+
 export { RecordAttendanceUseCase } from './use-cases/record-attendance.use-case.js';
 export type { RecordAttendanceInput } from './use-cases/record-attendance.use-case.js';
 
