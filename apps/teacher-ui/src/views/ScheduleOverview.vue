@@ -62,6 +62,16 @@
               <div>
                 <strong>{{ day.weekday }}</strong>
                 <span>{{ day.label }}</span>
+                <div v-if="day.markers.length > 0" class="calendar-markers">
+                  <span
+                    v-for="marker in day.markers"
+                    :key="`${day.key}-${marker.type}-${marker.label}`"
+                    class="calendar-marker"
+                    :class="`is-${marker.type}`"
+                  >
+                    {{ marker.label }}
+                  </span>
+                </div>
               </div>
               <span>{{ day.lessons.length }} Stunden</span>
             </header>
@@ -99,6 +109,10 @@ import { useClassGroups, useLessons } from '../composables/useSportBridge'
 import { getDashboardLessonState } from '../utils/dashboard-workspace'
 import type { ClassGroup, Lesson } from '@viccoboard/core'
 import { formatGermanDateTime, formatGermanTime } from '../utils/locale-format'
+import {
+  getScheduleCalendarMarkers,
+  type ResolvedScheduleCalendarMarker
+} from './schedule-calendar-markers'
 
 interface ScheduleDay {
   key: string
@@ -106,6 +120,7 @@ interface ScheduleDay {
   weekday: string
   isToday: boolean
   lessons: Lesson[]
+  markers: ResolvedScheduleCalendarMarker[]
 }
 
 const classGroups = useClassGroups()
@@ -118,6 +133,10 @@ const lessons = ref<Lesson[]>([])
 const now = ref(Date.now())
 
 const classesById = computed(() => new Map(classes.value.map((classGroup) => [classGroup.id, classGroup])))
+
+const activeStates = computed(() =>
+  Array.from(new Set(classes.value.map((classGroup) => normalizeState(classGroup.state)).filter(Boolean)))
+)
 
 const lessonState = computed(() => getDashboardLessonState(lessons.value, new Date(now.value)))
 const currentOrNextLesson = computed(() => lessonState.value.currentOrNextLesson)
@@ -145,7 +164,8 @@ const scheduleDays = computed<ScheduleDay[]>(() => {
       label: date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
       weekday: date.toLocaleDateString('de-DE', { weekday: 'long' }),
       isToday: index === 0,
-      lessons: [...dayLessons].sort(compareLessonsByStartTime)
+      lessons: [...dayLessons].sort(compareLessonsByStartTime),
+      markers: getScheduleCalendarMarkers(key, activeStates.value)
     }
   })
 })
@@ -263,6 +283,21 @@ const getDateKey = (date: Date): string => {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return year + '-' + month + '-' + day
+}
+
+const normalizeState = (state: string | undefined): string => {
+  if (!state) {
+    return ''
+  }
+
+  const normalized = state.trim().toUpperCase()
+  if (normalized === 'BERLIN') {
+    return 'BE'
+  }
+  if (normalized === 'BRANDENBURG') {
+    return 'BB'
+  }
+  return normalized
 }
 
 onMounted(() => {
@@ -385,7 +420,8 @@ onMounted(() => {
 .lesson-focus,
 .week-list,
 .day-lessons,
-.mini-lesson {
+.mini-lesson,
+.calendar-markers {
   display: flex;
   flex-direction: column;
 }
@@ -398,6 +434,29 @@ onMounted(() => {
 .day-lessons,
 .mini-lesson {
   gap: 0.75rem;
+}
+
+.calendar-markers {
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.calendar-marker {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+}
+
+.calendar-marker.is-holiday {
+  background: rgba(220, 38, 38, 0.1);
+  color: #991b1b;
+}
+
+.calendar-marker.is-school-break {
+  background: rgba(14, 165, 233, 0.12);
+  color: #075985;
 }
 
 .day-card.is-today {
