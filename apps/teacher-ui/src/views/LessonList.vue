@@ -261,6 +261,12 @@ const dateTo = ref<string>('')
 const showCreateLessonModal = ref(false)
 const showEditLessonModal = ref(false)
 
+interface LessonPartForm {
+  description: string
+  duration: string
+  type: string
+}
+
 interface LessonForm {
   id?: string
   classGroupId: string
@@ -269,16 +275,22 @@ interface LessonForm {
   durationMinutes: 45 | 90
   title: string
   room: string
+  shortcuts: string
+  lessonParts: LessonPartForm[]
 }
 
-const lessonForm = ref<LessonForm>({
-  classGroupId: '',
+const getInitialLessonForm = (): LessonForm => ({
+  classGroupId: selectedClassId.value || '',
   date: new Date().toISOString().split('T')[0],
   startTime: '08:00',
   durationMinutes: 45,
   title: '',
-  room: ''
+  room: '',
+  shortcuts: '',
+  lessonParts: []
 })
+
+const lessonForm = ref<LessonForm>(getInitialLessonForm())
 
 // Computed
 const filteredLessons = computed(() => {
@@ -371,7 +383,13 @@ const handleEditLesson = async (lesson: Lesson) => {
     startTime: lesson.startTime || lesson.date.toTimeString().split(' ')[0].substring(0, 5),
     durationMinutes: lesson.durationMinutes,
     title: lesson.title || '',
-    room: lesson.room || ''
+    room: lesson.room || '',
+    shortcuts: (lesson.shortcuts ?? []).join(', '),
+    lessonParts: parts.map((part) => ({
+      description: part.description,
+      duration: part.duration !== undefined ? String(part.duration) : '',
+      type: part.type ?? ''
+    }))
   }
   showEditLessonModal.value = true
 }
@@ -397,6 +415,14 @@ const handleSaveLesson = async () => {
   try {
     // Combine date and time for the lesson date field
     const dateTime = new Date(`${lessonForm.value.date}T${lessonForm.value.startTime}:00`)
+    const shortcuts = parseShortcuts(lessonForm.value.shortcuts)
+    const partsInput = lessonForm.value.lessonParts
+      .filter((part) => part.description.trim().length > 0)
+      .map((part) => ({
+        description: part.description.trim(),
+        duration: part.duration ? Number(part.duration) : undefined,
+        type: part.type.trim() || undefined
+      }))
 
     if (showEditLessonModal.value && lessonForm.value.id) {
       // Update existing lesson via validated use-case
@@ -406,7 +432,8 @@ const handleSaveLesson = async () => {
         startTime: lessonForm.value.startTime,
         durationMinutes: lessonForm.value.durationMinutes,
         title: lessonForm.value.title.trim() || undefined,
-        room: lessonForm.value.room.trim() || undefined
+        room: lessonForm.value.room.trim() || undefined,
+        shortcuts
       })
       await SportBridge.lessonPartRepository.replacePartsForLesson(lessonForm.value.id, partsInput)
     } else {
@@ -417,7 +444,8 @@ const handleSaveLesson = async () => {
         startTime: lessonForm.value.startTime,
         durationMinutes: lessonForm.value.durationMinutes,
         title: lessonForm.value.title.trim() || undefined,
-        room: lessonForm.value.room.trim() || undefined
+        room: lessonForm.value.room.trim() || undefined,
+        shortcuts
       })
       await SportBridge.lessonPartRepository.replacePartsForLesson(created.id, partsInput)
     }
@@ -440,15 +468,14 @@ const closeModals = () => {
   showCreateLessonModal.value = false
   showEditLessonModal.value = false
   saveError.value = ''
-  lessonForm.value = {
-    classGroupId: selectedClassId.value || '',
-    date: new Date().toISOString().split('T')[0],
-    startTime: '08:00',
-    durationMinutes: 45,
-    title: '',
-    room: ''
-  }
+  lessonForm.value = getInitialLessonForm()
 }
+
+const parseShortcuts = (value: string): string[] =>
+  value
+    .split(',')
+    .map((shortcut) => shortcut.trim())
+    .filter((shortcut) => shortcut.length > 0)
 
 const getClassName = (classGroupId: string): string => {
   const cls = classes.value.find(c => c.id === classGroupId)
