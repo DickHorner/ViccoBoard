@@ -16,6 +16,7 @@ export interface UpdateLessonInput {
   durationMinutes?: 45 | 90;
   title?: string;
   room?: string;
+  shortcuts?: string[];
 }
 
 export class UpdateLessonUseCase {
@@ -30,6 +31,7 @@ export class UpdateLessonUseCase {
     if (input.durationMinutes !== undefined) updates.durationMinutes = input.durationMinutes;
     if (input.title !== undefined) updates.title = input.title;
     if (input.room !== undefined) updates.room = input.room;
+    if (input.shortcuts !== undefined) updates.shortcuts = input.shortcuts;
 
     return this.lessonRepo.update(input.lessonId, updates);
   }
