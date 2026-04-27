@@ -4,7 +4,24 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    cooldown:
+      default-days: 7
+      semver-major-days: 7
+      semver-minor-days: 7
+      semver-patch-days: 7
+    open-pull-requests-limit: 2
+    groups:
+      npm-production:
+        dependency-type: "production"
+        patterns:
+          - "*"
+      npm-development:
+        dependency-type: "development"
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "security"
@@ -12,8 +29,14 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
+      interval: "monthly"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 1
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "ci"
