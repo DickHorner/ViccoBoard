@@ -1,0 +1,32 @@
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  moduleNameMapper: {
+    '^@viccoboard/core$': '<rootDir>/../../packages/core/src',
+    '^@viccoboard/storage$': '<rootDir>/../../packages/storage/src',
+    '^uuid$': '<rootDir>/tests/__mocks__/uuid.cjs',
+    '^(\\.{1,2}/.*)\\.js$': '$1'
+  },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: false,
+        tsconfig: {
+          lib: ['ES2020', 'DOM'],
+          types: ['jest', 'node'],
+          allowSyntheticDefaultImports: true,
+          esModuleInterop: true
+        }
+      }
+    ]
+  },
+  testMatch: ['**/tests/**/*.test.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/index.ts'
+  ]
+};
