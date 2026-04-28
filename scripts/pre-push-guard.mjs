@@ -15,12 +15,17 @@ const README_TAB_MARKERS = ['[Deutsch](./README.md) | [English](./README.en.md)'
 
 const BANNED_ROOT_ARTIFACTS = new Set([
   '$filePath',
+  'annotations_65215071421.json',
+  'check_runs.json',
+  'commit_status.json',
   'exams-forcexit-test.txt',
   'exams-test-output.txt',
   'final-exams-test-forcexit.txt',
   'final-test.txt',
   'full-test-forcexit.txt',
   'ipad-build.txt',
+  'job_65215071421.json',
+  'job_65215071421_logs.bin',
   'root-test-output.txt',
   'test-output.txt'
 ]);
@@ -145,6 +150,25 @@ function checkTrackedStructure(files) {
   const bannedRoots = files.filter((file) => !file.includes('/') && BANNED_ROOT_ARTIFACTS.has(file));
   if (bannedRoots.length > 0) {
     failWithList('Banned root artifacts are tracked.', bannedRoots);
+  }
+
+  const bannedRootPatterns = [
+    /^annotations_\d+\.json$/,
+    /^job_\d+\.json$/,
+    /^job_\d+_logs\.bin$/,
+    /^check_runs\.json$/,
+    /^commit_status\.json$/
+  ];
+  const patternViolations = files.filter(
+    (file) => !file.includes('/') && bannedRootPatterns.some((pattern) => pattern.test(file))
+  );
+  if (patternViolations.length > 0) {
+    failWithList('Generated CI/API diagnostic artifacts are tracked at repo root.', patternViolations);
+  }
+
+  const jestResultArtifacts = files.filter((file) => /(^|\/)jest-results\.json$/.test(file));
+  if (jestResultArtifacts.length > 0) {
+    failWithList('Generated Jest result artifacts are tracked. Remove them before push.', jestResultArtifacts);
   }
 
   const rootDocViolations = files.filter((file) => {

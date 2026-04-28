@@ -45,6 +45,14 @@ demo-data/
 logs/
 *.log
 
+# CI/API dump artifacts (local diagnostics only)
+annotations_*.json
+job_*.json
+job_*_logs.bin
+check_runs.json
+commit_status.json
+**/jest-results.json
+
 # Local run artifacts
 $filePath
 exams-forcexit-test.txt
