@@ -22,8 +22,8 @@ export class CreateTaskUseCase {
   async execute(input: CreateTaskInput): Promise<TeacherTask> {
     validate(input);
 
-    const checklist: TeacherTaskChecklistItem[] = (input.checklist ?? []).map((item, idx) => ({
-      id: `ci-${idx}-${Date.now()}`,
+    const checklist: TeacherTaskChecklistItem[] = (input.checklist ?? []).map(item => ({
+      id: crypto.randomUUID(),
       text: item.text,
       done: false
     }));
