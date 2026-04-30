@@ -174,6 +174,29 @@
           </div>
 
           <div class="form-group">
+            <label for="lesson-duration" class="form-label">Dauer (Minuten)*</label>
+            <div class="duration-presets">
+              <button
+                v-for="preset in [45, 90]"
+                :key="preset"
+                type="button"
+                class="btn-secondary duration-preset"
+                :class="{ active: lessonForm.durationMinutes === preset }"
+                @click="lessonForm.durationMinutes = preset"
+              >{{ preset }} min</button>
+            </div>
+            <input
+              id="lesson-duration"
+              type="number"
+              v-model.number="lessonForm.durationMinutes"
+              class="form-input"
+              min="1"
+              max="300"
+              step="1"
+            />
+          </div>
+
+          <div class="form-group">
             <label for="lesson-shortcuts" class="form-label">Kürzel / Tags</label>
             <input
               id="lesson-shortcuts"
@@ -272,7 +295,7 @@ interface LessonForm {
   classGroupId: string
   date: string
   startTime: string
-  durationMinutes: 45 | 90
+  durationMinutes: number
   title: string
   room: string
   shortcuts: string

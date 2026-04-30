@@ -13,7 +13,7 @@ export interface UpdateLessonInput {
   lessonId: string;
   date?: Date;
   startTime?: string;
-  durationMinutes?: 45 | 90;
+  durationMinutes?: number;
   title?: string;
   room?: string;
   shortcuts?: string[];
@@ -37,9 +37,13 @@ export class UpdateLessonUseCase {
   }
 
   private async validate(input: UpdateLessonInput): Promise<void> {
-    const validDurations: Array<UpdateLessonInput['durationMinutes']> = [45, 90];
-    if (input.durationMinutes !== undefined && !validDurations.includes(input.durationMinutes)) {
-      throw new Error('Duration must be 45 or 90 minutes');
+    if (
+      input.durationMinutes !== undefined &&
+      (!Number.isInteger(input.durationMinutes) ||
+        input.durationMinutes <= 0 ||
+        input.durationMinutes > 300)
+    ) {
+      throw new Error('Duration must be a whole number between 1 and 300 minutes');
     }
 
     // Parse once, reuse in the overlap check below
