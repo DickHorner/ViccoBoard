@@ -163,6 +163,7 @@ export interface AttendanceRecord {
   lessonId: string;
   status: AttendanceStatus;
   reason?: string;
+  lateMinutes?: number;
   notes?: string;
   timestamp: Date;
   createdAt: Date;

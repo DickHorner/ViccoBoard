@@ -11,6 +11,7 @@ export interface RecordAttendanceInput {
   lessonId: string;
   status: AttendanceStatus;
   reason?: string;
+  lateMinutes?: number;
   notes?: string;
 }
 
@@ -32,6 +33,7 @@ export class RecordAttendanceUseCase {
       return await this.attendanceRepo.update(existingRecord.id, {
         status: input.status,
         reason: input.reason,
+        lateMinutes: input.lateMinutes,
         notes: input.notes
       });
     }
@@ -42,6 +44,7 @@ export class RecordAttendanceUseCase {
       lessonId: input.lessonId,
       status: input.status,
       reason: input.reason,
+      lateMinutes: input.lateMinutes,
       notes: input.notes,
       timestamp: new Date()
     });
@@ -85,6 +88,13 @@ export class RecordAttendanceUseCase {
     ];
     if (!validStatuses.includes(input.status)) {
       throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+    }
+
+    if (
+      input.lateMinutes !== undefined &&
+      (!Number.isInteger(input.lateMinutes) || input.lateMinutes < 0)
+    ) {
+      throw new Error('Late minutes must be a non-negative integer');
     }
 
     // Note: Student and lesson existence validation happens at the repository level

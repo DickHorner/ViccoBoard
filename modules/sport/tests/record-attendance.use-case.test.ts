@@ -120,6 +120,62 @@ describe('RecordAttendanceUseCase', () => {
     expect(allRecords[0].reason).toBe('Trip');
   });
 
+  test('stores late minutes and updates them without creating duplicates', async () => {
+    await recordAttendanceUseCase.execute({
+      studentId: testStudentId,
+      lessonId: testLessonId,
+      status: AttendanceStatus.Late,
+      lateMinutes: 7
+    });
+
+    await recordAttendanceUseCase.execute({
+      studentId: testStudentId,
+      lessonId: testLessonId,
+      status: AttendanceStatus.Late,
+      lateMinutes: 12
+    });
+
+    const allRecords = await attendanceRepo.findByLesson(testLessonId);
+    expect(allRecords).toHaveLength(1);
+    expect(allRecords[0].status).toBe(AttendanceStatus.Late);
+    expect(allRecords[0].lateMinutes).toBe(12);
+  });
+
+  test('stores passive reason and clears stale reason and late minutes on status change', async () => {
+    await recordAttendanceUseCase.execute({
+      studentId: testStudentId,
+      lessonId: testLessonId,
+      status: AttendanceStatus.Late,
+      lateMinutes: 6
+    });
+
+    await recordAttendanceUseCase.execute({
+      studentId: testStudentId,
+      lessonId: testLessonId,
+      status: AttendanceStatus.Passive,
+      reason: 'Injured'
+    });
+
+    const passiveRecords = await attendanceRepo.findByLesson(testLessonId);
+    expect(passiveRecords).toHaveLength(1);
+    expect(passiveRecords[0].reason).toBe('Injured');
+    expect(passiveRecords[0].lateMinutes).toBeUndefined();
+
+    await recordAttendanceUseCase.execute({
+      studentId: testStudentId,
+      lessonId: testLessonId,
+      status: AttendanceStatus.Present,
+      reason: undefined,
+      lateMinutes: undefined
+    });
+
+    const updatedRecords = await attendanceRepo.findByLesson(testLessonId);
+    expect(updatedRecords).toHaveLength(1);
+    expect(updatedRecords[0].status).toBe(AttendanceStatus.Present);
+    expect(updatedRecords[0].reason).toBeUndefined();
+    expect(updatedRecords[0].lateMinutes).toBeUndefined();
+  });
+
   test('throws error when student ID is missing', async () => {
     await expect(
       recordAttendanceUseCase.execute({
