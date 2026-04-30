@@ -86,7 +86,7 @@
               <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
               <div class="student-info">
                 <h4>{{ student.firstName }} {{ student.lastName }}</h4>
-                <p v-if="student.dateOfBirth">Geb.: {{ student.dateOfBirth }}</p>
+                <p v-if="student.dateOfBirth">Geb.: {{ formatGermanDateOfBirth(student.dateOfBirth) }}</p>
               </div>
               <div class="student-arrow">→</div>
             </RouterLink>
@@ -232,6 +232,7 @@ import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge, initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import { buildClassSportSummary, buildSportWorkAreas } from '../utils/class-detail-summary'
+import { formatGermanDateOfBirth } from '../utils/locale-format'
 import type { ClassGroup, Student } from '@viccoboard/core'
 
 const route = useRoute()
