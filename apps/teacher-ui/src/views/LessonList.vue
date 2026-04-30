@@ -193,6 +193,7 @@
               min="1"
               max="300"
               step="1"
+              required
             />
           </div>
 
