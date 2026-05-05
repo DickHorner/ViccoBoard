@@ -419,6 +419,8 @@ describe('P5-3: examBuilderStore', () => {
       const reloadedTask = store.tasks[0]
       expect(reloadedTask.criteria).toHaveLength(2)
       expect(reloadedTask.criteria[0].text).toBe('Analyse')
+      expect(reloadedTask.criteria[0].points).toBe(4)
+      expect(reloadedTask.criteria[1].text).toBe('Darstellung')
       expect(reloadedTask.criteria[1].points).toBe(6)
     })
   })
