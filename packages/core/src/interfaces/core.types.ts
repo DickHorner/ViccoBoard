@@ -138,7 +138,7 @@ export interface Lesson {
   classGroupId: string;
   date: Date;
   startTime: string;
-  durationMinutes: 45 | 90;
+  durationMinutes: number;
   title?: string;
   room?: string;
   lessonParts?: LessonPart[];
