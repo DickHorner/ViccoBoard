@@ -121,7 +121,7 @@
 
           <div class="criteria-section">
             <div class="criteria-header">
-              <h3>Kriterien</h3>
+              <h3>Kriterien / Erwartungshorizont</h3>
               <button
                 @click="addCriterion(taskIndex)"
                 class="btn btn-secondary btn-xs"
@@ -129,6 +129,13 @@
               >
                 + Kriterium hinzufügen
               </button>
+            </div>
+
+            <div
+              v-if="task.criteria.length > 0 && criteriaSum(taskIndex) !== task.points"
+              class="criteria-points-warning"
+            >
+              ⚠ Kriteriensumme ({{ criteriaSum(taskIndex) }}) weicht von den Aufgabenpunkten ({{ task.points }}) ab.
             </div>
 
             <div v-if="task.criteria.length === 0" class="empty-criteria">
@@ -528,6 +535,12 @@ const validateCriterion = (taskIndex: number, criterionIndex: number) => {
   if (criterion && criterion.points < 0) {
     console.warn('Kriteriumspunkte dürfen nicht negativ sein');
   }
+};
+
+const criteriaSum = (taskIndex: number): number => {
+  const task = formData.tasks[taskIndex];
+  if (!task) return 0;
+  return task.criteria.reduce((sum, c) => sum + (Number(c.points) || 0), 0);
 };
 
 const saveExam = async () => {

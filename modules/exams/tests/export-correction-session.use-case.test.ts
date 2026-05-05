@@ -196,5 +196,75 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
       'task-leaf-a::task'
     );
     expect(artifact.localReferenceMap.candidateIdByChatRef).toEqual(result.sessionMap);
+
+    // Criteria must appear as expectedHorizon in the rendered contract
+    expect(artifact.contractFile.content).toContain('expectedHorizon:');
+    expect(artifact.contractFile.content).toContain('Inhalt');
+    expect(artifact.contractFile.content).toContain('Sprache');
+    expect(artifact.contractFile.content).toContain('Fachsprache');
+    expect(artifact.contractFile.content).toContain('Grammatik');
+
+    // The contract must instruct the AI that expectedHorizon is the binding basis
+    expect(artifact.contractFile.content).toContain('expectedHorizon');
+    expect(artifact.contractFile.content).toContain('Erwartungshorizont');
+    expect(artifact.promptFile.content).toContain('expectedHorizon');
+  });
+
+  it('export contains no criteria for tasks without criteria defined', () => {
+    const exam: Exams.Exam = {
+      id: 'exam-no-criteria',
+      title: 'Simple Exam',
+      assessmentFormat: 'klausur',
+      mode: Exams.ExamMode.Simple,
+      structure: {
+        parts: [],
+        tasks: [
+          createTask({
+            id: 'task-plain',
+            level: 1,
+            order: 1,
+            title: 'Aufgabe 1',
+            points: 5
+          })
+        ],
+        allowsComments: false,
+        allowsSupportTips: false,
+        totalPoints: 5
+      },
+      gradingKey: {
+        id: 'grading-key-plain',
+        name: 'Punkte',
+        type: Exams.GradingKeyType.Points,
+        totalPoints: 5,
+        gradeBoundaries: [],
+        roundingRule: { type: 'none', decimalPlaces: 0 },
+        errorPointsToGrade: false,
+        customizable: true,
+        modifiedAfterCorrection: false
+      },
+      printPresets: [],
+      candidates: [
+        {
+          id: 'candidate-plain-1',
+          examId: 'exam-no-criteria',
+          firstName: 'Test',
+          lastName: 'Person'
+        }
+      ],
+      candidateGroups: [],
+      status: 'draft',
+      createdAt: new Date('2026-05-01T08:00:00.000Z'),
+      lastModified: new Date('2026-05-01T08:00:00.000Z')
+    };
+
+    const useCase = new ExportCorrectionSessionArtifactsUseCase();
+    const result = useCase.execute({ exam, sessionId: 'session-plain' });
+
+    // No criteria defined → no expectedHorizon section in rendered output
+    expect(result.artifact.contractFile.content).not.toContain('expectedHorizon:');
+    // No hardcoded example criteria
+    expect(result.artifact.contract.scoringUnits[0].metadata).toMatchObject({
+      criteria: []
+    });
   });
 });
