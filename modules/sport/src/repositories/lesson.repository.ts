@@ -114,12 +114,10 @@ export class LessonRepository extends AdapterRepository<Lesson> {
     return DEFAULT_LESSON_START_TIME;
   }
 
-  private resolveDurationMinutes(rawDuration: unknown): 45 | 90 {
-    if (rawDuration === 45 || rawDuration === '45') {
-      return 45;
-    }
-    if (rawDuration === 90 || rawDuration === '90') {
-      return 90;
+  private resolveDurationMinutes(rawDuration: unknown): number {
+    const parsed = Number(rawDuration);
+    if (Number.isInteger(parsed) && parsed > 0 && parsed <= 300) {
+      return parsed;
     }
 
     if (rawDuration !== null && rawDuration !== undefined) {

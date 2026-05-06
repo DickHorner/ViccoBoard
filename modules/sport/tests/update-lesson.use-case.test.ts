@@ -77,14 +77,45 @@ describe('UpdateLessonUseCase', () => {
   test('rejects invalid durationMinutes', async () => {
     repo.seed(makeLesson());
 
-    // Type cast simulates runtime data from external sources (imports, serialization)
-    // that bypass TypeScript's compile-time type safety.
     await expect(
       useCase.execute({
         lessonId: 'lesson-1',
-        durationMinutes: 60 as unknown as 45 | 90
+        durationMinutes: 0
       })
-    ).rejects.toThrow('Duration must be 45 or 90 minutes');
+    ).rejects.toThrow('Duration must be a whole number between 1 and 300 minutes');
+  });
+
+  test('rejects durationMinutes above 300', async () => {
+    repo.seed(makeLesson());
+
+    await expect(
+      useCase.execute({
+        lessonId: 'lesson-1',
+        durationMinutes: 301
+      })
+    ).rejects.toThrow('Duration must be a whole number between 1 and 300 minutes');
+  });
+
+  test('rejects non-integer durationMinutes', async () => {
+    repo.seed(makeLesson());
+
+    await expect(
+      useCase.execute({
+        lessonId: 'lesson-1',
+        durationMinutes: 45.5
+      })
+    ).rejects.toThrow('Duration must be a whole number between 1 and 300 minutes');
+  });
+
+  test('accepts custom durationMinutes within valid range', async () => {
+    repo.seed(makeLesson());
+
+    const updated = await useCase.execute({
+      lessonId: 'lesson-1',
+      durationMinutes: 60
+    });
+
+    expect(updated.durationMinutes).toBe(60);
   });
 
   test('rejects invalid startTime format', async () => {
