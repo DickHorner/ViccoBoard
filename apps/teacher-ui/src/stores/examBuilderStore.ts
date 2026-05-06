@@ -9,9 +9,7 @@ import { useRouter } from 'vue-router'
 export interface CriteriaConsistencyWarning {
   taskId: string
   taskTitle: string
-  kind: 'criteria-with-subtasks' | 'criteria-sum-mismatch'
-  criteriaSum?: number
-  taskPoints?: number
+  kind: 'criteria-with-subtasks'
 }
 
 export interface CriterionDraft {
@@ -134,19 +132,6 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
           taskTitle: task.title || '(ohne Titel)',
           kind: 'criteria-with-subtasks'
         })
-      }
-
-      if (task.criteria.length > 0 && task.subtasks.length === 0) {
-        const sum = task.criteria.reduce((acc, c) => acc + (Number(c.points) || 0), 0)
-        if (Math.abs(sum - (Number(task.points) || 0)) > 0.001) {
-          warnings.push({
-            taskId: task.id,
-            taskTitle: task.title || '(ohne Titel)',
-            kind: 'criteria-sum-mismatch',
-            criteriaSum: sum,
-            taskPoints: Number(task.points) || 0
-          })
-        }
       }
 
       task.subtasks.forEach(check)

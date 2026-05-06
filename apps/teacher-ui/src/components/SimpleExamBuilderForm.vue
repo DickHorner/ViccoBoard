@@ -84,7 +84,7 @@
                 v-model.number="task.points"
                 type="number"
                 min="0"
-                step="1"
+                step="0.5"
                 class="form-input points-input"
                 @blur="validateTaskPoints(taskIndex)"
               />
@@ -132,8 +132,10 @@
             </div>
 
             <div
-              v-if="task.criteria.length > 0 && criteriaSum(taskIndex) !== task.points"
+              v-if="task.criteria.length > 0 && Number.isFinite(task.points) && criteriaSum(taskIndex) !== task.points"
               class="criteria-points-warning"
+              role="alert"
+              aria-live="polite"
             >
               ⚠ Kriteriensumme ({{ criteriaSum(taskIndex) }}) weicht von den Aufgabenpunkten ({{ task.points }}) ab.
             </div>

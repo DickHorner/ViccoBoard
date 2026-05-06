@@ -377,7 +377,7 @@ describe('P5-3: examBuilderStore', () => {
       expect(warnings[0].taskId).toBe(root.id)
     })
 
-    it('returns no warnings when criteria sum equals task points', () => {
+    it('returns no warnings for a leaf task with multiple criteria', () => {
       const store = useExamBuilderStore()
       store.addTask()
       const task = store.tasks[0]

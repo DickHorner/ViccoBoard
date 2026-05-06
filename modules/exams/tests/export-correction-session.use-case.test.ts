@@ -207,7 +207,8 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     // The contract must instruct the AI that expectedHorizon is the binding basis
     expect(artifact.contractFile.content).toContain('expectedHorizon');
     expect(artifact.contractFile.content).toContain('Erwartungshorizont');
-    expect(artifact.promptFile.content).toContain('expectedHorizon');
+    // The prompt must carry the specific instruction (not just echoed contract content)
+    expect(artifact.promptFile.content).toContain('do not invent or replace them');
   });
 
   it('export contains no criteria for tasks without criteria defined', () => {

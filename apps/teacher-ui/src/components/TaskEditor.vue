@@ -108,7 +108,7 @@
           Kriterium hinzufügen
         </button>
       </div>
-      <div v-if="task.criteria.length > 0 && task.subtasks.length > 0" class="criteria-conflict-warning">
+      <div v-if="task.criteria.length > 0 && task.subtasks.length > 0" class="criteria-conflict-warning" role="alert" aria-live="polite">
         ⚠ Kriterien werden ignoriert, wenn Teilaufgaben vorhanden sind. Bitte Kriterien entfernen oder in die Teilaufgaben verschieben.
       </div>
       <div v-if="task.criteria.length === 0" class="empty">
