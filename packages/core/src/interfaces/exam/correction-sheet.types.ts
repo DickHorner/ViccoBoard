@@ -1,5 +1,10 @@
 export type CorrectionSheetLayoutMode = 'compact' | 'standard';
 
+export interface CorrectionSheetImage {
+  src: string;
+  fileName?: string;
+}
+
 export interface CorrectionSheetPreset {
   id: string;
   examId: string;
@@ -15,6 +20,8 @@ export interface CorrectionSheetPreset {
   showSignatureArea: boolean;
   headerText?: string;
   footerText?: string;
+  schoolLogo?: CorrectionSheetImage;
+  teacherSignature?: CorrectionSheetImage;
   updatedAt: Date;
 }
 
@@ -47,6 +54,8 @@ export interface CorrectionSheetProjection {
   generalComment?: string;
   headerText?: string;
   footerText?: string;
+  schoolLogo?: CorrectionSheetImage;
+  teacherSignature?: CorrectionSheetImage;
   layoutMode: CorrectionSheetLayoutMode;
   showHeader: boolean;
   showOverallPoints: boolean;
