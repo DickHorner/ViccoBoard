@@ -43,6 +43,8 @@
 
 ## Scoring Units
 
+> Criteria listed under `expectedHorizon` per scoring unit are the binding assessment basis (Erwartungshorizont). When present, use them as the authoritative evaluation standard for that task.
+
 {{render.scoringUnits}}
 
 ## Rules

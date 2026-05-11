@@ -103,10 +103,13 @@
 
     <div class="criteria-block">
       <div class="panel-header">
-        <component :is="criteriaHeaderTag">Kriterien</component>
+        <component :is="criteriaHeaderTag">Kriterien / Erwartungshorizont</component>
         <button class="ghost" type="button" @click="store.addCriterion(task)">
           Kriterium hinzufügen
         </button>
+      </div>
+      <div v-if="task.criteria.length > 0 && task.subtasks.length > 0" class="criteria-conflict-warning" role="alert" aria-live="polite">
+        ⚠ Kriterien werden ignoriert, wenn Teilaufgaben vorhanden sind. Bitte Kriterien entfernen oder in die Teilaufgaben verschieben.
       </div>
       <div v-if="task.criteria.length === 0" class="empty">
         Noch keine Kriterien.

@@ -6,6 +6,12 @@ import { useExamsBridge } from '../composables/useExamsBridge'
 import { useToast } from '../composables/useToast'
 import { useRouter } from 'vue-router'
 
+export interface CriteriaConsistencyWarning {
+  taskId: string
+  taskTitle: string
+  kind: 'criteria-with-subtasks'
+}
+
 export interface CriterionDraft {
   id: string
   text: string
@@ -114,6 +120,25 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
 
   const recalculateTaskPoints = (): void => {
     tasks.value.forEach(syncTaskBranch)
+  }
+
+  const getCriteriaConsistencyWarnings = (): CriteriaConsistencyWarning[] => {
+    const warnings: CriteriaConsistencyWarning[] = []
+
+    const check = (task: TaskDraft): void => {
+      if (task.criteria.length > 0 && task.subtasks.length > 0) {
+        warnings.push({
+          taskId: task.id,
+          taskTitle: task.title || '(ohne Titel)',
+          kind: 'criteria-with-subtasks'
+        })
+      }
+
+      task.subtasks.forEach(check)
+    }
+
+    tasks.value.forEach(check)
+    return warnings
   }
 
   const flattenTasks = (items: TaskDraft[], level: 1 | 2 | 3 = 1, parentId?: string): ExamsTypes.TaskNode[] => {
@@ -445,6 +470,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     addPart,
     removePart,
     recalculateTaskPoints,
+    getCriteriaConsistencyWarnings,
     buildExam,
     hydrateFromExam,
     saveExam,

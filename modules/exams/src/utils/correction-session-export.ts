@@ -333,6 +333,40 @@ function renderMetadataBlock(metadata: Record<string, unknown> | undefined, inde
   return lines;
 }
 
+interface ScoringUnitCriterionEntry {
+  id: string;
+  text: string;
+  points: number;
+  subCriteria?: Array<{ id: string; text: string; weight?: number }>;
+}
+
+function extractCriteriaMetadata(
+  metadata: Record<string, unknown> | undefined
+): ScoringUnitCriterionEntry[] | null {
+  if (!metadata || !Array.isArray(metadata.criteria) || metadata.criteria.length === 0) {
+    return null;
+  }
+  return metadata.criteria as ScoringUnitCriterionEntry[];
+}
+
+function renderExpectedHorizonLines(
+  criteria: ScoringUnitCriterionEntry[],
+  indent: string
+): string[] {
+  const lines: string[] = [`${indent}- expectedHorizon:`];
+  for (const criterion of criteria) {
+    const pointsSuffix = criterion.points !== undefined ? ` (${criterion.points} pts)` : '';
+    lines.push(`${indent}  - ${criterion.id}: ${criterion.text}${pointsSuffix}`);
+    if (Array.isArray(criterion.subCriteria)) {
+      for (const sub of criterion.subCriteria) {
+        const weightSuffix = sub.weight !== undefined ? ` (weight: ${sub.weight})` : '';
+        lines.push(`${indent}    - ${sub.id}: ${sub.text}${weightSuffix}`);
+      }
+    }
+  }
+  return lines;
+}
+
 export function renderCorrectionSessionParts(parts: Exams.KbrCorrectionSessionPart[]): string {
   if (parts.length === 0) {
     return '_No exam parts defined._';
@@ -440,6 +474,12 @@ export function renderCorrectionSessionScoringUnits(
       }
 
       lines.push(...renderMetadataBlock(scoringUnit.metadata, '  '));
+
+      const criteria = extractCriteriaMetadata(scoringUnit.metadata);
+      if (criteria) {
+        lines.push(...renderExpectedHorizonLines(criteria, '  '));
+      }
+
       return lines.join('\n');
     })
     .join('\n\n');
