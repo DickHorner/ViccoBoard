@@ -28,10 +28,12 @@
         <div class="exam-meta">
           <span>{{ exam.structure.tasks.length }} Aufgaben</span>
           <span>{{ exam.structure.totalPoints }} Punkte</span>
+          <span v-if="exam.candidates.length === 0">Vorlage</span>
           <span class="meta-date">Aktualisiert {{ formatDate(exam.lastModified) }}</span>
         </div>
         <div class="exam-actions">
           <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+          <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
           <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
           <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
           <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
@@ -66,6 +68,25 @@ const createNew = () => {
 
 const editExam = (id: string) => {
   router.push(`/exams/${id}`)
+}
+
+const copyExam = async (exam: ExamsTypes.Exam) => {
+  if (!examRepository) return
+
+  const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...copyInput } = exam
+  const copy = await examRepository.create({
+    ...copyInput,
+    title: `${exam.title} (Kopie)`,
+    date: undefined,
+    classGroupId: undefined,
+    kind: 'template',
+    sourceTemplateId: exam.id,
+    candidates: [],
+    candidateGroups: [],
+    status: 'draft'
+  })
+
+  router.push(`/exams/${copy.id}`)
 }
 
 const openCorrection = (id: string) => {
@@ -217,15 +238,3 @@ onMounted(() => {
   min-height: 44px;
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
