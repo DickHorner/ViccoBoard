@@ -82,7 +82,18 @@ export class BuildCorrectionSheetProjectionUseCase {
           maxPoints: task.points,
           awardedPoints: score?.points ?? 0,
           comment: preset.showTaskComments ? score?.comment : undefined,
-          partLabel: preset.showExamParts ? resolvePartLabel(exam, task.id) : undefined
+          partLabel: preset.showExamParts ? resolvePartLabel(exam, task.id) : undefined,
+          criteria: task.criteria.map((criterion) => {
+            const criterionScore = score?.criterionScores?.find(
+              (entry) => entry.criterionId === criterion.id
+            );
+            return {
+              criterionId: criterion.id,
+              text: criterion.text,
+              maxPoints: criterion.points,
+              awardedPoints: criterionScore?.points
+            };
+          })
         };
       });
 

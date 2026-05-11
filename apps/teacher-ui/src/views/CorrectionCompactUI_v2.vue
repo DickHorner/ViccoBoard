@@ -96,6 +96,7 @@
                   :max="task.points"
                   step="0.5"
                   class="score-input"
+                  :disabled="task.criteria.length > 0"
                   @input="markDirty"
                 />
                 <span class="points-to-next">
@@ -119,6 +120,35 @@
                 <div v-if="taskAlternativeGrades[task.id]" class="selected-grade-info">
                   <span class="grade-label">{{ getGradeLabel(taskAlternativeGrades[task.id]) }}</span>
                   <span class="grade-points">(≈ {{ getAlternativeGradePoints(task.id, task.points) }} Punkte)</span>
+                </div>
+              </div>
+
+              <div v-if="task.criteria.length > 0" class="criteria-correction">
+                <div class="criteria-correction-header">
+                  <h4>Kriterien</h4>
+                  <span v-if="scoringMode === 'numeric'">
+                    {{ getTaskCriterionPoints(task.id) }} / {{ task.points }} Punkte
+                  </span>
+                </div>
+                <div
+                  v-for="criterion in task.criteria"
+                  :key="criterion.id"
+                  class="criterion-correction-row"
+                >
+                  <span class="criterion-text">{{ criterion.text }}</span>
+                  <template v-if="scoringMode === 'numeric'">
+                    <input
+                      v-model.number="criterionScores[task.id][criterion.id]"
+                      type="number"
+                      min="0"
+                      :max="criterion.points"
+                      step="0.5"
+                      class="criterion-score-input"
+                      @input="onCriterionScoreInput(task.id)"
+                    />
+                    <span class="criterion-max">/ {{ criterion.points }}</span>
+                  </template>
+                  <span v-else class="criterion-max">{{ criterion.points }} Pkt.</span>
                 </div>
               </div>
 
@@ -240,6 +270,7 @@ const loadError = ref('');
 const candidateFilter = ref('');
 const scoringMode = ref<'numeric' | 'alternative'>('numeric');
 const taskScores = ref<Record<string, number>>({});
+const criterionScores = ref<Record<string, Record<string, number>>>({});
 const taskAlternativeGrades = ref<Record<string, AlternativeGradeType>>({});
 const taskComments = ref<Record<string, string>>({});
 const generalComment = ref('');
@@ -279,7 +310,7 @@ const currentCorrectionStatus = computed(() =>
 const totalPoints = computed(() => {
   if (!exam.value) return 0;
   if (scoringMode.value === 'numeric') {
-    return Object.values(taskScores.value).reduce((sum, pts) => sum + (pts || 0), 0);
+    return correctionTasks.value.reduce((sum, task) => sum + getTaskPoints(task), 0);
   }
   return correctionTasks.value.reduce((sum, task) => {
     const grade = taskAlternativeGrades.value[task.id];
@@ -366,13 +397,21 @@ function hydrateCandidateState(candidateId: string): void {
 
   const correction = corrections.value.get(candidateId);
   taskScores.value = {};
+  criterionScores.value = {};
   taskAlternativeGrades.value = {};
   taskComments.value = {};
   generalComment.value = '';
 
   for (const task of correctionTasks.value) {
     const score = correction?.taskScores.find((entry) => entry.taskId === task.id);
-    taskScores.value[task.id] = score?.points ?? 0;
+    criterionScores.value[task.id] = {};
+    for (const criterion of task.criteria) {
+      const criterionScore = score?.criterionScores?.find(
+        (entry) => entry.criterionId === criterion.id
+      );
+      criterionScores.value[task.id][criterion.id] = criterionScore?.points ?? 0;
+    }
+    taskScores.value[task.id] = score?.points ?? getTaskCriterionPoints(task.id);
     if (score?.alternativeGrading) {
       taskAlternativeGrades.value[task.id] = score.alternativeGrading.type;
     }
@@ -395,7 +434,7 @@ function onScoringModeChange(): void {
 
   if (scoringMode.value === 'alternative') {
     for (const task of correctionTasks.value) {
-      const numericPoints = taskScores.value[task.id] || 0;
+      const numericPoints = getTaskPoints(task);
       taskAlternativeGrades.value[task.id] = AlternativeGradingService.fromNumericPoints(
         numericPoints,
         task.points,
@@ -428,6 +467,22 @@ function getGradeLabel(grade: AlternativeGradeType): string {
   return `${config.emoji} ${config.label}`;
 }
 
+function getTaskCriterionPoints(taskId: string): number {
+  return Object.values(criterionScores.value[taskId] ?? {})
+    .reduce((sum, points) => sum + (points || 0), 0);
+}
+
+function getTaskPoints(task: Exams.TaskNode): number {
+  return task.criteria.length > 0
+    ? getTaskCriterionPoints(task.id)
+    : (taskScores.value[task.id] || 0);
+}
+
+function onCriterionScoreInput(taskId: string): void {
+  taskScores.value[taskId] = getTaskCriterionPoints(taskId);
+  markDirty();
+}
+
 function getAlternativeGradePoints(taskId: string, maxPoints: number): number {
   const grade = taskAlternativeGrades.value[taskId];
   if (!grade) return 0;
@@ -443,12 +498,20 @@ async function saveCurrentCandidate(finalize: boolean): Promise<void> {
     const payload: Exams.TaskScore = {
       taskId: task.id,
       points: scoringMode.value === 'numeric'
-        ? (taskScores.value[task.id] || 0)
+        ? getTaskPoints(task)
         : getAlternativeGradePoints(task.id, task.points),
       maxPoints: task.points,
       comment: taskComments.value[task.id] || undefined,
       timestamp: new Date()
     };
+
+    if (scoringMode.value === 'numeric' && task.criteria.length > 0) {
+      payload.criterionScores = task.criteria.map((criterion) => ({
+        criterionId: criterion.id,
+        points: criterionScores.value[task.id]?.[criterion.id] || 0,
+        maxPoints: criterion.points
+      }));
+    }
 
     if (scoringMode.value === 'alternative' && taskAlternativeGrades.value[task.id]) {
       payload.alternativeGrading = AlternativeGradingService.createAlternativeGrading(

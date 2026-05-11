@@ -191,6 +191,16 @@ export class CorrectionSheetPdfRenderer {
         );
       }
 
+      for (const criterion of row.criteria) {
+        const criterionPoints = criterion.awardedPoints === undefined
+          ? `${criterion.maxPoints} Pkt.`
+          : `${criterion.awardedPoints} / ${criterion.maxPoints} Pkt.`;
+        drawParagraph(`• ${criterion.text} (${criterionPoints})`, {
+          size: SMALL_FONT_SIZE,
+          indent: 12
+        });
+      }
+
       if (projection.showTaskComments && row.comment) {
         drawParagraph(row.comment, {
           size: projection.layoutMode === 'compact' ? SMALL_FONT_SIZE : NORMAL_FONT_SIZE,

@@ -18,6 +18,13 @@ export interface CorrectionSheetPreset {
   updatedAt: Date;
 }
 
+export interface CorrectionSheetCriterionRow {
+  criterionId: string;
+  text: string;
+  maxPoints: number;
+  awardedPoints?: number;
+}
+
 export interface CorrectionSheetTaskRow {
   taskId: string;
   label: string;
@@ -25,6 +32,7 @@ export interface CorrectionSheetTaskRow {
   awardedPoints: number;
   comment?: string;
   partLabel?: string;
+  criteria: CorrectionSheetCriterionRow[];
 }
 
 export interface CorrectionSheetProjection {
