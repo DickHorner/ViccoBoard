@@ -48,7 +48,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
   const description = ref('')
   const classGroupId = ref('')
   const assessmentFormat = ref<ExamsTypes.ExamAssessmentFormat>('klausur')
-  const mode = ref<'simple' | 'complex'>('simple')
+  const mode = ref<'simple' | 'complex'>('complex')
   const tasks = ref<TaskDraft[]>([])
   const parts = ref<PartDraft[]>([])
   const candidateGroups = ref<CandidateGroupDraft[]>([])
@@ -408,7 +408,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     description.value = ''
     classGroupId.value = ''
     assessmentFormat.value = 'klausur'
-    mode.value = 'simple'
+    mode.value = 'complex'
     tasks.value = []
     parts.value = []
     candidateGroups.value = []
