@@ -22,7 +22,7 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label for="exam-date">Prüfungsdatum</label>
+          <label for="exam-date">Prüfungsdatum (optional)</label>
           <input id="exam-date" v-model="formData.date" type="date" class="form-input" />
         </div>
         <div class="form-group">
@@ -173,12 +173,15 @@
 
     <section class="section">
       <div class="section-header">
-        <h2>Kandidaten</h2>
+        <div>
+          <h2>Kandidaten</h2>
+          <p class="section-hint">Optional. Ohne Kandidaten bleibt die Prüfung als wiederverwendbare Vorlage nutzbar.</p>
+        </div>
         <button @click="addCandidate" class="btn btn-primary btn-sm">+ Kandidat hinzufügen</button>
       </div>
 
       <div v-if="formData.candidates.length === 0" class="empty-state">
-        <p>Für die Korrektur und den PDF-Export wird mindestens ein Kandidat benötigt.</p>
+        <p>Noch keine Kandidaten. Für reine Prüfungsvorlagen ist das in Ordnung.</p>
       </div>
 
       <div v-else class="task-list">
@@ -374,12 +377,15 @@ const canAddTask = computed(() => {
   return !formData.tasks.some(task => !task.title?.trim() || task.points < 0);
 });
 
+const candidatesAreValid = computed(() =>
+  formData.candidates.every(candidate => candidate.firstName.trim() && candidate.lastName.trim())
+);
+
 const canSave = computed(() => {
   return (
     formData.title.trim().length > 0 &&
     formData.tasks.length > 0 &&
-    formData.candidates.length > 0 &&
-    formData.candidates.every(candidate => candidate.firstName.trim() && candidate.lastName.trim()) &&
+    candidatesAreValid.value &&
     formData.tasks.every(
       task => task.title?.trim().length > 0 && task.points >= 0
     ) &&
@@ -548,6 +554,7 @@ const saveExam = async () => {
 
   isSaving.value = true;
   try {
+    const examId = isEditing.value ? (route.params.id as string) : uuidv4();
     const tasks: Exams.TaskNode[] = formData.tasks.map((task, index) => ({
       id: task.id,
       level: 1,
@@ -574,7 +581,7 @@ const saveExam = async () => {
     }
 
     const examInput: Exams.Exam = {
-      id: isEditing.value ? (route.params.id as string) : uuidv4(),
+      id: examId,
       title: formData.title.trim(),
       description: formData.description.trim() || undefined,
       date: formData.date ? new Date(`${formData.date}T00:00:00`) : undefined,
@@ -601,7 +608,7 @@ const saveExam = async () => {
       printPresets: [],
       candidates: formData.candidates.map(candidate => ({
         id: candidate.id,
-        examId: isEditing.value ? (route.params.id as string) : 'draft',
+        examId,
         firstName: candidate.firstName.trim(),
         lastName: candidate.lastName.trim(),
         externalId: candidate.externalId?.trim() || undefined
