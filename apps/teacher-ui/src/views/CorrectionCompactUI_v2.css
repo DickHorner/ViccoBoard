@@ -71,3 +71,62 @@
   color: #666;
   margin-left: 0.5rem;
 }
+
+.criteria-correction {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f0f6ff;
+  border-radius: 4px;
+}
+
+.criteria-correction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  color: #0056b3;
+}
+
+.criteria-correction-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.criterion-correction-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 60px;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-top: 1px solid #d7e7fb;
+}
+
+.criterion-correction-row:first-of-type {
+  border-top: 0;
+}
+
+.criterion-text {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.criterion-score-input {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.criterion-score-input:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.criterion-max {
+  color: #666;
+  font-size: 0.85rem;
+}
