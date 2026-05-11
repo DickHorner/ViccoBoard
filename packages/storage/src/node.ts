@@ -26,3 +26,4 @@ export * from './migrations/018_kbr_feedback_workflow.js';
 export * from './migrations/021_student_import_batches.js';
 export * from './migrations/022_exam_assessment_format_schema.js';
 export * from './migrations/023_lesson_schedule_fields.js';
+export * from './migrations/024_attendance_late_minutes.js';

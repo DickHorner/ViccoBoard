@@ -94,6 +94,7 @@
                         } : {}"
                         :disabled="saving || catalogLoading"
                         :title="status.label"
+                        :aria-pressed="attendance[student.id]?.status === status.value"
                       >
                         {{ status.icon || status.short }}
                       </button>
@@ -104,11 +105,22 @@
                   </td>
                   <td class="reason-cell">
                     <input 
-                      v-if="attendance[student.id] && [AttendanceStatus.Absent, AttendanceStatus.Excused].includes(attendance[student.id].status)"
+                      v-if="attendance[student.id] && statusesWithReason.includes(attendance[student.id].status)"
                       v-model="attendance[student.id].reason"
                       type="text"
                       class="reason-input"
                       :placeholder="`${t('ANWESENHEIT.reason')}...`"
+                      :disabled="saving"
+                    />
+                    <input
+                      v-if="attendance[student.id]?.status === AttendanceStatus.Late"
+                      v-model.number="attendance[student.id].lateMinutes"
+                      type="number"
+                      min="0"
+                      step="1"
+                      inputmode="numeric"
+                      class="reason-input late-minutes-input"
+                      placeholder="Minuten..."
                       :disabled="saving"
                     />
                   </td>
@@ -153,6 +165,11 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge } from '../composables/useStudentsBridge'
+import {
+  ATTENDANCE_STATUSES_WITH_REASON,
+  buildAttendanceRecords,
+  shouldClearAttendanceAfterSave
+} from '../utils/attendance-entry'
 import { AttendanceStatus } from '@viccoboard/core'
 import type { ClassGroup, Student, StatusOption } from '@viccoboard/core'
 
@@ -174,6 +191,7 @@ const catalogLoading = ref(false)
 interface AttendanceEntry {
   status: AttendanceStatus
   reason?: string
+  lateMinutes?: number
 }
 
 const attendance = ref<Record<string, AttendanceEntry>>({})
@@ -195,6 +213,10 @@ const currentDate = computed(() => {
 const hasAnyAttendance = computed(() => {
   return Object.keys(attendance.value).length > 0
 })
+
+const statusesWithReason = [
+  ...ATTENDANCE_STATUSES_WITH_REASON
+]
 
 // Status options derived from catalog
 // Maps catalog StatusOption to UI format compatible with existing AttendanceStatus enum
@@ -252,9 +274,12 @@ const setStatus = (studentId: string, status: AttendanceStatus) => {
     attendance.value[studentId].status = status
   }
   
-  // Clear reason if not absent/excused
-  if (![AttendanceStatus.Absent, AttendanceStatus.Excused].includes(status)) {
+  if (!statusesWithReason.includes(status)) {
     delete attendance.value[studentId].reason
+  }
+
+  if (status !== AttendanceStatus.Late) {
+    delete attendance.value[studentId].lateMinutes
   }
 }
 
@@ -315,6 +340,7 @@ const handleSaveAttendance = async () => {
     }
 
     // Reuse existing lesson if editing, otherwise create a new one
+    const wasEditingExistingLesson = !!currentLessonId.value
     let lessonId: string
     if (currentLessonId.value) {
       lessonId = currentLessonId.value
@@ -331,13 +357,7 @@ const handleSaveAttendance = async () => {
     }
     
     // Prepare attendance records
-    const records = Object.entries(attendance.value).map(([studentId, entry]) => ({
-      studentId,
-      lessonId,
-      status: entry.status,
-      reason: entry.reason,
-      notes: undefined
-    }))
+    const records = buildAttendanceRecords(attendance.value, lessonId)
     
     // Save using batch record
     await SportBridge.recordAttendanceUseCase.executeBatch(records)
@@ -345,10 +365,12 @@ const handleSaveAttendance = async () => {
     const savedCount = records.length
     saveSuccess.value = `${t('COMMON.success')} (${savedCount})`
     
-    // Reset attendance after brief display
+    // Reset attendance after brief display in create mode only.
     setTimeout(() => {
       if (saveSuccess.value.includes(savedCount.toString())) {
-        attendance.value = {}
+        if (shouldClearAttendanceAfterSave(wasEditingExistingLesson)) {
+          attendance.value = {}
+        }
         saveSuccess.value = ''
       }
     }, 2000)
@@ -383,7 +405,8 @@ onMounted(async () => {
         for (const record of records) {
           attendance.value[record.studentId] = {
             status: record.status,
-            reason: record.reason
+            reason: record.reason,
+            lateMinutes: record.lateMinutes
           }
         }
       } else {

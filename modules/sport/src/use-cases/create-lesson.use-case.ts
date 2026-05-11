@@ -12,7 +12,7 @@ export interface CreateLessonInput {
   classGroupId: string;
   date: Date;
   startTime: string;
-  durationMinutes: 45 | 90;
+  durationMinutes: number;
   title?: string;
   room?: string;
   shortcuts?: string[];
@@ -63,9 +63,12 @@ export class CreateLessonUseCase {
     }
 
     const lessonStart = this.parseStartTimeToMinutes(input.startTime);
-    const validDurations: Array<CreateLessonInput['durationMinutes']> = [45, 90];
-    if (!validDurations.includes(input.durationMinutes)) {
-      throw new Error('Duration must be 45 or 90 minutes');
+    if (
+      !Number.isInteger(input.durationMinutes) ||
+      input.durationMinutes <= 0 ||
+      input.durationMinutes > 300
+    ) {
+      throw new Error('Duration must be a whole number between 1 and 300 minutes');
     }
 
     const lessonEnd = lessonStart + input.durationMinutes;

@@ -162,7 +162,7 @@
           <Column field="dateOfBirth" header="Geburtsdatum" sortable>
             <template #body="{ data }">
               <div class="student-list-page__name-cell">
-                <span>{{ data.dateOfBirth ?? '—' }}</span>
+                <span>{{ formatGermanDateOfBirth(data.dateOfBirth) || '—' }}</span>
                 <small v-if="data.legacyFlag" class="app-data-note">Legacy-Datum fehlt</small>
               </div>
             </template>
@@ -429,6 +429,7 @@ import Message from 'primevue/message'
 import ProgressSpinner from 'primevue/progressspinner'
 import Select from 'primevue/select'
 import { useStudentListView } from '../composables/useStudentListView'
+import { formatGermanDateOfBirth } from '../utils/locale-format'
 
 const {
   t,

@@ -138,7 +138,7 @@ export interface Lesson {
   classGroupId: string;
   date: Date;
   startTime: string;
-  durationMinutes: 45 | 90;
+  durationMinutes: number;
   title?: string;
   room?: string;
   lessonParts?: LessonPart[];
@@ -163,6 +163,7 @@ export interface AttendanceRecord {
   lessonId: string;
   status: AttendanceStatus;
   reason?: string;
+  lateMinutes?: number;
   notes?: string;
   timestamp: Date;
   createdAt: Date;

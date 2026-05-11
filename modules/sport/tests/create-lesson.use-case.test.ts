@@ -58,9 +58,41 @@ describe('CreateLessonUseCase', () => {
         classGroupId,
         date: new Date('2026-09-01T00:00:00.000Z'),
         startTime: '08:00',
-        durationMinutes: 60 as unknown as 45 | 90
+        durationMinutes: 0
       })
-    ).rejects.toThrow('Duration must be 45 or 90 minutes');
+    ).rejects.toThrow('Duration must be a whole number between 1 and 300 minutes');
+  });
+
+  test('rejects duration above 300', async () => {
+    await expect(
+      useCase.execute({
+        classGroupId,
+        date: new Date('2026-09-01T00:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 301
+      })
+    ).rejects.toThrow('Duration must be a whole number between 1 and 300 minutes');
+  });
+
+  test('rejects non-integer duration', async () => {
+    await expect(
+      useCase.execute({
+        classGroupId,
+        date: new Date('2026-09-01T00:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45.5
+      })
+    ).rejects.toThrow('Duration must be a whole number between 1 and 300 minutes');
+  });
+
+  test('accepts custom duration within valid range', async () => {
+    const lesson = await useCase.execute({
+      classGroupId,
+      date: new Date('2026-09-01T00:00:00.000Z'),
+      startTime: '08:00',
+      durationMinutes: 60
+    });
+    expect(lesson.durationMinutes).toBe(60);
   });
 
   test('rejects missing startTime', async () => {

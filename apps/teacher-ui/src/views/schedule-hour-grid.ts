@@ -1,7 +1,7 @@
 export interface ScheduleHourSlot {
   label: string
   startTime: string
-  durationMinutes: 45 | 90
+  durationMinutes: number
   order: number
 }
 

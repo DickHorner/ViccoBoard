@@ -158,6 +158,7 @@ export class InitialSchemaMigration implements Migration {
         student_id TEXT NOT NULL,
         status TEXT NOT NULL,
         reason TEXT,
+        late_minutes INTEGER,
         notes TEXT,
         timestamp TEXT NOT NULL,
         created_at TEXT NOT NULL,

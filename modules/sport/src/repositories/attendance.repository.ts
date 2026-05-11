@@ -22,6 +22,7 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
       lessonId: row.lesson_id,
       status: row.status,
       reason: row.reason || undefined,
+      lateMinutes: row.late_minutes ?? undefined,
       notes: row.notes || undefined,
       timestamp: new Date(row.timestamp),
       createdAt: new Date(row.created_at),
@@ -40,8 +41,9 @@ export class AttendanceRepository extends AdapterRepository<AttendanceRecord> {
     if (entity.studentId !== undefined) row.student_id = entity.studentId;
     if (entity.lessonId !== undefined) row.lesson_id = entity.lessonId;
     if (entity.status !== undefined) row.status = entity.status;
-    if (entity.reason !== undefined) row.reason = entity.reason;
-    if (entity.notes !== undefined) row.notes = entity.notes;
+    if (Object.prototype.hasOwnProperty.call(entity, 'reason')) row.reason = entity.reason ?? null;
+    if (Object.prototype.hasOwnProperty.call(entity, 'lateMinutes')) row.late_minutes = entity.lateMinutes ?? null;
+    if (Object.prototype.hasOwnProperty.call(entity, 'notes')) row.notes = entity.notes ?? null;
     if (entity.timestamp !== undefined) row.timestamp = entity.timestamp.toISOString();
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
