@@ -53,6 +53,36 @@
       ></textarea>
     </div>
 
+    <div class="form-row">
+      <div class="form-group">
+        <label for="preset-school-logo">Schullogo</label>
+        <input
+          id="preset-school-logo"
+          type="file"
+          accept="image/png,image/jpeg"
+          @change="uploadImage('schoolLogo', $event)"
+        />
+        <div v-if="modelValue.schoolLogo" class="image-preview-row">
+          <span>{{ modelValue.schoolLogo.fileName ?? 'Logo hochgeladen' }}</span>
+          <button type="button" class="small-button" @click="clearImage('schoolLogo')">Entfernen</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="preset-teacher-signature">Gescannte Unterschrift</label>
+        <input
+          id="preset-teacher-signature"
+          type="file"
+          accept="image/png,image/jpeg"
+          @change="uploadImage('teacherSignature', $event)"
+        />
+        <div v-if="modelValue.teacherSignature" class="image-preview-row">
+          <span>{{ modelValue.teacherSignature.fileName ?? 'Unterschrift hochgeladen' }}</span>
+          <button type="button" class="small-button" @click="clearImage('teacherSignature')">Entfernen</button>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="preset-footer-text">Footer-Text</label>
       <textarea
@@ -96,6 +126,48 @@ function updateField<Key extends keyof Exams.CorrectionSheetPreset>(
     [key]: value,
     updatedAt: new Date()
   });
+}
+
+function readImageFile(file: File): Promise<Exams.CorrectionSheetImage> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') {
+        reject(new Error('Bild konnte nicht gelesen werden.'));
+        return;
+      }
+
+      resolve({
+        src: reader.result,
+        fileName: file.name
+      });
+    };
+    reader.onerror = () => reject(reader.error ?? new Error('Bild konnte nicht gelesen werden.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadImage(
+  key: 'schoolLogo' | 'teacherSignature',
+  event: Event
+): Promise<void> {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) {
+    return;
+  }
+
+  if (!['image/png', 'image/jpeg'].includes(file.type)) {
+    input.value = '';
+    return;
+  }
+
+  updateField(key, await readImageFile(file));
+  input.value = '';
+}
+
+function clearImage(key: 'schoolLogo' | 'teacherSignature'): void {
+  updateField(key, undefined);
 }
 </script>
 
@@ -151,6 +223,23 @@ function updateField<Key extends keyof Exams.CorrectionSheetPreset>(
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 14px;
   background: #f8fafc;
+}
+
+.image-preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.small-button {
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
 }
 
 textarea {
