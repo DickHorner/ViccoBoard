@@ -12,6 +12,8 @@ export interface Exam {
   classGroupId?: string;
   assessmentFormat: ExamAssessmentFormat;
   mode: ExamMode;
+  kind: ExamKind;
+  sourceTemplateId?: string;
   structure: ExamStructure;
   gradingKey: GradingKey;
   printPresets: PrintPreset[];
@@ -21,6 +23,8 @@ export interface Exam {
   createdAt: Date;
   lastModified: Date;
 }
+
+export type ExamKind = 'template' | 'exam';
 
 export type ExamAssessmentFormat =
   | 'klausur'
