@@ -33,10 +33,10 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
-    "jsdom": "^29.0.2",
+    "jsdom": "^29.1.1",
     "ts-jest": "^29.4.9",
     "typescript": "^6.0.3",
     "vite": "^8.0.10",
-    "vue-tsc": "^3.2.7"
+    "vue-tsc": "^3.2.8"
   }
 }
