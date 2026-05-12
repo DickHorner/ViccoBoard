@@ -109,6 +109,8 @@ export class BuildCorrectionSheetProjectionUseCase {
       generalComment: resolveGeneralComment(correction, preset),
       headerText: preset.headerText,
       footerText: preset.footerText,
+      schoolLogo: preset.schoolLogo,
+      teacherSignature: preset.teacherSignature,
       layoutMode: preset.layoutMode,
       showHeader: preset.showHeader,
       showOverallPoints: preset.showOverallPoints,

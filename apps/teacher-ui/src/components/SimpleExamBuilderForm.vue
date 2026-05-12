@@ -390,6 +390,16 @@ const candidatesAreValid = computed(() =>
   formData.candidates.every(candidate => candidate.firstName.trim() && candidate.lastName.trim())
 );
 
+const hasValidationErrors = computed(() => {
+  if (errors.title) {
+    return true;
+  }
+
+  return errors.tasks?.some((taskError) =>
+    Boolean(taskError?.title || taskError?.points || taskError?.bonusPoints)
+  ) ?? false;
+});
+
 const canSave = computed(() => {
   return (
     formData.title.trim().length > 0 &&
@@ -398,7 +408,7 @@ const canSave = computed(() => {
     formData.tasks.every(
       task => task.title?.trim().length > 0 && task.points >= 0
     ) &&
-    !Object.values(errors).some(e => e !== undefined)
+    !hasValidationErrors.value
   );
 });
 
@@ -602,6 +612,7 @@ const saveExam = async () => {
       date: formData.date ? new Date(`${formData.date}T00:00:00`) : undefined,
       assessmentFormat: 'klausur',
       mode: 'simple' as Exams.ExamMode,
+      kind: 'template',
       structure: {
         parts: [],
         tasks,

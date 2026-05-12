@@ -61,6 +61,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
   const isEditing = ref(false)
   const createdAt = ref<Date | null>(null)
   const examId = ref<string | undefined>(undefined)
+  const sourceTemplateId = ref<string | undefined>(undefined)
 
   // ============ Getters ============
   const flatTasks = computed(() => flattenTasks(tasks.value))
@@ -246,6 +247,8 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
       classGroupId: classGroupId.value.trim() || undefined,
       assessmentFormat: assessmentFormat.value,
       mode: mode.value as ExamsTypes.ExamMode,
+      kind: 'template',
+      sourceTemplateId: sourceTemplateId.value,
       structure: {
         parts: parts.value.map((part, index) => ({
           id: part.id,
@@ -294,6 +297,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     examId.value = exam.id
     isEditing.value = true
     createdAt.value = exam.createdAt
+    sourceTemplateId.value = exam.sourceTemplateId
     title.value = exam.title
     description.value = exam.description ?? ''
     classGroupId.value = exam.classGroupId ?? ''
@@ -429,6 +433,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     examId.value = undefined
     isEditing.value = false
     createdAt.value = null
+    sourceTemplateId.value = undefined
     title.value = ''
     description.value = ''
     classGroupId.value = ''
@@ -452,6 +457,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     isEditing,
     createdAt,
     examId,
+    sourceTemplateId,
 
     // Getters
     flatTasks,
