@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, type PDFPage, type PDFFont } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, type PDFImage, type PDFPage, type PDFFont } from 'pdf-lib';
 import { Exams } from '@viccoboard/core';
 
 const PAGE_MARGIN = 40;
@@ -57,6 +57,40 @@ function wrapText(text: string, maxWidth: number, font: PDFFont, fontSize: numbe
   return lines;
 }
 
+function readDataUrlBytes(src: string): Uint8Array | null {
+  const match = src.match(/^data:image\/(png|jpeg|jpg);base64,(.+)$/);
+  if (!match) {
+    return null;
+  }
+
+  const binary = atob(match[2]);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
+}
+
+async function embedImage(
+  document: PDFDocument,
+  image?: Exams.CorrectionSheetImage
+): Promise<PDFImage | null> {
+  if (!image?.src) {
+    return null;
+  }
+
+  const bytes = readDataUrlBytes(image.src);
+  if (!bytes) {
+    return null;
+  }
+
+  if (image.src.startsWith('data:image/png;')) {
+    return document.embedPng(bytes);
+  }
+
+  return document.embedJpg(bytes);
+}
+
 export class CorrectionSheetPdfRenderer {
   async render(
     projections: Exams.CorrectionSheetProjection[],
@@ -90,6 +124,8 @@ export class CorrectionSheetPdfRenderer {
     let page = document.addPage();
     let { width, height } = page.getSize();
     let cursorY = height - PAGE_MARGIN;
+    const logoImage = await embedImage(document, projection.schoolLogo);
+    const signatureImage = await embedImage(document, projection.teacherSignature);
 
     const ensureSpace = (requiredHeight: number): void => {
       if (cursorY - requiredHeight >= PAGE_MARGIN) {
@@ -137,6 +173,16 @@ export class CorrectionSheetPdfRenderer {
     };
 
     if (projection.showHeader) {
+      if (logoImage) {
+        const scaled = logoImage.scaleToFit(110, 48);
+        page.drawImage(logoImage, {
+          x: width - PAGE_MARGIN - scaled.width,
+          y: cursorY - scaled.height + 6,
+          width: scaled.width,
+          height: scaled.height
+        });
+      }
+
       drawTextLine(projection.examTitle, { size: TITLE_FONT_SIZE, font: boldFont });
 
       const metaBits = [
@@ -191,6 +237,16 @@ export class CorrectionSheetPdfRenderer {
         );
       }
 
+      for (const criterion of row.criteria) {
+        const criterionPoints = criterion.awardedPoints === undefined
+          ? `${criterion.maxPoints} Pkt.`
+          : `${criterion.awardedPoints} / ${criterion.maxPoints} Pkt.`;
+        drawParagraph(`• ${criterion.text} (${criterionPoints})`, {
+          size: SMALL_FONT_SIZE,
+          indent: 12
+        });
+      }
+
       if (projection.showTaskComments && row.comment) {
         drawParagraph(row.comment, {
           size: projection.layoutMode === 'compact' ? SMALL_FONT_SIZE : NORMAL_FONT_SIZE,
@@ -212,14 +268,25 @@ export class CorrectionSheetPdfRenderer {
     }
 
     if (projection.showSignatureArea) {
-      ensureSpace(50);
+      ensureSpace(70);
       drawTextLine('Unterschrift', { font: boldFont });
+
+      if (signatureImage) {
+        const scaled = signatureImage.scaleToFit(180, 42);
+        page.drawImage(signatureImage, {
+          x: PAGE_MARGIN,
+          y: cursorY - scaled.height,
+          width: scaled.width,
+          height: scaled.height
+        });
+      }
+
       page.drawLine({
         start: { x: PAGE_MARGIN, y: cursorY - 8 },
         end: { x: PAGE_MARGIN + 180, y: cursorY - 8 },
         thickness: 0.8
       });
-      cursorY -= 28;
+      cursorY -= 48;
     }
 
     if (projection.footerText) {

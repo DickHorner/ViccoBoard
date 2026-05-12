@@ -346,4 +346,82 @@ describe('P5-3: examBuilderStore', () => {
       expect(store.candidateGroups[0].topic).toBe('Recherche')
     })
   })
+
+  describe('criteria consistency validation (getCriteriaConsistencyWarnings)', () => {
+    it('returns no warnings for a task with criteria only', () => {
+      const store = useExamBuilderStore()
+      store.addTask()
+      const task = store.tasks[0]
+      store.addCriterion(task)
+      task.criteria[0].text = 'Inhalt'
+      task.criteria[0].points = 5
+      store.recalculateTaskPoints()
+
+      expect(store.getCriteriaConsistencyWarnings()).toHaveLength(0)
+    })
+
+    it('returns a criteria-with-subtasks warning when task has both criteria and subtasks', () => {
+      const store = useExamBuilderStore()
+      store.setMode('complex')
+      store.addTask()
+      const root = store.tasks[0]
+      root.title = 'Aufgabe 1'
+      store.addCriterion(root)
+      root.criteria[0].text = 'Kriterium auf Root'
+      root.criteria[0].points = 3
+      store.addSubtask(root, 2)
+
+      const warnings = store.getCriteriaConsistencyWarnings()
+      expect(warnings).toHaveLength(1)
+      expect(warnings[0].kind).toBe('criteria-with-subtasks')
+      expect(warnings[0].taskId).toBe(root.id)
+    })
+
+    it('returns no warnings for a leaf task with multiple criteria', () => {
+      const store = useExamBuilderStore()
+      store.addTask()
+      const task = store.tasks[0]
+      store.addCriterion(task)
+      store.addCriterion(task)
+      task.criteria[0].points = 3
+      task.criteria[1].points = 7
+      store.recalculateTaskPoints()
+
+      expect(task.points).toBe(10)
+      expect(store.getCriteriaConsistencyWarnings()).toHaveLength(0)
+    })
+
+    it('criteria points are preserved through buildExam and hydrateFromExam round-trip', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Kriterien Round-Trip'
+      store.addTask()
+      const task = store.tasks[0]
+      task.title = 'Aufgabe 1'
+      store.addCriterion(task)
+      task.criteria[0].text = 'Analyse'
+      task.criteria[0].points = 4
+      store.addCriterion(task)
+      task.criteria[1].text = 'Darstellung'
+      task.criteria[1].points = 6
+      store.recalculateTaskPoints()
+
+      const exam = store.buildExam()
+      const savedTask = exam.structure.tasks.find(t => t.id === task.id)
+      expect(savedTask?.criteria).toHaveLength(2)
+      expect(savedTask?.criteria[0].text).toBe('Analyse')
+      expect(savedTask?.criteria[0].points).toBe(4)
+      expect(savedTask?.criteria[1].text).toBe('Darstellung')
+      expect(savedTask?.criteria[1].points).toBe(6)
+
+      // Round-trip: hydrate from saved exam
+      store.reset()
+      store.hydrateFromExam(exam)
+      const reloadedTask = store.tasks[0]
+      expect(reloadedTask.criteria).toHaveLength(2)
+      expect(reloadedTask.criteria[0].text).toBe('Analyse')
+      expect(reloadedTask.criteria[0].points).toBe(4)
+      expect(reloadedTask.criteria[1].text).toBe('Darstellung')
+      expect(reloadedTask.criteria[1].points).toBe(6)
+    })
+  })
 })

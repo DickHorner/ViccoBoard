@@ -93,7 +93,22 @@ describe('KBR correction sheet workflow', () => {
             points: 10,
             bonusPoints: 0,
             isChoice: false,
-            criteria: [],
+            criteria: [
+              {
+                id: 'criterion-1',
+                text: 'Einleitung nennt Textsorte, Titel und Autor.',
+                formatting: {},
+                points: 4,
+                aspectBased: false
+              },
+              {
+                id: 'criterion-2',
+                text: 'Hauptaussage wird sachlich zusammengefasst.',
+                formatting: {},
+                points: 6,
+                aspectBased: false
+              }
+            ],
             allowComments: true,
             allowSupportTips: false,
             commentBoxEnabled: true,
@@ -212,7 +227,17 @@ describe('KBR correction sheet workflow', () => {
       examId: exam.id,
       candidateId: 'cand-1',
       taskScores: [
-        { taskId: 'task-1', points: 9, maxPoints: 10, comment: 'Sehr strukturiert', timestamp: new Date() },
+        {
+          taskId: 'task-1',
+          points: 9,
+          maxPoints: 10,
+          comment: 'Sehr strukturiert',
+          timestamp: new Date(),
+          criterionScores: [
+            { criterionId: 'criterion-1', points: 4, maxPoints: 4 },
+            { criterionId: 'criterion-2', points: 5, maxPoints: 6 }
+          ]
+        },
         { taskId: 'task-2', points: 12, maxPoints: 15, comment: 'Gute Textbelege', timestamp: new Date() }
       ],
       comments: [
@@ -248,7 +273,21 @@ describe('KBR correction sheet workflow', () => {
         maxPoints: 10,
         awardedPoints: 9,
         comment: 'Sehr strukturiert',
-        partLabel: 'Teil A'
+        partLabel: 'Teil A',
+        criteria: [
+          {
+            criterionId: 'criterion-1',
+            text: 'Einleitung nennt Textsorte, Titel und Autor.',
+            maxPoints: 4,
+            awardedPoints: 4
+          },
+          {
+            criterionId: 'criterion-2',
+            text: 'Hauptaussage wird sachlich zusammengefasst.',
+            maxPoints: 6,
+            awardedPoints: 5
+          }
+        ]
       }),
       expect.objectContaining({
         taskId: 'task-2',
@@ -256,7 +295,8 @@ describe('KBR correction sheet workflow', () => {
         maxPoints: 15,
         awardedPoints: 12,
         comment: 'Gute Textbelege',
-        partLabel: 'Teil A'
+        partLabel: 'Teil A',
+        criteria: []
       })
     ]);
   });

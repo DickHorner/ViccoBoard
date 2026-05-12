@@ -58,6 +58,31 @@
       />
     </div>
 
+    <div class="task-library-fields">
+      <label class="choice-toggle">
+        <input v-model="task.reusable" type="checkbox" />
+        In die Sammlung
+      </label>
+      <div class="field">
+        <label :for="`task-subject-${task.id}`">Fach</label>
+        <input
+          :id="`task-subject-${task.id}`"
+          v-model="task.subject"
+          type="text"
+          placeholder="z. B. Deutsch"
+        />
+      </div>
+      <div class="field">
+        <label :for="`task-grade-level-${task.id}`">Klassenstufe</label>
+        <input
+          :id="`task-grade-level-${task.id}`"
+          v-model="task.gradeLevel"
+          type="text"
+          placeholder="z. B. 8"
+        />
+      </div>
+    </div>
+
     <div class="field-grid">
       <div class="field">
         <label :for="`task-points-${task.id}`">Punkte</label>
@@ -103,10 +128,13 @@
 
     <div class="criteria-block">
       <div class="panel-header">
-        <component :is="criteriaHeaderTag">Kriterien</component>
+        <component :is="criteriaHeaderTag">Kriterien / Erwartungshorizont</component>
         <button class="ghost" type="button" @click="store.addCriterion(task)">
           Kriterium hinzufügen
         </button>
+      </div>
+      <div v-if="task.criteria.length > 0 && task.subtasks.length > 0" class="criteria-conflict-warning" role="alert" aria-live="polite">
+        ⚠ Kriterien werden ignoriert, wenn Teilaufgaben vorhanden sind. Bitte Kriterien entfernen oder in die Teilaufgaben verschieben.
       </div>
       <div v-if="task.criteria.length === 0" class="empty">
         Noch keine Kriterien.
