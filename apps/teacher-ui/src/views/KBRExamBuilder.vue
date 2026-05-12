@@ -75,7 +75,7 @@
             <p v-if="store.classGroupId">
               {{ classStudents.length }} Schüler in {{ selectedClassLabel }}
             </p>
-            <p v-else>Wählen Sie oben eine Klasse aus, um Schüler oder komplette Klassen zu übernehmen.</p>
+            <p v-else>Optional: Wählen Sie eine Klasse aus, um Schüler oder komplette Klassen zu übernehmen.</p>
           </div>
           <div class="import-actions">
             <button
@@ -111,7 +111,7 @@
         </div>
 
         <div v-if="candidates.length === 0" class="empty-state">
-          Noch keine Kandidaten. Für die Korrektur und den PDF-Export wird mindestens ein Prüfling benötigt.
+          Noch keine Kandidaten. Die Prüfung kann als Vorlage gespeichert werden; für Korrektur und PDF-Export fügen Sie später Prüflinge hinzu.
         </div>
 
         <div v-else class="candidate-list">
@@ -402,11 +402,14 @@ const availableImportStudents = computed(() => {
 });
 
 const canSave = computed(() => {
-  const hasValidCandidates = candidates.value.length > 0 &&
-    candidates.value.every((candidate) => candidate.firstName.trim() && candidate.lastName.trim());
-  const hasValidGroups = store.assessmentFormat !== 'gruppenarbeit' || store.candidateGroups.every((group: Exams.CandidateGroup) =>
-    group.name.trim().length > 0 && group.memberCandidateIds.length > 0
+  const hasValidCandidates = candidates.value.every((candidate) =>
+    candidate.firstName.trim() && candidate.lastName.trim()
   );
+  const hasValidGroups = candidates.value.length === 0 ||
+    store.assessmentFormat !== 'gruppenarbeit' ||
+    store.candidateGroups.every((group: Exams.CandidateGroup) =>
+      group.name.trim().length > 0 && group.memberCandidateIds.length > 0
+    );
 
   return Boolean(store.canSave && hasValidCandidates && hasValidGroups);
 });
