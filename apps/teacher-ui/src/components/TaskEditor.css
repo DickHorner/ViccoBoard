@@ -69,10 +69,15 @@
   gap: 0.5rem;
 }
 
-.field-grid {
+.field-grid,
+.task-library-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+.task-library-fields .choice-toggle {
+  grid-column: 1 / -1;
 }
 
 label {

@@ -58,6 +58,31 @@
       />
     </div>
 
+    <div class="task-library-fields">
+      <label class="choice-toggle">
+        <input v-model="task.reusable" type="checkbox" />
+        In die Sammlung
+      </label>
+      <div class="field">
+        <label :for="`task-subject-${task.id}`">Fach</label>
+        <input
+          :id="`task-subject-${task.id}`"
+          v-model="task.subject"
+          type="text"
+          placeholder="z. B. Deutsch"
+        />
+      </div>
+      <div class="field">
+        <label :for="`task-grade-level-${task.id}`">Klassenstufe</label>
+        <input
+          :id="`task-grade-level-${task.id}`"
+          v-model="task.gradeLevel"
+          type="text"
+          placeholder="z. B. 8"
+        />
+      </div>
+    </div>
+
     <div class="field-grid">
       <div class="field">
         <label :for="`task-points-${task.id}`">Punkte</label>
