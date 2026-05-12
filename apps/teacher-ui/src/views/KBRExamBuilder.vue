@@ -402,9 +402,8 @@ const availableImportStudents = computed(() => {
 });
 
 const canSave = computed(() => {
-  const hasValidCandidates = candidates.value.length > 0 &&
-    candidates.value.every((candidate) => candidate.firstName.trim() && candidate.lastName.trim());
-  const hasValidGroups = store.assessmentFormat !== 'gruppenarbeit' || store.candidateGroups.every((group: Exams.CandidateGroup) =>
+  const hasValidCandidates = candidates.value.every((candidate) => candidate.firstName.trim() && candidate.lastName.trim());
+  const hasValidGroups = candidates.value.length === 0 || store.assessmentFormat !== 'gruppenarbeit' || store.candidateGroups.every((group: Exams.CandidateGroup) =>
     group.name.trim().length > 0 && group.memberCandidateIds.length > 0
   );
 
