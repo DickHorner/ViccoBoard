@@ -185,6 +185,72 @@
 
       <section class="section">
         <div class="section-header">
+          <h2>Aufgabensammlung</h2>
+          <span class="collection-count">{{ filteredReusableTasks.length }} Aufgaben</span>
+        </div>
+
+        <div class="collection-filters">
+          <div class="form-group">
+            <label>Fach</label>
+            <select v-model="taskCollectionSubject">
+              <option value="">Alle Fächer</option>
+              <option v-for="subject in taskCollectionSubjects" :key="subject" :value="subject">
+                {{ subject }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Klassenstufe</label>
+            <select v-model="taskCollectionGradeLevel">
+              <option value="">Alle Klassenstufen</option>
+              <option v-for="gradeLevel in taskCollectionGradeLevels" :key="gradeLevel" :value="gradeLevel">
+                {{ gradeLevel }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Suche</label>
+            <input v-model="taskCollectionQuery" type="text" placeholder="Titel oder Kriterien" />
+          </div>
+        </div>
+
+        <div v-if="taskCollectionLoading" class="empty-state">
+          Aufgabensammlung wird geladen...
+        </div>
+        <div v-else-if="filteredReusableTasks.length === 0" class="empty-state">
+          Keine passenden Aufgaben in der Sammlung.
+        </div>
+        <div v-else class="task-collection-list">
+          <article
+            v-for="entry in filteredReusableTasks"
+            :key="`${entry.examId}-${entry.task.id}`"
+            class="task-collection-card"
+          >
+            <div class="task-collection-main">
+              <h3>{{ entry.task.title }}</h3>
+              <div class="task-collection-meta">
+                <span>{{ entry.task.points }} Punkte</span>
+                <span v-if="entry.task.bonusPoints">{{ entry.task.bonusPoints }} Bonuspunkte</span>
+                <span v-if="entry.task.subject">{{ entry.task.subject }}</span>
+                <span v-if="entry.task.gradeLevel">Klasse {{ entry.task.gradeLevel }}</span>
+                <span>{{ entry.examTitle }}</span>
+              </div>
+              <p v-if="entry.task.criteria.length > 0" class="task-collection-criteria">
+                {{ entry.task.criteria.map((criterion) => criterion.text).join(' · ') }}
+              </p>
+              <small v-if="entry.childTasks.length > 0">
+                {{ entry.childTasks.length }} Teilaufgaben
+              </small>
+            </div>
+            <button class="btn-secondary-small" type="button" @click="insertReusableTask(entry)">
+              In Prüfung übernehmen
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
           <h2>Aufgaben</h2>
           <button @click="store.addTask()" class="btn-small">+ Aufgabe hinzufügen</button>
         </div>
@@ -333,6 +399,12 @@ import { getStudentsBridge, initializeStudentsBridge } from '../composables/useS
 import { useExamsBridge } from '../composables/useExamsBridge';
 import { useExamBuilderStore } from '../stores/examBuilderStore';
 import {
+  cloneTaskDraftFromNode,
+  collectReusableTasks,
+  filterReusableTasks,
+  type ReusableTaskEntry
+} from '../utils/task-collection';
+import {
   createCandidateGroup,
   mapStudentToExamCandidate,
   mergeImportedCandidates,
@@ -370,6 +442,11 @@ const gradeBoundaries = ref<Exams.GradeBoundary[]>([]);
 const examStatus = ref<Exams.Exam['status']>('draft');
 const printPresets = ref<Exams.Exam['printPresets']>([]);
 const isLoading = ref(true);
+const taskCollectionLoading = ref(false);
+const reusableTaskEntries = ref<ReusableTaskEntry[]>([]);
+const taskCollectionSubject = ref('');
+const taskCollectionGradeLevel = ref('');
+const taskCollectionQuery = ref('');
 
 const assessmentFormats: Array<{ value: Exams.ExamAssessmentFormat; label: string }> = [
   { value: 'klausur', label: 'Klausur' },
@@ -400,6 +477,27 @@ const availableImportStudents = computed(() => {
   );
   return classStudents.value.filter((student) => !existingStudentIds.has(student.id));
 });
+const filteredReusableTasks = computed(() =>
+  filterReusableTasks(reusableTaskEntries.value, {
+    subject: taskCollectionSubject.value,
+    gradeLevel: taskCollectionGradeLevel.value,
+    query: taskCollectionQuery.value
+  })
+);
+const taskCollectionSubjects = computed(() =>
+  Array.from(new Set(
+    reusableTaskEntries.value
+      .map((entry) => entry.task.subject?.trim())
+      .filter((subject): subject is string => Boolean(subject))
+  )).sort((a, b) => a.localeCompare(b, 'de'))
+);
+const taskCollectionGradeLevels = computed(() =>
+  Array.from(new Set(
+    reusableTaskEntries.value
+      .map((entry) => entry.task.gradeLevel?.trim())
+      .filter((gradeLevel): gradeLevel is string => Boolean(gradeLevel))
+  )).sort((a, b) => a.localeCompare(b, 'de', { numeric: true }))
+);
 
 const canSave = computed(() => {
   const hasValidCandidates = candidates.value.every((candidate) => candidate.firstName.trim() && candidate.lastName.trim());
@@ -473,6 +571,16 @@ const loadStudentsForSelectedClass = async () => {
   classStudents.value = await studentsBridge.studentRepository.findByClassGroup(store.classGroupId);
 };
 
+const loadReusableTasks = async () => {
+  taskCollectionLoading.value = true;
+  try {
+    const exams = await examRepository?.findAll() ?? [];
+    reusableTaskEntries.value = collectReusableTasks(exams);
+  } finally {
+    taskCollectionLoading.value = false;
+  }
+};
+
 const handleModeChange = () => {
   store.setMode(store.mode);
 };
@@ -516,6 +624,11 @@ const addCandidateGroup = () => {
 
 const removeCandidateGroup = (index: number) => {
   store.candidateGroups.splice(index, 1);
+};
+
+const insertReusableTask = (entry: ReusableTaskEntry) => {
+  store.tasks.push(cloneTaskDraftFromNode(entry.task, entry.childTasks, uuidv4));
+  store.recalculateTaskPoints();
 };
 
 const applySelectedGradingPreset = () => {
@@ -629,7 +742,7 @@ watch(candidates, () => {
 
 onMounted(async () => {
   store.reset();
-  await loadClassGroups();
+  await Promise.all([loadClassGroups(), loadReusableTasks()]);
 
   if (isEditing.value) {
     const id = route.params.id as string;

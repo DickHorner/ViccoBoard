@@ -16,6 +16,9 @@ export interface CriterionDraft {
   id: string
   text: string
   points: number
+  formatting?: ExamsTypes.TextFormatting
+  subCriteria?: ExamsTypes.SubCriterion[]
+  aspectBased?: boolean
 }
 
 export interface TaskDraft {
@@ -23,6 +26,9 @@ export interface TaskDraft {
   title: string
   points: number
   bonusPoints: number
+  reusable: boolean
+  subject: string
+  gradeLevel: string
   isChoice: boolean
   choiceGroup: string
   criteria: CriterionDraft[]
@@ -78,6 +84,9 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     title: '',
     points: 0,
     bonusPoints: 0,
+    reusable: false,
+    subject: '',
+    gradeLevel: '',
     isChoice: false,
     choiceGroup: '',
     criteria: [],
@@ -155,14 +164,21 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
         description: undefined,
         points: taskPoints,
         bonusPoints: Number(task.bonusPoints) || 0,
+        reusable: task.reusable,
+        subject: task.subject.trim() || undefined,
+        gradeLevel: task.gradeLevel.trim() || undefined,
         isChoice: task.isChoice,
         choiceGroup: task.choiceGroup || undefined,
         criteria: task.criteria.map(criterion => ({
           id: criterion.id,
           text: criterion.text.trim() || 'Criterion',
-          formatting: {},
+          formatting: criterion.formatting ?? {},
           points: Number(criterion.points) || 0,
-          aspectBased: false
+          subCriteria: criterion.subCriteria?.map((subCriterion) => ({
+            ...subCriterion,
+            formatting: subCriterion.formatting ?? {}
+          })),
+          aspectBased: criterion.aspectBased ?? false
         })),
         allowComments: false,
         allowSupportTips: false,
@@ -330,12 +346,18 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
           title: task.title,
           points: task.points,
           bonusPoints: task.bonusPoints ?? 0,
+          reusable: task.reusable ?? false,
+          subject: task.subject ?? '',
+          gradeLevel: task.gradeLevel ?? '',
           isChoice: task.isChoice,
           choiceGroup: task.choiceGroup ?? '',
           criteria: task.criteria.map(criterion => ({
             id: criterion.id,
             text: criterion.text,
-            points: criterion.points
+            points: criterion.points,
+            formatting: criterion.formatting,
+            subCriteria: criterion.subCriteria,
+            aspectBased: criterion.aspectBased
           })),
           subtasks: []
         }))
@@ -350,12 +372,18 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
         title: task.title,
         points: task.points,
         bonusPoints: task.bonusPoints ?? 0,
+        reusable: task.reusable ?? false,
+        subject: task.subject ?? '',
+        gradeLevel: task.gradeLevel ?? '',
         isChoice: task.isChoice,
         choiceGroup: task.choiceGroup ?? '',
         criteria: task.criteria.map(criterion => ({
           id: criterion.id,
           text: criterion.text,
-          points: criterion.points
+          points: criterion.points,
+          formatting: criterion.formatting,
+          subCriteria: criterion.subCriteria,
+          aspectBased: criterion.aspectBased
         })),
         subtasks: []
       })

@@ -75,6 +75,13 @@
   gap: 1rem;
 }
 
+.collection-fields {
+  display: grid;
+  grid-template-columns: minmax(140px, auto) 1fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
 label {
   font-weight: 500;
   font-size: 0.9rem;
@@ -157,4 +164,15 @@ input[type="number"] {
   color: var(--color-text-muted, #777);
   font-size: 0.9rem;
   font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .field-grid,
+  .collection-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-fields {
+    align-items: stretch;
+  }
 }

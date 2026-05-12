@@ -168,6 +168,55 @@
   color: var(--color-text-muted, #666);
 }
 
+.collection-count {
+  color: var(--color-text-muted, #666);
+  font-size: 0.9rem;
+}
+
+.collection-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.task-collection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-collection-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 6px;
+  padding: 1rem;
+  background: white;
+}
+
+.task-collection-main {
+  min-width: 0;
+}
+
+.task-collection-main h3 {
+  margin: 0 0 0.5rem;
+}
+
+.task-collection-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  color: var(--color-text-muted, #666);
+  font-size: 0.85rem;
+}
+
+.task-collection-criteria {
+  margin: 0.75rem 0 0;
+  color: var(--color-text, #333);
+}
+
 .candidate-list,
 .group-list {
   display: flex;
@@ -396,6 +445,14 @@
   }
 
   .import-panel {
+    flex-direction: column;
+  }
+
+  .collection-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .task-collection-card {
     flex-direction: column;
   }
 

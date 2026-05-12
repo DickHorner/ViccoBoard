@@ -70,6 +70,9 @@ export interface TaskNode {
   description?: string;
   points: number;
   bonusPoints?: number;
+  reusable?: boolean;
+  subject?: string;
+  gradeLevel?: string;
   isChoice: boolean;
   choiceGroup?: string;
   criteria: Criterion[];

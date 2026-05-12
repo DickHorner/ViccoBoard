@@ -301,6 +301,30 @@ describe('P5-3: examBuilderStore', () => {
   })
 
   describe('KBR-specific metadata', () => {
+    it('preserves reusable task metadata in buildExam and hydrateFromExam', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Sammlung'
+      store.addTask()
+      const task = store.tasks[0]
+      task.title = 'Markierte Aufgabe'
+      task.points = 5
+      task.reusable = true
+      task.subject = 'KBR'
+      task.gradeLevel = '11'
+
+      const exam = store.buildExam()
+      const savedTask = exam.structure.tasks.find((entry) => entry.id === task.id)
+      expect(savedTask?.reusable).toBe(true)
+      expect(savedTask?.subject).toBe('KBR')
+      expect(savedTask?.gradeLevel).toBe('11')
+
+      store.reset()
+      store.hydrateFromExam(exam)
+      expect(store.tasks[0].reusable).toBe(true)
+      expect(store.tasks[0].subject).toBe('KBR')
+      expect(store.tasks[0].gradeLevel).toBe('11')
+    })
+
     it('preserves assessment format and candidate groups in buildExam', () => {
       const store = useExamBuilderStore()
       store.title = 'Gruppenpruefung'

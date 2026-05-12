@@ -101,6 +101,31 @@
       />
     </div>
 
+    <div class="collection-fields">
+      <label class="choice-toggle">
+        <input v-model="task.reusable" type="checkbox" />
+        In die Sammlung
+      </label>
+      <div class="field">
+        <label :for="`task-subject-${task.id}`">Fach</label>
+        <input
+          :id="`task-subject-${task.id}`"
+          v-model="task.subject"
+          type="text"
+          placeholder="z. B. KBR"
+        />
+      </div>
+      <div class="field">
+        <label :for="`task-grade-${task.id}`">Klassenstufe</label>
+        <input
+          :id="`task-grade-${task.id}`"
+          v-model="task.gradeLevel"
+          type="text"
+          placeholder="z. B. 11"
+        />
+      </div>
+    </div>
+
     <div class="criteria-block">
       <div class="panel-header">
         <component :is="criteriaHeaderTag">Kriterien / Erwartungshorizont</component>
