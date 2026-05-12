@@ -133,4 +133,24 @@ describe('ExamRepository', () => {
     expect(byStatus[0].title).toBe('Final');
     expect(byClass[0].candidateGroups[0]?.name).toBe('Gruppe Blau');
   });
+
+  test('persists template metadata without schema columns', async () => {
+    const created = await repository.create({
+      title: 'Essay template',
+      assessmentFormat: 'klausur',
+      mode: Exams.ExamMode.Simple,
+      kind: 'template',
+      sourceTemplateId: 'template-source-1',
+      structure,
+      gradingKey,
+      printPresets: [],
+      candidates: [],
+      candidateGroups: [],
+      status: 'draft'
+    });
+
+    const found = await repository.findById(created.id);
+    expect(found?.kind).toBe('template');
+    expect(found?.sourceTemplateId).toBe('template-source-1');
+  });
 });
