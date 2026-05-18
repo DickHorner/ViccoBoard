@@ -49,6 +49,8 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/sql.js": "^1.4.11"
+    "@types/sql.js": "^1.4.11",
+    "babel-jest": "^29.7.0",
+    "jest-util": "^29.7.0"
   }
 }
