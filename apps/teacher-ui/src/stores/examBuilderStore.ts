@@ -32,6 +32,30 @@ export interface TaskDraft {
   subtasks: TaskDraft[]
 }
 
+export interface ReusableTaskBranch {
+  node: ExamsTypes.TaskNode
+  children: ReusableTaskBranch[]
+}
+
+export interface ReusableTaskCollectionItem {
+  id: string
+  sourceExamId: string
+  sourceExamTitle: string
+  title: string
+  subject: string
+  gradeLevel: string
+  points: number
+  criteriaSummary: string
+  searchText: string
+  task: ReusableTaskBranch
+}
+
+export interface ReusableTaskFilters {
+  subject?: string
+  gradeLevel?: string
+  query?: string
+}
+
 export interface PartDraft {
   id: string
   name: string
@@ -71,6 +95,124 @@ function toTaskDraft(task: ExamsTypes.TaskNode, subtasks: TaskDraft[] = []): Tas
   }
 }
 
+function compareTaskOrder(a: ExamsTypes.TaskNode, b: ExamsTypes.TaskNode): number {
+  return a.order - b.order
+}
+
+function buildTaskChildrenMap(tasks: ExamsTypes.TaskNode[]): Map<string, ExamsTypes.TaskNode[]> {
+  const childrenByParent = new Map<string, ExamsTypes.TaskNode[]>()
+
+  tasks.forEach(task => {
+    if (!task.parentId) return
+    const siblings = childrenByParent.get(task.parentId) ?? []
+    siblings.push(task)
+    childrenByParent.set(task.parentId, siblings)
+  })
+
+  childrenByParent.forEach(children => children.sort(compareTaskOrder))
+  return childrenByParent
+}
+
+function buildReusableTaskBranch(
+  task: ExamsTypes.TaskNode,
+  childrenByParent: Map<string, ExamsTypes.TaskNode[]>
+): ReusableTaskBranch {
+  const children = (childrenByParent.get(task.id) ?? []).map(child =>
+    buildReusableTaskBranch(child, childrenByParent)
+  )
+
+  return {
+    node: task,
+    children
+  }
+}
+
+function collectCriteriaTexts(branch: ReusableTaskBranch): string[] {
+  const ownCriteria = branch.node.criteria.map(criterion => criterion.text).filter(Boolean)
+  return ownCriteria.concat(branch.children.flatMap(collectCriteriaTexts))
+}
+
+function collectSearchSegments(branch: ReusableTaskBranch): string[] {
+  const ownSegments = [branch.node.title, ...branch.node.criteria.map(criterion => criterion.text)]
+  return ownSegments.concat(branch.children.flatMap(collectSearchSegments))
+}
+
+export function collectReusableTasks(exams: ExamsTypes.Exam[]): ReusableTaskCollectionItem[] {
+  const items: ReusableTaskCollectionItem[] = []
+
+  exams.forEach(exam => {
+    const childrenByParent = buildTaskChildrenMap(exam.structure.tasks)
+
+    exam.structure.tasks
+      .filter(task => task.reusable === true)
+      .sort(compareTaskOrder)
+      .forEach(task => {
+        const branch = buildReusableTaskBranch(task, childrenByParent)
+        const criteriaSummary = collectCriteriaTexts(branch).join(' · ')
+
+        items.push({
+          id: `${exam.id}:${task.id}`,
+          sourceExamId: exam.id,
+          sourceExamTitle: exam.title,
+          title: task.title,
+          subject: task.subject ?? '',
+          gradeLevel: task.gradeLevel ?? '',
+          points: task.points,
+          criteriaSummary,
+          searchText: collectSearchSegments(branch).join(' ').toLocaleLowerCase(),
+          task: branch
+        })
+      })
+  })
+
+  return items
+}
+
+export function filterReusableTasks(
+  items: ReusableTaskCollectionItem[],
+  filters: ReusableTaskFilters
+): ReusableTaskCollectionItem[] {
+  const normalizedSubject = filters.subject?.trim().toLocaleLowerCase() ?? ''
+  const normalizedGradeLevel = filters.gradeLevel?.trim().toLocaleLowerCase() ?? ''
+  const normalizedQuery = filters.query?.trim().toLocaleLowerCase() ?? ''
+
+  return items.filter(item => {
+    if (normalizedSubject && item.subject.toLocaleLowerCase() !== normalizedSubject) {
+      return false
+    }
+
+    if (normalizedGradeLevel && item.gradeLevel.toLocaleLowerCase() !== normalizedGradeLevel) {
+      return false
+    }
+
+    if (normalizedQuery && !item.searchText.includes(normalizedQuery)) {
+      return false
+    }
+
+    return true
+  })
+}
+
+export function cloneTaskDraftFromNode(branch: ReusableTaskBranch): TaskDraft {
+  return {
+    id: createUuid(),
+    title: branch.node.title,
+    points: branch.node.points,
+    bonusPoints: branch.node.bonusPoints ?? 0,
+    isChoice: branch.node.isChoice,
+    choiceGroup: branch.node.choiceGroup ?? '',
+    reusable: Boolean(branch.node.reusable),
+    subject: branch.node.subject ?? '',
+    gradeLevel: branch.node.gradeLevel ?? '',
+    criteria: branch.node.criteria.map(criterion => ({
+      id: createUuid(),
+      text: criterion.text,
+      points: criterion.points
+    })),
+    subtasks: branch.children.map(child => cloneTaskDraftFromNode(child))
+  }
+}
+
 export const useExamBuilderStore = defineStore('examBuilder', () => {
   const title = ref('')
   const description = ref('')
@@ -80,6 +222,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
   const tasks = ref<TaskDraft[]>([])
   const parts = ref<PartDraft[]>([])
   const candidateGroups = ref<CandidateGroupDraft[]>([])
+  const reusableTaskLibrary = ref<ReusableTaskCollectionItem[]>([])
   const isEditing = ref(false)
   const createdAt = ref<Date | null>(null)
   const examId = ref<string | undefined>(undefined)
@@ -199,6 +342,15 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     recalculateTaskPoints()
   }
 
+  const canInsertReusableTask = (item: ReusableTaskCollectionItem): boolean => {
+    return mode.value === 'complex' || item.task.children.length === 0
+  }
+
+  const insertReusableTask = (item: ReusableTaskCollectionItem): void => {
+    tasks.value.push(cloneTaskDraftFromNode(item.task))
+    recalculateTaskPoints()
+  }
+
   const addSubtask = (task: TaskDraft, level: 2 | 3): void => {
     if (level === 2 || level === 3) task.subtasks.push(newTask())
     recalculateTaskPoints()
@@ -233,6 +385,12 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
 
   const addPart = (): void => { parts.value.push(newPart()) }
   const removePart = (id: string): void => { parts.value = parts.value.filter(part => part.id !== id) }
+
+  const loadReusableTasks = async (): Promise<void> => {
+    const { examRepository } = useExamsBridge()
+    const exams = await examRepository?.findAll() ?? []
+    reusableTaskLibrary.value = collectReusableTasks(exams)
+  }
 
   const buildExam = (): ExamsTypes.Exam => {
     const now = new Date()
@@ -401,6 +559,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     tasks.value = []
     parts.value = []
     candidateGroups.value = []
+    reusableTaskLibrary.value = []
   }
 
   return {
@@ -412,6 +571,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     tasks,
     parts,
     candidateGroups,
+    reusableTaskLibrary,
     isEditing,
     createdAt,
     examId,
@@ -421,6 +581,8 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     canSave,
     setMode,
     addTask,
+    canInsertReusableTask,
+    insertReusableTask,
     addSubtask,
     removeTask,
     removeNestedTask,
@@ -429,6 +591,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     removeCriterion,
     addPart,
     removePart,
+    loadReusableTasks,
     recalculateTaskPoints,
     getCriteriaConsistencyWarnings,
     buildExam,

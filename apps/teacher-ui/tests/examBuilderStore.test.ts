@@ -10,25 +10,130 @@
  */
 
 import { setActivePinia, createPinia } from 'pinia'
+import type { Exams as ExamsTypes } from '@viccoboard/core'
 
 // Mock vue-router before importing store
 jest.mock('vue-router', () => ({
   useRouter: () => ({ push: jest.fn() }),
 }))
 
+const mockExamRepository = {
+  findAll: jest.fn(),
+  findById: jest.fn(),
+  update: jest.fn(),
+  create: jest.fn()
+}
+
 // Mock useExamsBridge before importing store
 jest.mock('../src/composables/useExamsBridge', () => ({
   useExamsBridge: () => ({
-    saveExam: jest.fn().mockResolvedValue({ id: 'saved-exam-id' }),
-    getExam: jest.fn().mockResolvedValue(null),
+    examRepository: mockExamRepository
   }),
 }))
 
-import { useExamBuilderStore } from '../src/stores/examBuilderStore'
+import {
+  collectReusableTasks,
+  filterReusableTasks,
+  useExamBuilderStore
+} from '../src/stores/examBuilderStore'
+
+const createReusableExam = (): ExamsTypes.Exam => ({
+  id: 'exam-1',
+  title: 'Klassenarbeit Deutsch',
+  assessmentFormat: 'klausur',
+  mode: 'complex',
+  structure: {
+    parts: [],
+    tasks: [
+      {
+        id: 'task-root',
+        level: 1,
+        order: 1,
+        title: 'Erörterung',
+        points: 6,
+        bonusPoints: 1,
+        isChoice: false,
+        reusable: true,
+        subject: 'Deutsch',
+        gradeLevel: '8',
+        criteria: [],
+        allowComments: false,
+        allowSupportTips: false,
+        commentBoxEnabled: false,
+        subtasks: ['task-child']
+      },
+      {
+        id: 'task-child',
+        parentId: 'task-root',
+        level: 2,
+        order: 1,
+        title: 'Material auswerten',
+        points: 6,
+        isChoice: false,
+        reusable: false,
+        subject: 'Deutsch',
+        gradeLevel: '8',
+        criteria: [
+          {
+            id: 'criterion-child',
+            text: 'Analyse der Quelle',
+            formatting: {},
+            points: 6,
+            aspectBased: false
+          }
+        ],
+        allowComments: false,
+        allowSupportTips: false,
+        commentBoxEnabled: false,
+        subtasks: []
+      },
+      {
+        id: 'task-non-reusable',
+        level: 1,
+        order: 2,
+        title: 'Nicht in Sammlung',
+        points: 5,
+        isChoice: false,
+        reusable: false,
+        subject: 'Mathe',
+        gradeLevel: '9',
+        criteria: [],
+        allowComments: false,
+        allowSupportTips: false,
+        commentBoxEnabled: false,
+        subtasks: []
+      }
+    ],
+    allowsComments: false,
+    allowsSupportTips: false,
+    totalPoints: 11
+  },
+  gradingKey: {
+    id: 'grading-key-1',
+    name: 'default',
+    type: 'points',
+    totalPoints: 11,
+    gradeBoundaries: [],
+    roundingRule: { type: 'none', decimalPlaces: 0 },
+    errorPointsToGrade: false,
+    customizable: true,
+    modifiedAfterCorrection: false
+  },
+  printPresets: [],
+  candidates: [],
+  candidateGroups: [],
+  status: 'draft',
+  createdAt: new Date('2026-01-10T00:00:00.000Z'),
+  lastModified: new Date('2026-01-10T00:00:00.000Z')
+})
 
 describe('P5-3: examBuilderStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    mockExamRepository.findAll.mockReset()
+    mockExamRepository.findById.mockReset()
+    mockExamRepository.update.mockReset()
+    mockExamRepository.create.mockReset()
   })
 
   describe('3-level hierarchy', () => {
@@ -422,6 +527,93 @@ describe('P5-3: examBuilderStore', () => {
       expect(reloadedTask.criteria[0].points).toBe(4)
       expect(reloadedTask.criteria[1].text).toBe('Darstellung')
       expect(reloadedTask.criteria[1].points).toBe(6)
+    })
+  })
+
+  describe('reusable task library slice', () => {
+    it('loads only reusable tasks from existing exams into the collection', async () => {
+      const store = useExamBuilderStore()
+      mockExamRepository.findAll.mockResolvedValue([createReusableExam()])
+
+      await store.loadReusableTasks()
+
+      expect(store.reusableTaskLibrary).toHaveLength(1)
+      expect(store.reusableTaskLibrary[0].title).toBe('Erörterung')
+      expect(store.reusableTaskLibrary[0].subject).toBe('Deutsch')
+      expect(store.reusableTaskLibrary[0].gradeLevel).toBe('8')
+    })
+
+    it('filters reusable tasks by subject, grade level, and text query', () => {
+      const additionalExam: ExamsTypes.Exam = {
+        ...createReusableExam(),
+        id: 'exam-2',
+        title: 'Mathearbeit',
+        structure: {
+          ...createReusableExam().structure,
+          tasks: [
+            {
+              id: 'math-root',
+              level: 1,
+              order: 1,
+              title: 'Lineare Funktionen',
+              points: 8,
+              isChoice: false,
+              reusable: true,
+              subject: 'Mathematik',
+              gradeLevel: '9',
+              criteria: [
+                {
+                  id: 'math-criterion',
+                  text: 'Funktionsgleichung bestimmen',
+                  formatting: {},
+                  points: 8,
+                  aspectBased: false
+                }
+              ],
+              allowComments: false,
+              allowSupportTips: false,
+              commentBoxEnabled: false,
+              subtasks: []
+            }
+          ],
+          totalPoints: 8
+        }
+      }
+
+      const items = collectReusableTasks([createReusableExam(), additionalExam])
+
+      expect(filterReusableTasks(items, { subject: 'Deutsch' })).toHaveLength(1)
+      expect(filterReusableTasks(items, { gradeLevel: '9' })).toHaveLength(1)
+      expect(filterReusableTasks(items, { query: 'analyse der quelle' })).toHaveLength(1)
+      expect(filterReusableTasks(items, {
+        subject: 'Deutsch',
+        gradeLevel: '8',
+        query: 'analyse der quelle'
+      })).toHaveLength(1)
+    })
+
+    it('inserts a reusable task as a deep copy with fresh task and criterion ids', () => {
+      const store = useExamBuilderStore()
+      store.setMode('complex')
+      const sourceItem = collectReusableTasks([createReusableExam()])[0]
+      const sourceSnapshot = JSON.parse(JSON.stringify(sourceItem))
+
+      store.insertReusableTask(sourceItem)
+
+      expect(store.tasks).toHaveLength(1)
+      const insertedTask = store.tasks[0]
+
+      expect(insertedTask.id).not.toBe(sourceItem.task.node.id)
+      expect(insertedTask.criteria).toHaveLength(0)
+      expect(insertedTask.subtasks[0].id).not.toBe(sourceItem.task.children[0].node.id)
+      expect(insertedTask.subtasks[0].criteria[0].id).not.toBe(sourceItem.task.children[0].node.criteria[0].id)
+      expect(insertedTask.title).toBe(sourceItem.task.node.title)
+      expect(insertedTask.points).toBe(sourceItem.task.node.points)
+      expect(insertedTask.bonusPoints).toBe(sourceItem.task.node.bonusPoints)
+      expect(insertedTask.subject).toBe(sourceItem.task.node.subject)
+      expect(insertedTask.gradeLevel).toBe(sourceItem.task.node.gradeLevel)
+      expect(insertedTask.subtasks[0].title).toBe(sourceItem.task.children[0].node.title)
+      expect(sourceItem).toEqual(sourceSnapshot)
     })
   })
 })

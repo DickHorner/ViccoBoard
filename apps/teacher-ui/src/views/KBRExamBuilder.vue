@@ -185,6 +185,97 @@
 
       <section class="section">
         <div class="section-header">
+          <div>
+            <h2>Aufgabensammlung</h2>
+            <p class="section-subtitle">
+              Wiederverwendbare Aufgaben aus bestehenden Prüfungen übernehmen.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-library-subject">Fach</label>
+            <select id="task-library-subject" v-model="reusableTaskSubjectFilter">
+              <option value="">Alle Fächer</option>
+              <option
+                v-for="subject in reusableTaskSubjects"
+                :key="subject"
+                :value="subject"
+              >
+                {{ subject }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-library-grade-level">Klassenstufe</label>
+            <select id="task-library-grade-level" v-model="reusableTaskGradeLevelFilter">
+              <option value="">Alle Klassenstufen</option>
+              <option
+                v-for="gradeLevel in reusableTaskGradeLevels"
+                :key="gradeLevel"
+                :value="gradeLevel"
+              >
+                {{ gradeLevel }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-library-search">Suche</label>
+            <input
+              id="task-library-search"
+              v-model="reusableTaskQuery"
+              type="text"
+              placeholder="Titel oder Kriterien durchsuchen"
+            />
+          </div>
+        </div>
+
+        <div v-if="filteredReusableTasks.length === 0" class="empty-state">
+          Noch keine passenden Aufgaben in der Sammlung.
+        </div>
+
+        <div v-else class="task-library-list">
+          <article
+            v-for="item in filteredReusableTasks"
+            :key="item.id"
+            class="task-library-card"
+          >
+            <div class="task-library-card-header">
+              <div>
+                <h3>{{ item.title || 'Ohne Titel' }}</h3>
+                <p class="task-library-origin">Aus: {{ item.sourceExamTitle }}</p>
+              </div>
+              <span class="task-library-points">{{ item.points }} Punkte</span>
+            </div>
+
+            <div class="task-library-meta">
+              <span v-if="item.subject">Fach: {{ item.subject }}</span>
+              <span v-if="item.gradeLevel">Klassenstufe: {{ item.gradeLevel }}</span>
+              <span v-if="item.task.children.length > 0">
+                {{ item.task.children.length }} Teilaufgaben
+              </span>
+            </div>
+
+            <p v-if="item.criteriaSummary" class="task-library-criteria">
+              {{ item.criteriaSummary }}
+            </p>
+
+            <button
+              class="btn-secondary-small"
+              type="button"
+              :disabled="!store.canInsertReusableTask(item)"
+              :title="store.canInsertReusableTask(item) ? 'Aufgabe in die aktuelle Prüfung übernehmen' : 'Im einfachen Modus können nur Aufgaben ohne Teilaufgaben übernommen werden.'"
+              @click="store.insertReusableTask(item)"
+            >
+              In Prüfung übernehmen
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
           <h2>Aufgaben</h2>
           <button @click="store.addTask()" class="btn-small">+ Aufgabe hinzufügen</button>
         </div>
@@ -331,7 +422,10 @@ import { createUuid as uuidv4 } from '@/utils/uuid';
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge';
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge';
 import { useExamsBridge } from '../composables/useExamsBridge';
-import { useExamBuilderStore } from '../stores/examBuilderStore';
+import {
+  filterReusableTasks,
+  useExamBuilderStore
+} from '../stores/examBuilderStore';
 import {
   createCandidateGroup,
   mapStudentToExamCandidate,
@@ -362,6 +456,9 @@ const gradingPresets = KBR_GRADING_PRESETS;
 const selectedGradingPresetId = ref('');
 const preset = ref<Exams.CorrectionSheetPreset>(createDefaultCorrectionSheetPreset('draft'));
 const examDateValue = ref('');
+const reusableTaskSubjectFilter = ref('');
+const reusableTaskGradeLevelFilter = ref('');
+const reusableTaskQuery = ref('');
 const allowsComments = ref(false);
 const allowsSupportTips = ref(false);
 const gradingKeyType = ref<Exams.GradingKeyType>(Exams.GradingKeyType.Points);
@@ -393,6 +490,27 @@ const selectedAssessmentFormatLabel = computed(() =>
 );
 const selectedGradingPresetDescription = computed(() =>
   gradingPresets.find((presetOption: Exams.GradingPreset) => presetOption.id === selectedGradingPresetId.value)?.description ?? ''
+);
+const reusableTaskSubjects = computed(() =>
+  [...new Set(
+    store.reusableTaskLibrary
+      .map((item) => item.subject.trim())
+      .filter((subject) => subject.length > 0)
+  )].sort((a, b) => a.localeCompare(b, 'de'))
+);
+const reusableTaskGradeLevels = computed(() =>
+  [...new Set(
+    store.reusableTaskLibrary
+      .map((item) => item.gradeLevel.trim())
+      .filter((gradeLevel) => gradeLevel.length > 0)
+  )].sort((a, b) => a.localeCompare(b, 'de'))
+);
+const filteredReusableTasks = computed(() =>
+  filterReusableTasks(store.reusableTaskLibrary, {
+    subject: reusableTaskSubjectFilter.value,
+    gradeLevel: reusableTaskGradeLevelFilter.value,
+    query: reusableTaskQuery.value
+  })
 );
 const availableImportStudents = computed(() => {
   const existingStudentIds = new Set(
@@ -634,6 +752,7 @@ watch(candidates, () => {
 onMounted(async () => {
   store.reset();
   await loadClassGroups();
+  await store.loadReusableTasks();
 
   if (isEditing.value) {
     const id = route.params.id as string;
