@@ -565,7 +565,23 @@ export class StudentCsvImportUseCase {
   }
 
   private isValidEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (email.length > 254) {
+      return false;
+    }
+
+    if (email.includes(' ') || email.includes('\t') || email.includes('\n') || email.includes('\r')) {
+      return false;
+    }
+
+    const atIndex = email.indexOf('@');
+    if (atIndex <= 0 || atIndex !== email.lastIndexOf('@')) {
+      return false;
+    }
+
+    const domain = email.slice(atIndex + 1);
+    const dotIndex = domain.lastIndexOf('.');
+
+    return dotIndex > 0 && dotIndex < domain.length - 1;
   }
 
   private getCurrentSchoolYear(referenceDate: Date = new Date()): string {
