@@ -16,7 +16,16 @@ export interface LiveDataBackupFile {
 export interface LiveDataRestoreResult {
   importedStores: number
   skippedStores: string[]
-  importedRecords: number
+  insertedRecords: number
+  mergedRecords: number
+  unchangedRecords: number
+  conflictRecords: number
+}
+
+interface MergeResult {
+  value: unknown
+  changed: boolean
+  conflict: boolean
 }
 
 export async function createLiveDataBackup(): Promise<LiveDataBackupFile> {
@@ -49,8 +58,11 @@ export async function restoreLiveDataBackup(backup: LiveDataBackupFile): Promise
   assertBackupFile(backup)
 
   const db = getStorage().getDatabase()
+  let insertedRecords = 0
+  let mergedRecords = 0
+  let unchangedRecords = 0
+  let conflictRecords = 0
   let importedStores = 0
-  let importedRecords = 0
   const skippedStores: string[] = []
 
   for (const storeBackup of backup.stores) {
@@ -60,13 +72,20 @@ export async function restoreLiveDataBackup(backup: LiveDataBackupFile): Promise
     }
 
     importedStores += 1
-    importedRecords += await putRecords(db, storeBackup.name, storeBackup.records)
+    const result = await restoreChangedRecords(db, storeBackup.name, storeBackup.records)
+    insertedRecords += result.insertedRecords
+    mergedRecords += result.mergedRecords
+    unchangedRecords += result.unchangedRecords
+    conflictRecords += result.conflictRecords
   }
 
   return {
     importedStores,
     skippedStores,
-    importedRecords
+    insertedRecords,
+    mergedRecords,
+    unchangedRecords,
+    conflictRecords
   }
 }
 
@@ -102,27 +121,186 @@ function readAllRecords(db: IDBDatabase, storeName: string): Promise<Array<Recor
   })
 }
 
-function putRecords(
+function restoreChangedRecords(
   db: IDBDatabase,
   storeName: string,
   records: Array<Record<string, unknown>>
-): Promise<number> {
+): Promise<{
+  insertedRecords: number
+  mergedRecords: number
+  unchangedRecords: number
+  conflictRecords: number
+}> {
   if (records.length === 0) {
-    return Promise.resolve(0)
+    return Promise.resolve({
+      insertedRecords: 0,
+      mergedRecords: 0,
+      unchangedRecords: 0,
+      conflictRecords: 0
+    })
   }
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction(storeName, 'readwrite')
     const store = tx.objectStore(storeName)
-    let queued = 0
+    let insertedRecords = 0
+    let mergedRecords = 0
+    let unchangedRecords = 0
+    let conflictRecords = 0
 
-    for (const record of records) {
-      store.put(record)
-      queued += 1
-    }
-
-    tx.oncomplete = () => resolve(queued)
+    tx.oncomplete = () => resolve({ insertedRecords, mergedRecords, unchangedRecords, conflictRecords })
     tx.onerror = () => reject(tx.error)
     tx.onabort = () => reject(tx.error ?? new Error('Die Wiederherstellung wurde abgebrochen.'))
+
+    for (const backupRecord of records) {
+      const id = backupRecord.id
+      if (typeof id !== 'string') {
+        tx.abort()
+        reject(new Error(`Backup-Datensatz in ${storeName} hat keine gültige ID.`))
+        return
+      }
+
+      const getRequest = store.get(id)
+      getRequest.onsuccess = () => {
+        const currentRecord = getRequest.result as Record<string, unknown> | undefined
+        if (!currentRecord) {
+          store.put(backupRecord)
+          insertedRecords += 1
+          return
+        }
+
+        const merge = mergeValue(currentRecord, backupRecord)
+        if (merge.conflict) {
+          conflictRecords += 1
+          return
+        }
+
+        if (!merge.changed) {
+          unchangedRecords += 1
+          return
+        }
+
+        store.put(merge.value as Record<string, unknown>)
+        mergedRecords += 1
+      }
+      getRequest.onerror = () => reject(getRequest.error)
+    }
   })
+}
+
+function mergeValue(current: unknown, incoming: unknown): MergeResult {
+  if (stableStringify(current) === stableStringify(incoming)) {
+    return { value: current, changed: false, conflict: false }
+  }
+
+  if (current === undefined || current === null || current === '') {
+    return { value: incoming, changed: true, conflict: false }
+  }
+
+  if (incoming === undefined || incoming === null || incoming === '') {
+    return { value: current, changed: false, conflict: false }
+  }
+
+  if (Array.isArray(current) && Array.isArray(incoming)) {
+    return mergeArray(current, incoming)
+  }
+
+  if (isPlainRecord(current) && isPlainRecord(incoming)) {
+    return mergeRecord(current, incoming)
+  }
+
+  return { value: current, changed: false, conflict: true }
+}
+
+function mergeRecord(
+  current: Record<string, unknown>,
+  incoming: Record<string, unknown>
+): MergeResult {
+  const merged: Record<string, unknown> = { ...current }
+  let changed = false
+  let conflict = false
+
+  for (const key of Object.keys(incoming)) {
+    const result = mergeValue(current[key], incoming[key])
+    if (result.conflict) {
+      conflict = true
+      continue
+    }
+    if (result.changed) {
+      merged[key] = result.value
+      changed = true
+    }
+  }
+
+  return { value: merged, changed, conflict }
+}
+
+function mergeArray(current: unknown[], incoming: unknown[]): MergeResult {
+  if (canMergeArrayById(current) && canMergeArrayById(incoming)) {
+    return mergeArrayById(current, incoming)
+  }
+
+  const merged = [...current]
+  let changed = false
+
+  for (const incomingItem of incoming) {
+    if (!merged.some((currentItem) => stableStringify(currentItem) === stableStringify(incomingItem))) {
+      merged.push(incomingItem)
+      changed = true
+    }
+  }
+
+  return { value: merged, changed, conflict: false }
+}
+
+function mergeArrayById(current: Array<Record<string, unknown>>, incoming: Array<Record<string, unknown>>): MergeResult {
+  const merged = [...current]
+  let changed = false
+  let conflict = false
+
+  for (const incomingItem of incoming) {
+    const id = incomingItem.id
+    const index = merged.findIndex((currentItem) => currentItem.id === id)
+
+    if (index === -1) {
+      merged.push(incomingItem)
+      changed = true
+      continue
+    }
+
+    const result = mergeRecord(merged[index], incomingItem)
+    if (result.conflict) {
+      conflict = true
+      continue
+    }
+    if (result.changed) {
+      merged[index] = result.value as Record<string, unknown>
+      changed = true
+    }
+  }
+
+  return { value: merged, changed, conflict }
+}
+
+function canMergeArrayById(items: unknown[]): items is Array<Record<string, unknown>> {
+  return items.every((item) => isPlainRecord(item) && typeof item.id === 'string')
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
+function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(',')}]`
+  }
+
+  if (isPlainRecord(value)) {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
+      .join(',')}}`
+  }
+
+  return JSON.stringify(value)
 }
