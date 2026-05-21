@@ -35,7 +35,7 @@ export interface StudentImportCandidate {
   lastName: string;
   className: string;
   classGroupId?: string;
-  dateOfBirth: string;
+  dateOfBirth: string | null;
   gender?: StudentGender;
   email?: string;
   status: 'ready' | 'skip_existing' | 'conflict' | 'invalid';
@@ -62,14 +62,16 @@ interface ParsedStudentRow {
   classLevel: string;
   subClass: string;
   className: string;
-  dateOfBirth: string;
+  dateOfBirth: string | null;
   gender?: StudentGender;
   email?: string;
   validationErrors: string[];
 }
 
-const REQUIRED_HEADERS = ['vorname', 'nachname', 'klasse', 'teilklasse', 'geburtsdatum', 'geschlecht', 'e-mail'];
-const HEADER_ALIASES: Record<string, string[]> = {
+type HeaderIndex = Partial<Record<keyof typeof HEADER_ALIASES, number>>;
+
+const REQUIRED_HEADERS = ['vorname', 'nachname', 'klasse'] as const;
+const HEADER_ALIASES = {
   vorname: ['vorname', 'firstname', 'first_name', 'first name'],
   nachname: ['nachname', 'lastname', 'last_name', 'last name', 'surname'],
   klasse: ['klasse', 'class', 'jahrgang', 'stufe'],
@@ -123,12 +125,14 @@ export class StudentCsvImportUseCase {
       }
 
       if (candidate.status === 'skip_existing') {
-        const existing = await this.studentRepository.findExactIdentityMatch({
-          firstName: candidate.firstName,
-          lastName: candidate.lastName,
-          classGroupId: candidate.classGroupId as string,
-          dateOfBirth: candidate.dateOfBirth
-        });
+        const existing = candidate.dateOfBirth
+          ? await this.studentRepository.findExactIdentityMatch({
+              firstName: candidate.firstName,
+              lastName: candidate.lastName,
+              classGroupId: candidate.classGroupId as string,
+              dateOfBirth: candidate.dateOfBirth
+            })
+          : null;
 
         await this.importBatchItemRepository.create({
           batchId: batch.id,
@@ -172,7 +176,7 @@ export class StudentCsvImportUseCase {
         contactInfo: {
           email: candidate.email
         },
-        legacyDateOfBirthMissing: false
+        legacyDateOfBirthMissing: !candidate.dateOfBirth
       });
 
       await this.importBatchItemRepository.create({
@@ -264,12 +268,14 @@ export class StudentCsvImportUseCase {
         }
 
         const existingClassGroup = classGroupByName.get(row.className.toLowerCase());
-        const existingStudent = await this.studentRepository.findExactIdentityMatch({
-          firstName: row.firstName,
-          lastName: row.lastName,
-          classGroupId: existingClassGroup?.id ?? `missing:${row.className}`,
-          dateOfBirth: row.dateOfBirth
-        });
+        const existingStudent = existingClassGroup && row.dateOfBirth
+          ? await this.studentRepository.findExactIdentityMatch({
+              firstName: row.firstName,
+              lastName: row.lastName,
+              classGroupId: existingClassGroup.id,
+              dateOfBirth: row.dateOfBirth
+            })
+          : null;
 
         const emailMatches = row.email ? await this.studentRepository.findByEmail(row.email) : [];
 
@@ -277,8 +283,8 @@ export class StudentCsvImportUseCase {
         if (candidateIssues.length > 0) {
           status = 'invalid';
         } else if (existingStudent) {
-          const sameEmail = (existingStudent.contactInfo?.email ?? '') === (row.email ?? '');
-          const sameGender = existingStudent.gender === row.gender;
+          const sameEmail = !row.email || (existingStudent.contactInfo?.email ?? '') === row.email;
+          const sameGender = !row.gender || existingStudent.gender === row.gender;
           status = sameEmail && sameGender ? 'skip_existing' : 'conflict';
           if (status === 'conflict') {
             const message = 'Vorhandener Schüler mit abweichenden Stammdaten gefunden';
@@ -360,9 +366,12 @@ export class StudentCsvImportUseCase {
       const lastName = this.getCell(cells, headerIndex.nachname);
       const classLevel = this.getCell(cells, headerIndex.klasse);
       const subClass = this.getCell(cells, headerIndex.teilklasse);
-      const dateOfBirth = this.getCell(cells, headerIndex.geburtsdatum);
-      const gender = normalizeStudentGender(this.getCell(cells, headerIndex.geschlecht));
-      const email = this.getCell(cells, headerIndex['e-mail']);
+      const rawDateOfBirth = this.getCell(cells, headerIndex.geburtsdatum);
+      const rawGender = this.getCell(cells, headerIndex.geschlecht);
+      const rawEmail = this.getCell(cells, headerIndex['e-mail']);
+      const gender = rawGender ? normalizeStudentGender(rawGender) : undefined;
+      const email = rawEmail || undefined;
+      const dateOfBirth = rawDateOfBirth || null;
       const validationErrors: string[] = [];
 
       if (!firstName) {
@@ -380,25 +389,18 @@ export class StudentCsvImportUseCase {
         issues.push({ rowNumber, field: 'klasse', message, severity: 'error' });
         validationErrors.push(message);
       }
-      if (!subClass) {
-        const message = 'Teilklasse fehlt';
-        issues.push({ rowNumber, field: 'teilklasse', message, severity: 'error' });
-        validationErrors.push(message);
-      }
-      if (!dateOfBirth || !isValidDateOnlyString(dateOfBirth)) {
+      if (rawDateOfBirth && !isValidDateOnlyString(rawDateOfBirth)) {
         const message = 'Ungültiges Geburtsdatum';
         issues.push({ rowNumber, field: 'geburtsdatum', message, severity: 'error' });
         validationErrors.push(message);
       }
-      if (!gender) {
+      if (rawGender && !gender) {
         const message = 'Geschlecht muss m oder f sein';
-        issues.push({ rowNumber, field: 'geschlecht', message, severity: 'error' });
-        validationErrors.push(message);
+        issues.push({ rowNumber, field: 'geschlecht', message, severity: 'warning' });
       }
-      if (!email || !this.isValidEmail(email)) {
+      if (email && !this.isValidEmail(email)) {
         const message = 'Ungültige E-Mail';
-        issues.push({ rowNumber, field: 'e-mail', message, severity: 'error' });
-        validationErrors.push(message);
+        issues.push({ rowNumber, field: 'e-mail', message, severity: 'warning' });
       }
 
       parsedRows.push({
@@ -408,10 +410,10 @@ export class StudentCsvImportUseCase {
         lastName,
         classLevel,
         subClass,
-        className: `${classLevel}${subClass}`.trim(),
+        className: subClass ? `${classLevel}${subClass}`.trim() : classLevel.trim(),
         dateOfBirth,
         gender,
-        email,
+        email: email && this.isValidEmail(email) ? email : undefined,
         validationErrors
       });
     }
@@ -419,33 +421,41 @@ export class StudentCsvImportUseCase {
     return parsedRows;
   }
 
-  private resolveHeaders(header: string[], issues: StudentImportIssue[]): Record<string, number> | null {
+  private resolveHeaders(header: string[], issues: StudentImportIssue[]): HeaderIndex | null {
     const normalizedHeader = header.map((cell) => cell.trim().toLowerCase());
-    const result: Record<string, number> = {};
+    const result: HeaderIndex = {};
+
+    for (const [headerName, aliases] of Object.entries(HEADER_ALIASES)) {
+      const index = normalizedHeader.findIndex((entry) => aliases.includes(entry));
+      if (index !== -1) {
+        result[headerName as keyof typeof HEADER_ALIASES] = index;
+      }
+    }
 
     for (const requiredHeader of REQUIRED_HEADERS) {
-      const aliases = HEADER_ALIASES[requiredHeader];
-      const index = normalizedHeader.findIndex((entry) => aliases.includes(entry));
-      if (index === -1) {
+      if (result[requiredHeader] === undefined) {
         issues.push({
           rowNumber: 1,
           field: requiredHeader,
           message: `Pflichtspalte fehlt: ${requiredHeader}`,
           severity: 'error'
         });
-      } else {
-        result[requiredHeader] = index;
       }
     }
 
     return REQUIRED_HEADERS.every((field) => result[field] !== undefined) ? result : null;
   }
 
-  private getCell(cells: string[], index: number): string {
+  private getCell(cells: string[], index?: number): string {
+    if (index === undefined) {
+      return '';
+    }
+
     return (cells[index] ?? '').trim();
   }
 
   private parseCsv(content: string): string[][] {
+    const delimiter = this.detectDelimiter(content);
     const rows: string[][] = [];
     let currentCell = '';
     let currentRow: string[] = [];
@@ -465,7 +475,7 @@ export class StudentCsvImportUseCase {
         continue;
       }
 
-      if (char === ',' && !inQuotes) {
+      if (char === delimiter && !inQuotes) {
         currentRow.push(currentCell);
         currentCell = '';
         continue;
@@ -493,12 +503,23 @@ export class StudentCsvImportUseCase {
     return rows;
   }
 
+  private detectDelimiter(content: string): ',' | ';' | '\t' {
+    const firstLine = content.split(/\r?\n/, 1)[0] ?? '';
+    const candidates: Array<',' | ';' | '\t'> = [',', ';', '\t'];
+    return candidates
+      .map((delimiter) => ({
+        delimiter,
+        count: firstLine.split(delimiter).length
+      }))
+      .sort((left, right) => right.count - left.count)[0]?.delimiter ?? ',';
+  }
+
   private buildIdentityKey(row: ParsedStudentRow): string {
     return [
       row.firstName.trim().toLowerCase(),
       row.lastName.trim().toLowerCase(),
       row.className.trim().toLowerCase(),
-      row.dateOfBirth
+      row.dateOfBirth ?? ''
     ].join('|');
   }
 
