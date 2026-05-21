@@ -14,9 +14,9 @@ export const settingsCards: SettingsCard[] = [
   },
   {
     title: 'Backups & Wiederherstellung',
-    description: 'Export, Import und Backup-Status für die iPad-Safari-Realität.',
-    status: 'in Aufbau',
-    to: null
+    description: 'Export, Import und Backup-Status für lokale Live-Daten.',
+    status: 'verfügbar',
+    to: '/settings/backups'
   },
   {
     title: 'Sprache & Einrichtung',
