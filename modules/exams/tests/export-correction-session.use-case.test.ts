@@ -211,6 +211,73 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(artifact.promptFile.content).toContain('do not invent or replace them');
   });
 
+  it('does not require users to provide Leistung chatRefs before evaluation', () => {
+    const exam: Exams.Exam = {
+      id: 'exam-chatref-matching',
+      title: 'ChatRef Matching',
+      assessmentFormat: 'klausur',
+      mode: Exams.ExamMode.Simple,
+      structure: {
+        parts: [],
+        tasks: [
+          createTask({
+            id: 'task-chatref',
+            level: 1,
+            order: 1,
+            title: 'Aufgabe 1',
+            points: 5
+          })
+        ],
+        allowsComments: false,
+        allowsSupportTips: false,
+        totalPoints: 5
+      },
+      gradingKey: {
+        id: 'grading-key-chatref',
+        name: 'Punkte',
+        type: Exams.GradingKeyType.Points,
+        totalPoints: 5,
+        gradeBoundaries: [],
+        roundingRule: { type: 'none', decimalPlaces: 0 },
+        errorPointsToGrade: false,
+        customizable: true,
+        modifiedAfterCorrection: false
+      },
+      printPresets: [],
+      candidates: [
+        {
+          id: 'candidate-chatref-1',
+          examId: 'exam-chatref-matching',
+          firstName: 'Test',
+          lastName: 'Person'
+        }
+      ],
+      candidateGroups: [],
+      status: 'draft',
+      createdAt: new Date('2026-05-01T08:00:00.000Z'),
+      lastModified: new Date('2026-05-01T08:00:00.000Z')
+    };
+
+    const useCase = new ExportCorrectionSessionArtifactsUseCase();
+    const result = useCase.execute({ exam, sessionId: 'session-chatref' });
+    const exportedInstructions = [
+      result.artifact.contractFile.content,
+      result.artifact.promptFile.content
+    ].join('\n');
+
+    expect(exportedInstructions).not.toContain('must be provided together with the submitted Leistung');
+    expect(exportedInstructions).not.toContain('must be provided in the same message as the uploaded Leistung');
+    expect(exportedInstructions).not.toContain('ask for the Leistung `chatRef`');
+    expect(exportedInstructions).not.toContain('must not be evaluated until the Leistung `chatRef` is provided');
+
+    expect(exportedInstructions).toContain('Upload order is not semantic and must never be used for matching.');
+    expect(exportedInstructions).toContain('upload order is never semantic and must never be used for matching');
+    expect(exportedInstructions).toContain('Identify the matching Leistung `chatRef`');
+    expect(exportedInstructions).toContain('identify the matching Leistung `chatRef`');
+    expect(exportedInstructions).toContain('Do not ask the user to provide a Leistung `chatRef`');
+    expect(exportedInstructions).toContain('do not ask the user to provide a Leistung `chatRef`');
+  });
+
   it('export contains no criteria for tasks without criteria defined', () => {
     const exam: Exams.Exam = {
       id: 'exam-no-criteria',
