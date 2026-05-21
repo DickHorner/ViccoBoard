@@ -183,7 +183,8 @@
             <input
               id="dateOfBirth"
               v-model="newStudent.dateOfBirth"
-              type="date"
+              type="text"
+              placeholder="TT.MM.JJJJ"
               class="form-input"
             />
           </div>

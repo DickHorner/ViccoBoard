@@ -4,7 +4,7 @@
  */
 
 import type { Student, ContactInfo } from '../interfaces/core.types.js';
-import { isValidDateOnlyString } from '../utils/student-helpers.js';
+import { isValidDateOnlyString, parseDateOnlyString } from '../utils/student-helpers.js';
 
 export interface ValidationResult {
   isValid: boolean;
@@ -21,8 +21,8 @@ export interface StudentValidationOptions {
 const DEFAULT_OPTIONS: Required<StudentValidationOptions> = {
   maxNameLength: 200,
   maxEmailLength: 320, // RFC 5321 standard
-  minDateOfBirth: '1900-01-01',
-  maxDateOfBirth: `${new Date().getFullYear() + 10}-12-31`
+  minDateOfBirth: '01.01.1900',
+  maxDateOfBirth: `31.12.${new Date().getFullYear() + 10}`
 };
 
 export class StudentValidator {
@@ -67,10 +67,10 @@ export class StudentValidator {
       errors.push('Date of birth is required');
     } else if (data.dateOfBirth !== null) {
       if (typeof data.dateOfBirth !== 'string' || !isValidDateOnlyString(data.dateOfBirth)) {
-        errors.push('Date of birth must be a valid date in YYYY-MM-DD format');
+        errors.push('Date of birth must be a valid date in DD.MM.YYYY format');
       } else if (
-        data.dateOfBirth < this.options.minDateOfBirth ||
-        data.dateOfBirth > this.options.maxDateOfBirth
+        (parseDateOnlyString(data.dateOfBirth) as Date) < (parseDateOnlyString(this.options.minDateOfBirth) as Date) ||
+        (parseDateOnlyString(data.dateOfBirth) as Date) > (parseDateOnlyString(this.options.maxDateOfBirth) as Date)
       ) {
         errors.push(`Date of birth must be between ${this.options.minDateOfBirth} and ${this.options.maxDateOfBirth}`);
       }

@@ -387,7 +387,7 @@ export class StudentCsvImportUseCase {
       const rawEmail = this.getCell(cells, headerMatch.headers['e-mail']);
       const gender = rawGender ? normalizeStudentGender(rawGender) : undefined;
       const email = rawEmail || undefined;
-      const dateOfBirth = rawDateOfBirth || null;
+      const dateOfBirth = this.normalizeDateOfBirth(rawDateOfBirth);
       const className = options.targetClassName?.trim() || (subClass ? `${classLevel}${subClass}`.trim() : classLevel.trim());
       const validationErrors: string[] = [];
 
@@ -406,7 +406,7 @@ export class StudentCsvImportUseCase {
         issues.push({ rowNumber, field: 'klasse', message, severity: 'error' });
         validationErrors.push(message);
       }
-      if (rawDateOfBirth && !isValidDateOnlyString(rawDateOfBirth)) {
+      if (rawDateOfBirth && !dateOfBirth) {
         const message = 'Ungültiges Geburtsdatum';
         issues.push({ rowNumber, field: 'geburtsdatum', message, severity: 'error' });
         validationErrors.push(message);
@@ -491,6 +491,26 @@ export class StudentCsvImportUseCase {
     }
 
     return (cells[index] ?? '').trim();
+  }
+
+  private normalizeDateOfBirth(value: string): string | null {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    if (isValidDateOnlyString(trimmed)) {
+      return trimmed;
+    }
+
+    const isoDateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
+    if (!isoDateMatch) {
+      return null;
+    }
+
+    const [, year, month, day] = isoDateMatch;
+    const normalized = `${day}.${month}.${year}`;
+    return isValidDateOnlyString(normalized) ? normalized : null;
   }
 
   private parseCsv(content: string): string[][] {

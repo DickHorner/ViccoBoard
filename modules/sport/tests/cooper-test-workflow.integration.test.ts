@@ -93,7 +93,7 @@ describe('Cooper Test Workflow Integration', () => {
         firstName: 'Test',
         lastName: 'Student',
         gender: 'm',
-        dateOfBirth: '2008-03-20'
+        dateOfBirth: '..'
       });
     });
 
@@ -211,7 +211,7 @@ describe('Cooper Test Workflow Integration', () => {
         firstName: 'Swimmer',
         lastName: 'Student',
         gender: 'f',
-        dateOfBirth: '2008-08-12'
+        dateOfBirth: '..'
       });
     });
 
@@ -427,7 +427,7 @@ describe('Cooper Test Workflow Integration', () => {
         firstName: 'Persist',
         lastName: 'Test',
         gender: 'm',
-        dateOfBirth: '2008-11-30'
+        dateOfBirth: '..'
       });
 
       const entry = await performanceRepository.create({

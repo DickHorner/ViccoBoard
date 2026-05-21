@@ -12,7 +12,7 @@ describe('exam candidate utilities', () => {
     id: 'student-1',
     firstName: 'Mia',
     lastName: 'Becker',
-    dateOfBirth: '2010-03-05',
+    dateOfBirth: '..',
     classGroupId: 'class-1',
     createdAt: new Date('2026-01-01T00:00:00Z'),
     lastModified: new Date('2026-01-01T00:00:00Z')

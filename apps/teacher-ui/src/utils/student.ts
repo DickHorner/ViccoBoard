@@ -20,18 +20,18 @@ export const formatDate = (date: Date | string): string => {
 }
 
 /**
- * Format date for input field (YYYY-MM-DD)
+ * Format date for input field (DD.MM.YYYY)
  */
 export const formatDateForInput = (date: Date): string => {
   const d = new Date(date)
-  return d.toISOString().split('T')[0]
+  return formatGermanDate(d)
 }
 
 /**
- * Get current date in YYYY-MM-DD format for max date validation
+ * Get current date in DD.MM.YYYY format for max date validation
  */
 export const getTodayDateString = (): string => {
-  return new Date().toISOString().split('T')[0]
+  return formatGermanDate(new Date())
 }
 
 /**

@@ -45,7 +45,7 @@ describe('SportabzeichenResultRepository', () => {
       firstName: 'Jamie',
       lastName: 'Doe',
       classGroupId: classGroup.id,
-      dateOfBirth: '2012-04-05',
+      dateOfBirth: '..',
       gender: 'f'
     });
 
@@ -76,7 +76,7 @@ describe('SportabzeichenResultRepository', () => {
       firstName: 'Alex',
       lastName: 'Lee',
       classGroupId: classGroup.id,
-      dateOfBirth: '2012-09-11',
+      dateOfBirth: '..',
       gender: 'm'
     });
 

@@ -97,7 +97,7 @@ describe('Sport schema roundtrip', () => {
     const coreStudent = await coreStudentRepository.create({
       firstName: 'Alex',
       lastName: 'Beispiel',
-      dateOfBirth: '2012-04-11',
+      dateOfBirth: '..',
       classGroupId: 'cls2'
     });
 

@@ -277,9 +277,9 @@
               id="student-date-of-birth"
               v-model="studentForm.dateOfBirth"
               class="student-list-page__input"
-              placeholder="YYYY-MM-DD"
+              placeholder="TT.MM.JJJJ"
             />
-            <p class="app-field-hint">Vollständiges Datum im Format YYYY-MM-DD</p>
+            <p class="app-field-hint">Vollständiges Datum im Format TT.MM.JJJJ</p>
           </div>
 
           <div class="app-field">

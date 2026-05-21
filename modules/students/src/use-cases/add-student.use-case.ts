@@ -3,7 +3,7 @@
  * Business logic for adding a student to a class
  */
 
-import { Student } from '@viccoboard/core';
+import { isValidDateOnlyString, Student } from '@viccoboard/core';
 import { StudentRepository } from '../repositories/student.repository.js';
 
 export interface ClassGroupLookup {
@@ -69,13 +69,8 @@ export class AddStudentUseCase {
       }
     }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(input.dateOfBirth)) {
-      throw new Error('Date of birth must use YYYY-MM-DD');
-    }
-
-    const parsedDate = new Date(`${input.dateOfBirth}T00:00:00.000Z`);
-    if (Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== input.dateOfBirth) {
-      throw new Error('Date of birth must be a valid calendar date');
+    if (!isValidDateOnlyString(input.dateOfBirth)) {
+      throw new Error('Date of birth must use DD.MM.YYYY');
     }
 
     if (input.gender && input.gender !== 'm' && input.gender !== 'f') {

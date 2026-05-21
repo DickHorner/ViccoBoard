@@ -31,7 +31,7 @@ const GERMAN_DATE_ONLY_UTC_FORMATTER = new Intl.DateTimeFormat('de-DE', {
 })
 
 function isDateOnlyString(value: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
+  return /^\d{2}\.\d{2}\.\d{4}$/.test(value)
 }
 
 function toDate(value: Date | string): Date {
@@ -40,7 +40,8 @@ function toDate(value: Date | string): Date {
   }
 
   if (isDateOnlyString(value)) {
-    return new Date(`${value}T00:00:00.000Z`)
+    const [day, month, year] = value.split('.').map((part) => Number.parseInt(part, 10))
+    return new Date(Date.UTC(year, month - 1, day))
   }
 
   return new Date(value)
@@ -85,6 +86,10 @@ export function formatGermanTime(
 export function formatGermanDateOfBirth(value: string | null | undefined): string {
   if (!value) {
     return ''
+  }
+
+  if (isDateOnlyString(value)) {
+    return value
   }
 
   return formatGermanDate(value)

@@ -47,7 +47,7 @@ describe('RecordAttendanceUseCase', () => {
     const student = await studentRepository.create({
       firstName: 'Max',
       lastName: 'Mustermann',
-      dateOfBirth: '2012-02-10',
+      dateOfBirth: '..',
       classGroupId: classGroup.id
     });
     testStudentId = student.id;

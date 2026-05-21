@@ -187,7 +187,7 @@ function buildStudent(overrides: Partial<Student> = {}): Student {
     firstName: 'Anna',
     lastName: 'Muster',
     classGroupId: 'class-7a',
-    dateOfBirth: '2012-03-14',
+    dateOfBirth: '14.03.2012',
     gender: 'f',
     contactInfo: {
       email: 'anna.muster@vvb-gym.de'
@@ -209,8 +209,8 @@ describe('StudentCsvImportUseCase', () => {
         fileName: 'students.csv',
         content: [
           'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
-          'Anna,Muster,7,a,2012-03-14,f,anna.muster@vvb-gym.de',
-          'Ben,Beispiel,7,a,2012-08-20,m,ben.beispiel@vvb-gym.de'
+          'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de',
+          'Ben,Beispiel,7,a,20.08.2012,m,ben.beispiel@vvb-gym.de'
         ].join('\n')
       }
     ], 'live', 'Testimport');
@@ -227,6 +227,26 @@ describe('StudentCsvImportUseCase', () => {
     expect(preview.candidates.every((candidate) => candidate.classGroupId === 'class-7a')).toBe(true);
   });
 
+  test('accepts German birth dates from CSV and stores them as date-only strings', async () => {
+    const { useCase } = createUseCase({
+      classGroups: [buildClassGroup('class-7a', '7a')]
+    });
+
+    const preview = await useCase.preview([
+      {
+        fileName: 'students.csv',
+        content: [
+          'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
+          'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de'
+        ].join('\n')
+      }
+    ], 'live', 'German dates');
+
+    expect(preview.summary.errors).toBe(0);
+    expect(preview.candidates[0]?.status).toBe('ready');
+    expect(preview.candidates[0]?.dateOfBirth).toBe('14.03.2012');
+  });
+
   test('marks invalid date, invalid gender and invalid email rows as errors', async () => {
     const { useCase } = createUseCase();
 
@@ -235,7 +255,7 @@ describe('StudentCsvImportUseCase', () => {
         fileName: 'students.csv',
         content: [
           'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
-          'Anna,Muster,7,a,2012-02-31,x,not-an-email'
+          'Anna,Muster,7,a,31.02.2012,x,not-an-email'
         ].join('\n')
       }
     ], 'live', 'Invalid rows');
@@ -256,8 +276,8 @@ describe('StudentCsvImportUseCase', () => {
         fileName: 'students.csv',
         content: [
           'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
-          'Anna,Muster,7,a,2012-03-14,f,anna.muster@vvb-gym.de',
-          'Anna,Muster,7,a,2012-03-14,f,anna.muster@vvb-gym.de'
+          'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de',
+          'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de'
         ].join('\n')
       }
     ], 'live', 'Duplicates');
@@ -276,7 +296,7 @@ describe('StudentCsvImportUseCase', () => {
           id: 'student-conflict',
           firstName: 'Ben',
           lastName: 'Beispiel',
-          dateOfBirth: '2012-08-20',
+          dateOfBirth: '20.08.2012',
           gender: 'm',
           contactInfo: {
             email: 'ben.alt@vvb-gym.de'
@@ -290,8 +310,8 @@ describe('StudentCsvImportUseCase', () => {
         fileName: 'students.csv',
         content: [
           'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
-          'Anna,Muster,7,a,2012-03-14,f,anna.muster@vvb-gym.de',
-          'Ben,Beispiel,7,a,2012-08-20,m,ben.neu@vvb-gym.de'
+          'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de',
+          'Ben,Beispiel,7,a,20.08.2012,m,ben.neu@vvb-gym.de'
         ].join('\n')
       }
     ], 'live', 'Existing data');
@@ -316,8 +336,8 @@ describe('StudentCsvImportUseCase', () => {
         fileName: 'students.csv',
         content: [
           'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
-          'Anna,Muster,7,a,2012-03-14,f,anna.muster@vvb-gym.de',
-          'Ben,Beispiel,7,a,2012-08-20,m,ben.beispiel@vvb-gym.de'
+          'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de',
+          'Ben,Beispiel,7,a,20.08.2012,m,ben.beispiel@vvb-gym.de'
         ].join('\n')
       }
     ], 'live', 'Execution');
@@ -337,7 +357,7 @@ describe('StudentCsvImportUseCase', () => {
       firstName: 'Lena',
       lastName: 'Live',
       classGroupId: existingClass.id,
-      dateOfBirth: '2011-01-10',
+      dateOfBirth: '10.01.2011',
       contactInfo: { email: 'lena.live@school.de' }
     });
 
@@ -356,7 +376,7 @@ describe('StudentCsvImportUseCase', () => {
         fileName: 'demo.csv',
         content: [
           'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
-          'Anna,Muster,7,a,2012-03-14,f,anna.muster@vvb-gym.de'
+          'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de'
         ].join('\n')
       }
     ], 'demo', 'Demo batch');
@@ -366,7 +386,7 @@ describe('StudentCsvImportUseCase', () => {
         fileName: 'live.csv',
         content: [
           'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
-          'Bela,Echt,8,b,2011-09-18,m,bela.echt@school.de'
+          'Bela,Echt,8,b,18.09.2011,m,bela.echt@school.de'
         ].join('\n')
       }
     ], 'live', 'Live batch');

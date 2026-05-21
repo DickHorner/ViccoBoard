@@ -1,4 +1,4 @@
-import { Sport} from '@viccoboard/core';
+import { calculateAgeFromDateOfBirth, Sport} from '@viccoboard/core';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 export interface SportabzeichenPerformanceInput {
@@ -37,25 +37,17 @@ export class SportabzeichenService {
   /**
    * Calculates the age from a birth year relative to a test date.
    * 
-   * @param dateOfBirth - The full date of birth in YYYY-MM-DD format
+   * @param dateOfBirth - The full date of birth in DD.MM.YYYY format
    * @param testDate - The reference date for age calculation (defaults to today)
    * @returns The calculated age as a non-negative integer
    * @throws {Error} If dateOfBirth is not a valid date string
    */
   calculateAgeFromDateOfBirth(dateOfBirth: string, testDate: Date = new Date()): number {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) {
-      throw new Error('Date of birth must use YYYY-MM-DD');
-    }
-    const birthDate = new Date(`${dateOfBirth}T00:00:00.000Z`);
-    if (Number.isNaN(birthDate.getTime())) {
+    const age = calculateAgeFromDateOfBirth(dateOfBirth, testDate);
+    if (age === null) {
       throw new Error('Date of birth must be a valid date');
     }
-    let age = testDate.getUTCFullYear() - birthDate.getUTCFullYear();
-    const monthDelta = testDate.getUTCMonth() - birthDate.getUTCMonth();
-    if (monthDelta < 0 || (monthDelta === 0 && testDate.getUTCDate() < birthDate.getUTCDate())) {
-      age -= 1;
-    }
-    return Math.max(0, age);
+    return age;
   }
 
   /**
@@ -107,7 +99,7 @@ export class SportabzeichenService {
    * @param params - The parameters object containing:
    *   - studentId: Unique identifier for the student
    *   - disciplineId: Unique identifier for the discipline
-   *   - dateOfBirth: Full date of birth in YYYY-MM-DD format
+   *   - dateOfBirth: Full date of birth in DD.MM.YYYY format
    *   - gender: The student's gender (SportabzeichenGender)
    *   - performanceValue: The numeric performance value achieved
    *   - unit: The unit of measurement for the performance (e.g., 'seconds', 'meters')

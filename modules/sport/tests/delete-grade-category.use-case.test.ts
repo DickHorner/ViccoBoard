@@ -53,13 +53,13 @@ describe('DeleteGradeCategoryUseCase', () => {
     const s1 = await studentRepository.create({
       firstName: 'Anna',
       lastName: 'Müller',
-      dateOfBirth: '2012-03-10',
+      dateOfBirth: '..',
       classGroupId
     });
     const s2 = await studentRepository.create({
       firstName: 'Ben',
       lastName: 'Schmidt',
-      dateOfBirth: '2012-07-18',
+      dateOfBirth: '..',
       classGroupId
     });
     studentId1 = s1.id;

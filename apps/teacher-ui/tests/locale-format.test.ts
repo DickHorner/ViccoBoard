@@ -6,11 +6,11 @@ describe('locale-format utilities', () => {
   })
 
   it('formats dates of birth without timezone drift', () => {
-    expect(formatGermanDateOfBirth('2008-09-03')).toBe('03.09.2008')
+    expect(formatGermanDateOfBirth('03.09.2008')).toBe('03.09.2008')
   })
 
-  it('formats 2012-02-10 as 10.02.2012', () => {
-    expect(formatGermanDateOfBirth('2012-02-10')).toBe('10.02.2012')
+  it('keeps German date-only strings as the canonical birth date format', () => {
+    expect(formatGermanDateOfBirth('10.02.2012')).toBe('10.02.2012')
   })
 
   it('returns empty string for null dateOfBirth', () => {
