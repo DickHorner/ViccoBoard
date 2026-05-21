@@ -340,6 +340,34 @@
     >
       <div class="app-form-grid">
         <div class="app-field">
+          <label for="student-import-class-existing">Zielklasse auswählen</label>
+          <Select
+            id="student-import-class-existing"
+            v-model="importClassGroupId"
+            class="student-list-page__input"
+            :options="classOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Aus bestehender Klasse wählen"
+            showClear
+          />
+        </div>
+
+        <div class="app-field">
+          <label for="student-import-class-new">Neue Zielklasse</label>
+          <InputText
+            id="student-import-class-new"
+            v-model="importClassName"
+            class="student-list-page__input"
+            placeholder="z. B. 8b"
+            :disabled="Boolean(importClassGroupId)"
+          />
+          <p class="app-field-hint">
+            Wenn eine Zielklasse gesetzt ist, muss die CSV keine Klasse-/Teilklasse-Spalte enthalten.
+          </p>
+        </div>
+
+        <div class="app-field">
           <label for="student-csv-import">CSV-Datei auswählen</label>
           <input
             id="student-csv-import"
@@ -348,8 +376,8 @@
             @change="handleCsvFileSelection"
           />
           <p class="app-field-hint">
-            Pflichtspalten: Vorname, Nachname, Klasse. Optional: Teilklasse, Geburtsdatum, Geschlecht, E-Mail.
-            Komma, Semikolon und Tab werden erkannt.
+            Die Kopfzeile darf in Zeile 2 stehen. Pflichtspalten: Vorname, Nachname; Klasse nur, wenn oben keine Zielklasse gewählt ist.
+            Optional: Geburtsdatum, Geschlecht, E-Mail. Komma, Semikolon und Tab werden erkannt.
           </p>
         </div>
 
@@ -454,6 +482,8 @@ const {
   emptyStateMessage,
   genderStats,
   importPreview,
+  importClassGroupId,
+  importClassName,
   loadData,
   resetFilters,
   openCreateDialog,
