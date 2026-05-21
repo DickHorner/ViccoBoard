@@ -70,6 +70,8 @@ export function useStudentListView() {
   const importPreview = ref<StudentImportPreview | null>(null);
   const importLabel = ref('');
   const importSourceType = ref<'demo' | 'live'>('live');
+  const importClassGroupId = ref<string | null>(null);
+  const importClassName = ref('');
 
   const defaultStudentForm = (): StudentFormState => ({
     firstName: '',
@@ -90,6 +92,11 @@ export function useStudentListView() {
       value: classGroup.id
     }))
   );
+
+  const selectedImportClassName = computed(() => {
+    const existing = classes.value.find((classGroup) => classGroup.id === importClassGroupId.value);
+    return existing?.name ?? importClassName.value.trim();
+  });
 
   const genderOptions = computed(() => [
     { label: t('SCHUELER.maennlich'), value: 'm' as const },
@@ -313,6 +320,8 @@ export function useStudentListView() {
     importPreview.value = null;
     importLabel.value = '';
     importSourceType.value = 'live';
+    importClassGroupId.value = null;
+    importClassName.value = '';
   }
 
   async function previewImport(files: StudentCsvFile[], sourceType: 'demo' | 'live', label: string) {
@@ -321,7 +330,9 @@ export function useStudentListView() {
       pendingImportFiles.value = files;
       importSourceType.value = sourceType;
       importLabel.value = label;
-      importPreview.value = await studentsBridge.studentCsvImportUseCase.preview(files, sourceType, label);
+      importPreview.value = await studentsBridge.studentCsvImportUseCase.preview(files, sourceType, label, {
+        targetClassName: selectedImportClassName.value || undefined
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Fehler bei der Importvorschau');
     } finally {
@@ -360,7 +371,8 @@ export function useStudentListView() {
       const result = await studentsBridge.studentCsvImportUseCase.execute(
         pendingImportFiles.value,
         importSourceType.value,
-        importLabel.value
+        importLabel.value,
+        { targetClassName: selectedImportClassName.value || undefined }
       );
       toast.success(
         `${result.summary.imported} importiert, ${result.summary.skipped} übersprungen, ${result.summary.conflicts} Konflikte`
@@ -421,6 +433,8 @@ export function useStudentListView() {
     emptyStateMessage,
     genderStats,
     importPreview,
+    importClassGroupId,
+    importClassName,
     loadData,
     resetFilters,
     openCreateDialog,
