@@ -1,8 +1,6 @@
 import type {
   ClassGroup,
   ImportBatch,
-  ImportBatchItem,
-  Student,
   StudentGender
 } from '@viccoboard/core';
 import { normalizeStudentGender, isValidDateOnlyString } from '@viccoboard/core';
@@ -70,9 +68,6 @@ interface ParsedStudentRow {
   validationErrors: string[];
 }
 
-type HeaderIndex = Partial<Record<keyof typeof HEADER_ALIASES, number>>;
-
-const REQUIRED_HEADERS = ['vorname', 'nachname'] as const;
 const HEADER_ALIASES = {
   vorname: ['vorname', 'firstname', 'first_name', 'first name'],
   nachname: ['nachname', 'lastname', 'last_name', 'last name', 'surname'],
@@ -82,6 +77,10 @@ const HEADER_ALIASES = {
   geschlecht: ['geschlecht', 'gender', 'sex'],
   'e-mail': ['e-mail', 'email', 'mail']
 };
+
+type HeaderIndex = Partial<Record<keyof typeof HEADER_ALIASES, number>>;
+
+const REQUIRED_HEADERS = ['vorname', 'nachname'] as const;
 
 export class StudentCsvImportUseCase {
   constructor(
@@ -542,12 +541,16 @@ export class StudentCsvImportUseCase {
   }
 
   private detectDelimiter(content: string): ',' | ';' | '\t' {
-    const firstHeaderCandidate = content.split(/\r?\n/).find((line) => line.trim()) ?? '';
+    const lines = content
+      .split(/\r?\n/)
+      .filter((line) => line.trim())
+      .slice(0, 5);
     const candidates: Array<',' | ';' | '\t'> = [',', ';', '\t'];
+
     return candidates
       .map((delimiter) => ({
         delimiter,
-        count: firstHeaderCandidate.split(delimiter).length
+        count: Math.max(...lines.map((line) => line.split(delimiter).length), 1)
       }))
       .sort((left, right) => right.count - left.count)[0]?.delimiter ?? ',';
   }
