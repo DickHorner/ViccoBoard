@@ -1,6 +1,4 @@
-import { getStorage } from './storage.service'
-
-const VICCOBOARD_DATABASE_NAME = 'viccoboard'
+import { getStorage, VICCOBOARD_DATABASE_NAME } from './storage.service'
 
 export interface LiveDataBackupStore {
   name: string
