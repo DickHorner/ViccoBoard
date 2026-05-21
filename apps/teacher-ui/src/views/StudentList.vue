@@ -348,7 +348,8 @@
             @change="handleCsvFileSelection"
           />
           <p class="app-field-hint">
-            Pflichtspalten: Vorname, Nachname, Klasse, Teilklasse, Geburtsdatum, Geschlecht, E-Mail
+            Pflichtspalten: Vorname, Nachname, Klasse. Optional: Teilklasse, Geburtsdatum, Geschlecht, E-Mail.
+            Komma, Semikolon und Tab werden erkannt.
           </p>
         </div>
 
