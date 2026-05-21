@@ -29,7 +29,10 @@
 
       <article class="backup-card">
         <h2>Backup wiederherstellen</h2>
-        <p>Importiert eine ViccoBoard-Backup-Datei. Es werden keine Stores geleert.</p>
+        <p>
+          Importiert eine ViccoBoard-Backup-Datei differenziell. Neue Datensätze werden ergänzt,
+          nicht geänderte Datensätze bleiben unberührt.
+        </p>
         <input
           type="file"
           accept="application/json,.json"
@@ -104,10 +107,16 @@ async function handleRestoreFile(event: Event): Promise<void> {
 
     const backup = parseLiveDataBackup(await file.text())
     const result = await restoreLiveDataBackup(backup)
-    statusMessage.value = `${result.importedRecords} Datensätze aus ${result.importedStores} Bereichen importiert.`
+    statusMessage.value = [
+      `${result.insertedRecords} neu`,
+      `${result.mergedRecords} ergänzt`,
+      `${result.unchangedRecords} unverändert`,
+      `${result.conflictRecords} Konflikte`,
+      `${result.importedStores} Bereiche geprüft`
+    ].join(' · ')
 
     if (result.skippedStores.length > 0) {
-      statusMessage.value += ` Übersprungen: ${result.skippedStores.join(', ')}.`
+      statusMessage.value += ` · Übersprungen: ${result.skippedStores.join(', ')}`
     }
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Backup konnte nicht importiert werden.'
