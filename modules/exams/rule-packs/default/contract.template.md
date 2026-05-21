@@ -15,11 +15,11 @@
 
 ## Matching Rule
 
-- Each submitted Leistung must be explicitly associated with exactly one Leistung `chatRef`.
-- The Leistung `chatRef` must be provided together with the submitted Leistung or immediately before it.
+- Identify the matching Leistung `chatRef` from the submitted Leistung itself and the `Chat References` list.
 - Upload order is not semantic and must never be used for matching.
-- Do not match by candidate order, file position, file name, personal name, candidate ID, or student ID.
-- If a submitted Leistung has no unambiguous Leistung `chatRef`, it must not be evaluated until the Leistung `chatRef` is provided.
+- Do not ask the user to provide a Leistung `chatRef` before evaluating a submitted Leistung.
+- Do not match by candidate order, file position, file name, personal name, candidate ID, or student ID alone.
+- If a submitted Leistung cannot be matched to exactly one Leistung `chatRef`, state the ambiguity in one short plain-text line.
 - Returned correction data must be matched back only by Leistung `chatRef`.
 
 ## Expected Return Format
