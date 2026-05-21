@@ -83,11 +83,11 @@ const DEFAULT_CONTRACT_TEMPLATE = `# Correction Session Contract
 
 ## Matching Rule
 
-- Each submitted Leistung must be explicitly associated with exactly one Leistung \`chatRef\`.
-- The Leistung \`chatRef\` must be provided together with the submitted Leistung or immediately before it.
+- Identify the matching Leistung \`chatRef\` from the submitted Leistung itself and the \`Chat References\` list.
 - Upload order is not semantic and must never be used for matching.
-- Do not match by candidate order, file position, file name, personal name, candidate ID, or student ID.
-- If a submitted Leistung has no unambiguous Leistung \`chatRef\`, it must not be evaluated until the Leistung \`chatRef\` is provided.
+- Do not ask the user to provide a Leistung \`chatRef\` before evaluating a submitted Leistung.
+- Do not match by candidate order, file position, file name, personal name, candidate ID, or student ID alone.
+- If a submitted Leistung cannot be matched to exactly one Leistung \`chatRef\`, state the ambiguity in one short plain-text line.
 - Returned correction data must be matched back only by Leistung \`chatRef\`.
 
 ## Expected Return Format
@@ -129,7 +129,7 @@ Session workflow (generic and strict):
 - process exactly one Leistung at a time
 - keep each Leistung isolated; do not mix data between Leistungen
 - use only Leistung \`chatRef\` values from the contract's \`Chat References\` list as external references for submitted Leistungen
-- do not use names, candidate IDs, student IDs, or other personal identifiers
+- do not use names, candidate IDs, student IDs, or other personal identifiers in structured outputs
 - use only the supplied contract structure for all structured outputs
 - do not invent assessment metadata, fields, labels, scoring dimensions, or identifiers that are not present in the loaded contract or rules
 - emit importable task scores and evidence only when supported by the loaded rules
@@ -144,12 +144,12 @@ Chat reference roles:
 - never write the \`Session Chat Reference\` into the import bundle top-level \`chatRef\`
 
 Matching rule:
-- each uploaded Leistung must have exactly one explicit Leistung \`chatRef\`
-- the Leistung \`chatRef\` must be provided in the same message as the uploaded Leistung or immediately before it
+- identify the matching Leistung \`chatRef\` from the submitted Leistung itself and the contract's \`Chat References\` list
 - upload order is never semantic and must never be used for matching
-- do not infer Leistung \`chatRef\` from candidate order, file position, file name, personal name, candidate ID, or student ID
-- if no unambiguous Leistung \`chatRef\` is provided, ask for the Leistung \`chatRef\` and do not evaluate the Leistung yet
-- every stored result and every export must use the explicit Leistung \`chatRef\` of that Leistung
+- do not ask the user to provide a Leistung \`chatRef\` before evaluating a submitted Leistung
+- do not match by candidate order, file position, file name, personal name, candidate ID, or student ID alone
+- if the submitted Leistung cannot be matched to exactly one Leistung \`chatRef\`, state that it could not be matched unambiguously and do not evaluate it yet
+- every stored result and every export must use the matched Leistung \`chatRef\` of that Leistung
 
 Control commands in this session:
 - \`Zwischenexport\`: output current result state for the active Leistung \`chatRef\`
