@@ -21,6 +21,10 @@ export interface StudentCsvFile {
   content: string;
 }
 
+export interface StudentCsvImportOptions {
+  targetClassName?: string;
+}
+
 export interface StudentImportIssue {
   rowNumber: number;
   field: string;
@@ -59,8 +63,6 @@ interface ParsedStudentRow {
   fileName: string;
   firstName: string;
   lastName: string;
-  classLevel: string;
-  subClass: string;
   className: string;
   dateOfBirth: string | null;
   gender?: StudentGender;
@@ -70,7 +72,7 @@ interface ParsedStudentRow {
 
 type HeaderIndex = Partial<Record<keyof typeof HEADER_ALIASES, number>>;
 
-const REQUIRED_HEADERS = ['vorname', 'nachname', 'klasse'] as const;
+const REQUIRED_HEADERS = ['vorname', 'nachname'] as const;
 const HEADER_ALIASES = {
   vorname: ['vorname', 'firstname', 'first_name', 'first name'],
   nachname: ['nachname', 'lastname', 'last_name', 'last name', 'surname'],
@@ -89,12 +91,22 @@ export class StudentCsvImportUseCase {
     private importBatchItemRepository: ImportBatchItemRepository
   ) {}
 
-  async preview(files: StudentCsvFile[], sourceType: 'demo' | 'live', label: string): Promise<StudentImportPreview> {
-    return this.buildPreview(files, sourceType, label);
+  async preview(
+    files: StudentCsvFile[],
+    sourceType: 'demo' | 'live',
+    label: string,
+    options: StudentCsvImportOptions = {}
+  ): Promise<StudentImportPreview> {
+    return this.buildPreview(files, sourceType, label, options);
   }
 
-  async execute(files: StudentCsvFile[], sourceType: 'demo' | 'live', label: string): Promise<StudentImportExecutionResult> {
-    const preview = await this.buildPreview(files, sourceType, label);
+  async execute(
+    files: StudentCsvFile[],
+    sourceType: 'demo' | 'live',
+    label: string,
+    options: StudentCsvImportOptions = {}
+  ): Promise<StudentImportExecutionResult> {
+    const preview = await this.buildPreview(files, sourceType, label, options);
 
     const batch = await this.importBatchRepository.create({
       sourceType,
@@ -102,7 +114,8 @@ export class StudentCsvImportUseCase {
       label,
       summary: preview.summary,
       metadata: {
-        files: files.map((file) => file.fileName)
+        files: files.map((file) => file.fileName),
+        targetClassName: options.targetClassName
       }
     });
 
@@ -239,7 +252,8 @@ export class StudentCsvImportUseCase {
   private async buildPreview(
     files: StudentCsvFile[],
     sourceType: 'demo' | 'live',
-    label: string
+    label: string,
+    options: StudentCsvImportOptions
   ): Promise<StudentImportPreview> {
     const issues: StudentImportIssue[] = [];
     const candidates: StudentImportCandidate[] = [];
@@ -249,7 +263,7 @@ export class StudentCsvImportUseCase {
     const seenKeys = new Map<string, number>();
 
     for (const file of files) {
-      const parsed = this.parseCsvFile(file, issues);
+      const parsed = this.parseCsvFile(file, issues, options);
       for (const row of parsed) {
         const candidateIssues = [...row.validationErrors];
         const identityKey = this.buildIdentityKey(row);
@@ -342,36 +356,40 @@ export class StudentCsvImportUseCase {
     };
   }
 
-  private parseCsvFile(file: StudentCsvFile, issues: StudentImportIssue[]): ParsedStudentRow[] {
+  private parseCsvFile(
+    file: StudentCsvFile,
+    issues: StudentImportIssue[],
+    options: StudentCsvImportOptions
+  ): ParsedStudentRow[] {
     const rows = this.parseCsv(file.content);
     if (rows.length === 0) {
       return [];
     }
 
-    const header = rows[0].map((entry) => entry.trim());
-    const headerIndex = this.resolveHeaders(header, issues);
-    if (!headerIndex) {
+    const headerMatch = this.findHeaderRow(rows, issues, Boolean(options.targetClassName?.trim()));
+    if (!headerMatch) {
       return [];
     }
 
     const parsedRows: ParsedStudentRow[] = [];
-    for (let rowIndex = 1; rowIndex < rows.length; rowIndex += 1) {
+    for (let rowIndex = headerMatch.rowIndex + 1; rowIndex < rows.length; rowIndex += 1) {
       const cells = rows[rowIndex];
       if (cells.every((cell) => cell.trim() === '')) {
         continue;
       }
 
       const rowNumber = rowIndex + 1;
-      const firstName = this.getCell(cells, headerIndex.vorname);
-      const lastName = this.getCell(cells, headerIndex.nachname);
-      const classLevel = this.getCell(cells, headerIndex.klasse);
-      const subClass = this.getCell(cells, headerIndex.teilklasse);
-      const rawDateOfBirth = this.getCell(cells, headerIndex.geburtsdatum);
-      const rawGender = this.getCell(cells, headerIndex.geschlecht);
-      const rawEmail = this.getCell(cells, headerIndex['e-mail']);
+      const firstName = this.getCell(cells, headerMatch.headers.vorname);
+      const lastName = this.getCell(cells, headerMatch.headers.nachname);
+      const classLevel = this.getCell(cells, headerMatch.headers.klasse);
+      const subClass = this.getCell(cells, headerMatch.headers.teilklasse);
+      const rawDateOfBirth = this.getCell(cells, headerMatch.headers.geburtsdatum);
+      const rawGender = this.getCell(cells, headerMatch.headers.geschlecht);
+      const rawEmail = this.getCell(cells, headerMatch.headers['e-mail']);
       const gender = rawGender ? normalizeStudentGender(rawGender) : undefined;
       const email = rawEmail || undefined;
       const dateOfBirth = rawDateOfBirth || null;
+      const className = options.targetClassName?.trim() || (subClass ? `${classLevel}${subClass}`.trim() : classLevel.trim());
       const validationErrors: string[] = [];
 
       if (!firstName) {
@@ -384,7 +402,7 @@ export class StudentCsvImportUseCase {
         issues.push({ rowNumber, field: 'nachname', message, severity: 'error' });
         validationErrors.push(message);
       }
-      if (!classLevel) {
+      if (!className) {
         const message = 'Klasse fehlt';
         issues.push({ rowNumber, field: 'klasse', message, severity: 'error' });
         validationErrors.push(message);
@@ -408,9 +426,7 @@ export class StudentCsvImportUseCase {
         fileName: file.fileName,
         firstName,
         lastName,
-        classLevel,
-        subClass,
-        className: subClass ? `${classLevel}${subClass}`.trim() : classLevel.trim(),
+        className,
         dateOfBirth,
         gender,
         email: email && this.isValidEmail(email) ? email : undefined,
@@ -421,7 +437,31 @@ export class StudentCsvImportUseCase {
     return parsedRows;
   }
 
-  private resolveHeaders(header: string[], issues: StudentImportIssue[]): HeaderIndex | null {
+  private findHeaderRow(
+    rows: string[][],
+    issues: StudentImportIssue[],
+    hasTargetClassName: boolean
+  ): { rowIndex: number; headers: HeaderIndex } | null {
+    const rowsToInspect = rows.slice(0, Math.min(rows.length, 5));
+
+    for (let rowIndex = 0; rowIndex < rowsToInspect.length; rowIndex += 1) {
+      const headers = this.resolveHeaders(rowsToInspect[rowIndex], hasTargetClassName);
+      if (headers) {
+        return { rowIndex, headers };
+      }
+    }
+
+    const required = hasTargetClassName ? 'vorname, nachname' : 'vorname, nachname, klasse';
+    issues.push({
+      rowNumber: 1,
+      field: 'header',
+      message: `Keine passende Kopfzeile gefunden. Erwartete Spalten: ${required}`,
+      severity: 'error'
+    });
+    return null;
+  }
+
+  private resolveHeaders(header: string[], hasTargetClassName: boolean): HeaderIndex | null {
     const normalizedHeader = header.map((cell) => cell.trim().toLowerCase());
     const result: HeaderIndex = {};
 
@@ -432,18 +472,16 @@ export class StudentCsvImportUseCase {
       }
     }
 
-    for (const requiredHeader of REQUIRED_HEADERS) {
-      if (result[requiredHeader] === undefined) {
-        issues.push({
-          rowNumber: 1,
-          field: requiredHeader,
-          message: `Pflichtspalte fehlt: ${requiredHeader}`,
-          severity: 'error'
-        });
-      }
+    const hasRequiredHeaders = REQUIRED_HEADERS.every((field) => result[field] !== undefined);
+    if (!hasRequiredHeaders) {
+      return null;
     }
 
-    return REQUIRED_HEADERS.every((field) => result[field] !== undefined) ? result : null;
+    if (!hasTargetClassName && result.klasse === undefined) {
+      return null;
+    }
+
+    return result;
   }
 
   private getCell(cells: string[], index?: number): string {
@@ -504,12 +542,12 @@ export class StudentCsvImportUseCase {
   }
 
   private detectDelimiter(content: string): ',' | ';' | '\t' {
-    const firstLine = content.split(/\r?\n/, 1)[0] ?? '';
+    const firstHeaderCandidate = content.split(/\r?\n/).find((line) => line.trim()) ?? '';
     const candidates: Array<',' | ';' | '\t'> = [',', ';', '\t'];
     return candidates
       .map((delimiter) => ({
         delimiter,
-        count: firstLine.split(delimiter).length
+        count: firstHeaderCandidate.split(delimiter).length
       }))
       .sort((left, right) => right.count - left.count)[0]?.delimiter ?? ',';
   }
