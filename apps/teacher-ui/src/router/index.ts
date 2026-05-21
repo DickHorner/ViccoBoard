@@ -35,6 +35,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Einstellungen', parent: '/' }
   },
   {
+    path: '/settings/backups',
+    name: 'backup-restore',
+    component: () => import('../views/BackupRestoreView.vue'),
+    meta: { title: 'Backups & Wiederherstellung', parent: '/settings' }
+  },
+  {
     path: '/settings/catalogs',
     name: 'catalog-management',
     component: () => import('../views/CatalogManagement.vue'),

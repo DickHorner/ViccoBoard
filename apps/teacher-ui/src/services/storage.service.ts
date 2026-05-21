@@ -1,11 +1,3 @@
-/**
- * Storage Service
- * Initializes and manages @viccoboard/storage for the UI
- * This is the ONLY place where storage should be initialized in the app
- * 
- * ARCHITECTURE: Provides shared storage instance to all composables/bridges
- */
-
 import {
   IndexedDBStorage,
   IndexedDBInitialSchemaMigration,
@@ -30,24 +22,21 @@ import {
 } from '@viccoboard/storage/browser';
 import type { StorageAdapter } from '@viccoboard/storage/browser';
 
+export const VICCOBOARD_DATABASE_NAME = 'viccoboard';
+
 let storageInstance: IndexedDBStorage | null = null;
 let storageInitialized = false;
 
-/**
- * Initialize storage (should be called in main.ts or App.vue setup)
- */
 export async function initializeStorage(): Promise<StorageAdapter> {
   if (storageInitialized && storageInstance) {
     return storageInstance.getAdapter();
   }
 
-  // Create storage instance
   const storage = new IndexedDBStorage({
-    databaseName: 'viccoboard',
+    databaseName: VICCOBOARD_DATABASE_NAME,
     version: 1
   });
 
-  // Register IndexedDB migrations (keeps schema aligned with package migrations)
   storage.registerMigration(new IndexedDBInitialSchemaMigration());
   storage.registerMigration(new IndexedDBGradingSchemaMigration());
   storage.registerMigration(new IndexedDBShuttleRunSchemaMigration());
@@ -68,8 +57,6 @@ export async function initializeStorage(): Promise<StorageAdapter> {
   storage.registerMigration(new IndexedDBStudentImportBatchesMigration());
   storage.registerMigration(new IndexedDBLessonScheduleFieldsMigration());
 
-  // Initialize with empty password (no encryption yet)
-  // TODO: Implement proper encryption/password in Phase X
   await storage.initialize('');
 
   storageInstance = storage;
@@ -78,9 +65,6 @@ export async function initializeStorage(): Promise<StorageAdapter> {
   return storage.getAdapter();
 }
 
-/**
- * Get initialized storage instance
- */
 export function getStorage(): IndexedDBStorage {
   if (!storageInstance) {
     throw new Error(
@@ -90,16 +74,10 @@ export function getStorage(): IndexedDBStorage {
   return storageInstance;
 }
 
-/**
- * Get storage adapter (for repositories)
- */
 export function getStorageAdapter(): StorageAdapter {
   return getStorage().getAdapter();
 }
 
-/**
- * Close storage (for cleanup)
- */
 export async function closeStorage(): Promise<void> {
   if (storageInstance) {
     await storageInstance.close();
@@ -108,9 +86,6 @@ export async function closeStorage(): Promise<void> {
   }
 }
 
-/**
- * Check if storage is initialized
- */
 export function isStorageInitialized(): boolean {
   return storageInitialized && storageInstance !== null;
 }
