@@ -149,7 +149,7 @@
           <Column field="firstName" :header="t('SCHUELER.name')" sortable>
             <template #body="{ data }">
               <div class="student-list-page__name-cell">
-                <span class="student-list-page__name">{{ data.firstName }} {{ data.lastName }}</span>
+                <span class="student-list-page__name">{{ data.firstName }}</span>
                 <small>{{ data.id }}</small>
               </div>
             </template>
