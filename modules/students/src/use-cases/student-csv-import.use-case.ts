@@ -413,11 +413,13 @@ export class StudentCsvImportUseCase {
       }
       if (rawGender && !gender) {
         const message = 'Geschlecht muss m oder f sein';
-        issues.push({ rowNumber, field: 'geschlecht', message, severity: 'warning' });
+        issues.push({ rowNumber, field: 'geschlecht', message, severity: 'error' });
+        validationErrors.push(message);
       }
       if (email && !this.isValidEmail(email)) {
         const message = 'Ungültige E-Mail';
-        issues.push({ rowNumber, field: 'e-mail', message, severity: 'warning' });
+        issues.push({ rowNumber, field: 'e-mail', message, severity: 'error' });
+        validationErrors.push(message);
       }
 
       parsedRows.push({
