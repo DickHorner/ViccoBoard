@@ -12,6 +12,11 @@ export interface CorrectionSessionReferenceMaps {
   scoringUnitKeyByRef: Record<string, string>;
 }
 
+export interface CorrectionSessionChatReferenceEntry {
+  chatRef: string;
+  candidateLabel: string;
+}
+
 type ScoringTaskSelection = Exams.CorrectionSessionRules['taskSelection'];
 
 function sanitizeReferenceToken(value: string, fallback: string): string {
@@ -516,4 +521,12 @@ export function renderCorrectionSessionChatRefs(chatRefs: string[]): string {
   }
 
   return chatRefs.map((chatRef) => `- ${chatRef}`).join('\n');
+}
+
+export function renderCorrectionSessionChatReferenceEntries(entries: CorrectionSessionChatReferenceEntry[]): string {
+  if (entries.length === 0) {
+    return '_No chat references available._';
+  }
+
+  return entries.map((entry) => `- ${entry.chatRef}: ${entry.candidateLabel}`).join('\n');
 }

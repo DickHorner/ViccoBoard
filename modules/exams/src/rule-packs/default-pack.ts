@@ -77,18 +77,19 @@ const DEFAULT_CONTRACT_TEMPLATE = `# Correction Session Contract
 ## Chat Reference Roles
 
 - \`Session Chat Reference\` identifies this correction session/contract.
-- Leistung chatRefs identify individual submitted Leistungen and are listed under \`Chat References\`.
-- The import bundle top-level \`chatRef\` must always be a Leistung chatRef from the \`Chat References\` list, for example \`chat-0001\`.
+- Leistung chatRefs are internal import/export keys for submitted Leistungen and are listed under \`Chat References\`.
+- The import bundle top-level \`chatRef\` must always be the resolved Leistung chatRef from the \`Chat References\` list, for example \`chat-0001\`.
 - Never use the \`Session Chat Reference\` as the import bundle top-level \`chatRef\`.
 
 ## Matching Rule
 
-- Each submitted Leistung must be explicitly associated with exactly one Leistung \`chatRef\`.
-- The Leistung \`chatRef\` must be provided together with the submitted Leistung or immediately before it.
-- Upload order is not semantic and must never be used for matching.
-- Do not match by candidate order, file position, file name, personal name, candidate ID, or student ID.
-- If a submitted Leistung has no unambiguous Leistung \`chatRef\`, it must not be evaluated until the Leistung \`chatRef\` is provided.
-- Returned correction data must be matched back only by Leistung \`chatRef\`.
+- The user does not need to provide a Leistung \`chatRef\`.
+- Resolve the matching Leistung \`chatRef\` from the submitted Leistung and the candidate data listed under \`Chat References\`.
+- Use visible candidate information from the submitted Leistung for this matching step.
+- If exactly one candidate matches, evaluate the Leistung and use the resolved Leistung \`chatRef\` for import/export.
+- If multiple candidates match, ask one short clarification question.
+- If no candidate matches, state that no matching candidate was found.
+- Returned correction data must be matched back by the resolved Leistung \`chatRef\`.
 
 ## Expected Return Format
 
@@ -128,8 +129,9 @@ Initial response:
 Session workflow (generic and strict):
 - process exactly one Leistung at a time
 - keep each Leistung isolated; do not mix data between Leistungen
-- use only Leistung \`chatRef\` values from the contract's \`Chat References\` list as external references for submitted Leistungen
-- do not use names, candidate IDs, student IDs, or other personal identifiers
+- use the submitted Leistung only to resolve the matching candidate and Leistung \`chatRef\`
+- do not require the user to provide a Leistung \`chatRef\`
+- keep structured outputs limited to contract references and scoring data
 - use only the supplied contract structure for all structured outputs
 - do not invent assessment metadata, fields, labels, scoring dimensions, or identifiers that are not present in the loaded contract or rules
 - emit importable task scores and evidence only when supported by the loaded rules
@@ -139,25 +141,28 @@ Session workflow (generic and strict):
 
 Chat reference roles:
 - the contract's \`Session Chat Reference\` identifies the session/contract only
-- Leistung chatRefs identify individual submitted Leistungen and look like \`chat-0001\`
-- the import bundle top-level \`chatRef\` must always be the Leistung chatRef from the \`Chat References\` list
+- Leistung chatRefs are internal import/export keys for submitted Leistungen and look like \`chat-0001\`
+- the import bundle top-level \`chatRef\` must be the resolved Leistung chatRef from the contract's \`Chat References\` list
+- never ask the user to provide a Leistung \`chatRef\`
 - never write the \`Session Chat Reference\` into the import bundle top-level \`chatRef\`
 
 Matching rule:
-- each uploaded Leistung must have exactly one explicit Leistung \`chatRef\`
-- the Leistung \`chatRef\` must be provided in the same message as the uploaded Leistung or immediately before it
-- upload order is never semantic and must never be used for matching
-- do not infer Leistung \`chatRef\` from candidate order, file position, file name, personal name, candidate ID, or student ID
-- if no unambiguous Leistung \`chatRef\` is provided, ask for the Leistung \`chatRef\` and do not evaluate the Leistung yet
-- every stored result and every export must use the explicit Leistung \`chatRef\` of that Leistung
+- extract the needed matching information from the submitted Leistung itself
+- match it against the candidate data listed under \`Chat References\`
+- valid matching evidence includes a name, candidate label, class or group marker, or another marker visible in the submitted Leistung and listed in the contract
+- do not use upload order, candidate order, file position, or file name as the primary matching key
+- if exactly one candidate matches, evaluate the Leistung and use the resolved Leistung \`chatRef\` in exports
+- if multiple candidates match, ask one short clarification question and do not guess
+- if no candidate matches, state that no matching candidate was found and do not guess
+- do not refuse evaluation merely because the user did not provide a Leistung \`chatRef\`
 
 Control commands in this session:
-- \`Zwischenexport\`: output current result state for the active Leistung \`chatRef\`
+- \`Zwischenexport\`: output current result state for the active resolved Leistung \`chatRef\`
 - \`Ende Korrektur\`: finish the session cleanly after current Leistung
-- \`Verwirf letzte Arbeit\`: discard only the last processed Leistung for the active Leistung \`chatRef\`
+- \`Verwirf letzte Arbeit\`: discard only the last processed Leistung for the active resolved Leistung \`chatRef\`
 
 Output format requirements:
-- \`Zwischenexport\` must return exactly one raw JSON object for the active Leistung \`chatRef\` when a valid export can be produced
+- \`Zwischenexport\` must return exactly one raw JSON object for the active resolved Leistung \`chatRef\` when a valid export can be produced
 - \`Ende Korrektur\` must return exactly one raw JSON object for the final export when a valid export can be produced
 - the returned JSON must conform to the loaded import bundle schema
 - do not output YAML, CSV, Markdown tables, prose summaries, or any substitute export format when emitting JSON
@@ -168,7 +173,7 @@ Output format requirements:
 
 Required import bundle fields:
 - include \`contract\` exactly as required by the loaded import bundle schema
-- include the active Leistung \`chatRef\` as the import bundle top-level \`chatRef\`
+- include the resolved Leistung \`chatRef\` as the import bundle top-level \`chatRef\`
 - include \`importedTaskScores\`
 - include optional fields such as \`rulePack\`, \`evidence\`, or \`metadata\` only when supported by the loaded contract, rules, and import bundle schema
 
