@@ -12,7 +12,7 @@ import {
   buildCorrectionSessionScoringUnits,
   buildCorrectionSessionTaskTree,
   buildExamReference,
-  renderCorrectionSessionChatRefs,
+  renderCorrectionSessionChatReferenceEntries,
   renderCorrectionSessionParts,
   renderCorrectionSessionRules,
   renderCorrectionSessionScoringUnits,
@@ -141,11 +141,15 @@ export class ExportCorrectionSessionArtifactsUseCase {
     const renderedScoringUnits = renderCorrectionSessionScoringUnits(scoringUnits);
     const renderedRules = renderCorrectionSessionRules(rulePack.rules);
     const sessionMap: Record<string, string> = {};
-    const chatRefs = selectedCandidates.map((candidate, index) => {
+    const chatRefEntries = selectedCandidates.map((candidate, index) => {
       const chatRef = `chat-${String(index + 1).padStart(CHAT_REF_PADDING_LENGTH, '0')}`;
       sessionMap[chatRef] = candidate.id;
-      return chatRef;
+      return {
+        chatRef,
+        label: `${candidate.firstName} ${candidate.lastName}`.trim()
+      };
     });
+    const chatRefs = chatRefEntries.map((entry) => entry.chatRef);
     const sessionChatRef = `session-${sessionId}`;
     const contract: Exams.KbrCorrectionSessionContract = {
       id: `contract-${sessionChatRef}`,
@@ -173,7 +177,7 @@ export class ExportCorrectionSessionArtifactsUseCase {
       'session.examRef': references.examRef,
       'rulePack.manifest.id': rulePack.manifest.id,
       'rulePack.manifest.version': rulePack.manifest.version,
-      'render.chatRefs': renderCorrectionSessionChatRefs(chatRefs),
+      'render.chatRefs': renderCorrectionSessionChatReferenceEntries(chatRefEntries),
       'render.parts': renderedParts,
       'render.taskTree': renderedTaskTree,
       'render.scoringUnits': renderedScoringUnits,
