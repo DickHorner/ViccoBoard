@@ -146,7 +146,7 @@ export class ExportCorrectionSessionArtifactsUseCase {
       sessionMap[chatRef] = candidate.id;
       return {
         chatRef,
-        label: `${candidate.firstName} ${candidate.lastName}`.trim()
+        candidateLabel: `${candidate.firstName} ${candidate.lastName}`.trim()
       };
     });
     const chatRefs = chatRefEntries.map((entry) => entry.chatRef);
