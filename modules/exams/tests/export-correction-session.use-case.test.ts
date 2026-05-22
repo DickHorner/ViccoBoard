@@ -184,10 +184,12 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(artifact.contractFile.content).toContain('Exam Reference: `exam-deutsch-klassenarbeit-1`');
     expect(artifact.contractFile.fileName).toBe('kbr-correction-session-2026-04-17-contract.md');
     expect(artifact.promptFile.fileName).toBe('kbr-correction-session-2026-04-17-prompt.md');
-    expect(artifact.contractFile.content).toContain('- chat-0001');
+    expect(artifact.contractFile.content).toContain('- chat-0001: Mia Muster');
+    expect(artifact.contractFile.content).toContain('- chat-0002: Noah Beispiel');
     expect(artifact.contractFile.content).not.toContain('Candidate Reference');
     expect(artifact.contractFile.content).not.toContain('exam-internal-id');
     expect(artifact.contractFile.content).not.toContain('candidate-internal-1');
+    expect(artifact.contractFile.content).not.toContain('candidate-internal-2');
     expect(artifact.contractFile.content).not.toContain('mia-muster');
     expect(artifact.contractFile.content).not.toContain('noah-beispiel');
     expect(artifact.promptFile.content).toContain(artifact.contractFile.content);
@@ -197,17 +199,14 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     );
     expect(artifact.localReferenceMap.candidateIdByChatRef).toEqual(result.sessionMap);
 
-    // Criteria must appear as expectedHorizon in the rendered contract
     expect(artifact.contractFile.content).toContain('expectedHorizon:');
     expect(artifact.contractFile.content).toContain('Inhalt');
     expect(artifact.contractFile.content).toContain('Sprache');
     expect(artifact.contractFile.content).toContain('Fachsprache');
     expect(artifact.contractFile.content).toContain('Grammatik');
 
-    // The contract must instruct the AI that expectedHorizon is the binding basis
     expect(artifact.contractFile.content).toContain('expectedHorizon');
     expect(artifact.contractFile.content).toContain('Erwartungshorizont');
-    // The prompt must carry the specific instruction (not just echoed contract content)
     expect(artifact.promptFile.content).toContain('do not invent or replace them');
   });
 
@@ -270,12 +269,10 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(exportedInstructions).not.toContain('ask for the Leistung `chatRef`');
     expect(exportedInstructions).not.toContain('must not be evaluated until the Leistung `chatRef` is provided');
 
-    expect(exportedInstructions).toContain('Upload order is not semantic and must never be used for matching.');
-    expect(exportedInstructions).toContain('upload order is never semantic and must never be used for matching');
-    expect(exportedInstructions).toContain('Identify the matching Leistung `chatRef`');
-    expect(exportedInstructions).toContain('identify the matching Leistung `chatRef`');
-    expect(exportedInstructions).toContain('Do not ask the user to provide a Leistung `chatRef`');
-    expect(exportedInstructions).toContain('do not ask the user to provide a Leistung `chatRef`');
+    expect(exportedInstructions).toContain('- chat-0001: Test Person');
+    expect(exportedInstructions).toContain('The user does not need to provide a Leistung `chatRef`.');
+    expect(exportedInstructions).toContain('extract the needed matching information from the submitted Leistung itself');
+    expect(exportedInstructions).toContain('never ask the user to provide a Leistung `chatRef`');
   });
 
   it('export contains no criteria for tasks without criteria defined', () => {
@@ -328,9 +325,7 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     const useCase = new ExportCorrectionSessionArtifactsUseCase();
     const result = useCase.execute({ exam, sessionId: 'session-plain' });
 
-    // No criteria defined → no expectedHorizon section in rendered output
     expect(result.artifact.contractFile.content).not.toContain('expectedHorizon:');
-    // No hardcoded example criteria
     expect(result.artifact.contract.scoringUnits[0].metadata).toMatchObject({
       criteria: []
     });
