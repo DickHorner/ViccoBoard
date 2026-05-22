@@ -9,18 +9,19 @@
 ## Chat Reference Roles
 
 - `Session Chat Reference` identifies this correction session/contract.
-- Leistung chatRefs identify individual submitted Leistungen and are listed under `Chat References`.
-- The import bundle top-level `chatRef` must always be a Leistung chatRef from the `Chat References` list, for example `chat-0001`.
+- Leistung chatRefs are internal import/export keys for submitted Leistungen and are listed under `Chat References`.
+- The import bundle top-level `chatRef` must always be the resolved Leistung chatRef from the `Chat References` list, for example `chat-0001`.
 - Never use the `Session Chat Reference` as the import bundle top-level `chatRef`.
 
 ## Matching Rule
 
-- Identify the matching Leistung `chatRef` from the submitted Leistung itself and the `Chat References` list.
-- Upload order is not semantic and must never be used for matching.
-- Do not ask the user to provide a Leistung `chatRef` before evaluating a submitted Leistung.
-- Do not match by candidate order, file position, file name, personal name, candidate ID, or student ID alone.
-- If a submitted Leistung cannot be matched to exactly one Leistung `chatRef`, state the ambiguity in one short plain-text line.
-- Returned correction data must be matched back only by Leistung `chatRef`.
+- The user does not need to provide a Leistung `chatRef`.
+- Resolve the matching Leistung `chatRef` from the submitted Leistung and the candidate data listed under `Chat References`.
+- Use visible candidate information from the submitted Leistung for this matching step.
+- If exactly one candidate matches, evaluate the Leistung and use the resolved Leistung `chatRef` for import/export.
+- If multiple candidates match, ask one short clarification question.
+- If no candidate matches, state that no matching candidate was found.
+- Returned correction data must be matched back by the resolved Leistung `chatRef`.
 
 ## Expected Return Format
 
