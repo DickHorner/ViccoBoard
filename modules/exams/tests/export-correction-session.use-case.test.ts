@@ -215,6 +215,26 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(artifact.promptFile.content).toContain('"importedTaskScores"');
     expect(artifact.promptFile.content).toContain('must return exactly one raw JSON array');
     expect(artifact.promptFile.content).toContain('do not invent a wrapper object');
+    expect(artifact.promptFile.content).toContain(
+      'Bitte laden Sie die erste Leistung oder mehrere Leistungen gleichzeitig hoch.'
+    );
+    expect(artifact.promptFile.content).toContain(
+      'the user may upload multiple Leistung files in the same message'
+    );
+    expect(artifact.promptFile.content).toContain('JSON structure to output for `Zwischenexport`');
+    expect(artifact.promptFile.content).toContain('JSON structure to output for `Ende Korrektur`');
+    expect(artifact.promptFile.content).toContain('"contract": {');
+    expect(artifact.promptFile.content).toContain('"id": "contract-session-session-2026-04-17"');
+    expect(artifact.promptFile.content).toContain('"chatRef": "chat-0001"');
+    expect(artifact.promptFile.content).toContain('"importedTaskScores": [');
+    expect(artifact.promptFile.content).toContain('"evidence": [');
+    expect(artifact.promptFile.content).toContain('"metadata": {');
+    expect(artifact.contractFile.content).toContain(
+      'The user may upload multiple Leistung files in the same message.'
+    );
+    expect(artifact.contractFile.content).toContain(
+      'Process each Leistung independently and keep its correction data isolated.'
+    );
   });
 
   it('does not require users to provide Leistung chatRefs before evaluation', () => {
