@@ -60,7 +60,7 @@ Required import bundle fields:
 
 JSON structure to output for `Zwischenexport`:
 {
-  "contract": {{contractJson}},
+  "contract": <contract_json_object>,
   "chatRef": "chat-0001",
   "importedTaskScores": [
     {
@@ -68,7 +68,7 @@ JSON structure to output for `Zwischenexport`:
       "points": 0,
       "maxPoints": 0,
       "scoringUnitId": "task-1.score",
-      "comment": "Kurzbegruendung mit Bezug zur Leistung",
+      "comment": "Kurzbegründung mit Bezug zur Leistung",
       "confidence": 0.8,
       "evidenceIds": ["evidence-1"]
     }
@@ -88,22 +88,27 @@ JSON structure to output for `Zwischenexport`:
 JSON structure to output for `Ende Korrektur`:
 [
   {
-    "contract": {{contractJson}},
+    "contract": <contract_json_object>,
     "chatRef": "chat-0001",
     "importedTaskScores": []
   },
   {
-    "contract": {{contractJson}},
+    "contract": <contract_json_object>,
     "chatRef": "chat-0002",
     "importedTaskScores": []
   }
 ]
 
 Formatting notes for the JSON structures:
+- replace `<contract_json_object>` with the full JSON object provided in the Contract JSON section below
 - replace example `chatRef`, `taskId`, `scoringUnitId`, points, comments, evidence, and metadata with the resolved values
 - use only task IDs and scoring-unit IDs that exist in the loaded contract
 - omit optional fields when they are empty or unsupported
 - for `Ende Korrektur`, output only the array and include one object per resolved Leistung
+
+## Contract JSON
+
+{{contractJson}}
 
 ## Contract
 
