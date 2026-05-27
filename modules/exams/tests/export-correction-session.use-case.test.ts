@@ -208,6 +208,13 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(artifact.contractFile.content).toContain('expectedHorizon');
     expect(artifact.contractFile.content).toContain('Erwartungshorizont');
     expect(artifact.promptFile.content).toContain('do not invent or replace them');
+    expect(artifact.promptFile.content).toContain('## Import Bundle Schema');
+    expect(artifact.promptFile.content).toContain('"required": [');
+    expect(artifact.promptFile.content).toContain('"contract"');
+    expect(artifact.promptFile.content).toContain('"chatRef"');
+    expect(artifact.promptFile.content).toContain('"importedTaskScores"');
+    expect(artifact.promptFile.content).toContain('must return exactly one raw JSON array');
+    expect(artifact.promptFile.content).toContain('do not invent a wrapper object');
   });
 
   it('does not require users to provide Leistung chatRefs before evaluation', () => {

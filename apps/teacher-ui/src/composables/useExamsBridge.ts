@@ -210,8 +210,16 @@ export function initializeExamsBridge(): ExamsBridge {
       exportCorrectionSheetsPdfUseCase.exportAllCandidatesPdf(examId),
     exportCorrectionSession: (input) =>
       exportCorrectionSessionArtifactsUseCase.execute(input),
-    importCorrectionBundle: (input) =>
-      importKbrCorrectionBundleUseCase.execute(input),
+    importCorrectionBundle: (input) => {
+      if (Array.isArray(input.bundle)) {
+        return importKbrCorrectionBundleUseCase.executeMany({
+          ...input,
+          bundles: input.bundle
+        });
+      }
+
+      return importKbrCorrectionBundleUseCase.execute(input);
+    },
 
     initialized: true
   };
