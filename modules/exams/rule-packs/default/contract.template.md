@@ -25,9 +25,10 @@
 
 ## Expected Return Format
 
-- `Zwischenexport` and `Ende Korrektur` must return raw JSON only when a valid import-bundle export can be produced.
-- The returned JSON must conform to the loaded import bundle schema.
-- No YAML, CSV, Markdown table, prose summary, or substitute export format is allowed when emitting JSON.
+- `Zwischenexport` must return raw JSON only when one valid import-bundle export can be produced.
+- `Ende Korrektur` must return one raw JSON array containing one import bundle object per resolved Leistung.
+- Every import bundle object must conform to the loaded import bundle schema.
+- No YAML, CSV, Markdown table, prose summary, wrapper object, or substitute export format is allowed when emitting JSON.
 - If a valid import-bundle JSON export cannot be produced, output exactly one short plain-text line stating the missing prerequisite, and nothing else.
 
 ## Chat References

@@ -19,9 +19,9 @@ Session workflow (generic and strict):
 Chat reference roles:
 - the contract's `Session Chat Reference` identifies the session/contract only
 - Leistung chatRefs are internal import/export keys for submitted Leistungen and look like `chat-0001`
-- the import bundle top-level `chatRef` must be the resolved Leistung chatRef from the contract's `Chat References` list
+- every import bundle object must use the resolved Leistung `chatRef` from the contract's `Chat References` list as its top-level `chatRef`
 - never ask the user to provide a Leistung `chatRef`
-- never write the `Session Chat Reference` into the import bundle top-level `chatRef`
+- never write the `Session Chat Reference` into an import bundle top-level `chatRef`
 
 Matching rule:
 - extract the needed matching information from the submitted Leistung itself
@@ -35,13 +35,15 @@ Matching rule:
 
 Control commands in this session:
 - `Zwischenexport`: output current result state for the active resolved Leistung `chatRef`
-- `Ende Korrektur`: finish the session cleanly after current Leistung
+- `Ende Korrektur`: finish the session cleanly after current Leistung and export all resolved Leistungen from this session
 - `Verwirf letzte Arbeit`: discard only the last processed Leistung for the active resolved Leistung `chatRef`
 
 Output format requirements:
 - `Zwischenexport` must return exactly one raw JSON object for the active resolved Leistung `chatRef` when a valid export can be produced
-- `Ende Korrektur` must return exactly one raw JSON object for the final export when a valid export can be produced
-- the returned JSON must conform to the loaded import bundle schema
+- `Ende Korrektur` must return exactly one raw JSON array; each array item must be one import bundle object for one resolved Leistung `chatRef`
+- every object in that array must conform to the loaded import bundle schema below
+- do not invent a wrapper object for multi-Leistung export
+- do not include unresolved, unprocessed, or non-matching Leistungen in the JSON array
 - do not output YAML, CSV, Markdown tables, prose summaries, or any substitute export format when emitting JSON
 - do not wrap JSON in Markdown code fences
 - do not prepend or append explanatory text when emitting JSON for an export command
@@ -57,6 +59,10 @@ Required import bundle fields:
 ## Contract
 
 {{contractMarkdown}}
+
+## Import Bundle Schema
+
+{{importBundleSchema}}
 
 ## Rule Pack Metadata
 

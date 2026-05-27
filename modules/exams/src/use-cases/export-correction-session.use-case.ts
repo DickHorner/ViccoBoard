@@ -95,6 +95,7 @@ function buildPromptArtifacts(
 ): string {
   return renderTemplate(rulePack.templates.prompt, {
     contractMarkdown,
+    importBundleSchema: JSON.stringify(rulePack.importBundleSchema, null, 2),
     rulePackManifest: JSON.stringify(rulePack.manifest, null, 2),
     rulePackRules: JSON.stringify(rulePack.rules, null, 2),
     'session.id': contract.id,
