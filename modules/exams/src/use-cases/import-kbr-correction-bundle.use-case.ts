@@ -44,10 +44,22 @@ export interface ImportKbrCorrectionBundleInput {
   finalizeCorrection?: boolean;
 }
 
+export interface ImportKbrCorrectionBundleBatchInput extends Omit<ImportKbrCorrectionBundleInput, 'bundle'> {
+  bundles: unknown[];
+}
+
 export interface ImportKbrCorrectionBundleResult {
   correction: Exams.CorrectionEntry;
   candidateId: string;
   chatRef: string;
+  importedTaskScoreCount: number;
+  skippedTaskScoreCount: number;
+  uncertainties: CorrectionImportUncertainty[];
+}
+
+export interface ImportKbrCorrectionBundleBatchResult {
+  results: ImportKbrCorrectionBundleResult[];
+  importedBundleCount: number;
   importedTaskScoreCount: number;
   skippedTaskScoreCount: number;
   uncertainties: CorrectionImportUncertainty[];
@@ -208,6 +220,22 @@ export class ImportKbrCorrectionBundleUseCase {
     private readonly correctionEntryRepository: CorrectionEntryRepository,
     private readonly recordCorrectionUseCase: RecordCorrectionUseCase
   ) {}
+
+  async executeMany(input: ImportKbrCorrectionBundleBatchInput): Promise<ImportKbrCorrectionBundleBatchResult> {
+    const results: ImportKbrCorrectionBundleResult[] = [];
+
+    for (const bundle of input.bundles) {
+      results.push(await this.execute({ ...input, bundle }));
+    }
+
+    return {
+      results,
+      importedBundleCount: results.length,
+      importedTaskScoreCount: results.reduce((sum, result) => sum + result.importedTaskScoreCount, 0),
+      skippedTaskScoreCount: results.reduce((sum, result) => sum + result.skippedTaskScoreCount, 0),
+      uncertainties: results.flatMap((result) => result.uncertainties)
+    };
+  }
 
   async execute(input: ImportKbrCorrectionBundleInput): Promise<ImportKbrCorrectionBundleResult> {
     const schema = input.schema ?? getDefaultCorrectionImportBundleSchema();
