@@ -34,9 +34,13 @@ import {
 } from '@viccoboard/exams';
 import { getStorageAdapter } from '../services/storage.service';
 
+/**
+ * Singleton exams bridge instance
+ */
 let examsBridgeInstance: ExamsBridge | null = null;
 
 interface ExamsBridge {
+  // Repositories
   examRepository: ExamRepository;
   taskNodeRepository: TaskNodeRepository;
   criterionRepository: CriterionRepository;
@@ -45,6 +49,7 @@ interface ExamsBridge {
   studentLongTermNoteRepository: StudentLongTermNoteRepository;
   correctionSheetPresetRepository: CorrectionSheetPresetRepository;
 
+  // Use Cases
   createExamPayload: typeof createExamPayload;
   recordCorrectionUseCase: RecordCorrectionUseCase;
   calculateGradeUseCase: CalculateGradeUseCase;
@@ -55,6 +60,7 @@ interface ExamsBridge {
   exportCorrectionSessionArtifactsUseCase: ExportCorrectionSessionArtifactsUseCase;
   importKbrCorrectionBundleUseCase: ImportKbrCorrectionBundleUseCase;
 
+  // Services
   gradingKeyService: typeof GradingKeyService;
   gradingKeyEngine: typeof GradingKeyEngine;
   alternativeGradingService: typeof AlternativeGradingService;
@@ -116,6 +122,10 @@ interface UseExamsBridgeResult {
   importCorrectionBundle(input: any): Promise<any>;
 }
 
+/**
+ * Initialize exams bridge
+ * Must be called after storage is initialized
+ */
 export function initializeExamsBridge(): ExamsBridge {
   if (examsBridgeInstance) {
     return examsBridgeInstance;
@@ -123,6 +133,7 @@ export function initializeExamsBridge(): ExamsBridge {
 
   const adapter = getStorageAdapter();
 
+  // Initialize repositories with storage adapter
   const examRepo = new ExamRepository(adapter);
   const taskNodeRepo = new TaskNodeRepository(adapter);
   const criterionRepo = new CriterionRepository(adapter);
@@ -131,6 +142,7 @@ export function initializeExamsBridge(): ExamsBridge {
   const studentLongTermNoteRepo = new StudentLongTermNoteRepository(adapter);
   const correctionSheetPresetRepo = new CorrectionSheetPresetRepository(examRepo);
 
+  // Initialize use cases with repositories
   const recordCorrectionUseCase = new RecordCorrectionUseCase(correctionEntryRepo, examRepo);
   const calculateGradeUseCase = new CalculateGradeUseCase();
   const getCorrectionSheetPresetUseCase = new GetCorrectionSheetPresetUseCase(correctionSheetPresetRepo);
@@ -153,6 +165,7 @@ export function initializeExamsBridge(): ExamsBridge {
   );
 
   examsBridgeInstance = {
+    // Repositories
     examRepository: examRepo,
     taskNodeRepository: taskNodeRepo,
     criterionRepository: criterionRepo,
@@ -161,6 +174,7 @@ export function initializeExamsBridge(): ExamsBridge {
     studentLongTermNoteRepository: studentLongTermNoteRepo,
     correctionSheetPresetRepository: correctionSheetPresetRepo,
 
+    // Use Cases
     createExamPayload,
     recordCorrectionUseCase,
     calculateGradeUseCase,
@@ -171,6 +185,7 @@ export function initializeExamsBridge(): ExamsBridge {
     exportCorrectionSessionArtifactsUseCase,
     importKbrCorrectionBundleUseCase,
 
+    // Services (static classes are referenced directly)
     gradingKeyService: GradingKeyService,
     gradingKeyEngine: GradingKeyEngine,
     alternativeGradingService: AlternativeGradingService,
@@ -212,6 +227,9 @@ export function initializeExamsBridge(): ExamsBridge {
   return examsBridgeInstance;
 }
 
+/**
+ * Get exams bridge instance
+ */
 export function getExamsBridge(): ExamsBridge {
   if (!examsBridgeInstance) {
     throw new Error(
@@ -221,6 +239,10 @@ export function getExamsBridge(): ExamsBridge {
   return examsBridgeInstance;
 }
 
+/**
+ * Vue composable for exams module access
+ * Provides reactive access to exams bridge
+ */
 export function useExamsBridge(): UseExamsBridgeResult {
   const bridge = shallowRef<ExamsBridge | null>(examsBridgeInstance);
 
@@ -229,6 +251,7 @@ export function useExamsBridge(): UseExamsBridgeResult {
   return {
     examsBridge: bridge,
     isInitialized,
+    // Direct references for convenience (after initialization)
     get examRepository() { return bridge.value?.examRepository; },
     get taskNodeRepository() { return bridge.value?.taskNodeRepository; },
     get criterionRepository() { return bridge.value?.criterionRepository; },
