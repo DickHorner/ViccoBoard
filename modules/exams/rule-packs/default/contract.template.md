@@ -15,6 +15,9 @@
 
 ## Matching Rule
 
+- The user may upload multiple Leistung files in the same message.
+- Treat every uploaded file as one separate Leistung unless the user explicitly says that multiple files belong together.
+- Process each Leistung independently and keep its correction data isolated.
 - The user does not need to provide a Leistung `chatRef`.
 - Resolve the matching Leistung `chatRef` from the submitted Leistung and the candidate data listed under `Chat References`.
 - Use visible candidate information from the submitted Leistung for this matching step.
