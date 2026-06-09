@@ -214,6 +214,75 @@ function mergeTaskScores(
   return Array.from(merged.values());
 }
 
+function getScoringUnitTaskRef(scoringUnit: Exams.KbrCorrectionScoringUnit): string | undefined {
+  const record = scoringUnit as unknown as Record<string, unknown>;
+  const taskRef = record.taskRef;
+  if (typeof taskRef === 'string' && taskRef.length > 0) {
+    return taskRef;
+  }
+
+  return scoringUnit.taskId;
+}
+
+function readScoringUnitCriteria(scoringUnit: Exams.KbrCorrectionScoringUnit): Record<string, unknown>[] {
+  const metadata = asRecord(scoringUnit.metadata);
+  const criteria = metadata?.criteria;
+  if (!Array.isArray(criteria)) {
+    return [];
+  }
+
+  return criteria.flatMap((criterion) => {
+    const record = asRecord(criterion);
+    return record ? [record] : [];
+  });
+}
+
+function buildCriterionIdMap(
+  task: Exams.TaskNode,
+  contract: Exams.KbrCorrectionSessionContract,
+  importedTaskRef: string,
+  scoringUnitId?: string
+): Map<string, string> {
+  const localCriterionIds = new Set(task.criteria.map((criterion) => criterion.id));
+  const criterionIdMap = new Map<string, string>();
+
+  for (const criterion of task.criteria) {
+    criterionIdMap.set(criterion.id, criterion.id);
+  }
+
+  for (const scoringUnit of contract.scoringUnits) {
+    const unitTaskRef = getScoringUnitTaskRef(scoringUnit);
+    const referencesImportedScore =
+      scoringUnit.id === scoringUnitId ||
+      unitTaskRef === importedTaskRef ||
+      unitTaskRef === task.id;
+
+    if (!referencesImportedScore) {
+      continue;
+    }
+
+    for (const criterion of readScoringUnitCriteria(scoringUnit)) {
+      const rawLocalCriterionId = criterion.criterionId;
+      if (typeof rawLocalCriterionId !== 'string' || !localCriterionIds.has(rawLocalCriterionId)) {
+        continue;
+      }
+
+      criterionIdMap.set(rawLocalCriterionId, rawLocalCriterionId);
+
+      const publicCriterionId = criterion.id;
+      if (typeof publicCriterionId === 'string' && publicCriterionId.length > 0) {
+        criterionIdMap.set(publicCriterionId, rawLocalCriterionId);
+      }
+    }
+  }
+
+  return criterionIdMap;
+}
+
+function sumCriterionScores(criterionScores: Exams.CriterionScore[]): number {
+  return criterionScores.reduce((sum, score) => sum + score.points, 0);
+}
+
 export class ImportKbrCorrectionBundleUseCase {
   constructor(
     private readonly examRepository: ExamRepository,
@@ -257,8 +326,9 @@ export class ImportKbrCorrectionBundleUseCase {
     const taskById = new Map(exam.structure.tasks.map((task) => [task.id, task]));
     const evidenceById = new Map((bundle.evidence ?? []).map((evidence) => [evidence.id, evidence]));
     const importedRules = bundle.contract.rules.imports;
-    const mappedTaskScores: Exams.TaskScore[] = [];
+    const mappedTaskScoresByTaskId = new Map<string, Exams.TaskScore>();
     const manualReviewComments: Exams.CorrectionComment[] = [];
+    let importedTaskScoreCount = 0;
     let skippedTaskScoreCount = 0;
 
     for (const importedTaskScore of bundle.importedTaskScores) {
@@ -309,8 +379,9 @@ export class ImportKbrCorrectionBundleUseCase {
       }
 
       assertPointStep(importedTaskScore.points, step, mappedTaskId);
+      importedTaskScoreCount += 1;
 
-      const deductionReview = reviewImportedDeduction(importedTaskScore, task.points, step, evidenceById);
+      const deductionReview = reviewImportedDeduction(importedTaskScore, importedTaskScore.maxPoints, step, evidenceById);
       if (deductionReview?.requiresManualReview) {
         uncertainties.push({
           code: 'deduction-requires-manual-review',
@@ -320,15 +391,73 @@ export class ImportKbrCorrectionBundleUseCase {
         manualReviewComments.push(buildDeductionManualReviewComment(mappedTaskId, deductionReview));
       }
 
-      mappedTaskScores.push({
+      const existingMappedScore = mappedTaskScoresByTaskId.get(mappedTaskId);
+      const timestamp = existingMappedScore?.timestamp ?? new Date();
+
+      if (importedTaskScore.criterionId) {
+        const criterionIdMap = buildCriterionIdMap(
+          task,
+          bundle.contract,
+          importedTaskScore.taskId,
+          importedTaskScore.scoringUnitId
+        );
+        const localCriterionId = criterionIdMap.get(importedTaskScore.criterionId);
+        if (!localCriterionId) {
+          throw new Error(
+            `Unknown criterionId "${importedTaskScore.criterionId}" for task "${importedTaskScore.taskId}" (mapped to "${mappedTaskId}") in import bundle.`
+          );
+        }
+
+        const criterion = task.criteria.find((entry) => entry.id === localCriterionId);
+        if (!criterion) {
+          throw new Error(
+            `Criterion "${localCriterionId}" for task "${mappedTaskId}" is not part of the local exam structure.`
+          );
+        }
+
+        if (importedTaskScore.points > criterion.points + EPSILON) {
+          throw new Error(
+            `Criterion "${localCriterionId}" has points ${importedTaskScore.points}, which exceeds criterion max ${criterion.points}.`
+          );
+        }
+
+        const criterionScores = [...(existingMappedScore?.criterionScores ?? [])];
+        const existingCriterionIndex = criterionScores.findIndex((entry) => entry.criterionId === localCriterionId);
+        const criterionScore: Exams.CriterionScore = {
+          criterionId: localCriterionId,
+          points: importedTaskScore.points,
+          maxPoints: criterion.points
+        };
+
+        if (existingCriterionIndex >= 0) {
+          criterionScores[existingCriterionIndex] = criterionScore;
+        } else {
+          criterionScores.push(criterionScore);
+        }
+
+        mappedTaskScoresByTaskId.set(mappedTaskId, {
+          taskId: mappedTaskId,
+          points: sumCriterionScores(criterionScores),
+          maxPoints: task.points,
+          alternativeGrading: existingMappedScore?.alternativeGrading ?? importedTaskScore.alternativeGrading,
+          comment: existingMappedScore?.comment ?? importedTaskScore.comment,
+          criterionScores,
+          timestamp
+        });
+        continue;
+      }
+
+      mappedTaskScoresByTaskId.set(mappedTaskId, {
         taskId: mappedTaskId,
         points: importedTaskScore.points,
         maxPoints: task.points,
         alternativeGrading: importedTaskScore.alternativeGrading,
         comment: importedTaskScore.comment,
-        timestamp: new Date()
+        timestamp
       });
     }
+
+    const mappedTaskScores = Array.from(mappedTaskScoresByTaskId.values());
 
     const existingCorrection = await this.correctionEntryRepository.findByExamAndCandidate(input.examId, candidateId);
     const finalTaskScores = mergeTaskScores(
@@ -358,7 +487,7 @@ export class ImportKbrCorrectionBundleUseCase {
       correction,
       candidateId,
       chatRef: bundle.chatRef,
-      importedTaskScoreCount: mappedTaskScores.length,
+      importedTaskScoreCount,
       skippedTaskScoreCount,
       uncertainties
     };

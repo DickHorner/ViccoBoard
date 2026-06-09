@@ -75,6 +75,15 @@ function stripFormattingWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
 }
 
+function resolveAllowedPointStep(exam: Exams.Exam): number {
+  const decimalPlaces = exam.gradingKey.roundingRule.decimalPlaces;
+  if (!Number.isFinite(decimalPlaces) || decimalPlaces <= 0) {
+    return 1;
+  }
+
+  return 1 / Math.pow(10, decimalPlaces);
+}
+
 function resolveTaskPartId(
   task: Exams.TaskNode,
   tasksById: Map<string, Exams.TaskNode>,
@@ -210,6 +219,7 @@ export function buildCorrectionSessionScoringUnits(
 ): Exams.KbrCorrectionScoringUnit[] {
   const scoringUnits: Exams.KbrCorrectionScoringUnit[] = [];
   const scoringTasks = resolveScoringTasks(exam.structure.tasks, rules.taskSelection);
+  const allowedPointStep = resolveAllowedPointStep(exam);
 
   for (const task of scoringTasks) {
     const taskRef = references.taskRefById[task.id];
@@ -227,11 +237,17 @@ export function buildCorrectionSessionScoringUnits(
       maxPoints: task.points,
       metadata: {
         source: 'task-points',
+        allowedPointStep,
+        requiredImportGranularity: task.criteria.length > 0 ? 'criterion' : 'task',
+        scoreExportMode: task.criteria.length > 0 ? 'criterionScoresOnly' : 'taskScore',
+        requiresCriterionId: task.criteria.length > 0,
+        requiresEvidenceForCriterionDeductions: rules.deductionGovernance.requireEvidenceForDeductions,
         criteria: task.criteria.map((criterion, criterionIndex) => ({
           id: `criterion-${criterionIndex + 1}`,
           criterionId: criterion.id,
           text: stripFormattingWhitespace(criterion.text) || `Criterion ${criterionIndex + 1}`,
           points: criterion.points,
+          pointsStep: allowedPointStep,
           aspectBased: criterion.aspectBased,
           formatting: renderFormattingMetadata(criterion.formatting),
           subCriteria: criterion.subCriteria?.map((subCriterion, subCriterionIndex) => ({

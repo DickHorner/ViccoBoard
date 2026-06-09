@@ -45,6 +45,27 @@ function createImportRules(): Exams.CorrectionSessionRules {
   };
 }
 
+function createStrictImportRules(): Exams.CorrectionSessionRules {
+  return {
+    ...createImportRules(),
+    evidence: {
+      required: false,
+      supportedKinds: ['text', 'structured'],
+      allowMultipleEvidenceItems: true
+    },
+    deductionGovernance: {
+      applyWhenPointsBelowMaxPoints: true,
+      requireDefectStatement: true,
+      requireEvidenceForDeductions: true,
+      requireExplanationForAnyNonFullScore: true,
+      rejectUnjustifiedDeductions: true,
+      minimumDeductionStepRequiresJustification: true,
+      onMissingDefect: 'reject-deduction',
+      onMissingEvidence: 'reject-deduction'
+    }
+  };
+}
+
 describe('ImportKbrCorrectionBundleUseCase', () => {
   let storage: SQLiteStorage;
   let examRepo: ExamRepository;
@@ -84,7 +105,22 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
             title: 'Aufgabe 1',
             points: 10,
             isChoice: false,
-            criteria: [],
+            criteria: [
+              {
+                id: 'criterion-a',
+                text: 'Fachinhalt',
+                formatting: {},
+                points: 4,
+                aspectBased: false
+              },
+              {
+                id: 'criterion-b',
+                text: 'Begründung',
+                formatting: {},
+                points: 6,
+                aspectBased: false
+              }
+            ],
             allowComments: true,
             allowSupportTips: false,
             commentBoxEnabled: true,
@@ -166,6 +202,217 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
     expect(result.correction.taskScores[0].taskId).toBe('task-internal-1');
     expect(result.correction.comments.some((comment) => comment.level === 'exam')).toBe(true);
     expect(result.correction.comments.find((comment) => comment.level === 'exam')?.text).toBe('Gute Gesamtleistung.');
+  });
+
+  it('imports criterion-level scores as criterionScores and aggregates task points', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [
+            {
+              id: 'task-1.score',
+              taskId: 'task-1',
+              kind: 'task',
+              label: 'Aufgabe 1',
+              maxPoints: 10,
+              metadata: {
+                criteria: [
+                  { id: 'criterion-1', criterionId: 'criterion-a', text: 'Fachinhalt', points: 4 },
+                  { id: 'criterion-2', criterionId: 'criterion-b', text: 'Begründung', points: 6 }
+                ]
+              }
+            }
+          ],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            scoringUnitId: 'task-1.score',
+            criterionId: 'criterion-1',
+            points: 4,
+            maxPoints: 4,
+            comment: 'Voll erfüllt',
+            evidenceIds: ['evidence-1']
+          },
+          {
+            taskId: 'task-1',
+            scoringUnitId: 'task-1.score',
+            criterionId: 'criterion-2',
+            points: 5,
+            maxPoints: 6,
+            comment: 'Ein Begründungsaspekt fehlt.',
+            evidenceIds: ['evidence-2']
+          }
+        ],
+        evidence: [
+          {
+            id: 'evidence-1',
+            kind: 'quote',
+            value: 'Relevanter Fachinhalt ist vollständig dargestellt.'
+          },
+          {
+            id: 'evidence-2',
+            kind: 'quote',
+            value: 'Die zweite Begründung bleibt knapp.'
+          }
+        ]
+      }
+    });
+
+    expect(result.importedTaskScoreCount).toBe(2);
+    expect(result.correction.taskScores).toEqual([
+      expect.objectContaining({
+        taskId: 'task-internal-1',
+        points: 9,
+        maxPoints: 10,
+        criterionScores: [
+          { criterionId: 'criterion-a', points: 4, maxPoints: 4 },
+          { criterionId: 'criterion-b', points: 5, maxPoints: 6 }
+        ]
+      })
+    ]);
+  });
+
+  it('rejects criterion contracts when an imported criterion score is missing', async () => {
+    await expect(
+      importUseCase.execute({
+        examId: exam.id,
+        sessionId: 'session-42',
+        sessionMap: {
+          examId: exam.id,
+          sessionId: 'session-42',
+          candidateIdByChatRef: {
+            'chat-0001': 'candidate-1'
+          },
+          taskIdByRef: {
+            'task-1': 'task-internal-1'
+          }
+        },
+        bundle: {
+          contract: {
+            id: 'contract-session-session-42',
+            chatRef: 'session-session-42',
+            title: 'Import contract',
+            parts: [],
+            taskTree: [{ id: 'task-1', title: 'Aufgabe 1', level: 1, points: 10, childTaskIds: [], scoringUnitIds: ['task-1.score'] }],
+            scoringUnits: [
+              {
+                id: 'task-1.score',
+                taskId: 'task-1',
+                kind: 'task',
+                label: 'Aufgabe 1',
+                maxPoints: 10,
+                metadata: {
+                  criteria: [
+                    { id: 'criterion-1', criterionId: 'criterion-a', text: 'Fachinhalt', points: 4 },
+                    { id: 'criterion-2', criterionId: 'criterion-b', text: 'Begründung', points: 6 }
+                  ]
+                }
+              }
+            ],
+            rules: createImportRules()
+          },
+          chatRef: 'chat-0001',
+          importedTaskScores: [
+            {
+              taskId: 'task-1',
+              scoringUnitId: 'task-1.score',
+              criterionId: 'criterion-a',
+              points: 4,
+              maxPoints: 4
+            }
+          ]
+        }
+      })
+    ).rejects.toThrow('missing score for criterionId "criterion-b"');
+  });
+
+  it('rejects criterion deductions without required structured evidence details', async () => {
+    await expect(
+      importUseCase.execute({
+        examId: exam.id,
+        sessionId: 'session-42',
+        sessionMap: {
+          examId: exam.id,
+          sessionId: 'session-42',
+          candidateIdByChatRef: {
+            'chat-0001': 'candidate-1'
+          },
+          taskIdByRef: {
+            'task-1': 'task-internal-1'
+          }
+        },
+        bundle: {
+          contract: {
+            id: 'contract-session-session-42',
+            chatRef: 'session-session-42',
+            title: 'Import contract',
+            parts: [],
+            taskTree: [{ id: 'task-1', title: 'Aufgabe 1', level: 1, points: 10, childTaskIds: [], scoringUnitIds: ['task-1.score'] }],
+            scoringUnits: [
+              {
+                id: 'task-1.score',
+                taskId: 'task-1',
+                kind: 'task',
+                label: 'Aufgabe 1',
+                maxPoints: 10,
+                metadata: {
+                  criteria: [
+                    { id: 'criterion-1', criterionId: 'criterion-a', text: 'Fachinhalt', points: 4 },
+                    { id: 'criterion-2', criterionId: 'criterion-b', text: 'Begründung', points: 6 }
+                  ]
+                }
+              }
+            ],
+            rules: createStrictImportRules()
+          },
+          chatRef: 'chat-0001',
+          importedTaskScores: [
+            {
+              taskId: 'task-1',
+              scoringUnitId: 'task-1.score',
+              criterionId: 'criterion-a',
+              points: 4,
+              maxPoints: 4
+            },
+            {
+              taskId: 'task-1',
+              scoringUnitId: 'task-1.score',
+              criterionId: 'criterion-b',
+              points: 5,
+              maxPoints: 6,
+              evidenceIds: ['evidence-1']
+            }
+          ],
+          evidence: [
+            {
+              id: 'evidence-1',
+              kind: 'structured',
+              value: 'Begründungsaspekt fehlt.'
+            }
+          ]
+        }
+      })
+    ).rejects.toThrow('missing defectStatement');
   });
 
   it('accepts a deduction with defect statement and linked evidence', async () => {

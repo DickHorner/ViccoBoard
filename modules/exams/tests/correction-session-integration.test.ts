@@ -191,10 +191,19 @@ describe('Correction Session Integration (Domain-Agnostic)', () => {
       importedTaskScores: [
         {
           taskId: 'task-1.1', // Ref from contract
-          points: 8,
-          maxPoints: 10,
+          scoringUnitId: 'task-1.1.score',
+          criterionId: 'crit-1-1-1',
+          points: 3,
+          maxPoints: 5,
           comment: 'Attribute A is missing specific details.',
           evidenceIds: ['ev-1']
+        },
+        {
+          taskId: 'task-1.1',
+          scoringUnitId: 'task-1.1.score',
+          criterionId: 'crit-1-1-2',
+          points: 5,
+          maxPoints: 5
         },
         {
           taskId: 'task-1.2',
@@ -205,8 +214,13 @@ describe('Correction Session Integration (Domain-Agnostic)', () => {
       evidence: [
         {
           id: 'ev-1',
-          kind: 'text',
-          value: 'Found no mention of detailed specs in response line 5.'
+          kind: 'structured',
+          value: 'Found no mention of detailed specs in response line 5.',
+          taskRef: 'task-1.1',
+          scoringUnitId: 'task-1.1.score',
+          criterionId: 'crit-1-1-1',
+          defectStatement: 'Attribute A lacks specific details.',
+          explanation: 'The response does not mention detailed specs in line 5.'
         }
       ],
       metadata: {
@@ -222,7 +236,7 @@ describe('Correction Session Integration (Domain-Agnostic)', () => {
     });
 
     expect(importResultA.candidateId).toBe(candidateId1);
-    expect(importResultA.importedTaskScoreCount).toBe(2);
+    expect(importResultA.importedTaskScoreCount).toBe(3);
     expect(importResultA.uncertainties).toHaveLength(0); // Should be clean because evidence is provided
     
     // Verify correction persistence
@@ -230,6 +244,10 @@ describe('Correction Session Integration (Domain-Agnostic)', () => {
     expect(correctionA).toBeDefined();
     expect(correctionA?.taskScores).toHaveLength(2);
     expect(correctionA?.taskScores.find(ts => ts.taskId === 'leaf-1-1')?.points).toBe(8);
+    expect(correctionA?.taskScores.find(ts => ts.taskId === 'leaf-1-1')?.criterionScores).toEqual([
+      { criterionId: 'crit-1-1-1', points: 3, maxPoints: 5 },
+      { criterionId: 'crit-1-1-2', points: 5, maxPoints: 5 }
+    ]);
 
     // Test Case B: Validation of Deduction Rules (Missing Evidence)
     const chatRef2 = Object.keys(localReferenceMap.candidateIdByChatRef)[1];
@@ -241,29 +259,29 @@ describe('Correction Session Integration (Domain-Agnostic)', () => {
       importedTaskScores: [
         {
           taskId: 'task-1.1',
+          scoringUnitId: 'task-1.1.score',
+          criterionId: 'crit-1-1-1',
           points: 5,
-          maxPoints: 10,
+          maxPoints: 5
+        },
+        {
+          taskId: 'task-1.1',
+          scoringUnitId: 'task-1.1.score',
+          criterionId: 'crit-1-1-2',
+          points: 4,
+          maxPoints: 5,
           comment: 'Major flaws.'
           // missing evidenceIds
         }
       ]
     };
 
-    const importResultB = await importUseCase.execute({
+    await expect(importUseCase.execute({
       examId: exam.id,
       sessionId,
       sessionMap: importSessionMap,
       bundle: bundleWithoutEvidence
-    });
-
-    // Default rule pack requires evidence for deductions (requireEvidenceForDeductions: true)
-    // So it should flag an uncertainty but still record it if the use case allows (v2 behavior)
-    expect(importResultB.uncertainties).toContainEqual(
-      expect.objectContaining({
-        code: 'deduction-requires-manual-review',
-        reference: 'leaf-1-1'
-      })
-    );
+    })).rejects.toThrow('deduction without evidenceIds');
     
     // 5. Verify Hierarchical Structure Reuse
     // Ensure that root tasks can also be scored if configured, 

@@ -105,6 +105,22 @@ function buildPromptArtifacts(
   });
 }
 
+function resolveAllowedPointStep(exam: Exams.Exam): number {
+  const decimalPlaces = exam.gradingKey.roundingRule.decimalPlaces;
+  if (!Number.isFinite(decimalPlaces) || decimalPlaces <= 0) {
+    return 1;
+  }
+
+  return 1 / Math.pow(10, decimalPlaces);
+}
+
+function hasCriteria(scoringUnits: Exams.KbrCorrectionScoringUnit[]): boolean {
+  return scoringUnits.some((scoringUnit) => {
+    const metadata = scoringUnit.metadata;
+    return Boolean(metadata && Array.isArray(metadata.criteria) && metadata.criteria.length > 0);
+  });
+}
+
 function cloneReferenceMap(
   references: CorrectionSessionReferenceMaps,
   sessionMap: Record<string, string>
@@ -153,6 +169,7 @@ export class ExportCorrectionSessionArtifactsUseCase {
     });
     const chatRefs = chatRefEntries.map((entry) => entry.chatRef);
     const sessionChatRef = `session-${sessionId}`;
+    const requiresCriterionId = hasCriteria(scoringUnits);
     const contract: Exams.KbrCorrectionSessionContract = {
       id: `contract-${sessionChatRef}`,
       chatRef: sessionChatRef,
@@ -168,7 +185,13 @@ export class ExportCorrectionSessionArtifactsUseCase {
         exportKind: 'chatgpt-correction-session',
         status: input.exam.status,
         chatRefs,
-        candidateCount: selectedCandidates.length
+        candidateCount: selectedCandidates.length,
+        allowedPointStep: resolveAllowedPointStep(input.exam),
+        requiredImportGranularity: requiresCriterionId ? 'criterion' : 'task',
+        scoreExportMode: requiresCriterionId ? 'criterionScoresOnly' : 'taskScores',
+        requiresCriterionId,
+        requiresEvidenceForCriterionDeductions: rulePack.rules.deductionGovernance.requireEvidenceForDeductions,
+        contractRulesShape: 'activeRulesNested'
       }
     };
 

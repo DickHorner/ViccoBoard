@@ -14,6 +14,7 @@ Session workflow (generic and strict):
 - use only the supplied contract structure for all structured outputs
 - do not invent assessment metadata, fields, labels, scoring dimensions, or identifiers that are not present in the loaded contract or rules
 - emit importable task scores and evidence only when supported by the loaded rules
+- if a scoring unit contains criteria in `metadata.criteria` or `expectedHorizon`, emit one score per criterion with `scoringUnitId` and the concrete `criterionId`
 - keep comments and evidence tied to explicit task or scoring-unit references
 - treat `evidence.required` as global evidence policy and `deductionGovernance.requireEvidenceForDeductions` as deduction-specific policy
 - if a scoring unit contains an `expectedHorizon` section, treat those criteria as the binding assessment basis (Erwartungshorizont) for that task; do not invent or replace them
@@ -68,6 +69,7 @@ JSON structure to output for `Zwischenexport`:
       "points": 0,
       "maxPoints": 0,
       "scoringUnitId": "task-1.score",
+      "criterionId": "criterion-id-from-contract",
       "comment": "Kurzbegründung mit Bezug zur Leistung",
       "confidence": 0.8,
       "evidenceIds": ["evidence-1"]
@@ -76,7 +78,12 @@ JSON structure to output for `Zwischenexport`:
   "evidence": [
     {
       "id": "evidence-1",
-      "kind": "quote",
+      "kind": "structured",
+      "taskRef": "task-1",
+      "scoringUnitId": "task-1.score",
+      "criterionId": "criterion-id-from-contract",
+      "defectStatement": "Konkreter Mangel",
+      "explanation": "Kurze Erklärung mit Bezug zum Kriterium",
       "value": "Kurzer Beleg aus der Leistung"
     }
   ],
@@ -102,7 +109,8 @@ JSON structure to output for `Ende Korrektur`:
 Formatting notes for the JSON structures:
 - replace `<contract_json_object>` with the full JSON object provided in the Contract JSON section below
 - replace example `chatRef`, `taskId`, `scoringUnitId`, points, comments, evidence, and metadata with the resolved values
-- use only task IDs and scoring-unit IDs that exist in the loaded contract
+- replace example `criterionId` with a real criterion ID from `metadata.criteria[].criterionId` when criteria exist
+- use only task IDs, scoring-unit IDs, and criterion IDs that exist in the loaded contract
 - omit optional fields when they are empty or unsupported
 - for `Ende Korrektur`, output only the array and include one object per resolved Leistung
 
