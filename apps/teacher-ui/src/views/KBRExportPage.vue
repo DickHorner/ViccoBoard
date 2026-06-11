@@ -164,7 +164,7 @@
 
             <div class="ai-action-group">
               <h4>2. Import</h4>
-              <p class="panel-copy">Laden Sie die Ergebnis-JSON-Datei des KI-Bundles hoch.</p>
+              <p class="panel-copy">Laden Sie die Ergebnis-JSON-Datei des KI-Bundles hoch. Der Import wird auf diese bestehende Prüfung angewendet.</p>
               <div class="import-controls">
                 <input
                   type="file"
@@ -177,7 +177,18 @@
                 <label for="ai-import-file" class="primary-button" :class="{ disabled: aiImporting }">
                   {{ aiImporting ? 'Importiert...' : 'KI-Ergebnisse importieren' }}
                 </label>
+                <button
+                  class="ghost-button"
+                  type="button"
+                  @click="reimportLastAIFile"
+                  :disabled="aiImporting || !lastAIImportContent"
+                >
+                  Letzte Importdatei erneut einlesen
+                </button>
               </div>
+              <p v-if="lastAIImportFileName" class="panel-copy">
+                Letzte Importdatei: {{ lastAIImportFileName }}
+              </p>
             </div>
           </div>
 
@@ -246,6 +257,18 @@ const aiImporting = ref(false)
 const aiError = ref('')
 const aiSuccess = ref('')
 const aiExportArtifacts = ref<CorrectionSessionDownloadArtifact[]>([])
+const lastAIImportFileName = ref('')
+const lastAIImportContent = ref('')
+
+const sessionMapStorageKey = computed(() =>
+  exam.value ? `viccoboard_session_map_${exam.value.id}` : ''
+)
+const lastImportContentStorageKey = computed(() =>
+  exam.value ? `viccoboard_ai_import_bundle_${exam.value.id}` : ''
+)
+const lastImportFileNameStorageKey = computed(() =>
+  exam.value ? `viccoboard_ai_import_file_${exam.value.id}` : ''
+)
 
 async function exportAISession(): Promise<void> {
   if (!exam.value || !exportCorrectionSession) return
@@ -272,7 +295,7 @@ async function exportAISession(): Promise<void> {
 
     aiSuccess.value = 'KI-Sitzungsdateien erfolgreich exportiert. ChatGPT-Dateien: Contract und Prompt. Session-Map wird getrennt als internes Hilfsartefakt gespeichert.'
 
-    localStorage.setItem(`viccoboard_session_map_${exam.value.id}`, sessionMapArtifact.content)
+    localStorage.setItem(sessionMapStorageKey.value, sessionMapArtifact.content)
   } catch (error: any) {
     console.error('AI Export failed:', error)
     aiError.value = `Export fehlgeschlagen: ${error.message}`
@@ -286,16 +309,40 @@ async function handleAIImport(event: Event): Promise<void> {
   const file = target.files?.[0]
   if (!file || !exam.value || !importCorrectionBundle) return
 
+  try {
+    const content = await file.text()
+    await importAIContent(content, file.name)
+  } finally {
+    target.value = ''
+  }
+}
+
+async function reimportLastAIFile(): Promise<void> {
+  if (!lastAIImportContent.value) {
+    return
+  }
+
+  await importAIContent(lastAIImportContent.value, lastAIImportFileName.value || 'zuletzt geladene Importdatei', {
+    reimport: true
+  })
+}
+
+async function importAIContent(
+  content: string,
+  fileName: string,
+  options: { reimport?: boolean } = {}
+): Promise<void> {
+  if (!exam.value || !importCorrectionBundle) return
+
   aiError.value = ''
   aiSuccess.value = ''
   aiImporting.value = true
 
   try {
-    const content = await file.text()
     const bundle = JSON.parse(content)
     
     // Retrieve session map
-    const storedMap = localStorage.getItem(`viccoboard_session_map_${exam.value.id}`)
+    const storedMap = localStorage.getItem(sessionMapStorageKey.value)
     if (!storedMap) {
       throw new Error('Keine zugehörige Sitzungs-Map gefunden. Bitte exportieren Sie die Sitzung zuerst erneut.')
     }
@@ -308,8 +355,15 @@ async function handleAIImport(event: Event): Promise<void> {
       sessionMap,
       bundle
     })
+
+    lastAIImportContent.value = content
+    lastAIImportFileName.value = fileName
+    localStorage.setItem(lastImportContentStorageKey.value, content)
+    localStorage.setItem(lastImportFileNameStorageKey.value, fileName)
     
-    aiSuccess.value = 'KI-Ergebnisse erfolgreich importiert.'
+    aiSuccess.value = options.reimport
+      ? `KI-Ergebnisse aus "${fileName}" erneut in diese Prüfung eingelesen.`
+      : `KI-Ergebnisse aus "${fileName}" erfolgreich in diese Prüfung importiert.`
     
     // Reload corrections and preview
     const loadedCorrections = await findCorrectionsByExam(exam.value.id)
@@ -322,8 +376,16 @@ async function handleAIImport(event: Event): Promise<void> {
     aiError.value = `Import fehlgeschlagen: ${error.message}`
   } finally {
     aiImporting.value = false
-    target.value = '' // Reset input
   }
+}
+
+function restoreLastAIImport(): void {
+  if (!lastImportContentStorageKey.value || !lastImportFileNameStorageKey.value) {
+    return
+  }
+
+  lastAIImportContent.value = localStorage.getItem(lastImportContentStorageKey.value) ?? ''
+  lastAIImportFileName.value = localStorage.getItem(lastImportFileNameStorageKey.value) ?? ''
 }
 
 type ExamCandidate = Exams.Exam['candidates'][number]
@@ -431,6 +493,7 @@ async function loadPage(): Promise<void> {
     }
 
     exam.value = loadedExam
+    restoreLastAIImport()
     const loadedCorrections = await findCorrectionsByExam(examId)
     corrections.value = new Map(loadedCorrections.map((entry) => [entry.candidateId, entry]))
 

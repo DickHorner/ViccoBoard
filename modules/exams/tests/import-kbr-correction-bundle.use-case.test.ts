@@ -168,6 +168,131 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
     expect(result.correction.comments.find((comment) => comment.level === 'exam')?.text).toBe('Gute Gesamtleistung.');
   });
 
+  it('imports criterion scores into correction entries used by the correction mask', async () => {
+    const criterionExam = await examRepo.create({
+      title: 'Criterion Import',
+      assessmentFormat: 'klausur',
+      mode: Exams.ExamMode.Simple,
+      structure: {
+        parts: [],
+        tasks: [
+          {
+            id: 'task-with-criteria',
+            level: 1,
+            order: 1,
+            title: 'Steckbrief',
+            points: 5,
+            isChoice: false,
+            criteria: [
+              {
+                id: 'criterion-title',
+                text: 'Überschrift',
+                formatting: {},
+                points: 2,
+                aspectBased: false
+              },
+              {
+                id: 'criterion-content',
+                text: 'Inhalt',
+                formatting: {},
+                points: 3,
+                aspectBased: false
+              }
+            ],
+            allowComments: true,
+            allowSupportTips: false,
+            commentBoxEnabled: true,
+            subtasks: []
+          }
+        ],
+        allowsComments: true,
+        allowsSupportTips: false,
+        totalPoints: 5
+      },
+      gradingKey: {
+        ...exam.gradingKey,
+        id: 'criterion-grading-key',
+        totalPoints: 5
+      },
+      printPresets: [],
+      candidates: [],
+      candidateGroups: [],
+      status: 'in-progress'
+    });
+
+    const result = await importUseCase.execute({
+      examId: criterionExam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: criterionExam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-with-criteria'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [
+            {
+              id: 'task-1.content',
+              taskId: 'task-1',
+              kind: 'criterion',
+              label: 'Inhalt',
+              maxPoints: 3,
+              criterionId: 'criterion-content'
+            }
+          ],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            criterionId: 'criterion-title',
+            points: 2,
+            maxPoints: 2
+          },
+          {
+            taskId: 'task-1',
+            scoringUnitId: 'task-1.content',
+            points: 2,
+            maxPoints: 3,
+            comment: 'Inhalt teilweise erfüllt.'
+          }
+        ]
+      }
+    });
+
+    expect(result.importedTaskScoreCount).toBe(2);
+    expect(result.correction.taskScores).toHaveLength(1);
+    expect(result.correction.taskScores[0]).toMatchObject({
+      taskId: 'task-with-criteria',
+      points: 4,
+      maxPoints: 5,
+      comment: 'Inhalt teilweise erfüllt.'
+    });
+    expect(result.correction.taskScores[0].criterionScores).toEqual([
+      {
+        criterionId: 'criterion-title',
+        points: 2,
+        maxPoints: 2
+      },
+      {
+        criterionId: 'criterion-content',
+        points: 2,
+        maxPoints: 3
+      }
+    ]);
+  });
+
   it('accepts a deduction with defect statement and linked evidence', async () => {
     const result = await importUseCase.execute({
       examId: exam.id,

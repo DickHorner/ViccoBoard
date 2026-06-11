@@ -127,7 +127,7 @@
                 <div class="criteria-correction-header">
                   <h4>Kriterien</h4>
                   <span v-if="scoringMode === 'numeric'">
-                    {{ getTaskCriterionPoints(task.id) }} / {{ task.points }} Punkte
+                    {{ getTaskPoints(task) }} / {{ task.points }} Punkte
                   </span>
                 </div>
                 <div
@@ -473,9 +473,12 @@ function getTaskCriterionPoints(taskId: string): number {
 }
 
 function getTaskPoints(task: Exams.TaskNode): number {
-  return task.criteria.length > 0
-    ? getTaskCriterionPoints(task.id)
-    : (taskScores.value[task.id] || 0);
+  if (task.criteria.length === 0) {
+    return taskScores.value[task.id] || 0;
+  }
+
+  const criterionPoints = getTaskCriterionPoints(task.id);
+  return criterionPoints > 0 ? criterionPoints : (taskScores.value[task.id] || 0);
 }
 
 function onCriterionScoreInput(taskId: string): void {

@@ -208,10 +208,58 @@ function mergeTaskScores(
 
   const merged = new Map(existingTaskScores.map((entry) => [entry.taskId, entry]));
   for (const imported of importedTaskScores) {
+    const existing = merged.get(imported.taskId);
+    if (existing?.criterionScores && imported.criterionScores) {
+      const criterionScores = new Map(existing.criterionScores.map((entry) => [entry.criterionId, entry]));
+      for (const criterionScore of imported.criterionScores) {
+        criterionScores.set(criterionScore.criterionId, criterionScore);
+      }
+      const nextCriterionScores = Array.from(criterionScores.values());
+      merged.set(imported.taskId, {
+        ...existing,
+        ...imported,
+        criterionScores: nextCriterionScores,
+        points: nextCriterionScores.reduce((sum, entry) => sum + entry.points, 0),
+        comment: imported.comment ?? existing.comment
+      });
+      continue;
+    }
+
     merged.set(imported.taskId, imported);
   }
 
   return Array.from(merged.values());
+}
+
+function resolveCriterionId(
+  importedTaskScore: Exams.KbrCorrectionImportedTaskScore,
+  scoringUnitById: ReadonlyMap<string, Exams.KbrCorrectionScoringUnit>
+): string | undefined {
+  if (importedTaskScore.criterionId) {
+    return importedTaskScore.criterionId;
+  }
+
+  if (!importedTaskScore.scoringUnitId) {
+    return undefined;
+  }
+
+  return scoringUnitById.get(importedTaskScore.scoringUnitId)?.criterionId;
+}
+
+function mergeComment(existingComment: string | undefined, importedComment: string | undefined): string | undefined {
+  if (!importedComment) {
+    return existingComment;
+  }
+
+  if (!existingComment) {
+    return importedComment;
+  }
+
+  if (existingComment.includes(importedComment)) {
+    return existingComment;
+  }
+
+  return `${existingComment}\n${importedComment}`;
 }
 
 export class ImportKbrCorrectionBundleUseCase {
@@ -256,10 +304,12 @@ export class ImportKbrCorrectionBundleUseCase {
     const step = resolveAllowedPointStep(exam);
     const taskById = new Map(exam.structure.tasks.map((task) => [task.id, task]));
     const evidenceById = new Map((bundle.evidence ?? []).map((evidence) => [evidence.id, evidence]));
+    const scoringUnitById = new Map(bundle.contract.scoringUnits.map((scoringUnit) => [scoringUnit.id, scoringUnit]));
     const importedRules = bundle.contract.rules.imports;
-    const mappedTaskScores: Exams.TaskScore[] = [];
+    const mappedTaskScoreByTaskId = new Map<string, Exams.TaskScore>();
     const manualReviewComments: Exams.CorrectionComment[] = [];
     let skippedTaskScoreCount = 0;
+    let importedTaskScoreCount = 0;
 
     for (const importedTaskScore of bundle.importedTaskScores) {
       const mappedTaskIdFromSession = input.sessionMap.taskIdByRef[importedTaskScore.taskId];
@@ -287,40 +337,80 @@ export class ImportKbrCorrectionBundleUseCase {
         throw new Error(`Unknown taskId "${importedTaskScore.taskId}" (mapped to "${mappedTaskId}") in import bundle.`);
       }
 
-      if (importedTaskScore.points < 0) {
-        throw new Error(`Task "${mappedTaskId}" has negative points (${importedTaskScore.points}).`);
+      const criterionId = resolveCriterionId(importedTaskScore, scoringUnitById);
+      const criterion = criterionId
+        ? task.criteria.find((entry) => entry.id === criterionId)
+        : undefined;
+      if (criterionId && !criterion) {
+        throw new Error(`Unknown criterionId "${criterionId}" for task "${mappedTaskId}" in import bundle.`);
       }
-      if (importedTaskScore.points > task.points + EPSILON) {
+
+      const localMaxPoints = criterion?.points ?? task.points;
+      const scoreLabel = criterion
+        ? `Criterion "${criterion.id}" for task "${mappedTaskId}"`
+        : `Task "${mappedTaskId}"`;
+
+      if (importedTaskScore.points < 0) {
+        throw new Error(`${scoreLabel} has negative points (${importedTaskScore.points}).`);
+      }
+      if (importedTaskScore.points > localMaxPoints + EPSILON) {
         throw new Error(
-          `Task "${mappedTaskId}" has points ${importedTaskScore.points}, which exceeds task max ${task.points}.`
+          `${scoreLabel} has points ${importedTaskScore.points}, which exceeds max ${localMaxPoints}.`
         );
       }
       if (importedTaskScore.points > importedTaskScore.maxPoints + EPSILON) {
         throw new Error(
-          `Task "${mappedTaskId}" has points ${importedTaskScore.points}, which exceeds imported max ${importedTaskScore.maxPoints}.`
+          `${scoreLabel} has points ${importedTaskScore.points}, which exceeds imported max ${importedTaskScore.maxPoints}.`
         );
       }
-      if (importedTaskScore.maxPoints > task.points + EPSILON) {
+      if (importedTaskScore.maxPoints > localMaxPoints + EPSILON) {
         uncertainties.push({
           code: 'imported-max-points-exceeds-task-max',
-          message: `Imported maxPoints ${importedTaskScore.maxPoints} exceeds exam task max ${task.points}; task max is used.`,
-          reference: mappedTaskId
+          message: `Imported maxPoints ${importedTaskScore.maxPoints} exceeds local max ${localMaxPoints}; local max is used.`,
+          reference: criterion?.id ?? mappedTaskId
         });
       }
 
       assertPointStep(importedTaskScore.points, step, mappedTaskId);
 
-      const deductionReview = reviewImportedDeduction(importedTaskScore, task.points, step, evidenceById);
+      const deductionReview = reviewImportedDeduction(importedTaskScore, localMaxPoints, step, evidenceById);
       if (deductionReview?.requiresManualReview) {
         uncertainties.push({
           code: 'deduction-requires-manual-review',
-          message: `Task "${mappedTaskId}" was marked for manual review: ${deductionReview.message}`,
-          reference: mappedTaskId
+          message: `${scoreLabel} was marked for manual review: ${deductionReview.message}`,
+          reference: criterion?.id ?? mappedTaskId
         });
         manualReviewComments.push(buildDeductionManualReviewComment(mappedTaskId, deductionReview));
       }
 
-      mappedTaskScores.push({
+      importedTaskScoreCount += 1;
+
+      if (criterion) {
+        const existingMappedScore = mappedTaskScoreByTaskId.get(mappedTaskId) ?? {
+          taskId: mappedTaskId,
+          points: 0,
+          maxPoints: task.points,
+          criterionScores: [],
+          timestamp: new Date()
+        };
+        const criterionScores = new Map((existingMappedScore.criterionScores ?? []).map((entry) => [entry.criterionId, entry]));
+        criterionScores.set(criterion.id, {
+          criterionId: criterion.id,
+          points: importedTaskScore.points,
+          maxPoints: criterion.points
+        });
+        const nextCriterionScores = Array.from(criterionScores.values());
+        mappedTaskScoreByTaskId.set(mappedTaskId, {
+          ...existingMappedScore,
+          points: nextCriterionScores.reduce((sum, entry) => sum + entry.points, 0),
+          criterionScores: nextCriterionScores,
+          comment: mergeComment(existingMappedScore.comment, importedTaskScore.comment),
+          timestamp: new Date()
+        });
+        continue;
+      }
+
+      mappedTaskScoreByTaskId.set(mappedTaskId, {
         taskId: mappedTaskId,
         points: importedTaskScore.points,
         maxPoints: task.points,
@@ -329,6 +419,8 @@ export class ImportKbrCorrectionBundleUseCase {
         timestamp: new Date()
       });
     }
+
+    const mappedTaskScores = Array.from(mappedTaskScoreByTaskId.values());
 
     const existingCorrection = await this.correctionEntryRepository.findByExamAndCandidate(input.examId, candidateId);
     const finalTaskScores = mergeTaskScores(
@@ -358,7 +450,7 @@ export class ImportKbrCorrectionBundleUseCase {
       correction,
       candidateId,
       chatRef: bundle.chatRef,
-      importedTaskScoreCount: mappedTaskScores.length,
+      importedTaskScoreCount,
       skippedTaskScoreCount,
       uncertainties
     };
