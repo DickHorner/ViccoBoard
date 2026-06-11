@@ -81,7 +81,16 @@ function extractGeneralComments(
     return [];
   }
 
-  const possibleKeys = ['generalComment', 'generalComments', 'examComment', 'examLevelComments'] as const;
+  const possibleKeys = [
+    'generalComment',
+    'generalComments',
+    'examComment',
+    'examLevelComments',
+    'remark',
+    'remarks',
+    'bemerkung',
+    'bemerkungen'
+  ] as const;
   const comments: string[] = [];
 
   for (const key of possibleKeys) {
@@ -174,6 +183,18 @@ function buildExamLevelComment(text: string): Exams.CorrectionComment {
   };
 }
 
+function buildTaskLevelComment(taskId: string, text: string): Exams.CorrectionComment {
+  return {
+    id: uuidv4(),
+    taskId,
+    level: 'task',
+    text,
+    printable: true,
+    availableAfterReturn: true,
+    timestamp: new Date()
+  };
+}
+
 function mergeUniqueComments(commentGroups: Exams.CorrectionComment[][]): Exams.CorrectionComment[] {
   const merged: Exams.CorrectionComment[] = [];
   const seen = new Set<string>();
@@ -191,6 +212,12 @@ function mergeUniqueComments(commentGroups: Exams.CorrectionComment[][]): Exams.
   }
 
   return merged;
+}
+
+function extractTaskComments(taskScores: Exams.TaskScore[]): Exams.CorrectionComment[] {
+  return taskScores
+    .filter((taskScore) => typeof taskScore.comment === 'string' && taskScore.comment.trim().length > 0)
+    .map((taskScore) => buildTaskLevelComment(taskScore.taskId, taskScore.comment!.trim()));
 }
 
 function mergeTaskScores(
@@ -431,11 +458,17 @@ export class ImportKbrCorrectionBundleUseCase {
 
     const generalComments = extractGeneralComments(asRecord(bundle.metadata), uncertainties);
     const importedExamComments = generalComments.map(buildExamLevelComment);
+    const importedTaskComments = extractTaskComments(finalTaskScores);
     // `preserveManualComments=false` means we intentionally replace existing comments on import.
     const existingComments = importedRules.preserveManualComments
       ? (existingCorrection?.comments ?? [])
       : [];
-    const allComments = mergeUniqueComments([existingComments, importedExamComments, manualReviewComments]);
+    const allComments = mergeUniqueComments([
+      existingComments,
+      importedExamComments,
+      importedTaskComments,
+      manualReviewComments
+    ]);
 
     const correction = await this.recordCorrectionUseCase.execute({
       examId: input.examId,

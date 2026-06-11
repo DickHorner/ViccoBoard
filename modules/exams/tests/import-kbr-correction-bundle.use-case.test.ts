@@ -164,8 +164,63 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
     expect(result.importedTaskScoreCount).toBe(1);
     expect(result.correction.taskScores).toHaveLength(1);
     expect(result.correction.taskScores[0].taskId).toBe('task-internal-1');
+    expect(result.correction.taskScores[0].comment).toBe('Teilweise korrekt');
     expect(result.correction.comments.some((comment) => comment.level === 'exam')).toBe(true);
     expect(result.correction.comments.find((comment) => comment.level === 'exam')?.text).toBe('Gute Gesamtleistung.');
+    expect(result.correction.comments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          taskId: 'task-internal-1',
+          level: 'task',
+          text: 'Teilweise korrekt',
+          printable: true,
+          availableAfterReturn: true
+        })
+      ])
+    );
+  });
+
+  it('accepts german metadata remark keys for exam-level comments on reimport', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 8,
+            maxPoints: 10
+          }
+        ],
+        metadata: {
+          bemerkungen: ['Saubere Argumentation.', 'Saubere Argumentation.']
+        }
+      }
+    });
+
+    expect(
+      result.correction.comments.filter((comment) => comment.level === 'exam').map((comment) => comment.text)
+    ).toEqual(['Saubere Argumentation.']);
   });
 
   it('imports criterion scores into correction entries used by the correction mask', async () => {
