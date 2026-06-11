@@ -99,6 +99,78 @@
   gap: 1rem;
 }
 
+.format-select-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.format-select-row .btn-secondary-small {
+  white-space: nowrap;
+}
+
+.format-editor,
+.format-missing {
+  grid-column: 1 / -1;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 6px;
+  background: white;
+  padding: 1rem;
+}
+
+.format-editor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.format-editor-item,
+.format-missing {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.format-editor-item {
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 4px;
+  padding: 0.65rem 0.75rem;
+  background: var(--color-surface, #f9f9f9);
+}
+
+.format-editor-item span,
+.format-missing span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.format-editor-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+}
+
+.format-editor-add input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.format-editor-name {
+  min-width: 0;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
 .task-card {
   border: 1px solid var(--color-border, #ddd);
   border-radius: 6px;
@@ -448,6 +520,17 @@
   }
 
   .import-panel {
+    flex-direction: column;
+  }
+
+  .format-select-row,
+  .format-editor-add {
+    grid-template-columns: 1fr;
+  }
+
+  .format-editor-item,
+  .format-missing {
+    align-items: stretch;
     flex-direction: column;
   }
 

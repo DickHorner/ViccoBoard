@@ -39,11 +39,55 @@
           </div>
           <div class="form-group">
             <label>Format</label>
-            <select v-model="store.assessmentFormat">
-              <option v-for="format in assessmentFormats" :key="format.value" :value="format.value">
-                {{ format.label }}
-              </option>
-            </select>
+            <div class="format-select-row">
+              <select v-model="store.assessmentFormat">
+                <option v-for="format in assessmentFormatOptions" :key="format.value" :value="format.value">
+                  {{ format.label }}
+                </option>
+              </select>
+              <button type="button" class="btn-secondary-small" @click="toggleFormatEditor">
+                {{ showFormatEditor ? 'Schließen' : 'Bearbeiten' }}
+              </button>
+            </div>
+          </div>
+          <div v-if="showFormatEditor" class="format-editor">
+            <div class="format-editor-list">
+              <div v-for="format in assessmentFormatOptions" :key="format.value" class="format-editor-item">
+                <input
+                  v-if="format.custom"
+                  class="format-editor-name"
+                  :value="format.label"
+                  type="text"
+                  maxlength="80"
+                  @change="updateCustomAssessmentFormatLabel(format.value, ($event.target as HTMLInputElement).value)"
+                  @keydown.enter.prevent="($event.target as HTMLInputElement).blur()"
+                />
+                <span v-else>{{ format.label }}</span>
+                <button
+                  v-if="format.custom"
+                  type="button"
+                  class="btn-danger-small"
+                  @click="removeCustomAssessmentFormat(format.value)"
+                >
+                  Entfernen
+                </button>
+              </div>
+            </div>
+            <form class="format-editor-add" @submit.prevent="addCustomAssessmentFormat">
+              <input
+                v-model="newAssessmentFormatLabel"
+                type="text"
+                placeholder="Neues Format"
+                maxlength="80"
+              />
+              <button type="submit" class="btn-small" :disabled="!newAssessmentFormatLabel.trim()">Hinzufügen</button>
+            </form>
+          </div>
+          <div v-else-if="isSelectedFormatMissing" class="format-missing">
+            <span>{{ selectedAssessmentFormatLabel }}</span>
+            <button type="button" class="btn-secondary-small" @click="restoreSelectedAssessmentFormat">
+              Wieder hinzufügen
+            </button>
           </div>
           <div class="form-group">
             <label>Modus</label>
@@ -467,8 +511,17 @@ const gradeBoundaries = ref<Exams.GradeBoundary[]>([]);
 const examStatus = ref<Exams.Exam['status']>('draft');
 const printPresets = ref<Exams.Exam['printPresets']>([]);
 const isLoading = ref(true);
+const showFormatEditor = ref(false);
+const newAssessmentFormatLabel = ref('');
 
-const assessmentFormats: Array<{ value: Exams.ExamAssessmentFormat; label: string }> = [
+type AssessmentFormatOption = {
+  value: Exams.ExamAssessmentFormat;
+  label: string;
+  custom?: boolean;
+};
+
+const assessmentFormatStorageKey = 'viccoboard:kbr-assessment-formats';
+const defaultAssessmentFormats: AssessmentFormatOption[] = [
   { value: 'klausur', label: 'Klausur' },
   { value: 'test', label: 'Test' },
   { value: 'mappenkorrektur', label: 'Mappenkorrektur' },
@@ -479,14 +532,41 @@ const assessmentFormats: Array<{ value: Exams.ExamAssessmentFormat; label: strin
   { value: 'muendliche-pruefung', label: 'Mündliche Prüfung' },
   { value: 'gruppenarbeit', label: 'Gruppenarbeit' }
 ];
+const customAssessmentFormats = ref<AssessmentFormatOption[]>([]);
 
 const isEditing = computed(() => !!route.params.id);
 const selectedClassLabel = computed(() => {
   const classGroup = classGroups.value.find((entry) => entry.id === store.classGroupId);
   return classGroup ? `${classGroup.name} (${classGroup.schoolYear})` : 'keine Klasse';
 });
+const assessmentFormatOptions = computed<AssessmentFormatOption[]>(() => {
+  const options = [...defaultAssessmentFormats];
+  for (const customFormat of customAssessmentFormats.value) {
+    if (!options.some((format) => format.value === customFormat.value)) {
+      options.push(customFormat);
+    }
+  }
+
+  if (
+    store.assessmentFormat &&
+    !options.some((format) => format.value === store.assessmentFormat)
+  ) {
+    options.push({
+      value: store.assessmentFormat,
+      label: store.assessmentFormat,
+      custom: true
+    });
+  }
+
+  return options;
+});
 const selectedAssessmentFormatLabel = computed(() =>
-  assessmentFormats.find((format) => format.value === store.assessmentFormat)?.label ?? 'Klausur'
+  assessmentFormatOptions.value.find((format) => format.value === store.assessmentFormat)?.label ?? store.assessmentFormat
+);
+const isSelectedFormatMissing = computed(() =>
+  Boolean(store.assessmentFormat) &&
+  !defaultAssessmentFormats.some((format) => format.value === store.assessmentFormat) &&
+  !customAssessmentFormats.value.some((format) => format.value === store.assessmentFormat)
 );
 const selectedGradingPresetDescription = computed(() =>
   gradingPresets.find((presetOption: Exams.GradingPreset) => presetOption.id === selectedGradingPresetId.value)?.description ?? ''
@@ -578,6 +658,138 @@ const syncGroupAssignments = () => {
   }
 
   store.candidateGroups = synchronizeCandidateGroups(store.candidateGroups, candidates.value);
+};
+
+const normalizeAssessmentFormatValue = (label: string): Exams.ExamAssessmentFormat => {
+  const normalized = label
+    .trim()
+    .toLocaleLowerCase('de-DE')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return `custom-${normalized || Date.now()}` as Exams.ExamAssessmentFormat;
+};
+
+const persistCustomAssessmentFormats = () => {
+  window.localStorage.setItem(
+    assessmentFormatStorageKey,
+    JSON.stringify(customAssessmentFormats.value)
+  );
+};
+
+const loadCustomAssessmentFormats = () => {
+  const serialized = window.localStorage.getItem(assessmentFormatStorageKey);
+  if (!serialized) {
+    customAssessmentFormats.value = [];
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(serialized);
+    if (!Array.isArray(parsed)) {
+      customAssessmentFormats.value = [];
+      return;
+    }
+
+    customAssessmentFormats.value = parsed
+      .filter((format): format is AssessmentFormatOption =>
+        typeof format?.value === 'string' &&
+        typeof format?.label === 'string' &&
+        format.value.trim().length > 0 &&
+        format.label.trim().length > 0
+      )
+      .map((format) => ({
+        value: format.value,
+        label: format.label.trim(),
+        custom: true
+      }));
+  } catch {
+    customAssessmentFormats.value = [];
+  }
+};
+
+const toggleFormatEditor = () => {
+  showFormatEditor.value = !showFormatEditor.value;
+};
+
+const addCustomAssessmentFormat = () => {
+  const label = newAssessmentFormatLabel.value.trim();
+  if (!label) {
+    return;
+  }
+
+  const existing = assessmentFormatOptions.value.find((format) =>
+    format.label.localeCompare(label, 'de', { sensitivity: 'accent' }) === 0
+  );
+  if (existing) {
+    store.assessmentFormat = existing.value;
+    newAssessmentFormatLabel.value = '';
+    return;
+  }
+
+  let value = normalizeAssessmentFormatValue(label);
+  let suffix = 2;
+  while (assessmentFormatOptions.value.some((format) => format.value === value)) {
+    value = `${normalizeAssessmentFormatValue(label)}-${suffix}` as Exams.ExamAssessmentFormat;
+    suffix += 1;
+  }
+
+  const format = { value, label, custom: true };
+  customAssessmentFormats.value.push(format);
+  store.assessmentFormat = value;
+  newAssessmentFormatLabel.value = '';
+  persistCustomAssessmentFormats();
+};
+
+const removeCustomAssessmentFormat = (value: Exams.ExamAssessmentFormat) => {
+  customAssessmentFormats.value = customAssessmentFormats.value.filter((format) => format.value !== value);
+  if (store.assessmentFormat === value) {
+    store.assessmentFormat = 'klausur';
+  }
+  persistCustomAssessmentFormats();
+};
+
+const updateCustomAssessmentFormatLabel = (value: Exams.ExamAssessmentFormat, nextLabel: string) => {
+  const label = nextLabel.trim();
+  const format = customAssessmentFormats.value.find((entry) => entry.value === value);
+  if (!format) {
+    return;
+  }
+
+  if (!label) {
+    return;
+  }
+
+  const duplicate = assessmentFormatOptions.value.some((entry) =>
+    entry.value !== value &&
+    entry.label.localeCompare(label, 'de', { sensitivity: 'accent' }) === 0
+  );
+  if (duplicate) {
+    return;
+  }
+
+  format.label = label;
+  persistCustomAssessmentFormats();
+};
+
+const restoreSelectedAssessmentFormat = () => {
+  if (!store.assessmentFormat) {
+    return;
+  }
+
+  customAssessmentFormats.value.push({
+    value: store.assessmentFormat,
+    label: selectedAssessmentFormatLabel.value,
+    custom: true
+  });
+  persistCustomAssessmentFormats();
+  showFormatEditor.value = true;
 };
 
 const loadClassGroups = async () => {
@@ -750,6 +962,7 @@ watch(candidates, () => {
 }, { deep: true });
 
 onMounted(async () => {
+  loadCustomAssessmentFormats();
   store.reset();
   await loadClassGroups();
   await store.loadReusableTasks();

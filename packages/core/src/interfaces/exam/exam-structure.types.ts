@@ -35,7 +35,8 @@ export type ExamAssessmentFormat =
   | 'referatsrueckmeldung'
   | 'facharbeit'
   | 'muendliche-pruefung'
-  | 'gruppenarbeit';
+  | 'gruppenarbeit'
+  | string;
 
 export enum ExamMode {
   Simple = 'simple',

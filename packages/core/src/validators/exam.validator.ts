@@ -56,21 +56,12 @@ export class ExamValidator {
       errors.push('Mode must be either "simple" or "complex"');
     }
 
-    if (
-      data.assessmentFormat &&
-      ![
-        'klausur',
-        'test',
-        'mappenkorrektur',
-        'portfolio',
-        'referat',
-        'referatsrueckmeldung',
-        'facharbeit',
-        'muendliche-pruefung',
-        'gruppenarbeit'
-      ].includes(data.assessmentFormat)
-    ) {
-      errors.push('Assessment format is invalid');
+    if (data.assessmentFormat !== undefined) {
+      if (typeof data.assessmentFormat !== 'string' || data.assessmentFormat.trim().length === 0) {
+        errors.push('Assessment format is invalid');
+      } else if (data.assessmentFormat.length > 120) {
+        errors.push('Assessment format must not exceed 120 characters');
+      }
     }
 
     // Structure validation
