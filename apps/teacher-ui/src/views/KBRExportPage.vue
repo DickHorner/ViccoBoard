@@ -12,6 +12,14 @@
         <button class="ghost-button" type="button" @click="goToCorrection" :disabled="!exam">
           Zur Korrektur
         </button>
+        <button
+          class="ghost-button"
+          type="button"
+          @click="markAllCompleted"
+          :disabled="!canMarkAllCompleted || finalizingAll"
+        >
+          {{ finalizingAll ? 'Markiert...' : 'Alle als abgeschlossen markieren' }}
+        </button>
         <button class="primary-button" type="button" @click="exportAll" :disabled="!canExportAll">
           Alle Bögen exportieren
         </button>
@@ -164,12 +172,13 @@
 
             <div class="ai-action-group">
               <h4>2. Import</h4>
-              <p class="panel-copy">Laden Sie die Ergebnis-JSON-Datei des KI-Bundles hoch.</p>
+              <p class="panel-copy">Laden Sie eine Bundle-JSON oder mehrere Einzel-JSONs der Korrekturbögen hoch.</p>
               <div class="import-controls">
                 <input
                   type="file"
                   id="ai-import-file"
                   accept=".json"
+                  multiple
                   class="hidden-input"
                   @change="handleAIImport"
                   :disabled="aiImporting"
@@ -215,6 +224,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { downloadBytes, downloadText } from '../utils/download'
+import { normalizeCorrectionImportPayload } from '../utils/kbr-correction-import'
 import {
   buildCorrectionSessionDownloads,
   type CorrectionSessionDownloadArtifact
@@ -229,7 +239,8 @@ const {
   exportCurrentCorrectionSheetPdf,
   exportAllCorrectionSheetsPdf,
   exportCorrectionSession,
-  importCorrectionBundle
+  importCorrectionBundle,
+  recordCorrectionUseCase
 } = useExamsBridge()
 
 const loading = ref(true)
@@ -246,6 +257,7 @@ const aiImporting = ref(false)
 const aiError = ref('')
 const aiSuccess = ref('')
 const aiExportArtifacts = ref<CorrectionSessionDownloadArtifact[]>([])
+const finalizingAll = ref(false)
 
 async function exportAISession(): Promise<void> {
   if (!exam.value || !exportCorrectionSession) return
@@ -283,16 +295,18 @@ async function exportAISession(): Promise<void> {
 
 async function handleAIImport(event: Event): Promise<void> {
   const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file || !exam.value || !importCorrectionBundle) return
+  const files = Array.from(target.files ?? [])
+  if (files.length === 0 || !exam.value || !importCorrectionBundle) return
 
   aiError.value = ''
   aiSuccess.value = ''
   aiImporting.value = true
 
   try {
-    const content = await file.text()
-    const bundle = JSON.parse(content)
+    const parsedBundles = await Promise.all(
+      files.map(async (file) => JSON.parse(await file.text()) as unknown)
+    )
+    const bundle = normalizeCorrectionImportPayload(parsedBundles)
     
     // Retrieve session map
     const storedMap = localStorage.getItem(`viccoboard_session_map_${exam.value.id}`)
@@ -309,7 +323,10 @@ async function handleAIImport(event: Event): Promise<void> {
       bundle
     })
     
-    aiSuccess.value = 'KI-Ergebnisse erfolgreich importiert.'
+    const importedCount = Array.isArray(bundle) ? bundle.length : 1
+    aiSuccess.value = importedCount === 1
+      ? 'KI-Ergebnisse erfolgreich importiert.'
+      : `${importedCount} KI-Ergebnisse erfolgreich importiert.`
     
     // Reload corrections and preview
     const loadedCorrections = await findCorrectionsByExam(exam.value.id)
@@ -347,6 +364,12 @@ const canExportAll = computed(() => {
     [...corrections.value.values()].some((c) => c.status === 'completed')
   )
 })
+const finalizableCorrections = computed(() =>
+  [...corrections.value.values()].filter((correction) => correction.status !== 'completed')
+)
+const canMarkAllCompleted = computed(() =>
+  Boolean(recordCorrectionUseCase && finalizableCorrections.value.length > 0)
+)
 
 const formattedExamDate = computed(() => {
   if (!projection.value?.examDate) {
@@ -474,6 +497,43 @@ async function exportAll(): Promise<void> {
 
   const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id)
   downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf')
+}
+
+async function markAllCompleted(): Promise<void> {
+  if (!exam.value || !recordCorrectionUseCase || finalizableCorrections.value.length === 0) {
+    return
+  }
+
+  finalizingAll.value = true
+  aiError.value = ''
+  aiSuccess.value = ''
+
+  try {
+    const completedCount = finalizableCorrections.value.length
+    for (const correction of finalizableCorrections.value) {
+      await recordCorrectionUseCase.execute({
+        examId: correction.examId,
+        candidateId: correction.candidateId,
+        taskScores: correction.taskScores,
+        comments: correction.comments,
+        supportTips: correction.supportTips,
+        finalizeCorrection: true
+      })
+    }
+
+    const loadedCorrections = await findCorrectionsByExam(exam.value.id)
+    corrections.value = new Map(loadedCorrections.map((entry) => [entry.candidateId, entry]))
+    if (selectedCandidateId.value) {
+      await loadPreview(selectedCandidateId.value)
+    }
+    aiSuccess.value = completedCount === 1
+      ? '1 Korrektur als abgeschlossen markiert.'
+      : `${completedCount} Korrekturen als abgeschlossen markiert.`
+  } catch (error: any) {
+    aiError.value = `Abschluss fehlgeschlagen: ${error.message}`
+  } finally {
+    finalizingAll.value = false
+  }
 }
 
 function goToCorrection(): void {

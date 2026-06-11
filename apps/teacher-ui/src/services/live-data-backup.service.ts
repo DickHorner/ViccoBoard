@@ -1,4 +1,5 @@
 import { getStorage, VICCOBOARD_DATABASE_NAME } from './storage.service'
+import { mergeBackupValue } from './live-data-backup-merge'
 
 export interface LiveDataBackupStore {
   name: string
@@ -20,12 +21,6 @@ export interface LiveDataRestoreResult {
   mergedRecords: number
   unchangedRecords: number
   conflictRecords: number
-}
-
-interface MergeResult {
-  value: unknown
-  changed: boolean
-  conflict: boolean
 }
 
 export async function createLiveDataBackup(): Promise<LiveDataBackupFile> {
@@ -169,7 +164,7 @@ function restoreChangedRecords(
           return
         }
 
-        const merge = mergeValue(currentRecord, backupRecord)
+        const merge = mergeBackupValue(currentRecord, backupRecord)
         if (merge.conflict) {
           conflictRecords += 1
           return
@@ -186,121 +181,4 @@ function restoreChangedRecords(
       getRequest.onerror = () => reject(getRequest.error)
     }
   })
-}
-
-function mergeValue(current: unknown, incoming: unknown): MergeResult {
-  if (stableStringify(current) === stableStringify(incoming)) {
-    return { value: current, changed: false, conflict: false }
-  }
-
-  if (current === undefined || current === null || current === '') {
-    return { value: incoming, changed: true, conflict: false }
-  }
-
-  if (incoming === undefined || incoming === null || incoming === '') {
-    return { value: current, changed: false, conflict: false }
-  }
-
-  if (Array.isArray(current) && Array.isArray(incoming)) {
-    return mergeArray(current, incoming)
-  }
-
-  if (isPlainRecord(current) && isPlainRecord(incoming)) {
-    return mergeRecord(current, incoming)
-  }
-
-  return { value: current, changed: false, conflict: true }
-}
-
-function mergeRecord(
-  current: Record<string, unknown>,
-  incoming: Record<string, unknown>
-): MergeResult {
-  const merged: Record<string, unknown> = { ...current }
-  let changed = false
-  let conflict = false
-
-  for (const key of Object.keys(incoming)) {
-    const result = mergeValue(current[key], incoming[key])
-    if (result.conflict) {
-      conflict = true
-      continue
-    }
-    if (result.changed) {
-      merged[key] = result.value
-      changed = true
-    }
-  }
-
-  return { value: merged, changed, conflict }
-}
-
-function mergeArray(current: unknown[], incoming: unknown[]): MergeResult {
-  if (canMergeArrayById(current) && canMergeArrayById(incoming)) {
-    return mergeArrayById(current, incoming)
-  }
-
-  const merged = [...current]
-  let changed = false
-
-  for (const incomingItem of incoming) {
-    if (!merged.some((currentItem) => stableStringify(currentItem) === stableStringify(incomingItem))) {
-      merged.push(incomingItem)
-      changed = true
-    }
-  }
-
-  return { value: merged, changed, conflict: false }
-}
-
-function mergeArrayById(current: Array<Record<string, unknown>>, incoming: Array<Record<string, unknown>>): MergeResult {
-  const merged = [...current]
-  let changed = false
-  let conflict = false
-
-  for (const incomingItem of incoming) {
-    const id = incomingItem.id
-    const index = merged.findIndex((currentItem) => currentItem.id === id)
-
-    if (index === -1) {
-      merged.push(incomingItem)
-      changed = true
-      continue
-    }
-
-    const result = mergeRecord(merged[index], incomingItem)
-    if (result.conflict) {
-      conflict = true
-      continue
-    }
-    if (result.changed) {
-      merged[index] = result.value as Record<string, unknown>
-      changed = true
-    }
-  }
-
-  return { value: merged, changed, conflict }
-}
-
-function canMergeArrayById(items: unknown[]): items is Array<Record<string, unknown>> {
-  return items.every((item) => isPlainRecord(item) && typeof item.id === 'string')
-}
-
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
-}
-
-function stableStringify(value: unknown): string {
-  if (Array.isArray(value)) {
-    return `[${value.map(stableStringify).join(',')}]`
-  }
-
-  if (isPlainRecord(value)) {
-    return `{${Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
-      .join(',')}}`
-  }
-
-  return JSON.stringify(value)
 }
