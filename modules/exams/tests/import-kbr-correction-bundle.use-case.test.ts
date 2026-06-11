@@ -223,6 +223,104 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
     ).toEqual(['Saubere Argumentation.']);
   });
 
+  it('imports alternative remark keys on task scores into task comments', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 7,
+            maxPoints: 10,
+            remark: 'Der Berufsalltag bleibt noch zu oberflächlich beschrieben.'
+          }
+        ]
+      }
+    });
+
+    expect(result.correction.taskScores[0].comment).toBe('Der Berufsalltag bleibt noch zu oberflächlich beschrieben.');
+    expect(result.correction.comments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          taskId: 'task-internal-1',
+          level: 'task',
+          text: 'Der Berufsalltag bleibt noch zu oberflächlich beschrieben.'
+        })
+      ])
+    );
+  });
+
+  it('imports structured metadata task comments and end comments', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 6,
+            maxPoints: 10
+          }
+        ],
+        metadata: {
+          finalComment: 'Insgesamt ein brauchbarer Ansatz mit Luecken.',
+          taskComments: [
+            {
+              taskId: 'task-1',
+              remark: 'Werkzeuge und Materialien sollten genauer benannt werden.'
+            }
+          ]
+        }
+      }
+    });
+
+    expect(result.correction.taskScores[0].comment).toBe('Werkzeuge und Materialien sollten genauer benannt werden.');
+    expect(
+      result.correction.comments.filter((comment) => comment.level === 'exam').map((comment) => comment.text)
+    ).toEqual(['Insgesamt ein brauchbarer Ansatz mit Luecken.']);
+  });
+
   it('imports criterion scores into correction entries used by the correction mask', async () => {
     const criterionExam = await examRepo.create({
       title: 'Criterion Import',

@@ -86,6 +86,10 @@ function extractGeneralComments(
     'generalComments',
     'examComment',
     'examLevelComments',
+    'generalRemark',
+    'generalRemarks',
+    'endComment',
+    'finalComment',
     'remark',
     'remarks',
     'bemerkung',
@@ -124,6 +128,149 @@ function extractGeneralComments(
   }
 
   return Array.from(new Set(comments));
+}
+
+function extractFirstText(value: unknown, keys: readonly string[]): string | undefined {
+  const texts: string[] = [];
+
+  if (typeof value === 'string' && value.trim().length > 0) {
+    texts.push(value.trim());
+  }
+
+  const record = asRecord(value);
+  if (record) {
+    for (const key of keys) {
+      const candidate = record[key];
+      if (typeof candidate === 'string' && candidate.trim().length > 0) {
+        texts.push(candidate.trim());
+      }
+    }
+  }
+
+  return Array.from(new Set(texts))[0];
+}
+
+function extractImportedTaskScoreComment(rawTaskScore: Record<string, unknown>): string | undefined {
+  return extractFirstText(rawTaskScore, [
+    'comment',
+    'comments',
+    'remark',
+    'remarks',
+    'bemerkung',
+    'bemerkungen',
+    'feedback',
+    'note',
+    'notes',
+    'justification'
+  ]);
+}
+
+function resolveMetadataCommentText(value: unknown): string | undefined {
+  return extractFirstText(value, [
+    'text',
+    'comment',
+    'comments',
+    'remark',
+    'remarks',
+    'bemerkung',
+    'bemerkungen',
+    'feedback',
+    'generalComment',
+    'generalComments',
+    'generalRemark',
+    'generalRemarks',
+    'examComment',
+    'examLevelComments',
+    'endComment',
+    'finalComment'
+  ]);
+}
+
+function resolveTaskReferenceFromMetadataComment(
+  entry: Record<string, unknown>,
+  sessionMap: CorrectionImportSessionMap,
+  taskById: ReadonlyMap<string, Exams.TaskNode>,
+  scoringUnitById: ReadonlyMap<string, Exams.KbrCorrectionScoringUnit>
+): string | undefined {
+  const possibleRefs: string[] = [];
+  const directRefKeys = [
+    'taskId',
+    'taskRef',
+    'taskReference',
+    'taskChatRef',
+    'task',
+    'reference'
+  ] as const;
+
+  for (const key of directRefKeys) {
+    const value = entry[key];
+    if (typeof value === 'string' && value.trim().length > 0) {
+      possibleRefs.push(value.trim());
+    }
+  }
+
+  const scoringUnitId = entry.scoringUnitId;
+  if (typeof scoringUnitId === 'string' && scoringUnitId.trim().length > 0) {
+    const scoringUnitTaskRef = scoringUnitById.get(scoringUnitId)?.taskId;
+    if (scoringUnitTaskRef) {
+      possibleRefs.push(scoringUnitTaskRef);
+    }
+  }
+
+  for (const ref of possibleRefs) {
+    const mappedTaskId = sessionMap.taskIdByRef[ref] ?? ref;
+    if (taskById.has(mappedTaskId)) {
+      return mappedTaskId;
+    }
+  }
+
+  return undefined;
+}
+
+function extractMetadataTaskComments(
+  metadata: Record<string, unknown> | undefined,
+  sessionMap: CorrectionImportSessionMap,
+  taskById: ReadonlyMap<string, Exams.TaskNode>,
+  scoringUnitById: ReadonlyMap<string, Exams.KbrCorrectionScoringUnit>,
+  uncertainties: CorrectionImportUncertainty[]
+): Map<string, string[]> {
+  if (!metadata) {
+    return new Map();
+  }
+
+  const taskCommentsByTaskId = new Map<string, string[]>();
+  const possibleKeys = ['comments', 'taskComments', 'remarks', 'feedback'] as const;
+
+  for (const key of possibleKeys) {
+    const raw = metadata[key];
+    if (!Array.isArray(raw)) {
+      continue;
+    }
+
+    for (const entry of raw) {
+      const comment = resolveMetadataCommentText(entry);
+      const asObj = asRecord(entry);
+
+      if (!comment || !asObj) {
+        uncertainties.push({
+          code: 'general-comment-unrecognized',
+          message: `Ignored metadata.${key} entry because no structured comment text could be resolved.`,
+          reference: key
+        });
+        continue;
+      }
+
+      const taskId = resolveTaskReferenceFromMetadataComment(asObj, sessionMap, taskById, scoringUnitById);
+      if (!taskId) {
+        continue;
+      }
+
+      const existing = taskCommentsByTaskId.get(taskId) ?? [];
+      taskCommentsByTaskId.set(taskId, existing.includes(comment) ? existing : [...existing, comment]);
+    }
+  }
+
+  return taskCommentsByTaskId;
 }
 
 function assertSessionContext(
@@ -289,6 +436,49 @@ function mergeComment(existingComment: string | undefined, importedComment: stri
   return `${existingComment}\n${importedComment}`;
 }
 
+function mergeTaskCommentsIntoScores(
+  taskScores: Exams.TaskScore[],
+  taskCommentsByTaskId: ReadonlyMap<string, string[]>,
+  taskById: ReadonlyMap<string, Exams.TaskNode>
+): Exams.TaskScore[] {
+  if (taskCommentsByTaskId.size === 0) {
+    return taskScores;
+  }
+
+  const scoresByTaskId = new Map(taskScores.map((taskScore) => [taskScore.taskId, taskScore]));
+
+  for (const [taskId, comments] of taskCommentsByTaskId.entries()) {
+    const mergedComment = comments.reduce<string | undefined>(
+      (current, next) => mergeComment(current, next),
+      scoresByTaskId.get(taskId)?.comment
+    );
+
+    const existingScore = scoresByTaskId.get(taskId);
+    if (existingScore) {
+      scoresByTaskId.set(taskId, {
+        ...existingScore,
+        comment: mergedComment
+      });
+      continue;
+    }
+
+    const task = taskById.get(taskId);
+    if (!task) {
+      continue;
+    }
+
+    scoresByTaskId.set(taskId, {
+      taskId,
+      points: 0,
+      maxPoints: task.points,
+      comment: mergedComment,
+      timestamp: new Date()
+    });
+  }
+
+  return Array.from(scoresByTaskId.values());
+}
+
 export class ImportKbrCorrectionBundleUseCase {
   constructor(
     private readonly examRepository: ExamRepository,
@@ -338,7 +528,14 @@ export class ImportKbrCorrectionBundleUseCase {
     let skippedTaskScoreCount = 0;
     let importedTaskScoreCount = 0;
 
-    for (const importedTaskScore of bundle.importedTaskScores) {
+    for (const rawImportedTaskScore of bundle.importedTaskScores) {
+      const importedTaskScoreRecord = asRecord(rawImportedTaskScore);
+      const importedTaskScore = importedTaskScoreRecord
+        ? {
+            ...rawImportedTaskScore,
+            comment: extractImportedTaskScoreComment(importedTaskScoreRecord)
+          }
+        : rawImportedTaskScore;
       const mappedTaskIdFromSession = input.sessionMap.taskIdByRef[importedTaskScore.taskId];
       const mappedTaskId = mappedTaskIdFromSession ?? importedTaskScore.taskId;
       if (!mappedTaskIdFromSession) {
@@ -450,11 +647,19 @@ export class ImportKbrCorrectionBundleUseCase {
     const mappedTaskScores = Array.from(mappedTaskScoreByTaskId.values());
 
     const existingCorrection = await this.correctionEntryRepository.findByExamAndCandidate(input.examId, candidateId);
-    const finalTaskScores = mergeTaskScores(
+    const mergedTaskScores = mergeTaskScores(
       existingCorrection?.taskScores ?? [],
       mappedTaskScores,
       importedRules.mergeStrategy
     );
+    const metadataTaskComments = extractMetadataTaskComments(
+      asRecord(bundle.metadata),
+      input.sessionMap,
+      taskById,
+      scoringUnitById,
+      uncertainties
+    );
+    const finalTaskScores = mergeTaskCommentsIntoScores(mergedTaskScores, metadataTaskComments, taskById);
 
     const generalComments = extractGeneralComments(asRecord(bundle.metadata), uncertainties);
     const importedExamComments = generalComments.map(buildExamLevelComment);
