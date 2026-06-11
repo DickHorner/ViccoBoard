@@ -56,6 +56,7 @@ This ledger tracks all KBR (Klassenarbeiten Unterricht Rückmeldung Tests) featu
 | 6.11.9 | Alternative Bepunktungsart (++,+,0,-,–) | P2 | ⏳ TODO |
 | 6.11.10 | Im komplexen Modus: drei Aufgabenebenen in UI/Logik | P1 | ⏳ TODO |
 | 6.11.11 | Schnelles Wechseln zwischen Prüflingen | P1 | ⏳ TODO |
+| 6.11.12 | Sammelaktion: alle Prüflinge mit aktuellem Stand als abgeschlossen markieren | P1 | ✅ DONE |
 
 ### §6.12 KBR — Fördertipps (DB, Zuweisung, QR, Auswertung)
 
@@ -101,7 +102,7 @@ This ledger tracks all KBR (Klassenarbeiten Unterricht Rückmeldung Tests) featu
 | Checkbox ID | Feature | Priority | Status |
 |-------------|---------|----------|--------|
 | 6.16.1 | PDF-Rückmeldebögen inkl. Teilpunkte, Kommentare, Fördertipps, Unterschrift, Schullogo | P0 | ⏳ TODO |
-| 6.16.2 | Mit einem Klick alle PDFs erzeugen | P1 | ⏳ TODO |
+| 6.16.2 | Mit einem Klick alle PDFs erzeugen | P1 | ✅ DONE |
 | 6.16.3 | Drucklayouts: vier Layouts | P1 | ⏳ TODO |
 | 6.16.4 | Headerbereich über Druckpresets anpassbar; Druck aktueller Prüfling oder alle | P1 | ⏳ TODO |
 | 6.16.5 | Kriterien formatiert drucken; pro Aufgabe Prozent anzeigen; Kommentare/Fördertipps kursiv | P1 | ⏳ TODO |

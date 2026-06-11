@@ -150,6 +150,26 @@ function extractFirstText(value: unknown, keys: readonly string[]): string | und
   return Array.from(new Set(texts))[0];
 }
 
+function extractTexts(value: unknown, keys: readonly string[]): string[] {
+  const texts: string[] = [];
+
+  if (typeof value === 'string' && value.trim().length > 0) {
+    texts.push(value.trim());
+  }
+
+  const record = asRecord(value);
+  if (record) {
+    for (const key of keys) {
+      const candidate = record[key];
+      if (typeof candidate === 'string' && candidate.trim().length > 0) {
+        texts.push(candidate.trim());
+      }
+    }
+  }
+
+  return Array.from(new Set(texts));
+}
+
 function extractImportedTaskScoreComment(rawTaskScore: Record<string, unknown>): string | undefined {
   return extractFirstText(rawTaskScore, [
     'comment',
@@ -163,6 +183,65 @@ function extractImportedTaskScoreComment(rawTaskScore: Record<string, unknown>):
     'notes',
     'justification'
   ]);
+}
+
+function extractEvidenceComment(evidence: Exams.KbrCorrectionEvidence | undefined): string | undefined {
+  if (!evidence) {
+    return undefined;
+  }
+
+  const topLevelComments = extractTexts(evidence as unknown, [
+    'comment',
+    'comments',
+    'remark',
+    'remarks',
+    'bemerkung',
+    'bemerkungen',
+    'feedback',
+    'note',
+    'notes',
+    'justification',
+    'defectStatement',
+    'explanation'
+  ]);
+
+  const metadataComments = extractTexts(evidence.metadata, [
+    'comment',
+    'comments',
+    'remark',
+    'remarks',
+    'bemerkung',
+    'bemerkungen',
+    'feedback',
+    'note',
+    'notes',
+    'justification',
+    'defectStatement',
+    'explanation'
+  ]);
+
+  const mergedTexts = [...topLevelComments, ...metadataComments];
+  if (mergedTexts.length === 0) {
+    return undefined;
+  }
+
+  return mergedTexts.join('\n');
+}
+
+function extractEvidenceLinkedComment(
+  evidenceIds: readonly string[] | undefined,
+  evidenceById: ReadonlyMap<string, Exams.KbrCorrectionEvidence>
+): string | undefined {
+  if (!evidenceIds || evidenceIds.length === 0) {
+    return undefined;
+  }
+
+  let merged: string | undefined;
+  for (const evidenceId of evidenceIds) {
+    merged = mergeComment(merged, extractEvidenceComment(evidenceById.get(evidenceId)));
+  }
+
+  return merged;
 }
 
 function resolveMetadataCommentText(value: unknown): string | undefined {
@@ -533,7 +612,15 @@ export class ImportKbrCorrectionBundleUseCase {
       const importedTaskScore = importedTaskScoreRecord
         ? {
             ...rawImportedTaskScore,
-            comment: extractImportedTaskScoreComment(importedTaskScoreRecord)
+            comment: mergeComment(
+              extractImportedTaskScoreComment(importedTaskScoreRecord),
+              extractEvidenceLinkedComment(
+                Array.isArray(importedTaskScoreRecord.evidenceIds)
+                  ? importedTaskScoreRecord.evidenceIds.filter((entry): entry is string => typeof entry === 'string')
+                  : undefined,
+                evidenceById
+              )
+            )
           }
         : rawImportedTaskScore;
       const mappedTaskIdFromSession = input.sessionMap.taskIdByRef[importedTaskScore.taskId];

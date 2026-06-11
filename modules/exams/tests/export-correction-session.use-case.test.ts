@@ -215,6 +215,10 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(artifact.promptFile.content).toContain('"importedTaskScores"');
     expect(artifact.promptFile.content).toContain('must return exactly one raw JSON array');
     expect(artifact.promptFile.content).toContain('do not invent a wrapper object');
+    expect(artifact.promptFile.content).toContain('include concise task-level feedback in the task score `comment` field');
+    expect(artifact.promptFile.content).toContain('include one concise overall feedback text for the Leistung in `metadata.generalComment` or `metadata.finalComment`');
+    expect(artifact.promptFile.content).toContain('populate `importedTaskScores[*].comment` with concise task feedback whenever possible');
+    expect(artifact.promptFile.content).toContain('include one overall feedback field in `metadata.generalComment` or `metadata.finalComment`');
   });
 
   it('does not require users to provide Leistung chatRefs before evaluation', () => {

@@ -20,6 +20,7 @@ import { GetCorrectionSheetPresetUseCase } from '../src/use-cases/get-correction
 import { SaveCorrectionSheetPresetUseCase } from '../src/use-cases/save-correction-sheet-preset.use-case';
 import { BuildCorrectionSheetProjectionUseCase } from '../src/use-cases/build-correction-sheet-projection.use-case';
 import { ExportCorrectionSheetsPdfUseCase } from '../src/use-cases/export-correction-sheets-pdf.use-case';
+import { FinalizeAllCorrectionsUseCase } from '../src/use-cases/finalize-all-corrections.use-case';
 
 describe('KBR correction sheet workflow', () => {
   let storage: SQLiteStorage;
@@ -31,6 +32,7 @@ describe('KBR correction sheet workflow', () => {
   let savePresetUseCase: SaveCorrectionSheetPresetUseCase;
   let buildProjectionUseCase: BuildCorrectionSheetProjectionUseCase;
   let exportSheetsUseCase: ExportCorrectionSheetsPdfUseCase;
+  let finalizeAllCorrectionsUseCase: FinalizeAllCorrectionsUseCase;
 
   beforeEach(async () => {
     storage = new SQLiteStorage({
@@ -60,6 +62,11 @@ describe('KBR correction sheet workflow', () => {
       examRepository,
       buildProjectionUseCase,
       correctionRepository
+    );
+    finalizeAllCorrectionsUseCase = new FinalizeAllCorrectionsUseCase(
+      examRepository,
+      correctionRepository,
+      recordCorrectionUseCase
     );
   });
 
@@ -361,6 +368,101 @@ describe('KBR correction sheet workflow', () => {
     expect(allPdf.fileName).toContain('rueckmeldeboegen');
     expect(allPdf.candidateCount).toBe(2);
     expect(allDocument.getPageCount()).toBe(2);
+  });
+
+  test('exports all completed correction sheets as individual PDFs with candidate names', async () => {
+    const exam = await createExam();
+
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 9, maxPoints: 10, comment: 'Strukturiert', timestamp: new Date() },
+        { taskId: 'task-2', points: 12, maxPoints: 15, comment: 'Differenziert', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: true
+    });
+
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-2',
+      taskScores: [
+        { taskId: 'task-1', points: 7, maxPoints: 10, comment: 'Einordnung stimmt', timestamp: new Date() },
+        { taskId: 'task-2', points: 9, maxPoints: 15, comment: 'Mehr Belege nötig', timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: true
+    });
+
+    const pdfDocuments = await exportSheetsUseCase.exportAllCandidatesAsIndividualPdfs(exam.id);
+
+    expect(pdfDocuments).toHaveLength(2);
+    expect(pdfDocuments.map((document) => document.fileName)).toEqual([
+      expect.stringContaining('deutsch-klassenarbeit-lea-meyer-rueckmeldebogen'),
+      expect.stringContaining('deutsch-klassenarbeit-noah-schmidt-rueckmeldebogen')
+    ]);
+    expect(pdfDocuments.map((document) => document.candidateCount)).toEqual([1, 1]);
+  });
+
+  test('finalizes all candidates and creates missing zero-point corrections', async () => {
+    const exam = await createExam();
+
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        {
+          taskId: 'task-1',
+          points: 8,
+          maxPoints: 10,
+          comment: 'Einleitung vollständig',
+          timestamp: new Date(),
+          criterionScores: [
+            { criterionId: 'criterion-1', points: 4, maxPoints: 4 },
+            { criterionId: 'criterion-2', points: 4, maxPoints: 6 }
+          ]
+        },
+        { taskId: 'task-2', points: 11, maxPoints: 15, comment: 'Analyse schlüssig', timestamp: new Date() }
+      ],
+      comments: [
+        {
+          level: 'exam',
+          text: 'Guter Gesamteindruck.',
+          printable: true,
+          availableAfterReturn: true
+        }
+      ],
+      finalizeCorrection: false
+    });
+
+    const result = await finalizeAllCorrectionsUseCase.execute(exam.id);
+    const reloadedCand1 = await correctionRepository.findByExamAndCandidate(exam.id, 'cand-1');
+    const reloadedCand2 = await correctionRepository.findByExamAndCandidate(exam.id, 'cand-2');
+
+    expect(result.finalizedCount).toBe(2);
+    expect(result.createdCount).toBe(1);
+    expect(reloadedCand1?.status).toBe('completed');
+    expect(reloadedCand1?.comments[0]?.text).toBe('Guter Gesamteindruck.');
+    expect(reloadedCand2?.status).toBe('completed');
+    expect(reloadedCand2?.totalPoints).toBe(0);
+    expect(reloadedCand2?.taskScores).toHaveLength(2);
+    expect(reloadedCand2?.taskScores[0]).toEqual(expect.objectContaining({
+      taskId: 'task-1',
+      points: 0,
+      maxPoints: 10,
+      criterionScores: [
+        { criterionId: 'criterion-1', points: 0, maxPoints: 4 },
+        { criterionId: 'criterion-2', points: 0, maxPoints: 6 }
+      ]
+    }));
+    expect(reloadedCand2?.taskScores[1]).toEqual(expect.objectContaining({
+      taskId: 'task-2',
+      points: 0,
+      maxPoints: 15
+    }));
+    expect(new Date(String(reloadedCand2?.taskScores[0]?.timestamp)).toString()).not.toBe('Invalid Date');
+    expect(new Date(String(reloadedCand2?.taskScores[1]?.timestamp)).toString()).not.toBe('Invalid Date');
   });
 
   test('single export is blocked when correction is in-progress', async () => {

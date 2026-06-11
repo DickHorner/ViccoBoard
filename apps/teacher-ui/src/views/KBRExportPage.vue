@@ -12,6 +12,12 @@
         <button class="ghost-button" type="button" @click="goToCorrection" :disabled="!exam">
           Zur Korrektur
         </button>
+        <button class="ghost-button" type="button" @click="finalizeAllCandidates" :disabled="!canFinalizeAll">
+          Alle als abgeschlossen markieren
+        </button>
+        <button class="ghost-button" type="button" @click="exportAllIndividually" :disabled="!canExportAll">
+          Alle Bögen als Einzeldateien
+        </button>
         <button class="primary-button" type="button" @click="exportAll" :disabled="!canExportAll">
           Alle Bögen exportieren
         </button>
@@ -225,6 +231,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
 import { useExamsBridge } from '../composables/useExamsBridge'
+import { useToast } from '../composables/useToast'
 import { downloadBytes, downloadText } from '../utils/download'
 import {
   buildCorrectionSessionDownloads,
@@ -233,13 +240,16 @@ import {
 
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 const {
   getExam,
   findCorrectionsByExam,
   buildCorrectionSheetPreview,
   exportCurrentCorrectionSheetPdf,
   exportAllCorrectionSheetsPdf,
+  exportAllCorrectionSheetsAsIndividualPdfs,
   exportCorrectionSession,
+  finalizeAllCorrections,
   importCorrectionBundle
 } = useExamsBridge()
 
@@ -409,6 +419,13 @@ const canExportAll = computed(() => {
     [...corrections.value.values()].some((c) => c.status === 'completed')
   )
 })
+const canFinalizeAll = computed(() => {
+  if (!exam.value || exam.value.candidates.length === 0) {
+    return false
+  }
+
+  return exam.value.candidates.some((candidate) => corrections.value.get(candidate.id)?.status !== 'completed')
+})
 
 const formattedExamDate = computed(() => {
   if (!projection.value?.examDate) {
@@ -537,6 +554,36 @@ async function exportAll(): Promise<void> {
 
   const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id)
   downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf')
+}
+
+async function exportAllIndividually(): Promise<void> {
+  if (!exam.value || !canExportAll.value || !exportAllCorrectionSheetsAsIndividualPdfs) {
+    return
+  }
+
+  const pdfDocuments = await exportAllCorrectionSheetsAsIndividualPdfs(exam.value.id)
+  pdfDocuments.forEach((pdfDocument: Exams.CorrectionSheetPdfDocument) => {
+    downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf')
+  })
+  toast.success(`${pdfDocuments.length} Rückmeldebögen als Einzeldateien exportiert.`)
+}
+
+async function finalizeAllCandidates(): Promise<void> {
+  if (!exam.value || !canFinalizeAll.value || !finalizeAllCorrections) {
+    return
+  }
+
+  const confirmed = window.confirm('Alle Prüflinge mit dem aktuell gespeicherten Stand als abgeschlossen markieren?')
+  if (!confirmed) {
+    return
+  }
+
+  const result = await finalizeAllCorrections(exam.value.id)
+  corrections.value = new Map(result.savedCorrections.map((entry: Exams.CorrectionEntry) => [entry.candidateId, entry]))
+  if (selectedCandidateId.value) {
+    await loadPreview(selectedCandidateId.value)
+  }
+  toast.success(`${result.finalizedCount} Korrekturen als abgeschlossen markiert.`)
 }
 
 function goToCorrection(): void {

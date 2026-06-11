@@ -92,4 +92,41 @@ export class ExportCorrectionSheetsPdfUseCase {
       buildCorrectionSheetFileNameBase(exam.title, 'all')
     );
   }
+
+  async exportAllCandidatesAsIndividualPdfs(
+    examId: string
+  ): Promise<Exams.CorrectionSheetPdfDocument[]> {
+    const exam = await this.examRepository.findById(examId);
+    if (!exam) {
+      throw new Error(`Exam ${examId} not found`);
+    }
+
+    if (exam.candidates.length === 0) {
+      throw new Error('Exam has no candidates');
+    }
+
+    const allCorrections = await this.correctionEntryRepository.findByExam(examId);
+    const completedCandidateIds = new Set(
+      allCorrections
+        .filter((c) => c.status === 'completed')
+        .map((c) => c.candidateId)
+    );
+
+    const completedCandidates = exam.candidates.filter((candidate) =>
+      completedCandidateIds.has(candidate.id)
+    );
+
+    if (completedCandidates.length === 0) {
+      throw new Error(
+        'Keine abgeschlossenen Korrekturen vorhanden. Der Einzeldatei-Export erfordert mindestens eine abgeschlossene Korrektur.'
+      );
+    }
+
+    const documents: Exams.CorrectionSheetPdfDocument[] = [];
+    for (const candidate of completedCandidates) {
+      documents.push(await this.exportCurrentCandidatePdf(examId, candidate.id));
+    }
+
+    return documents;
+  }
 }

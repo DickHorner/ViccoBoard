@@ -18,12 +18,24 @@ function hasStructuredPayload(value: Record<string, unknown> | undefined): boole
   return Boolean(value && Object.keys(value).length > 0);
 }
 
+function hasStructuredEvidenceFields(evidence: Exams.KbrCorrectionEvidence): boolean {
+  const raw = evidence as unknown as Record<string, unknown>;
+  const candidateKeys = ['defectStatement', 'explanation', 'criterionRef', 'taskRef', 'comment', 'remark'];
+
+  return candidateKeys.some((key) => typeof raw[key] === 'string' && raw[key].trim().length > 0);
+}
+
 function isReliableEvidence(evidence: Exams.KbrCorrectionEvidence | undefined): boolean {
   if (!evidence) {
     return false;
   }
 
-  return hasText(evidence.value) || hasText(evidence.uri) || hasStructuredPayload(evidence.metadata);
+  return (
+    hasText(evidence.value) ||
+    hasText(evidence.uri) ||
+    hasStructuredPayload(evidence.metadata) ||
+    hasStructuredEvidenceFields(evidence)
+  );
 }
 
 function buildReasonMessage(review: Omit<DeductionJustificationReview, 'requiresManualReview' | 'message'>): string {

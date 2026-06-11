@@ -137,6 +137,9 @@ Session workflow (generic and strict):
 - do not invent assessment metadata, fields, labels, scoring dimensions, or identifiers that are not present in the loaded contract or rules
 - emit importable task scores and evidence only when supported by the loaded rules
 - keep comments and evidence tied to explicit task or scoring-unit references
+- include concise task-level feedback in the task score \`comment\` field whenever the corrected task has a clear strength, gap, or deduction rationale
+- include one concise overall feedback text for the Leistung in \`metadata.generalComment\` or \`metadata.finalComment\`
+- do not omit feedback text merely because points can be derived from the score; comments are expected when producing a complete correction result
 - treat \`evidence.required\` as global evidence policy and \`deductionGovernance.requireEvidenceForDeductions\` as deduction-specific policy
 - if a scoring unit contains an \`expectedHorizon\` section, treat those criteria as the binding assessment basis (Erwartungshorizont) for that task; do not invent or replace them
 
@@ -178,6 +181,8 @@ Required import bundle fields:
 - include \`contract\` exactly as required by the loaded import bundle schema
 - include the resolved Leistung \`chatRef\` as the import bundle top-level \`chatRef\`
 - include \`importedTaskScores\`
+- populate \`importedTaskScores[*].comment\` with concise task feedback whenever possible
+- include one overall feedback field in \`metadata.generalComment\` or \`metadata.finalComment\`
 - include optional fields such as \`rulePack\`, \`evidence\`, or \`metadata\` only when supported by the loaded contract, rules, and import bundle schema
 
 ## Contract

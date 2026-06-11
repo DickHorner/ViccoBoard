@@ -219,11 +219,17 @@
             <button @click="exportAllCandidates" class="btn-secondary">
               Alle Bögen exportieren
             </button>
+            <button @click="exportAllCandidatesIndividually" class="btn-secondary">
+              Alle Bögen als Einzeldateien
+            </button>
             <button @click="saveCurrentCandidate(false)" class="btn-primary">
               Speichern
             </button>
             <button @click="saveCurrentCandidate(true)" class="btn-success">
               Als abgeschlossen markieren
+            </button>
+            <button @click="finalizeAllCandidates" class="btn-success">
+              Alle als abgeschlossen markieren
             </button>
           </div>
         </div>
@@ -260,7 +266,9 @@ const {
   findCorrectionsByExam,
   recordCorrectionUseCase,
   exportCurrentCorrectionSheetPdf,
-  exportAllCorrectionSheetsPdf
+  exportAllCorrectionSheetsPdf,
+  exportAllCorrectionSheetsAsIndividualPdfs,
+  finalizeAllCorrections
 } = useExamsBridge();
 
 const exam = ref<Exams.Exam | null>(null);
@@ -591,6 +599,48 @@ async function exportAllCandidates(): Promise<void> {
 
   const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id);
   downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+}
+
+async function exportAllCandidatesIndividually(): Promise<void> {
+  if (!exam.value || !exportAllCorrectionSheetsAsIndividualPdfs) {
+    return;
+  }
+
+  const completedCount = [...corrections.value.values()].filter((c) => c.status === 'completed').length;
+  if (completedCount === 0) {
+    toast.warning('Es gibt noch keine abgeschlossenen Korrekturen. Der Einzeldatei-Export erfordert mindestens eine abgeschlossene Korrektur.');
+    return;
+  }
+
+  const pdfDocuments = await exportAllCorrectionSheetsAsIndividualPdfs(exam.value.id);
+  pdfDocuments.forEach((pdfDocument: Exams.CorrectionSheetPdfDocument) => {
+    downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+  });
+  toast.success(`${pdfDocuments.length} Rückmeldebögen als Einzeldateien exportiert.`);
+}
+
+async function finalizeAllCandidates(): Promise<void> {
+  if (!exam.value || !finalizeAllCorrections) {
+    return;
+  }
+
+  const confirmed = window.confirm(
+    'Alle Prüflinge mit dem aktuellen Stand als abgeschlossen markieren? Ungespeicherte Änderungen des aktuellen Prüflings werden vorher übernommen.'
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  if (currentCandidate.value && hasChanges.value) {
+    await saveCurrentCandidate(false);
+  }
+
+  const result = await finalizeAllCorrections(exam.value.id);
+  corrections.value = new Map(result.savedCorrections.map((entry: Exams.CorrectionEntry) => [entry.candidateId, entry]));
+  if (currentCandidate.value) {
+    hydrateCandidateState(currentCandidate.value.id);
+  }
+  toast.success(`${result.finalizedCount} Korrekturen als abgeschlossen markiert.`);
 }
 
 function openPreviewForCurrentCandidate(): void {

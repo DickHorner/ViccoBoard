@@ -349,6 +349,7 @@ Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer B
 - [ ] Alternative Bepunktungsart **(++,+,0,-,–)**.
 - [ ] Im komplexen Modus: drei Aufgabenebenen in UI/Logik.
 - [ ] Schnelles Wechseln zwischen Prüflingen.
+- [ ] Sammelaktion: alle Prüflinge mit aktuellem Stand als abgeschlossen markieren.
 
 ### 6.12 KBR — Fördertipps (DB, Zuweisung, QR, Auswertung)
 - [ ] Fördertipps aufgabenbezogen oder allgemein; persönliche Datenbank.

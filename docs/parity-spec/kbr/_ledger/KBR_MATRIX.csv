@@ -24,6 +24,7 @@ checkbox_id,section,text_short,priority,scope,implemented,location,tests
 6.11.9,Korrigieren,Alternative Bepunktung (++/+/0/-/--),P2,in_scope_v2,no,N/A,N/A
 6.11.10,Korrigieren,Komplex: 3 Aufgabenebenen UI,P1,in_scope_v2,no,N/A,N/A
 6.11.11,Korrigieren,Schneller Prüflingswechsel,P1,in_scope_v2,no,N/A,N/A
+6.11.12,Korrigieren,Alle Prüflinge gesammelt als abgeschlossen markieren,P1,in_scope_v2,yes,apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue:231|622; apps/teacher-ui/src/views/KBRExportPage.vue:15|571; modules/exams/src/use-cases/finalize-all-corrections.use-case.ts:13,modules/exams/tests/correction-sheet-workflow.test.ts:408
 6.12.1,Fördertipps,Persönliche Fördertipps-DB,P0,in_scope_v2,no,N/A,N/A
 6.12.2,Fördertipps,Überblick: wem/wann/wo Tipps vergeben,P1,in_scope_v2,no,N/A,N/A
 6.12.3,Fördertipps,Titel/Kurzbeschreibung/Kategorien,P0,in_scope_v2,no,N/A,N/A
@@ -44,7 +45,7 @@ checkbox_id,section,text_short,priority,scope,implemented,location,tests
 6.15.2,Kommentare,Kommentare nach Rückgabe verfügbar,P0,in_scope_v2,no,N/A,N/A
 6.15.3,Kommentare,Kommentare anderer SuS wiederverwenden,P1,in_scope_v2,no,N/A,N/A
 6.16.1,PDF Export,PDF-Rückmeldebögen (umfassend),P0,in_scope_v2,no,N/A,N/A
-6.16.2,PDF Export,Alle PDFs mit einem Klick,P1,in_scope_v2,no,N/A,N/A
+6.16.2,PDF Export,Alle PDFs mit einem Klick,P1,in_scope_v2,yes,apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue:222|604; apps/teacher-ui/src/views/KBRExportPage.vue:18|559; modules/exams/src/use-cases/export-correction-sheets-pdf.use-case.ts:96,modules/exams/tests/correction-sheet-workflow.test.ts:373
 6.16.3,PDF Export,4 Drucklayouts,P1,in_scope_v2,no,N/A,N/A
 6.16.4,PDF Export,Headerbereich/Presets anpassbar,P1,in_scope_v2,no,N/A,N/A
 6.16.5,PDF Export,Kriterien formatiert drucken + Prozent,P1,in_scope_v2,no,N/A,N/A

@@ -321,6 +321,76 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
     ).toEqual(['Insgesamt ein brauchbarer Ansatz mit Luecken.']);
   });
 
+  it('derives task comments from structured evidence when direct comments are missing', async () => {
+    const result = await importUseCase.execute({
+      examId: exam.id,
+      sessionId: 'session-42',
+      sessionMap: {
+        examId: exam.id,
+        sessionId: 'session-42',
+        candidateIdByChatRef: {
+          'chat-0001': 'candidate-1'
+        },
+        taskIdByRef: {
+          'task-1': 'task-internal-1'
+        }
+      },
+      bundle: {
+        contract: {
+          id: 'contract-session-session-42',
+          chatRef: 'session-session-42',
+          title: 'Import contract',
+          parts: [],
+          taskTree: [],
+          scoringUnits: [
+            {
+              id: 'task-1.score',
+              taskId: 'task-1',
+              kind: 'task',
+              label: 'Diskussion',
+              maxPoints: 10
+            }
+          ],
+          rules: createImportRules()
+        },
+        chatRef: 'chat-0001',
+        importedTaskScores: [
+          {
+            taskId: 'task-1',
+            points: 7,
+            maxPoints: 10,
+            scoringUnitId: 'task-1.score',
+            evidenceIds: ['ev-1']
+          }
+        ],
+        evidence: [
+          {
+            id: 'ev-1',
+            kind: 'structured',
+            taskRef: 'task-1',
+            scoringUnitId: 'task-1.score',
+            defectStatement: 'Die geforderte persönliche Diskussion fehlt.',
+            explanation: 'Es ist keine ausreichende begründete Aussage sichtbar, ob der Beruf in Frage kommt oder nicht.'
+          }
+        ]
+      }
+    });
+
+    expect(result.correction.taskScores[0].comment).toBe(
+      'Die geforderte persönliche Diskussion fehlt.\nEs ist keine ausreichende begründete Aussage sichtbar, ob der Beruf in Frage kommt oder nicht.'
+    );
+    expect(result.uncertainties.find((entry) => entry.code === 'deduction-requires-manual-review')).toBeUndefined();
+    expect(result.correction.comments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          taskId: 'task-internal-1',
+          level: 'task',
+          text: 'Die geforderte persönliche Diskussion fehlt.\nEs ist keine ausreichende begründete Aussage sichtbar, ob der Beruf in Frage kommt oder nicht.'
+        })
+      ])
+    );
+  });
+
   it('imports criterion scores into correction entries used by the correction mask', async () => {
     const criterionExam = await examRepo.create({
       title: 'Criterion Import',
