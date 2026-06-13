@@ -30,6 +30,12 @@ export interface CorrectionSessionExportFileArtifact {
 
 export interface CorrectionSessionLocalReferenceMap {
   examRef: string;
+  contractId: string;
+  contractChatRef: string;
+  contractSnapshotId: string;
+  sessionChatRef: string;
+  exportId: string;
+  targetSessionId: string;
   partIdByRef: Record<string, string>;
   taskIdByRef: Record<string, string>;
   scoringUnitKeyByRef: Record<string, string>;
@@ -38,9 +44,12 @@ export interface CorrectionSessionLocalReferenceMap {
 
 export interface CorrectionSessionExportArtifact {
   sessionChatRef: string;
+  contractChatRef: string;
+  contractSnapshotId: string;
   chatRefs: string[];
   contract: Exams.KbrCorrectionSessionContract;
   contractFile: CorrectionSessionExportFileArtifact;
+  contractJsonFile: CorrectionSessionExportFileArtifact;
   promptFile: CorrectionSessionExportFileArtifact;
   localReferenceMap: CorrectionSessionLocalReferenceMap;
 }
@@ -88,6 +97,32 @@ function buildBaseFileName(sessionId: string): string {
   return `kbr-correction-session-${normalizedSessionId}`;
 }
 
+function buildStableContractSnapshotId(examRef: string, lastModified: Date): string {
+  const normalizedExamRef = examRef.trim().replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const snapshotStamp = lastModified.toISOString().replace(/[^\dTZ]/g, '');
+  return `contract-${normalizedExamRef || 'exam'}-${snapshotStamp}`;
+}
+
+function buildRuntimeSessionChatRef(sessionId: string): string {
+  return `session-${sessionId}`;
+}
+
+function resolveContractRules(exam: Exams.Exam, rules: Exams.CorrectionSessionRules): Exams.CorrectionSessionRules {
+  const decimalPlaces = exam.gradingKey.roundingRule.decimalPlaces;
+  const pointStep =
+    Number.isFinite(decimalPlaces) && decimalPlaces > 0
+      ? 1 / Math.pow(10, decimalPlaces)
+      : 1;
+
+  return {
+    ...rules,
+    scoring: {
+      ...rules.scoring,
+      pointStep
+    }
+  };
+}
+
 function buildPromptArtifacts(
   rulePack: LoadedCorrectionSessionRulePack,
   contractMarkdown: string,
@@ -97,7 +132,7 @@ function buildPromptArtifacts(
     contractMarkdown,
     importBundleSchema: JSON.stringify(rulePack.importBundleSchema, null, 2),
     rulePackManifest: JSON.stringify(rulePack.manifest, null, 2),
-    rulePackRules: JSON.stringify(rulePack.rules, null, 2),
+    rulePackRules: JSON.stringify(contract.rules, null, 2),
     'session.id': contract.id,
     'session.chatRef': contract.chatRef,
     'session.title': contract.title
@@ -106,9 +141,14 @@ function buildPromptArtifacts(
 
 function cloneReferenceMap(
   references: CorrectionSessionReferenceMaps,
-  sessionMap: Record<string, string>
+  sessionMap: Record<string, string>,
+  identity: Pick<
+    CorrectionSessionLocalReferenceMap,
+    'contractId' | 'contractChatRef' | 'contractSnapshotId' | 'sessionChatRef' | 'exportId' | 'targetSessionId'
+  >
 ): CorrectionSessionLocalReferenceMap {
   return {
+    ...identity,
     examRef: references.examRef,
     partIdByRef: { ...references.partIdByRef },
     taskIdByRef: { ...references.taskIdByRef },
@@ -133,14 +173,18 @@ export class ExportCorrectionSessionArtifactsUseCase {
     }
 
     const sessionId = input.sessionId ?? uuidv4();
+    const sessionChatRef = buildRuntimeSessionChatRef(sessionId);
     const references = buildCorrectionSessionReferenceMaps(input.exam);
+    const contractSnapshotId = buildStableContractSnapshotId(references.examRef, input.exam.lastModified);
+    const contractChatRef = contractSnapshotId;
     const parts = buildCorrectionSessionParts(input.exam, references, rulePack.rules);
-    const scoringUnits = buildCorrectionSessionScoringUnits(input.exam, references, rulePack.rules);
+    const resolvedRules = resolveContractRules(input.exam, rulePack.rules);
+    const scoringUnits = buildCorrectionSessionScoringUnits(input.exam, references, resolvedRules);
     const taskTree = buildCorrectionSessionTaskTree(input.exam, references, scoringUnits);
     const renderedParts = renderCorrectionSessionParts(parts);
     const renderedTaskTree = renderCorrectionSessionTaskTree(taskTree);
     const renderedScoringUnits = renderCorrectionSessionScoringUnits(scoringUnits);
-    const renderedRules = renderCorrectionSessionRules(rulePack.rules);
+    const renderedRules = renderCorrectionSessionRules(resolvedRules);
     const sessionMap: Record<string, string> = {};
     const chatRefEntries = selectedCandidates.map((candidate, index) => {
       const chatRef = `chat-${String(index + 1).padStart(CHAT_REF_PADDING_LENGTH, '0')}`;
@@ -151,15 +195,14 @@ export class ExportCorrectionSessionArtifactsUseCase {
       };
     });
     const chatRefs = chatRefEntries.map((entry) => entry.chatRef);
-    const sessionChatRef = `session-${sessionId}`;
     const contract: Exams.KbrCorrectionSessionContract = {
-      id: `contract-${sessionChatRef}`,
-      chatRef: sessionChatRef,
+      id: contractSnapshotId,
+      chatRef: contractChatRef,
       title: `${input.exam.title} - correction session`,
       parts,
       taskTree,
       scoringUnits,
-      rules: rulePack.rules,
+      rules: resolvedRules,
       metadata: {
         assessmentFormat: input.exam.assessmentFormat,
         examRef: references.examRef,
@@ -167,13 +210,20 @@ export class ExportCorrectionSessionArtifactsUseCase {
         exportKind: 'chatgpt-correction-session',
         status: input.exam.status,
         chatRefs,
-        candidateCount: selectedCandidates.length
+        candidateCount: selectedCandidates.length,
+        contractSnapshotId,
+        exportId: sessionId,
+        targetSessionId: sessionId,
+        sessionChatRef
       }
     };
 
     const contractMarkdown = renderTemplate(rulePack.templates.contract, {
       'session.id': contract.id,
       'session.chatRef': contract.chatRef,
+      'session.runtimeChatRef': sessionChatRef,
+      'session.exportId': sessionId,
+      'session.targetSessionId': sessionId,
       'session.title': contract.title,
       'session.examRef': references.examRef,
       'rulePack.manifest.id': rulePack.manifest.id,
@@ -193,17 +243,30 @@ export class ExportCorrectionSessionArtifactsUseCase {
       rulePack: rulePack.manifest,
       artifact: {
         sessionChatRef,
+        contractChatRef,
+        contractSnapshotId,
         chatRefs,
         contract,
         contractFile: {
           fileName: `${fileNameBase}-contract.md`,
           content: contractMarkdown
         },
+        contractJsonFile: {
+          fileName: `${fileNameBase}-contract.json`,
+          content: JSON.stringify(contract, null, 2)
+        },
         promptFile: {
           fileName: `${fileNameBase}-prompt.md`,
           content: promptMarkdown
         },
-        localReferenceMap: cloneReferenceMap(references, sessionMap)
+        localReferenceMap: cloneReferenceMap(references, sessionMap, {
+          contractId: contract.id,
+          contractChatRef,
+          contractSnapshotId,
+          sessionChatRef,
+          exportId: sessionId,
+          targetSessionId: sessionId
+        })
       },
       sessionMap
     };

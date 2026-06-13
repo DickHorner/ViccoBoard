@@ -177,6 +177,12 @@ describe('Correction Session Integration (Domain-Agnostic)', () => {
     const importSessionMap = {
       examId: exam.id,
       sessionId,
+      contractId: contract.id,
+      contractChatRef: contract.chatRef,
+      contractSnapshotId: contract.id,
+      sessionChatRef: exportResult.artifact.sessionChatRef,
+      exportId: sessionId,
+      targetSessionId: sessionId,
       candidateIdByChatRef: localReferenceMap.candidateIdByChatRef,
       taskIdByRef: localReferenceMap.taskIdByRef
     };

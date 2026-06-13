@@ -495,6 +495,7 @@ export function renderCorrectionSessionRules(rules: Exams.CorrectionSessionRules
     `- taskSelection: ${rules.taskSelection}`,
     `- scoringAggregation: ${rules.scoring.aggregation}`,
     `- allowPartialPoints: ${rules.scoring.allowPartialPoints ? 'yes' : 'no'}`,
+    ...(typeof rules.scoring.pointStep === 'number' ? [`- pointStep: ${rules.scoring.pointStep}`] : []),
     `- allowAlternativeGrading: ${rules.scoring.allowAlternativeGrading ? 'yes' : 'no'}`,
     `- allowManualScoringUnits: ${rules.scoring.allowManualScoringUnits ? 'yes' : 'no'}`,
     `- evidenceRequired: ${rules.evidence.required ? 'yes' : 'no'}`,

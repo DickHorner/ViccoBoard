@@ -4,12 +4,19 @@ export interface CorrectionSessionFileArtifact {
 }
 
 export interface CorrectionSessionLocalReferenceMapArtifact {
+  contractId: string;
+  contractChatRef: string;
+  contractSnapshotId: string;
+  sessionChatRef: string;
+  exportId: string;
+  targetSessionId: string;
   candidateIdByChatRef: Record<string, string>;
   taskIdByRef: Record<string, string>;
 }
 
 export interface CorrectionSessionExportResultArtifact {
   contractFile: CorrectionSessionFileArtifact;
+  contractJsonFile: CorrectionSessionFileArtifact;
   promptFile: CorrectionSessionFileArtifact;
   localReferenceMap: CorrectionSessionLocalReferenceMapArtifact;
 }
@@ -20,7 +27,7 @@ export interface CorrectionSessionExportResultLike {
 }
 
 export interface CorrectionSessionDownloadArtifact extends CorrectionSessionFileArtifact {
-  label: 'Contract' | 'Prompt' | 'Session-Map (intern)';
+  label: 'Contract' | 'Contract JSON' | 'Prompt' | 'Session-Map (intern)';
   audience: 'chatgpt' | 'internal';
   description: string;
 }
@@ -42,6 +49,12 @@ export function buildCorrectionSessionDownloads(
     {
       examId,
       sessionId: result.sessionId,
+      contractId: result.artifact.localReferenceMap.contractId,
+      contractChatRef: result.artifact.localReferenceMap.contractChatRef,
+      contractSnapshotId: result.artifact.localReferenceMap.contractSnapshotId,
+      sessionChatRef: result.artifact.localReferenceMap.sessionChatRef,
+      exportId: result.artifact.localReferenceMap.exportId,
+      targetSessionId: result.artifact.localReferenceMap.targetSessionId,
       candidateIdByChatRef: result.artifact.localReferenceMap.candidateIdByChatRef,
       taskIdByRef: result.artifact.localReferenceMap.taskIdByRef
     },
@@ -56,6 +69,13 @@ export function buildCorrectionSessionDownloads(
       description: 'Markdown-Datei mit dem Korrekturvertrag fur die KI-Sitzung.',
       fileName: result.artifact.contractFile.fileName,
       content: result.artifact.contractFile.content
+    },
+    {
+      label: 'Contract JSON',
+      audience: 'chatgpt',
+      description: 'Kanonische JSON-Datei des Korrekturvertrags fur maschinenlesbare Re-Exporte.',
+      fileName: result.artifact.contractJsonFile.fileName,
+      content: result.artifact.contractJsonFile.content
     },
     {
       label: 'Prompt',

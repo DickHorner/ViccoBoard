@@ -19,7 +19,7 @@ function createTask(
 }
 
 describe('ExportCorrectionSessionArtifactsUseCase', () => {
-  it('exports one session-scoped contract and prompt with task-centric scoring units', () => {
+  it('exports a stable contract snapshot plus prompt with task-centric scoring units', () => {
     const exam: Exams.Exam = {
       id: 'exam-internal-id',
       title: 'Deutsch Klassenarbeit 1',
@@ -138,6 +138,8 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
 
     expect(result.sessionId).toBe('session-2026-04-17');
     expect(result.artifact.sessionChatRef).toBe('session-session-2026-04-17');
+    expect(result.artifact.contractSnapshotId).toBe('contract-exam-deutsch-klassenarbeit-1-20260417T091500000Z');
+    expect(result.artifact.contractChatRef).toBe('contract-exam-deutsch-klassenarbeit-1-20260417T091500000Z');
     expect(result.artifact.chatRefs).toEqual([
       'chat-0001',
       'chat-0002'
@@ -151,7 +153,9 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
 
     expect(artifact.contract.examId).toBeUndefined();
     expect(artifact.contract.candidateId).toBeUndefined();
-    expect(artifact.contract.chatRef).toBe('session-session-2026-04-17');
+    expect(artifact.contract.id).toBe('contract-exam-deutsch-klassenarbeit-1-20260417T091500000Z');
+    expect(artifact.contract.chatRef).toBe('contract-exam-deutsch-klassenarbeit-1-20260417T091500000Z');
+    expect(artifact.contract.rules.scoring.pointStep).toBe(1);
     expect(artifact.contract.parts[0].id).toBe('part-1');
     expect(artifact.contract.taskTree.map((task) => task.id)).toEqual([
       'task-1',
@@ -182,7 +186,11 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     });
 
     expect(artifact.contractFile.content).toContain('Exam Reference: `exam-deutsch-klassenarbeit-1`');
+    expect(artifact.contractFile.content).toContain('Contract Snapshot ID: `contract-exam-deutsch-klassenarbeit-1-20260417T091500000Z`');
+    expect(artifact.contractFile.content).toContain('Runtime Session Chat Reference: `session-session-2026-04-17`');
+    expect(artifact.contractFile.content).toContain('pointStep: 1');
     expect(artifact.contractFile.fileName).toBe('kbr-correction-session-2026-04-17-contract.md');
+    expect(artifact.contractJsonFile.fileName).toBe('kbr-correction-session-2026-04-17-contract.json');
     expect(artifact.promptFile.fileName).toBe('kbr-correction-session-2026-04-17-prompt.md');
     expect(artifact.contractFile.content).toContain('- chat-0001: Mia Muster');
     expect(artifact.contractFile.content).toContain('- chat-0002: Noah Beispiel');
@@ -193,11 +201,17 @@ describe('ExportCorrectionSessionArtifactsUseCase', () => {
     expect(artifact.contractFile.content).not.toContain('mia-muster');
     expect(artifact.contractFile.content).not.toContain('noah-beispiel');
     expect(artifact.promptFile.content).toContain(artifact.contractFile.content);
+    expect(artifact.contractJsonFile.content).toBe(JSON.stringify(artifact.contract, null, 2));
     expect(artifact.localReferenceMap.taskIdByRef['task-1.1']).toBe('task-leaf-a');
     expect(artifact.localReferenceMap.scoringUnitKeyByRef['task-1.1.score']).toBe(
       'task-leaf-a::task'
     );
     expect(artifact.localReferenceMap.candidateIdByChatRef).toEqual(result.sessionMap);
+    expect(artifact.localReferenceMap.contractId).toBe(artifact.contract.id);
+    expect(artifact.localReferenceMap.contractChatRef).toBe(artifact.contract.chatRef);
+    expect(artifact.localReferenceMap.contractSnapshotId).toBe(artifact.contract.id);
+    expect(artifact.localReferenceMap.exportId).toBe(result.sessionId);
+    expect(artifact.localReferenceMap.targetSessionId).toBe(result.sessionId);
 
     expect(artifact.contractFile.content).toContain('expectedHorizon:');
     expect(artifact.contractFile.content).toContain('Inhalt');

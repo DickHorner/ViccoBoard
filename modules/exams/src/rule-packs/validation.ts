@@ -28,6 +28,14 @@ function expectBoolean(value: unknown, label: string): boolean {
   return value;
 }
 
+function expectPositiveNumber(value: unknown, label: string): number {
+  if (typeof value !== 'number' || Number.isNaN(value) || !Number.isFinite(value) || value <= 0) {
+    throw new Error(`${label} must be a positive number.`);
+  }
+
+  return value;
+}
+
 function expectStringArray(value: unknown, label: string): string[] {
   if (!Array.isArray(value) || value.some((entry) => typeof entry !== 'string' || entry.trim().length === 0)) {
     throw new Error(`${label} must be an array of non-empty strings.`);
@@ -176,6 +184,10 @@ export function validateCorrectionSessionRules(input: unknown): Exams.Correction
     scoring: {
       aggregation: aggregation as Exams.CorrectionSessionScoringRules['aggregation'],
       allowPartialPoints: expectBoolean(scoring.allowPartialPoints, 'Correction session scoring allowPartialPoints'),
+      pointStep:
+        scoring.pointStep === undefined
+          ? undefined
+          : expectPositiveNumber(scoring.pointStep, 'Correction session scoring pointStep'),
       allowAlternativeGrading: expectBoolean(scoring.allowAlternativeGrading, 'Correction session scoring allowAlternativeGrading'),
       allowManualScoringUnits: expectBoolean(scoring.allowManualScoringUnits, 'Correction session scoring allowManualScoringUnits')
     },

@@ -17,11 +17,12 @@ Session workflow (generic and strict):
 - if a scoring unit contains an `expectedHorizon` section, treat those criteria as the binding assessment basis (Erwartungshorizont) for that task; do not invent or replace them
 
 Chat reference roles:
-- the contract's `Session Chat Reference` identifies the session/contract only
+- the contract's `Contract Chat Reference` identifies the stable contract snapshot only
+- the contract's `Runtime Session Chat Reference` identifies the local export/import runtime only
 - Leistung chatRefs are internal import/export keys for submitted Leistungen and look like `chat-0001`
 - every import bundle object must use the resolved Leistung `chatRef` from the contract's `Chat References` list as its top-level `chatRef`
 - never ask the user to provide a Leistung `chatRef`
-- never write the `Session Chat Reference` into an import bundle top-level `chatRef`
+- never write the `Contract Chat Reference` or `Runtime Session Chat Reference` into an import bundle top-level `chatRef`
 
 Matching rule:
 - extract the needed matching information from the submitted Leistung itself

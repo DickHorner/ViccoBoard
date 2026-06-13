@@ -18,6 +18,12 @@ const EPSILON = 1e-6;
 export interface CorrectionImportSessionMap {
   examId: string;
   sessionId: string;
+  contractId?: string;
+  contractChatRef?: string;
+  contractSnapshotId?: string;
+  sessionChatRef?: string;
+  exportId?: string;
+  targetSessionId?: string;
   candidateIdByChatRef: Record<string, string>;
   taskIdByRef: Record<string, string>;
 }
@@ -371,15 +377,25 @@ function assertSessionContext(
     throw new Error(`Import bundle examId mismatch: expected "${examId}", got "${contractExamId}".`);
   }
 
-  const expectedSessionChatRef = `session-${sessionId}`;
-  if (bundle.contract.chatRef !== expectedSessionChatRef) {
+  const expectedContractChatRef = sessionMap.contractChatRef ?? sessionMap.sessionChatRef ?? `session-${sessionId}`;
+  if (bundle.contract.chatRef !== expectedContractChatRef) {
     throw new Error(
-      `Import bundle session chatRef mismatch: expected "${expectedSessionChatRef}", got "${bundle.contract.chatRef}".`
+      `Import bundle session chatRef mismatch: expected "${expectedContractChatRef}", got "${bundle.contract.chatRef}".`
     );
+  }
+
+  const expectedContractId = sessionMap.contractId ?? sessionMap.contractSnapshotId;
+  if (expectedContractId && bundle.contract.id !== expectedContractId) {
+    throw new Error(`Import bundle contract id mismatch: expected "${expectedContractId}", got "${bundle.contract.id}".`);
   }
 }
 
-function resolveAllowedPointStep(exam: Exams.Exam): number {
+function resolveAllowedPointStep(exam: Exams.Exam, contract: Exams.KbrCorrectionSessionContract): number {
+  const contractStep = contract.rules.scoring.pointStep;
+  if (typeof contractStep === 'number' && Number.isFinite(contractStep) && contractStep > 0) {
+    return contractStep;
+  }
+
   const decimalPlaces = exam.gradingKey.roundingRule.decimalPlaces;
   if (!Number.isFinite(decimalPlaces) || decimalPlaces <= 0) {
     return 1;
@@ -597,7 +613,7 @@ export class ImportKbrCorrectionBundleUseCase {
     }
 
     const uncertainties: CorrectionImportUncertainty[] = [];
-    const step = resolveAllowedPointStep(exam);
+    const step = resolveAllowedPointStep(exam, bundle.contract);
     const taskById = new Map(exam.structure.tasks.map((task) => [task.id, task]));
     const evidenceById = new Map((bundle.evidence ?? []).map((evidence) => [evidence.id, evidence]));
     const scoringUnitById = new Map(bundle.contract.scoringUnits.map((scoringUnit) => [scoringUnit.id, scoringUnit]));

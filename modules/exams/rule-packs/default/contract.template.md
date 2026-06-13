@@ -1,17 +1,21 @@
 # Correction Session Contract
 
-- Session ID: `{{session.id}}`
-- Session Chat Reference: `{{session.chatRef}}`
+- Contract Snapshot ID: `{{session.id}}`
+- Contract Chat Reference: `{{session.chatRef}}`
+- Runtime Session Chat Reference: `{{session.runtimeChatRef}}`
+- Export ID: `{{session.exportId}}`
+- Target Session ID: `{{session.targetSessionId}}`
 - Title: `{{session.title}}`
 - Exam Reference: `{{session.examRef}}`
 - Rule Pack: `{{rulePack.manifest.id}}@{{rulePack.manifest.version}}`
 
 ## Chat Reference Roles
 
-- `Session Chat Reference` identifies this correction session/contract.
+- `Contract Chat Reference` identifies the stable contract snapshot.
+- `Runtime Session Chat Reference` identifies the local export/import runtime context.
 - Leistung chatRefs are internal import/export keys for submitted Leistungen and are listed under `Chat References`.
 - The import bundle top-level `chatRef` must always be the resolved Leistung chatRef from the `Chat References` list, for example `chat-0001`.
-- Never use the `Session Chat Reference` as the import bundle top-level `chatRef`.
+- Never use the `Contract Chat Reference` or `Runtime Session Chat Reference` as the import bundle top-level `chatRef`.
 
 ## Matching Rule
 

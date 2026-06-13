@@ -37,6 +37,7 @@ const DEFAULT_RULE_PACK_RULES_SOURCE = {
   scoring: {
     aggregation: 'task',
     allowPartialPoints: true,
+    pointStep: 1,
     allowAlternativeGrading: true,
     allowManualScoringUnits: false
   },
@@ -68,18 +69,22 @@ const DEFAULT_RULE_PACK_RULES_SOURCE = {
 
 const DEFAULT_CONTRACT_TEMPLATE = `# Correction Session Contract
 
-- Session ID: \`{{session.id}}\`
-- Session Chat Reference: \`{{session.chatRef}}\`
+- Contract Snapshot ID: \`{{session.id}}\`
+- Contract Chat Reference: \`{{session.chatRef}}\`
+- Runtime Session Chat Reference: \`{{session.runtimeChatRef}}\`
+- Export ID: \`{{session.exportId}}\`
+- Target Session ID: \`{{session.targetSessionId}}\`
 - Title: \`{{session.title}}\`
 - Exam Reference: \`{{session.examRef}}\`
 - Rule Pack: \`{{rulePack.manifest.id}}@{{rulePack.manifest.version}}\`
 
 ## Chat Reference Roles
 
-- \`Session Chat Reference\` identifies this correction session/contract.
+- \`Contract Chat Reference\` identifies the stable contract snapshot.
+- \`Runtime Session Chat Reference\` identifies the local export/import runtime context.
 - Leistung chatRefs are internal import/export keys for submitted Leistungen and are listed under \`Chat References\`.
 - The import bundle top-level \`chatRef\` must always be the resolved Leistung chatRef from the \`Chat References\` list, for example \`chat-0001\`.
-- Never use the \`Session Chat Reference\` as the import bundle top-level \`chatRef\`.
+- Never use the \`Contract Chat Reference\` or \`Runtime Session Chat Reference\` as the import bundle top-level \`chatRef\`.
 
 ## Matching Rule
 
@@ -144,11 +149,12 @@ Session workflow (generic and strict):
 - if a scoring unit contains an \`expectedHorizon\` section, treat those criteria as the binding assessment basis (Erwartungshorizont) for that task; do not invent or replace them
 
 Chat reference roles:
-- the contract's \`Session Chat Reference\` identifies the session/contract only
+- the contract's \`Contract Chat Reference\` identifies the stable contract snapshot only
+- the contract's \`Runtime Session Chat Reference\` identifies the local export/import runtime only
 - Leistung chatRefs are internal import/export keys for submitted Leistungen and look like \`chat-0001\`
 - every import bundle object must use the resolved Leistung \`chatRef\` from the contract's \`Chat References\` list as its top-level \`chatRef\`
 - never ask the user to provide a Leistung \`chatRef\`
-- never write the \`Session Chat Reference\` into an import bundle top-level \`chatRef\`
+- never write the \`Contract Chat Reference\` or \`Runtime Session Chat Reference\` into an import bundle top-level \`chatRef\`
 
 Matching rule:
 - extract the needed matching information from the submitted Leistung itself
@@ -214,7 +220,28 @@ const DEFAULT_IMPORT_BUNDLE_SCHEMA_SOURCE = {
     contract: {
       type: 'object',
       required: ['id', 'chatRef', 'title', 'parts', 'taskTree', 'scoringUnits', 'rules'],
-      additionalProperties: true
+      additionalProperties: true,
+      properties: {
+        id: { type: 'string', minLength: 1 },
+        chatRef: { type: 'string', minLength: 1 },
+        title: { type: 'string', minLength: 1 },
+        parts: { type: 'array' },
+        taskTree: { type: 'array' },
+        scoringUnits: { type: 'array' },
+        rules: {
+          type: 'object',
+          required: ['scoring', 'evidence', 'deductionGovernance', 'imports'],
+          additionalProperties: true,
+          properties: {
+            scoring: { type: 'object', additionalProperties: true },
+            evidence: { type: 'object', additionalProperties: true },
+            deductionGovernance: { type: 'object', additionalProperties: true },
+            imports: { type: 'object', additionalProperties: true },
+            metadata: { type: 'object', additionalProperties: true }
+          }
+        },
+        metadata: { type: 'object', additionalProperties: true }
+      }
     },
     chatRef: {
       type: 'string',

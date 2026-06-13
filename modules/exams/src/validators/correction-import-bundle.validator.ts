@@ -1,4 +1,5 @@
 import { Exams } from '@viccoboard/core';
+import { validateCorrectionSessionRules } from '../rule-packs/validation.js';
 
 export interface KbrCorrectionImportBundleWithChatRef extends Exams.KbrCorrectionImportBundle {
   chatRef: string;
@@ -21,7 +22,28 @@ const DEFAULT_CORRECTION_IMPORT_BUNDLE_SCHEMA: Exams.CorrectionSessionImportBund
     contract: {
       type: 'object',
       required: ['id', 'chatRef', 'title', 'parts', 'taskTree', 'scoringUnits', 'rules'],
-      additionalProperties: true
+      additionalProperties: true,
+      properties: {
+        id: { type: 'string', minLength: 1 },
+        chatRef: { type: 'string', minLength: 1 },
+        title: { type: 'string', minLength: 1 },
+        parts: { type: 'array' },
+        taskTree: { type: 'array' },
+        scoringUnits: { type: 'array' },
+        rules: {
+          type: 'object',
+          required: ['scoring', 'evidence', 'deductionGovernance', 'imports'],
+          additionalProperties: true,
+          properties: {
+            scoring: { type: 'object', additionalProperties: true },
+            evidence: { type: 'object', additionalProperties: true },
+            deductionGovernance: { type: 'object', additionalProperties: true },
+            imports: { type: 'object', additionalProperties: true },
+            metadata: { type: 'object', additionalProperties: true }
+          }
+        },
+        metadata: { type: 'object', additionalProperties: true }
+      }
     },
     chatRef: {
       type: 'string',
@@ -73,6 +95,18 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function describeValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return 'array';
+  }
+
+  if (value === null) {
+    return 'null';
+  }
+
+  return typeof value;
+}
+
 function readSchemaObjectNode(
   schemaNode: unknown
 ): Record<string, unknown> & {
@@ -108,7 +142,7 @@ function validateSchemaNode(
   switch (schemaType) {
     case 'object': {
       if (!isObject(value)) {
-        pushError(errors, path, 'must be an object');
+        pushError(errors, path, `must be an object, got ${describeValue(value)}`);
         return;
       }
 
@@ -138,7 +172,7 @@ function validateSchemaNode(
     }
     case 'array': {
       if (!Array.isArray(value)) {
-        pushError(errors, path, 'must be an array');
+        pushError(errors, path, `must be an array, got ${describeValue(value)}`);
         return;
       }
 
@@ -151,7 +185,7 @@ function validateSchemaNode(
     }
     case 'string': {
       if (typeof value !== 'string') {
-        pushError(errors, path, 'must be a string');
+        pushError(errors, path, `must be a string, got ${describeValue(value)}`);
         return;
       }
 
@@ -169,7 +203,7 @@ function validateSchemaNode(
     }
     case 'number': {
       if (typeof value !== 'number' || Number.isNaN(value)) {
-        pushError(errors, path, 'must be a number');
+        pushError(errors, path, `must be a number, got ${describeValue(value)}`);
         return;
       }
 
@@ -187,8 +221,15 @@ function validateSchemaNode(
 }
 
 function assertContractRules(bundle: Exams.KbrCorrectionImportBundle): void {
-  if (!bundle.contract?.rules?.imports) {
-    throw new Error('Import bundle contract.rules.imports is required.');
+  if (!bundle.contract?.rules) {
+    throw new Error('Import bundle contract.rules is required.');
+  }
+
+  try {
+    validateCorrectionSessionRules(bundle.contract.rules);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Import bundle contract.rules is invalid: ${message}`);
   }
 }
 

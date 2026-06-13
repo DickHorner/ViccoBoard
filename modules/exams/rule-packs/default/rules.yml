@@ -3,6 +3,7 @@ taskSelection: leaf-only
 scoring:
   aggregation: task
   allowPartialPoints: true
+  pointStep: 1
   allowAlternativeGrading: true
   allowManualScoringUnits: false
 evidence:

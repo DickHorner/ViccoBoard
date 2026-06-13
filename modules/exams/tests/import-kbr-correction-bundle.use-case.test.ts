@@ -796,4 +796,75 @@ describe('ImportKbrCorrectionBundleUseCase', () => {
       })
     ).rejects.toThrow('violates allowed point step');
   });
+
+  it('rejects malformed contract arrays before business import logic runs', async () => {
+    await expect(
+      importUseCase.execute({
+        examId: exam.id,
+        sessionId: 'session-42',
+        sessionMap: {
+          examId: exam.id,
+          sessionId: 'session-42',
+          candidateIdByChatRef: {
+            'chat-0001': 'candidate-1'
+          },
+          taskIdByRef: {
+            'task-1': 'task-internal-1'
+          }
+        },
+        bundle: {
+          contract: {
+            id: 'contract-session-session-42',
+            chatRef: 'session-session-42',
+            title: 'Import contract',
+            parts: [],
+            taskTree: [],
+            scoringUnits: {
+              'task-1.score': {
+                id: 'task-1.score'
+              }
+            },
+            rules: createImportRules()
+          },
+          chatRef: 'chat-0001',
+          importedTaskScores: []
+        }
+      })
+    ).rejects.toThrow('$.contract.scoringUnits: must be an array, got object');
+  });
+
+  it('rejects flat contract rules with a contract-path error', async () => {
+    await expect(
+      importUseCase.execute({
+        examId: exam.id,
+        sessionId: 'session-42',
+        sessionMap: {
+          examId: exam.id,
+          sessionId: 'session-42',
+          candidateIdByChatRef: {
+            'chat-0001': 'candidate-1'
+          },
+          taskIdByRef: {
+            'task-1': 'task-internal-1'
+          }
+        },
+        bundle: {
+          contract: {
+            id: 'contract-session-session-42',
+            chatRef: 'session-session-42',
+            title: 'Import contract',
+            parts: [],
+            taskTree: [],
+            scoringUnits: [],
+            rules: {
+              allowPartialPoints: true,
+              scoringAggregation: 'task'
+            }
+          },
+          chatRef: 'chat-0001',
+          importedTaskScores: []
+        }
+      })
+    ).rejects.toThrow('$.contract.rules.scoring: is required');
+  });
 });

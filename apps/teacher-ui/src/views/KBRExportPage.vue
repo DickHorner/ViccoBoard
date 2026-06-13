@@ -303,7 +303,7 @@ async function exportAISession(): Promise<void> {
       throw new Error('Session-Map konnte fur den Re-Import nicht erstellt werden.')
     }
 
-    aiSuccess.value = 'KI-Sitzungsdateien erfolgreich exportiert. ChatGPT-Dateien: Contract und Prompt. Session-Map wird getrennt als internes Hilfsartefakt gespeichert.'
+    aiSuccess.value = 'KI-Sitzungsdateien erfolgreich exportiert. ChatGPT-Dateien: Contract, Contract JSON und Prompt. Session-Map wird getrennt als internes Hilfsartefakt gespeichert.'
 
     localStorage.setItem(sessionMapStorageKey.value, sessionMapArtifact.content)
   } catch (error: any) {

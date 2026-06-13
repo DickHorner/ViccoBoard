@@ -10,11 +10,21 @@ describe('buildCorrectionSessionDownloads', () => {
             fileName: 'kbr-correction-session-2026-04-17-contract.md',
             content: '# Contract'
           },
+          contractJsonFile: {
+            fileName: 'kbr-correction-session-2026-04-17-contract.json',
+            content: '{\"id\":\"contract-1\"}'
+          },
           promptFile: {
             fileName: 'kbr-correction-session-2026-04-17-prompt.md',
             content: '# Prompt'
           },
           localReferenceMap: {
+            contractId: 'contract-1',
+            contractChatRef: 'contract-1',
+            contractSnapshotId: 'contract-1',
+            sessionChatRef: 'session-session-2026-04-17',
+            exportId: 'session-2026-04-17',
+            targetSessionId: 'session-2026-04-17',
             candidateIdByChatRef: {
               'chat-0001': 'candidate-1'
             },
@@ -27,21 +37,29 @@ describe('buildCorrectionSessionDownloads', () => {
       'exam-1'
     )
 
-    expect(downloads).toHaveLength(3)
+    expect(downloads).toHaveLength(4)
     expect(downloads.map((artifact) => artifact.label)).toEqual([
       'Contract',
+      'Contract JSON',
       'Prompt',
       'Session-Map (intern)'
     ])
     expect(downloads.map((artifact) => artifact.audience)).toEqual([
       'chatgpt',
       'chatgpt',
+      'chatgpt',
       'internal'
     ])
-    expect(downloads[2].fileName).toBe('kbr-correction-session-2026-04-17-session-map-internal.json')
-    expect(JSON.parse(downloads[2].content)).toEqual({
+    expect(downloads[3].fileName).toBe('kbr-correction-session-2026-04-17-session-map-internal.json')
+    expect(JSON.parse(downloads[3].content)).toEqual({
       examId: 'exam-1',
       sessionId: 'session-2026-04-17',
+      contractId: 'contract-1',
+      contractChatRef: 'contract-1',
+      contractSnapshotId: 'contract-1',
+      sessionChatRef: 'session-session-2026-04-17',
+      exportId: 'session-2026-04-17',
+      targetSessionId: 'session-2026-04-17',
       candidateIdByChatRef: {
         'chat-0001': 'candidate-1'
       },

@@ -174,6 +174,7 @@ export interface RulePackCompatibility {
 export interface CorrectionSessionScoringRules {
   aggregation: 'task' | 'scoring-unit' | 'external';
   allowPartialPoints: boolean;
+  pointStep?: number;
   allowAlternativeGrading: boolean;
   allowManualScoringUnits: boolean;
 }

@@ -10,7 +10,28 @@
     "contract": {
       "type": "object",
       "required": ["id", "chatRef", "title", "parts", "taskTree", "scoringUnits", "rules"],
-      "additionalProperties": true
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "chatRef": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "parts": { "type": "array" },
+        "taskTree": { "type": "array" },
+        "scoringUnits": { "type": "array" },
+        "rules": {
+          "type": "object",
+          "required": ["scoring", "evidence", "deductionGovernance", "imports"],
+          "additionalProperties": true,
+          "properties": {
+            "scoring": { "type": "object", "additionalProperties": true },
+            "evidence": { "type": "object", "additionalProperties": true },
+            "deductionGovernance": { "type": "object", "additionalProperties": true },
+            "imports": { "type": "object", "additionalProperties": true },
+            "metadata": { "type": "object", "additionalProperties": true }
+          }
+        },
+        "metadata": { "type": "object", "additionalProperties": true }
+      }
     },
     "chatRef": {
       "type": "string",
