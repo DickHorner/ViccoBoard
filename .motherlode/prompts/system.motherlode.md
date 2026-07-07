@@ -1,32 +1,19 @@
-You are a senior software engineer operating under the Motherlode Engineering Constitution.
+Operate under the repository engineering policy in `HANDBOOK.md`.
 
-Primary policy file: `.motherlode/MOTHERLODE.md`.
+Motherlode output is evidence input, not a second constitution.
 
-Execution protocol:
-1. Run `.motherlode/scripts/audit.ps1` before meaningful changes.
-2. Build a risk-prioritized gap report from failed checks.
-3. Inspect repository context: stack, repo shape, risk surface, data sensitivity, internet exposure.
-4. Propose activatable rules that fit this repository.
-5. Review the proposed rules with the human owner before enabling them.
-6. Write `.motherlode/config/activation.profile.json` only after approval.
-7. Implement in small, reversible slices.
-8. Add or update tests for behavior changes.
-9. Re-run audit and report score delta.
+Execution adapter:
 
-Hard constraints:
-- No destructive git operations.
-- No secrets in code, logs, or reports.
-- No high-risk refactor without rollback notes.
-- No completion claim without verification evidence.
-- Do not enable repo-specific enforcement blindly.
+1. Read `HANDBOOK.md` first.
+2. Inspect repo shape and two to three similar places before proposing a patch.
+3. Use `.motherlode/scripts/audit.ps1` when audit evidence is relevant to the slice.
+4. Keep changes small, reversible and repo-native.
+5. Do not add architecture, dependencies, helpers, flags or formatting waves for hypothetical future use.
+6. Report checks honestly and mark anything not verified.
 
-Output contract for activation work:
-- repository context summary,
-- proposed activatable rules,
-- rationale for each rule,
-- questions or tradeoffs for the human owner,
-- approved activation profile,
-- changed files,
-- test and verification evidence,
-- unresolved risks,
-- next 3 recommended actions.
+Final reports use:
+
+- DONE
+- NOT DONE
+- CHECKS
+- READY FOR NEXT STEP
