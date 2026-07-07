@@ -1,48 +1,39 @@
-<a id="top"></a>
-
-<div align="center">
-
 # ViccoBoard
 
-**A modular, local-first teaching assistant for educators - optimized for iPadOS/Safari and built to grow by subject modules.**
+**A modular, local-first teaching assistant for educators, optimized for iPadOS/Safari.**
 
 [Deutsch](./README.md) | [English](./README.en.md)
 
 [![CI][badge-ci]][ci]
 [![CodeQL][badge-codeql]][codeql]
-[![Scorecard Workflow][badge-scorecard-workflow]][scorecard-workflow]
-[![OpenSSF Scorecard][badge-scorecard]][scorecard]
 [![License][badge-license]][license]
 
-[Quickstart](#quickstart) · [Docs](./INDEX.md) · [Roadmap](#roadmap-high-level) · [Motherlode](./.motherlode/README.md) · [Contributing](./CONTRIBUTING.md)
+## Scope
 
-</div>
+ViccoBoard unifies everyday teacher workflows in one local-first web app:
 
-## Why ViccoBoard?
+- class, lesson, student and attendance management,
+- configurable attendance status catalogs,
+- sport grading and classroom tools,
+- KBR exam builder and correction foundations,
+- IndexedDB-based local storage with migrations.
 
-ViccoBoard unifies everyday teacher workflows (class organization, assessment, exam work) in one local-first app.
-It is designed for practical school use: fast input, offline-first behavior, and strong modular boundaries.
+## Architecture
 
-## Modular approach (core differentiator)
+```text
+apps/      Vue teacher UI
+modules/   domain workflows: students, sport, exams
+packages/  shared contracts, plugins and storage
+```
 
-ViccoBoard separates:
+The active architecture direction is `apps -> modules -> packages`. UI code uses module bridges and use-cases instead of direct storage access.
 
-- `apps/*` for UI
-- `modules/*` for domain workflows (currently `students`, `sport`, `exams`)
-- `packages/*` for shared contracts/infrastructure (`core`, `storage`, `plugins`)
+## Start here
 
-This allows feature depth to grow by module (subject + school form) without rewriting the core.
-
-## Current product scope (today)
-
-- Class, lesson, student, and attendance management
-- Configurable attendance status catalogs
-- Sport grading categories and entry flows (criteria/time/cooper/shuttle/mittelstrecke/Sportabzeichen/BJS)
-- Timer, team builder, and scoreboard classroom tools
-- KBR exam builder foundations (simple/complex exam structures)
-- Local-first IndexedDB storage path with migrations
-
-See the German README for a detailed "Today" matrix and status granularity.
+- [HANDBOOK.md](./HANDBOOK.md) — engineering policy source
+- [Plan.md](./Plan.md) — product and feature scope
+- [DEVELOPMENT.md](./DEVELOPMENT.md) — setup, commands and repo shape
+- [INDEX.md](./INDEX.md) — remaining maintained documentation
 
 ## Quickstart
 
@@ -61,39 +52,6 @@ npm run test
 npm run build
 ```
 
-## Contributing
-
-- Start here: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Code of Conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
-- Security Policy: [SECURITY.md](./SECURITY.md)
-- Module proposals: use the `Module proposal` issue template
-
-## Roadmap (high level)
-
-- **Now**: sport + exam foundations, local-first storage, core classroom workflows
-- **Next**: complete end-to-end correction hardening, replace remaining placeholder views, UX polish
-- **Later (Vision)**: more subject/school-form modules, deeper export/reporting, optional integrations via plugins
-
-Roadmap docs: [Plan.md](./Plan.md), [docs/planning/ROADMAP.md](./docs/planning/ROADMAP.md)
-
-
-## Motherlode (Cross-Repo Standard)
-
-This repository includes a reusable motherlode pack in [`.motherlode/`](./.motherlode/README.md).
-Use it to audit other repositories against one engineering standard, prioritize refactors, and auto-generate robust agent instructions.
-
-Quick start:
-
-```powershell
-pwsh -NoLogo -File .\.motherlode\scripts\activate.ps1 -RunAudit -CopyToClipboard
-```
-## OpenSSF Best Practices badge (CII)
-
-We are actively pursuing the OpenSSF Best Practices badge (formerly CII).
-Short version: this project is in OpenSSF Best Practices badge pursuit on bestpractices.dev.
-
-- Fast-track playbook: [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md)
-- Current blocker: one manual account/project enrollment step on bestpractices.dev
 ## License
 
 MIT - see [LICENSE](./LICENSE).
@@ -101,15 +59,9 @@ MIT - see [LICENSE](./LICENSE).
 <!-- Badges -->
 [badge-ci]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/ci.yml?branch=main&label=CI
 [badge-codeql]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/codeql.yml?branch=main&label=CodeQL
-[badge-scorecard-workflow]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/scorecard.yml?branch=main&label=Scorecards
-[badge-scorecard]: https://api.securityscorecards.dev/projects/github.com/DickHorner/ViccoBoard/badge
 [badge-license]: https://img.shields.io/github/license/DickHorner/ViccoBoard
 
 <!-- Links -->
 [ci]: https://github.com/DickHorner/ViccoBoard/actions/workflows/ci.yml
 [codeql]: https://github.com/DickHorner/ViccoBoard/actions/workflows/codeql.yml
-[scorecard-workflow]: https://github.com/DickHorner/ViccoBoard/actions/workflows/scorecard.yml
-[scorecard]: https://securityscorecards.dev/viewer/?uri=github.com/DickHorner/ViccoBoard
 [license]: https://github.com/DickHorner/ViccoBoard/blob/main/LICENSE
-
-
