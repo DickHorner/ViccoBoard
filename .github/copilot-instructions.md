@@ -13,7 +13,7 @@ Do not treat this file as a second rulebook. It only tells GitHub Copilot where 
 5. `docs/status/STATUS.md` for current status
 6. `DEVELOPMENT.md` for commands and repo shape
 
-For Sport parity work, also read `docs/agents/sport_parity_v2.md`.
+For Sport parity work, refer to [`HANDBOOK.md`](../HANDBOOK.md).
 
 ## Repo boundaries
 
