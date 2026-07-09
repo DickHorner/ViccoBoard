@@ -72,7 +72,6 @@ ViccoBoard/
 │   └── storage/
 ├── docs/                # Maintained product, planning, QA and runbook docs
 ├── .github/             # GitHub-specific templates and instructions
-├── .motherlode/         # Audit/check tooling; policy adapter only
 ├── HANDBOOK.md          # Engineering policy source of truth
 ├── Plan.md              # Product and feature scope source
 ├── agents.md            # Agent entrypoint adapter
