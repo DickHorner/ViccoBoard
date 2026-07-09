@@ -9,7 +9,7 @@ Dieses Dokument ist nur der Einstieg für AI-gestützte Arbeit in ViccoBoard. Di
 3. [`docs/planning/ISSUES_TRACKER.md`](./docs/planning/ISSUES_TRACKER.md) für aktive Arbeitspakete.
 4. [`docs/status/STATUS.md`](./docs/status/STATUS.md) für aktuellen Repo- und Produktstatus.
 5. [`DEVELOPMENT.md`](./DEVELOPMENT.md) für lokale Kommandos, Struktur und Architekturgrenzen.
-6. [`docs/agents/sport_parity_v2.md`](./docs/agents/sport_parity_v2.md) nur bei Sport-Parity-Arbeit.
+6. Sport-Parity-Arbeit ist nun im [`HANDBOOK.md`](./HANDBOOK.md) konsolidiert.
 
 ## Non-negotiable repo constraints
 
