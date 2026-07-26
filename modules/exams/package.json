@@ -26,15 +26,15 @@
     "@viccoboard/storage": "*",
     "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
-    "uuid": "^14.0.0",
+    "uuid": "^14.0.1",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.9.1",
+    "@types/node": "^26.1.1",
     "@types/uuid": "^11.0.0",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.11",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
