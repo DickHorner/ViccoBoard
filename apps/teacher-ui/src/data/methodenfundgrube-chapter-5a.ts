@@ -88,7 +88,7 @@ export const METHODENFUNDGRUBE_CHAPTER_5A: SeedEntry[] = [
     sportType: 'Fußball'
   },
   {
-    name: 'Brennball',
+    name: 'Brennball (Gruppenlauf)',
     category: 'ballspiel',
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
