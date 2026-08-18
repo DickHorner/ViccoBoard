@@ -146,6 +146,7 @@ import { useI18n } from 'vue-i18n'
 import type { Sport } from '@viccoboard/core'
 import { getSportBridge } from '../composables/useSportBridge'
 import { GAME_SEED_DATA } from '../data/game-seed-data'
+import { METHODENFUNDGRUBE_SEED_DATA } from '../data/methodenfundgrube-seed-data'
 
 const { t } = useI18n()
 const bridge = getSportBridge()
@@ -162,6 +163,11 @@ const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
 
 const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis']
+const CORE_SEED_NAMES = new Set(GAME_SEED_DATA.map((seed) => seed.name))
+const BUILT_IN_GAME_SEED_DATA = [
+  ...GAME_SEED_DATA,
+  ...METHODENFUNDGRUBE_SEED_DATA.filter((seed) => !CORE_SEED_NAMES.has(seed.name))
+]
 
 interface CategoryOption {
   value: Sport.GameCategory | null
@@ -226,13 +232,17 @@ const filteredEntries = computed<Sport.GameEntry[]>(() => {
   return result
 })
 
-async function seedIfEmpty(): Promise<void> {
-  const count = await bridge.gameEntryRepository.count()
-  if (count > 0) return
+async function seedBuiltIns(): Promise<void> {
+  const existingEntries = await bridge.gameEntryRepository.findAll()
+  const existingBuiltInNames = new Set(
+    existingEntries.filter((entry) => !entry.isCustom).map((entry) => entry.name)
+  )
+  const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingBuiltInNames.has(seed.name))
+  if (missingSeeds.length === 0) return
 
   initializing.value = true
   try {
-    for (const seed of GAME_SEED_DATA) {
+    for (const seed of missingSeeds) {
       await bridge.gameEntryRepository.create({
         ...seed,
         isCustom: false
@@ -245,7 +255,7 @@ async function seedIfEmpty(): Promise<void> {
 
 onMounted(async () => {
   try {
-    await seedIfEmpty()
+    await seedBuiltIns()
     allEntries.value = await bridge.gameEntryRepository.findAll()
   } catch (err) {
     loadError.value = err instanceof Error ? err.message : 'Unknown error'
