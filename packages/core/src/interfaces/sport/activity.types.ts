@@ -63,9 +63,10 @@ export type GameCategory =
   | 'entspannung'
   | 'kraft'
   | 'ausdauer'
+  | 'schnelligkeit'
   | 'sonstiges';
 
-export type GameDifficulty = 'anfaenger' | 'fortgeschrittene' | 'profis';
+export type GameDifficulty = 'unbekannt' | 'anfaenger' | 'fortgeschrittene' | 'profis';
 
 export type GamePhase = 'erwaermung' | 'hauptteil' | 'schluss';
 
