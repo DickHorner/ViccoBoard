@@ -11,7 +11,7 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     duration: 0,
     ageGroup: 'ca. 6–60 Jahre, vor allem bei neuen Gruppen (Kennenlerneffekt)',
     goal: 'Aufwärmen, Gedächtnistraining',
-    description: 'Die TN stehen in einem großen Kreis von drei bis sechs Metern Durchmesser. Der erste TN stellt sich mit seinem Vornamen und einer einfachen Übung (z. B. Schulterkreisen, kleine Kniebeuge, kleine Sprünge, Dehnübung etc.) von zwei bis drei Sekunden Dauer vor. Nach dem bekannten „Ich packe meinen Koffer“Prinzip muss der nächste TN, bevor er sich und seine Übung vorstellt, immer zuerst den Vornamen und die Übung des vorherigen TN ansagen und ausführen. Für den letzten TN bedeutet dies also, dass erst alle vorherigen TN mit Name und Übungen angesagt werden, bevor dieser sich vorstellen kann. Bei jeder Übungsansage werden von allen TN die Übungen…',
+    description: 'Die Gruppe steht im Kreis. Jede Person nennt den eigenen Namen und zeigt eine kurze Bewegung; nach dem Kofferpack-Prinzip werden zuvor genannte Namen und Bewegungen in Reihenfolge wiederholt, bevor ein neues Element hinzukommt.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 72.',
     sportType: 'Allgemein'
   },
@@ -23,8 +23,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     duration: 0,
     ageGroup: 'ca. 10–60 Jahre',
     goal: 'Aufwärmen, Gedächtnistraining',
-    description: 'Die TN stehen im Kreis und jeder TN bekommt eine Zahl genannt, die er sich merken muss. Auf Kommando des ÜLs wechseln nun jeweils zwei angesagte Zahlen ihre Position (z. B. 2 und 8). Bei dieser Merkübung können die Laufwege durch oder außerhalb des Kreises erfolgen.',
-    variation: 'Ebenso können über eine weitere Zahl Geh-/ Lauf-ABC-Übungen integriert werden, z. B. 1 und 2: Anfersen, 3 und 4: Hopserlauf, 5 und 6: Seitgalopp, 7 und 8: Knieheben, 9 und 10: Zehengang, 11 und 12: Ausfallschritte. Folglich wechseln z. B. bei 2 und 8 die genannten ihre Position mit Anfersen (2)…',
+    description: 'Jede Person merkt sich eine Zahl. Werden zwei Zahlen aufgerufen, wechseln die entsprechenden Personen ihre Position im Kreis und müssen dabei ihre Nummer sowie die Bewegungsvorgabe korrekt erinnern.',
+    variation: 'Zahlen zusätzlich mit Lauf-ABC-Formen wie Anfersen, Hopserlauf, Seitgalopp oder Knieheben koppeln.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 74.',
     sportType: 'Allgemein'
   },
@@ -37,8 +37,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre, alle Sportarten; vor allem Breiten- und Gesundheitssport',
     material: '1 Gymnastikball oder Softball',
     goal: 'Übersicht, „stressfreies“ Agieren',
-    description: 'Die TN stehen im Kreis. Ein TN benennt einen anderen TN und spielt diesem den Ball (z. B. direkt oder indirekt, im hohen Bogen oder mit dem Fuß) zu. Nach dem Passspiel läuft er außerhalb des Kreises auf die Position, wo der angespielte TN mit dem Ball steht. Damit der Platz aber frei wird, muss der TN mit dem eben gefangenen Ball diesen sofort wieder weiterspielen und ebenfalls dahinlaufen, wo der Ball hin gespielt wurde („Folge deinem Passweg“). Um kurze Passwege (zum nächsten TN) zu vermeiden, muss dabei immer der längere Laufweg gewählt werden.',
-    variation: 'Die TN laufen ihrem Pass auf direktem Weg durch den Kreis hinterher. Dadurch ergeben sich kürzere Laufwege und das Spiel wird entsprechend schneller. Um das Spiel noch anspruchsvoller zu machen, können anschließend zwei bis drei Bälle ein gesetzt werden. Es können verschiedenfarbige Gymnastikbälle…',
+    description: 'Im Kreis wird eine Person benannt und angespielt. Wer passt, läuft anschließend auf die Position des Empfängers; dieser spielt den Ball sofort weiter und folgt wiederum seinem Passweg.',
+    variation: 'Direkt durch den Kreis laufen, mehrere Bälle einsetzen oder Ballfarben mit unterschiedlichen Zuspieltechniken verknüpfen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 76.',
     sportType: 'Allgemein'
   },
@@ -51,8 +51,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre',
     material: '3 verschiedene Bälle (Handball, Fußball, Basketball oder farbige Gymnastikbälle)',
     goal: 'Konzentration, Gedächtnistraining',
-    description: 'Zu Beginn dieser Kreisübung wird ein Ball einmal im Uhrzeigersinn weitergereicht. Jeder TN muss sich dabei seinen nächsten und übernächsten linken Nachbarn und seinen nächsten und übernächsten rechten Nachbarn merken (vier TN). Auf ein Kommando des ÜLs erfolgt nun eine neue Kreisaufstellung, nachdem alle TN kurz durch die Turnhalle gelaufen sind. Danach wird der Ball z. B. nur an den nächsten oder übernächsten TN (aus der ersten Kreisform) weitergespielt.',
-    variation: 'Gelingt dieses komplexe Merkspiel, werden verschiedenfarbige Bälle mit unterschiedlichen Passtechniken (z. B. rot = direkt zum ersten TN nach links, gelb = indirekt zum ersten TN nach rechts, grün = in hohem Bogen zum übernächsten TN nach links, blau = mit dem Fuß zum übernächsten TN nach rechts)…',
+    description: 'Im Ausgangskreis merkt sich jede Person die beiden nächsten Nachbarn auf jeder Seite. Nach einer freien Laufphase wird der Kreis neu gebildet; anschließend müssen die ursprünglich gemerkten Nachbarn trotz veränderter Position gezielt angespielt werden.',
+    variation: 'Verschiedene Ballfarben mit Richtung, Distanz und Passtechnik kombinieren.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 78.',
     sportType: 'Allgemein'
   },
@@ -65,8 +65,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre',
     material: '2 Bälle pro 4er-Gruppe',
     goal: 'Ballgefühl, Timing, Blick für den Raum („peripheres“ Auge)',
-    description: 'Aus der Quadrat-Position (ca. fünf bis neun Meter je Seite) heraus spielen sich zwei Pärchen (statt wie im vorigen Kapitel in der Gassenformation nebeneinander) über Kreuz den Ball zu. Auf Kommando des ÜLs wechselt dabei die Zuspielweise (von indirekt über direkt, von Handball-Wurf bewegung, Basketball-Druckpassbewegung, Volleyball-Zuspiel bis hin zum Fußball-Zuspielen). Dabei darf der querende bzw. kreuzende Ball nicht getroffen werden.',
-    variation: 'Gelingt diese (leichtere) Variante, so können vier Bälle eingesetzt werden. Somit erhält jeder TN einen Ball. Jedes Pärchen spielt sich wieder gleichzeitig/synchron beide Bälle zu. Sowohl mit als auch ohne Wechsel der Wurfhand bzw. des Zuspielfußes. Alternativ kann mit zwei Bällen versucht werden,…',
+    description: 'Vier Personen stehen im Quadrat. Zwei gegenüberliegende Paare spielen gleichzeitig diagonal über Kreuz, ohne dass sich die Bälle treffen; Passart und Balltechnik können gewechselt werden.',
+    variation: 'Mit vier Bällen gleichzeitig spielen oder als Kontrastaufgabe gezielt versuchen, die kreuzenden Ballwege zu treffen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 80.',
     sportType: 'Allgemein'
   },
@@ -79,8 +79,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre',
     material: '2 Bälle pro 4er-Gruppe',
     goal: 'genaues Zuspiel, Konzentration, Timing',
-    description: 'In der Quadratposition zu viert werden beide Bälle gleichzeitig seitlich z. B. nach links (im Uhrzeigersinn) gespielt (oder übergeben, indirekt vs. direkt zugepasst, mit dem Fuß oder als oberes Volleyball-Zuspiel gespielt). Dabei beginnt die 4er-Gruppe mit zwei Bällen, wobei die zwei diagonal stehenden TN je einen Ball erhalten. Durch das Kommando der Zuspiel-TN gelingen die synchronen Pässe bedeutend leichter.',
-    variation: 'Ein dritter und dann ein vierter Ball erhöhen das synchrone Zuspielniveau. Das Kommando der TN („… und Wurf!“) wird dabei für die Koordination immer wichtiger.',
+    description: 'Vier Personen stehen im Quadrat, zwei diagonal gegenüber besitzen je einen Ball. Auf gemeinsames Kommando werden beide Bälle synchron zur gleichen Seite weitergespielt; die Positionen bleiben unverändert.',
+    variation: 'Dritten und vierten Ball ergänzen und dadurch die Anforderungen an gemeinsames Timing steigern.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 82.',
     sportType: 'Allgemein'
   },
@@ -93,7 +93,7 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre',
     material: '2 Bälle pro 4er-Gruppe',
     goal: 'genaues Zuspiel, Konzentration, Timing',
-    description: 'Die Übung beginnt mit der 4er-Gruppe im Quadrat, zwei einander diagonal gegenüberstehende TN bekommen jeweils einen Ball. Aus dieser Position wird von beiden TN der Ball gleichzeitig z. B. nach links (über Boden) gespielt und sofort diagonal durch das Quadrat gelaufen. In der neuen Ecke angelangt, erhält jeder der beiden TN wieder den Ball (diesmal von rechts), da die beiden anderen TN die gleiche Pass- und Laufbewegung absolvieren. Das wichtige Kommando („… und Wurf!“) unterstützt dabei wieder die gleichzeitige Ausführung der Wurfaktion und diagonalen Laufbewegung.',
+    description: 'Zwei diagonal gegenüberstehende Personen passen gleichzeitig zur Seite und laufen danach diagonal durch das Quadrat in die freie Ecke. Die beiden anderen übernehmen spiegelbildlich dieselbe Pass- und Laufbewegung.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 84.',
     sportType: 'Allgemein'
   },
@@ -106,8 +106,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre',
     material: '1 Ball pro 4er-Gruppe',
     goal: 'genaues Zuspiel, Konzentration, Timing',
-    description: 'Diese Übung baut auf „Passen – diagonal laufen“ (S. 84) auf. Der Ball wird in hohem Bogen von einer Ecke diagonal in die gegenüberliegende Ecke geworfen. Dabei soll der Ball einmal auf dem Boden auf treffen (längere Flugphase). In dem Moment des Wurfes wechseln alle vier TN ihre Eckposition um eine Seitlänge (z. B. nach rechts/gegen den Uhrzeigersinn). Dies erfolgt am besten immer in Seitstepp-Ausführung. Demnach erhält immer der rechts vom Werfer stehende TN den Ball, da dieser auf die nächste Eckposition (wo der Ball hingespielt wurde) wechselt. Auch hier kann das Kommando („… und Wurf!“) die gleichzeitige/synchrone Laufbewegung aller…',
-    variation: 'Der Ball wird ohne Bodenberührung diagonal zugespielt. Die Übung kann durch den Einsatz von zwei Bällen gesteigert werden, wobei die TN dann schneller laufen müssen. Nutzt man hierbei verschiedenfarbige Gymnastikbälle oder unterschiedliche Ballarten, kann daran eine bestimmte Wurftechnik gekoppelt…',
+    description: 'Ein diagonaler Pass löst gleichzeitig bei allen vier Personen einen Positionswechsel um eine Ecke aus. Die Laufbewegung wird synchron durchgeführt, sodass eine neue Person am Zielpunkt des Passes ankommt und weiterspielt.',
+    variation: 'Direkten statt indirekten Pass verwenden, zwei Bälle einsetzen oder Ballarten mit unterschiedlichen Techniken verknüpfen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 86.',
     sportType: 'Allgemein'
   },
@@ -120,8 +120,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre',
     material: '1 Ball pro Gruppe; evtl. Eckpunktmarkierungen mit je 4 Hütchen oder 4 Reifen',
     goal: 'genaues Zuspiel, Konzentration, Timing',
-    description: 'Jeweils zwei TN stellen sich in einer Ecke eines Quadrats auf. Der Ball wird von einer Ecke zur nächsten Ecke (nach links/im Uhrzeigersinn) gespielt. Der TN, der den Ball in seiner Ecke (von rechts kommend) erhält, muss nun den Ball diagonal (durch das Quadrat) weiterspielen. Der folgende TN mit Ball spielt dann wieder den Ball längs in die nächste Ecke (nach links/im Uhr zeigersinn). D. h., es erfolgt immer nach dem Längspass der Diagonalpass und dann wieder der Längspass. Wichtig dabei ist das Einhalten der gleichen Passrichtung (im Uhrzeigersinn). Hat sich das Zuspielmuster eingeprägt, werden nun die Laufwege mit eingebaut. So wie der…',
-    variation: 'Die Steigerung gelingt wieder über den Einsatz von zwei Bällen.',
+    description: 'Im Quadrat wechseln sich Längs- und Diagonalpässe nach einem festen Muster ab. Nach jedem Pass läuft die passgebende Person auf die Zielposition des eigenen Passes und reiht sich dort ein.',
+    variation: 'Mit zwei Bällen gleichzeitig spielen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 88.',
     sportType: 'Allgemein'
   },
@@ -134,8 +134,8 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     ageGroup: 'ca. 10–60 Jahre',
     material: '1 Ball pro Gruppe; evtl. Eckpunktmarkierungen mit je 4 Hütchen oder 4 Reifen',
     goal: 'genaues Zuspiel, Konzentration, Timing',
-    description: 'Diese Übung wird möglichst aufbauend auf die vorherige (S. 88) durchgeführt. Die Herausforderung besteht nun darin, dass dem Passweg nicht hinterhergelaufen wird. Somit erfolgt die Laufrichtung diagonal, wenn der TN längs gepasst hat bzw. umgekehrt (längs laufen nach Diagonalpass). Dabei müssen die TN sich noch mehr konzen trieren und beobachten, von wo der Ball gespielt wurde (z. B. diagonal), um dann den Ball nach links weiterzuspielen, aber diagonal zu laufen.',
+    description: 'Das Passmuster aus der Vorübung bleibt erhalten, aber die Laufbewegung folgt bewusst nicht dem Ball: Nach einem Längspass wird diagonal gelaufen, nach einem Diagonalpass längs.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 90.',
     sportType: 'Allgemein'
-  },
+  }
 ];
