@@ -73,7 +73,7 @@ export const METHODENFUNDGRUBE_CHAPTER_5D: SeedEntry[] = [
     sportType: 'Ballsport'
   },
   {
-    name: 'Zahlenball',
+    name: 'Zahlenball (Reaktionsduelle)',
     category: 'ballspiel',
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
