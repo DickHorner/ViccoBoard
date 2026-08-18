@@ -11,7 +11,7 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     duration: 0,
     ageGroup: 'ca. 6–14 Jahre, alle Sportarten',
     goal: 'Kurzzeitausdauer, Sprintfähigkeit sowie Reaktion und Raumüberblick',
-    description: 'Ein TN (der Jäger) steht an der Grundlinie der Turnhalle. Alle anderen TN (die Gejagten) verweilen auf der gegenüberliegenden Seite. Auf Kommando versucht der Jäger, die entgegenkommenden TN zu berühren. Es darf nur in Laufrichtung gefangen bzw. sich gerettet werden. Alle gefangenen TN stellen sich anschließend mit auf die Seite des Jägers und fangen in der nächsten Runde mit.',
+    description: 'Ein Jäger startet an einer Grundlinie, die übrigen Teilnehmenden auf der gegenüberliegenden Seite. Auf Signal laufen beide Seiten aufeinander zu; gefangen werden darf nur in Laufrichtung. Gefangene unterstützen in der nächsten Runde die Jägerseite.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 30.',
     sportType: 'Allgemein'
   },
@@ -23,7 +23,7 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     duration: 0,
     ageGroup: 'ca. 6–14 Jahre, alle Sportarten',
     goal: 'Kurzzeitausdauer, Sprint- und Reaktionsfähigkeit',
-    description: 'Ein TN wird als Jäger ausgewählt. Die TN dürfen in alle Richtungen durch die Turnhalle laufen. Wird ein TN vom Jäger berührt, wird dieser zum „Spiderman“. Mit Händen und Füßen am Boden (bäuchlings oder rücklings) krabbeln die „Spidermen“ (oder Spinnen) auf allen vieren durch die Turnhalle und unterstützen dabei den Jäger. Zunehmend verändert sich hierbei das Verhältnis von Jägern zu freien TN.',
+    description: 'Eine Person beginnt als Jäger. Wer gefangen wird, bewegt sich anschließend bäuchlings oder rücklings auf Händen und Füßen durch die Halle und unterstützt den Jäger; dadurch steigt die Zahl der Fangenden fortlaufend.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 32.',
     sportType: 'Allgemein'
   },
@@ -35,8 +35,8 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     duration: 0,
     ageGroup: 'ca. 6–14 Jahre',
     goal: 'Kurzzeitausdauer, Reaktions- sowie Antizipationsfähigkeit',
-    description: 'Die TN finden sich in Paaren zusammen und verteilen sich in der Turnhalle (innerhalb des Volleyballfeldes). Sie stellen oder setzen sich dann eng nebeneinander und bilden dadurch „Inseln“. Ein Pärchen bildet keine Insel, sondern wird getrennt, sodass es einen Jäger und einen Gejagten gibt. Der Gejagte rennt vor dem Jäger weg und kann sich an eine Insel retten. Dabei entscheidet die jeweilige Seite: Rettet sich der Gejagte auf die linke Seite des Pärchens, wird nun der rechts stehende TN zum „neuen“ Gejagten und rennt weg.',
-    variation: 'Im nächsten Schritt wechseln Jäger und Gejagte: Rettet sich ein Gejagter erfolgreich an die z. B. rechte Inselseite, wird die linke Inselseite zum neuen Jäger. Somit wechselt der vorherige Jäger reaktionsschnell zum Gejagten und rennt weg.',
+    description: 'Paare bilden im Feld stationäre „Inseln“. Eine gejagte Person kann sich an eine Seite eines Paars retten; dadurch muss die Person auf der gegenüberliegenden Inselseite sofort als neue gejagte Person weiterlaufen. Bei einem Fang tauschen Jäger und Gejagter die Rollen.',
+    variation: 'In der Steigerung wird beim Andocken nicht der neue Gejagte, sondern ein neuer Jäger aus der Insel bestimmt.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 34.',
     sportType: 'Allgemein'
   },
@@ -49,7 +49,7 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: '6–14 Jahre, alle Sportarten',
     material: '2–4 Parteibänder oder Leibchen',
     goal: 'Kurzzeitausdauer, Reaktion und Teamgedanke',
-    description: 'Je nach Gruppenstärke werden zwei bis vier Jäger ausgewählt. Jeder Jäger erhält ein buntes Leibchen. Innerhalb einer bestimmten Zeit (z. B. zwei Minuten) müssen die Jäger nun alle anderen TN durch eine Berührung „versteinern“. Die restlichen freien TN versuchen hingegen, ihre versteinerten Mitspieler wieder zu befreien: Je nach Zielsetzung und Fitness erfolgt diese Befreiung z. B. durch beidhändiges Abklatschen in der Luft, sich rücklings mit den Händen über Kopf berühren, sich die Hand unter dem Bein geben oder durch ein „Tor krabbeln“ (der versteinerte TN bildet das Tor, sobald er von einem Jäger gefangen wurde).',
+    description: 'Zwei bis vier markierte Jäger versuchen innerhalb einer festgelegten Zeit alle anderen zu „versteinern“. Freie Mitspielende können Versteinerte durch vorgegebene Partneraktionen wie Abklatschen, Berühren oder Durchkrabbeln wieder befreien.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 36.',
     sportType: 'Allgemein'
   },
@@ -62,7 +62,7 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: 'ca. 6–14 Jahre',
     material: '10 Leibchen',
     goal: 'Kurzzeitausdauer, Reaktion und Teamgedanke',
-    description: 'Das Fangspiel startet mit einem Jäger. Sobald dieser einen TN berührt hat, nehmen sich beide TN an die Hand und fangen zu zweit. Nach der nächsten Berührung fangen nun drei TN als kleine Kette weiter. Wird ein vierter TN gefangen, bleibt die 3er-Kette zusammen (und fängt weiter) und der einzelne TN fängt zusätzlich (3 + 1). Es ergeben sich somit gegen Ende des Spiels mehrere kleine 3er-Ketten. Damit wird eine höhere Dynamik (gegenüber der Variante „große Kette“) gewährleistet. Damit der Überblick über die „neuen“ Jäger er halten bleibt, macht es Sinn, dass sich der jeweils einzelne Jäger kurz in den Mittelkreis begibt.',
+    description: 'Nach jedem Fang wächst die Fangkette bis auf drei Personen. Die nächste gefangene Person beginnt wieder als einzelner Jäger, sodass im Verlauf mehrere kleine Dreierketten und einzelne Jäger gleichzeitig entstehen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 38.',
     sportType: 'Allgemein'
   },
@@ -75,8 +75,8 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: 'ca. 6–14 Jahre, alle Sportarten',
     material: '2 verschiedene Bälle oder verschiedenfarbige Gymnastikbälle',
     goal: 'Sprint- und Reaktionsfähigkeit',
-    description: 'Zwei gleich große Gruppen stehen sich an der Angriffslinie des Volleyballfeldes gegenüber. Auf ein optisches Kommando des ÜLs (z. B. Arm bewegung) jagt das Team A (Angriff), während das Team B (Verteidigung) zurücksprintet. Als Startlinie gilt für beide Teams die Angriffslinie, als Ziellinie für die „Ausreißer“ die Grundlinie des Volleyballfelds. Dabei können verschiedene Startstellungen (stehend, sitzend, liegend) ergänzend gewählt werden. Wird ein Gegner berührt bzw. gefangen, erhält die Jägergruppe einen Punkt. Dabei zählt der ÜL die einzelnen Punkte mit.',
-    variation: 'Statt die Gruppe A oder B mit einer Armbewegung oder Ansage aufzufordern, wird die Jägergruppe nun indirekt angezeigt (z. B. blauer Ball für Gruppe A, grüner Ball für Gruppe B). Ebenso kann das Kommando indirekt erfolgen: Der ÜL stellt eine Rechenaufgabe.',
+    description: 'Zwei Teams stehen sich an einer Linie gegenüber. Ein optisches Signal bestimmt spontan, welches Team jagt und welches zur eigenen Ziellinie flieht; erfolgreiche Berührungen bringen Punkte.',
+    variation: 'Die jagende Seite indirekt über Ballfarbe, Zahl oder Rechenaufgabe bestimmen und unterschiedliche Startpositionen einsetzen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 40.',
     sportType: 'Allgemein'
   },
@@ -89,8 +89,8 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: 'ca. 8–18 Jahre, alle Sportarten; vor allem große Ballsportarten',
     material: '1 Basketball, Handball, Fußball, Volleyball oder Gymnastikball pro TN',
     goal: 'Balldribbling unter „Stress“, Reaktion und Sprintfähigkeit',
-    description: 'Das bekannte Fangspiel „Angsthase“ von einer zur anderen Turnhallenseite (siehe S. 30) wird nun mit Bällen gespielt. Sowohl der Jäger als auch die TN (Gejagte) erhalten je einen Ball. Gefangen bzw. weggelaufen wird nun durch das Laufen mit Ballführung. Nach einer Berührung wechselt der Gejagte zum Jäger.',
-    variation: 'Der ÜL kann mit Blick auf seine Sportart vari ieren: Basketballdribbling, Handballprellen, Fußballspielen oder den Gymnastikball (neutral) spielen werden somit zur entsprechenden Technikschulung eingesetzt. Grundlinie/Ziellinie',
+    description: 'Das Fangspiel „Angsthase“ wird mit individueller Ballführung gespielt. Sowohl Jäger als auch Gejagte führen einen Ball und müssen beim Sprint gleichzeitig die sportartspezifische Dribbel- bzw. Prelltechnik kontrollieren.',
+    variation: 'Je nach Schwerpunkt Basketball, Handball, Fußball oder neutralen Gymnastikball verwenden.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 42.',
     sportType: 'Allgemein'
   },
@@ -103,8 +103,8 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: 'ca. 6–18 Jahre, alle Sportarten',
     material: '2–4 Softbälle; 1 Langbank',
     goal: 'Reaktion und Hinführung zur Sportartregel',
-    description: 'Es werden zwei bis vier weiche Softbälle in der Kreismitte der Turnhalle platziert. Auf Kommando dürfen alle TN sich in der Turnhalle bewegen und sich vor einem Ballabwurf retten. Dabei agiert jeder TN für sich bzw. gegen alle anderen TN. Wer im Besitz eines Balls (aber nicht zweier oder dreier Bälle) ist, darf maximal drei Schritte laufen, um dann den Abwurf vorzunehmen. Wer getroffen wurde, stellt sich auf die Langbank oder in eine Zone. Alle weiteren TN, die getroffen wurden, reihen sich hinter dem ersten TN ein, die auf der Bank stehenden TN sind die „Zwerge“.',
-    variation: 'Es werden zwei bis vier Basketbälle und deren Schrittregel verwendet. Es darf nur mit einem beidhändigen Druckpass und nur auf die Füße und Unterschenkel direkt und indirekt abgeworfen werden. Es werden zwei bis drei Pezzibälle® für das Abwerfen verwendet.',
+    description: 'Mehrere Bälle liegen frei im Feld. Wer einen Ball besitzt, darf nur eine begrenzte Schrittzahl laufen und versucht andere abzuwerfen. Getroffene wechseln auf eine Langbank bzw. in eine Wartezone und reihen sich dort ein.',
+    variation: 'Mit Basketbällen und Druckpässen, großen Pezzibällen oder veränderten Trefferzonen spielen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 44.',
     sportType: 'Allgemein'
   },
@@ -117,8 +117,8 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: 'ca. 6–18 Jahre, alle Sportarten',
     material: '2–4 Softbälle oder Basketbälle; 1 Langbank',
     goal: 'Reaktion und Hinführung zu Sportartregeln (Basketball oder Handball)',
-    description: 'Nach dem gleichen Muster wie die „Sieben Zwerge“ (S. 44) wird weiterhin mit zwei bis vier Softbällen abgeworfen. Jedoch müssen die TN, die getroffen wurden, so lange auf der Langbank verweilen, bis ihr Abwerfer getroffen wurde. Dabei darf der Werfer immer nur einen Ball zum Abwerfen verwenden. Ebenso muss innerhalb von z. B. drei Sekunden geworfen werden (Zeitspiel).',
-    variation: 'Es wird eine Zone bzw. ein Korridor markiert (z. B. entlang der Mittellinie werden sechs bis acht Hütchen aufgestellt oder drei bis vier Matten platziert). Der TN, der wieder in das Spiel läuft, muss zuerst durch diesen Korridor laufen und kann dabei nicht abgeworfen werden („Frischmachen“).',
+    description: 'Abgeworfene warten auf der Bank, bis die Person getroffen wird, die sie zuvor abgeworfen hat; dann dürfen sie zurück ins Spiel. Ballbesitz und Wurfzeit sind begrenzt, damit der Spielfluss hoch bleibt.',
+    variation: 'Rückkehrende müssen zunächst durch einen sicheren Korridor mit einer Zusatzaufgabe laufen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 46.',
     sportType: 'Allgemein'
   },
@@ -131,7 +131,7 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: 'ca. 10–18 Jahre, alle Sportarten; vor allem Ballsportarten',
     material: '1 Softball, Basketball, Handball, Volleyball, Fußball oder Frisbee-Scheibe',
     goal: 'Reaktion und zielgerichtetes Ballzuspiel bzw. Ballfangen',
-    description: 'Alle TN befinden sich in der Turnhalle. Im Mittelkreis steht ein Jäger. Der Jäger hat nun die Auf gabe, den TN zu berühren, welcher im Besitz des Balles ist (Ballträger). Gelingt es dem Jäger, den Ballbesitzer zu berühren, wechselt dieser in den Mittelkreis und meldet sich kurz als der neue Jäger an. Ebenso erfolgt der Jägerwechsel bei Fehlern wie Bodenberührung oder unkorrektem Zuspiel mit dem Ball.',
+    description: 'Ein Jäger darf ausschließlich die Person fangen, die gerade den Ball besitzt. Das Team versucht deshalb durch schnelles, sauberes Zuspiel den gefährdeten Ballbesitz ständig zu verlagern; Fang oder Ballfehler lösen einen Jägerwechsel aus.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 48.',
     sportType: 'Allgemein'
   },
@@ -144,9 +144,9 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     ageGroup: 'ca. 10–18 Jahre, alle Sportarten; vor allem Ballsportarten',
     material: '1 Softball, Basketball, Handball, Fußball, Volleyball oder Frisbee-Scheibe',
     goal: 'Reaktion und zielgerichtetes Ballzuspiel bzw. Ballfangen',
-    description: 'Diese Spielvariante funktioniert in genau um gekehrter Weise wie im Spiel „Fang den Ball!“ (S. 48). Im Mittelkreis steht ein Jäger, der alle TN fangen darf, die keinen Ball besitzen. Da relativ schnell eine Berührung gelingt, muss sich der neue Jäger immer im Mittelkreis ankündigen. Bei diesem Spiel geht es vor allem darum, dass sich der Ballbesitzer stets in unmittelbarer Nähe des Jägers aufhält (wie ein Schatten). Gerät ein TN in Not, kann durch ein gezieltes Zuspiel des Ballträgers dieser den Ball fangen und bleibt somit frei.',
-    variation: 'Es kommt ein zweiter Ball ins Spiel. Damit können zwei TN einen Mitspieler in Gefahr retten. Kommen unterschiedliche Bälle zum Einsatz, müssen diese auch unterschiedlich zugespielt werden (z. B. Handball über den Boden und Basketball direkt). Der Jäger kündigt sich im Mittelkreis an.',
+    description: 'Die Umkehrung des vorherigen Spiels: Der Jäger darf nur ballfreie Personen fangen. Der Ballträger muss daher gefährdete Mitspielende erkennen und durch gezieltes Zuspiel kurzfristig schützen.',
+    variation: 'Mit einem zweiten Ball oder zwei Ballarten spielen und für jede Ballart eine eigene Zuspieltechnik festlegen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 50.',
     sportType: 'Allgemein'
-  },
+  }
 ];
