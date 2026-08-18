@@ -54,7 +54,7 @@ export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
     sportType: 'Allgemein'
   },
   {
-    name: 'Kettenfangen',
+    name: 'Kettenfangen (3er-Ketten)',
     category: 'laufspiel',
     phase: 'erwaermung',
     difficulty: 'anfaenger',
