@@ -102,7 +102,7 @@
           </div>
           <h2 class="game-card__title">{{ entry.name }}</h2>
           <div class="game-card__info-row">
-            <span class="info-chip">⏱ {{ entry.duration }} {{ t('UEBUNGEN.min') }}</span>
+            <span v-if="entry.duration > 0" class="info-chip">⏱ {{ entry.duration }} {{ t('UEBUNGEN.min') }}</span>
             <span class="info-chip">👥 {{ entry.ageGroup }}</span>
             <span v-if="entry.material" class="info-chip">🎒 {{ entry.material }}</span>
           </div>
@@ -234,10 +234,8 @@ const filteredEntries = computed<Sport.GameEntry[]>(() => {
 
 async function seedBuiltIns(): Promise<void> {
   const existingEntries = await bridge.gameEntryRepository.findAll()
-  const existingBuiltInNames = new Set(
-    existingEntries.filter((entry) => !entry.isCustom).map((entry) => entry.name)
-  )
-  const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingBuiltInNames.has(seed.name))
+  const existingNames = new Set(existingEntries.map((entry) => entry.name))
+  const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingNames.has(seed.name))
   if (missingSeeds.length === 0) return
 
   initializing.value = true
