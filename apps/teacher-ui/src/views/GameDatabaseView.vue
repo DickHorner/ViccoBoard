@@ -201,6 +201,7 @@
                 <option value="kraft">{{ t('UEBUNGEN.kategorie-kraft') }}</option>
                 <option value="ausdauer">{{ t('UEBUNGEN.kategorie-ausdauer') }}</option>
                 <option value="schnelligkeit">{{ t('UEBUNGEN.kategorie-schnelligkeit') }}</option>
+                <option value="beweglichkeit">{{ t('UEBUNGEN.kategorie-beweglichkeit') }}</option>
                 <option value="sonstiges">{{ t('UEBUNGEN.kategorie-sonstiges') }}</option>
               </select>
             </div>
@@ -399,6 +400,7 @@ const CATEGORIES = computed<CategoryOption[]>(() => [
   { value: 'kraft', label: t('UEBUNGEN.kategorie-kraft') },
   { value: 'ausdauer', label: t('UEBUNGEN.kategorie-ausdauer') },
   { value: 'schnelligkeit', label: t('UEBUNGEN.kategorie-schnelligkeit') },
+  { value: 'beweglichkeit', label: t('UEBUNGEN.kategorie-beweglichkeit') },
   { value: 'sonstiges', label: t('UEBUNGEN.kategorie-sonstiges') }
 ])
 

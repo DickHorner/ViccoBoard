@@ -208,6 +208,7 @@
 .game-card--kraft       { border-left: 4px solid #ef4444; }
 .game-card--ausdauer    { border-left: 4px solid #14b8a6; }
 .game-card--schnelligkeit { border-left: 4px solid #0284c7; }
+.game-card--beweglichkeit { border-left: 4px solid #0d9488; }
 .game-card--sonstiges   { border-left: 4px solid #8b5cf6; }
 
 .game-card__header {
