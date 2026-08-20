@@ -9,7 +9,8 @@ import {
   SQLiteStorage,
   InitialSchemaMigration,
   GradingSchemaMigration,
-  GameDatabaseSchemaMigration
+  GameDatabaseSchemaMigration,
+  GameEntryMetadataMigration
 } from '@viccoboard/storage/node';
 import type { StorageAdapter } from '@viccoboard/storage/node';
 
@@ -24,6 +25,7 @@ describe('GameEntryRepository', () => {
     storage.registerMigration(new InitialSchemaMigration(storage));
     storage.registerMigration(new GradingSchemaMigration(storage));
     storage.registerMigration(new GameDatabaseSchemaMigration(storage));
+    storage.registerMigration(new GameEntryMetadataMigration(storage));
     await storage.migrate();
 
     adapter = storage.getAdapter();
@@ -124,7 +126,7 @@ describe('GameEntryRepository', () => {
     expect(ballGames[0].name).toBe('Ballspiel 1');
   });
 
-  it('updates an entry', async () => {
+  it('updates an entry and preserves built-in identity', async () => {
     const entry = await repository.create({
       name: 'Original',
       category: 'koordination',
@@ -134,7 +136,8 @@ describe('GameEntryRepository', () => {
       ageGroup: 'Klasse 6–9',
       goal: 'Koordination verbessern',
       description: 'Ursprüngliche Beschreibung',
-      isCustom: true
+      builtinKey: 'core:original',
+      isCustom: false
     });
 
     const updated = await repository.update(entry.id, {
@@ -145,9 +148,11 @@ describe('GameEntryRepository', () => {
     expect(updated.name).toBe('Aktualisiert');
     expect(updated.duration).toBe(15);
     expect(updated.category).toBe('koordination');
+    expect(updated.builtinKey).toBe('core:original');
 
     const found = await repository.findById(entry.id);
     expect(found!.name).toBe('Aktualisiert');
+    expect(found!.builtinKey).toBe('core:original');
   });
 
   it('deletes an entry', async () => {
@@ -201,6 +206,8 @@ describe('GameEntryRepository', () => {
       variation: 'Variante A oder B',
       notes: 'Sicherheit beachten',
       sportType: 'Allgemein',
+      videoUrl: 'https://example.com/video',
+      builtinKey: 'core:mit-variationen',
       isCustom: false
     });
 
@@ -209,5 +216,7 @@ describe('GameEntryRepository', () => {
     expect(found!.variation).toBe('Variante A oder B');
     expect(found!.notes).toBe('Sicherheit beachten');
     expect(found!.sportType).toBe('Allgemein');
+    expect(found!.videoUrl).toBe('https://example.com/video');
+    expect(found!.builtinKey).toBe('core:mit-variationen');
   });
 });
