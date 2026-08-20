@@ -64,6 +64,7 @@ export type GameCategory =
   | 'kraft'
   | 'ausdauer'
   | 'schnelligkeit'
+  | 'beweglichkeit'
   | 'sonstiges';
 
 export type GameDifficulty = 'unbekannt' | 'anfaenger' | 'fortgeschrittene' | 'profis';
