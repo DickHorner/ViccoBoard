@@ -57,6 +57,7 @@
         <label class="filter-label" for="difficulty-select">{{ t('UEBUNGEN.schwierigkeit') }}</label>
         <select id="difficulty-select" v-model="selectedDifficulty" class="filter-select">
           <option value="">{{ t('UEBUNGEN.alle-kategorien') }}</option>
+          <option value="unbekannt">{{ t('UEBUNGEN.schwierigkeit-unbekannt') }}</option>
           <option value="anfaenger">{{ t('UEBUNGEN.schwierigkeit-anfaenger') }}</option>
           <option value="fortgeschrittene">{{ t('UEBUNGEN.schwierigkeit-fortgeschrittene') }}</option>
           <option value="profis">{{ t('UEBUNGEN.schwierigkeit-profis') }}</option>
@@ -168,6 +169,8 @@ const BUILT_IN_GAME_SEED_DATA = [
   ...GAME_SEED_DATA,
   ...METHODENFUNDGRUBE_SEED_DATA.filter((seed) => !CORE_SEED_NAMES.has(seed.name))
 ]
+const BUILT_IN_SEED_DATA = [...GAME_SEED_DATA, ...METHODENFUNDGRUBE_SEED_DATA]
+const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis', 'unbekannt']
 
 interface CategoryOption {
   value: Sport.GameCategory | null
@@ -185,6 +188,7 @@ const CATEGORIES = computed<CategoryOption[]>(() => [
   { value: 'entspannung', label: t('UEBUNGEN.kategorie-entspannung') },
   { value: 'kraft', label: t('UEBUNGEN.kategorie-kraft') },
   { value: 'ausdauer', label: t('UEBUNGEN.kategorie-ausdauer') },
+  { value: 'schnelligkeit', label: t('UEBUNGEN.kategorie-schnelligkeit') },
   { value: 'sonstiges', label: t('UEBUNGEN.kategorie-sonstiges') }
 ])
 
@@ -195,6 +199,7 @@ function categoryLabel(cat: Sport.GameCategory): string {
 
 function difficultyLabel(d: Sport.GameDifficulty): string {
   const map: Record<Sport.GameDifficulty, string> = {
+    unbekannt: t('UEBUNGEN.schwierigkeit-unbekannt'),
     anfaenger: t('UEBUNGEN.schwierigkeit-anfaenger'),
     fortgeschrittene: t('UEBUNGEN.schwierigkeit-fortgeschrittene'),
     profis: t('UEBUNGEN.schwierigkeit-profis')
@@ -222,7 +227,11 @@ const filteredEntries = computed<Sport.GameEntry[]>(() => {
 
   result = [...result].sort((a, b) => {
     if (sortBy.value === 'name') return a.name.localeCompare(b.name)
-    if (sortBy.value === 'duration') return a.duration - b.duration
+    if (sortBy.value === 'duration') {
+      const durationA = a.duration > 0 ? a.duration : Number.POSITIVE_INFINITY
+      const durationB = b.duration > 0 ? b.duration : Number.POSITIVE_INFINITY
+      return durationA - durationB
+    }
     if (sortBy.value === 'difficulty') {
       return DIFFICULTY_ORDER.indexOf(a.difficulty) - DIFFICULTY_ORDER.indexOf(b.difficulty)
     }

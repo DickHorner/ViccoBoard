@@ -49,6 +49,10 @@ npm run test
 npm run build
 ```
 
+## OpenSSF Best Practices
+
+ViccoBoard verfolgt das OpenSSF Best Practices Badge. Der dazugehörige Evidenz- und Ablaufleitfaden liegt unter [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md).
+
 ## Lizenz
 
 MIT - siehe [LICENSE](./LICENSE).
