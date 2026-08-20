@@ -163,6 +163,12 @@ const selectedPhase = ref<Sport.GamePhase | ''>('')
 const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
 
+const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis']
+const CORE_SEED_NAMES = new Set(GAME_SEED_DATA.map((seed) => seed.name))
+const BUILT_IN_GAME_SEED_DATA = [
+  ...GAME_SEED_DATA,
+  ...METHODENFUNDGRUBE_SEED_DATA.filter((seed) => !CORE_SEED_NAMES.has(seed.name))
+]
 const BUILT_IN_SEED_DATA = [...GAME_SEED_DATA, ...METHODENFUNDGRUBE_SEED_DATA]
 const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis', 'unbekannt']
 
@@ -235,10 +241,10 @@ const filteredEntries = computed<Sport.GameEntry[]>(() => {
   return result
 })
 
-async function seedMissingBuiltIns(): Promise<void> {
-  const existing = await bridge.gameEntryRepository.findAll()
-  const existingBuiltInNames = new Set(existing.filter((entry) => !entry.isCustom).map((entry) => entry.name))
-  const missingSeeds = BUILT_IN_SEED_DATA.filter((seed) => !existingBuiltInNames.has(seed.name))
+async function seedBuiltIns(): Promise<void> {
+  const existingEntries = await bridge.gameEntryRepository.findAll()
+  const existingNames = new Set(existingEntries.map((entry) => entry.name))
+  const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingNames.has(seed.name))
   if (missingSeeds.length === 0) return
 
   initializing.value = true
@@ -256,7 +262,7 @@ async function seedMissingBuiltIns(): Promise<void> {
 
 onMounted(async () => {
   try {
-    await seedMissingBuiltIns()
+    await seedBuiltIns()
     allEntries.value = await bridge.gameEntryRepository.findAll()
   } catch (err) {
     loadError.value = err instanceof Error ? err.message : 'Unknown error'
