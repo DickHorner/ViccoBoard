@@ -16,7 +16,6 @@ in einem konsistenten System vereint.
 6. **Sicherheitsmodell:** App-Sperre (PIN/Passwort), Lock-Policy/Timeout, sichere Schlüsselableitung, saubere Backups/Restore (kein Datenverlust durch Updates).
 7. **Konfigurierbarkeit statt Hartkodierung:** Kriterien und Statusoptionen müssen in den relevanten Bereichen (z. B. Anwesenheit) als benutzerdefinierbare Kataloge pflegbar sein (hinzufügen/umbenennen/deaktivieren/sortieren), ohne Codeänderung.
 
-
 ### 1.1 Zielplattform: iPad (10. Gen) / iPadOS Safari (WebKit)
 Diese App wird **primär** für iPadOS (Safari/WebKit) gebaut. Das beeinflusst insbesondere lokale Persistenz, Datei-Flows und Bedienung.
 
@@ -29,9 +28,7 @@ Diese App wird **primär** für iPadOS (Safari/WebKit) gebaut. Das beeinflusst i
 - **Touch & Split View:** Touch-Targets ≥ 44 px, keine Hover-only Interaktionen, Layouts für ½/⅓ Split View, Portrait/Landscape, optionale Keyboard-Shortcuts.
 - **Offline:** App-Shell darf gecacht werden (Service Worker), aber die App bleibt **ohne Installation** nutzbar; „Zum Home-Bildschirm“ ist optional und wird nicht vorausgesetzt.
 
-
 ---
-
 
 ## 2) Produktstruktur (Module / Bounded Contexts)
 
@@ -102,7 +99,6 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 
 ---
 
-
 ## 4) Datenmodell (konzeptionell)
 
 ### 4.1 Kern-Entitäten
@@ -154,92 +150,94 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 
 ## 6) Vollständige Feature-Checkliste (Pflichtenheft)
 > Diese Checkliste ist der **Single Source of Truth** für „nichts vergessen“. Jede Checkbox bekommt in der Umsetzung einen Issue/PR-Link.
+>
+> **Audit-Stand: 19.8.2026 (`main` @ `b373c89`).** `[x]` bedeutet: auf `main` als nutzbarer Workflow belegt. `[ ]` bedeutet: mindestens ein Plan-Aspekt fehlt oder ist nicht ausreichend verdrahtet; das zugehörige offene Issue steht direkt am Punkt.
 
 ### 6.1 Core: Security, Storage, Settings
-- [ ] **Verschlüsselte lokale Speicherung** (Daten bleiben lokal).
-- [ ] **App-Sperre** (PIN/Passwort).
-- [ ] **Passwort ändern** (App-intern).
-- [ ] **PIN setzen/ändern**.
-- [ ] **Datenbank-Passwort** verwalten.
-- [ ] **Backups verwalten** (Export/Import).
-- [ ] **Einstellungen**: Shuttle-Run-Konfiguration importieren/verwenden, Sprache, Einrichtungshilfe.
+- [ ] **Verschlüsselte lokale Speicherung** (Daten bleiben lokal). — #316
+- [ ] **App-Sperre** (PIN/Passwort). — #316
+- [ ] **Passwort ändern** (App-intern). — #316
+- [ ] **PIN setzen/ändern**. — #316
+- [ ] **Datenbank-Passwort** verwalten. — #316
+- [x] **Backups verwalten** (Export/Import).
+- [ ] **Einstellungen**: Shuttle-Run-Konfiguration importieren/verwenden, Sprache, Einrichtungshilfe. — #317
 
 ### 6.2 Sport — Kernverwaltung (Klassen/Schüler/Stunden/Fehlzeiten)
-- [ ] **Klasse anlegen**.
-- [ ] **Notenschema pro Klasse wählen**.
-- [ ] **Stunden automatisch anlegen** (Ferien berücksichtigt).
-- [ ] **Schnelle Navigation** in Unterfunktionen.
-- [ ] Schüler: **Stammdaten inkl. Geburtsjahr**.
-- [ ] Schüler: **Foto/Bild hinterlegen**.
-- [ ] Schüler: **Noten-/Leistungsentwicklung**.
-- [ ] Schüler: **Fehlzeiten/Anwesenheiten überwachen**.
-- [ ] Schüler: **WOW-Übersicht pro Schüler**.
-- [ ] Fehlzeiten: **digital dokumentieren** (verschiedene Formen).
-- [ ] Fehlzeiten: **Statuskatalog konfigurierbar** (eigene Statusoptionen hinzufügen, umbenennen, deaktivieren, sortieren).
-- [ ] Fehlzeiten: **Status-Metadaten** (z. B. Kürzel/Farbe) wirken konsistent in Eingabe, Statistik und Export.
-- [ ] Fehlzeiten: **prozentuale Anwesenheit**.
-- [ ] Fehlzeiten: **Export**.
-- [ ] Stunden: **Stundenübersicht** (Schuljahr/Ferien).
-- [ ] Stunden: **Anwesenheiten je Stunde** verwalten.
-- [ ] Stunden: **Stundenteile dokumentieren**.
-- [ ] Stunden: **Direktsprünge** zu Tools/Funktionen.
-- [ ] Stunden: **Zufälligen Schüler auswählen**.
+- [x] **Klasse anlegen**.
+- [x] **Notenschema pro Klasse wählen**.
+- [ ] **Stunden automatisch anlegen** (Ferien berücksichtigt). — #318
+- [x] **Schnelle Navigation** in Unterfunktionen.
+- [x] Schüler: **Stammdaten inkl. Geburtsjahr**.
+- [ ] Schüler: **Foto/Bild hinterlegen**. — #318
+- [x] Schüler: **Noten-/Leistungsentwicklung**.
+- [x] Schüler: **Fehlzeiten/Anwesenheiten überwachen**.
+- [ ] Schüler: **WOW-Übersicht pro Schüler**. — #322
+- [x] Fehlzeiten: **digital dokumentieren** (verschiedene Formen).
+- [x] Fehlzeiten: **Statuskatalog konfigurierbar** (eigene Statusoptionen hinzufügen, umbenennen, deaktivieren, sortieren).
+- [ ] Fehlzeiten: **Status-Metadaten** (z. B. Kürzel/Farbe) wirken konsistent in Eingabe, Statistik und Export. — #318
+- [x] Fehlzeiten: **prozentuale Anwesenheit**.
+- [ ] Fehlzeiten: **Export**. — #318
+- [x] Stunden: **Stundenübersicht** (Schuljahr/Ferien).
+- [x] Stunden: **Anwesenheiten je Stunde** verwalten.
+- [x] Stunden: **Stundenteile dokumentieren**.
+- [x] Stunden: **Direktsprünge** zu Tools/Funktionen.
+- [ ] Stunden: **Zufälligen Schüler auswählen**. — #318
 
 ### 6.3 Sport — Benotung & Bewertungssystem
-- [ ] **Notenschemata**: pro Klasse auswählbar.
-- [ ] **Notenkategorien: Noten nach Kriterien**:
-  - [ ] bis zu **8 Kriterien** definieren
-  - [ ] **Gewichtung** je Kriterium
-  - [ ] Bewertung per **Schieberegler**
-  - [ ] **Selbsteinschätzung** (direkt oder via WOW)
-- [ ] **Notenkategorien: Noten auf Zeit**:
-  - [ ] beste/schlechteste Note festlegen
-  - [ ] lineare Einordnung aller Zeiten
-  - [ ] Grenzwerte nachträglich anpassbar
-- [ ] **Notenkategorien: Cooper-Test**:
-  - [ ] Runden zählen
-  - [ ] Sofort-Auswertung bei hinterlegter Tabelle
-- [ ] **Verbalbeurteilungen** (eigener Funktionspunkt; Detail-Spezifikation TBD, aber Feature muss existieren).
-- [ ] **Kriterienkataloge bereichsübergreifend**: eigene Kriterien in verschiedenen Bereichen definierbar (u. a. Anwesenheit/Verhalten/Mitarbeit), inkl. Wiederverwendung pro Klasse.
+- [x] **Notenschemata**: pro Klasse auswählbar.
+- [ ] **Notenkategorien: Noten nach Kriterien**: — #319
+  - [x] bis zu **8 Kriterien** definieren
+  - [x] **Gewichtung** je Kriterium
+  - [x] Bewertung per **Schieberegler**
+  - [ ] **Selbsteinschätzung** (direkt oder via WOW) — #319
+- [x] **Notenkategorien: Noten auf Zeit**:
+  - [x] beste/schlechteste Note festlegen
+  - [x] lineare Einordnung aller Zeiten
+  - [x] Grenzwerte nachträglich anpassbar
+- [x] **Notenkategorien: Cooper-Test**:
+  - [x] Runden zählen
+  - [x] Sofort-Auswertung bei hinterlegter Tabelle
+- [ ] **Verbalbeurteilungen** (eigener Funktionspunkt; Detail-Spezifikation TBD, aber Feature muss existieren). — #319
+- [x] **Kriterienkataloge bereichsübergreifend**: eigene Kriterien in verschiedenen Bereichen definierbar (u. a. Anwesenheit/Verhalten/Mitarbeit), inkl. Wiederverwendung pro Klasse.
 
 ### 6.4 Sport — Tabellen & CSV (Import/Export)
-- [ ] Unterscheidung **„einfache Tabellen“ vs „Tabellen“**.
-- [ ] **Lokale Tabellen auswählen & anpassen**.
-- [ ] **Tabellen-Vorlagen herunterladen/anpassen/importieren** (CSV).
-- [ ] **Geburtsjahr pro Schüler** (für automatisierte Auswertung erforderlich/empfohlen).
-- [ ] Workflow: Vorlage → Excel anpassen (Spaltenreihenfolge bleibt) → CSV speichern → importieren.
-- [ ] Android-Import-Hinweis/Pfad-Hilfe (als UX-Hilfe in App).
-- [ ] **Schüler-Import per CSV** inkl. Geschlecht & Geburtsjahr.
+- [x] Unterscheidung **„einfache Tabellen“ vs „Tabellen“**.
+- [x] **Lokale Tabellen auswählen & anpassen**.
+- [ ] **Tabellen-Vorlagen herunterladen/anpassen/importieren** (CSV). — #320
+- [x] **Geburtsjahr pro Schüler** (für automatisierte Auswertung erforderlich/empfohlen).
+- [ ] Workflow: Vorlage → Excel anpassen (Spaltenreihenfolge bleibt) → CSV speichern → importieren. — #320
+- [ ] Android-Import-Hinweis/Pfad-Hilfe (als UX-Hilfe in App). — #320
+- [x] **Schüler-Import per CSV** inkl. Geschlecht & Geburtsjahr.
 
 ### 6.5 Sport — Test- & Mess-Workflows
-- [ ] **Shuttle-Run**:
-  - [ ] Start–Stop–Fertig; Stopp je Schüler beim Aufhören
-  - [ ] Auswertung automatisiert mit Tabelle (Vorlage/lokal)
-  - [ ] Audio-Signale aus App
-  - [ ] eigene Konfiguration via CSV **über Einstellungen** (nicht als Tabelle)
-- [ ] **Cooper-Test ohne Papier**:
-  - [ ] Runden erfassen; automatische Auswertung/Noten bei Tabelle
-  - [ ] Sportart Laufen/Schwimmen festlegbar
-  - [ ] Tabelle downloaden/selbst erstellen, importieren
-- [ ] **Mittelstrecke**:
-  - [ ] Timer läuft; individuelle Stopps pro Schüler im Ziel (Mehrfach-Stopp)
-- [ ] **Sportabzeichen**:
-  - [ ] eigene Notenkategorie
-  - [ ] Geburtsjahr relevant (altersabhängig)
-  - [ ] Tabelle hinterlegbar (Notenautomatik)
-  - [ ] Leistungen erfassen + direkte Bewertung anzeigen
-  - [ ] PDF-Export einer Übersicht
-- [ ] **Bundesjugendspiele**:
-  - [ ] Leistungen erfassen und auswerten
-  - [ ] optionale Tabelle → automatische Einbindung als Note
+- [x] **Shuttle-Run**:
+  - [x] Start–Stop–Fertig; Stopp je Schüler beim Aufhören
+  - [x] Auswertung automatisiert mit Tabelle (Vorlage/lokal)
+  - [x] Audio-Signale aus App
+  - [x] eigene Konfiguration via CSV **über Einstellungen** (nicht als Tabelle)
+- [ ] **Cooper-Test ohne Papier**: — #320
+  - [x] Runden erfassen; automatische Auswertung/Noten bei Tabelle
+  - [x] Sportart Laufen/Schwimmen festlegbar
+  - [ ] Tabelle downloaden/selbst erstellen, importieren — #320
+- [x] **Mittelstrecke**:
+  - [x] Timer läuft; individuelle Stopps pro Schüler im Ziel (Mehrfach-Stopp)
+- [x] **Sportabzeichen**:
+  - [x] eigene Notenkategorie
+  - [x] Geburtsjahr relevant (altersabhängig)
+  - [x] Tabelle hinterlegbar (Notenautomatik)
+  - [x] Leistungen erfassen + direkte Bewertung anzeigen
+  - [x] PDF-Export einer Übersicht
+- [ ] **Bundesjugendspiele**: — #321
+  - [ ] Leistungen erfassen und auswerten — #321
+  - [ ] optionale Tabelle → automatische Einbindung als Note — #321
 
 ### 6.6 Sport — Live-Unterrichtstools
-- [ ] **Teams einteilen** (digital, schnell, fair).
-- [ ] **Turnierplanung** (planen & durchführen).
-- [ ] **Scoreboard** (Spielstände erfassen).
+- [x] **Teams einteilen** (digital, schnell, fair).
+- [x] **Turnierplanung** (planen & durchführen).
+- [x] **Scoreboard** (Spielstände erfassen).
 - [x] **Timer** (Zeiten stoppen). ✅ P4-4 COMPLETE
-- [ ] **Taktikboard**: Top-Down-Ansicht + Sportartspezifische Annotation/Markierungen.
-- [ ] **Würfeln**: Zahlenbereich wählen + Ergebnisse loggen.
+- [x] **Taktikboard**: Top-Down-Ansicht + Sportartspezifische Annotation/Markierungen.
+- [x] **Würfeln**: Zahlenbereich wählen + Ergebnisse loggen.
 
 ### 6.6-Video Sport — Video Delay für Live-Bewegungsbeobachtung
 Ref: GitHub Issue #182 [Sport] Video Delay mit Live-Feed, Delay-Puffer und Annotationen umsetzen
@@ -285,14 +283,14 @@ Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer B
 - [x] i18n-Einträge (de/en). – `apps/teacher-ui/src/i18n/locales/de.json`, `en.json`
 
 ### 6.7 Sport — Feedback & Statistiken
-- [ ] **Feedback**: mehrere Methoden, direkt am Lehrertablet.
-- [ ] **Statistiken**: Überblick über geleistete Arbeit/Nutzung.
+- [x] **Feedback**: mehrere Methoden, direkt am Lehrertablet.
+- [x] **Statistiken**: Überblick über geleistete Arbeit/Nutzung.
 
 ### 6.8 Sport — WOW
-- [ ] Workouts erstellen & bereitstellen.
-- [ ] Schüler tragen Ergebnisse **über Browser** ein (ohne Registrierung/ohne App).
-- [ ] Lehrkraft ruft Ergebnisse/Fortschritt ab.
-- [ ] WOW-Übersichten in App (auch pro Schüler).
+- [ ] Workouts erstellen & bereitstellen. — #322
+- [ ] Schüler tragen Ergebnisse **über Browser** ein (ohne Registrierung/ohne App). — #322
+- [ ] Lehrkraft ruft Ergebnisse/Fortschritt ab. — #322
+- [ ] WOW-Übersichten in App (auch pro Schüler). — #322
 
 ### 6.8a Sport — Spieldatenbank (lokale Übungs- und Spielesuche)
 - [x] Datenmodell `GameEntry` (Kategorie, Schwierigkeit, Phase, Dauer, Altersgruppe, Material, Ziel, Beschreibung, Variation, Hinweise). – `packages/core/src/interfaces/sport.types.ts`
@@ -319,102 +317,102 @@ Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer B
 - Ref: GitHub Issue #184 [Sport] Zielkamera fuer Langstreckenlauf mit Zeitmarken und assistierter Zuordnung umsetzen
 
 ### 6.9 KBR — Prüfungen anlegen (Strukturen)
-- [ ] Prüfungen mit Unteraufgaben und komplexen Bausteinen (Darstellungsleistung, Schreibaufgabe, Kriterien, Unterkriterien, Wahlaufgaben, Kommentare, Prüfungsteile, Bonuspunkte).
-- [ ] **Einfacher vs. komplexer Aufgabenmodus**:
-  - [ ] Einfach (Standard)
-  - [ ] Komplex: unbegrenzte Aufgabenanzahl auf **drei Ebenen**, Aufgabennoten, Kommentare & Tipps auch für Unteraufgaben.
-- [ ] Pro Aufgabe: Anzahl Unteraufgaben definierbar.
-- [ ] Kriterien pro Aufgabe/Unteraufgabe definieren und **formatieren** (z. B. Fett).
-- [ ] Pro Aufgabe festlegen, ob Aufgabenkommentare oder Fördertipps vergeben werden sollen.
-- [ ] **Prüfungsteile** definieren; Teilpunkte/Teilnoten automatisch; optional mitdruckbar.
+- [ ] Prüfungen mit Unteraufgaben und komplexen Bausteinen (Darstellungsleistung, Schreibaufgabe, Kriterien, Unterkriterien, Wahlaufgaben, Kommentare, Prüfungsteile, Bonuspunkte). — #323 #335
+- [x] **Einfacher vs. komplexer Aufgabenmodus**:
+  - [x] Einfach (Standard)
+  - [ ] Komplex: unbegrenzte Aufgabenanzahl auf **drei Ebenen**, Aufgabennoten, Kommentare & Tipps auch für Unteraufgaben. — #323 #335
+- [x] Pro Aufgabe: Anzahl Unteraufgaben definierbar.
+- [ ] Kriterien pro Aufgabe/Unteraufgabe definieren und **formatieren** (z. B. Fett). — #323
+- [ ] Pro Aufgabe festlegen, ob Aufgabenkommentare oder Fördertipps vergeben werden sollen. — #323
+- [ ] **Prüfungsteile** definieren; Teilpunkte/Teilnoten automatisch; optional mitdruckbar. — #335
 
 ### 6.10 KBR — Benotung/Notenschlüssel
-- [ ] Verschiedene Notenschlüssel schnell einsetzbar; flexible Benotungsoptionen.
-- [ ] Nach der Korrektur Notenschlüssel/Optionen ohne Datenverlust anpassbar.
-- [ ] Notengrenzen per Prozentwerten anpassbar, auch nachträglich; zurücksetzbar.
-- [ ] Punktegrenzen automatisch aus Prozentangaben berechnen.
-- [ ] Noten-Presets auswählen + prüfungsindividuell anpassen.
-- [ ] Finetuning (z. B. Rundungslogik).
-- [ ] Optional: „Fehlerpunkte → Aufgabennote“.
+- [x] Verschiedene Notenschlüssel schnell einsetzbar; flexible Benotungsoptionen.
+- [ ] Nach der Korrektur Notenschlüssel/Optionen ohne Datenverlust anpassbar. — #324
+- [ ] Notengrenzen per Prozentwerten anpassbar, auch nachträglich; zurücksetzbar. — #324
+- [x] Punktegrenzen automatisch aus Prozentangaben berechnen.
+- [x] Noten-Presets auswählen + prüfungsindividuell anpassen.
+- [x] Finetuning (z. B. Rundungslogik).
+- [ ] Optional: „Fehlerpunkte → Aufgabennote“. — #324
 
 ### 6.11 KBR — Korrigieren (Flows & Modi)
-- [ ] Kompakte Korrekturmaske: Auto-Gesamtpunkte/Note, minimierte Verrechnungsfehler.
-- [ ] Anzeige: Punkte bis zur nächsten Notenstufe.
-- [ ] Tab-Navigation in Punktefelder.
-- [ ] Aufgabenweise korrigieren (Tabellenmodus + AWK).
-- [ ] Aufgabenkommentare erfassen; mitdruckbar; nach Abgabe verfügbar.
-- [ ] Teilpunkte/Teilnoten je Prüfungsteil automatisch; optional druckbar.
-- [ ] Wahlaufgaben abbilden (z. B. 3a/3b).
-- [ ] Kommentarboxen pro Aufgabenebene zuschaltbar.
-- [ ] Alternative Bepunktungsart **(++,+,0,-,–)**.
-- [ ] Im komplexen Modus: drei Aufgabenebenen in UI/Logik.
-- [ ] Schnelles Wechseln zwischen Prüflingen.
+- [x] Kompakte Korrekturmaske: Auto-Gesamtpunkte/Note, minimierte Verrechnungsfehler.
+- [x] Anzeige: Punkte bis zur nächsten Notenstufe.
+- [x] Tab-Navigation in Punktefelder.
+- [ ] Aufgabenweise korrigieren (Tabellenmodus + AWK). — #20
+- [x] Aufgabenkommentare erfassen; mitdruckbar; nach Abgabe verfügbar.
+- [ ] Teilpunkte/Teilnoten je Prüfungsteil automatisch; optional druckbar. — #335
+- [ ] Wahlaufgaben abbilden (z. B. 3a/3b). — #335
+- [ ] Kommentarboxen pro Aufgabenebene zuschaltbar. — #20 #323
+- [x] Alternative Bepunktungsart **(++,+,0,-,–)**.
+- [ ] Im komplexen Modus: drei Aufgabenebenen in UI/Logik. — #335
+- [x] Schnelles Wechseln zwischen Prüflingen.
 
 ### 6.12 KBR — Fördertipps (DB, Zuweisung, QR, Auswertung)
-- [ ] Fördertipps aufgabenbezogen oder allgemein; persönliche Datenbank.
-- [ ] Nach Korrektur: Überblick wem/wann/wo Tipps; Auswertung Handlungs-/Übungsbedarf (Klasse/Individuum).
-- [ ] Pro Fördermöglichkeit: Titel, Kurzbeschreibung, optionale Kategorien.
-- [ ] Übungshinweise/Links hinterlegen; bis zu **3 Links**.
-- [ ] QR-Codes per Knopfdruck erzeugen.
-- [ ] In Korrekturmaske: suchen/auswählen/hinzufügen (auch unteraufgabenbezogen).
-- [ ] Fördertipps gewichten/priorisieren; Gewichtung erscheint auf Rückmeldebogen.
-- [ ] Dropdown-Vorschau: Name, Beschreibungsvorschau, Anzahl vergebener Tipps, Kategorie; häufige Tipps oben.
-- [ ] Fördertipps pro Aufgabenebene nutzbar oder für Ebenen/Aufgaben deaktivierbar.
+- [ ] Fördertipps aufgabenbezogen oder allgemein; persönliche Datenbank. — #325
+- [ ] Nach Korrektur: Überblick wem/wann/wo Tipps; Auswertung Handlungs-/Übungsbedarf (Klasse/Individuum). — #325
+- [ ] Pro Fördermöglichkeit: Titel, Kurzbeschreibung, optionale Kategorien. — #325
+- [ ] Übungshinweise/Links hinterlegen; bis zu **3 Links**. — #325
+- [ ] QR-Codes per Knopfdruck erzeugen. — #325
+- [ ] In Korrekturmaske: suchen/auswählen/hinzufügen (auch unteraufgabenbezogen). — #325
+- [ ] Fördertipps gewichten/priorisieren; Gewichtung erscheint auf Rückmeldebogen. — #325
+- [ ] Dropdown-Vorschau: Name, Beschreibungsvorschau, Anzahl vergebener Tipps, Kategorie; häufige Tipps oben. — #325
+- [ ] Fördertipps pro Aufgabenebene nutzbar oder für Ebenen/Aufgaben deaktivierbar. — #325
 
 ### 6.13 KBR — Auswertung & nachträgliche Anpassung
-- [ ] Schwierigkeit: welche Aufgaben/Unteraufgaben/Kriterien schwierig; Streuungen; Bewertungskorridore.
-- [ ] Punkteänderungsassistent: Aufgabengewichtungen anpassen, Punkteverhältnisse erhalten.
-- [ ] Notenschlüssel nachträglich anpassen; Noten ändern automatisch.
-- [ ] Ergebnis-/Auswertungstabellen sortierbar: Korrekturreihenfolge, Name, Punkte, Aufgabenpunkte; Sortierung nach (Unter-)Aufgabe.
+- [x] Schwierigkeit: welche Aufgaben/Unteraufgaben/Kriterien schwierig; Streuungen; Bewertungskorridore.
+- [ ] Punkteänderungsassistent: Aufgabengewichtungen anpassen, Punkteverhältnisse erhalten. — #326
+- [ ] Notenschlüssel nachträglich anpassen; Noten ändern automatisch. — #324
+- [ ] Ergebnis-/Auswertungstabellen sortierbar: Korrekturreihenfolge, Name, Punkte, Aufgabenpunkte; Sortierung nach (Unter-)Aufgabe. — #326
 
 ### 6.14 KBR — Langzeit-Überblick & Notizen
-- [ ] Schuljahres-Überblick zur Entwicklung von Kompetenzbereichen.
-- [ ] Interne Notizen für Entwicklungen/Förderschwerpunkte.
-- [ ] Pro Prüfling Überblick: Aufgaben-/Endkommentare & Fördertipps.
+- [ ] Schuljahres-Überblick zur Entwicklung von Kompetenzbereichen. — #327
+- [ ] Interne Notizen für Entwicklungen/Förderschwerpunkte. — #327
+- [ ] Pro Prüfling Überblick: Aufgaben-/Endkommentare & Fördertipps. — #327
 
 ### 6.15 KBR — Rückmeldung/Kommentare
-- [ ] Aufgabenbezogene oder allgemeine Kommentare als individuelle Rückmeldung.
-- [ ] Kommentare bleiben nach Rückgabe verfügbar.
-- [ ] Kommentare anderer SuS derselben Prüfung einsehen und wiederverwenden.
+- [x] Aufgabenbezogene oder allgemeine Kommentare als individuelle Rückmeldung.
+- [x] Kommentare bleiben nach Rückgabe verfügbar.
+- [ ] Kommentare anderer SuS derselben Prüfung einsehen und wiederverwenden. — #20
 
 ### 6.16 KBR — Export & Druck (PDF)
-- [ ] PDF-Rückmeldebögen inkl. Teilpunkte, Kommentare, Fördertipps, Unterschrift, Schullogo.
-- [ ] Mit einem Klick alle PDFs erzeugen.
-- [ ] Drucklayouts: **vier** Layouts.
-- [ ] Headerbereich über Druckpresets anpassbar; Druck aktueller Prüfling oder alle.
-- [ ] Kriterien formatiert drucken; pro Aufgabe Prozent anzeigen; Kommentare/Fördertipps kursiv.
-- [ ] Punktabzüge anzeigen oder deaktivieren.
-- [ ] Unterschrift: Bilddatei, per Hand malen, oder leer.
+- [ ] PDF-Rückmeldebögen inkl. Teilpunkte, Kommentare, Fördertipps, Unterschrift, Schullogo. — #328
+- [ ] Mit einem Klick alle PDFs erzeugen. — #296
+- [ ] Drucklayouts: **vier** Layouts. — #328
+- [x] Headerbereich über Druckpresets anpassbar; Druck aktueller Prüfling oder alle.
+- [ ] Kriterien formatiert drucken; pro Aufgabe Prozent anzeigen; Kommentare/Fördertipps kursiv. — #328
+- [ ] Punktabzüge anzeigen oder deaktivieren. — #328
+- [ ] Unterschrift: Bilddatei, per Hand malen, oder leer. — #328
 
 ### 6.17 KBR — Besondere Schülerleistungen markieren
-- [ ] Während Korrektur markieren; Bild und/oder Wortlaut dokumentieren.
-- [ ] Übersicht nach Aufgabe & Kategorie.
-- [ ] Namen ausblendbar (Anonymisierung).
+- [ ] Während Korrektur markieren; Bild und/oder Wortlaut dokumentieren. — #329
+- [ ] Übersicht nach Aufgabe & Kategorie. — #329
+- [ ] Namen ausblendbar (Anonymisierung). — #329
 
 ### 6.18 KBR — E-Mail-Versand
-- [ ] Ergebnisse per E-Mail an Schüler und/oder Eltern.
-- [ ] E-Mail enthält Noten- und Aufgabenergebnisse; Platzhalter automatisch korrekt befüllen.
+- [ ] Ergebnisse per E-Mail an Schüler und/oder Eltern. — #330
+- [ ] E-Mail enthält Noten- und Aufgabenergebnisse; Platzhalter automatisch korrekt befüllen. — #330
 
 ### 6.19 KBR — Gruppenweise korrigieren & Splitscreen
-- [ ] Gruppenkorrektur im Splitscreenmodus (Referate/mündlich).
-- [ ] Vollbildmodus; bis zu vier Prüflinge gleichzeitig.
-- [ ] Thema für Referate/mündliche Prüfungen festlegen.
+- [ ] Gruppenkorrektur im Splitscreenmodus (Referate/mündlich). — #331
+- [ ] Vollbildmodus; bis zu vier Prüflinge gleichzeitig. — #331
+- [ ] Thema für Referate/mündliche Prüfungen festlegen. — #331
 
 ### 6.20 KBR — Zusammenarbeit/Kompatibilität
-- [ ] Lerngruppen aus WebUntis importieren.
-- [ ] Prüfungsnoten in Notenapps kopieren; Notenspiegel kopieren.
-- [ ] Fördermöglichkeiten oder Prüfungsentwürfe mit anderen Nutzern teilen.
-- [ ] Notenspalte kopieren (Excel/Notenprogramme).
+- [ ] Lerngruppen aus WebUntis importieren. — #332
+- [ ] Prüfungsnoten in Notenapps kopieren; Notenspiegel kopieren. — #332
+- [ ] Fördermöglichkeiten oder Prüfungsentwürfe mit anderen Nutzern teilen. — #332
+- [ ] Notenspalte kopieren (Excel/Notenprogramme). — #332
 
 ### 6.21 KBR — Unterstützte Bewertungsformate
-- [ ] Abdeckung der genannten Formate: Mappen, Portfolios, Referate, Tests, Facharbeiten, mündliche Prüfungen etc.
+- [ ] Abdeckung der genannten Formate: Mappen, Portfolios, Referate, Tests, Facharbeiten, mündliche Prüfungen etc. — #333
 
 ### 6.22 KBR — Oberstufenklausuren & Erwartungshorizont-Workflow
-- [ ] Aufgabenaspekte/Unterkriterien feiner beschreibbar.
-- [ ] Kriterien/Aufgabenaspekte formatierbar.
-- [ ] Copy & Paste aus Word: Formatierungen bleiben erhalten (best effort).
-- [ ] Alternative Blanko-EWH-Workflow (exportierbar/unterstützt).
-- [ ] 0–15 Punkte, Wahlaufgaben mit Teilkriterien, Bonuscharakter, Prüfung in Teile, Zwischennoten je Teil (optional ausblendbar).
+- [ ] Aufgabenaspekte/Unterkriterien feiner beschreibbar. — #334
+- [ ] Kriterien/Aufgabenaspekte formatierbar. — #323 #334
+- [ ] Copy & Paste aus Word: Formatierungen bleiben erhalten (best effort). — #334
+- [ ] Alternative Blanko-EWH-Workflow (exportierbar/unterstützt). — #334
+- [ ] 0–15 Punkte, Wahlaufgaben mit Teilkriterien, Bonuscharakter, Prüfung in Teile, Zwischennoten je Teil (optional ausblendbar). — #334
 
 ---
 

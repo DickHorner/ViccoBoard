@@ -1,0 +1,152 @@
+import type { Sport } from '@viccoboard/core';
+
+type SeedEntry = Omit<Sport.GameEntry, 'id' | 'isCustom' | 'createdAt' | 'lastModified'>;
+
+export const METHODENFUNDGRUBE_CHAPTER_2: SeedEntry[] = [
+  {
+    name: 'Angsthase',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 6–14 Jahre, alle Sportarten',
+    goal: 'Kurzzeitausdauer, Sprintfähigkeit sowie Reaktion und Raumüberblick',
+    description: 'Ein Jäger startet an einer Grundlinie, die übrigen Teilnehmenden auf der gegenüberliegenden Seite. Auf Signal laufen beide Seiten aufeinander zu; gefangen werden darf nur in Laufrichtung. Gefangene unterstützen in der nächsten Runde die Jägerseite.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 30.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Spiderman',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 6–14 Jahre, alle Sportarten',
+    goal: 'Kurzzeitausdauer, Sprint- und Reaktionsfähigkeit',
+    description: 'Eine Person beginnt als Jäger. Wer gefangen wird, bewegt sich anschließend bäuchlings oder rücklings auf Händen und Füßen durch die Halle und unterstützt den Jäger; dadurch steigt die Zahl der Fangenden fortlaufend.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 32.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Rettungsinsel',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 6–14 Jahre',
+    goal: 'Kurzzeitausdauer, Reaktions- sowie Antizipationsfähigkeit',
+    description: 'Paare bilden im Feld stationäre „Inseln“. Eine gejagte Person kann sich an eine Seite eines Paars retten; dadurch muss die Person auf der gegenüberliegenden Inselseite sofort als neue gejagte Person weiterlaufen. Bei einem Fang tauschen Jäger und Gejagter die Rollen.',
+    variation: 'In der Steigerung wird beim Andocken nicht der neue Gejagte, sondern ein neuer Jäger aus der Insel bestimmt.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 34.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Versteinern',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: '6–14 Jahre, alle Sportarten',
+    material: '2–4 Parteibänder oder Leibchen',
+    goal: 'Kurzzeitausdauer, Reaktion und Teamgedanke',
+    description: 'Zwei bis vier markierte Jäger versuchen innerhalb einer festgelegten Zeit alle anderen zu „versteinern“. Freie Mitspielende können Versteinerte durch vorgegebene Partneraktionen wie Abklatschen, Berühren oder Durchkrabbeln wieder befreien.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 36.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Kettenfangen (3er-Ketten)',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 6–14 Jahre',
+    material: '10 Leibchen',
+    goal: 'Kurzzeitausdauer, Reaktion und Teamgedanke',
+    description: 'Nach jedem Fang wächst die Fangkette bis auf drei Personen. Die nächste gefangene Person beginnt wieder als einzelner Jäger, sodass im Verlauf mehrere kleine Dreierketten und einzelne Jäger gleichzeitig entstehen.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 38.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Flight or Fight',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 6–14 Jahre, alle Sportarten',
+    material: '2 verschiedene Bälle oder verschiedenfarbige Gymnastikbälle',
+    goal: 'Sprint- und Reaktionsfähigkeit',
+    description: 'Zwei Teams stehen sich an einer Linie gegenüber. Ein optisches Signal bestimmt spontan, welches Team jagt und welches zur eigenen Ziellinie flieht; erfolgreiche Berührungen bringen Punkte.',
+    variation: 'Die jagende Seite indirekt über Ballfarbe, Zahl oder Rechenaufgabe bestimmen und unterschiedliche Startpositionen einsetzen.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 40.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Angsthase – mit Ball',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 8–18 Jahre, alle Sportarten; vor allem große Ballsportarten',
+    material: '1 Basketball, Handball, Fußball, Volleyball oder Gymnastikball pro TN',
+    goal: 'Balldribbling unter „Stress“, Reaktion und Sprintfähigkeit',
+    description: 'Das Fangspiel „Angsthase“ wird mit individueller Ballführung gespielt. Sowohl Jäger als auch Gejagte führen einen Ball und müssen beim Sprint gleichzeitig die sportartspezifische Dribbel- bzw. Prelltechnik kontrollieren.',
+    variation: 'Je nach Schwerpunkt Basketball, Handball, Fußball oder neutralen Gymnastikball verwenden.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 42.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Sieben Zwerge',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 6–18 Jahre, alle Sportarten',
+    material: '2–4 Softbälle; 1 Langbank',
+    goal: 'Reaktion und Hinführung zur Sportartregel',
+    description: 'Mehrere Bälle liegen frei im Feld. Wer einen Ball besitzt, darf nur eine begrenzte Schrittzahl laufen und versucht andere abzuwerfen. Getroffene wechseln auf eine Langbank bzw. in eine Wartezone und reihen sich dort ein.',
+    variation: 'Mit Basketbällen und Druckpässen, großen Pezzibällen oder veränderten Trefferzonen spielen.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 44.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Zombieball',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 6–18 Jahre, alle Sportarten',
+    material: '2–4 Softbälle oder Basketbälle; 1 Langbank',
+    goal: 'Reaktion und Hinführung zu Sportartregeln (Basketball oder Handball)',
+    description: 'Abgeworfene warten auf der Bank, bis die Person getroffen wird, die sie zuvor abgeworfen hat; dann dürfen sie zurück ins Spiel. Ballbesitz und Wurfzeit sind begrenzt, damit der Spielfluss hoch bleibt.',
+    variation: 'Rückkehrende müssen zunächst durch einen sicheren Korridor mit einer Zusatzaufgabe laufen.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 46.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Fang den Ball!',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 10–18 Jahre, alle Sportarten; vor allem Ballsportarten',
+    material: '1 Softball, Basketball, Handball, Volleyball, Fußball oder Frisbee-Scheibe',
+    goal: 'Reaktion und zielgerichtetes Ballzuspiel bzw. Ballfangen',
+    description: 'Ein Jäger darf ausschließlich die Person fangen, die gerade den Ball besitzt. Das Team versucht deshalb durch schnelles, sauberes Zuspiel den gefährdeten Ballbesitz ständig zu verlagern; Fang oder Ballfehler lösen einen Jägerwechsel aus.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 48.',
+    sportType: 'Allgemein'
+  },
+  {
+    name: 'Fang den Ball nicht!',
+    category: 'laufspiel',
+    phase: 'erwaermung',
+    difficulty: 'anfaenger',
+    duration: 0,
+    ageGroup: 'ca. 10–18 Jahre, alle Sportarten; vor allem Ballsportarten',
+    material: '1 Softball, Basketball, Handball, Fußball, Volleyball oder Frisbee-Scheibe',
+    goal: 'Reaktion und zielgerichtetes Ballzuspiel bzw. Ballfangen',
+    description: 'Die Umkehrung des vorherigen Spiels: Der Jäger darf nur ballfreie Personen fangen. Der Ballträger muss daher gefährdete Mitspielende erkennen und durch gezieltes Zuspiel kurzfristig schützen.',
+    variation: 'Mit einem zweiten Ball oder zwei Ballarten spielen und für jede Ballart eine eigene Zuspieltechnik festlegen.',
+    notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 50.',
+    sportType: 'Allgemein'
+  }
+];
