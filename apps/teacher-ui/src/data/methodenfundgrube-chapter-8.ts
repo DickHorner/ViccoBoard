@@ -5,7 +5,7 @@ type SeedEntry = Omit<Sport.GameEntry, 'id' | 'isCustom' | 'createdAt' | 'lastMo
 export const METHODENFUNDGRUBE_CHAPTER_8: SeedEntry[] = [
   {
     name: 'B-A-S-Ko-K – Beweglichkeit',
-    category: 'sonstiges',
+    category: 'beweglichkeit',
     phase: 'hauptteil',
     difficulty: 'unbekannt',
     duration: 0,
