@@ -5,7 +5,12 @@
         <h1>{{ t('UEBUNGEN.spieldatenbank') }}</h1>
         <p class="subtitle">{{ t('UEBUNGEN.spiele') }}</p>
       </div>
-      <span class="summary-pill">{{ t('UEBUNGEN.spiele-anzahl', { count: filteredEntries.length }) }}</span>
+      <div class="page-header__actions">
+        <span class="summary-pill">{{ t('UEBUNGEN.spiele-anzahl', { count: filteredEntries.length }) }}</span>
+        <button class="add-button" type="button" @click="openAddModal">
+          + {{ t('UEBUNGEN.uebung-hinzu') }}
+        </button>
+      </div>
     </header>
 
     <div v-if="loadError" class="error-banner" role="alert">
@@ -96,15 +101,25 @@
       >
         <div class="game-card__header">
           <div class="game-card__meta">
-            <span class="badge badge--category">{{ categoryLabel(entry.category) }}</span>
-            <span class="badge badge--difficulty" :class="`badge--${entry.difficulty}`">
-              {{ difficultyLabel(entry.difficulty) }}
-            </span>
+            <div class="game-card__badges">
+              <span class="badge badge--category">{{ categoryLabel(entry.category) }}</span>
+              <span class="badge badge--difficulty" :class="`badge--${entry.difficulty}`">
+                {{ difficultyLabel(entry.difficulty) }}
+              </span>
+            </div>
+            <button
+              class="edit-button"
+              type="button"
+              :aria-label="t('UEBUNGEN.bearbeiten')"
+              @click.stop="openEditModal(entry)"
+            >
+              ✏️ {{ t('UEBUNGEN.bearbeiten') }}
+            </button>
           </div>
           <h2 class="game-card__title">{{ entry.name }}</h2>
           <div class="game-card__info-row">
             <span v-if="entry.duration > 0" class="info-chip">⏱ {{ entry.duration }} {{ t('UEBUNGEN.min') }}</span>
-            <span class="info-chip">👥 {{ entry.ageGroup }}</span>
+            <span v-if="entry.ageGroup" class="info-chip">👥 {{ entry.ageGroup }}</span>
             <span v-if="entry.material" class="info-chip">🎒 {{ entry.material }}</span>
           </div>
         </div>
@@ -126,6 +141,18 @@
               <span class="detail-label">{{ t('UEBUNGEN.detail-hinweise') }}</span>
               <p class="detail-text">{{ entry.notes }}</p>
             </div>
+            <div v-if="safeVideoUrl(entry.videoUrl)" class="detail-section">
+              <span class="detail-label">{{ t('UEBUNGEN.video') }}</span>
+              <a
+                class="video-link"
+                :href="safeVideoUrl(entry.videoUrl) ?? undefined"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click.stop
+              >
+                ▶ {{ t('UEBUNGEN.video-oeffnen') }}
+              </a>
+            </div>
           </div>
         </transition>
 
@@ -137,6 +164,132 @@
           {{ expandedId === entry.id ? '▲' : '▼' }}
         </button>
       </article>
+    </div>
+
+    <!-- Add / Edit Modal -->
+    <div
+      v-if="showModal"
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="editingEntry ? t('UEBUNGEN.formular-bearbeiten') : t('UEBUNGEN.formular-neu')"
+      @click.self="closeModal"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h2>{{ editingEntry ? t('UEBUNGEN.formular-bearbeiten') : t('UEBUNGEN.formular-neu') }}</h2>
+          <button class="close-button" type="button" :aria-label="t('UEBUNGEN.abbrechen')" @click="closeModal">×</button>
+        </div>
+
+        <form class="modal-content" @submit.prevent="saveModal">
+          <div class="form-grid">
+            <div class="form-group form-group--wide">
+              <label for="game-name">{{ t('UEBUNGEN.name') }} *</label>
+              <input id="game-name" v-model="form.name" type="text" maxlength="120" required />
+            </div>
+
+            <div class="form-group">
+              <label for="game-category">{{ t('UEBUNGEN.kategorie') }}</label>
+              <select id="game-category" v-model="form.category">
+                <option value="erwaermung">{{ t('UEBUNGEN.kategorie-erwaermung') }}</option>
+                <option value="ballspiel">{{ t('UEBUNGEN.kategorie-ballspiel') }}</option>
+                <option value="reaktionsspiel">{{ t('UEBUNGEN.kategorie-reaktionsspiel') }}</option>
+                <option value="laufspiel">{{ t('UEBUNGEN.kategorie-laufspiel') }}</option>
+                <option value="koordination">{{ t('UEBUNGEN.kategorie-koordination') }}</option>
+                <option value="kooperation">{{ t('UEBUNGEN.kategorie-kooperation') }}</option>
+                <option value="entspannung">{{ t('UEBUNGEN.kategorie-entspannung') }}</option>
+                <option value="kraft">{{ t('UEBUNGEN.kategorie-kraft') }}</option>
+                <option value="ausdauer">{{ t('UEBUNGEN.kategorie-ausdauer') }}</option>
+                <option value="schnelligkeit">{{ t('UEBUNGEN.kategorie-schnelligkeit') }}</option>
+                <option value="sonstiges">{{ t('UEBUNGEN.kategorie-sonstiges') }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="game-phase">{{ t('UEBUNGEN.phase') }}</label>
+              <select id="game-phase" v-model="form.phase">
+                <option value="erwaermung">{{ t('UEBUNGEN.phase-erwaermung') }}</option>
+                <option value="hauptteil">{{ t('UEBUNGEN.phase-hauptteil') }}</option>
+                <option value="schluss">{{ t('UEBUNGEN.phase-schluss') }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="game-difficulty">{{ t('UEBUNGEN.schwierigkeit') }}</label>
+              <select id="game-difficulty" v-model="form.difficulty">
+                <option value="unbekannt">{{ t('UEBUNGEN.schwierigkeit-unbekannt') }}</option>
+                <option value="anfaenger">{{ t('UEBUNGEN.schwierigkeit-anfaenger') }}</option>
+                <option value="fortgeschrittene">{{ t('UEBUNGEN.schwierigkeit-fortgeschrittene') }}</option>
+                <option value="profis">{{ t('UEBUNGEN.schwierigkeit-profis') }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="game-duration">{{ t('UEBUNGEN.dauer') }}</label>
+              <input id="game-duration" v-model.number="form.duration" type="number" min="0" step="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="game-age-group">{{ t('UEBUNGEN.altersgruppe') }}</label>
+              <input id="game-age-group" v-model="form.ageGroup" type="text" maxlength="160" />
+            </div>
+
+            <div class="form-group">
+              <label for="game-material">{{ t('UEBUNGEN.material') }}</label>
+              <input id="game-material" v-model="form.material" type="text" maxlength="240" />
+            </div>
+
+            <div class="form-group">
+              <label for="game-sport-type">{{ t('UEBUNGEN.sportart') }}</label>
+              <input id="game-sport-type" v-model="form.sportType" type="text" maxlength="120" />
+            </div>
+
+            <div class="form-group form-group--wide">
+              <label for="game-goal">{{ t('UEBUNGEN.ziele') }}</label>
+              <textarea id="game-goal" v-model="form.goal" rows="2"></textarea>
+            </div>
+
+            <div class="form-group form-group--wide">
+              <label for="game-description">{{ t('UEBUNGEN.detail-beschreibung') }}</label>
+              <textarea id="game-description" v-model="form.description" rows="5"></textarea>
+            </div>
+
+            <div class="form-group form-group--wide">
+              <label for="game-variation">{{ t('UEBUNGEN.detail-variation') }}</label>
+              <textarea id="game-variation" v-model="form.variation" rows="3"></textarea>
+            </div>
+
+            <div class="form-group form-group--wide">
+              <label for="game-notes">{{ t('UEBUNGEN.detail-hinweise') }}</label>
+              <textarea id="game-notes" v-model="form.notes" rows="3"></textarea>
+            </div>
+
+            <div class="form-group form-group--wide">
+              <label for="game-video-url">{{ t('UEBUNGEN.video-url') }}</label>
+              <input
+                id="game-video-url"
+                v-model="form.videoUrl"
+                type="url"
+                inputmode="url"
+                placeholder="https://…"
+              />
+            </div>
+          </div>
+
+          <div v-if="modalError" class="error-banner" role="alert">
+            {{ modalError }}
+          </div>
+
+          <div class="modal-footer">
+            <button class="cancel-button" type="button" @click="closeModal">
+              {{ t('UEBUNGEN.abbrechen') }}
+            </button>
+            <button class="save-button" type="submit" :disabled="saving">
+              {{ saving ? t('UEBUNGEN.speichern-laeuft') : t('UEBUNGEN.speichern') }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </section>
 </template>
@@ -156,6 +309,10 @@ const allEntries = ref<Sport.GameEntry[]>([])
 const loadError = ref<string | null>(null)
 const initializing = ref(false)
 const expandedId = ref<string | null>(null)
+const showModal = ref(false)
+const editingEntry = ref<Sport.GameEntry | null>(null)
+const modalError = ref('')
+const saving = ref(false)
 
 const searchQuery = ref('')
 const selectedCategory = ref<Sport.GameCategory | null>(null)
@@ -163,10 +320,56 @@ const selectedPhase = ref<Sport.GamePhase | ''>('')
 const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
 
-const CORE_SEED_NAMES = new Set(GAME_SEED_DATA.map((seed) => seed.name))
+interface GameForm {
+  name: string
+  category: Sport.GameCategory
+  phase: Sport.GamePhase
+  difficulty: Sport.GameDifficulty
+  duration: number
+  ageGroup: string
+  material: string
+  goal: string
+  description: string
+  variation: string
+  notes: string
+  sportType: string
+  videoUrl: string
+}
+
+function emptyGameForm(): GameForm {
+  return {
+    name: '',
+    category: 'sonstiges',
+    phase: 'hauptteil',
+    difficulty: 'unbekannt',
+    duration: 0,
+    ageGroup: '',
+    material: '',
+    goal: '',
+    description: '',
+    variation: '',
+    notes: '',
+    sportType: '',
+    videoUrl: ''
+  }
+}
+
+const form = ref<GameForm>(emptyGameForm())
+
+const CORE_BUILT_IN_GAME_SEED_DATA = GAME_SEED_DATA.map((seed) => ({
+  ...seed,
+  builtinKey: `core:${seed.name}`
+}))
+const METHODENFUNDGRUBE_BUILT_IN_GAME_SEED_DATA = METHODENFUNDGRUBE_SEED_DATA.map((seed) => {
+  const sourcePage = seed.notes?.match(/S\. (\d+)\./)?.[1]
+  return {
+    ...seed,
+    builtinKey: sourcePage ? `methodenfundgrube:p${sourcePage}` : `methodenfundgrube:${seed.name}`
+  }
+})
 const BUILT_IN_GAME_SEED_DATA = [
-  ...GAME_SEED_DATA,
-  ...METHODENFUNDGRUBE_SEED_DATA.filter((seed) => !CORE_SEED_NAMES.has(seed.name))
+  ...CORE_BUILT_IN_GAME_SEED_DATA,
+  ...METHODENFUNDGRUBE_BUILT_IN_GAME_SEED_DATA
 ]
 const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis', 'unbekannt']
 
@@ -205,6 +408,19 @@ function difficultyLabel(d: Sport.GameDifficulty): string {
   return map[d] ?? d
 }
 
+function safeVideoUrl(value?: string): string | null {
+  const trimmed = value?.trim()
+  if (!trimmed) return null
+
+  try {
+    const parsed = new URL(trimmed)
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null
+    return parsed.toString()
+  } catch {
+    return null
+  }
+}
+
 function toggleExpand(id: string) {
   expandedId.value = expandedId.value === id ? null : id
 }
@@ -241,20 +457,125 @@ const filteredEntries = computed<Sport.GameEntry[]>(() => {
 
 async function seedBuiltIns(): Promise<void> {
   const existingEntries = await bridge.gameEntryRepository.findAll()
-  const existingNames = new Set(existingEntries.map((entry) => entry.name))
-  const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingNames.has(seed.name))
+  const existingKeys = new Set(
+    existingEntries.flatMap((entry) => entry.builtinKey ? [entry.builtinKey] : [])
+  )
+  const legacyByName = new Map<string, Sport.GameEntry[]>()
+
+  for (const entry of existingEntries) {
+    if (entry.isCustom || entry.builtinKey) continue
+    const matches = legacyByName.get(entry.name) ?? []
+    matches.push(entry)
+    legacyByName.set(entry.name, matches)
+  }
+
+  const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingKeys.has(seed.builtinKey))
   if (missingSeeds.length === 0) return
 
   initializing.value = true
   try {
     for (const seed of missingSeeds) {
-      await bridge.gameEntryRepository.create({
-        ...seed,
-        isCustom: false
-      })
+      const legacyMatches = legacyByName.get(seed.name)
+      const legacyEntry = legacyMatches?.shift()
+
+      if (legacyEntry) {
+        await bridge.gameEntryRepository.update(legacyEntry.id, { builtinKey: seed.builtinKey })
+      } else {
+        await bridge.gameEntryRepository.create({
+          ...seed,
+          isCustom: false
+        })
+      }
+
+      existingKeys.add(seed.builtinKey)
     }
   } finally {
     initializing.value = false
+  }
+}
+
+function openAddModal(): void {
+  editingEntry.value = null
+  form.value = emptyGameForm()
+  modalError.value = ''
+  showModal.value = true
+}
+
+function openEditModal(entry: Sport.GameEntry): void {
+  editingEntry.value = entry
+  form.value = {
+    name: entry.name,
+    category: entry.category,
+    phase: entry.phase,
+    difficulty: entry.difficulty,
+    duration: entry.duration,
+    ageGroup: entry.ageGroup,
+    material: entry.material ?? '',
+    goal: entry.goal,
+    description: entry.description,
+    variation: entry.variation ?? '',
+    notes: entry.notes ?? '',
+    sportType: entry.sportType ?? '',
+    videoUrl: entry.videoUrl ?? ''
+  }
+  modalError.value = ''
+  showModal.value = true
+}
+
+function closeModal(): void {
+  showModal.value = false
+  editingEntry.value = null
+  modalError.value = ''
+}
+
+async function saveModal(): Promise<void> {
+  const name = form.value.name.trim()
+  if (!name) {
+    modalError.value = t('UEBUNGEN.name-erforderlich')
+    return
+  }
+
+  const videoInput = form.value.videoUrl.trim()
+  const videoUrl = safeVideoUrl(videoInput)
+  if (videoInput && !videoUrl) {
+    modalError.value = t('UEBUNGEN.video-ungueltig')
+    return
+  }
+
+  const input = {
+    name,
+    category: form.value.category,
+    phase: form.value.phase,
+    difficulty: form.value.difficulty,
+    duration: Math.max(0, Number(form.value.duration) || 0),
+    ageGroup: form.value.ageGroup.trim(),
+    material: form.value.material.trim() || undefined,
+    goal: form.value.goal.trim(),
+    description: form.value.description.trim(),
+    variation: form.value.variation.trim() || undefined,
+    notes: form.value.notes.trim() || undefined,
+    sportType: form.value.sportType.trim() || undefined,
+    videoUrl: videoUrl ?? undefined
+  }
+
+  saving.value = true
+  modalError.value = ''
+  try {
+    if (editingEntry.value) {
+      await bridge.gameEntryRepository.update(editingEntry.value.id, input)
+    } else {
+      await bridge.gameEntryRepository.create({
+        ...input,
+        isCustom: true
+      })
+    }
+
+    closeModal()
+    allEntries.value = await bridge.gameEntryRepository.findAll()
+  } catch (err) {
+    modalError.value = err instanceof Error ? err.message : t('UEBUNGEN.speichern-fehler')
+  } finally {
+    saving.value = false
   }
 }
 
