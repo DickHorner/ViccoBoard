@@ -13,6 +13,7 @@ import { METHODENFUNDGRUBE_CHAPTER_6C } from './methodenfundgrube-chapter-6c';
 import { METHODENFUNDGRUBE_CHAPTER_7A } from './methodenfundgrube-chapter-7a';
 import { METHODENFUNDGRUBE_CHAPTER_7B } from './methodenfundgrube-chapter-7b';
 import { METHODENFUNDGRUBE_CHAPTER_7C } from './methodenfundgrube-chapter-7c';
+import { METHODENFUNDGRUBE_CHAPTER_8 } from './methodenfundgrube-chapter-8';
 
 export const METHODENFUNDGRUBE_SEED_DATA = [
   ...METHODENFUNDGRUBE_CHAPTER_1,
@@ -30,4 +31,5 @@ export const METHODENFUNDGRUBE_SEED_DATA = [
   ...METHODENFUNDGRUBE_CHAPTER_7A,
   ...METHODENFUNDGRUBE_CHAPTER_7B,
   ...METHODENFUNDGRUBE_CHAPTER_7C,
+  ...METHODENFUNDGRUBE_CHAPTER_8,
 ];
