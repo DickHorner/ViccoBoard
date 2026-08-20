@@ -20,6 +20,8 @@ export interface CreateGameEntryInput {
   variation?: string;
   notes?: string;
   sportType?: string;
+  videoUrl?: string;
+  builtinKey?: string;
   isCustom?: boolean;
 }
 
@@ -41,6 +43,8 @@ export class GameEntryRepository {
       variation: raw.variation ?? undefined,
       notes: raw.notes ?? undefined,
       sportType: raw.sport_type ?? undefined,
+      videoUrl: raw.video_url ?? undefined,
+      builtinKey: raw.builtin_key ?? undefined,
       isCustom: Boolean(raw.is_custom),
       createdAt: new Date(raw.created_at),
       lastModified: new Date(raw.last_modified)
@@ -63,6 +67,8 @@ export class GameEntryRepository {
       variation: input.variation,
       notes: input.notes,
       sportType: input.sportType,
+      videoUrl: input.videoUrl,
+      builtinKey: input.builtinKey,
       isCustom: input.isCustom ?? true,
       createdAt: now,
       lastModified: now
@@ -82,6 +88,8 @@ export class GameEntryRepository {
       variation: entry.variation ?? null,
       notes: entry.notes ?? null,
       sport_type: entry.sportType ?? null,
+      video_url: entry.videoUrl ?? null,
+      builtin_key: entry.builtinKey ?? null,
       is_custom: entry.isCustom ? 1 : 0,
       created_at: entry.createdAt.toISOString(),
       last_modified: entry.lastModified.toISOString()
@@ -134,6 +142,8 @@ export class GameEntryRepository {
       variation: updated.variation ?? null,
       notes: updated.notes ?? null,
       sport_type: updated.sportType ?? null,
+      video_url: updated.videoUrl ?? null,
+      builtin_key: updated.builtinKey ?? null,
       last_modified: updated.lastModified.toISOString()
     });
 
