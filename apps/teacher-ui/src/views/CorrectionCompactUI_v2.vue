@@ -260,7 +260,7 @@ const {
   findCorrectionsByExam,
   recordCorrectionUseCase,
   exportCurrentCorrectionSheetPdf,
-  exportAllCorrectionSheetsPdf
+  exportAllCompletedCandidatePdfs
 } = useExamsBridge();
 
 const exam = ref<Exams.Exam | null>(null);
@@ -576,7 +576,7 @@ async function exportCurrentCandidate(): Promise<void> {
 }
 
 async function exportAllCandidates(): Promise<void> {
-  if (!exam.value || !exportAllCorrectionSheetsPdf) {
+  if (!exam.value || !exportAllCompletedCandidatePdfs) {
     return;
   }
 
@@ -586,8 +586,14 @@ async function exportAllCandidates(): Promise<void> {
     return;
   }
 
-  const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id);
-  downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+  const pdfDocuments = await exportAllCompletedCandidatePdfs(exam.value.id);
+  if (!pdfDocuments) {
+    return;
+  }
+
+  for (const pdfDocument of pdfDocuments) {
+    downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+  }
 }
 
 function openPreviewForCurrentCandidate(): void {

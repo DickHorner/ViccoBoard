@@ -73,6 +73,7 @@ export * from './use-cases/calculate-grade.use-case.js';
 export * from './use-cases/get-correction-sheet-preset.use-case.js';
 export * from './use-cases/save-correction-sheet-preset.use-case.js';
 export * from './use-cases/build-correction-sheet-projection.use-case.js';
+export * from './use-cases/finalize-all-corrections.use-case.js';
 export * from './use-cases/export-correction-sheets-pdf.use-case.js';
 export * from './use-cases/export-correction-session.use-case.js';
 export * from './use-cases/import-kbr-correction-bundle.use-case.js';
