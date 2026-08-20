@@ -281,7 +281,16 @@
           </div>
 
           <div class="modal-footer">
-            <button class="cancel-button" type="button" @click="closeModal">
+            <button
+              v-if="editingEntry?.isCustom"
+              class="cancel-button"
+              type="button"
+              :disabled="saving"
+              @click="deleteEditingEntry"
+            >
+              {{ t('UEBUNGEN.loeschen') }}
+            </button>
+            <button class="cancel-button" type="button" :disabled="saving" @click="closeModal">
               {{ t('UEBUNGEN.abbrechen') }}
             </button>
             <button class="save-button" type="submit" :disabled="saving">
@@ -526,6 +535,29 @@ function closeModal(): void {
   showModal.value = false
   editingEntry.value = null
   modalError.value = ''
+}
+
+async function deleteEditingEntry(): Promise<void> {
+  const entry = editingEntry.value
+  if (!entry?.isCustom) return
+
+  const confirmed = window.confirm(
+    t('UEBUNGEN.loeschen-bestaetigen', { name: entry.name })
+  )
+  if (!confirmed) return
+
+  saving.value = true
+  modalError.value = ''
+  try {
+    await bridge.gameEntryRepository.delete(entry.id)
+    allEntries.value = await bridge.gameEntryRepository.findAll()
+    if (expandedId.value === entry.id) expandedId.value = null
+    closeModal()
+  } catch (err) {
+    modalError.value = err instanceof Error ? err.message : t('UEBUNGEN.loeschen-fehler')
+  } finally {
+    saving.value = false
+  }
 }
 
 async function saveModal(): Promise<void> {
