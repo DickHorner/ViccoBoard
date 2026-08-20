@@ -163,13 +163,11 @@ const selectedPhase = ref<Sport.GamePhase | ''>('')
 const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
 
-const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis']
 const CORE_SEED_NAMES = new Set(GAME_SEED_DATA.map((seed) => seed.name))
 const BUILT_IN_GAME_SEED_DATA = [
   ...GAME_SEED_DATA,
   ...METHODENFUNDGRUBE_SEED_DATA.filter((seed) => !CORE_SEED_NAMES.has(seed.name))
 ]
-const BUILT_IN_SEED_DATA = [...GAME_SEED_DATA, ...METHODENFUNDGRUBE_SEED_DATA]
 const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis', 'unbekannt']
 
 interface CategoryOption {
