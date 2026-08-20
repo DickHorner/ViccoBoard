@@ -123,6 +123,8 @@ export interface GameEntry {
   variation?: string;
   notes?: string;
   sportType?: string;
+  videoUrl?: string;
+  builtinKey?: string;
   isCustom: boolean;
   createdAt: Date;
   lastModified: Date;
