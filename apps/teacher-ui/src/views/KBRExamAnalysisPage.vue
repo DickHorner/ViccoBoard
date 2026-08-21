@@ -7,6 +7,7 @@
       :exam="exam"
       :corrections="corrections"
       :candidates="exam.candidates"
+      :on-apply-adjustments="applyAdjustments"
     />
   </section>
 </template>
@@ -21,7 +22,8 @@ import type { Exams as ExamsTypes } from '@viccoboard/core'
 const route = useRoute()
 const {
   examRepository,
-  correctionEntryRepository
+  correctionEntryRepository,
+  applyPointAdjustments
 } = useExamsBridge()
 
 const loading = ref(true)
@@ -50,6 +52,12 @@ const loadData = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const applyAdjustments = async (adjustments: Array<{ taskId: string; suggestedPoints: number }>) => {
+  if (!exam.value || !applyPointAdjustments) return
+  await applyPointAdjustments({ examId: exam.value.id, adjustments })
+  await loadData()
 }
 
 onMounted(() => {
