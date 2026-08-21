@@ -122,6 +122,7 @@
           <button class="btn-primary" @click="saveLongTermNote">Notizen speichern</button>
         </div>
         <p v-if="noteStatus" class="record-notes">{{ noteStatus }}</p>
+        <p v-if="competencySummary.length" class="record-notes">Kompetenzentwicklung: {{ competencySummary.join(' · ') }}</p>
         <div v-if="kbrRows.length === 0" class="empty-state"><p>Keine KBR-Prüfungen für diesen Prüfling im gewählten Schuljahr.</p></div>
         <div v-else class="kbr-list"><article v-for="row in kbrRows" :key="row.exam.id" class="kbr-row"><strong>{{ row.exam.title }}</strong><span>{{ formatDateDe(row.exam.date ?? row.exam.createdAt) }} · {{ row.correction.totalPoints }} Pkt. · Note {{ row.correction.totalGrade }}</span><p v-if="row.comments.length">{{ row.comments.join(' · ') }}</p><p v-if="row.tips.length">Fördertipps: {{ row.tips.join(', ') }}</p></article></div>
       </section>
@@ -165,7 +166,7 @@ initializeStudentsBridge()
 
 const sportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
-const { examRepository, correctionEntryRepository, studentLongTermNoteRepository } = useExamsBridge()
+const { examRepository, correctionEntryRepository, studentLongTermNoteRepository, supportTipRepository } = useExamsBridge()
 
 const student = ref<Student | null>(null)
 const className = ref<string | null>(null)
@@ -178,6 +179,14 @@ const internalNotes = ref('')
 const noteStatus = ref('')
 const kbrRows = ref<Array<{ exam: any; correction: any; comments: string[]; tips: string[] }>>([])
 const schoolYear = computed(() => { const year = new Date().getFullYear(); return `${year}/${year + 1}` })
+const competencySummary = computed(() => {
+  const buckets = new Map<string, number[]>()
+  for (const row of kbrRows.value) for (const score of row.correction.taskScores) {
+    const label = row.exam.structure.tasks.find((task: any) => task.id === score.taskId)?.title ?? score.taskId
+    buckets.set(label, [...(buckets.get(label) ?? []), score.maxPoints ? (score.points / score.maxPoints) * 100 : 0])
+  }
+  return [...buckets.entries()].map(([label, values]) => `${label}: ${(values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(0)} %`)
+})
 let longTermNote: StudentLongTermNote | null = null
 
 const initials = computed(() =>
@@ -228,16 +237,22 @@ async function loadData() {
       (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
     )
     categories.value = cats
-    const [note, exams] = await Promise.all([
+    const [note, exams, tips] = await Promise.all([
       studentLongTermNoteRepository?.findByStudentAndYear(studentId, schoolYear.value) ?? null,
-      examRepository?.findAll() ?? []
+      examRepository?.findAll() ?? [],
+      supportTipRepository?.findAll() ?? []
     ])
     longTermNote = note
     internalNotes.value = note?.internalNotes ?? ''
-    const rows = await Promise.all(exams.filter((exam: any) => exam.candidates.some((candidate: any) => candidate.id === studentId)).map(async (exam: any) => {
+    const yearStarts = Number(schoolYear.value.slice(0, 4))
+    const rows = await Promise.all(exams.filter((exam: any) => {
+      const date = exam.date ?? exam.createdAt
+      const academicYear = date.getMonth() >= 7 ? date.getFullYear() : date.getFullYear() - 1
+      return academicYear === yearStarts && exam.candidates.some((candidate: any) => candidate.id === studentId)
+    }).map(async (exam: any) => {
       const correction = await correctionEntryRepository?.findByExamAndCandidate(exam.id, studentId)
       if (!correction) return null
-      return { exam, correction, comments: correction.comments.map((comment: any) => comment.text).filter(Boolean), tips: correction.supportTips.map((tip: any) => tip.supportTipId) }
+      return { exam, correction, comments: correction.comments.map((comment: any) => comment.text).filter(Boolean), tips: correction.supportTips.map((assignment: any) => tips.find((tip: any) => tip.id === assignment.supportTipId)?.title ?? assignment.supportTipId) }
     }))
     kbrRows.value = rows.filter(Boolean) as typeof kbrRows.value
   } catch (err) {
