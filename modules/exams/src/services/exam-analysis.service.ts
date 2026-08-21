@@ -167,7 +167,7 @@ export class ExamAnalysisService {
     const analysis = this.analyzeExamDifficulty(exam, corrections);
     const currentDistribution: Record<string, number> = {};
     const suggestedDistribution: Record<string, number> = {};
-    const adjustments: Array<{
+    let adjustments: Array<{
       taskId: string;
       taskTitle: string;
       currentPoints: number;
@@ -199,20 +199,6 @@ export class ExamAnalysisService {
       suggestedDistribution[task.id] = suggestedPoints;
       totalSuggestedPoints += suggestedPoints;
 
-      if (suggestedPoints !== task.points) {
-        adjustments.push({
-          taskId: task.id,
-          taskTitle: task.title,
-          currentPoints: task.points,
-          suggestedPoints,
-          reason:
-            difficulty.difficultyIndex < 0.5
-              ? 'Task is too difficult'
-              : difficulty.difficultyIndex > 0.7
-                ? 'Task is too easy'
-                : 'Minor balancing adjustment'
-        });
-      }
     }
 
     // Normalize suggested points to maintain total
@@ -220,6 +206,21 @@ export class ExamAnalysisService {
     for (const taskId in suggestedDistribution) {
       suggestedDistribution[taskId] = Math.round(suggestedDistribution[taskId] * scaleFactor);
     }
+    // Build the UI payload after normalization so preview and persisted input agree.
+    adjustments = relevantTasks.flatMap((task) => {
+      const suggestedPoints = suggestedDistribution[task.id];
+      if (suggestedPoints === task.points) return [];
+      const difficulty = analysis.taskDifficulties.find((item) => item.taskId === task.id);
+      return [{
+        taskId: task.id,
+        taskTitle: task.title,
+        currentPoints: task.points,
+        suggestedPoints,
+        reason: (difficulty?.difficultyIndex ?? targetDifficultyIndex) < targetDifficultyIndex
+          ? 'Task is too difficult'
+          : 'Task is too easy'
+      }];
+    });
 
     // Analyze impact
     const impactAnalysis = {
