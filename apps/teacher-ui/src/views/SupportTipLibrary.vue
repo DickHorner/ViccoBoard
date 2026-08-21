@@ -13,6 +13,7 @@
       <select v-model="categoryFilter"><option value="">Alle Kategorien</option><option v-for="category in categories" :key="category" :value="category">{{ category }}</option></select>
       <select v-model="sortBy"><option value="usage">Häufig verwendet</option><option value="weight">Gewichtung</option><option value="title">Titel</option><option value="recent">Zuletzt geändert</option></select>
     </div>
+    <section v-if="usageRows.length" class="tip-card"><h2>Vergabeübersicht</h2><p v-for="row in usageRows" :key="row.title">{{ row.title }}: {{ row.count }} Vergaben · {{ row.students }} Prüflinge · {{ row.tasks }} Aufgaben</p></section>
 
     <p v-if="loading">Fördertipps werden geladen …</p>
     <p v-else-if="filteredTips.length === 0" class="empty">Noch keine passenden Fördertipps vorhanden.</p>
@@ -49,7 +50,7 @@ import { useExamsBridge } from '../composables/useExamsBridge'
 import { useToast } from '../composables/useToast'
 
 type EditableTip = Omit<Exams.SupportTip, 'id' | 'createdAt' | 'lastModified' | 'usageCount'> & { id?: string }
-const { supportTipRepository } = useExamsBridge()
+const { supportTipRepository, correctionEntryRepository } = useExamsBridge()
 const toast = useToast()
 const tips = ref<Exams.SupportTip[]>([])
 const loading = ref(true)
@@ -62,8 +63,9 @@ const formError = ref('')
 const qrTip = ref<Exams.SupportTip | null>(null)
 const categories = computed(() => [...new Set(tips.value.map((tip) => tip.category).filter(Boolean) as string[])].sort())
 const filteredTips = computed(() => SupportTipManagementService.searchSupportTips(tips.value, query.value, { category: categoryFilter.value || undefined, sortBy: sortBy.value }))
+const usageRows = ref<Array<{ title: string; count: number; students: number; tasks: number }>>([])
 
-async function load(): Promise<void> { tips.value = await supportTipRepository?.findAll() ?? []; loading.value = false }
+async function load(): Promise<void> { tips.value = await supportTipRepository?.findAll() ?? []; const counts = new Map<string, { count: number; students: Set<string>; tasks: Set<string> }>(); for (const correction of await correctionEntryRepository?.findAll() ?? []) for (const assignment of correction.supportTips) { const item = counts.get(assignment.supportTipId) ?? { count: 0, students: new Set(), tasks: new Set() }; item.count++; item.students.add(correction.candidateId); if (assignment.taskId) item.tasks.add(assignment.taskId); counts.set(assignment.supportTipId, item) }; usageRows.value = [...counts].map(([id, item]) => ({ title: tips.value.find(tip => tip.id === id)?.title ?? id, count: item.count, students: item.students.size, tasks: item.tasks.size })); loading.value = false }
 function startCreate(): void { editing.value = { title: '', shortDescription: '', category: '', tags: [], links: [], priority: 0, weight: 1 }; tagsText.value = ''; formError.value = '' }
 function edit(tip: Exams.SupportTip): void { editing.value = { ...tip, category: tip.category ?? '', tags: [...tip.tags], links: tip.links.map((link) => ({ ...link })) }; tagsText.value = tip.tags.join(', '); formError.value = '' }
 function showQr(tip: Exams.SupportTip): void { qrTip.value = tip }
