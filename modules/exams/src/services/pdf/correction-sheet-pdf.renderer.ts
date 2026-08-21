@@ -244,9 +244,11 @@ export class CorrectionSheetPdfRenderer {
         const criterionPoints = criterion.awardedPoints === undefined
           ? `${criterion.maxPoints} Pkt.`
           : `${criterion.awardedPoints} / ${criterion.maxPoints} Pkt.`;
-        drawParagraph(`• ${criterion.text} (${criterionPoints})`, {
+        const deduction = criterion.awardedPoints === undefined ? 0 : criterion.maxPoints - criterion.awardedPoints;
+        drawParagraph(`• ${criterion.text}${projection.showPointDeductions && deduction > 0 ? ` (Abzug: ${deduction.toFixed(2)} Pkt.)` : ` (${criterionPoints})`}`, {
           size: SMALL_FONT_SIZE,
-          indent: 12
+          indent: 12,
+          font: criterion.formatting?.bold ? boldFont : criterion.formatting?.italic ? await document.embedFont(StandardFonts.HelveticaOblique) : regularFont
         });
       }
 

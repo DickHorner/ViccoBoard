@@ -19,6 +19,7 @@ export interface CorrectionSheetPreset {
   showSupportTips: boolean;
   showTaskPercentages: boolean;
   italicizeFeedback: boolean;
+  showPointDeductions: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   headerText?: string;
@@ -33,6 +34,7 @@ export interface CorrectionSheetCriterionRow {
   text: string;
   maxPoints: number;
   awardedPoints?: number;
+  formatting?: { bold?: boolean; italic?: boolean; underline?: boolean };
 }
 
 export interface CorrectionSheetTaskRow {
@@ -82,6 +84,7 @@ export interface CorrectionSheetProjection {
   showSupportTips: boolean;
   showTaskPercentages: boolean;
   italicizeFeedback: boolean;
+  showPointDeductions: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   taskRows: CorrectionSheetTaskRow[];
