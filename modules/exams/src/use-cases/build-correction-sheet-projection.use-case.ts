@@ -95,7 +95,8 @@ export class BuildCorrectionSheetProjectionUseCase {
               criterionId: criterion.id,
               text: criterion.text,
               maxPoints: criterion.points,
-              awardedPoints: criterionScore?.points
+              awardedPoints: criterionScore?.points,
+              formatting: criterion.formatting
             };
           })
         };
@@ -151,6 +152,9 @@ export class BuildCorrectionSheetProjectionUseCase {
       showTaskComments: preset.showTaskComments,
       showGeneralComment: preset.showGeneralComment,
       showSupportTips: preset.showSupportTips,
+      showTaskPercentages: preset.showTaskPercentages,
+      italicizeFeedback: preset.italicizeFeedback,
+      showPointDeductions: preset.showPointDeductions,
       showExamParts: preset.showExamParts,
       showSignatureArea: preset.showSignatureArea,
       taskRows,
