@@ -48,6 +48,8 @@ export function createDefaultCorrectionSheetPreset(
     showTaskComments: true,
     showGeneralComment: true,
     showSupportTips: true,
+    showTaskPercentages: false,
+    italicizeFeedback: true,
     showExamParts: true,
     showSignatureArea: false,
     headerText: '',

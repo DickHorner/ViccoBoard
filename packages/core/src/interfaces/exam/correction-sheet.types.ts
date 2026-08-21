@@ -1,4 +1,4 @@
-export type CorrectionSheetLayoutMode = 'compact' | 'standard';
+export type CorrectionSheetLayoutMode = 'compact' | 'standard' | 'detailed' | 'minimal';
 
 export interface CorrectionSheetImage {
   src: string;
@@ -17,6 +17,8 @@ export interface CorrectionSheetPreset {
   showTaskComments: boolean;
   showGeneralComment: boolean;
   showSupportTips: boolean;
+  showTaskPercentages: boolean;
+  italicizeFeedback: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   headerText?: string;
@@ -78,6 +80,8 @@ export interface CorrectionSheetProjection {
   showTaskComments: boolean;
   showGeneralComment: boolean;
   showSupportTips: boolean;
+  showTaskPercentages: boolean;
+  italicizeFeedback: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   taskRows: CorrectionSheetTaskRow[];

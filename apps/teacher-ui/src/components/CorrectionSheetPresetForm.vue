@@ -26,8 +26,10 @@
           :value="modelValue.layoutMode"
           @change="updateField('layoutMode', ($event.target as HTMLSelectElement).value as Exams.CorrectionSheetLayoutMode)"
         >
-          <option value="standard">Standard</option>
           <option value="compact">Kompakt</option>
+          <option value="standard">Standard</option>
+          <option value="detailed">Detailliert</option>
+          <option value="minimal">Minimal</option>
         </select>
       </div>
     </div>
@@ -114,6 +116,8 @@ const toggles: Array<{ key: keyof Exams.CorrectionSheetPreset; label: string }> 
   { key: 'showTaskComments', label: 'Aufgabenkommentare anzeigen' },
   { key: 'showGeneralComment', label: 'Gesamtkommentar anzeigen' },
   { key: 'showSupportTips', label: 'Fördertipps anzeigen' },
+  { key: 'showTaskPercentages', label: 'Aufgabenprozente anzeigen' },
+  { key: 'italicizeFeedback', label: 'Kommentare und Tipps kursiv' },
   { key: 'showExamParts', label: 'Prüfungsteile anzeigen' },
   { key: 'showSignatureArea', label: 'Unterschriftsbereich anzeigen' }
 ];

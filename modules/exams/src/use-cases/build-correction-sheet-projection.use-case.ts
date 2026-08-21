@@ -151,6 +151,8 @@ export class BuildCorrectionSheetProjectionUseCase {
       showTaskComments: preset.showTaskComments,
       showGeneralComment: preset.showGeneralComment,
       showSupportTips: preset.showSupportTips,
+      showTaskPercentages: preset.showTaskPercentages,
+      italicizeFeedback: preset.italicizeFeedback,
       showExamParts: preset.showExamParts,
       showSignatureArea: preset.showSignatureArea,
       taskRows,
