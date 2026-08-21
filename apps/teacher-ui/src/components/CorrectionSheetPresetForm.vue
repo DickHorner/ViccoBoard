@@ -26,8 +26,10 @@
           :value="modelValue.layoutMode"
           @change="updateField('layoutMode', ($event.target as HTMLSelectElement).value as Exams.CorrectionSheetLayoutMode)"
         >
-          <option value="standard">Standard</option>
           <option value="compact">Kompakt</option>
+          <option value="standard">Standard</option>
+          <option value="detailed">Detailliert</option>
+          <option value="minimal">Minimal</option>
         </select>
       </div>
     </div>
@@ -80,6 +82,9 @@
           <span>{{ modelValue.teacherSignature.fileName ?? 'Unterschrift hochgeladen' }}</span>
           <button type="button" class="small-button" @click="clearImage('teacherSignature')">Entfernen</button>
         </div>
+        <label for="signature-canvas">Oder Unterschrift zeichnen</label>
+        <canvas id="signature-canvas" ref="signatureCanvas" width="360" height="100" class="signature-canvas" @pointerdown="startDrawing" @pointermove="draw" @pointerup="stopDrawing" @pointerleave="stopDrawing"></canvas>
+        <div class="image-preview-row"><button type="button" class="small-button" @click="clearDrawing">Leeren</button><button type="button" class="small-button" @click="saveDrawing">Zeichnung verwenden</button></div>
       </div>
     </div>
 
@@ -96,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Exams } from '@viccoboard/core';
 
 const props = defineProps<{
@@ -105,6 +111,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'update:modelValue', value: Exams.CorrectionSheetPreset): void;
 }>();
+const signatureCanvas = ref<HTMLCanvasElement | null>(null);
+let drawing = false;
 
 const toggles: Array<{ key: keyof Exams.CorrectionSheetPreset; label: string }> = [
   { key: 'showHeader', label: 'Kopfbereich anzeigen' },
@@ -114,6 +122,9 @@ const toggles: Array<{ key: keyof Exams.CorrectionSheetPreset; label: string }> 
   { key: 'showTaskComments', label: 'Aufgabenkommentare anzeigen' },
   { key: 'showGeneralComment', label: 'Gesamtkommentar anzeigen' },
   { key: 'showSupportTips', label: 'Fördertipps anzeigen' },
+  { key: 'showTaskPercentages', label: 'Aufgabenprozente anzeigen' },
+  { key: 'italicizeFeedback', label: 'Kommentare und Tipps kursiv' },
+  { key: 'showPointDeductions', label: 'Punktabzüge anzeigen' },
   { key: 'showExamParts', label: 'Prüfungsteile anzeigen' },
   { key: 'showSignatureArea', label: 'Unterschriftsbereich anzeigen' }
 ];
@@ -170,6 +181,13 @@ async function uploadImage(
 function clearImage(key: 'schoolLogo' | 'teacherSignature'): void {
   updateField(key, undefined);
 }
+
+function point(event: PointerEvent) { const canvas = signatureCanvas.value!; const rect = canvas.getBoundingClientRect(); return { x: (event.clientX - rect.left) * (canvas.width / rect.width), y: (event.clientY - rect.top) * (canvas.height / rect.height) }; }
+function startDrawing(event: PointerEvent): void { const canvas = signatureCanvas.value; if (!canvas) return; drawing = true; canvas.setPointerCapture(event.pointerId); const ctx = canvas.getContext('2d')!; const p = point(event); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+function draw(event: PointerEvent): void { if (!drawing || !signatureCanvas.value) return; const ctx = signatureCanvas.value.getContext('2d')!; const p = point(event); ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111'; ctx.lineTo(p.x, p.y); ctx.stroke(); }
+function stopDrawing(): void { drawing = false; }
+function clearDrawing(): void { const canvas = signatureCanvas.value; if (canvas) canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height); }
+function saveDrawing(): void { const canvas = signatureCanvas.value; if (canvas) updateField('teacherSignature', { src: canvas.toDataURL('image/png'), fileName: 'unterschrift-zeichnung.png' }); }
 </script>
 
 <style scoped>
@@ -246,4 +264,5 @@ function clearImage(key: 'schoolLogo' | 'teacherSignature'): void {
 textarea {
   resize: vertical;
 }
+.signature-canvas { width: 100%; max-width: 360px; height: 100px; border: 1px dashed rgba(15, 23, 42, 0.28); background: #fff; touch-action: none; }
 </style>

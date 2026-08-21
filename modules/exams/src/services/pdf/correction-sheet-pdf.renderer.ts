@@ -214,7 +214,9 @@ export class CorrectionSheetPdfRenderer {
       cursorY -= 6;
     }
 
-    const headerLine = projection.layoutMode === 'compact'
+    const headerLine = projection.layoutMode === 'minimal'
+      ? 'Aufgabe'
+      : projection.layoutMode === 'compact'
       ? 'Aufgabe | Punkte'
       : 'Aufgabe | Punkte | Kommentar';
     drawTextLine(headerLine, { size: SMALL_FONT_SIZE, font: boldFont });
@@ -230,26 +232,30 @@ export class CorrectionSheetPdfRenderer {
       const labelPrefix = row.partLabel ? `${row.partLabel} - ` : '';
       drawTextLine(`${labelPrefix}${row.label}`, { font: boldFont });
 
-      if (projection.showTaskPoints) {
+      if (projection.showTaskPoints && projection.layoutMode !== 'minimal') {
+        const percentage = row.maxPoints > 0 ? ` (${((row.awardedPoints / row.maxPoints) * 100).toFixed(0)} %)` : '';
         drawTextLine(
-          `${row.awardedPoints} / ${row.maxPoints} Punkte`,
+          `${row.awardedPoints} / ${row.maxPoints} Punkte${projection.showTaskPercentages ? percentage : ''}`,
           { size: SMALL_FONT_SIZE, color: { r: 0.27, g: 0.32, b: 0.39 } }
         );
       }
 
-      for (const criterion of row.criteria) {
+      for (const criterion of projection.layoutMode === 'compact' ? [] : row.criteria) {
         const criterionPoints = criterion.awardedPoints === undefined
           ? `${criterion.maxPoints} Pkt.`
           : `${criterion.awardedPoints} / ${criterion.maxPoints} Pkt.`;
-        drawParagraph(`• ${criterion.text} (${criterionPoints})`, {
+        const deduction = criterion.awardedPoints === undefined ? 0 : criterion.maxPoints - criterion.awardedPoints;
+        drawParagraph(`• ${criterion.text}${projection.showPointDeductions && deduction > 0 ? ` (Abzug: ${deduction.toFixed(2)} Pkt.)` : ` (${criterionPoints})`}`, {
           size: SMALL_FONT_SIZE,
-          indent: 12
+          indent: 12,
+          font: criterion.formatting?.bold ? boldFont : criterion.formatting?.italic ? await document.embedFont(StandardFonts.HelveticaOblique) : regularFont
         });
       }
 
       if (projection.showTaskComments && row.comment) {
         drawParagraph(row.comment, {
           size: projection.layoutMode === 'compact' ? SMALL_FONT_SIZE : NORMAL_FONT_SIZE,
+          font: projection.italicizeFeedback ? await document.embedFont(StandardFonts.HelveticaOblique) : regularFont,
           indent: 12
         });
       }
@@ -260,9 +266,10 @@ export class CorrectionSheetPdfRenderer {
     if (projection.showGeneralComment && projection.generalComment) {
       ensureSpace(70);
       drawTextLine('Gesamtkommentar', { font: boldFont });
-      drawParagraph(projection.generalComment, {
-        size: NORMAL_FONT_SIZE,
-        indent: 12
+        drawParagraph(projection.generalComment, {
+          size: NORMAL_FONT_SIZE,
+          indent: 12,
+          font: projection.italicizeFeedback ? await document.embedFont(StandardFonts.HelveticaOblique) : regularFont
       });
       cursorY -= 6;
     }
@@ -280,7 +287,7 @@ export class CorrectionSheetPdfRenderer {
 
         drawTextLine(`• ${tip.title}${metaText}`, { font: boldFont, size: SMALL_FONT_SIZE });
         if (tip.shortDescription) {
-          drawParagraph(tip.shortDescription, { size: SMALL_FONT_SIZE, indent: 12 });
+          drawParagraph(tip.shortDescription, { size: SMALL_FONT_SIZE, indent: 12, font: projection.italicizeFeedback ? await document.embedFont(StandardFonts.HelveticaOblique) : regularFont });
         }
         if (tip.links && tip.links.length > 0) {
           for (const link of tip.links.slice(0, 3)) {
