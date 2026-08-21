@@ -166,7 +166,8 @@ export function initializeExamsBridge(): ExamsBridge {
   const buildCorrectionSheetProjectionUseCase = new BuildCorrectionSheetProjectionUseCase(
     examRepo,
     correctionEntryRepo,
-    getCorrectionSheetPresetUseCase
+    getCorrectionSheetPresetUseCase,
+    supportTipRepo
   );
   const finalizeAllCorrectionsUseCase = new FinalizeAllCorrectionsUseCase(
     examRepo,
