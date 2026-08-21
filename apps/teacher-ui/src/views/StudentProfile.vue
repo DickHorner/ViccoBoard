@@ -114,6 +114,18 @@
         </div>
       </section>
 
+      <section class="card kbr-overview">
+        <h3>KBR: Schuljahresüberblick {{ schoolYear }}</h3>
+        <div class="note-editor">
+          <label>Interne Notizen / Förderschwerpunkte</label>
+          <textarea v-model="internalNotes" rows="4" placeholder="Entwicklung, Stärken und Förderschwerpunkte …"></textarea>
+          <button class="btn-primary" @click="saveLongTermNote">Notizen speichern</button>
+        </div>
+        <p v-if="noteStatus" class="record-notes">{{ noteStatus }}</p>
+        <div v-if="kbrRows.length === 0" class="empty-state"><p>Keine KBR-Prüfungen für diesen Prüfling im gewählten Schuljahr.</p></div>
+        <div v-else class="kbr-list"><article v-for="row in kbrRows" :key="row.exam.id" class="kbr-row"><strong>{{ row.exam.title }}</strong><span>{{ formatDateDe(row.exam.date ?? row.exam.createdAt) }} · {{ row.correction.totalPoints }} Pkt. · Note {{ row.correction.totalGrade }}</span><p v-if="row.comments.length">{{ row.comments.join(' · ') }}</p><p v-if="row.tips.length">Fördertipps: {{ row.tips.join(', ') }}</p></article></div>
+      </section>
+
     </div>
 
     <!-- Not found -->
@@ -141,6 +153,9 @@ import {
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 import type { Student, AttendanceRecord } from '@viccoboard/core'
 import type { Sport } from '@viccoboard/core'
+import { useExamsBridge } from '../composables/useExamsBridge'
+import { LongTermNoteManagementService } from '@viccoboard/exams'
+import type { StudentLongTermNote } from '@viccoboard/exams'
 
 const route = useRoute()
 const studentId = route.params.id as string
@@ -150,6 +165,7 @@ initializeStudentsBridge()
 
 const sportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
+const { examRepository, correctionEntryRepository, studentLongTermNoteRepository } = useExamsBridge()
 
 const student = ref<Student | null>(null)
 const className = ref<string | null>(null)
@@ -158,6 +174,11 @@ const performanceEntries = ref<Sport.PerformanceEntry[]>([])
 const categories = ref<Sport.GradeCategory[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const internalNotes = ref('')
+const noteStatus = ref('')
+const kbrRows = ref<Array<{ exam: any; correction: any; comments: string[]; tips: string[] }>>([])
+const schoolYear = computed(() => { const year = new Date().getFullYear(); return `${year}/${year + 1}` })
+let longTermNote: StudentLongTermNote | null = null
 
 const initials = computed(() =>
   student.value ? getStudentInitials(student.value) : ''
@@ -207,12 +228,35 @@ async function loadData() {
       (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
     )
     categories.value = cats
+    const [note, exams] = await Promise.all([
+      studentLongTermNoteRepository?.findByStudentAndYear(studentId, schoolYear.value) ?? null,
+      examRepository?.findAll() ?? []
+    ])
+    longTermNote = note
+    internalNotes.value = note?.internalNotes ?? ''
+    const rows = await Promise.all(exams.filter((exam: any) => exam.candidates.some((candidate: any) => candidate.id === studentId)).map(async (exam: any) => {
+      const correction = await correctionEntryRepository?.findByExamAndCandidate(exam.id, studentId)
+      if (!correction) return null
+      return { exam, correction, comments: correction.comments.map((comment: any) => comment.text).filter(Boolean), tips: correction.supportTips.map((tip: any) => tip.supportTipId) }
+    }))
+    kbrRows.value = rows.filter(Boolean) as typeof kbrRows.value
   } catch (err) {
     console.error('Failed to load student profile:', err)
     error.value = 'Fehler beim Laden des Schülerprofils.'
   } finally {
     loading.value = false
   }
+}
+
+async function saveLongTermNote() {
+  if (!student.value || !studentLongTermNoteRepository) return
+  if (longTermNote) {
+    longTermNote = await studentLongTermNoteRepository.update(longTermNote.id, { internalNotes: internalNotes.value, lastReviewDate: new Date() })
+  } else {
+    const draft = LongTermNoteManagementService.createLongTermNote(studentId, student.value.classGroupId, schoolYear.value, { internalNotes: internalNotes.value })
+    longTermNote = await studentLongTermNoteRepository.create(draft)
+  }
+  noteStatus.value = 'Gespeichert.'
 }
 </script>
 
@@ -449,4 +493,3 @@ h2 {
   }
 }
 </style>
-
