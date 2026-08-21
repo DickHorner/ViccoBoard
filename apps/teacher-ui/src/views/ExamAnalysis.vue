@@ -123,6 +123,19 @@
       </div>
     </div>
 
+    <div v-if="selectedTab === 'results'" class="analysis-section">
+      <h2>Ergebnisübersicht</h2>
+      <div class="difficulty-table"><table><thead><tr>
+        <th class="sortable" @click="sortResultsBy('correctionOrder')">Korrekturreihenfolge</th>
+        <th class="sortable" @click="sortResultsBy('name')">Name</th>
+        <th class="sortable" @click="sortResultsBy('totalPoints')">Gesamtpunkte</th>
+        <th v-for="task in resultTasks" :key="task.id" class="sortable" @click="sortResultsBy(task.id)">{{ task.title }}</th>
+      </tr></thead><tbody><tr v-for="row in sortedResults" :key="row.correction.id">
+        <td>{{ row.correctionOrder + 1 }}</td><td>{{ getCandidateName(row.correction.candidateId) }}</td><td>{{ row.correction.totalPoints }}</td>
+        <td v-for="task in resultTasks" :key="task.id">{{ row.correction.taskScores.find((score) => score.taskId === task.id)?.points ?? '—' }}</td>
+      </tr></tbody></table></div>
+    </div>
+
     <div v-if="selectedTab === 'risk'" class="analysis-section">
       <h2>Gefährdete Schüler</h2>
       <div class="risk-controls">
@@ -180,6 +193,7 @@ interface Props {
   exam: Exams.Exam
   corrections: Exams.CorrectionEntry[]
   candidates: Exams.Candidate[]
+  onApplyAdjustments?: (adjustments: Array<{ taskId: string; suggestedPoints: number }>) => Promise<void>
 }
 
 const props = defineProps<Props>()
@@ -209,11 +223,14 @@ const {
   refreshAnalysis,
   resetAdjustments,
   riskThreshold,
+  resultTasks,
   selectedTab,
   sortBy,
   sortRiskBy,
+  sortResultsBy,
   sortedAtRisk,
   sortedDifficulties,
+  sortedResults,
   studentsAtRisk,
   tabs,
   targetDifficulty,
