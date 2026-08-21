@@ -13,28 +13,38 @@ export class GradingKeyService {
     points: number,
     gradingKey: Exams.GradingKey
   ): { grade: string | number; percentage: number } {
-    if (gradingKey.gradeBoundaries.length === 0) {
-      return { grade: 'N/A', percentage: (points / gradingKey.totalPoints) * 100 };
-    }
+    const isErrorPoints = gradingKey.type === Exams.GradingKeyType.ErrorPoints || gradingKey.errorPointsToGrade === true;
+    const effectivePoints = isErrorPoints
+      ? Math.max(0, (gradingKey.totalPoints || 0) - points)
+      : points;
 
-    const percentage = (points / gradingKey.totalPoints) * 100;
+    const percentage = gradingKey.totalPoints > 0
+      ? (effectivePoints / gradingKey.totalPoints) * 100
+      : 0;
+
+    if (!gradingKey.gradeBoundaries || gradingKey.gradeBoundaries.length === 0) {
+      const fallbackGrade = Number.isFinite(percentage)
+        ? Number(percentage.toFixed(2))
+        : effectivePoints;
+      return { grade: fallbackGrade, percentage };
+    }
 
     // Find matching boundary
     const boundary = gradingKey.gradeBoundaries.find(b => {
-      if (gradingKey.type === Exams.GradingKeyType.Percentage) {
-        const minPct = b.minPercentage ?? 0;
-        const maxPct = b.maxPercentage ?? 100;
+      if (gradingKey.type === Exams.GradingKeyType.Percentage || isErrorPoints) {
+        const minPct = b.minPercentage ?? (b.minPoints !== undefined && gradingKey.totalPoints > 0 ? (b.minPoints / gradingKey.totalPoints) * 100 : 0);
+        const maxPct = b.maxPercentage ?? (b.maxPoints !== undefined && gradingKey.totalPoints > 0 ? (b.maxPoints / gradingKey.totalPoints) * 100 : 100);
         // Use inclusive upper bound when no explicit maxPercentage is set (open-ended top grade)
-        return b.maxPercentage !== undefined
+        return b.maxPercentage !== undefined || b.maxPoints !== undefined
           ? percentage >= minPct && percentage < maxPct
           : percentage >= minPct && percentage <= maxPct;
       } else if (gradingKey.type === Exams.GradingKeyType.Points) {
-        const minPts = b.minPoints ?? 0;
-        const maxPts = b.maxPoints ?? gradingKey.totalPoints;
+        const minPts = b.minPoints ?? (b.minPercentage !== undefined ? (b.minPercentage / 100) * gradingKey.totalPoints : 0);
+        const maxPts = b.maxPoints ?? (b.maxPercentage !== undefined ? (b.maxPercentage / 100) * gradingKey.totalPoints : gradingKey.totalPoints);
         // Use inclusive upper bound when no explicit maxPoints is set (open-ended top grade)
-        return b.maxPoints !== undefined
-          ? points >= minPts && points < maxPts
-          : points >= minPts && points <= maxPts;
+        return b.maxPoints !== undefined || b.maxPercentage !== undefined
+          ? effectivePoints >= minPts && effectivePoints < maxPts
+          : effectivePoints >= minPts && effectivePoints <= maxPts;
       }
       return false;
     });

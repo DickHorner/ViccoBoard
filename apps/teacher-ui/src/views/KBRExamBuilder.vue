@@ -308,6 +308,15 @@
 
       <section class="section">
         <h2>Notenschlüssel</h2>
+        <div v-if="isModifiedAfterCorrection || gradingKeyHistory.length > 0" class="grading-history-banner alert alert-info">
+          <span>Notenschlüssel wurde nach/während der Korrektur angepasst (Revisionen: {{ gradingKeyHistory.length }})</span>
+          <button type="button" class="btn btn-secondary btn-sm" @click="handleRevertGradingKey">
+            Auf vorherigen Schlüssel zurücksetzen
+          </button>
+        </div>
+        <div v-if="keyUpdateStatus" class="key-status-msg text-success">
+          {{ keyUpdateStatus }}
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label>Vorgabe</label>
@@ -446,7 +455,13 @@ initializeStudentsBridge();
 
 const sportBridge = getSportBridge();
 const studentsBridge = getStudentsBridge();
-const { examRepository, getCorrectionSheetPreset, saveCorrectionSheetPreset } = useExamsBridge();
+const {
+  examRepository,
+  getCorrectionSheetPreset,
+  saveCorrectionSheetPreset,
+  updateGradingKey,
+  revertGradingKey
+} = useExamsBridge();
 
 const classGroups = ref<ClassGroup[]>([]);
 const classStudents = ref<Student[]>([]);
@@ -464,6 +479,9 @@ const allowsSupportTips = ref(false);
 const gradingKeyType = ref<Exams.GradingKeyType>(Exams.GradingKeyType.Points);
 const roundingRuleType = ref<Exams.RoundingRule['type']>('nearest');
 const gradeBoundaries = ref<Exams.GradeBoundary[]>([]);
+const gradingKeyHistory = ref<Exams.GradingKeyChange[]>([]);
+const isModifiedAfterCorrection = ref(false);
+const keyUpdateStatus = ref('');
 const examStatus = ref<Exams.Exam['status']>('draft');
 const printPresets = ref<Exams.Exam['printPresets']>([]);
 const isLoading = ref(true);
@@ -651,11 +669,42 @@ const applySelectedGradingPreset = () => {
   roundingRuleType.value = selectedPreset.defaultRounding.type;
 };
 
+const handleRevertGradingKey = async () => {
+  if (!store.examId) return;
+  try {
+    const result = await revertGradingKey?.(store.examId, 'Notenschlüssel über UI zurückgesetzt');
+    if (result) {
+      gradingKeyType.value = result.exam.gradingKey.type;
+      roundingRuleType.value = result.exam.gradingKey.roundingRule.type;
+      gradeBoundaries.value = result.exam.gradingKey.gradeBoundaries;
+      selectedGradingPresetId.value = matchPresetByBoundaries(result.exam.gradingKey.gradeBoundaries);
+      gradingKeyHistory.value = (result.exam.gradingKey.history as Exams.GradingKeyChange[]) || [];
+      isModifiedAfterCorrection.value = result.exam.gradingKey.modifiedAfterCorrection;
+      keyUpdateStatus.value = `Notenschlüssel zurückgesetzt. ${result.affectedCorrectionsCount} Korrekturen neu berechnet.`;
+    }
+  } catch (err: any) {
+    console.error('Failed to revert grading key:', err);
+  }
+};
+
 async function persistExam(): Promise<Exams.Exam> {
   syncGroupAssignments();
 
   const builtExam = store.buildExam();
   const examId = builtExam.id;
+  const isErrorPoints = gradingKeyType.value === Exams.GradingKeyType.ErrorPoints;
+  const targetGradingKey: Exams.GradingKey = {
+    ...builtExam.gradingKey,
+    type: gradingKeyType.value,
+    totalPoints: store.totalPoints,
+    gradeBoundaries: gradeBoundaries.value,
+    roundingRule: {
+      ...builtExam.gradingKey.roundingRule,
+      type: roundingRuleType.value
+    },
+    errorPointsToGrade: isErrorPoints
+  };
+
   const nextExam: Exams.Exam = {
     ...builtExam,
     date: examDateValue.value ? new Date(`${examDateValue.value}T00:00:00`) : undefined,
@@ -665,16 +714,7 @@ async function persistExam(): Promise<Exams.Exam> {
       allowsSupportTips: allowsSupportTips.value,
       totalPoints: store.totalPoints
     },
-    gradingKey: {
-      ...builtExam.gradingKey,
-      type: gradingKeyType.value,
-      totalPoints: store.totalPoints,
-      gradeBoundaries: gradeBoundaries.value,
-      roundingRule: {
-        ...builtExam.gradingKey.roundingRule,
-        type: roundingRuleType.value
-      }
-    },
+    gradingKey: targetGradingKey,
     printPresets: printPresets.value,
     candidates: candidates.value.map((candidate) => ({
       ...candidate,
@@ -687,6 +727,18 @@ async function persistExam(): Promise<Exams.Exam> {
   };
 
   if (isEditing.value) {
+    if (updateGradingKey) {
+      const updateResult = await updateGradingKey({
+        examId: nextExam.id,
+        newGradingKey: targetGradingKey,
+        reason: 'Notenschlüssel im Builder angepasst'
+      });
+      nextExam.gradingKey = updateResult.exam.gradingKey;
+      if (updateResult.affectedCorrectionsCount > 0) {
+        keyUpdateStatus.value = `${updateResult.affectedCorrectionsCount} Korrekturen wurden neu berechnet.`;
+      }
+    }
+
     await examRepository?.update(nextExam.id, nextExam);
     return (await examRepository?.findById(nextExam.id)) ?? nextExam;
   }
@@ -769,6 +821,8 @@ onMounted(async () => {
       gradingKeyType.value = loaded.gradingKey.type;
       roundingRuleType.value = loaded.gradingKey.roundingRule.type;
       gradeBoundaries.value = loaded.gradingKey.gradeBoundaries;
+      gradingKeyHistory.value = (loaded.gradingKey.history as Exams.GradingKeyChange[]) || [];
+      isModifiedAfterCorrection.value = loaded.gradingKey.modifiedAfterCorrection || false;
       selectedGradingPresetId.value = matchPresetByBoundaries(loaded.gradingKey.gradeBoundaries);
       examStatus.value = loaded.status;
       printPresets.value = loaded.printPresets;

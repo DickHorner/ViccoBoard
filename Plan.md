@@ -328,12 +328,12 @@ Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer B
 
 ### 6.10 KBR — Benotung/Notenschlüssel
 - [x] Verschiedene Notenschlüssel schnell einsetzbar; flexible Benotungsoptionen.
-- [ ] Nach der Korrektur Notenschlüssel/Optionen ohne Datenverlust anpassbar. — #324
-- [ ] Notengrenzen per Prozentwerten anpassbar, auch nachträglich; zurücksetzbar. — #324
+- [x] Nach der Korrektur Notenschlüssel/Optionen ohne Datenverlust anpassbar. — #324
+- [x] Notengrenzen per Prozentwerten anpassbar, auch nachträglich; zurücksetzbar. — #324
 - [x] Punktegrenzen automatisch aus Prozentangaben berechnen.
 - [x] Noten-Presets auswählen + prüfungsindividuell anpassen.
 - [x] Finetuning (z. B. Rundungslogik).
-- [ ] Optional: „Fehlerpunkte → Aufgabennote“. — #324
+- [x] Optional: „Fehlerpunkte → Aufgabennote“. — #324
 
 ### 6.11 KBR — Korrigieren (Flows & Modi)
 - [x] Kompakte Korrekturmaske: Auto-Gesamtpunkte/Note, minimierte Verrechnungsfehler.
@@ -362,7 +362,7 @@ Ref: GitHub Issue [Sport] Slow Motion Analyse mit manueller/semi-automatischer B
 ### 6.13 KBR — Auswertung & nachträgliche Anpassung
 - [x] Schwierigkeit: welche Aufgaben/Unteraufgaben/Kriterien schwierig; Streuungen; Bewertungskorridore.
 - [ ] Punkteänderungsassistent: Aufgabengewichtungen anpassen, Punkteverhältnisse erhalten. — #326
-- [ ] Notenschlüssel nachträglich anpassen; Noten ändern automatisch. — #324
+- [x] Notenschlüssel nachträglich anpassen; Noten ändern automatisch. — #324
 - [ ] Ergebnis-/Auswertungstabellen sortierbar: Korrekturreihenfolge, Name, Punkte, Aufgabenpunkte; Sortierung nach (Unter-)Aufgabe. — #326
 
 ### 6.14 KBR — Langzeit-Überblick & Notizen
