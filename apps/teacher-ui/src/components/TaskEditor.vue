@@ -149,6 +149,14 @@
           type="text"
           placeholder="Kriterium"
         />
+        <label class="format-toggle" :title="'Fett'">
+          <input v-model="criterion.formatting.bold" type="checkbox" />
+          <strong>F</strong>
+        </label>
+        <label class="format-toggle" :title="'Unterstrichen'">
+          <input v-model="criterion.formatting.underline" type="checkbox" />
+          <span style="text-decoration:underline">U</span>
+        </label>
         <input
           v-model.number="criterion.points"
           type="number"
@@ -164,6 +172,21 @@
           Entfernen
         </button>
       </div>
+    </div>
+
+    <div class="task-flags">
+      <label class="choice-toggle">
+        <input v-model="task.allowComments" type="checkbox" />
+        Aufgabenkommentare
+      </label>
+      <label class="choice-toggle">
+        <input v-model="task.allowSupportTips" type="checkbox" />
+        Fördertipps
+      </label>
+      <label class="choice-toggle">
+        <input v-model="task.commentBoxEnabled" type="checkbox" />
+        Kommentarbox
+      </label>
     </div>
 
     <div v-if="canAddSubtasks" class="subtasks">
