@@ -135,6 +135,16 @@ export interface GradingKey {
   presetId?: string;
   customizable: boolean;
   modifiedAfterCorrection: boolean;
+  history?: GradingKeyChange[];
+}
+
+export interface GradingKeyChange {
+  id: string;
+  timestamp: Date;
+  previousKey: GradingKey;
+  newKey: GradingKey;
+  reason?: string;
+  changedBy?: string;
 }
 
 export enum GradingKeyType {

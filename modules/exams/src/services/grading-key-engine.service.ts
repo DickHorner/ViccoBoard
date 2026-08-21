@@ -11,14 +11,7 @@ import { Exams } from '@viccoboard/core';
 const uuidv4 = () => crypto.randomUUID();
 import { GradingKeyService } from './grading-key.service';
 
-export interface GradingKeyChange {
-  id: string;
-  timestamp: Date;
-  previousKey: Exams.GradingKey;
-  newKey: Exams.GradingKey;
-  reason?: string;
-  changedBy?: string;
-}
+export type GradingKeyChange = Exams.GradingKeyChange;
 
 export interface GradingKeyModificationResult {
   success: boolean;
@@ -82,12 +75,17 @@ export class GradingKeyEngine {
   /**
    * Modify grading key after correction with change tracking
    */
+  /**
+   * Modify grading key after correction with change tracking
+   */
   static modifyGradingKeyAfterCorrection(
     oldKey: Exams.GradingKey,
     newBoundaries: Exams.GradeBoundary[],
     reason?: string,
     changedBy?: string
   ): Exams.GradingKey {
+    const existingHistory = oldKey.history || this.changeHistory.get(oldKey.id) || [];
+
     const modifiedKey: Exams.GradingKey = {
       ...oldKey,
       gradeBoundaries: newBoundaries,
@@ -104,11 +102,47 @@ export class GradingKeyEngine {
       changedBy
     };
 
-    const history = this.changeHistory.get(oldKey.id) || [];
-    history.push(change);
-    this.changeHistory.set(oldKey.id, history);
+    const newHistory = [...existingHistory, change];
+    modifiedKey.history = newHistory;
+    this.changeHistory.set(oldKey.id, newHistory);
 
     return modifiedKey;
+  }
+
+  /**
+   * Revert grading key to its previous revision
+   */
+  static revertToPreviousGradingKey(
+    currentKey: Exams.GradingKey,
+    reason?: string,
+    changedBy?: string
+  ): Exams.GradingKey | null {
+    const history = currentKey.history || this.changeHistory.get(currentKey.id) || [];
+    if (history.length === 0) {
+      return null;
+    }
+
+    const lastChange = history[history.length - 1];
+    const previousKey = lastChange.previousKey;
+
+    const revertChange: GradingKeyChange = {
+      id: uuidv4(),
+      timestamp: new Date(),
+      previousKey: currentKey,
+      newKey: previousKey,
+      reason: reason || 'Reverted to previous grading key',
+      changedBy
+    };
+
+    const newHistory = [...history, revertChange];
+    const revertedKey: Exams.GradingKey = {
+      ...previousKey,
+      history: newHistory,
+      modifiedAfterCorrection: newHistory.some(h => !h.reason?.includes('Reverted'))
+    };
+
+    this.changeHistory.set(currentKey.id, newHistory);
+    return revertedKey;
   }
 
   /**
@@ -153,7 +187,12 @@ export class GradingKeyEngine {
     gradingKey: Exams.GradingKey
   ): { grade: string | number; calculatedPoints: number } {
     const calculatedPoints = Math.max(0, maxPoints - errorPoints);
-    const gradeResult = GradingKeyService.calculateGrade(calculatedPoints, gradingKey);
+    const keyForNetPoints: Exams.GradingKey = {
+      ...gradingKey,
+      errorPointsToGrade: false,
+      type: gradingKey.type === Exams.GradingKeyType.ErrorPoints ? Exams.GradingKeyType.Percentage : gradingKey.type
+    };
+    const gradeResult = GradingKeyService.calculateGrade(calculatedPoints, keyForNetPoints);
     return { grade: gradeResult.grade, calculatedPoints };
   }
 
@@ -196,8 +235,14 @@ export class GradingKeyEngine {
   /**
    * Get change history for a grading key
    */
-  static getChangeHistory(keyId: string): GradingKeyChange[] {
-    return this.changeHistory.get(keyId) || [];
+  static getChangeHistory(keyOrId: Exams.GradingKey | string): GradingKeyChange[] {
+    if (typeof keyOrId === 'object' && keyOrId !== null) {
+      if (keyOrId.history && keyOrId.history.length > 0) {
+        return keyOrId.history as GradingKeyChange[];
+      }
+      return this.changeHistory.get(keyOrId.id) || [];
+    }
+    return this.changeHistory.get(keyOrId) || [];
   }
 
   /**
