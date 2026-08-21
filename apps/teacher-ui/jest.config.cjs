@@ -7,7 +7,22 @@ module.exports = {
   transform: {
     '^.+\\.vue$': '@vue/vue3-jest',
     '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: '<rootDir>/tsconfig.test.json'
+      // ts-jest 29 requires TypeScript 6's compiler APIs (ts.sys, findConfigFile).
+      // TypeScript 7 (installed locally) removed these in favour of the ./unstable/* ESM API.
+      // Point ts-jest at the compatible TypeScript 6 in the workspace root node_modules.
+      compiler: require.resolve('typescript', { paths: [require('path').resolve(__dirname, '../../')] }),
+      tsconfig: {
+        target: 'ES2020',
+        module: 'CommonJS',
+        lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        skipLibCheck: true,
+        strict: true,
+        types: ['jest', '@types/jest', 'node'],
+        ignoreDeprecations: '6.0'
+      },
+      diagnostics: false
     }],
   },
   moduleNameMapper: {
