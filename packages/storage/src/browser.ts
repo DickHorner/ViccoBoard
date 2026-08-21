@@ -28,3 +28,4 @@ export * from './migrations/indexeddb/019_game_database_schema.js';
 export * from './migrations/indexeddb/020_kbr_feedback_workflow.js';
 export * from './migrations/indexeddb/021_student_import_batches.js';
 export * from './migrations/indexeddb/022_lesson_schedule_fields.js';
+export * from './migrations/indexeddb/023_support_tips.js';

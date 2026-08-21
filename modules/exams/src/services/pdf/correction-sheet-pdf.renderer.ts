@@ -267,6 +267,30 @@ export class CorrectionSheetPdfRenderer {
       cursorY -= 6;
     }
 
+    if (projection.supportTips && projection.supportTips.length > 0) {
+      ensureSpace(80);
+      drawTextLine('Fördertipps & Übungshinweise', { font: boldFont });
+      for (const tip of projection.supportTips) {
+        ensureSpace(40);
+        const metaParts: string[] = [];
+        if (tip.category) metaParts.push(`Kategorie: ${tip.category}`);
+        if (tip.taskTitle) metaParts.push(`Aufgabe: ${tip.taskTitle}`);
+        if (tip.priority) metaParts.push(`Prio: ${tip.priority}`);
+        const metaText = metaParts.length > 0 ? ` (${metaParts.join(' | ')})` : '';
+
+        drawTextLine(`• ${tip.title}${metaText}`, { font: boldFont, size: SMALL_FONT_SIZE });
+        if (tip.shortDescription) {
+          drawParagraph(tip.shortDescription, { size: SMALL_FONT_SIZE, indent: 12 });
+        }
+        if (tip.links && tip.links.length > 0) {
+          for (const link of tip.links.slice(0, 3)) {
+            drawParagraph(`Link: ${link.title} → ${link.url}`, { size: SMALL_FONT_SIZE, indent: 24 });
+          }
+        }
+      }
+      cursorY -= 8;
+    }
+
     if (projection.showSignatureArea) {
       ensureSpace(70);
       drawTextLine('Unterschrift', { font: boldFont });

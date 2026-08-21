@@ -113,6 +113,7 @@ const toggles: Array<{ key: keyof Exams.CorrectionSheetPreset; label: string }> 
   { key: 'showTaskPoints', label: 'Aufgabenpunkte anzeigen' },
   { key: 'showTaskComments', label: 'Aufgabenkommentare anzeigen' },
   { key: 'showGeneralComment', label: 'Gesamtkommentar anzeigen' },
+  { key: 'showSupportTips', label: 'Fördertipps anzeigen' },
   { key: 'showExamParts', label: 'Prüfungsteile anzeigen' },
   { key: 'showSignatureArea', label: 'Unterschriftsbereich anzeigen' }
 ];

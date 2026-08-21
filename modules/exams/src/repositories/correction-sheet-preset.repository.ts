@@ -10,7 +10,7 @@ function createFeedbackContent(preset: Exams.CorrectionSheetPreset): Exams.Feedb
     showPercentages: false,
     showPointDeductions: false,
     showComments: preset.showTaskComments || preset.showGeneralComment,
-    showSupportTips: false,
+    showSupportTips: preset.showSupportTips,
     formatCriteriaText: false,
     italicizeComments: false
   };
@@ -47,6 +47,7 @@ export function createDefaultCorrectionSheetPreset(
     showTaskPoints: true,
     showTaskComments: true,
     showGeneralComment: true,
+    showSupportTips: true,
     showExamParts: true,
     showSignatureArea: false,
     headerText: '',

@@ -16,6 +16,7 @@ export interface CorrectionSheetPreset {
   showTaskPoints: boolean;
   showTaskComments: boolean;
   showGeneralComment: boolean;
+  showSupportTips: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   headerText?: string;
@@ -42,6 +43,19 @@ export interface CorrectionSheetTaskRow {
   criteria: CorrectionSheetCriterionRow[];
 }
 
+export interface ProjectionSupportTipRow {
+  id: string;
+  title: string;
+  shortDescription: string;
+  category?: string;
+  taskId?: string;
+  taskTitle?: string;
+  priority?: number;
+  weight?: number;
+  links: Array<{ title: string; url: string }>;
+  qrCode?: string;
+}
+
 export interface CorrectionSheetProjection {
   examId: string;
   examTitle: string;
@@ -63,9 +77,11 @@ export interface CorrectionSheetProjection {
   showTaskPoints: boolean;
   showTaskComments: boolean;
   showGeneralComment: boolean;
+  showSupportTips: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   taskRows: CorrectionSheetTaskRow[];
+  supportTips?: ProjectionSupportTipRow[];
 }
 
 export interface CorrectionSheetPdfDocument {
