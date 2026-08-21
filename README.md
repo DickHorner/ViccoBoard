@@ -8,6 +8,8 @@
 [![CodeQL][badge-codeql]][codeql]
 [![License][badge-license]][license]
 
+## Inhaltsverzeichnis
+
 ## Scope
 
 ViccoBoard bündelt Unterrichtsarbeit in einer lokalen Web-App:

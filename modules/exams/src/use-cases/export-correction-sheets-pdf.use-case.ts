@@ -92,4 +92,51 @@ export class ExportCorrectionSheetsPdfUseCase {
       buildCorrectionSheetFileNameBase(exam.title, 'all')
     );
   }
+
+  async exportAllCompletedCandidatePdfs(
+    examId: string
+  ): Promise<Exams.CorrectionSheetPdfDocument[]> {
+    const exam = await this.examRepository.findById(examId);
+    if (!exam) {
+      throw new Error(`Exam ${examId} not found`);
+    }
+
+    if (exam.candidates.length === 0) {
+      throw new Error('Exam has no candidates');
+    }
+
+    const allCorrections = await this.correctionEntryRepository.findByExam(examId);
+    const completedCandidateIds = new Set(
+      allCorrections
+        .filter((c) => c.status === 'completed')
+        .map((c) => c.candidateId)
+    );
+
+    const completedCandidates = exam.candidates.filter((candidate) =>
+      completedCandidateIds.has(candidate.id)
+    );
+
+    if (completedCandidates.length === 0) {
+      throw new Error(
+        'Keine abgeschlossenen Korrekturen vorhanden. Der Sammel-Export erfordert mindestens eine abgeschlossene Korrektur.'
+      );
+    }
+
+    const documents: Promise<Exams.CorrectionSheetPdfDocument>[] = [];
+    for (const candidate of completedCandidates) {
+      const projection = await this.buildCorrectionSheetProjectionUseCase.execute(examId, candidate.id);
+      documents.push(
+        this.renderer.render(
+          [projection],
+          buildCorrectionSheetFileNameBase(
+            projection.examTitle,
+            'single',
+            projection.candidateName
+          )
+        )
+      );
+    }
+
+    return Promise.all(documents);
+  }
 }

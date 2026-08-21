@@ -49,5 +49,9 @@
     "@types/sql.js": "^1.4.11",
     "babel-jest": "^30.4.1",
     "jest-util": "^30.4.1"
+  },
+  "allowScripts": {
+    "better-sqlite3": true,
+    "unrs-resolver": true
   }
 }

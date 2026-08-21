@@ -301,7 +301,7 @@ describe('KBR correction sheet workflow', () => {
     ]);
   });
 
-  test('exports single and combined correction-sheet PDFs for the happy path', async () => {
+  test('exports single and individual correction-sheet PDFs for completed candidates', async () => {
     const exam = await createExam();
 
     await savePresetUseCase.execute({
@@ -349,18 +349,21 @@ describe('KBR correction sheet workflow', () => {
     });
 
     const singlePdf = await exportSheetsUseCase.exportCurrentCandidatePdf(exam.id, 'cand-1');
-    const allPdf = await exportSheetsUseCase.exportAllCandidatesPdf(exam.id);
+    const allPdfs = await exportSheetsUseCase.exportAllCompletedCandidatePdfs(exam.id);
 
     const singleDocument = await PDFDocument.load(singlePdf.bytes);
-    const allDocument = await PDFDocument.load(allPdf.bytes);
+    const firstDocument = await PDFDocument.load(allPdfs[0].bytes);
+    const secondDocument = await PDFDocument.load(allPdfs[1].bytes);
 
     expect(singlePdf.fileName).toContain('rueckmeldebogen');
     expect(singlePdf.candidateCount).toBe(1);
     expect(singleDocument.getPageCount()).toBe(1);
 
-    expect(allPdf.fileName).toContain('rueckmeldeboegen');
-    expect(allPdf.candidateCount).toBe(2);
-    expect(allDocument.getPageCount()).toBe(2);
+    expect(allPdfs).toHaveLength(2);
+    expect(allPdfs[0].fileName).toContain('lea-meyer');
+    expect(allPdfs[1].fileName).toContain('noah-schmidt');
+    expect(firstDocument.getPageCount()).toBe(1);
+    expect(secondDocument.getPageCount()).toBe(1);
   });
 
   test('single export is blocked when correction is in-progress', async () => {

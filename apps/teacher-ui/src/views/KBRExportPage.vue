@@ -236,8 +236,9 @@ const {
   getExam,
   findCorrectionsByExam,
   buildCorrectionSheetPreview,
+  finalizeAllCorrections,
   exportCurrentCorrectionSheetPdf,
-  exportAllCorrectionSheetsPdf,
+  exportAllCompletedCandidatePdfs,
   exportCorrectionSession,
   importCorrectionBundle,
   recordCorrectionUseCase
@@ -491,12 +492,18 @@ async function exportCurrent(): Promise<void> {
 }
 
 async function exportAll(): Promise<void> {
-  if (!exam.value || !canExportAll.value || !exportAllCorrectionSheetsPdf) {
+  if (!exam.value || !canExportAll.value || !exportAllCompletedCandidatePdfs) {
     return
   }
 
-  const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id)
-  downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf')
+  const pdfDocuments = await exportAllCompletedCandidatePdfs(exam.value.id)
+  if (!pdfDocuments) {
+    return
+  }
+
+  for (const pdfDocument of pdfDocuments) {
+    downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf')
+  }
 }
 
 async function markAllCompleted(): Promise<void> {
@@ -509,26 +516,16 @@ async function markAllCompleted(): Promise<void> {
   aiSuccess.value = ''
 
   try {
-    const completedCount = finalizableCorrections.value.length
-    for (const correction of finalizableCorrections.value) {
-      await recordCorrectionUseCase.execute({
-        examId: correction.examId,
-        candidateId: correction.candidateId,
-        taskScores: correction.taskScores,
-        comments: correction.comments,
-        supportTips: correction.supportTips,
-        finalizeCorrection: true
-      })
-    }
+    const result = await finalizeAllCorrections?.(exam.value.id)
 
     const loadedCorrections = await findCorrectionsByExam(exam.value.id)
     corrections.value = new Map(loadedCorrections.map((entry) => [entry.candidateId, entry]))
     if (selectedCandidateId.value) {
       await loadPreview(selectedCandidateId.value)
     }
-    aiSuccess.value = completedCount === 1
+    aiSuccess.value = result?.finalizedCount === 1
       ? '1 Korrektur als abgeschlossen markiert.'
-      : `${completedCount} Korrekturen als abgeschlossen markiert.`
+      : `${result?.finalizedCount ?? 0} Korrekturen als abgeschlossen markiert.`
   } catch (error: any) {
     aiError.value = `Abschluss fehlgeschlagen: ${error.message}`
   } finally {
