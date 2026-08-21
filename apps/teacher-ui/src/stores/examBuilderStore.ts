@@ -12,9 +12,16 @@ export interface CriteriaConsistencyWarning {
   kind: 'criteria-with-subtasks'
 }
 
+export interface CriterionFormatting {
+  bold?: boolean
+  italic?: boolean
+  underline?: boolean
+}
+
 export interface CriterionDraft {
   id: string
   text: string
+  formatting: CriterionFormatting
   points: number
 }
 
@@ -28,6 +35,9 @@ export interface TaskDraft {
   reusable: boolean
   subject: string
   gradeLevel: string
+  allowComments: boolean
+  allowSupportTips: boolean
+  commentBoxEnabled: boolean
   criteria: CriterionDraft[]
   subtasks: TaskDraft[]
 }
@@ -86,9 +96,13 @@ function toTaskDraft(task: ExamsTypes.TaskNode, subtasks: TaskDraft[] = []): Tas
     reusable: Boolean(task.reusable),
     subject: task.subject ?? '',
     gradeLevel: task.gradeLevel ?? '',
+    allowComments: task.allowComments,
+    allowSupportTips: task.allowSupportTips,
+    commentBoxEnabled: task.commentBoxEnabled,
     criteria: task.criteria.map(criterion => ({
       id: criterion.id,
       text: criterion.text,
+      formatting: { ...criterion.formatting },
       points: criterion.points
     })),
     subtasks
@@ -204,9 +218,13 @@ export function cloneTaskDraftFromNode(branch: ReusableTaskBranch): TaskDraft {
     reusable: Boolean(branch.node.reusable),
     subject: branch.node.subject ?? '',
     gradeLevel: branch.node.gradeLevel ?? '',
+    allowComments: branch.node.allowComments,
+    allowSupportTips: branch.node.allowSupportTips,
+    commentBoxEnabled: branch.node.commentBoxEnabled,
     criteria: branch.node.criteria.map(criterion => ({
       id: createUuid(),
       text: criterion.text,
+      formatting: { ...criterion.formatting },
       points: criterion.points
     })),
     subtasks: branch.children.map(child => cloneTaskDraftFromNode(child))
@@ -242,11 +260,14 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     reusable: false,
     subject: '',
     gradeLevel: '',
+    allowComments: false,
+    allowSupportTips: false,
+    commentBoxEnabled: false,
     criteria: [],
     subtasks: []
   })
 
-  const newCriterion = (): CriterionDraft => ({ id: createUuid(), text: '', points: 0 })
+  const newCriterion = (): CriterionDraft => ({ id: createUuid(), text: '', formatting: {}, points: 0 })
 
   const newPart = (): PartDraft => ({
     id: createUuid(),
@@ -312,13 +333,13 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
         criteria: task.criteria.map(criterion => ({
           id: criterion.id,
           text: criterion.text.trim() || 'Criterion',
-          formatting: {},
+          formatting: { ...criterion.formatting },
           points: Number(criterion.points) || 0,
           aspectBased: false
         })),
-        allowComments: false,
-        allowSupportTips: false,
-        commentBoxEnabled: false,
+        allowComments: task.allowComments,
+        allowSupportTips: task.allowSupportTips,
+        commentBoxEnabled: task.commentBoxEnabled,
         subtasks: task.subtasks.map(subtask => subtask.id)
       })
       if (level < 3 && task.subtasks.length) {
