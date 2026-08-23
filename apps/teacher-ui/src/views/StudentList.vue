@@ -81,7 +81,7 @@
     </section>
 
     <section v-if="loading" class="app-card app-status-panel">
-      <ProgressSpinner strokeWidth="4" style="width: 2.5rem; height: 2.5rem" />
+      <ProgressSpinner :strokeWidth="4" style="width: 2.5rem; height: 2.5rem" />
       <p>Schüler werden geladen...</p>
     </section>
 

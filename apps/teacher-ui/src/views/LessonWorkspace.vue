@@ -68,6 +68,23 @@
           </div>
         </section>
 
+        <section class="panel">
+          <h2>Zufallsschüler</h2>
+          <p class="section-hint">Wählt Schüler zufällig und merkt sich lokal, wer in dieser Runde bereits dran war.</p>
+          <div class="random-actions">
+            <button class="primary-link random-button" @click="selectRandomStudent" :disabled="classStudents.length === 0">
+              Schüler ziehen
+            </button>
+            <button class="ghost-button" @click="resetRandomHistory" :disabled="randomHistory.length === 0">
+              Runde zurücksetzen
+            </button>
+          </div>
+          <p v-if="randomSelectionError" class="random-error">{{ randomSelectionError }}</p>
+          <div v-if="selectedRandomStudent" class="random-result">
+            <strong>{{ selectedRandomStudent.firstName }} {{ selectedRandomStudent.lastName }}</strong>
+          </div>
+        </section>
+
         <section v-if="recentSessions.length > 0" class="panel full-width">
           <h2>Zuletzt gearbeitet</h2>
           <p class="section-hint">Letzte Tool-Sitzungen für diese Klasse. Mit einem Klick weiterarbeiten.</p>
@@ -122,17 +139,25 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import { resolveLessonWorkspaceSubject, buildSportToolEntries, formatToolLabel, SPORT_TOOL_ROUTES } from '../utils/lesson-workspace'
-import type { ClassGroup, Lesson, Sport } from '@viccoboard/core'
+import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
+import { selectRandomStudentId } from '../utils/random-student'
+import type { ClassGroup, Lesson, Sport, Student } from '@viccoboard/core'
 import { formatGermanDateTime } from '../utils/locale-format'
 
 const route = useRoute()
 const SportBridge = getSportBridge()
+initializeStudentsBridge()
+const studentsBridge = getStudentsBridge()
 
 const loading = ref(true)
 const loadError = ref('')
 const lesson = ref<Lesson | null>(null)
 const classGroup = ref<ClassGroup | null>(null)
 const recentSessions = ref<Array<{ id: string; toolLabel: string; startedAt: Date; resumeLink: string }>>([])
+const classStudents = ref<Student[]>([])
+const randomHistory = ref<string[]>([])
+const selectedRandomStudent = ref<Student | null>(null)
+const randomSelectionError = ref('')
 
 const MAX_RECENT_SESSIONS = 3
 
@@ -192,6 +217,9 @@ const loadData = async () => {
 
     lesson.value = loadedLesson
     classGroup.value = loadedClassGroup
+    randomHistory.value = loadedLesson.randomStudentHistory ?? []
+    selectedRandomStudent.value = null
+    classStudents.value = await studentsBridge.studentRepository.findByClassGroup(loadedClassGroup.id)
 
     const allSessions = await SportBridge.toolSessionRepository.findByClassGroup(loadedClassGroup.id)
     const ctx = { lessonId: loadedLesson.id, classGroupId: loadedClassGroup.id }
@@ -209,6 +237,43 @@ const loadData = async () => {
     loadError.value = 'Der Stundenarbeitsbereich konnte nicht geladen werden.'
   } finally {
     loading.value = false
+  }
+}
+
+const selectRandomStudent = async () => {
+  randomSelectionError.value = ''
+  if (!lesson.value || classStudents.value.length === 0) {
+    randomSelectionError.value = 'Keine Schüler für diese Klasse verfügbar.'
+    return
+  }
+
+  const result = selectRandomStudentId(
+    classStudents.value.map((student) => student.id),
+    randomHistory.value
+  )
+  if (!result) {
+    randomSelectionError.value = 'Keine Schüler für diese Klasse verfügbar.'
+    return
+  }
+
+  const selected = classStudents.value.find((student) => student.id === result.selectedStudentId)
+  if (!selected) {
+    randomSelectionError.value = 'Auswahl konnte nicht aufgelöst werden.'
+    return
+  }
+
+  randomHistory.value = result.updatedHistory
+  selectedRandomStudent.value = selected
+  await SportBridge.lessonRepository.update(lesson.value.id, {
+    randomStudentHistory: result.updatedHistory
+  })
+}
+
+const resetRandomHistory = async () => {
+  randomSelectionError.value = ''
+  randomHistory.value = []
+  if (lesson.value) {
+    await SportBridge.lessonRepository.update(lesson.value.id, { randomStudentHistory: [] })
   }
 }
 
@@ -283,6 +348,48 @@ onMounted(() => {
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 18px;
   padding: 1.25rem;
+}
+
+.random-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.random-button {
+  border: none;
+  cursor: pointer;
+}
+
+.ghost-button {
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: white;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.random-result {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.random-result span {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.random-error {
+  margin-top: 0.75rem;
+  color: #b91c1c;
 }
 
 .state-card.error {
@@ -374,4 +481,3 @@ onMounted(() => {
   }
 }
 </style>
-

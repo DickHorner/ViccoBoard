@@ -115,7 +115,7 @@ import { formatGermanDateTime, formatGermanTime } from '../utils/locale-format'
 import {
   getScheduleCalendarMarkers,
   type ResolvedScheduleCalendarMarker
-} from './schedule-calendar-markers'
+} from '../utils/schedule-calendar-markers'
 import { getScheduleHourSlot } from './schedule-hour-grid'
 
 interface ScheduleDay {

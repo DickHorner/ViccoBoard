@@ -24,12 +24,36 @@
       <!-- Identity card -->
       <section class="card profile-card">
         <div class="student-header">
-          <div class="student-avatar">{{ initials }}</div>
+          <div class="student-avatar">
+            <img
+              v-if="student.photoUri"
+              :src="student.photoUri"
+              :alt="`Profilbild von ${student.firstName} ${student.lastName}`"
+              class="student-avatar-image"
+            >
+            <span v-else>{{ initials }}</span>
+          </div>
           <div class="student-info">
             <h3>{{ student.firstName }} {{ student.lastName }}</h3>
             <p v-if="student.dateOfBirth" class="meta">Geburtsdatum {{ formatGermanDateOfBirth(student.dateOfBirth) }}</p>
             <p v-if="student.contactInfo?.email" class="meta">{{ student.contactInfo.email }}</p>
             <p v-if="className" class="meta class-badge">{{ className }}</p>
+            <div class="photo-actions">
+              <input
+                ref="photoInput"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                class="photo-input"
+                @change="handlePhotoFileChange"
+              >
+              <button class="btn-secondary" @click="triggerPhotoSelection" :disabled="photoSaving">
+                {{ student.photoUri ? 'Foto ändern' : 'Foto setzen' }}
+              </button>
+              <button v-if="student.photoUri" class="btn-secondary" @click="removePhoto" :disabled="photoSaving">
+                Foto entfernen
+              </button>
+            </div>
+            <p v-if="photoError" class="photo-error">{{ photoError }}</p>
           </div>
         </div>
       </section>
@@ -157,6 +181,7 @@ import type { Sport } from '@viccoboard/core'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { LongTermNoteManagementService } from '@viccoboard/exams'
 import type { StudentLongTermNote } from '@viccoboard/exams'
+import { readFileAsDataUrl, validateStudentPhotoFile } from '../utils/student-photo'
 
 const route = useRoute()
 const studentId = route.params.id as string
@@ -178,6 +203,9 @@ const error = ref<string | null>(null)
 const internalNotes = ref('')
 const noteStatus = ref('')
 const kbrRows = ref<Array<{ exam: any; correction: any; comments: string[]; tips: string[] }>>([])
+const photoSaving = ref(false)
+const photoError = ref('')
+const photoInput = ref<HTMLInputElement | null>(null)
 const schoolYear = computed(() => { const year = new Date().getFullYear(); return `${year}/${year + 1}` })
 const competencySummary = computed(() => {
   const buckets = new Map<string, number[]>()
@@ -273,6 +301,59 @@ async function saveLongTermNote() {
   }
   noteStatus.value = 'Gespeichert.'
 }
+
+function triggerPhotoSelection(): void {
+  photoInput.value?.click()
+}
+
+async function handlePhotoFileChange(event: Event): Promise<void> {
+  if (!student.value) {
+    return
+  }
+
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  target.value = ''
+
+  if (!file) {
+    return
+  }
+
+  const validationError = validateStudentPhotoFile(file)
+  if (validationError) {
+    photoError.value = validationError
+    return
+  }
+
+  try {
+    photoSaving.value = true
+    photoError.value = ''
+    const photoUri = await readFileAsDataUrl(file)
+    await studentsBridge.studentRepository.update(student.value.id, { photoUri })
+    student.value.photoUri = photoUri
+  } catch (error) {
+    photoError.value = error instanceof Error ? error.message : 'Foto konnte nicht gespeichert werden.'
+  } finally {
+    photoSaving.value = false
+  }
+}
+
+async function removePhoto(): Promise<void> {
+  if (!student.value) {
+    return
+  }
+
+  try {
+    photoSaving.value = true
+    photoError.value = ''
+    await studentsBridge.studentRepository.update(student.value.id, { photoUri: '' })
+    student.value.photoUri = undefined
+  } catch (error) {
+    photoError.value = error instanceof Error ? error.message : 'Foto konnte nicht entfernt werden.'
+  } finally {
+    photoSaving.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -345,6 +426,30 @@ h2 {
   font-size: 1.25rem;
   font-weight: 700;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.student-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.photo-input {
+  display: none;
+}
+
+.photo-error {
+  margin: 0.5rem 0 0;
+  color: #b91c1c;
+  font-size: 0.85rem;
 }
 
 .student-info h3 {

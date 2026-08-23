@@ -24,6 +24,16 @@ module.exports = {
       },
       diagnostics: false
     }],
+    '^.+\\.m?jsx?$': ['ts-jest', {
+      compiler: require.resolve('typescript', { paths: [require('path').resolve(__dirname, '../../')] }),
+      useESM: false,
+      tsconfig: {
+        target: 'ES2020',
+        module: 'CommonJS',
+        allowJs: true
+      },
+      diagnostics: false
+    }],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -40,6 +50,6 @@ module.exports = {
   setupFilesAfterEnv: [],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transformIgnorePatterns: [
-    'node_modules/(?!(vue-i18n)/)',
+    'node_modules/(?!(vue-i18n|pinia|vue-router|nostics)/)',
   ],
 };
