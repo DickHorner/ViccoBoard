@@ -16,6 +16,7 @@ export * from './migrations/006_exam_schema.js';
 export * from './migrations/007_correction_schema.js';
 export * from './migrations/008_class_group_color.js';
 export * from './migrations/009_class_group_archive.js';
+export * from './migrations/010_support_tips_schema.js';
 export * from './migrations/013_sport_schema.js';
 export * from './migrations/014_tool_sessions_schema.js';
 export * from './migrations/015_tactics_snapshots_schema.js';

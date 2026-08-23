@@ -1,4 +1,4 @@
-export type CorrectionSheetLayoutMode = 'compact' | 'standard';
+export type CorrectionSheetLayoutMode = 'compact' | 'standard' | 'detailed' | 'minimal';
 
 export interface CorrectionSheetImage {
   src: string;
@@ -16,6 +16,10 @@ export interface CorrectionSheetPreset {
   showTaskPoints: boolean;
   showTaskComments: boolean;
   showGeneralComment: boolean;
+  showSupportTips: boolean;
+  showTaskPercentages: boolean;
+  italicizeFeedback: boolean;
+  showPointDeductions: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   headerText?: string;
@@ -30,6 +34,7 @@ export interface CorrectionSheetCriterionRow {
   text: string;
   maxPoints: number;
   awardedPoints?: number;
+  formatting?: { bold?: boolean; italic?: boolean; underline?: boolean };
 }
 
 export interface CorrectionSheetTaskRow {
@@ -40,6 +45,19 @@ export interface CorrectionSheetTaskRow {
   comment?: string;
   partLabel?: string;
   criteria: CorrectionSheetCriterionRow[];
+}
+
+export interface ProjectionSupportTipRow {
+  id: string;
+  title: string;
+  shortDescription: string;
+  category?: string;
+  taskId?: string;
+  taskTitle?: string;
+  priority?: number;
+  weight?: number;
+  links: Array<{ title: string; url: string }>;
+  qrCode?: string;
 }
 
 export interface CorrectionSheetProjection {
@@ -63,9 +81,14 @@ export interface CorrectionSheetProjection {
   showTaskPoints: boolean;
   showTaskComments: boolean;
   showGeneralComment: boolean;
+  showSupportTips: boolean;
+  showTaskPercentages: boolean;
+  italicizeFeedback: boolean;
+  showPointDeductions: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
   taskRows: CorrectionSheetTaskRow[];
+  supportTips?: ProjectionSupportTipRow[];
 }
 
 export interface CorrectionSheetPdfDocument {

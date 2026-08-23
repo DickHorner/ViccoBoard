@@ -4,6 +4,7 @@ import { Exams } from '@viccoboard/core'
 import {
   AnalysisUIHelper,
   ExamAnalysisService,
+  getCorrectionRelevantTaskNodes,
   type DifficultyAnalysis,
   type ExamStatistics,
   type PointAdjustmentSuggestion
@@ -13,9 +14,10 @@ interface ExamAnalysisProps {
   exam: Exams.Exam
   corrections: Exams.CorrectionEntry[]
   candidates: Exams.Candidate[]
+  onApplyAdjustments?: (adjustments: Array<{ taskId: string; suggestedPoints: number }>) => Promise<void>
 }
 
-const tabs = ['statistics', 'difficulty', 'adjustment', 'risk', 'variance'] as const
+const tabs = ['statistics', 'difficulty', 'adjustment', 'results', 'risk', 'variance'] as const
 
 export function useExamAnalysisView(props: ExamAnalysisProps) {
   const selectedTab = ref<(typeof tabs)[number]>('statistics')
@@ -28,6 +30,7 @@ export function useExamAnalysisView(props: ExamAnalysisProps) {
   const riskThreshold = ref(50)
   const difficultySort = ref<'title' | 'difficultyIndex' | 'averageScore' | 'standardDeviation'>('title')
   const riskSort = ref<'name' | 'percentage' | 'riskLevel'>('percentage')
+  const resultSort = ref<string>('correctionOrder')
 
   function performAnalysis() {
     analysis.value = ExamAnalysisService.analyzeExamDifficulty(props.exam, props.corrections)
@@ -64,8 +67,13 @@ export function useExamAnalysisView(props: ExamAnalysisProps) {
     anchor.click()
   }
 
-  function applyAdjustments() {
-    alert('Das Übernehmen der Anpassungen wird über einen Use Case umgesetzt.')
+  async function applyAdjustments() {
+    if (!adjustmentSuggestion.value || !props.onApplyAdjustments) return
+    const adjustments = adjustmentSuggestion.value.adjustments.map(({ taskId, suggestedPoints }) => ({ taskId, suggestedPoints }))
+    if (adjustments.length === 0) return
+    await props.onApplyAdjustments(adjustments)
+    adjustmentSuggestion.value = null
+    performAnalysis()
   }
 
   function resetAdjustments() {
@@ -79,6 +87,20 @@ export function useExamAnalysisView(props: ExamAnalysisProps) {
   function sortRiskBy(field: typeof riskSort.value) {
     riskSort.value = field
   }
+
+  function sortResultsBy(field: string) { resultSort.value = field }
+  const resultTasks = computed(() => getCorrectionRelevantTaskNodes(props.exam.structure.tasks))
+  const sortedResults = computed(() => {
+    const rows = props.corrections.map((correction, correctionOrder) => ({ correction, correctionOrder }))
+    return rows.sort((left, right) => {
+      if (resultSort.value === 'correctionOrder') return left.correctionOrder - right.correctionOrder
+      if (resultSort.value === 'name') return getCandidateName(left.correction.candidateId).localeCompare(getCandidateName(right.correction.candidateId))
+      if (resultSort.value === 'totalPoints') return right.correction.totalPoints - left.correction.totalPoints
+      const leftPoints = left.correction.taskScores.find((score) => score.taskId === resultSort.value)?.points ?? 0
+      const rightPoints = right.correction.taskScores.find((score) => score.taskId === resultSort.value)?.points ?? 0
+      return rightPoints - leftPoints
+    })
+  })
 
   const sortedDifficulties = computed(() => {
     if (!analysis.value) return []
@@ -154,6 +176,8 @@ export function useExamAnalysisView(props: ExamAnalysisProps) {
         return 'Anpassungen'
       case 'risk':
         return 'Risiko'
+      case 'results':
+        return 'Ergebnisse'
       case 'variance':
         return 'Varianz'
       default:
@@ -195,12 +219,16 @@ export function useExamAnalysisView(props: ExamAnalysisProps) {
     refreshAnalysis,
     resetAdjustments,
     riskSort,
+    resultSort,
+    resultTasks,
     riskThreshold,
     selectedTab,
     sortBy,
     sortRiskBy,
+    sortResultsBy,
     sortedAtRisk,
     sortedDifficulties,
+    sortedResults,
     studentsAtRisk,
     tabs,
     targetDifficulty,

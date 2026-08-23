@@ -36,6 +36,12 @@
         <p>Direkter Einstieg in den KBR-Editor für einfache und komplexe Strukturen.</p>
       </RouterLink>
 
+      <RouterLink class="hub-card" to="/support-tips">
+        <p class="eyebrow">Förderung</p>
+        <h2>Fördertipps</h2>
+        <p>Tipps verwalten, suchen und in Korrekturen wiederverwenden.</p>
+      </RouterLink>
+
       <RouterLink class="hub-card" :to="analysisEntry.to">
         <p class="eyebrow">Analyse</p>
         <h2>{{ analysisEntry.title }}</h2>
