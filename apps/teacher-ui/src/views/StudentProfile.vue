@@ -134,6 +134,7 @@
               Note: {{ entry.calculatedGrade }}
             </span>
             <span v-if="entry.comment" class="record-notes">{{ entry.comment }}</span>
+            <span v-if="getVerbalText(entry)" class="record-notes">{{ getVerbalText(entry) }}</span>
           </div>
         </div>
       </section>
@@ -232,6 +233,11 @@ const performanceSummary = computed(() =>
 function getCategoryName(categoryId: string): string {
   const cat = categories.value.find((c) => c.id === categoryId)
   return cat?.name ?? categoryId
+}
+
+function getVerbalText(entry: Sport.PerformanceEntry): string | null {
+  const text = (entry.measurements as Record<string, unknown>).text
+  return typeof text === 'string' && text.trim().length > 0 ? text : null
 }
 
 onMounted(loadData)

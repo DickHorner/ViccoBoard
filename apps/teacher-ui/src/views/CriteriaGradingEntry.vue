@@ -47,6 +47,10 @@
           <span v-if="criteria.length >= 8" class="info-note">
             Maximum 8 Kriterien erreicht
           </span>
+          <label class="self-assessment-toggle">
+            <input type="checkbox" :checked="selfAssessmentEnabled" @change="setSelfAssessmentEnabled(($event.target as HTMLInputElement).checked)">
+            Selbsteinschätzung erfassen
+          </label>
         </div>
 
         <div v-if="criteria.length > 0" class="criteria-list">
@@ -104,6 +108,14 @@
                     <br>
                     <span class="col-subtitle">({{ criterion.minValue }}-{{ criterion.maxValue }})</span>
                   </th>
+                  <th
+                    v-for="criterion in selfAssessmentEnabled ? criteria : []"
+                    :key="`self-${criterion.id}`"
+                    class="self-col"
+                    :title="`Selbsteinschätzung: ${criterion.name}`"
+                  >
+                    Selbst: {{ criterion.name }}
+                  </th>
                   <th class="total-col">Gesamt</th>
                   <th class="grade-col">Note</th>
                   <th class="actions-col">Aktionen</th>
@@ -145,6 +157,20 @@
                       @input="onGradeChange(student.id, criterion.id, ($event.target as HTMLInputElement)?.value)"
                       @blur="saveStudentGrade(student.id)"
                     />
+                  </td>
+                  <td
+                    v-for="criterion in selfAssessmentEnabled ? criteria : []"
+                    :key="`self-${criterion.id}`"
+                    class="self-assessment-cell"
+                  >
+                    <select
+                      :value="getSelfAssessmentValue(student.id, criterion.id)"
+                      :disabled="saving"
+                      @change="onSelfAssessmentChange(student.id, criterion.id, ($event.target as HTMLSelectElement).value)"
+                    >
+                      <option value="">—</option>
+                      <option v-for="value in 6" :key="value" :value="value - 1">{{ value - 1 }}</option>
+                    </select>
                   </td>
                   <td class="total-cell">
                     <strong>{{ calculateTotal(student.id).toFixed(1) }}</strong>
@@ -286,11 +312,13 @@ const {
   currentComment,
   error,
   getGradeValue,
+  getSelfAssessmentValue,
   hasUnsavedChanges,
   hasUnsavedChangesForStudent,
   loading,
   newCriterion,
   onGradeChange,
+  onSelfAssessmentChange,
   participationOptions,
   participationStatus,
   remainingWeight,
@@ -300,6 +328,8 @@ const {
   saveStudentGrade,
   saving,
   setParticipation,
+  setSelfAssessmentEnabled,
+  selfAssessmentEnabled,
   showAddCriterionModal,
   showCommentModal,
   students,

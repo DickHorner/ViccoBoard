@@ -217,7 +217,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/grading/verbal/:id',
     name: 'verbal-grading',
-    component: () => import('../views/VerbalGradingEntry.vue'),
+    component: () => import('../views/ParticipationGradingEntry.vue'),
     meta: { title: 'Verbalbeurteilung', parent: '/grading' }
   },
   {

@@ -55,6 +55,11 @@ export function useCriteriaGradingEntryView() {
 
   const participationOptions = ref<StatusOption[]>([])
   const participationStatus = ref<Map<string, string>>(new Map())
+  const selfAssessmentEntries = ref<Map<string, Map<string, number>>>(new Map())
+
+  const selfAssessmentEnabled = computed(() =>
+    Boolean((category.value?.configuration as Sport.CriteriaGradingConfig | undefined)?.allowSelfAssessment)
+  )
 
   const newCriterion = ref({
     name: '',
@@ -100,6 +105,14 @@ export function useCriteriaGradingEntryView() {
         }
         gradeEntries.value.set(student.id, studentGrades)
 
+        const savedSelfAssessment = latestEntry.metadata?.selfAssessment
+        if (savedSelfAssessment && typeof savedSelfAssessment === 'object') {
+          selfAssessmentEntries.value.set(
+            student.id,
+            new Map(Object.entries(savedSelfAssessment as Record<string, number>))
+          )
+        }
+
         if (latestEntry.comment) comments.value.set(student.id, latestEntry.comment)
       }
 
@@ -125,6 +138,34 @@ export function useCriteriaGradingEntryView() {
   function getGradeValue(studentId: string, criterionId: string): number | '' {
     const value = gradeEntries.value.get(studentId)?.get(criterionId)
     return value === undefined ? '' : value
+  }
+
+  function getSelfAssessmentValue(studentId: string, criterionId: string): number | '' {
+    return selfAssessmentEntries.value.get(studentId)?.get(criterionId) ?? ''
+  }
+
+  function onSelfAssessmentChange(studentId: string, criterionId: string, rawValue: string): void {
+    let scores = selfAssessmentEntries.value.get(studentId)
+    if (!scores) {
+      scores = new Map<string, number>()
+      selfAssessmentEntries.value.set(studentId, scores)
+    }
+    if (rawValue === '') scores.delete(criterionId)
+    else scores.set(criterionId, Number(rawValue))
+    unsavedStudents.value.add(studentId)
+    hasUnsavedChanges.value = true
+  }
+
+  async function setSelfAssessmentEnabled(enabled: boolean): Promise<void> {
+    if (!category.value) return
+    const currentCategory = category.value as CriteriaCategory
+    const updatedCategory = {
+      ...currentCategory,
+      configuration: { ...currentCategory.configuration, allowSelfAssessment: enabled },
+      lastModified: new Date()
+    }
+    await gradeCategories.value?.update(currentCategory.id, updatedCategory)
+    category.value = updatedCategory
   }
 
   function setParticipation(studentId: string, code: string): void {
@@ -220,7 +261,10 @@ export function useCriteriaGradingEntryView() {
         categoryId,
         measurements,
         calculatedGrade: calculateGrade(studentId),
-        comment: comments.value.get(studentId)
+        comment: comments.value.get(studentId),
+        metadata: {
+          selfAssessment: Object.fromEntries(selfAssessmentEntries.value.get(studentId) ?? [])
+        }
       })
 
       unsavedStudents.value.delete(studentId)
@@ -361,11 +405,13 @@ export function useCriteriaGradingEntryView() {
     currentComment,
     error,
     getGradeValue,
+    getSelfAssessmentValue,
     hasUnsavedChanges,
     hasUnsavedChangesForStudent,
     loading,
     newCriterion,
     onGradeChange,
+    onSelfAssessmentChange,
     participationOptions,
     participationStatus,
     remainingWeight,
@@ -375,6 +421,8 @@ export function useCriteriaGradingEntryView() {
     saveStudentGrade,
     saving,
     setParticipation,
+    setSelfAssessmentEnabled,
+    selfAssessmentEnabled,
     showAddCriterionModal,
     showCommentModal,
     students,
