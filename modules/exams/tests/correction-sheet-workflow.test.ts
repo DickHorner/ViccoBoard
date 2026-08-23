@@ -4,13 +4,15 @@ import {
   GradingSchemaMigration,
   ExamSchemaMigration,
   CorrectionSchemaMigration,
-  KbrFeedbackWorkflowMigration
+  KbrFeedbackWorkflowMigration,
+  SupportTipsMigration
 } from '@viccoboard/storage/node';
 import { PDFDocument } from 'pdf-lib';
 const uuidv4 = () => crypto.randomUUID();
 import { Exams } from '@viccoboard/core';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import { CorrectionEntryRepository } from '../src/repositories/correction-entry.repository';
+import { SupportTipRepository } from '../src/repositories/support-tip.repository';
 import {
   CorrectionSheetPresetRepository,
   createDefaultCorrectionSheetPreset
@@ -25,6 +27,7 @@ describe('KBR correction sheet workflow', () => {
   let storage: SQLiteStorage;
   let examRepository: ExamRepository;
   let correctionRepository: CorrectionEntryRepository;
+  let supportTipRepository: SupportTipRepository;
   let presetRepository: CorrectionSheetPresetRepository;
   let recordCorrectionUseCase: RecordCorrectionUseCase;
   let getPresetUseCase: GetCorrectionSheetPresetUseCase;
@@ -43,10 +46,12 @@ describe('KBR correction sheet workflow', () => {
     storage.registerMigration(new ExamSchemaMigration(storage));
     storage.registerMigration(new CorrectionSchemaMigration(storage));
     storage.registerMigration(new KbrFeedbackWorkflowMigration(storage));
+    storage.registerMigration(new SupportTipsMigration(storage));
     await storage.migrate();
 
     examRepository = new ExamRepository(storage.getAdapter());
     correctionRepository = new CorrectionEntryRepository(storage.getAdapter());
+    supportTipRepository = new SupportTipRepository(storage.getAdapter());
     presetRepository = new CorrectionSheetPresetRepository(examRepository);
     recordCorrectionUseCase = new RecordCorrectionUseCase(correctionRepository, examRepository);
     getPresetUseCase = new GetCorrectionSheetPresetUseCase(presetRepository);
@@ -54,7 +59,8 @@ describe('KBR correction sheet workflow', () => {
     buildProjectionUseCase = new BuildCorrectionSheetProjectionUseCase(
       examRepository,
       correctionRepository,
-      getPresetUseCase
+      getPresetUseCase,
+      supportTipRepository
     );
     exportSheetsUseCase = new ExportCorrectionSheetsPdfUseCase(
       examRepository,
@@ -299,6 +305,57 @@ describe('KBR correction sheet workflow', () => {
         criteria: []
       })
     ]);
+  });
+
+  test('persists assigned support tips and includes them in an enabled feedback sheet', async () => {
+    const exam = await createExam();
+    exam.structure.allowsSupportTips = true;
+    exam.structure.tasks[0].allowSupportTips = true;
+    await examRepository.update(exam.id, exam);
+    const tip = await supportTipRepository.create({
+      title: 'Einleitungen üben',
+      shortDescription: 'Baue eine Einleitung mit Textsorte, Titel und Autor.',
+      category: 'Schreiben',
+      tags: ['Einleitung'],
+      links: [{ title: 'Übungsblatt', url: 'https://example.test/einleitung' }],
+      priority: 8,
+      weight: 6,
+      usageCount: 0
+    });
+
+    await savePresetUseCase.execute({
+      ...createDefaultCorrectionSheetPreset(exam.id),
+      examId: exam.id,
+      showSupportTips: true
+    });
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 8, maxPoints: 10, timestamp: new Date() },
+        { taskId: 'task-2', points: 10, maxPoints: 15, timestamp: new Date() }
+      ],
+      comments: [],
+      supportTips: [{ supportTipId: tip.id, taskId: 'task-1', assignedAt: new Date(), weight: 9 }],
+      finalizeCorrection: true
+    });
+
+    const reloaded = await correctionRepository.findByExamAndCandidate(exam.id, 'cand-1');
+    const projection = await buildProjectionUseCase.execute(exam.id, 'cand-1');
+
+    expect(reloaded?.supportTips).toEqual([expect.objectContaining({ supportTipId: tip.id, taskId: 'task-1' })]);
+    expect(projection.supportTips).toEqual([expect.objectContaining({
+      id: tip.id,
+      taskTitle: 'Inhaltsangabe',
+      weight: 9,
+      priority: 8
+    })]);
+
+    await savePresetUseCase.execute({
+      ...(await getPresetUseCase.execute(exam.id)),
+      showSupportTips: false
+    });
+    expect((await buildProjectionUseCase.execute(exam.id, 'cand-1')).supportTips).toBeUndefined();
   });
 
   test('exports single and individual correction-sheet PDFs for completed candidates', async () => {

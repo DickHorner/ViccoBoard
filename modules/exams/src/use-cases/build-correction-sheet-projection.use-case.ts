@@ -4,6 +4,9 @@ import type { ExamRepository } from '../repositories/exam.repository';
 import { GetCorrectionSheetPresetUseCase } from './get-correction-sheet-preset.use-case';
 import { getCorrectionRelevantTaskNodes } from '../utils/task-tree';
 
+import type { SupportTipRepository } from '../repositories/support-tip.repository';
+import { SupportTipManagementService } from '../services/support-tip-management.service';
+
 function resolveCandidateName(candidate: Exams.Candidate): string {
   return `${candidate.firstName} ${candidate.lastName}`.trim();
 }
@@ -39,7 +42,8 @@ export class BuildCorrectionSheetProjectionUseCase {
   constructor(
     private readonly examRepository: ExamRepository,
     private readonly correctionEntryRepository: CorrectionEntryRepository,
-    private readonly getCorrectionSheetPresetUseCase: GetCorrectionSheetPresetUseCase
+    private readonly getCorrectionSheetPresetUseCase: GetCorrectionSheetPresetUseCase,
+    private readonly supportTipRepository?: SupportTipRepository
   ) {}
 
   async execute(
@@ -91,11 +95,40 @@ export class BuildCorrectionSheetProjectionUseCase {
               criterionId: criterion.id,
               text: criterion.text,
               maxPoints: criterion.points,
-              awardedPoints: criterionScore?.points
+              awardedPoints: criterionScore?.points,
+              formatting: criterion.formatting
             };
           })
         };
       });
+
+    let supportTipRows: Exams.ProjectionSupportTipRow[] | undefined;
+    if (preset.showSupportTips && this.supportTipRepository && correction.supportTips.length > 0) {
+      const allTips = await this.supportTipRepository.findAll();
+      supportTipRows = [];
+      for (const assignment of correction.supportTips) {
+        const tip = allTips.find((t) => t.id === assignment.supportTipId);
+        if (tip) {
+          const assignedTaskId = assignment.subtaskId ?? assignment.taskId;
+          const taskNode = assignedTaskId
+            ? getCorrectionRelevantTaskNodes(exam.structure.tasks).find((task) => task.id === assignedTaskId)
+            : undefined;
+          supportTipRows.push({
+            id: tip.id,
+            title: tip.title,
+            shortDescription: tip.shortDescription,
+            category: tip.category,
+            taskId: assignedTaskId,
+            taskTitle: taskNode?.title,
+            priority: tip.priority,
+            weight: assignment.weight ?? tip.weight,
+            links: tip.links || [],
+            qrCode: tip.qrCode || SupportTipManagementService.generateQRCode(tip)
+          });
+        }
+      }
+      supportTipRows.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0) || (b.weight ?? 1) - (a.weight ?? 1));
+    }
 
     return {
       examId: exam.id,
@@ -118,9 +151,14 @@ export class BuildCorrectionSheetProjectionUseCase {
       showTaskPoints: preset.showTaskPoints,
       showTaskComments: preset.showTaskComments,
       showGeneralComment: preset.showGeneralComment,
+      showSupportTips: preset.showSupportTips,
+      showTaskPercentages: preset.showTaskPercentages,
+      italicizeFeedback: preset.italicizeFeedback,
+      showPointDeductions: preset.showPointDeductions,
       showExamParts: preset.showExamParts,
       showSignatureArea: preset.showSignatureArea,
-      taskRows
+      taskRows,
+      supportTips: supportTipRows
     };
   }
 }

@@ -83,6 +83,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'KBR-Prüfungen', parent: '/subjects/kbr' }
   },
   {
+    path: '/support-tips',
+    name: 'support-tips',
+    component: () => import('../views/SupportTipLibrary.vue'),
+    meta: { title: 'Fördertipps', parent: '/subjects/kbr' }
+  },
+  {
     path: '/exams/new',
     name: 'exam-new',
     component: () => import('../views/KBRExamBuilder.vue'),
