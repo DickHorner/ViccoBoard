@@ -95,8 +95,15 @@
 
 .auto-generation-status {
   margin: 0.75rem 0 0;
-  color: #2e7d32;
   font-weight: 500;
+}
+
+.auto-generation-status-success {
+  color: #2e7d32;
+}
+
+.auto-generation-status-error {
+  color: #b91c1c;
 }
 
 .filters {

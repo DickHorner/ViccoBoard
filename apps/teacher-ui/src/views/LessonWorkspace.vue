@@ -82,7 +82,6 @@
           <p v-if="randomSelectionError" class="random-error">{{ randomSelectionError }}</p>
           <div v-if="selectedRandomStudent" class="random-result">
             <strong>{{ selectedRandomStudent.firstName }} {{ selectedRandomStudent.lastName }}</strong>
-            <span>{{ selectedRandomStudent.id }}</span>
           </div>
         </section>
 

@@ -1,4 +1,4 @@
-import { getScheduleCalendarMarkers } from '../views/schedule-calendar-markers'
+import { getScheduleCalendarMarkers } from './schedule-calendar-markers'
 
 export interface LessonAutoGenerationInput {
   schoolYear: string
@@ -20,8 +20,8 @@ export function parseSchoolYearRange(schoolYear: string): { start: Date; end: Da
   }
 
   return {
-    start: new Date(startYear, 7, 1),
-    end: new Date(endYear, 6, 31)
+    start: new Date(Date.UTC(startYear, 7, 1)),
+    end: new Date(Date.UTC(endYear, 6, 31))
   }
 }
 
@@ -33,7 +33,7 @@ export function buildAutoLessonDates(input: LessonAutoGenerationInput): Date[] {
 
   const dates: Date[] = []
   const cursor = new Date(range.start)
-  const normalizedStates = input.states.map(normalizeState).filter(Boolean)
+  const normalizedStates = input.states.map(normalizeState).filter((state) => state.length > 0)
 
   while (cursor <= range.end) {
     const date = new Date(cursor)
@@ -59,8 +59,8 @@ export function getDateKey(date: Date): string {
   return year + '-' + month + '-' + day
 }
 
-function normalizeState(state: string | undefined): string {
-  if (!state) {
+function normalizeState(state: string): string {
+  if (!state.trim()) {
     return ''
   }
 
