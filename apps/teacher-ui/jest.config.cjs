@@ -50,6 +50,6 @@ module.exports = {
   setupFilesAfterEnv: [],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transformIgnorePatterns: [
-    'node_modules/(?!(vue-i18n|pinia|vue-router|nostics)/)',
+    'node_modules/(?!(vue-i18n|pinia|vue-router)/)',
   ],
 };
