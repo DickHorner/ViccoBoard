@@ -43,6 +43,38 @@
   font-weight: 700;
 }
 
+.template-card {
+  background: #ecfeff;
+  border: 1px solid #a5f3fc;
+  border-radius: 18px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.template-card h2 {
+  margin: 0.2rem 0;
+}
+
+.template-button {
+  min-height: 44px;
+  border: 1px solid #0e7490;
+  border-radius: 8px;
+  background: #0e7490;
+  color: white;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.template-button:hover {
+  background: #155e75;
+}
+
 /* Import card */
 .import-card {
   background: white;
@@ -78,6 +110,32 @@
   border-radius: 4px;
   padding: 0.1em 0.3em;
   font-family: monospace;
+}
+
+.import-guidance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.workflow-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.workflow-steps li + li {
+  margin-top: 0.2rem;
+}
+
+.android-hint {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.9rem;
 }
 
 .form-row {

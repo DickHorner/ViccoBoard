@@ -16,8 +16,12 @@ export function downloadBytes(
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function downloadText(content: string, fileName: string): void {
-  const blob = new Blob([content], { type: 'text/plain' });
+export function downloadText(
+  content: string,
+  fileName: string,
+  mimeType = 'text/plain'
+): void {
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

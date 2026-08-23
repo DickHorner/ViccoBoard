@@ -9,14 +9,37 @@
       <span class="summary-pill">{{ tables.length }} Tabellen</span>
     </header>
 
+    <section class="template-card" aria-label="CSV-Vorlage herunterladen">
+      <div>
+        <p class="eyebrow">Vorlage</p>
+        <h2>Cooper-Normen als CSV</h2>
+        <p class="hint">
+          Vorlage herunterladen, in Excel oder einer Tabellen-App anpassen und wieder als CSV importieren.
+        </p>
+      </div>
+      <button class="template-button" type="button" @click="downloadCooperTemplate">
+        CSV-Vorlage herunterladen
+      </button>
+    </section>
+
     <!-- Import section -->
     <section class="import-card" aria-label="Tabelle importieren">
       <p class="eyebrow">Import</p>
       <h2>Tabelle importieren</h2>
-      <p class="hint">
-        CSV-Datei hochladen. Erste Zeile = Spaltennamen, letzte Spalte muss
-        <code>value</code> heißen. Zeilen mit <code>#</code> werden ignoriert.
-      </p>
+      <div class="import-guidance">
+        <p class="hint">
+          Erste Zeile = Spaltennamen; die letzte Spalte muss <code>value</code> heißen.
+          Spaltenreihenfolge und Anzahl der Spalten nicht ändern. Zeilen mit <code>#</code> werden ignoriert.
+        </p>
+        <ol class="workflow-steps">
+          <li>Vorlage herunterladen und in Excel oder einer Tabellen-App bearbeiten.</li>
+          <li>Als <strong>CSV (kommagetrennt)</strong> speichern.</li>
+          <li>Datei auswählen, Vorschau prüfen und importieren.</li>
+        </ol>
+        <p class="android-hint">
+          <strong>Android:</strong> Speichere die CSV in <em>Downloads</em> oder <em>Dateien</em> und wähle sie hier über den Dateiauswahldialog aus.
+        </p>
+      </div>
 
       <div class="form-row">
         <label class="field">
@@ -137,6 +160,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Sport } from '@viccoboard/core'
+import {
+  COOPER_TABLE_CSV_TEMPLATE,
+  COOPER_TABLE_TEMPLATE_FILE_NAME
+} from '@viccoboard/sport'
+import { downloadText } from '../utils/download'
 
 const bridge = getSportBridge()
 
@@ -164,6 +192,14 @@ const sourceLabelMap: Record<string, string> = {
 const canImport = computed(
   () => importName.value.trim().length > 0 && csvContent.value !== null
 )
+
+function downloadCooperTemplate(): void {
+  downloadText(
+    COOPER_TABLE_CSV_TEMPLATE,
+    COOPER_TABLE_TEMPLATE_FILE_NAME,
+    'text/csv;charset=utf-8'
+  )
+}
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('de-DE', {
