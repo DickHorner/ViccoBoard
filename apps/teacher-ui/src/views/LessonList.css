@@ -66,6 +66,39 @@
   margin-bottom: 1.5rem;
 }
 
+.auto-generation {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1rem;
+}
+
+.auto-generation h4 {
+  margin: 0;
+  color: #333;
+}
+
+.auto-generation-hint {
+  margin: 0.5rem 0 1rem;
+  color: #666;
+}
+
+.auto-generation-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-group-actions {
+  flex: 0 0 auto;
+}
+
+.auto-generation-status {
+  margin: 0.75rem 0 0;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
 .filters {
   display: flex;
   gap: 1rem;

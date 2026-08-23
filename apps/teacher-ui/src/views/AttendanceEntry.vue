@@ -144,7 +144,16 @@
             >
               {{ t('COMMON.delete') }}
             </button>
+            <button
+              class="btn-secondary"
+              @click="exportAttendance"
+              :disabled="!hasAnyAttendance || saving"
+            >
+              Export CSV
+            </button>
           </div>
+
+          <p class="text-muted">Lokales Exportformat (CSV UTF-8): {{ attendanceExportFormat }}</p>
           
           <div v-if="saveError" class="error-message">
             {{ saveError }}
@@ -170,6 +179,8 @@ import {
   buildAttendanceRecords,
   shouldClearAttendanceAfterSave
 } from '../utils/attendance-entry'
+import { buildAttendanceExportCsv, ATTENDANCE_EXPORT_COLUMNS } from '../utils/attendance-export'
+import { downloadText } from '../utils/download'
 import { AttendanceStatus } from '@viccoboard/core'
 import type { ClassGroup, Student, StatusOption } from '@viccoboard/core'
 
@@ -181,6 +192,7 @@ const classes = ref<ClassGroup[]>([])
 const students = ref<Student[]>([])
 const selectedClassId = ref<string>('')
 const currentLessonId = ref<string | null>(null)
+const currentLessonDate = ref<Date | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const saveError = ref('')
@@ -192,6 +204,40 @@ interface AttendanceEntry {
   status: AttendanceStatus
   reason?: string
   lateMinutes?: number
+}
+
+const exportAttendance = () => {
+  if (!selectedClassId.value) {
+    saveError.value = 'Keine Klasse ausgewählt'
+    return
+  }
+
+  const selectedClass = classes.value.find((entry) => entry.id === selectedClassId.value)
+  const lessonDate = currentLessonDate.value ?? new Date()
+  const lessonId = currentLessonId.value ?? 'draft-' + lessonDate.toISOString().slice(0, 10)
+  const rows = Object.entries(attendance.value).map(([studentId, entry]) => {
+    const student = students.value.find((candidate) => candidate.id === studentId)
+    return {
+      studentId,
+      firstName: student?.firstName ?? '',
+      lastName: student?.lastName ?? '',
+      status: entry.status,
+      reason: entry.reason,
+      lateMinutes: entry.lateMinutes
+    }
+  })
+
+  const csv = buildAttendanceExportCsv({
+    lessonId,
+    classId: selectedClassId.value,
+    className: selectedClass?.name ?? '',
+    lessonDate,
+    rows
+  })
+
+  const safeClassName = (selectedClass?.name ?? 'klasse').replace(/[^a-zA-Z0-9_-]/g, '-')
+  downloadText(csv, `attendance-${safeClassName}-${lessonDate.toISOString().slice(0, 10)}.csv`)
+  saveSuccess.value = 'Export heruntergeladen'
 }
 
 const attendance = ref<Record<string, AttendanceEntry>>({})
@@ -217,6 +263,7 @@ const hasAnyAttendance = computed(() => {
 const statusesWithReason = [
   ...ATTENDANCE_STATUSES_WITH_REASON
 ]
+const attendanceExportFormat = ATTENDANCE_EXPORT_COLUMNS.join('; ')
 
 // Status options derived from catalog
 // Maps catalog StatusOption to UI format compatible with existing AttendanceStatus enum
@@ -354,6 +401,7 @@ const handleSaveAttendance = async () => {
       })
       lessonId = lesson.id
       currentLessonId.value = lessonId
+      currentLessonDate.value = lesson.date
     }
     
     // Prepare attendance records
@@ -398,6 +446,7 @@ onMounted(async () => {
       const lesson = await SportBridge.lessonRepository.findById(lessonIdFromQuery)
       if (lesson) {
         currentLessonId.value = lesson.id
+        currentLessonDate.value = lesson.date
         selectedClassId.value = lesson.classGroupId
         await onClassChange()
         // Load existing attendance records for this lesson
