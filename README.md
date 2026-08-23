@@ -8,6 +8,8 @@
 [![CodeQL][badge-codeql]][codeql]
 [![License][badge-license]][license]
 
+## Inhaltsverzeichnis
+
 ## Scope
 
 ViccoBoard bündelt Unterrichtsarbeit in einer lokalen Web-App:
@@ -48,6 +50,10 @@ npm run typecheck
 npm run test
 npm run build
 ```
+
+## OpenSSF Best Practices
+
+ViccoBoard verfolgt das OpenSSF Best Practices Badge. Der dazugehörige Evidenz- und Ablaufleitfaden liegt unter [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md).
 
 ## Lizenz
 

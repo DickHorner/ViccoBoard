@@ -13,6 +13,8 @@ export {
   createDefaultCorrectionSheetPreset
 } from './repositories/correction-sheet-preset.repository.js';
 export { SupportTipRepository } from './repositories/support-tip.repository.js';
+export { ApplyPointAdjustmentsUseCase } from './use-cases/apply-point-adjustments.use-case.js';
+export type { ApplyPointAdjustmentsInput, PointAdjustment } from './use-cases/apply-point-adjustments.use-case.js';
 export { StudentLongTermNoteRepository } from './repositories/student-long-term-note.repository.js';
 export type { StudentLongTermNote, CompetencyArea, DevelopmentNote } from './repositories/student-long-term-note.repository.js';
 
@@ -73,9 +75,11 @@ export * from './use-cases/calculate-grade.use-case.js';
 export * from './use-cases/get-correction-sheet-preset.use-case.js';
 export * from './use-cases/save-correction-sheet-preset.use-case.js';
 export * from './use-cases/build-correction-sheet-projection.use-case.js';
+export * from './use-cases/finalize-all-corrections.use-case.js';
 export * from './use-cases/export-correction-sheets-pdf.use-case.js';
 export * from './use-cases/export-correction-session.use-case.js';
 export * from './use-cases/import-kbr-correction-bundle.use-case.js';
+export * from './use-cases/update-grading-key.use-case.js';
 export { RecordCorrectionUseCase } from './use-cases/record-correction.use-case-v2.js';
 export type { RecordCorrectionInput } from './use-cases/record-correction.use-case-v2.js';
 export * from './validators/correction-import-bundle.validator.js';

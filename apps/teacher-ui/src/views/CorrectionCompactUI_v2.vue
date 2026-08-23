@@ -192,6 +192,41 @@
             ></textarea>
           </div>
 
+          <section v-if="exam.structure.allowsSupportTips" class="support-tips-section">
+            <div class="support-tips-header">
+              <div>
+                <h3>Fördertipps</h3>
+                <p>Allgemein oder für eine aktivierte Aufgabe zuweisen.</p>
+              </div>
+              <RouterLink :to="{ path: '/support-tips', query: { returnTo: route.fullPath } }" class="btn-secondary">
+                Tipps verwalten
+              </RouterLink>
+            </div>
+            <div class="support-tip-picker">
+              <select v-model="selectedSupportTipId" aria-label="Fördertipp auswählen">
+                <option value="">Fördertipp auswählen …</option>
+                <option v-for="tip in sortedSupportTips" :key="tip.id" :value="tip.id">
+                  {{ tip.title }} · {{ tip.category || 'Allgemein' }} ({{ tip.usageCount }}×)
+                </option>
+              </select>
+              <select v-model="supportTipTaskId" aria-label="Aufgabenbezug auswählen">
+                <option value="">Allgemeiner Tipp</option>
+                <option v-for="task in supportTipTasks" :key="task.id" :value="task.id">{{ task.title }}</option>
+              </select>
+              <button class="btn-secondary" :disabled="!selectedSupportTipId" @click="assignSupportTip">Hinzufügen</button>
+            </div>
+            <p v-if="supportTips.length === 0" class="support-tips-empty">Noch keine Fördertipps angelegt.</p>
+            <ul v-else-if="assignedSupportTips.length" class="assigned-support-tips">
+              <li v-for="assignment in assignedSupportTips" :key="`${assignment.supportTipId}:${assignment.taskId || 'general'}`">
+                <div>
+                  <strong>{{ supportTipById(assignment.supportTipId)?.title || 'Gelöschter Fördertipp' }}</strong>
+                  <span>{{ assignment.taskId ? ` · ${taskTitle(assignment.taskId)}` : ' · allgemein' }}</span>
+                </div>
+                <button class="link-button" @click="removeSupportTip(assignment)">Entfernen</button>
+              </li>
+            </ul>
+          </section>
+
           <div class="nav-buttons">
             <button
               v-if="currentCandidateIndex > 0"
@@ -259,8 +294,9 @@ const {
   getExam,
   findCorrectionsByExam,
   recordCorrectionUseCase,
+  supportTipRepository,
   exportCurrentCorrectionSheetPdf,
-  exportAllCorrectionSheetsPdf
+  exportAllCompletedCandidatePdfs
 } = useExamsBridge();
 
 const exam = ref<Exams.Exam | null>(null);
@@ -274,6 +310,10 @@ const criterionScores = ref<Record<string, Record<string, number>>>({});
 const taskAlternativeGrades = ref<Record<string, AlternativeGradeType>>({});
 const taskComments = ref<Record<string, string>>({});
 const generalComment = ref('');
+const supportTips = ref<Exams.SupportTip[]>([]);
+const assignedSupportTips = ref<Exams.AssignedSupportTip[]>([]);
+const selectedSupportTipId = ref('');
+const supportTipTaskId = ref('');
 const hasChanges = ref(false);
 
 const alternativeGrades = computed(() =>
@@ -284,6 +324,10 @@ const candidates = computed(() => exam.value?.candidates ?? []);
 const correctionTasks = computed(() => (
   exam.value ? getCorrectionRelevantTaskNodes(exam.value.structure.tasks) : []
 ));
+const supportTipTasks = computed(() => correctionTasks.value.filter((task) => task.allowSupportTips));
+const sortedSupportTips = computed(() => [...supportTips.value]
+  .sort((left, right) => right.usageCount - left.usageCount || right.priority - left.priority || left.title.localeCompare(right.title))
+);
 
 const filteredCandidates = computed(() => {
   const filter = candidateFilter.value.toLowerCase();
@@ -363,6 +407,7 @@ async function loadExamData(): Promise<void> {
     exam.value = loadedExam;
     const loadedCorrections = await findCorrectionsByExam(examId);
     corrections.value = new Map(loadedCorrections.map((entry) => [entry.candidateId, entry]));
+    supportTips.value = await supportTipRepository?.findAll() ?? [];
 
     if (loadedExam.candidates.length > 0) {
       await selectCandidate(loadedExam.candidates[0]);
@@ -401,6 +446,7 @@ function hydrateCandidateState(candidateId: string): void {
   taskAlternativeGrades.value = {};
   taskComments.value = {};
   generalComment.value = '';
+  assignedSupportTips.value = correction?.supportTips.map((tip) => ({ ...tip })) ?? [];
 
   for (const task of correctionTasks.value) {
     const score = correction?.taskScores.find((entry) => entry.taskId === task.id);
@@ -425,6 +471,39 @@ function hydrateCandidateState(candidateId: string): void {
 
   generalComment.value = latestExamComment?.text ?? '';
   scoringMode.value = Object.keys(taskAlternativeGrades.value).length > 0 ? 'alternative' : 'numeric';
+}
+
+function supportTipById(id: string): Exams.SupportTip | undefined {
+  return supportTips.value.find((tip) => tip.id === id);
+}
+
+function taskTitle(taskId: string): string {
+  return correctionTasks.value.find((task) => task.id === taskId)?.title ?? 'Aufgabe';
+}
+
+function assignSupportTip(): void {
+  const tip = supportTipById(selectedSupportTipId.value);
+  if (!tip) return;
+  const taskId = supportTipTaskId.value || undefined;
+  if (assignedSupportTips.value.some((assignment) => assignment.supportTipId === tip.id && assignment.taskId === taskId)) {
+    toast.warning('Dieser Fördertipp ist bereits für diesen Bereich zugewiesen.');
+    return;
+  }
+  assignedSupportTips.value = [...assignedSupportTips.value, {
+    supportTipId: tip.id,
+    taskId,
+    assignedAt: new Date(),
+    weight: tip.weight
+  }];
+  selectedSupportTipId.value = '';
+  markDirty();
+}
+
+function removeSupportTip(assignment: Exams.AssignedSupportTip): void {
+  assignedSupportTips.value = assignedSupportTips.value.filter((candidate) =>
+    candidate.supportTipId !== assignment.supportTipId || candidate.taskId !== assignment.taskId
+  );
+  markDirty();
 }
 
 function onScoringModeChange(): void {
@@ -534,15 +613,22 @@ async function saveCurrentCandidate(finalize: boolean): Promise<void> {
         }]
       : [];
 
+  const previousTipIds = new Set(currentCorrection.value?.supportTips.map((assignment) => assignment.supportTipId) ?? []);
   const saved = await recordCorrectionUseCase.execute({
     examId: exam.value.id,
     candidateId: currentCandidate.value.id,
     taskScores: taskScoresPayload,
     comments,
+    supportTips: assignedSupportTips.value,
     finalizeCorrection: finalize
   });
 
   corrections.value = new Map(corrections.value).set(currentCandidate.value.id, saved);
+  const newlyAssignedTipIds = new Set(assignedSupportTips.value
+    .map((assignment) => assignment.supportTipId)
+    .filter((tipId) => !previousTipIds.has(tipId)));
+  await Promise.all([...newlyAssignedTipIds].map((tipId) => supportTipRepository?.incrementUsage(tipId)));
+  supportTips.value = await supportTipRepository?.findAll() ?? supportTips.value;
   hasChanges.value = false;
   hydrateCandidateState(currentCandidate.value.id);
 }
@@ -576,7 +662,7 @@ async function exportCurrentCandidate(): Promise<void> {
 }
 
 async function exportAllCandidates(): Promise<void> {
-  if (!exam.value || !exportAllCorrectionSheetsPdf) {
+  if (!exam.value || !exportAllCompletedCandidatePdfs) {
     return;
   }
 
@@ -586,8 +672,14 @@ async function exportAllCandidates(): Promise<void> {
     return;
   }
 
-  const pdfDocument = await exportAllCorrectionSheetsPdf(exam.value.id);
-  downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+  const pdfDocuments = await exportAllCompletedCandidatePdfs(exam.value.id);
+  if (!pdfDocuments) {
+    return;
+  }
+
+  for (const pdfDocument of pdfDocuments) {
+    downloadBytes(pdfDocument.bytes, pdfDocument.fileName, 'application/pdf');
+  }
 }
 
 function openPreviewForCurrentCandidate(): void {

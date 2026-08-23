@@ -199,6 +199,15 @@ function buildStudent(overrides: Partial<Student> = {}): Student {
 }
 
 describe('StudentCsvImportUseCase', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-04-10T12:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test('builds a valid preview for m/f students and reuses class groups', async () => {
     const { useCase } = createUseCase({
       classGroups: [buildClassGroup('class-7a', '7a')]

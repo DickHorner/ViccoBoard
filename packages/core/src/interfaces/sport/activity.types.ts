@@ -63,9 +63,11 @@ export type GameCategory =
   | 'entspannung'
   | 'kraft'
   | 'ausdauer'
+  | 'schnelligkeit'
+  | 'beweglichkeit'
   | 'sonstiges';
 
-export type GameDifficulty = 'anfaenger' | 'fortgeschrittene' | 'profis';
+export type GameDifficulty = 'unbekannt' | 'anfaenger' | 'fortgeschrittene' | 'profis';
 
 export type GamePhase = 'erwaermung' | 'hauptteil' | 'schluss';
 
@@ -122,6 +124,8 @@ export interface GameEntry {
   variation?: string;
   notes?: string;
   sportType?: string;
+  videoUrl?: string;
+  builtinKey?: string;
   isCustom: boolean;
   createdAt: Date;
   lastModified: Date;

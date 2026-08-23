@@ -616,4 +616,83 @@ describe('P5-3: examBuilderStore', () => {
       expect(sourceItem).toEqual(sourceSnapshot)
     })
   })
+
+  describe('§6.9/§6.22 criterion formatting and task comment/tip flags', () => {
+    it('new criterion has empty formatting object', () => {
+      const store = useExamBuilderStore()
+      store.addTask()
+      store.addCriterion(store.tasks[0])
+      expect(store.tasks[0].criteria[0].formatting).toEqual({})
+    })
+
+    it('new task has allowComments, allowSupportTips, commentBoxEnabled defaulting to false', () => {
+      const store = useExamBuilderStore()
+      store.addTask()
+      const task = store.tasks[0]
+      expect(task.allowComments).toBe(false)
+      expect(task.allowSupportTips).toBe(false)
+      expect(task.commentBoxEnabled).toBe(false)
+    })
+
+    it('flattenTasks preserves criterion formatting through buildExam', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Formatting Test'
+      store.addTask()
+      const task = store.tasks[0]
+      task.title = 'Aufgabe 1'
+      store.addCriterion(task)
+      task.criteria[0].text = 'Inhalt'
+      task.criteria[0].points = 5
+      task.criteria[0].formatting = { bold: true, underline: true }
+      store.recalculateTaskPoints()
+
+      const exam = store.buildExam()
+      const savedTask = exam.structure.tasks.find(t => t.id === task.id)
+      expect(savedTask?.criteria[0].formatting).toEqual({ bold: true, underline: true })
+    })
+
+    it('flattenTasks preserves allowComments, allowSupportTips, commentBoxEnabled through buildExam', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Flags Test'
+      store.addTask()
+      const task = store.tasks[0]
+      task.title = 'Aufgabe 1'
+      task.points = 5
+      task.allowComments = true
+      task.allowSupportTips = true
+      task.commentBoxEnabled = true
+
+      const exam = store.buildExam()
+      const savedTask = exam.structure.tasks.find(t => t.id === task.id)
+      expect(savedTask?.allowComments).toBe(true)
+      expect(savedTask?.allowSupportTips).toBe(true)
+      expect(savedTask?.commentBoxEnabled).toBe(true)
+    })
+
+    it('formatting and flags survive buildExam → hydrateFromExam round-trip', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Roundtrip'
+      store.addTask()
+      const task = store.tasks[0]
+      task.title = 'Aufgabe 1'
+      store.addCriterion(task)
+      task.criteria[0].text = 'Analyse'
+      task.criteria[0].points = 4
+      task.criteria[0].formatting = { bold: true }
+      task.allowComments = true
+      task.allowSupportTips = false
+      task.commentBoxEnabled = true
+      store.recalculateTaskPoints()
+
+      const exam = store.buildExam()
+      store.reset()
+      store.hydrateFromExam(exam)
+
+      const reloaded = store.tasks[0]
+      expect(reloaded.criteria[0].formatting).toEqual({ bold: true })
+      expect(reloaded.allowComments).toBe(true)
+      expect(reloaded.allowSupportTips).toBe(false)
+      expect(reloaded.commentBoxEnabled).toBe(true)
+    })
+  })
 })
