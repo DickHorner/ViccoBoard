@@ -197,7 +197,7 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 - [x] **Notenkategorien: Cooper-Test**:
   - [x] Runden zählen
   - [x] Sofort-Auswertung bei hinterlegter Tabelle
-- [ ] **Verbalbeurteilungen** (eigener Funktionspunkt; Detail-Spezifikation TBD, aber Feature muss existieren). — #319
+- [x] **Verbalbeurteilungen** (eigener Funktionspunkt; Detail-Spezifikation TBD, aber Feature muss existieren). — #319
 - [x] **Kriterienkataloge bereichsübergreifend**: eigene Kriterien in verschiedenen Bereichen definierbar (u. a. Anwesenheit/Verhalten/Mitarbeit), inkl. Wiederverwendung pro Klasse.
 
 ### 6.4 Sport — Tabellen & CSV (Import/Export)
