@@ -285,13 +285,15 @@ describe('KBR correction sheet workflow', () => {
             criterionId: 'criterion-1',
             text: 'Einleitung nennt Textsorte, Titel und Autor.',
             maxPoints: 4,
-            awardedPoints: 4
+            awardedPoints: 4,
+            formatting: {}
           },
           {
             criterionId: 'criterion-2',
             text: 'Hauptaussage wird sachlich zusammengefasst.',
             maxPoints: 6,
-            awardedPoints: 5
+            awardedPoints: 5,
+            formatting: {}
           }
         ]
       }),
