@@ -203,10 +203,10 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 ### 6.4 Sport — Tabellen & CSV (Import/Export)
 - [x] Unterscheidung **„einfache Tabellen“ vs „Tabellen“**.
 - [x] **Lokale Tabellen auswählen & anpassen**.
-- [ ] **Tabellen-Vorlagen herunterladen/anpassen/importieren** (CSV). — #320
+- [x] **Tabellen-Vorlagen herunterladen/anpassen/importieren** (CSV). — #320
 - [x] **Geburtsjahr pro Schüler** (für automatisierte Auswertung erforderlich/empfohlen).
-- [ ] Workflow: Vorlage → Excel anpassen (Spaltenreihenfolge bleibt) → CSV speichern → importieren. — #320
-- [ ] Android-Import-Hinweis/Pfad-Hilfe (als UX-Hilfe in App). — #320
+- [x] Workflow: Vorlage → Excel anpassen (Spaltenreihenfolge bleibt) → CSV speichern → importieren. — #320
+- [x] Android-Import-Hinweis/Pfad-Hilfe (als UX-Hilfe in App). — #320
 - [x] **Schüler-Import per CSV** inkl. Geschlecht & Geburtsjahr.
 
 ### 6.5 Sport — Test- & Mess-Workflows
@@ -215,10 +215,10 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
   - [x] Auswertung automatisiert mit Tabelle (Vorlage/lokal)
   - [x] Audio-Signale aus App
   - [x] eigene Konfiguration via CSV **über Einstellungen** (nicht als Tabelle)
-- [ ] **Cooper-Test ohne Papier**: — #320
+- [x] **Cooper-Test ohne Papier**: — #320
   - [x] Runden erfassen; automatische Auswertung/Noten bei Tabelle
   - [x] Sportart Laufen/Schwimmen festlegbar
-  - [ ] Tabelle downloaden/selbst erstellen, importieren — #320
+  - [x] Tabelle downloaden/selbst erstellen, importieren — #320
 - [x] **Mittelstrecke**:
   - [x] Timer läuft; individuelle Stopps pro Schüler im Ziel (Mehrfach-Stopp)
 - [x] **Sportabzeichen**:

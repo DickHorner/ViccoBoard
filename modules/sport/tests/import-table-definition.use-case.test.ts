@@ -7,6 +7,10 @@ import {
 } from '@viccoboard/storage/node';
 import { TableDefinitionRepository } from '../src/repositories/table-definition.repository';
 import { ImportTableDefinitionUseCase } from '../src/use-cases/import-table-definition.use-case';
+import {
+  COOPER_TABLE_CSV_TEMPLATE,
+  COOPER_TABLE_TEMPLATE_FILE_NAME
+} from '../src/templates/cooper-table.template';
 
 describe('ImportTableDefinitionUseCase', () => {
   let storage: SQLiteStorage;
@@ -34,6 +38,21 @@ describe('ImportTableDefinitionUseCase', () => {
   });
 
   describe('execute – successful import', () => {
+    test('imports the downloadable Cooper CSV template without changes', async () => {
+      const result = await useCase.execute({
+        name: 'Cooper-Normen',
+        csvContent: COOPER_TABLE_CSV_TEMPLATE
+      });
+
+      expect(COOPER_TABLE_TEMPLATE_FILE_NAME).toMatch(/\.csv$/);
+      expect(result.success).toBe(true);
+      expect(result.definition?.entries).toHaveLength(6);
+      expect(result.definition?.entries[0]).toEqual({
+        key: { min_meters: '3200', max_meters: '9999' },
+        value: '1'
+      });
+    });
+
     test('imports a valid CSV and persists the definition', async () => {
       const csv = 'min_meters,max_meters,value\n3200,9999,1\n2800,3199,2\n';
 

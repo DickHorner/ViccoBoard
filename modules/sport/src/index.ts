@@ -186,6 +186,12 @@ export type {
 export { TableImportService } from './services/table-import.service.js';
 export type { TableImportResult, TableImportValidationError } from './services/table-import.service.js';
 
+// CSV templates
+export {
+  COOPER_TABLE_CSV_TEMPLATE,
+  COOPER_TABLE_TEMPLATE_FILE_NAME
+} from './templates/cooper-table.template.js';
+
 export { PushupRepetitionCounter } from './services/pushup-repetition-counter.service.js';
 export type {
   PushupQuality,
