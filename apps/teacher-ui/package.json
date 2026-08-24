@@ -16,7 +16,7 @@
   "dependencies": {
     "@primeuix/themes": "^3.0.0",
     "@viccoboard/core": "*",
-    "dexie": "^4.4.4",
+    "dexie": "^4.4.5",
     "pinia": "^4.0.3",
     "primeicons": "^8.0.0",
     "primevue": "^5.0.1",
