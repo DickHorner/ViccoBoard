@@ -26,6 +26,15 @@ function createTask(
   };
 }
 
+function withMutedVueLifecycleWarning<T>(callback: () => T): T {
+  const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+  try {
+    return callback();
+  } finally {
+    warnSpy.mockRestore();
+  }
+}
+
 const exam: Exams.Exam = {
   id: 'exam-1',
   title: 'Analysis Sort Test',
@@ -118,44 +127,43 @@ const corrections: Exams.CorrectionEntry[] = [
 
 describe('useExamAnalysisView result sorting (#326)', () => {
   it('exposes correction-relevant subtasks as result columns', () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-    const view = useExamAnalysisView({ exam, corrections, candidates: exam.candidates });
+    withMutedVueLifecycleWarning(() => {
+      const view = useExamAnalysisView({ exam, corrections, candidates: exam.candidates });
 
-    expect(view.resultTasks.value.map((task) => task.id)).toEqual(['task-a', 'task-b']);
-    warnSpy.mockRestore();
+      expect(view.resultTasks.value.map((task) => task.id)).toEqual(['task-a', 'task-b']);
+    });
   });
 
   it('sorts results by correction order, name, total points and subtask points', () => {
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
-    const view = useExamAnalysisView({ exam, corrections, candidates: exam.candidates });
+    withMutedVueLifecycleWarning(() => {
+      const view = useExamAnalysisView({ exam, corrections, candidates: exam.candidates });
 
-    expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
-      'candidate-1',
-      'candidate-2',
-      'candidate-3'
-    ]);
+      expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
+        'candidate-1',
+        'candidate-2',
+        'candidate-3'
+      ]);
 
-    view.sortResultsBy('name');
-    expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
-      'candidate-2',
-      'candidate-1',
-      'candidate-3'
-    ]);
+      view.sortResultsBy('name');
+      expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
+        'candidate-2',
+        'candidate-1',
+        'candidate-3'
+      ]);
 
-    view.sortResultsBy('totalPoints');
-    expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
-      'candidate-2',
-      'candidate-1',
-      'candidate-3'
-    ]);
+      view.sortResultsBy('totalPoints');
+      expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
+        'candidate-2',
+        'candidate-1',
+        'candidate-3'
+      ]);
 
-    view.sortResultsBy('task-b');
-    expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
-      'candidate-2',
-      'candidate-1',
-      'candidate-3'
-    ]);
-
-    warnSpy.mockRestore();
+      view.sortResultsBy('task-b');
+      expect(view.sortedResults.value.map((row) => row.correction.candidateId)).toEqual([
+        'candidate-2',
+        'candidate-1',
+        'candidate-3'
+      ]);
+    });
   });
 });
