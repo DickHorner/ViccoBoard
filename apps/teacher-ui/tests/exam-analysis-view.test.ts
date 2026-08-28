@@ -1,5 +1,37 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { Exams } from '@viccoboard/core';
+import type { Exams } from '@viccoboard/core';
+
+jest.mock('@viccoboard/exams', () => ({
+  AnalysisUIHelper: {
+    formatDifficultyText: () => 'Moderate',
+    getDifficultyColor: () => '#ffc107'
+  },
+  ExamAnalysisService: {
+    analyzeExamDifficulty: () => ({
+      totalCandidates: 0,
+      completedCount: 0,
+      averageScore: 0,
+      medianScore: 0,
+      standardDeviation: 0,
+      minScore: 0,
+      maxScore: 0,
+      gradeDistribution: new Map(),
+      taskDifficulties: []
+    }),
+    identifyOutliers: () => ({ veryDifficult: [], veryEasy: [] }),
+    identifyStudentsAtRisk: () => [],
+    calculateTaskVariance: () => new Map(),
+    suggestPointAdjustments: () => ({
+      currentDistribution: {},
+      suggestedDistribution: {},
+      adjustments: [],
+      impactAnalysis: { affectedGrades: [], gradeShift: 0 }
+    })
+  },
+  getCorrectionRelevantTaskNodes: (tasks: Array<{ subtasks?: string[] }>) =>
+    tasks.filter((task) => !task.subtasks || task.subtasks.length === 0)
+}), { virtual: true });
+
 import { useExamAnalysisView } from '../src/composables/useExamAnalysisView';
 
 function createTask(
@@ -39,7 +71,7 @@ const exam: Exams.Exam = {
   id: 'exam-1',
   title: 'Analysis Sort Test',
   assessmentFormat: 'test',
-  mode: Exams.ExamMode.Complex,
+  mode: 'complex' as Exams.ExamMode,
   structure: {
     parts: [],
     tasks: [
@@ -54,7 +86,7 @@ const exam: Exams.Exam = {
   gradingKey: {
     id: 'grading-key-1',
     name: 'Percentage',
-    type: Exams.GradingKeyType.Percentage,
+    type: 'percentage' as Exams.GradingKeyType,
     totalPoints: 30,
     gradeBoundaries: [],
     roundingRule: { type: 'nearest', decimalPlaces: 1 },
