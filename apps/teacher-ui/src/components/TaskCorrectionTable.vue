@@ -222,10 +222,9 @@ async function onSelectedTaskChange(event: Event): Promise<void> {
 
 function reuseComment(candidateId: string, event: Event): void {
   const target = event.target as HTMLSelectElement | null;
-  const text = target?.value ?? '';
-  if (!text) return;
+  if (!target || !target.value) return;
 
-  applyReusableComment(candidateId, text);
+  applyReusableComment(candidateId, target.value);
   markDirty(candidateId);
   target.value = '';
 }
