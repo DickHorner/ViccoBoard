@@ -48,6 +48,41 @@ function dateFrom(value: Date | string | undefined): Date {
   return value instanceof Date ? value : new Date(value);
 }
 
+function clampPoints(points: number, maxPoints: number): number {
+  if (!Number.isFinite(points)) return 0;
+  return Math.min(Math.max(points, 0), maxPoints);
+}
+
+export function buildTaskCorrectionTaskScores(
+  tasks: Exams.TaskNode[],
+  selectedTask: Exams.TaskNode,
+  correction: Exams.CorrectionEntry | undefined,
+  draft: TaskCorrectionDraft
+): Exams.TaskScore[] {
+  const existingScores = new Map(correction?.taskScores.map((score) => [score.taskId, score]) ?? []);
+
+  return tasks.map((task) => {
+    const existingScore = existingScores.get(task.id);
+    if (task.id !== selectedTask.id) {
+      return existingScore ?? {
+        taskId: task.id,
+        points: 0,
+        maxPoints: task.points,
+        timestamp: new Date()
+      };
+    }
+
+    return {
+      ...existingScore,
+      taskId: selectedTask.id,
+      points: clampPoints(draft.points, selectedTask.points),
+      maxPoints: selectedTask.points,
+      comment: draft.comment.trim() || undefined,
+      timestamp: new Date()
+    };
+  });
+}
+
 export function useTaskCorrectionTable(input: TaskCorrectionTableInput) {
   const selectedTaskId = ref('');
   const sort = ref<TaskCorrectionSort>('candidate');
