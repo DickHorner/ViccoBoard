@@ -98,7 +98,10 @@ import { computed, ref, watch } from 'vue';
 import type { Exams } from '@viccoboard/core';
 import { getCorrectionRelevantTaskNodes } from '@viccoboard/exams';
 
-import { useTaskCorrectionTable } from '../composables/useTaskCorrectionTable';
+import {
+  buildTaskCorrectionTaskScores,
+  useTaskCorrectionTable
+} from '../composables/useTaskCorrectionTable';
 
 interface RecordCorrectionUseCaseLike {
   execute(input: {
@@ -130,7 +133,6 @@ const {
   commentSuggestionsForCandidate,
   drafts,
   ensureSelectedTask,
-  hydrateDrafts,
   rows,
   selectTask,
   selectedTask,
@@ -177,41 +179,14 @@ function markDirty(candidateId: string): void {
   hasChanges.value = true;
 }
 
-function clampPoints(points: number, maxPoints: number): number {
-  if (!Number.isFinite(points)) return 0;
-  return Math.min(Math.max(points, 0), maxPoints);
-}
-
 function buildTaskScores(candidateId: string): Exams.TaskScore[] {
-  const task = selectedTask.value;
-  if (!task) return [];
-
-  const correction = props.corrections.get(candidateId);
-  const existingScores = new Map(correction?.taskScores.map((score) => [score.taskId, score]) ?? []);
-  const draft = drafts.value[candidateId] ?? { points: 0, comment: '' };
-
-  return correctionTasks.value.map((candidateTask) => {
-    const existingScore = existingScores.get(candidateTask.id);
-    if (candidateTask.id !== task.id) {
-      return existingScore ?? {
-        taskId: candidateTask.id,
-        points: 0,
-        maxPoints: candidateTask.points,
-        timestamp: new Date()
-      };
-    }
-
-    const taskScore: Exams.TaskScore = {
-      ...existingScore,
-      taskId: task.id,
-      points: clampPoints(draft.points, task.points),
-      maxPoints: task.points,
-      comment: draft.comment.trim() || undefined,
-      timestamp: new Date()
-    };
-
-    return taskScore;
-  });
+  if (!selectedTask.value) return [];
+  return buildTaskCorrectionTaskScores(
+    correctionTasks.value,
+    selectedTask.value,
+    props.corrections.get(candidateId),
+    drafts.value[candidateId] ?? { points: 0, comment: '' }
+  );
 }
 
 async function saveTaskRows(): Promise<void> {
