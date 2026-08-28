@@ -5,7 +5,7 @@
         <h2>Aufgabenweise Korrektur</h2>
         <p>Eine Aufgabe über alle Prüflinge korrigieren und vorhandene Aufgabenkommentare wiederverwenden.</p>
       </div>
-      <button class="btn-primary" :disabled="!hasChanges || !recordCorrectionUseCase" @click="saveTaskRows">
+      <button class="btn-primary" :disabled="!hasChanges || !props.recordCorrectionUseCase" @click="saveTaskRows">
         {{ hasChanges ? 'Tabellenänderungen speichern' : 'Alles gespeichert' }}
       </button>
     </div>
