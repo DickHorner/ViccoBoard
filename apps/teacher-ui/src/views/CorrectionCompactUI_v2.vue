@@ -8,7 +8,12 @@
         </p>
       </div>
       <div class="header-actions">
-        <button @click="saveCurrentCandidate(false)" class="btn-primary" :disabled="!hasChanges || !currentCandidate">
+        <button
+          v-if="correctionViewMode === 'candidate'"
+          @click="saveCurrentCandidate(false)"
+          class="btn-primary"
+          :disabled="!hasChanges || !currentCandidate"
+        >
           {{ hasChanges ? 'Aktuellen Stand speichern' : 'Alles gespeichert' }}
         </button>
         <button @click="openExportPage" class="btn-secondary" :disabled="!exam">Export</button>
@@ -48,7 +53,31 @@
       </div>
 
       <div class="correction-panel">
-        <div v-if="currentCandidate && exam" class="correction-form">
+        <div class="correction-mode-switch">
+          <button
+            :class="['btn-secondary', { active: correctionViewMode === 'candidate' }]"
+            @click="setCorrectionViewMode('candidate')"
+          >
+            Prüfling
+          </button>
+          <button
+            :class="['btn-secondary', { active: correctionViewMode === 'task' }]"
+            @click="setCorrectionViewMode('task')"
+          >
+            Aufgabe
+          </button>
+        </div>
+
+        <TaskCorrectionTable
+          v-show="correctionViewMode === 'task'"
+          :exam="exam"
+          :candidates="candidates"
+          :corrections="corrections"
+          :record-correction-use-case="recordCorrectionUseCase"
+          @saved="updateSavedTaskCorrections"
+        />
+
+        <div v-if="correctionViewMode === 'candidate' && currentCandidate && exam" class="correction-form">
           <div class="candidate-header">
             <h2>{{ currentCandidate.firstName }} {{ currentCandidate.lastName }}</h2>
             <span class="status" :class="`status-${currentCorrectionStatus}`">
@@ -263,7 +292,7 @@
           </div>
         </div>
 
-        <div v-else class="no-candidate">
+        <div v-else-if="correctionViewMode === 'candidate'" class="no-candidate">
           Wählen Sie einen Schüler aus, um mit der Korrektur zu beginnen.
         </div>
       </div>
@@ -286,6 +315,7 @@ import {
 import { useExamsBridge } from '../composables/useExamsBridge';
 import { useToast } from '../composables/useToast';
 import { downloadBytes } from '../utils/download';
+import TaskCorrectionTable from '../components/TaskCorrectionTable.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -304,6 +334,7 @@ const corrections = ref<Map<string, Exams.CorrectionEntry>>(new Map());
 const currentCandidate = ref<Exams.Candidate | null>(null);
 const loadError = ref('');
 const candidateFilter = ref('');
+const correctionViewMode = ref<'candidate' | 'task'>('candidate');
 const scoringMode = ref<'numeric' | 'alternative'>('numeric');
 const taskScores = ref<Record<string, number>>({});
 const criterionScores = ref<Record<string, Record<string, number>>>({});
@@ -393,6 +424,18 @@ function formatCorrectionStatus(status: Exams.CorrectionEntry['status'] | 'not-s
 
 function markDirty(): void {
   hasChanges.value = true;
+}
+
+async function setCorrectionViewMode(mode: 'candidate' | 'task'): Promise<void> {
+  if (correctionViewMode.value === mode) {
+    return;
+  }
+
+  if (correctionViewMode.value === 'candidate' && hasChanges.value) {
+    await saveCurrentCandidate(false);
+  }
+
+  correctionViewMode.value = mode;
 }
 
 async function loadExamData(): Promise<void> {
@@ -631,6 +674,18 @@ async function saveCurrentCandidate(finalize: boolean): Promise<void> {
   supportTips.value = await supportTipRepository?.findAll() ?? supportTips.value;
   hasChanges.value = false;
   hydrateCandidateState(currentCandidate.value.id);
+}
+
+function updateSavedTaskCorrections(savedCorrections: Exams.CorrectionEntry[]): void {
+  const nextCorrections = new Map(corrections.value);
+  for (const correction of savedCorrections) {
+    nextCorrections.set(correction.candidateId, correction);
+  }
+  corrections.value = nextCorrections;
+
+  if (currentCandidate.value) {
+    hydrateCandidateState(currentCandidate.value.id);
+  }
 }
 
 function getCorrectionStatus(candidateId: string): string | null {
