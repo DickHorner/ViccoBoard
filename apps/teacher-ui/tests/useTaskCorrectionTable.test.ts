@@ -2,7 +2,10 @@ import { describe, expect, it } from '@jest/globals';
 import { ref } from 'vue';
 import type { Exams } from '@viccoboard/core';
 
-import { useTaskCorrectionTable } from '../src/composables/useTaskCorrectionTable';
+import {
+  buildTaskCorrectionTaskScores,
+  useTaskCorrectionTable
+} from '../src/composables/useTaskCorrectionTable';
 
 function createCandidate(id: string, firstName: string, lastName: string): Exams.Candidate {
   return { id, examId: 'exam-1', firstName, lastName };
@@ -121,5 +124,28 @@ describe('useTaskCorrectionTable (#20)', () => {
     table.applyReusableComment('candidate-c', 'Ansatz stimmt');
 
     expect(table.drafts.value['candidate-c'].comment).toBe('Ansatz stimmt');
+  });
+
+  it('builds a save payload from the selected task without losing other task scores', () => {
+    const correction = createCorrection('candidate-a', [
+      { taskId: 'task-a', points: 4, maxPoints: 10, comment: 'alt', timestamp: new Date('2026-01-02T10:00:00Z') },
+      { taskId: 'task-b', points: 12, maxPoints: 20, comment: 'bleibt', timestamp: new Date('2026-01-02T10:05:00Z') }
+    ]);
+
+    const payload = buildTaskCorrectionTaskScores(
+      tasks,
+      tasks[0],
+      correction,
+      { points: 11, comment: ' überarbeitet ' }
+    );
+
+    expect(payload).toHaveLength(2);
+    expect(payload[0]).toEqual(expect.objectContaining({
+      taskId: 'task-a',
+      points: 10,
+      maxPoints: 10,
+      comment: 'überarbeitet'
+    }));
+    expect(payload[1]).toEqual(correction.taskScores[1]);
   });
 });
