@@ -47,8 +47,8 @@
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^9.6.0",
     "@types/sql.js": "^1.4.11",
-    "babel-jest": "^30.4.1",
-    "jest-util": "^30.4.1"
+    "babel-jest": "^30.5.0",
+    "jest-util": "^30.5.0"
   },
   "allowScripts": {
     "better-sqlite3": true,
