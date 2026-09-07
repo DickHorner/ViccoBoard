@@ -9,6 +9,7 @@ import { initializeStorage } from './services/storage.service'
 import { initializeSportBridge } from './composables/useSportBridge'
 import { initializeStudentsBridge } from './composables/useStudentsBridge'
 import { initializeExamsBridge } from './composables/useExamsBridge'
+import { initializePlanningBridge } from './composables/usePlanningBridge'
 import { primeVueOptions } from './primevue'
 import 'primeicons/primeicons.css'
 import './style.css'
@@ -26,6 +27,7 @@ const bootstrap = async () => {
 		initializeSportBridge()
 		initializeStudentsBridge()
 		initializeExamsBridge()
+		initializePlanningBridge()
 		
 		console.log('✓ All module bridges initialized')
 	} catch (error) {
