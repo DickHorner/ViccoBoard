@@ -35,6 +35,7 @@ export const primaryNavSections: NavSection[] = [
     defaultExpanded: false,
     items: [
       { to: '/schedule', label: 'Stundenplan', hint: 'Tages- und Stundenübersicht' },
+      { to: '/planning', label: 'Sequenzplanung', hint: 'Themenblöcke im Schuljahr' },
       { to: '/classes', label: 'Klassen', hint: 'Klassen und Gruppen' },
       { to: '/students', label: 'Schüler', hint: 'Zentrale Verwaltung' },
       { to: '/lessons', label: 'Stunden', hint: 'Einträge und Verlauf' },
