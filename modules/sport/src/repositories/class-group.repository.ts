@@ -72,8 +72,9 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
    * Get all active classes (current school year)
    */
   async findActive(): Promise<ClassGroup[]> {
-    const currentYear = new Date().getFullYear();
-    const schoolYear = `${currentYear}/${currentYear + 1}`;
+    const now = new Date();
+    const startYear = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+    const schoolYear = `${startYear}/${startYear + 1}`;
     const classes = await this.findBySchoolYear(schoolYear);
     return classes.filter((cls) => !cls.archived);
   }
