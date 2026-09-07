@@ -38,6 +38,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@viccoboard/core$': '<rootDir>/../../packages/core/src/interfaces/core.types.ts',
+    '^@viccoboard/storage/browser$': '<rootDir>/tests/__mocks__/viccoboard-storage-browser.ts',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^perfect-debounce$': '<rootDir>/tests/__mocks__/perfect-debounce.js',
   },
