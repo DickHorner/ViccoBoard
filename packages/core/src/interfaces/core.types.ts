@@ -150,6 +150,18 @@ export interface Lesson {
   lastModified: Date;
 }
 
+export interface PlanningBlock {
+  id: string;
+  classGroupId: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  color?: string;
+  notes?: string;
+  createdAt: Date;
+  lastModified: Date;
+}
+
 export interface LessonPart {
   id: string;
   description: string;

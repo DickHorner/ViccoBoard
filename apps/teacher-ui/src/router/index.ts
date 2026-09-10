@@ -23,6 +23,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Stundenplan', parent: '/' }
   },
   {
+    path: '/planning',
+    name: 'planning',
+    component: () => import('../views/PlanningOverview.vue'),
+    meta: { title: 'Sequenzplanung', parent: '/' }
+  },
+  {
     path: '/classes',
     name: 'classes',
     component: () => import('../views/ClassesOverview.vue'),
