@@ -162,6 +162,25 @@ export interface PlanningBlock {
   lastModified: Date;
 }
 
+export interface StudentCalendarEntry {
+  id: string;
+  studentId: string;
+  type: 'absence' | 'injury';
+  startDate: string;
+  endDate: string;
+  status?: string;
+  period?: string;
+  compulsoryLessons?: string;
+  missedDays?: number;
+  missedHours?: number;
+  missedMinutes?: number;
+  notes?: string;
+  source: 'manual' | 'iserv';
+  sourceKey?: string;
+  createdAt: Date;
+  lastModified: Date;
+}
+
 export interface LessonPart {
   id: string;
   description: string;
