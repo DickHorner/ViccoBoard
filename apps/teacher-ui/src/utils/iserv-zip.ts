@@ -8,7 +8,6 @@ const MAX_TOTAL_UNCOMPRESSED_BYTES = 50 * 1024 * 1024;
 
 interface ZipEntry {
   path: string;
-  flags: number;
   compressionMethod: number;
   compressedSize: number;
   uncompressedSize: number;
@@ -89,7 +88,6 @@ function parseCentralDirectory(bytes: Uint8Array): ZipEntry[] {
     if (!path.endsWith('/')) {
       entries.push({
         path,
-        flags,
         compressionMethod,
         compressedSize,
         uncompressedSize,
@@ -123,7 +121,9 @@ async function extractEntry(archive: Uint8Array, entry: ZipEntry): Promise<Uint8
     if (typeof DecompressionStream === 'undefined') {
       throw new Error('Dieser Browser kann komprimierte ZIP-Dateien nicht lokal entpacken.');
     }
-    const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    const compressedBuffer = new ArrayBuffer(compressed.byteLength);
+    new Uint8Array(compressedBuffer).set(compressed);
+    const stream = new Blob([compressedBuffer]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
     result = new Uint8Array(await new Response(stream).arrayBuffer());
   } else {
     throw new Error(`ZIP-Kompressionsmethode ${entry.compressionMethod} wird nicht unterstützt.`);
