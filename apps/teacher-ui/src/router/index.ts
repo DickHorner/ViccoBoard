@@ -149,6 +149,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Schüler', parent: '/' }
   },
   {
+    path: '/student-calendar',
+    name: 'student-calendar',
+    component: () => import('../views/StudentCalendar.vue'),
+    meta: { title: 'Abwesenheiten & Verletzungen', parent: '/students' }
+  },
+  {
     path: '/students/:id',
     name: 'student-profile',
     component: () => import('../views/StudentProfile.vue'),
