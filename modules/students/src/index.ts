@@ -9,6 +9,7 @@ export { SportStudentProfileRepository } from './repositories/sport-student-prof
 export { StatusCatalogRepository } from './repositories/status-catalog.repository.js';
 export { ImportBatchRepository } from './repositories/import-batch.repository.js';
 export { ImportBatchItemRepository } from './repositories/import-batch-item.repository.js';
+export { StudentCalendarEntryRepository } from './repositories/student-calendar-entry.repository.js';
 
 // Use Cases
 export { AddStudentUseCase } from './use-cases/add-student.use-case.js';
@@ -32,6 +33,15 @@ export type {
   StudentImportPreview,
   StudentImportExecutionResult
 } from './use-cases/student-csv-import.use-case.js';
+export { IservAbsenceImportUseCase } from './use-cases/iserv-absence-import.use-case.js';
+export type {
+  IservClassGroupGateway,
+  IservArchiveTextFile,
+  IservAbsenceImportIssue,
+  IservAbsenceImportCandidate,
+  IservAbsenceImportPreview,
+  IservAbsenceImportExecutionResult
+} from './use-cases/iserv-absence-import.use-case.js';
 export { CopyClassGroupToSchoolYearUseCase } from './use-cases/copy-class-group-to-school-year.use-case.js';
 export type {
   CopyClassGroupGateway,

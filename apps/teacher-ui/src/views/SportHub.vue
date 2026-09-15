@@ -72,6 +72,12 @@ const entries = [
     description: 'Lokale Spiel- und Übungsdatenbank: suchen, filtern und im Unterricht nutzen.'
   },
   {
+    to: '/student-calendar',
+    eyebrow: 'Schüler',
+    title: 'Abwesenheiten & Verletzungen',
+    description: 'Datumsbereiche dokumentieren und Abwesenheiten aus IServ-ZIP-Exporten importieren.'
+  },
+  {
     to: '/subjects/sport/statistics',
     eyebrow: 'Statistiken',
     title: 'Statistiken',
