@@ -1,4 +1,4 @@
-name: Daily Driver Build
+name: Local iPad Build
 
 on:
   workflow_dispatch:
@@ -7,12 +7,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: daily-driver-build-${{ github.ref }}
+  group: local-ipad-build-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-ipad:
-    name: Build iPad Artifact
+  build-ipad-local:
+    name: Build Local iPad File
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -42,32 +42,17 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Build iPad target
-        run: npm run build:ipad
+      - name: Build local iPad file
+        run: npm run build:ipad:local
 
-      - name: Create deployment bundle
+      - name: Verify single-file artifact
         run: |
-          mkdir -p release-artifacts/teacher-ui
-          cp -r apps/teacher-ui/dist/* release-artifacts/teacher-ui/
-          cat > release-artifacts/DEPLOY.md << 'EOF'
-          # ViccoBoard Daily Driver Build
+          test -f release-artifacts/viccoboard.html
+          test "$(find release-artifacts -type f | wc -l)" -eq 1
 
-          The `teacher-ui/` directory contains the production build for static deployment.
-
-          ## Deployment
-
-          Upload the contents of `teacher-ui/` to the public root of an HTTPS host or subdomain.
-          Configure the host so SPA routes fall back to `index.html`.
-
-          ## iPad use
-
-          Open the HTTPS URL in iPadOS Safari and add it to the Home Screen.
-          Data is stored locally in IndexedDB. Use the in-app backup export before relying on real school data.
-          EOF
-
-      - name: Upload iPad artifact
+      - name: Upload local iPad artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: viccoboard-daily-driver-${{ github.sha }}
-          path: release-artifacts/
+          name: viccoboard-local-ipad-${{ github.sha }}
+          path: release-artifacts/viccoboard.html
           retention-days: 7
