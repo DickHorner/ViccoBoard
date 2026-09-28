@@ -1,0 +1,73 @@
+name: Daily Driver Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-driver-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ipad:
+    name: Build iPad Artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint docs
+        run: npm run lint:docs
+
+      - name: Lint workflows
+        run: npm run lint:workflows
+
+      - name: OpenSSF readiness
+        run: npm run lint:openssf
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Build iPad target
+        run: npm run build:ipad
+
+      - name: Create deployment bundle
+        run: |
+          mkdir -p release-artifacts/teacher-ui
+          cp -r apps/teacher-ui/dist/* release-artifacts/teacher-ui/
+          cat > release-artifacts/DEPLOY.md << 'EOF'
+          # ViccoBoard Daily Driver Build
+
+          The `teacher-ui/` directory contains the production build for static deployment.
+
+          ## Deployment
+
+          Upload the contents of `teacher-ui/` to the public root of an HTTPS host or subdomain.
+          Configure the host so SPA routes fall back to `index.html`.
+
+          ## iPad use
+
+          Open the HTTPS URL in iPadOS Safari and add it to the Home Screen.
+          Data is stored locally in IndexedDB. Use the in-app backup export before relying on real school data.
+          EOF
+
+      - name: Upload iPad artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: viccoboard-daily-driver-${{ github.sha }}
+          path: release-artifacts/
+          retention-days: 7
