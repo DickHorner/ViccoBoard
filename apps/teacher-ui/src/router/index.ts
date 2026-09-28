@@ -347,7 +347,7 @@ export function getSafeBackNavigationTarget(
 }
 
 const router = createRouter({
-  history: import.meta.env.MODE === 'ipad-local' ? createWebHashHistory() : createWebHistory(),
+  history:\n    typeof window !== 'undefined' && window.location.protocol === 'file:'\n      ? createWebHashHistory()\n      : createWebHistory(),
   routes,
   scrollBehavior(to, _from, savedPosition) {
     if (savedPosition) {
