@@ -34,8 +34,9 @@ const entries = await readdir(assetsDir, { withFileTypes: true });
 const files = entries.filter((entry) => entry.isFile()).map((entry) => entry.name);
 const jsFiles = files.filter((name) => extname(name) === '.js');
 const cssFiles = files.filter((name) => extname(name) === '.css');
+const svgFiles = files.filter((name) => extname(name) === '.svg');
 const unsupportedEntries = entries.filter(
-  (entry) => entry.isDirectory() || !['.js', '.css'].includes(extname(entry.name))
+  (entry) => entry.isDirectory() || !['.js', '.css', '.svg'].includes(extname(entry.name))
 );
 
 if (jsFiles.length !== 1) {
@@ -53,9 +54,20 @@ if (unsupportedEntries.length > 0) {
 }
 
 const js = escapeRawTextEndTag(await readFile(join(assetsDir, jsFiles[0]), 'utf8'), 'script');
-const css = cssFiles[0]
-  ? escapeRawTextEndTag(await readFile(join(assetsDir, cssFiles[0]), 'utf8'), 'style')
-  : '';
+let css = cssFiles[0] ? await readFile(join(assetsDir, cssFiles[0]), 'utf8') : '';
+
+for (const svgFile of svgFiles) {
+  const reference = `./${svgFile}`;
+  if (!css.includes(reference)) {
+    throw new Error(`Local iPad SVG asset is not referenced by the CSS bundle: ${svgFile}`);
+  }
+
+  const svg = await readFile(join(assetsDir, svgFile));
+  const dataUrl = `data:image/svg+xml;base64,${svg.toString('base64')}`;
+  css = css.replaceAll(`${reference}?#`, `${dataUrl}#`).replaceAll(reference, dataUrl);
+}
+
+css = escapeRawTextEndTag(css, 'style');
 
 const styleTag = css ? `    <style>\n${css}\n    </style>\n` : '';
 const html = `<!doctype html>
