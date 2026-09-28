@@ -58,7 +58,7 @@ async function inlineStyles(html) {
 async function inlineScripts(html) {
   return replaceAsync(
     html,
-    /<script\s+([^>]*src=["'][^"']+["'][^>]*)><\/script>/g,
+    /<script\s+([^>]*src=["'][^"']+["'][^>]*)><\/script\s*>/g,
     async ([original, attributes]) => {
       const src = attributeValue(attributes, 'src');
       if (!src) {
