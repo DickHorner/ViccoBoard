@@ -347,7 +347,10 @@ export function getSafeBackNavigationTarget(
 }
 
 const router = createRouter({
-  history:\n    typeof window !== 'undefined' && window.location.protocol === 'file:'\n      ? createWebHashHistory()\n      : createWebHistory(),
+  history:
+    typeof window !== 'undefined' && window.location.protocol === 'file:'
+      ? createWebHashHistory()
+      : createWebHistory(),
   routes,
   scrollBehavior(to, _from, savedPosition) {
     if (savedPosition) {
