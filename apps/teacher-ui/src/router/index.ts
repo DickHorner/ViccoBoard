@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
 
 declare module 'vue-router' {
@@ -347,7 +347,10 @@ export function getSafeBackNavigationTarget(
 }
 
 const router = createRouter({
-  history: createWebHistory(),
+  history:
+    typeof window !== 'undefined' && window.location.protocol === 'file:'
+      ? createWebHashHistory()
+      : createWebHistory(),
   routes,
   scrollBehavior(to, _from, savedPosition) {
     if (savedPosition) {

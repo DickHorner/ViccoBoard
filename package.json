@@ -16,6 +16,7 @@
     "build:packages": "npm run build --workspace=@viccoboard/core && npm run build --workspace=@viccoboard/plugins && npm run build --workspace=@viccoboard/storage && npm run build --workspace=@viccoboard/students && npm run build --workspace=@viccoboard/exams && npm run build --workspace=@viccoboard/sport",
     "build:all": "npm run build:packages && npm run build --workspace=teacher-ui",
     "build:ipad": "npm run build:packages && npm run build --workspace=teacher-ui",
+    "build:ipad:local": "npm run build:packages && npm run build --workspace=teacher-ui -- --mode ipad-local && node scripts/package-ipad-local.mjs",
     "install:all": "npm install && npm install --workspaces",
     "lint:docs": "node scripts/doc-guardrails.mjs",
     "hooks:check": "node scripts/pre-push-guard.mjs",
