@@ -11,7 +11,7 @@
         <h3>Jetzt / Als Nächstes</h3>
         <div v-if="currentOrNextLesson" class="focus-content">
           <p class="focus-meta">{{ currentOrNextMode }}</p>
-          <h4>{{ getClassName(currentOrNextLesson.classGroupId) }}</h4>
+          <h4>{{ getSubjectName(currentOrNextLesson.subjectId) }} · {{ getClassName(currentOrNextLesson.classGroupId) }}</h4>
           <p>{{ formatLessonDateTime(currentOrNextLesson.date) }}</p>
 
           <div class="focus-actions">
@@ -24,7 +24,7 @@
           </div>
 
           <p v-if="upcomingLesson" class="focus-follow-up">
-            Danach: {{ getClassName(upcomingLesson.classGroupId) }} um {{ formatLessonTime(upcomingLesson.date) }}
+            Danach: {{ getSubjectName(upcomingLesson.subjectId) }} · {{ getClassName(upcomingLesson.classGroupId) }} um {{ formatLessonTime(upcomingLesson.date) }}
           </p>
         </div>
         <div v-else class="empty-state">
@@ -70,7 +70,7 @@
             :to="`/lessons/${lesson.id}/workspace`"
             class="lesson-timeline-item"
           >
-            <strong>{{ getClassName(lesson.classGroupId) }}</strong>
+            <strong>{{ getSubjectName(lesson.subjectId) }} · {{ getClassName(lesson.classGroupId) }}</strong>
             <span>{{ formatLessonTime(lesson.date) }}</span>
           </RouterLink>
         </div>
@@ -394,6 +394,7 @@ const {
   filteredClasses,
   loadData,
   getClassName,
+  getSubjectName,
   formatLessonTime,
   formatLessonDateTime,
   handleCreateClass,
