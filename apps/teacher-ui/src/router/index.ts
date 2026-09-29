@@ -164,13 +164,13 @@ const routes: RouteRecordRaw[] = [
     path: '/attendance',
     name: 'attendance',
     component: () => import('../views/AttendanceEntry.vue'),
-    meta: { title: 'Anwesenheit', parent: '/subjects/sport' }
+    meta: { title: 'Anwesenheit', parent: '/lessons' }
   },
   {
     path: '/lessons',
     name: 'lessons',
     component: () => import('../views/LessonList.vue'),
-    meta: { title: 'Stunden', parent: '/subjects/sport' }
+    meta: { title: 'Stunden', parent: '/schedule' }
   },
   {
     path: '/lessons/:id/workspace',
