@@ -4,7 +4,7 @@
  */
 
 import { AdapterRepository } from '@viccoboard/storage';
-import { ClassGroup, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
+import { ClassGroup } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
@@ -27,7 +27,6 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
       state: row.state || undefined,
       holidayCalendarRef: row.holiday_calendar_ref || undefined,
       gradingScheme: row.grading_scheme || 'default',
-      subjectProfile: row.subject_profile ? safeJsonParse(row.subject_profile, undefined, 'ClassGroup.subjectProfile') : undefined,
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
     };
@@ -47,7 +46,6 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
     if (entity.state !== undefined) row.state = entity.state;
     if (entity.holidayCalendarRef !== undefined) row.holiday_calendar_ref = entity.holidayCalendarRef;
     if (entity.gradingScheme !== undefined) row.grading_scheme = entity.gradingScheme;
-    if (entity.subjectProfile !== undefined) row.subject_profile = safeJsonStringify(entity.subjectProfile, 'ClassGroup.subjectProfile');
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
 
