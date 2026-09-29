@@ -29,6 +29,8 @@ export function buildPlanningWeeks(input: PlanningWeekProjectionInput): Planning
 
   const state = normalizeState(input.classGroup.state)
   const states = state ? [state] : []
+  const classLessons = input.lessons.filter((lesson) => lesson.classGroupId === input.classGroup.id)
+  const lessonWeekdays = new Set(classLessons.map((lesson) => lesson.date.getDay()))
   const weeks: PlanningWeek[] = []
   const cursor = startOfWeek(range.start)
   const end = endOfWeek(range.end)
@@ -44,13 +46,13 @@ export function buildPlanningWeeks(input: PlanningWeekProjectionInput): Planning
       startDate,
       endDate,
       label: formatWeekLabel(weekStart, weekEnd),
-      markers: getWeekMarkers(weekStart, states),
+      markers: getWeekMarkers(weekStart, states, lessonWeekdays),
       blocks: input.blocks
         .filter((block) => block.classGroupId === input.classGroup.id)
         .filter((block) => doesDateRangeOverlap(block.startDate, block.endDate, startDate, endDate)),
-      lessons: input.lessons
-        .filter((lesson) => lesson.classGroupId === input.classGroup.id)
+      lessons: classLessons
         .filter((lesson) => doesDateRangeOverlap(getDateKey(lesson.date), getDateKey(lesson.date), startDate, endDate))
+        .filter((lesson) => getScheduleCalendarMarkers(getDateKey(lesson.date), states).length === 0)
         .sort(compareLessonsByDateAndStartTime)
     })
 
@@ -69,14 +71,21 @@ export function doesDateRangeOverlap(
   return leftStart <= rightEnd && rightStart <= leftEnd
 }
 
-const getWeekMarkers = (weekStart: Date, states: string[]): ResolvedScheduleCalendarMarker[] => {
+const getWeekMarkers = (
+  weekStart: Date,
+  states: string[],
+  lessonWeekdays: Set<number>
+): ResolvedScheduleCalendarMarker[] => {
   const markers = new Map<string, ResolvedScheduleCalendarMarker>()
 
   for (let offset = 0; offset < 7; offset += 1) {
     const date = new Date(weekStart)
     date.setDate(weekStart.getDate() + offset)
-    const dateKey = getDateKey(date)
+    if (!lessonWeekdays.has(date.getDay())) {
+      continue
+    }
 
+    const dateKey = getDateKey(date)
     for (const marker of getScheduleCalendarMarkers(dateKey, states)) {
       markers.set(marker.type + ':' + marker.label, marker)
     }
