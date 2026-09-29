@@ -6,13 +6,13 @@ import {
 } from '../src/utils/lesson-workspace'
 
 describe('lesson workspace subject resolution', () => {
-  it('maps known subject profiles to sport or kbr', () => {
+  it('maps known workspace profiles to sport or kbr', () => {
     expect(resolveLessonWorkspaceSubject('sport')).toBe('sport')
     expect(resolveLessonWorkspaceSubject('Sport Sek I')).toBe('sport')
     expect(resolveLessonWorkspaceSubject('kbr')).toBe('kbr')
   })
 
-  it('falls back to generic for unknown or missing profiles', () => {
+  it('falls back to generic for unknown or missing workspace profiles', () => {
     expect(resolveLessonWorkspaceSubject()).toBe('generic')
     expect(resolveLessonWorkspaceSubject('mathe')).toBe('generic')
   })
