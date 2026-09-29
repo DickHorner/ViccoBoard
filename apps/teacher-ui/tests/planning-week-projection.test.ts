@@ -156,10 +156,56 @@ describe('planning week projection', () => {
     const missingLessonWeek = weeks.find((week) => week.startDate === '2026-09-14')
     const laterLessonWeek = weeks.find((week) => week.startDate === '2026-09-21')
 
-    expect(missingLessonWeek?.blocks[0]?.startDate).toBe('2026-09-07')
-    expect(missingLessonWeek?.blocks[0]?.endDate).toBe('2026-09-28')
+    expect(missingLessonWeek?.blocks).toHaveLength(0)
     expect(missingLessonWeek?.lessons).toHaveLength(0)
+    expect(laterLessonWeek?.blocks[0]?.startDate).toBe('2026-09-07')
+    expect(laterLessonWeek?.blocks[0]?.endDate).toBe('2026-09-28')
     expect(laterLessonWeek?.lessons[0]?.date.toISOString()).toBe('2026-09-21T08:00:00.000Z')
+  })
+
+  it('leaves a school-break week empty without extending the sequence afterwards', () => {
+    const block: PlanningBlock = {
+      id: 'block-autumn',
+      classGroupId: 'class-1',
+      title: 'Basketball',
+      startDate: '2026-10-12',
+      endDate: '2026-11-02',
+      color: 'blue',
+      createdAt: now,
+      lastModified: now
+    }
+    const lessons: Lesson[] = [
+      {
+        id: 'lesson-before-break',
+        classGroupId: 'class-1',
+        date: new Date('2026-10-12T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      },
+      {
+        id: 'lesson-after-break',
+        classGroupId: 'class-1',
+        date: new Date('2026-11-02T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      }
+    ]
+
+    const weeks = buildPlanningWeeks({ classGroup, blocks: [block], lessons })
+    const breakWeek = weeks.find((week) => week.startDate === '2026-10-19')
+    const afterBreakWeek = weeks.find((week) => week.startDate === '2026-11-02')
+
+    expect(breakWeek?.markers.map((marker) => marker.label)).toContain('Herbstferien')
+    expect(breakWeek?.blocks).toHaveLength(0)
+    expect(breakWeek?.lessons).toHaveLength(0)
+    expect(afterBreakWeek?.blocks[0]?.endDate).toBe('2026-11-02')
+    expect(afterBreakWeek?.lessons[0]?.date.toISOString()).toBe('2026-11-02T08:00:00.000Z')
   })
 
   it('rejects non-overlapping date ranges', () => {
