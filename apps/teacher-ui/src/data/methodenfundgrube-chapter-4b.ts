@@ -5,7 +5,7 @@ type SeedEntry = Omit<Sport.GameEntry, 'id' | 'isCustom' | 'createdAt' | 'lastMo
 export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
   {
     name: 'Sprinte um die Ecken!',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -15,11 +15,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Vier Gruppen stehen an den Ecken eines Rechtecks. Je eine Person sprintet eine volle Runde und übergibt per Abklatschen an den nächsten Läufer der eigenen Ecke.',
     variation: 'Als Umkehrstaffel zur Mitte laufen, ein zentrales Hütchen umrunden und zur eigenen Gruppe zurückkehren.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 92.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Jogge um die Ecken! (Pyramidenlauf)',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -29,11 +28,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Die Gruppen starten nacheinander weitere Läufer in denselben Rundkurs. Dadurch wächst die Zahl gleichzeitig Laufender zunächst an und nimmt später wieder ab, sobald die zuerst Gestarteten ihre vorgegebene Rundenzahl erreicht haben.',
     variation: 'Die gleiche Gruppenaufstellung als Pendel-/Umkehrlauf zur Hallenmitte nutzen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 94.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Zahlen laufen',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -42,11 +40,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     goal: 'Kurzzeitausdauer und Sprintschnelligkeit',
     description: 'In jeder Eckgruppe erhält jede Person eine Nummer. Eine aufgerufene Nummer löst gleichzeitig in allen Gruppen den Sprint aus; alternativ bestimmt ein Würfel die Zahl der zu laufenden Runden oder Strecken.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 96.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Wo ist die Karte?',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -56,11 +53,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Verdeckte Spielkarten liegen in der Hallenmitte. Jede Gruppe sucht staffelartig ausschließlich Karten der eigenen Farbe; pro Lauf darf nur eine Karte aufgedeckt werden.',
     variation: 'Mit Basketball- oder Fußballdribbling laufen oder Karten zusätzlich in aufsteigender Reihenfolge sammeln.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 98.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Matten-Rutschen',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -70,11 +66,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Je zwei Personen eines Teams springen möglichst gleichzeitig auf eine mit glatter Seite unten liegende Weichbodenmatte und schieben sie dadurch vorwärts. Anschließend sprinten sie zurück und übergeben an das nächste Paar.',
     variation: 'Bäuchlings, sitzend oder stehend auf die Matte springen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 100.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Matten-Tragen',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -84,11 +79,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Vier bis sechs Personen tragen gemeinsam eine große Weichbodenmatte von einer Hallenseite zur anderen. Geschwindigkeit und Stabilität hängen von abgestimmtem Greifen und gemeinsamem Tempo ab.',
     variation: 'Einen oder mehrere Bälle bzw. eine Person zusätzlich auf der Matte transportieren.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 102.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Frisbee-Biathlon',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -98,11 +92,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Staffelläufer sprinten zu einer Wurfstation und versuchen von dort eine Frisbee-Scheibe oder einen Ball in ein Ziel zu werfen. Danach laufen sie zurück und übergeben an die nächste Person.',
     variation: 'Wurfposition und Zielgerät umkehren oder einbeinige bzw. erhöhte Ausgangspositionen wählen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 104.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Vielseitigkeits-Biathlon',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -112,11 +105,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Sechs Geräte oder Ballarten sind sechs Würfelzahlen zugeordnet. Die jeweils startende Person würfelt, nimmt das passende Gerät und absolviert die dazugehörige Hin-und-zurück-Aufgabe, bevor die nächste Person würfeln darf.',
     variation: 'Slalom-, Balance- oder Sprungstationen in die Laufwege integrieren.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 106.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Ballübergabe – 1 (Pendelstaffel parallel)',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -126,11 +118,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     description: 'Jedes Team teilt sich auf beide Hallenseiten. Zwei entgegenlaufende Personen treffen sich in einer markierten Mittelzone und übergeben dort den Ball kontrolliert, bevor beide zur jeweils anderen Seite weiterlaufen.',
     variation: 'Übergabe im Einbeinstand oder Sprung sowie als Fußballübergabe in einer markierten Boden-Zone.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 108.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Ballübergabe – 2 (Pendelstaffel kreuzend)',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -139,6 +130,5 @@ export const METHODENFUNDGRUBE_CHAPTER_4B: SeedEntry[] = [
     goal: 'Timing, genaues Zuspiel',
     description: 'Die Pendelstaffel wird diagonal organisiert: äußere Gruppen laufen zu gegenüberliegenden inneren Gruppen und umgekehrt. Die Ballübergabe erfolgt in der Mitte auf bzw. an einer markierten Gerätezone.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 110.',
-    sportType: 'Allgemein'
   }
 ];
