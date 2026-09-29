@@ -48,6 +48,13 @@ describe('game entry tags migrations', () => {
       .get('legacy-1') as { tags: string };
 
     expect(JSON.parse(row.tags)).toEqual(['Reaktion', 'Basketball']);
+
+    const columns = storage.getDatabase()
+      .prepare('PRAGMA table_info(game_entries)')
+      .all() as Array<{ name: string }>;
+    expect(columns.map((column) => column.name)).not.toContain('category');
+    expect(columns.map((column) => column.name)).not.toContain('sport_type');
+
     await storage.close();
   });
 
