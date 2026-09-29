@@ -31,3 +31,4 @@ export * from './migrations/indexeddb/022_lesson_schedule_fields.js';
 export * from './migrations/indexeddb/023_support_tips.js';
 export * from './migrations/indexeddb/024_planning_blocks.js';
 export * from './migrations/indexeddb/025_student_calendar_entries.js';
+export * from './migrations/indexeddb/026_game_entry_tags.js';
