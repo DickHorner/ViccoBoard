@@ -93,7 +93,9 @@
 
         <div v-if="!selectedClass" class="empty-state">Keine Klasse gewählt.</div>
         <div v-else-if="weeks.length === 0" class="empty-state">Ungültiges Schuljahr.</div>
-        <div v-else class="week-grid">
+        <template v-else>
+          <p v-if="lessonError && !lessonFormWeekKey" class="error-text">{{ lessonError }}</p>
+          <div class="week-grid">
           <section v-for="week in weeks" :key="week.key" class="week-card">
             <header class="week-header">
               <strong>{{ week.label }}</strong>
@@ -202,7 +204,8 @@
               </div>
             </div>
           </section>
-        </div>
+          </div>
+        </template>
       </section>
     </div>
   </section>
