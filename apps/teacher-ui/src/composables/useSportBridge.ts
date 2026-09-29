@@ -10,6 +10,7 @@ import {
   AttendanceRepository,
   BJSGradingService,
   ClassGroupRepository,
+  SubjectRepository,
   CooperTestConfigRepository,
   CooperTestService,
   CreateClassUseCase,
@@ -80,6 +81,7 @@ let sportBridgeInstance: SportBridge | null = null;
 
 interface SportBridge {
   classGroupRepository: ClassGroupRepository;
+  subjectRepository: SubjectRepository;
   lessonRepository: LessonRepository;
   lessonPartRepository: LessonPartRepository;
   gradeCategoryRepository: GradeCategoryRepository;
@@ -147,6 +149,7 @@ export function initializeSportBridge(): SportBridge {
   const adapter = getStorageAdapter();
 
   const classGroupRepository = new ClassGroupRepository(adapter);
+  const subjectRepository = new SubjectRepository(adapter);
   const lessonRepository = new LessonRepository(adapter);
   const lessonPartRepository = new LessonPartRepository(adapter);
   const gradeCategoryRepository = new GradeCategoryRepository(adapter);
@@ -233,6 +236,7 @@ export function initializeSportBridge(): SportBridge {
 
   sportBridgeInstance = {
     classGroupRepository,
+    subjectRepository,
     lessonRepository,
     lessonPartRepository,
     gradeCategoryRepository,
@@ -307,6 +311,10 @@ export function useClassGroups() {
   return getSportBridge().classGroupRepository;
 }
 
+export function useSubjects() {
+  return getSportBridge().subjectRepository;
+}
+
 export function useLessons() {
   return getSportBridge().lessonRepository;
 }
@@ -324,6 +332,7 @@ export function useSportBridge() {
     SportBridge: bridge,
     isInitialized,
     classGroups: computed(() => bridge.value?.classGroupRepository),
+    subjects: computed(() => bridge.value?.subjectRepository),
     lessons: computed(() => bridge.value?.lessonRepository),
     gradeCategories: computed(() => bridge.value?.gradeCategoryRepository),
     performanceEntries: computed(() => bridge.value?.performanceEntryRepository),
@@ -349,6 +358,7 @@ export function useStudents(): never {
 export {
   AttendanceRepository,
   ClassGroupRepository,
+  SubjectRepository,
   CreateClassUseCase,
   CreateGradeCategoryUseCase,
   CreateLessonUseCase,
