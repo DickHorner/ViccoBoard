@@ -97,7 +97,12 @@
           <section v-for="week in weeks" :key="week.key" class="week-card">
             <header class="week-header">
               <strong>{{ week.label }}</strong>
-              <span>{{ week.startDate }}</span>
+              <div class="week-header-actions">
+                <span>{{ week.startDate }}</span>
+                <button class="week-add-button" type="button" @click="openLessonForm(week)">
+                  + Termin
+                </button>
+              </div>
             </header>
 
             <div v-if="week.markers.length > 0" class="calendar-markers">
@@ -110,6 +115,68 @@
                 {{ marker.label }}
               </span>
             </div>
+
+            <form
+              v-if="lessonFormWeekKey === week.key"
+              class="lesson-form"
+              @submit.prevent="handleCreateLesson(week)"
+            >
+              <div class="form-row">
+                <div class="form-group">
+                  <label :for="'lesson-date-' + week.key">Datum</label>
+                  <input
+                    :id="'lesson-date-' + week.key"
+                    v-model="lessonForm.date"
+                    type="date"
+                    :min="week.startDate"
+                    :max="week.endDate"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label :for="'lesson-time-' + week.key">Uhrzeit</label>
+                  <input
+                    :id="'lesson-time-' + week.key"
+                    v-model="lessonForm.startTime"
+                    type="time"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label :for="'lesson-duration-' + week.key">Dauer</label>
+                  <input
+                    :id="'lesson-duration-' + week.key"
+                    v-model.number="lessonForm.durationMinutes"
+                    type="number"
+                    min="1"
+                    max="300"
+                    step="1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label :for="'lesson-title-' + week.key">Titel</label>
+                <input
+                  :id="'lesson-title-' + week.key"
+                  v-model="lessonForm.title"
+                  type="text"
+                  placeholder="optional"
+                />
+              </div>
+
+              <p v-if="lessonError" class="error-text">{{ lessonError }}</p>
+
+              <div class="form-actions">
+                <button class="primary-link" type="submit" :disabled="lessonSaving">
+                  {{ lessonSaving ? 'Wird angelegt...' : 'Termin anlegen' }}
+                </button>
+                <button class="ghost-link" type="button" :disabled="lessonSaving" @click="resetLessonForm">
+                  Abbrechen
+                </button>
+              </div>
+            </form>
 
             <div v-if="week.blocks.length > 0" class="block-list">
               <article
@@ -129,9 +196,10 @@
             </div>
 
             <div v-if="week.lessons.length > 0" class="lesson-list">
-              <span v-for="lesson in week.lessons" :key="lesson.id">
-                {{ getLessonLabel(lesson) }}
-              </span>
+              <div v-for="lesson in week.lessons" :key="lesson.id" class="lesson-row">
+                <span>{{ getLessonLabel(lesson) }}</span>
+                <button type="button" @click="deleteLesson(lesson)">Löschen</button>
+              </div>
             </div>
           </section>
         </div>
@@ -144,9 +212,10 @@
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import type { ClassGroup, Lesson, PlanningBlock } from '@viccoboard/core'
-import { useClassGroups, useLessons } from '../composables/useSportBridge'
+import { getSportBridge, useClassGroups, useLessons } from '../composables/useSportBridge'
 import { usePlanningBlocks } from '../composables/usePlanningBridge'
-import { buildPlanningWeeks } from '../utils/planning-week-projection'
+import { buildPlanningWeeks, type PlanningWeek } from '../utils/planning-week-projection'
+import { getScheduleCalendarMarkers } from '../utils/schedule-calendar-markers'
 
 interface BlockForm {
   title: string
@@ -156,6 +225,14 @@ interface BlockForm {
   notes: string
 }
 
+interface LessonForm {
+  date: string
+  startTime: string
+  durationMinutes: number
+  title: string
+}
+
+const sportBridge = getSportBridge()
 const classGroups = useClassGroups()
 const lessonsRepository = useLessons()
 const planningBlocks = usePlanningBlocks()
@@ -169,6 +246,9 @@ const lessons = ref<Lesson[]>([])
 const blocks = ref<PlanningBlock[]>([])
 const selectedClassId = ref('')
 const editingBlockId = ref<string | null>(null)
+const lessonFormWeekKey = ref<string | null>(null)
+const lessonSaving = ref(false)
+const lessonError = ref('')
 
 const blockForm = ref<BlockForm>({
   title: '',
@@ -176,6 +256,13 @@ const blockForm = ref<BlockForm>({
   endDate: '',
   color: 'blue',
   notes: ''
+})
+
+const lessonForm = ref<LessonForm>({
+  date: '',
+  startTime: '08:00',
+  durationMinutes: 45,
+  title: ''
 })
 
 const activeClasses = computed(() =>
@@ -227,6 +314,7 @@ const loadSelectedClassPlanning = async () => {
     blocks.value = []
     lessons.value = []
     resetBlockForm()
+    resetLessonForm()
     return
   }
 
@@ -238,6 +326,7 @@ const loadSelectedClassPlanning = async () => {
   blocks.value = loadedBlocks
   lessons.value = loadedLessons
   resetBlockForm()
+  resetLessonForm()
 }
 
 const handleClassChange = async () => {
@@ -293,6 +382,90 @@ const deleteBlock = async (block: PlanningBlock) => {
   await loadSelectedClassPlanning()
 }
 
+const openLessonForm = (week: PlanningWeek) => {
+  lessonFormWeekKey.value = week.key
+  lessonError.value = ''
+  lessonForm.value = {
+    date: '',
+    startTime: '08:00',
+    durationMinutes: 45,
+    title: ''
+  }
+}
+
+const resetLessonForm = () => {
+  lessonFormWeekKey.value = null
+  lessonError.value = ''
+  lessonForm.value = {
+    date: '',
+    startTime: '08:00',
+    durationMinutes: 45,
+    title: ''
+  }
+}
+
+const handleCreateLesson = async (week: PlanningWeek) => {
+  if (!selectedClass.value) {
+    return
+  }
+
+  lessonError.value = ''
+  if (lessonForm.value.date < week.startDate || lessonForm.value.date > week.endDate) {
+    lessonError.value = 'Das Datum muss innerhalb der ausgewählten Kalenderwoche liegen.'
+    return
+  }
+
+  const state = normalizeState(selectedClass.value.state)
+  const markers = getScheduleCalendarMarkers(
+    lessonForm.value.date,
+    state ? [state] : []
+  )
+  if (markers.length > 0) {
+    lessonError.value = 'An diesem Tag findet kein Unterricht statt: ' +
+      markers.map((marker) => marker.label).join(', ')
+    return
+  }
+
+  lessonSaving.value = true
+  try {
+    const dateTime = new Date(
+      lessonForm.value.date + 'T' + lessonForm.value.startTime + ':00'
+    )
+
+    await sportBridge.createLessonUseCase.execute({
+      classGroupId: selectedClass.value.id,
+      date: dateTime,
+      startTime: lessonForm.value.startTime,
+      durationMinutes: lessonForm.value.durationMinutes,
+      title: lessonForm.value.title.trim() || undefined
+    })
+
+    await loadSelectedClassPlanning()
+  } catch (error) {
+    lessonError.value = error instanceof Error ? error.message : 'Termin konnte nicht angelegt werden.'
+  } finally {
+    lessonSaving.value = false
+  }
+}
+
+const deleteLesson = async (lesson: Lesson) => {
+  const confirmed = window.confirm(
+    'Termin ' + getLessonLabel(lesson) +
+    ' wirklich löschen? Alle anderen Termine und Themenblock-Grenzen bleiben unverändert.'
+  )
+  if (!confirmed) {
+    return
+  }
+
+  lessonError.value = ''
+  try {
+    await lessonsRepository.delete(lesson.id)
+    await loadSelectedClassPlanning()
+  } catch (error) {
+    lessonError.value = error instanceof Error ? error.message : 'Termin konnte nicht gelöscht werden.'
+  }
+}
+
 const resetBlockForm = () => {
   editingBlockId.value = null
   const fallbackDate = selectedClass.value ? getSchoolYearStartDate(selectedClass.value.schoolYear) : ''
@@ -316,6 +489,21 @@ const getBlockRangeLabel = (block: PlanningBlock): string =>
 const getLessonLabel = (lesson: Lesson): string => {
   const date = lesson.date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
   return date + ' · ' + lesson.startTime + ' · ' + (lesson.title || 'Stunde')
+}
+
+const normalizeState = (state: string | undefined): string => {
+  if (!state) {
+    return ''
+  }
+
+  const normalized = state.trim().toUpperCase()
+  if (normalized === 'BERLIN') {
+    return 'BE'
+  }
+  if (normalized === 'BRANDENBURG') {
+    return 'BB'
+  }
+  return normalized
 }
 
 onMounted(() => {
@@ -347,16 +535,23 @@ onMounted(() => {
 .form-row,
 .form-actions,
 .block-actions,
-.week-header {
+.week-header,
+.week-header-actions,
+.lesson-row {
   display: flex;
   gap: 1rem;
 }
 
 .page-header,
 .panel-header,
-.week-header {
+.week-header,
+.lesson-row {
   align-items: center;
   justify-content: space-between;
+}
+
+.week-header-actions {
+  align-items: center;
 }
 
 .page-header,
@@ -384,7 +579,9 @@ onMounted(() => {
 
 .primary-link,
 .ghost-link,
-.block-actions button {
+.block-actions button,
+.week-add-button,
+.lesson-row button {
   min-height: 44px;
   border-radius: 16px;
   text-decoration: none;
@@ -519,14 +716,37 @@ onMounted(() => {
   background: rgba(100, 116, 139, 0.08);
 }
 
-.block-actions button {
+.block-actions button,
+.week-add-button,
+.lesson-row button {
   border: 1px solid rgba(15, 23, 42, 0.12);
   background: white;
   color: #0f172a;
   padding: 0.45rem 0.75rem;
 }
 
-.lesson-list span {
+.week-add-button {
+  min-height: 36px;
+}
+
+.lesson-form {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 0.75rem;
+}
+
+.lesson-form,
+.lesson-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.lesson-form {
+  flex-direction: column;
+}
+
+.lesson-row span {
   font-size: 0.85rem;
 }
 
