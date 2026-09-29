@@ -1,4 +1,4 @@
-import { InMemoryStorageAdapter } from '@viccoboard/storage/browser';
+import { InMemoryStorageAdapter } from '@viccoboard/storage';
 import { SubjectRepository } from '../src/repositories/subject.repository';
 
 describe('SubjectRepository', () => {
