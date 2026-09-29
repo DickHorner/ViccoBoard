@@ -14,7 +14,6 @@ type LegacyGameEntryRow = {
   id: string;
   category: string | null;
   sport_type: string | null;
-  tags: string | null;
 };
 
 const CATEGORY_TAGS: Record<string, string> = {
