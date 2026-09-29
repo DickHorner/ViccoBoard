@@ -10,6 +10,7 @@ export class PlanningBlockRepository extends AdapterRepository<PlanningBlock> {
     return {
       id: row.id,
       classGroupId: row.class_group_id,
+      subjectId: row.subject_id,
       title: row.title,
       startDate: row.start_date,
       endDate: row.end_date,
@@ -25,6 +26,7 @@ export class PlanningBlockRepository extends AdapterRepository<PlanningBlock> {
 
     if (entity.id !== undefined) row.id = entity.id
     if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId
+    if (entity.subjectId !== undefined) row.subject_id = entity.subjectId
     if (entity.title !== undefined) row.title = entity.title
     if (entity.startDate !== undefined) row.start_date = entity.startDate
     if (entity.endDate !== undefined) row.end_date = entity.endDate
@@ -58,11 +60,20 @@ export class PlanningBlockRepository extends AdapterRepository<PlanningBlock> {
     return blocks.sort(comparePlanningBlocks)
   }
 
+  async findByClassGroupAndSubject(classGroupId: string, subjectId: string): Promise<PlanningBlock[]> {
+    const blocks = await this.find({ class_group_id: classGroupId, subject_id: subjectId })
+    return blocks.sort(comparePlanningBlocks)
+  }
+
   private assertValidPlanningBlock(
-    block: Pick<PlanningBlock, 'classGroupId' | 'title' | 'startDate' | 'endDate'>
+    block: Pick<PlanningBlock, 'classGroupId' | 'subjectId' | 'title' | 'startDate' | 'endDate'>
   ): void {
     if (!block.classGroupId.trim()) {
       throw new Error('classGroupId is required')
+    }
+
+    if (!block.subjectId.trim()) {
+      throw new Error('subjectId is required')
     }
 
     if (!block.title.trim()) {

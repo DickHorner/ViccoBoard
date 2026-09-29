@@ -5,20 +5,47 @@
         <h1>Stundenplan</h1>
         <p class="subtitle">Wochennahe Übersicht der vorhandenen Unterrichtsstunden.</p>
       </div>
-      <RouterLink class="primary-link" to="/lessons">
-        Stunden verwalten
-      </RouterLink>
+      <div class="actions">
+        <button class="ghost-link" type="button" @click="showSubjectForm = !showSubjectForm">
+          + Fach
+        </button>
+        <RouterLink class="primary-link" to="/lessons">
+          Stunden verwalten
+        </RouterLink>
+      </div>
     </header>
 
     <div v-if="loading" class="state-card">Stunden werden geladen...</div>
     <div v-else-if="loadError" class="state-card error">{{ loadError }}</div>
     <div v-else class="schedule-grid">
+      <section v-if="showSubjectForm" class="panel full-width subject-panel">
+        <div>
+          <h2>Fach anlegen</h2>
+          <p class="panel-subtitle">Fächer gelten klassenübergreifend und werden anschließend einer Stunde oder Sequenz zugeordnet.</p>
+        </div>
+        <form class="subject-form" @submit.prevent="handleCreateSubject">
+          <input v-model="newSubjectName" type="text" placeholder="Fachname" required />
+          <select v-model="newSubjectProfile">
+            <option value="generic">Allgemein</option>
+            <option value="sport">Sport-Arbeitsbereich</option>
+            <option value="kbr">KBR-Arbeitsbereich</option>
+          </select>
+          <button class="primary-link" type="submit" :disabled="creatingSubject">
+            {{ creatingSubject ? 'Wird angelegt...' : 'Anlegen' }}
+          </button>
+        </form>
+        <p v-if="subjectError" class="error-text">{{ subjectError }}</p>
+        <div v-if="subjects.length > 0" class="subject-list">
+          <span v-for="subject in subjects" :key="subject.id">{{ subject.name }}</span>
+        </div>
+      </section>
+
       <section class="panel hero-panel">
         <h2>Jetzt / Als Nächstes</h2>
         <div v-if="currentOrNextLesson" class="lesson-focus">
           <p class="eyebrow">{{ currentOrNextMode }}</p>
           <h3>{{ getLessonTitle(currentOrNextLesson) }}</h3>
-          <p>{{ getClassName(currentOrNextLesson.classGroupId) }}</p>
+          <p>{{ getSubjectName(currentOrNextLesson.subjectId) }} · {{ getClassName(currentOrNextLesson.classGroupId) }}</p>
           <p>{{ formatLessonDateTime(currentOrNextLesson) }}</p>
           <div class="actions">
             <RouterLink :to="getLessonWorkspaceUrl(currentOrNextLesson)" class="ghost-link">
@@ -36,7 +63,7 @@
         <h2>Danach</h2>
         <div v-if="upcomingLesson" class="mini-lesson">
           <strong>{{ getLessonTitle(upcomingLesson) }}</strong>
-          <span>{{ getClassName(upcomingLesson.classGroupId) }}</span>
+          <span>{{ getSubjectName(upcomingLesson.subjectId) }} · {{ getClassName(upcomingLesson.classGroupId) }}</span>
           <span>{{ formatLessonDateTime(upcomingLesson) }}</span>
         </div>
         <p v-else class="empty-text">Keine weitere Stunde für heute gefunden.</p>
@@ -90,7 +117,7 @@
                 <time>{{ formatLessonTime(lesson) }}</time>
                 <div>
                   <strong>{{ getLessonTitle(lesson) }}</strong>
-                  <p>{{ getClassName(lesson.classGroupId) }}{{ getLessonMeta(lesson) }}</p>
+                  <p>{{ getSubjectName(lesson.subjectId) }} · {{ getClassName(lesson.classGroupId) }}{{ getLessonMeta(lesson) }}</p>
                   <p v-if="getLessonHourSlotLabel(lesson)" class="lesson-slot">
                     {{ getLessonHourSlotLabel(lesson) }}
                   </p>
@@ -108,9 +135,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useClassGroups, useLessons } from '../composables/useSportBridge'
+import { useClassGroups, useLessons, useSubjects } from '../composables/useSportBridge'
 import { getDashboardLessonState } from '../utils/dashboard-workspace'
-import type { ClassGroup, Lesson } from '@viccoboard/core'
+import type { ClassGroup, Lesson, Subject, SubjectWorkspaceProfile } from '@viccoboard/core'
 import { formatGermanDateTime, formatGermanTime } from '../utils/locale-format'
 import {
   getScheduleCalendarMarkers,
@@ -128,15 +155,23 @@ interface ScheduleDay {
 }
 
 const classGroups = useClassGroups()
+const subjectsRepository = useSubjects()
 const lessonsRepository = useLessons()
 
 const loading = ref(true)
 const loadError = ref('')
 const classes = ref<ClassGroup[]>([])
+const subjects = ref<Subject[]>([])
 const lessons = ref<Lesson[]>([])
+const showSubjectForm = ref(false)
+const newSubjectName = ref('')
+const newSubjectProfile = ref<SubjectWorkspaceProfile>('generic')
+const creatingSubject = ref(false)
+const subjectError = ref('')
 const now = ref(Date.now())
 
 const classesById = computed(() => new Map(classes.value.map((classGroup) => [classGroup.id, classGroup])))
+const subjectsById = computed(() => new Map(subjects.value.map((subject) => [subject.id, subject])))
 
 const activeStates = computed(() =>
   Array.from(new Set(classes.value.map((classGroup) => normalizeState(classGroup.state)).filter(Boolean)))
@@ -191,8 +226,12 @@ const loadData = async () => {
   loadError.value = ''
 
   try {
-    const loadedClasses = await classGroups.findAll()
+    const [loadedClasses, loadedSubjects] = await Promise.all([
+      classGroups.findAll(),
+      subjectsRepository.findAll()
+    ])
     classes.value = loadedClasses
+    subjects.value = loadedSubjects.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
 
     const today = startOfDay(new Date())
     const endDate = new Date(today)
@@ -219,8 +258,11 @@ const loadData = async () => {
 const getClassName = (classGroupId: string): string =>
   classesById.value.get(classGroupId)?.name ?? 'Unbekannte Klasse'
 
+const getSubjectName = (subjectId: string): string =>
+  subjectsById.value.get(subjectId)?.name ?? 'Unzugeordnet'
+
 const getLessonTitle = (lesson: Lesson): string =>
-  lesson.title?.trim() || 'Unterrichtsstunde'
+  lesson.title?.trim() || getSubjectName(lesson.subjectId)
 
 const getLessonMeta = (lesson: Lesson): string => {
   const meta: string[] = []
@@ -238,6 +280,26 @@ const getLessonWorkspaceUrl = (lesson: Lesson): string =>
 
 const getAttendanceUrl = (lesson: Lesson): string =>
   '/attendance?classId=' + lesson.classGroupId + '&lessonId=' + lesson.id
+
+const handleCreateSubject = async () => {
+  subjectError.value = ''
+  creatingSubject.value = true
+
+  try {
+    await subjectsRepository.create({
+      name: newSubjectName.value,
+      workspaceProfile: newSubjectProfile.value
+    })
+    subjects.value = (await subjectsRepository.findAll())
+      .sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
+    newSubjectName.value = ''
+    newSubjectProfile.value = 'generic'
+  } catch (error) {
+    subjectError.value = error instanceof Error ? error.message : 'Fach konnte nicht angelegt werden.'
+  } finally {
+    creatingSubject.value = false
+  }
+}
 
 const getLessonHourSlotLabel = (lesson: Lesson): string =>
   getScheduleHourSlot(lesson.startTime, lesson.durationMinutes)?.label ?? ''
@@ -398,8 +460,31 @@ onMounted(() => {
   padding: 1.25rem;
 }
 
-.state-card.error {
+.state-card.error,
+.error-text {
   color: #991b1b;
+}
+
+.subject-form,
+.subject-list {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.subject-form input,
+.subject-form select {
+  min-height: 44px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 12px;
+  padding: 0.65rem 0.8rem;
+  font: inherit;
+}
+
+.subject-list span {
+  border-radius: 999px;
+  background: #f1f5f9;
+  padding: 0.35rem 0.7rem;
 }
 
 .schedule-grid {

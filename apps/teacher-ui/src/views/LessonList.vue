@@ -41,6 +41,16 @@
           </div>
           
           <div class="filter-group">
+            <label for="subject-filter" class="filter-label">Fach:</label>
+            <select id="subject-filter" v-model="selectedSubjectId" class="filter-select">
+              <option value="">Alle Fächer</option>
+              <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
+                {{ subject.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
             <label for="date-from" class="filter-label">Von:</label>
             <input 
               id="date-from" 
@@ -66,7 +76,7 @@
         <div class="auto-generation">
           <h4>Stundenlauf für Schuljahr anlegen</h4>
           <p class="auto-generation-hint">
-            Legt automatisch Wochenstunden für die ausgewählte Klasse an. Feiertage und Ferien aus dem Kalender werden übersprungen.
+            Legt automatisch Wochenstunden für die ausgewählte Kombination aus Klasse und Fach an. Feiertage und Ferien aus dem Kalender werden übersprungen.
           </p>
           <div class="auto-generation-controls">
             <div class="filter-group">
@@ -88,7 +98,7 @@
             <div class="filter-group filter-group-actions">
               <button
                 class="btn-secondary"
-                :disabled="!selectedClassId || autoGenerateBusy"
+                :disabled="!selectedClassId || !selectedSubjectId || autoGenerateBusy"
                 @click="handleAutoGenerateLessons"
               >
                 {{ autoGenerateBusy ? 'Wird angelegt…' : 'Stunden anlegen' }}
@@ -123,7 +133,7 @@
                 <div class="lesson-month">{{ formatMonth(lesson.date) }}</div>
               </div>
               <div class="lesson-info">
-                <h4>{{ getClassName(lesson.classGroupId) }}</h4>
+                <h4>{{ getClassName(lesson.classGroupId) }} · {{ getSubjectName(lesson.subjectId) }}</h4>
                 <p class="lesson-time">{{ lesson.startTime }} Uhr · {{ lesson.durationMinutes }} min{{ lesson.room ? ` · ${lesson.room}` : '' }}</p>
                 <p v-if="lesson.title" class="lesson-title">{{ lesson.title }}</p>
                 <div v-if="lesson.lessonParts && lesson.lessonParts.length > 0" class="lesson-parts">
@@ -196,6 +206,20 @@
             </select>
           </div>
           
+          <div class="form-group">
+            <label for="lesson-subject" class="form-label">Fach*</label>
+            <select
+              id="lesson-subject"
+              v-model="lessonForm.subjectId"
+              class="form-input"
+            >
+              <option value="">Fach wählen...</option>
+              <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
+                {{ subject.name }}
+              </option>
+            </select>
+          </div>
+
           <div class="form-group">
             <label for="lesson-date" class="form-label">Datum*</label>
             <input 
@@ -295,7 +319,7 @@
           <button 
             class="btn-primary" 
             @click="handleSaveLesson"
-            :disabled="!lessonForm.classGroupId || !lessonForm.date || !lessonForm.startTime || saving"
+            :disabled="!lessonForm.classGroupId || !lessonForm.subjectId || !lessonForm.date || !lessonForm.startTime || saving"
           >
             {{ saving ? 'Wird gespeichert...' : (showEditLessonModal ? 'Speichern' : 'Erstellen') }}
           </button>
@@ -309,7 +333,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
-import type { Lesson, ClassGroup } from '@viccoboard/core'
+import type { Lesson, ClassGroup, Subject } from '@viccoboard/core'
 import { buildAutoLessonDates, getDateKey } from '../utils/lesson-auto-generation'
 
 const route = useRoute()
@@ -317,6 +341,7 @@ const SportBridge = getSportBridge()
 
 // State
 const classes = ref<ClassGroup[]>([])
+const subjects = ref<Subject[]>([])
 const lessons = ref<Lesson[]>([])
 const classGroup = ref<ClassGroup | null>(null)
 const loading = ref(false)
@@ -324,6 +349,7 @@ const saving = ref(false)
 const error = ref('')
 const saveError = ref('')
 const selectedClassId = ref<string>('')
+const selectedSubjectId = ref<string>('')
 const dateFrom = ref<string>('')
 const dateTo = ref<string>('')
 const showCreateLessonModal = ref(false)
@@ -344,6 +370,7 @@ interface LessonPartForm {
 interface LessonForm {
   id?: string
   classGroupId: string
+  subjectId: string
   date: string
   startTime: string
   durationMinutes: number
@@ -355,6 +382,7 @@ interface LessonForm {
 
 const getInitialLessonForm = (): LessonForm => ({
   classGroupId: selectedClassId.value || '',
+  subjectId: selectedSubjectId.value || '',
   date: new Date().toISOString().split('T')[0],
   startTime: '08:00',
   durationMinutes: 45,
@@ -380,6 +408,10 @@ const filteredLessons = computed(() => {
 
   if (selectedClassId.value) {
     filtered = filtered.filter(l => l.classGroupId === selectedClassId.value)
+  }
+
+  if (selectedSubjectId.value) {
+    filtered = filtered.filter(l => l.subjectId === selectedSubjectId.value)
   }
 
   if (dateFrom.value) {
@@ -409,8 +441,12 @@ const loadData = async () => {
   error.value = ''
 
   try {
-    // Load all classes
-    classes.value = await SportBridge.classGroupRepository.findAll()
+    const [loadedClasses, loadedSubjects] = await Promise.all([
+      SportBridge.classGroupRepository.findAll(),
+      SportBridge.subjectRepository.findAll()
+    ])
+    classes.value = loadedClasses
+    subjects.value = loadedSubjects.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
 
     // If classId is in route, load that class specifically
     const classIdFromRoute = route.query.classId as string
@@ -457,8 +493,8 @@ const onClassChange = async () => {
 const handleAutoGenerateLessons = async () => {
   autoGenerateStatus.value = ''
   autoGenerateStatusType.value = ''
-  if (!selectedClassId.value) {
-    autoGenerateStatus.value = 'Bitte zuerst eine Klasse auswählen.'
+  if (!selectedClassId.value || !selectedSubjectId.value) {
+    autoGenerateStatus.value = 'Bitte zuerst Klasse und Fach auswählen.'
     autoGenerateStatusType.value = 'error'
     return
   }
@@ -474,7 +510,9 @@ const handleAutoGenerateLessons = async () => {
   try {
     const existingLessonDateKeys = new Set(
       lessons.value
-        .filter((entry) => entry.classGroupId === selectedClass.id)
+        .filter((entry) =>
+          entry.classGroupId === selectedClass.id && entry.subjectId === selectedSubjectId.value
+        )
         .map((entry) => getDateKey(entry.date))
     )
     const dates = buildAutoLessonDates({
@@ -498,6 +536,7 @@ const handleAutoGenerateLessons = async () => {
 
       await SportBridge.createLessonUseCase.execute({
         classGroupId: selectedClass.id,
+        subjectId: selectedSubjectId.value,
         date: lessonDate,
         startTime: autoGenerateStartTime.value,
         durationMinutes: autoGenerateDuration.value
@@ -525,6 +564,7 @@ const handleEditLesson = async (lesson: Lesson) => {
   lessonForm.value = {
     id: lesson.id,
     classGroupId: lesson.classGroupId,
+    subjectId: lesson.subjectId,
     date: lesson.date.toISOString().split('T')[0],
     startTime: lesson.startTime || lesson.date.toTimeString().split(' ')[0].substring(0, 5),
     durationMinutes: lesson.durationMinutes,
@@ -574,6 +614,7 @@ const handleSaveLesson = async () => {
       // Update existing lesson via validated use-case
       await SportBridge.updateLessonUseCase.execute({
         lessonId: lessonForm.value.id,
+        subjectId: lessonForm.value.subjectId,
         date: dateTime,
         startTime: lessonForm.value.startTime,
         durationMinutes: lessonForm.value.durationMinutes,
@@ -586,6 +627,7 @@ const handleSaveLesson = async () => {
       // Create new lesson
       const created = await SportBridge.createLessonUseCase.execute({
         classGroupId: lessonForm.value.classGroupId,
+        subjectId: lessonForm.value.subjectId,
         date: dateTime,
         startTime: lessonForm.value.startTime,
         durationMinutes: lessonForm.value.durationMinutes,
@@ -627,6 +669,9 @@ const getClassName = (classGroupId: string): string => {
   const cls = classes.value.find(c => c.id === classGroupId)
   return cls ? cls.name : 'Unbekannt'
 }
+
+const getSubjectName = (subjectId: string): string =>
+  subjects.value.find((subject) => subject.id === subjectId)?.name ?? 'Unzugeordnet'
 
 const formatDay = (date: Date): string => {
   return date.getDate().toString().padStart(2, '0')

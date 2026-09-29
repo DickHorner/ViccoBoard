@@ -206,6 +206,7 @@ describe('SaveCooperSessionUseCase', () => {
     // Create a real lesson to satisfy the FK constraint
     const lesson = await createLessonUseCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       date: new Date(),
       startTime: '08:00',
       durationMinutes: 45

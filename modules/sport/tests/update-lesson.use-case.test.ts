@@ -4,6 +4,7 @@ import type { Lesson } from '@viccoboard/core';
 const makeLesson = (overrides: Partial<Lesson> = {}): Lesson => ({
   id: 'lesson-1',
   classGroupId: 'class-1',
+  subjectId: 'subject-sport',
   date: new Date('2026-09-01T00:00:00.000Z'),
   startTime: '08:00',
   durationMinutes: 45,
@@ -45,6 +46,19 @@ describe('UpdateLessonUseCase', () => {
   beforeEach(() => {
     repo = new MockLessonRepository();
     useCase = new UpdateLessonUseCase(repo as any);
+  });
+
+  test('updates lesson subject without changing schedule fields', async () => {
+    repo.seed(makeLesson());
+
+    const updated = await useCase.execute({
+      lessonId: 'lesson-1',
+      subjectId: 'subject-physics'
+    });
+
+    expect(updated.subjectId).toBe('subject-physics');
+    expect(updated.startTime).toBe('08:00');
+    expect(updated.durationMinutes).toBe(45);
   });
 
   test('updates title and room without overlap check', async () => {

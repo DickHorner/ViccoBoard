@@ -17,6 +17,7 @@ describe('planning week projection', () => {
       {
         id: 'block-1',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         title: 'Basketball',
         startDate: '2026-09-14',
         endDate: '2026-10-09',
@@ -29,6 +30,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-1',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2026-09-14T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -39,7 +41,7 @@ describe('planning week projection', () => {
       }
     ]
 
-    const weeks = buildPlanningWeeks({ classGroup, blocks, lessons })
+    const weeks = buildPlanningWeeks({ classGroup, subjectId: 'subject-sport', blocks, lessons })
     const projectedWeek = weeks.find((week) => week.startDate === '2026-09-14')
 
     expect(projectedWeek?.blocks.map((block) => block.title)).toEqual(['Basketball'])
@@ -51,6 +53,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-monday',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2026-10-12T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -60,7 +63,7 @@ describe('planning week projection', () => {
       }
     ]
 
-    const weeks = buildPlanningWeeks({ classGroup, blocks: [], lessons })
+    const weeks = buildPlanningWeeks({ classGroup, subjectId: 'subject-sport', blocks: [], lessons })
     const autumnBreakWeek = weeks.find((week) => week.startDate === '2026-10-19')
 
     expect(autumnBreakWeek?.markers.map((marker) => marker.label)).toContain('Herbstferien')
@@ -71,6 +74,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-monday',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2026-09-28T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -80,7 +84,7 @@ describe('planning week projection', () => {
       }
     ]
 
-    const weeks = buildPlanningWeeks({ classGroup, blocks: [], lessons })
+    const weeks = buildPlanningWeeks({ classGroup, subjectId: 'subject-sport', blocks: [], lessons })
     const unityDayWeek = weeks.find((week) => week.startDate === '2026-09-28')
 
     expect(unityDayWeek?.markers.map((marker) => marker.label)).not.toContain('Tag der Deutschen Einheit')
@@ -91,6 +95,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-before-holiday',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2027-03-01T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -101,6 +106,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-on-holiday',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2027-03-08T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -111,7 +117,7 @@ describe('planning week projection', () => {
       }
     ]
 
-    const weeks = buildPlanningWeeks({ classGroup, blocks: [], lessons })
+    const weeks = buildPlanningWeeks({ classGroup, subjectId: 'subject-sport', blocks: [], lessons })
     const holidayWeek = weeks.find((week) => week.startDate === '2027-03-08')
 
     expect(holidayWeek?.markers.map((marker) => marker.label)).toContain('Internationaler Frauentag')
@@ -122,6 +128,7 @@ describe('planning week projection', () => {
     const block: PlanningBlock = {
       id: 'block-fixed',
       classGroupId: 'class-1',
+      subjectId: 'subject-sport',
       title: 'Basketball',
       startDate: '2026-09-07',
       endDate: '2026-09-28',
@@ -133,6 +140,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-1',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2026-09-07T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -143,6 +151,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-3',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2026-09-21T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -152,7 +161,7 @@ describe('planning week projection', () => {
       }
     ]
 
-    const weeks = buildPlanningWeeks({ classGroup, blocks: [block], lessons })
+    const weeks = buildPlanningWeeks({ classGroup, subjectId: 'subject-sport', blocks: [block], lessons })
     const missingLessonWeek = weeks.find((week) => week.startDate === '2026-09-14')
     const laterLessonWeek = weeks.find((week) => week.startDate === '2026-09-21')
 
@@ -167,6 +176,7 @@ describe('planning week projection', () => {
     const block: PlanningBlock = {
       id: 'block-autumn',
       classGroupId: 'class-1',
+      subjectId: 'subject-sport',
       title: 'Basketball',
       startDate: '2026-10-12',
       endDate: '2026-11-02',
@@ -178,6 +188,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-before-break',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2026-10-12T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -188,6 +199,7 @@ describe('planning week projection', () => {
       {
         id: 'lesson-after-break',
         classGroupId: 'class-1',
+        subjectId: 'subject-sport',
         date: new Date('2026-11-02T08:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45,
@@ -197,7 +209,7 @@ describe('planning week projection', () => {
       }
     ]
 
-    const weeks = buildPlanningWeeks({ classGroup, blocks: [block], lessons })
+    const weeks = buildPlanningWeeks({ classGroup, subjectId: 'subject-sport', blocks: [block], lessons })
     const breakWeek = weeks.find((week) => week.startDate === '2026-10-19')
     const afterBreakWeek = weeks.find((week) => week.startDate === '2026-11-02')
 
@@ -206,6 +218,45 @@ describe('planning week projection', () => {
     expect(breakWeek?.lessons).toHaveLength(0)
     expect(afterBreakWeek?.blocks[0]?.endDate).toBe('2026-11-02')
     expect(afterBreakWeek?.lessons[0]?.date.toISOString()).toBe('2026-11-02T08:00:00.000Z')
+  })
+
+  it('excludes lessons and blocks from another subject', () => {
+    const blocks: PlanningBlock[] = [
+      {
+        id: 'block-other',
+        classGroupId: 'class-1',
+        subjectId: 'subject-other',
+        title: 'Physik',
+        startDate: '2026-09-14',
+        endDate: '2026-09-14',
+        createdAt: now,
+        lastModified: now
+      }
+    ]
+    const lessons: Lesson[] = [
+      {
+        id: 'lesson-other',
+        classGroupId: 'class-1',
+        subjectId: 'subject-other',
+        date: new Date('2026-09-14T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      }
+    ]
+
+    const weeks = buildPlanningWeeks({
+      classGroup,
+      subjectId: 'subject-sport',
+      blocks,
+      lessons
+    })
+    const projectedWeek = weeks.find((week) => week.startDate === '2026-09-14')
+
+    expect(projectedWeek?.blocks).toHaveLength(0)
+    expect(projectedWeek?.lessons).toHaveLength(0)
   })
 
   it('rejects non-overlapping date ranges', () => {

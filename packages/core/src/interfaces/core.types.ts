@@ -55,7 +55,6 @@ export interface ClassGroup {
   state?: string; // Bundesland
   holidayCalendarRef?: string;
   gradingScheme?: string;
-  subjectProfile?: string;
   createdAt: Date;
   lastModified: Date;
 }
@@ -133,9 +132,20 @@ export interface ImportBatchItem {
   lastModified: Date;
 }
 
+export type SubjectWorkspaceProfile = 'generic' | 'sport' | 'kbr';
+
+export interface Subject {
+  id: string;
+  name: string;
+  workspaceProfile: SubjectWorkspaceProfile;
+  createdAt: Date;
+  lastModified: Date;
+}
+
 export interface Lesson {
   id: string;
   classGroupId: string;
+  subjectId: string;
   date: Date;
   startTime: string;
   durationMinutes: number;
@@ -153,6 +163,7 @@ export interface Lesson {
 export interface PlanningBlock {
   id: string;
   classGroupId: string;
+  subjectId: string;
   title: string;
   startDate: string;
   endDate: string;

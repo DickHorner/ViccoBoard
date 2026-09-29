@@ -29,6 +29,20 @@
           </select>
         </div>
         
+        <div v-if="!currentLessonId" class="form-section">
+          <label for="subject-select" class="form-label">Fach</label>
+          <select
+            id="subject-select"
+            v-model="selectedSubjectId"
+            class="form-select"
+          >
+            <option value="">Fach...</option>
+            <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
+              {{ subject.name }}
+            </option>
+          </select>
+        </div>
+
         <div class="card-content" v-if="!selectedClassId">
           <p class="empty-state">{{ t('KLASSEN.klasse') }}...</p>
         </div>
@@ -182,15 +196,17 @@ import {
 import { buildAttendanceExportCsv, ATTENDANCE_EXPORT_COLUMNS } from '../utils/attendance-export'
 import { downloadText } from '../utils/download'
 import { AttendanceStatus } from '@viccoboard/core'
-import type { ClassGroup, Student, StatusOption } from '@viccoboard/core'
+import type { ClassGroup, Student, StatusOption, Subject } from '@viccoboard/core'
 
 const route = useRoute()
 const { t } = useI18n()
 
 // State
 const classes = ref<ClassGroup[]>([])
+const subjects = ref<Subject[]>([])
 const students = ref<Student[]>([])
 const selectedClassId = ref<string>('')
+const selectedSubjectId = ref<string>('')
 const currentLessonId = ref<string | null>(null)
 const currentLessonDate = ref<Date | null>(null)
 const loading = ref(false)
@@ -386,6 +402,10 @@ const handleSaveAttendance = async () => {
       throw new Error('Keine Klasse ausgewählt')
     }
 
+    if (!currentLessonId.value && !selectedSubjectId.value) {
+      throw new Error('Kein Fach ausgewählt')
+    }
+
     // Reuse existing lesson if editing, otherwise create a new one
     const wasEditingExistingLesson = !!currentLessonId.value
     let lessonId: string
@@ -395,6 +415,7 @@ const handleSaveAttendance = async () => {
       const now = new Date()
       const lesson = await SportBridge.createLessonUseCase.execute({
         classGroupId: selectedClassId.value,
+        subjectId: selectedSubjectId.value,
         date: now,
         startTime: now.toTimeString().split(' ')[0].slice(0, 5),
         durationMinutes: 45
@@ -436,7 +457,12 @@ const handleSaveAttendance = async () => {
 // Lifecycle
 onMounted(async () => {
   try {
-    classes.value = await SportBridge.classGroupRepository.findAll()
+    const [loadedClasses, loadedSubjects] = await Promise.all([
+      SportBridge.classGroupRepository.findAll(),
+      SportBridge.subjectRepository.findAll()
+    ])
+    classes.value = loadedClasses
+    subjects.value = loadedSubjects.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
     
     // Check if lessonId is passed via query params (edit mode)
     const lessonIdFromQuery = route.query.lessonId as string
@@ -448,6 +474,7 @@ onMounted(async () => {
         currentLessonId.value = lesson.id
         currentLessonDate.value = lesson.date
         selectedClassId.value = lesson.classGroupId
+        selectedSubjectId.value = lesson.subjectId
         await onClassChange()
         // Load existing attendance records for this lesson
         const records = await SportBridge.attendanceRepository.findByLesson(lesson.id)

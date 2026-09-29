@@ -10,6 +10,7 @@ const DEFAULT_LESSON_START_MINUTES = 8 * 60;
 
 export interface CreateLessonInput {
   classGroupId: string;
+  subjectId: string;
   date: Date;
   startTime: string;
   durationMinutes: number;
@@ -31,6 +32,7 @@ export class CreateLessonUseCase {
     // Create new lesson
     const lesson = await this.lessonRepo.create({
       classGroupId: input.classGroupId,
+      subjectId: input.subjectId,
       date: input.date,
       startTime: input.startTime.trim(),
       durationMinutes: input.durationMinutes,
@@ -48,6 +50,10 @@ export class CreateLessonUseCase {
   private async validate(input: CreateLessonInput): Promise<void> {
     if (!input.classGroupId || input.classGroupId.trim().length === 0) {
       throw new Error('Class group ID is required');
+    }
+
+    if (!input.subjectId || input.subjectId.trim().length === 0) {
+      throw new Error('Subject ID is required');
     }
 
     if (!input.date) {

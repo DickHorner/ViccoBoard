@@ -23,6 +23,7 @@ export class LessonRepository extends AdapterRepository<Lesson> {
     return {
       id: row.id,
       classGroupId: row.class_group_id,
+      subjectId: row.subject_id,
       date: lessonDate,
       startTime: this.resolveStartTime(row.start_time, lessonDate),
       durationMinutes: this.resolveDurationMinutes(row.duration_minutes),
@@ -46,6 +47,7 @@ export class LessonRepository extends AdapterRepository<Lesson> {
 
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
+    if (entity.subjectId !== undefined) row.subject_id = entity.subjectId;
     if (entity.date !== undefined) row.date = entity.date.toISOString();
     if (entity.startTime !== undefined) row.start_time = entity.startTime;
     if (entity.durationMinutes !== undefined) row.duration_minutes = entity.durationMinutes;
@@ -65,6 +67,10 @@ export class LessonRepository extends AdapterRepository<Lesson> {
    */
   async findByClassGroup(classGroupId: string): Promise<Lesson[]> {
     return this.find({ class_group_id: classGroupId });
+  }
+
+  async findByClassGroupAndSubject(classGroupId: string, subjectId: string): Promise<Lesson[]> {
+    return this.find({ class_group_id: classGroupId, subject_id: subjectId });
   }
 
   /**

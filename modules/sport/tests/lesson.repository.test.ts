@@ -37,6 +37,7 @@ describe('LessonRepository', () => {
   test('persists random student history across reload', async () => {
     const lesson = await lessonRepository.create({
       classGroupId,
+      subjectId: 'subject-sport',
       date: new Date('2026-09-01T08:00:00.000Z'),
       startTime: '08:00',
       durationMinutes: 45,

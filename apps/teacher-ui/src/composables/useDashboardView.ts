@@ -1,10 +1,10 @@
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import type { AttendanceRecord, ClassGroup, Lesson } from '@viccoboard/core';
+import type { AttendanceRecord, ClassGroup, Lesson, Subject } from '@viccoboard/core';
 
 import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading';
-import { useAttendance, useClassGroups, useLessons } from './useSportBridge';
+import { useAttendance, useClassGroups, useLessons, useSubjects } from './useSportBridge';
 import { getDashboardLessonState } from '../utils/dashboard-workspace';
 import {
   formatGermanDate,
@@ -17,6 +17,7 @@ export function useDashboardView() {
 
   const classes = ref<ClassGroup[]>([]);
   const recentActivity = ref<AttendanceRecord[]>([]);
+  const subjects = ref<Subject[]>([]);
   const lessons = ref<Lesson[]>([]);
   const loading = ref(true);
   const loadError = ref('');
@@ -52,6 +53,7 @@ export function useDashboardView() {
 
   const classGroups = useClassGroups();
   const attendance = useAttendance();
+  const subjectsRepository = useSubjects();
   const lessonsRepository = useLessons();
   const gradingSchemes = GRADING_SCHEMES;
   const classColorOptions = [
@@ -75,6 +77,7 @@ export function useDashboardView() {
   ];
 
   const classesById = computed(() => new Map(classes.value.map((cls) => [cls.id, cls])));
+  const subjectsById = computed(() => new Map(subjects.value.map((subject) => [subject.id, subject])));
   const schoolYears = computed(() => {
     const years = new Set(classes.value.map((cls: ClassGroup) => cls.schoolYear));
     return Array.from(years).sort().reverse();
@@ -111,16 +114,18 @@ export function useDashboardView() {
       const loadedClasses = await classGroups.findAll();
       classes.value = loadedClasses;
 
-      const [attendanceRecords, lessonCollections] = await Promise.all([
+      const [attendanceRecords, loadedSubjects, lessonCollections] = await Promise.all([
         attendance.findAll({
           orderBy: 'timestamp',
           orderDirection: 'desc',
           limit: 5
         }),
+        subjectsRepository.findAll(),
         Promise.all(loadedClasses.map((cls) => lessonsRepository.findByClassGroup(cls.id)))
       ]);
 
       recentActivity.value = attendanceRecords;
+      subjects.value = loadedSubjects;
       const allLessons = lessonCollections.flat();
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -139,6 +144,9 @@ export function useDashboardView() {
 
   const getClassName = (classGroupId: string): string =>
     classesById.value.get(classGroupId)?.name ?? 'Unbekannte Klasse';
+
+  const getSubjectName = (subjectId: string): string =>
+    subjectsById.value.get(subjectId)?.name ?? 'Unzugeordnet';
 
   const formatLessonTime = (date: Date): string =>
     formatGermanTime(date);
@@ -317,6 +325,7 @@ export function useDashboardView() {
     t,
     classes,
     recentActivity,
+    subjects,
     lessons,
     loading,
     loadError,
@@ -347,6 +356,7 @@ export function useDashboardView() {
     filteredClasses,
     loadData,
     getClassName,
+    getSubjectName,
     formatLessonTime,
     formatLessonDateTime,
     handleCreateClass,

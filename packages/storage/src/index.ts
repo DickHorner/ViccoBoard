@@ -28,6 +28,7 @@ export * from './migrations/indexeddb/020_kbr_feedback_workflow.js';
 export * from './migrations/indexeddb/021_student_import_batches.js';
 export * from './migrations/022_exam_assessment_format_schema.js';
 export * from './migrations/indexeddb/026_game_entry_tags.js';
+export * from './migrations/indexeddb/027_subject_assignments.js';
 export * from './indexeddb.storage.js';
 
 // Version
