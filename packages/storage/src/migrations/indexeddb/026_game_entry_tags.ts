@@ -39,6 +39,10 @@ export class IndexedDBGameEntryTagsMigration implements IndexedDBMigration {
     if (!db.objectStoreNames.contains('game_entries')) return;
 
     const store = tx.objectStore('game_entries');
+    if (store.indexNames.contains('category')) {
+      store.deleteIndex('category');
+    }
+
     const request = store.openCursor();
 
     request.onsuccess = () => {
