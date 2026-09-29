@@ -9,12 +9,13 @@ import { getSportBridge, initializeSportBridge } from './useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from './useStudentsBridge'
 
 const DEBOUNCE_MS = 800
-const DETECTION_ZONE_HALF_HEIGHT = 12
+const DETECTION_ZONE_HALF_SIZE = 12
 const THUMBNAIL_JPEG_QUALITY = 0.5
 const CANVAS_W = 640
 const CANVAS_H = 360
 
 type EventWithFrame = FinishCameraEvent & { frameDataUrl?: string }
+type FinishLineOrientation = 'horizontal' | 'vertical'
 
 function generateId(): string {
   return `fc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
@@ -67,6 +68,8 @@ export function useFinishCameraView() {
   let prevFrameData: ImageData | null = null
   let rafId: number | null = null
 
+  const finishLineOrientation = ref<FinishLineOrientation>('vertical')
+  const finishLineX = ref(Math.round(CANVAS_W / 2))
   const finishLineY = ref(Math.round(CANVAS_H / 2))
   const finishLineSet = ref(false)
   const detectionThreshold = ref(25)
@@ -213,28 +216,52 @@ export function useFinishCameraView() {
     ctx.drawImage(captureCanvas, 0, 0, CANVAS_W, CANVAS_H)
 
     if (finishLineSet.value) {
+      const vertical = finishLineOrientation.value === 'vertical'
+
       ctx.save()
       ctx.strokeStyle = sessionActive.value ? '#ff3300' : '#ffcc00'
       ctx.lineWidth = 2
       ctx.setLineDash([8, 4])
       ctx.beginPath()
-      ctx.moveTo(0, finishLineY.value)
-      ctx.lineTo(CANVAS_W, finishLineY.value)
+      ctx.moveTo(vertical ? finishLineX.value : 0, vertical ? 0 : finishLineY.value)
+      ctx.lineTo(vertical ? finishLineX.value : CANVAS_W, vertical ? CANVAS_H : finishLineY.value)
       ctx.stroke()
       ctx.restore()
 
       ctx.save()
       ctx.fillStyle = 'rgba(255, 100, 0, 0.10)'
-      ctx.fillRect(0, finishLineY.value - 12, CANVAS_W, 24)
+      if (vertical) {
+        ctx.fillRect(
+          finishLineX.value - DETECTION_ZONE_HALF_SIZE,
+          0,
+          DETECTION_ZONE_HALF_SIZE * 2,
+          CANVAS_H
+        )
+      } else {
+        ctx.fillRect(
+          0,
+          finishLineY.value - DETECTION_ZONE_HALF_SIZE,
+          CANVAS_W,
+          DETECTION_ZONE_HALF_SIZE * 2
+        )
+      }
       ctx.restore()
     }
   }
 
   function detectCrossing(): void {
     if (!captureCtx) return
-    const zoneTop = Math.max(0, finishLineY.value - DETECTION_ZONE_HALF_HEIGHT)
-    const zoneHeight = Math.min(DETECTION_ZONE_HALF_HEIGHT * 2, CANVAS_H - zoneTop)
-    const current = captureCtx.getImageData(0, zoneTop, CANVAS_W, zoneHeight)
+
+    let current: ImageData
+    if (finishLineOrientation.value === 'vertical') {
+      const zoneLeft = Math.max(0, finishLineX.value - DETECTION_ZONE_HALF_SIZE)
+      const zoneWidth = Math.min(DETECTION_ZONE_HALF_SIZE * 2, CANVAS_W - zoneLeft)
+      current = captureCtx.getImageData(zoneLeft, 0, zoneWidth, CANVAS_H)
+    } else {
+      const zoneTop = Math.max(0, finishLineY.value - DETECTION_ZONE_HALF_SIZE)
+      const zoneHeight = Math.min(DETECTION_ZONE_HALF_SIZE * 2, CANVAS_H - zoneTop)
+      current = captureCtx.getImageData(0, zoneTop, CANVAS_W, zoneHeight)
+    }
 
     if (!prevFrameData) {
       prevFrameData = current
@@ -267,24 +294,32 @@ export function useFinishCameraView() {
     return count > 0 ? total / count : 0
   }
 
-  function updateFinishLine(clientY: number): void {
+  function updateFinishLine(clientX: number, clientY: number): void {
     if (!cameraActive.value) return
     const canvas = displayCanvas.value
     if (!canvas) return
+
     const rect = canvas.getBoundingClientRect()
+    const scaleX = CANVAS_W / rect.width
     const scaleY = CANVAS_H / rect.height
-    finishLineY.value = Math.round((clientY - rect.top) * scaleY)
+
+    if (finishLineOrientation.value === 'vertical') {
+      finishLineX.value = Math.round((clientX - rect.left) * scaleX)
+    } else {
+      finishLineY.value = Math.round((clientY - rect.top) * scaleY)
+    }
+
     finishLineSet.value = true
     prevFrameData = null
   }
 
   function setFinishLineByClick(event: MouseEvent): void {
-    updateFinishLine(event.clientY)
+    updateFinishLine(event.clientX, event.clientY)
   }
 
   function setFinishLineByTouch(event: TouchEvent): void {
     if (event.touches.length === 0) return
-    updateFinishLine(event.touches[0].clientY)
+    updateFinishLine(event.touches[0].clientX, event.touches[0].clientY)
   }
 
   function resetFinishLine(): void {
@@ -418,7 +453,9 @@ export function useFinishCameraView() {
     detectionThreshold,
     displayCanvas,
     events,
+    finishLineOrientation,
     finishLineSet,
+    finishLineX,
     finishLineY,
     formatElapsed,
     formattedElapsed,
