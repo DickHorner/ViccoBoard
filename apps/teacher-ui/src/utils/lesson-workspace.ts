@@ -1,7 +1,7 @@
 export type LessonWorkspaceSubject = 'sport' | 'kbr' | 'generic'
 
-export function resolveLessonWorkspaceSubject(subjectProfile?: string): LessonWorkspaceSubject {
-  const normalized = subjectProfile?.trim().toLowerCase()
+export function resolveLessonWorkspaceSubject(workspaceProfile?: string): LessonWorkspaceSubject {
+  const normalized = workspaceProfile?.trim().toLowerCase()
 
   if (!normalized) {
     return 'generic'
