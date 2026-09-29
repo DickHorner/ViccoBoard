@@ -13,6 +13,7 @@ describe('PlanningBlockRepository', () => {
 
     const created = await repository.create({
       classGroupId: 'class-1',
+      subjectId: 'subject-sport',
       title: 'Basketball',
       startDate: '2026-09-14',
       endDate: '2026-10-09',
@@ -34,6 +35,7 @@ describe('PlanningBlockRepository', () => {
 
     await expect(repository.create({
       classGroupId: 'class-1',
+      subjectId: 'subject-sport',
       title: 'Volleyball',
       startDate: '2026-11-20',
       endDate: '2026-11-10'
@@ -45,19 +47,23 @@ describe('PlanningBlockRepository', () => {
 
     await repository.create({
       classGroupId: 'class-1',
+      subjectId: 'subject-sport',
       title: 'Volleyball',
       startDate: '2026-11-02',
       endDate: '2026-11-27'
     })
     await repository.create({
       classGroupId: 'class-1',
+      subjectId: 'subject-sport',
       title: 'Basketball',
       startDate: '2026-09-14',
       endDate: '2026-10-09'
     })
 
     const loaded = await repository.findByClassGroup('class-1')
+    const subjectBlocks = await repository.findByClassGroupAndSubject('class-1', 'subject-sport')
 
     expect(loaded.map((block) => block.title)).toEqual(['Basketball', 'Volleyball'])
+    expect(subjectBlocks).toHaveLength(2)
   })
 })
