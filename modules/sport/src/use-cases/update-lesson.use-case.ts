@@ -11,6 +11,7 @@ const DEFAULT_LESSON_START_MINUTES = 8 * 60;
 
 export interface UpdateLessonInput {
   lessonId: string;
+  subjectId?: string;
   date?: Date;
   startTime?: string;
   durationMinutes?: number;
@@ -26,6 +27,7 @@ export class UpdateLessonUseCase {
     await this.validate(input);
 
     const updates: Partial<Lesson> = {};
+    if (input.subjectId !== undefined) updates.subjectId = input.subjectId.trim();
     if (input.date !== undefined) updates.date = input.date;
     if (input.startTime !== undefined) updates.startTime = input.startTime.trim();
     if (input.durationMinutes !== undefined) updates.durationMinutes = input.durationMinutes;
@@ -37,6 +39,10 @@ export class UpdateLessonUseCase {
   }
 
   private async validate(input: UpdateLessonInput): Promise<void> {
+    if (input.subjectId !== undefined && !input.subjectId.trim()) {
+      throw new Error('Subject ID is required');
+    }
+
     if (
       input.durationMinutes !== undefined &&
       (!Number.isInteger(input.durationMinutes) ||
