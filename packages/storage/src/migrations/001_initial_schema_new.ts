@@ -49,6 +49,17 @@ export class InitialSchemaMigration implements Migration {
       )
     `);
 
+    // Subjects
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS subjects (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        workspace_profile TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        last_modified TEXT NOT NULL
+      )
+    `);
+
     // Students
     db.exec(`
       CREATE TABLE IF NOT EXISTS students (
@@ -125,6 +136,7 @@ export class InitialSchemaMigration implements Migration {
       CREATE TABLE IF NOT EXISTS lessons (
         id TEXT PRIMARY KEY,
         class_group_id TEXT NOT NULL,
+        subject_id TEXT,
         date TEXT NOT NULL,
         start_time TEXT NOT NULL DEFAULT '08:00',
         duration_minutes INTEGER NOT NULL DEFAULT 45,
@@ -202,7 +214,9 @@ export class InitialSchemaMigration implements Migration {
       CREATE INDEX IF NOT EXISTS idx_sport_student_profiles_student ON sport_student_profiles(student_id);
       CREATE INDEX IF NOT EXISTS idx_import_batches_source_type ON import_batches(source_type);
       CREATE INDEX IF NOT EXISTS idx_import_batch_items_batch ON import_batch_items(batch_id);
+      CREATE INDEX IF NOT EXISTS idx_subjects_name ON subjects(name COLLATE NOCASE);
       CREATE INDEX IF NOT EXISTS idx_lessons_class_group ON lessons(class_group_id);
+      CREATE INDEX IF NOT EXISTS idx_lessons_subject ON lessons(subject_id);
       CREATE INDEX IF NOT EXISTS idx_lessons_date ON lessons(date);
       CREATE INDEX IF NOT EXISTS idx_attendance_lesson ON attendance_records(lesson_id);
       CREATE INDEX IF NOT EXISTS idx_attendance_student ON attendance_records(student_id);
@@ -220,6 +234,7 @@ export class InitialSchemaMigration implements Migration {
       DROP TABLE IF EXISTS import_batches;
       DROP TABLE IF EXISTS sport_student_profiles;
       DROP TABLE IF EXISTS students;
+      DROP TABLE IF EXISTS subjects;
       DROP TABLE IF EXISTS class_groups;
       DROP TABLE IF EXISTS teacher_accounts;
       DROP TABLE IF EXISTS backups;
