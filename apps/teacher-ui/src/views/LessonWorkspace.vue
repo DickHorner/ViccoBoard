@@ -21,7 +21,7 @@
       <header class="page-header">
         <div>
           <p class="eyebrow">Stundenarbeitsbereich</p>
-          <h1>{{ classGroup.name }}</h1>
+          <h1>{{ subject?.name || 'Unzugeordnet' }} · {{ classGroup.name }}</h1>
           <p class="subtitle">{{ formatLessonDateTime(lesson.date) }}</p>
         </div>
         <RouterLink :to="`/attendance?classId=${classGroup.id}&lessonId=${lesson.id}`" class="primary-link">
@@ -30,8 +30,8 @@
       </header>
 
       <section v-if="workspaceSubject === 'generic'" class="notice-card">
-        <strong>Fachprofil offen</strong>
-        <p>Für diese Klasse ist noch kein eindeutiges Fachprofil hinterlegt. Der Arbeitsbereich bietet deshalb sowohl fachneutrale als auch fachbezogene Einstiege an.</p>
+        <strong>Allgemeiner Fachkontext</strong>
+        <p>Für dieses Fach ist kein spezieller Arbeitsbereich hinterlegt. Der Arbeitsbereich bietet deshalb fachneutrale Einstiege an.</p>
       </section>
 
       <div class="workspace-grid">
@@ -109,8 +109,8 @@
               <span>{{ classGroup.name }} ({{ classGroup.schoolYear }})</span>
             </div>
             <div>
-              <strong>Fachprofil</strong>
-              <span>{{ classGroup.subjectProfile || 'nicht gesetzt' }}</span>
+              <strong>Fach</strong>
+              <span>{{ subject?.name || 'Unzugeordnet' }}</span>
             </div>
             <div>
               <strong>Datum</strong>
@@ -141,7 +141,7 @@ import { getSportBridge } from '../composables/useSportBridge'
 import { resolveLessonWorkspaceSubject, buildSportToolEntries, formatToolLabel, SPORT_TOOL_ROUTES } from '../utils/lesson-workspace'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import { selectRandomStudentId } from '../utils/random-student'
-import type { ClassGroup, Lesson, Sport, Student } from '@viccoboard/core'
+import type { ClassGroup, Lesson, Sport, Student, Subject } from '@viccoboard/core'
 import { formatGermanDateTime } from '../utils/locale-format'
 
 const route = useRoute()
@@ -153,6 +153,7 @@ const loading = ref(true)
 const loadError = ref('')
 const lesson = ref<Lesson | null>(null)
 const classGroup = ref<ClassGroup | null>(null)
+const subject = ref<Subject | null>(null)
 const recentSessions = ref<Array<{ id: string; toolLabel: string; startedAt: Date; resumeLink: string }>>([])
 const classStudents = ref<Student[]>([])
 const randomHistory = ref<string[]>([])
@@ -162,7 +163,7 @@ const randomSelectionError = ref('')
 const MAX_RECENT_SESSIONS = 3
 
 const workspaceSubject = computed(() =>
-  resolveLessonWorkspaceSubject(classGroup.value?.subjectProfile)
+  resolveLessonWorkspaceSubject(subject.value?.workspaceProfile)
 )
 
 const lessonContext = computed(() => {
@@ -208,15 +209,24 @@ const loadData = async () => {
       return
     }
 
-    const loadedClassGroup = await SportBridge.classGroupRepository.findById(loadedLesson.classGroupId)
+    const [loadedClassGroup, loadedSubject] = await Promise.all([
+      SportBridge.classGroupRepository.findById(loadedLesson.classGroupId),
+      SportBridge.subjectRepository.findById(loadedLesson.subjectId)
+    ])
 
     if (!loadedClassGroup) {
       loadError.value = 'Die zugehörige Klasse konnte nicht geladen werden.'
       return
     }
 
+    if (!loadedSubject) {
+      loadError.value = 'Das zugehörige Fach konnte nicht geladen werden.'
+      return
+    }
+
     lesson.value = loadedLesson
     classGroup.value = loadedClassGroup
+    subject.value = loadedSubject
     randomHistory.value = loadedLesson.randomStudentHistory ?? []
     selectedRandomStudent.value = null
     classStudents.value = await studentsBridge.studentRepository.findByClassGroup(loadedClassGroup.id)
