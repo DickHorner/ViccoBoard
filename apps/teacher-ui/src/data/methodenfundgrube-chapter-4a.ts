@@ -5,7 +5,7 @@ type SeedEntry = Omit<Sport.GameEntry, 'id' | 'isCustom' | 'createdAt' | 'lastMo
 export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
   {
     name: 'Mein Name – meine Übung',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -13,11 +13,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     goal: 'Aufwärmen, Gedächtnistraining',
     description: 'Die Gruppe steht im Kreis. Jede Person nennt den eigenen Namen und zeigt eine kurze Bewegung; nach dem Kofferpack-Prinzip werden zuvor genannte Namen und Bewegungen in Reihenfolge wiederholt, bevor ein neues Element hinzukommt.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 72.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Meine Zahl – meine Übung',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -26,11 +25,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     description: 'Jede Person merkt sich eine Zahl. Werden zwei Zahlen aufgerufen, wechseln die entsprechenden Personen ihre Position im Kreis und müssen dabei ihre Nummer sowie die Bewegungsvorgabe korrekt erinnern.',
     variation: 'Zahlen zusätzlich mit Lauf-ABC-Formen wie Anfersen, Hopserlauf, Seitgalopp oder Knieheben koppeln.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 74.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Mein Pass – mein Positionswechsel',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -40,11 +38,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     description: 'Im Kreis wird eine Person benannt und angespielt. Wer passt, läuft anschließend auf die Position des Empfängers; dieser spielt den Ball sofort weiter und folgt wiederum seinem Passweg.',
     variation: 'Direkt durch den Kreis laufen, mehrere Bälle einsetzen oder Ballfarben mit unterschiedlichen Zuspieltechniken verknüpfen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 76.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Wo sind meine Nachbarn?',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -54,11 +51,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     description: 'Im Ausgangskreis merkt sich jede Person die beiden nächsten Nachbarn auf jeder Seite. Nach einer freien Laufphase wird der Kreis neu gebildet; anschließend müssen die ursprünglich gemerkten Nachbarn trotz veränderter Position gezielt angespielt werden.',
     variation: 'Verschiedene Ballfarben mit Richtung, Distanz und Passtechnik kombinieren.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 78.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Kreuzpässe',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -68,11 +64,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     description: 'Vier Personen stehen im Quadrat. Zwei gegenüberliegende Paare spielen gleichzeitig diagonal über Kreuz, ohne dass sich die Bälle treffen; Passart und Balltechnik können gewechselt werden.',
     variation: 'Mit vier Bällen gleichzeitig spielen oder als Kontrastaufgabe gezielt versuchen, die kreuzenden Ballwege zu treffen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 80.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Zur Seite passen – ohne Laufen',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -82,11 +77,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     description: 'Vier Personen stehen im Quadrat, zwei diagonal gegenüber besitzen je einen Ball. Auf gemeinsames Kommando werden beide Bälle synchron zur gleichen Seite weitergespielt; die Positionen bleiben unverändert.',
     variation: 'Dritten und vierten Ball ergänzen und dadurch die Anforderungen an gemeinsames Timing steigern.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 82.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Passen – diagonal laufen',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -95,11 +89,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     goal: 'genaues Zuspiel, Konzentration, Timing',
     description: 'Zwei diagonal gegenüberstehende Personen passen gleichzeitig zur Seite und laufen danach diagonal durch das Quadrat in die freie Ecke. Die beiden anderen übernehmen spiegelbildlich dieselbe Pass- und Laufbewegung.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 84.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Ein Pass – Vier Läufer',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -109,11 +102,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     description: 'Ein diagonaler Pass löst gleichzeitig bei allen vier Personen einen Positionswechsel um eine Ecke aus. Die Laufbewegung wird synchron durchgeführt, sodass eine neue Person am Zielpunkt des Passes ankommt und weiterspielt.',
     variation: 'Direkten statt indirekten Pass verwenden, zwei Bälle einsetzen oder Ballarten mit unterschiedlichen Techniken verknüpfen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 86.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Das Haus vom Nikolaus (Folge deinem Pass!)',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -123,11 +115,10 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     description: 'Im Quadrat wechseln sich Längs- und Diagonalpässe nach einem festen Muster ab. Nach jedem Pass läuft die passgebende Person auf die Zielposition des eigenen Passes und reiht sich dort ein.',
     variation: 'Mit zwei Bällen gleichzeitig spielen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 88.',
-    sportType: 'Allgemein'
   },
   {
     name: 'Das Haus vom Nikolaus (Folge deinem Pass nicht!)',
-    category: 'laufspiel',
+    tags: ['Laufspiel', 'Allgemein'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -136,6 +127,5 @@ export const METHODENFUNDGRUBE_CHAPTER_4A: SeedEntry[] = [
     goal: 'genaues Zuspiel, Konzentration, Timing',
     description: 'Das Passmuster aus der Vorübung bleibt erhalten, aber die Laufbewegung folgt bewusst nicht dem Ball: Nach einem Längspass wird diagonal gelaufen, nach einem Diagonalpass längs.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 90.',
-    sportType: 'Allgemein'
   }
 ];
