@@ -75,6 +75,7 @@ describe('SaveCooperSessionUseCase', () => {
 
     const category = await categoryRepository.create({
       classGroupId,
+      subjectId: 'subject-sport',
       name: 'Cooper Test',
       type: Sport.GradeCategoryType.Cooper,
       weight: 1,
@@ -98,6 +99,7 @@ describe('SaveCooperSessionUseCase', () => {
 
     const s1 = await studentRepository.create({
       classGroupId,
+      subjectId: 'subject-sport',
       firstName: 'Anna',
       lastName: 'Müller',
       gender: 'f',
@@ -107,6 +109,7 @@ describe('SaveCooperSessionUseCase', () => {
 
     const s2 = await studentRepository.create({
       classGroupId,
+      subjectId: 'subject-sport',
       firstName: 'Ben',
       lastName: 'Schmidt',
       gender: 'm',
@@ -126,6 +129,7 @@ describe('SaveCooperSessionUseCase', () => {
   test('creates a ToolSession with toolType cooper-test', async () => {
     const session = await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'running',
       configId: runningConfigId,
@@ -144,6 +148,7 @@ describe('SaveCooperSessionUseCase', () => {
   test('session metadata contains categoryId, SportType, configId and entryCount', async () => {
     const session = await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'running',
       configId: runningConfigId,
@@ -165,6 +170,7 @@ describe('SaveCooperSessionUseCase', () => {
   test('persists a PerformanceEntry per active student with sessionId in metadata', async () => {
     const session = await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'running',
       configId: runningConfigId,
@@ -188,6 +194,7 @@ describe('SaveCooperSessionUseCase', () => {
   test('saves session with optional tableId', async () => {
     const session = await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'running',
       configId: runningConfigId,
@@ -206,6 +213,7 @@ describe('SaveCooperSessionUseCase', () => {
     // Create a real lesson to satisfy the FK constraint
     const lesson = await createLessonUseCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       date: new Date(),
       startTime: '08:00',
       durationMinutes: 45
@@ -213,6 +221,7 @@ describe('SaveCooperSessionUseCase', () => {
 
     const session = await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       lessonId: lesson.id,
       categoryId,
       SportType: 'running',
@@ -229,6 +238,7 @@ describe('SaveCooperSessionUseCase', () => {
   test('skips entries with distanceMeters <= 0', async () => {
     const session = await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'running',
       configId: runningConfigId,
@@ -252,6 +262,7 @@ describe('SaveCooperSessionUseCase', () => {
   test('session is retrievable via toolSessionRepository.findByClassGroup', async () => {
     await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'running',
       configId: runningConfigId,
@@ -269,6 +280,7 @@ describe('SaveCooperSessionUseCase', () => {
   test('two sessions for the same class are both retrievable', async () => {
     const commonInput = {
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'running' as const,
       configId: runningConfigId,
@@ -296,6 +308,7 @@ describe('SaveCooperSessionUseCase', () => {
 
     const session = await useCase.execute({
       classGroupId,
+      subjectId: 'subject-sport',
       categoryId,
       SportType: 'swimming',
       configId: swimmingConfig.id,
@@ -331,6 +344,7 @@ describe('SaveCooperSessionUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
+      subjectId: 'subject-sport',
         categoryId,
         SportType: 'running',
         configId: '',
@@ -344,6 +358,7 @@ describe('SaveCooperSessionUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
+      subjectId: 'subject-sport',
         categoryId,
         SportType: 'running',
         configId: 'non-existent-id',
@@ -357,6 +372,7 @@ describe('SaveCooperSessionUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
+      subjectId: 'subject-sport',
         categoryId,
         SportType: 'swimming',         // running config but swimming SportType
         configId: runningConfigId,
@@ -370,6 +386,7 @@ describe('SaveCooperSessionUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
+      subjectId: 'subject-sport',
         categoryId,
         SportType: 'running',
         configId: runningConfigId,
@@ -386,6 +403,7 @@ describe('SaveCooperSessionUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
+      subjectId: 'subject-sport',
         categoryId,
         SportType: 'running',
         configId: runningConfigId,
