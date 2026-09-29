@@ -185,9 +185,8 @@ const subjectEntries = computed(() => {
   }
 
   return [
-    { to: '/subjects/sport', title: 'Sport', description: 'Sport-Arbeitsbereich für Bewertung, Tests und Tools.' },
-    { to: '/subjects/kbr', title: 'KBR', description: 'KBR-Arbeitsbereich für Prüfungen und Korrektur.' },
-    { to: '/schedule', title: 'Organisation', description: 'Fachneutral im Stundenplan und bei der Stunde bleiben.' }
+    { to: '/schedule', title: 'Stundenplan', description: 'Weitere Unterrichtstermine öffnen.' },
+    { to: '/planning', title: 'Sequenzplanung', description: 'Themenblöcke für Klasse und Fach planen.' }
   ]
 })
 
@@ -234,6 +233,7 @@ const loadData = async () => {
     const allSessions = await SportBridge.toolSessionRepository.findByClassGroup(loadedClassGroup.id)
     const ctx = { lessonId: loadedLesson.id, classGroupId: loadedClassGroup.id }
     recentSessions.value = allSessions
+      .filter((session) => session.lessonId === loadedLesson.id)
       .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
       .slice(0, MAX_RECENT_SESSIONS)
       .map((s) => ({
