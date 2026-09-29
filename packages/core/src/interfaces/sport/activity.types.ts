@@ -53,20 +53,6 @@ export interface WorkoutProgress {
   lastActivity: Date;
 }
 
-export type GameCategory =
-  | 'erwaermung'
-  | 'ballspiel'
-  | 'reaktionsspiel'
-  | 'laufspiel'
-  | 'koordination'
-  | 'kooperation'
-  | 'entspannung'
-  | 'kraft'
-  | 'ausdauer'
-  | 'schnelligkeit'
-  | 'beweglichkeit'
-  | 'sonstiges';
-
 export type GameDifficulty = 'unbekannt' | 'anfaenger' | 'fortgeschrittene' | 'profis';
 
 export type GamePhase = 'erwaermung' | 'hauptteil' | 'schluss';
@@ -113,7 +99,7 @@ export interface SlowMotionSessionMetadata {
 export interface GameEntry {
   id: string;
   name: string;
-  category: GameCategory;
+  tags: string[];
   phase: GamePhase;
   difficulty: GameDifficulty;
   duration: number;
@@ -123,7 +109,6 @@ export interface GameEntry {
   description: string;
   variation?: string;
   notes?: string;
-  sportType?: string;
   videoUrl?: string;
   builtinKey?: string;
   isCustom: boolean;
