@@ -38,8 +38,8 @@ describe('CreateLessonUseCase', () => {
   test('creates a valid lesson with startTime and durationMinutes', async () => {
     const lesson = await useCase.execute({
       classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
       startTime: '08:00',
       durationMinutes: 45,
       title: 'Sprinttraining',
@@ -69,8 +69,8 @@ describe('CreateLessonUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 0
       })
@@ -81,8 +81,8 @@ describe('CreateLessonUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 301
       })
@@ -93,8 +93,8 @@ describe('CreateLessonUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
         startTime: '08:00',
         durationMinutes: 45.5
       })
@@ -104,8 +104,8 @@ describe('CreateLessonUseCase', () => {
   test('accepts custom duration within valid range', async () => {
     const lesson = await useCase.execute({
       classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
       startTime: '08:00',
       durationMinutes: 60
     });
@@ -116,8 +116,8 @@ describe('CreateLessonUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
         startTime: '',
         durationMinutes: 45
       })
@@ -127,8 +127,8 @@ describe('CreateLessonUseCase', () => {
   test('rejects overlapping lessons for same class on same day', async () => {
     await useCase.execute({
       classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
       startTime: '08:00',
       durationMinutes: 90
     });
@@ -136,8 +136,8 @@ describe('CreateLessonUseCase', () => {
     await expect(
       useCase.execute({
         classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
         startTime: '08:30',
         durationMinutes: 45
       })
@@ -147,16 +147,16 @@ describe('CreateLessonUseCase', () => {
   test('allows non-overlapping lessons for same class on same day', async () => {
     await useCase.execute({
       classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
       startTime: '08:00',
       durationMinutes: 45
     });
 
     const secondLesson = await useCase.execute({
       classGroupId,
-        subjectId: 'subject-sport',
-        date: new Date('2026-09-01T00:00:00.000Z'),
+      subjectId: 'subject-sport',
+      date: new Date('2026-09-01T00:00:00.000Z'),
       startTime: '08:45',
       durationMinutes: 45
     });
