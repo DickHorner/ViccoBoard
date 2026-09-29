@@ -55,19 +55,98 @@ export class GameEntryTagsMigration implements Migration {
     const tableInfo = db.prepare('PRAGMA table_info(game_entries)').all() as TableInfoRow[];
     const existingColumns = new Set(tableInfo.map((column) => column.name));
 
-    if (!existingColumns.has('tags')) {
-      db.exec("ALTER TABLE game_entries ADD COLUMN tags TEXT NOT NULL DEFAULT '[]';");
+    if (!existingColumns.has('category')) {
+      return;
     }
 
-    const rows = db
-      .prepare('SELECT id, category, sport_type, tags FROM game_entries')
-      .all() as LegacyGameEntryRow[];
-    const update = db.prepare('UPDATE game_entries SET tags = ? WHERE id = ?');
+    const rows = db.prepare(`
+      SELECT
+        id, name, category, phase, difficulty, duration, age_group, material, goal,
+        description, variation, notes, sport_type, video_url, builtin_key, is_custom,
+        created_at, last_modified
+      FROM game_entries
+    `).all() as Array<LegacyGameEntryRow & {
+      name: string;
+      phase: string;
+      difficulty: string;
+      duration: number;
+      age_group: string;
+      material: string | null;
+      goal: string;
+      description: string;
+      variation: string | null;
+      notes: string | null;
+      video_url: string | null;
+      builtin_key: string | null;
+      is_custom: number;
+      created_at: string;
+      last_modified: string;
+    }>;
 
-    for (const row of rows) {
-      if (row.tags && row.tags !== '[]') continue;
-      update.run(JSON.stringify(legacyTags(row.category, row.sport_type)), row.id);
-    }
+    const migrate = db.transaction(() => {
+      db.exec('ALTER TABLE game_entries RENAME TO game_entries_legacy;');
+      db.exec(`
+        CREATE TABLE game_entries (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          tags TEXT NOT NULL DEFAULT '[]',
+          phase TEXT NOT NULL,
+          difficulty TEXT NOT NULL,
+          duration INTEGER NOT NULL DEFAULT 0,
+          age_group TEXT NOT NULL DEFAULT '',
+          material TEXT,
+          goal TEXT NOT NULL DEFAULT '',
+          description TEXT NOT NULL DEFAULT '',
+          variation TEXT,
+          notes TEXT,
+          video_url TEXT,
+          builtin_key TEXT,
+          is_custom INTEGER NOT NULL DEFAULT 0,
+          created_at TEXT NOT NULL,
+          last_modified TEXT NOT NULL
+        );
+      `);
+
+      const insert = db.prepare(`
+        INSERT INTO game_entries (
+          id, name, tags, phase, difficulty, duration, age_group, material, goal,
+          description, variation, notes, video_url, builtin_key, is_custom,
+          created_at, last_modified
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      for (const row of rows) {
+        insert.run(
+          row.id,
+          row.name,
+          JSON.stringify(legacyTags(row.category, row.sport_type)),
+          row.phase,
+          row.difficulty,
+          row.duration,
+          row.age_group,
+          row.material,
+          row.goal,
+          row.description,
+          row.variation,
+          row.notes,
+          row.video_url,
+          row.builtin_key,
+          row.is_custom,
+          row.created_at,
+          row.last_modified
+        );
+      }
+
+      db.exec('DROP TABLE game_entries_legacy;');
+      db.exec(`
+        CREATE INDEX idx_game_entries_phase ON game_entries(phase);
+        CREATE INDEX idx_game_entries_difficulty ON game_entries(difficulty);
+        CREATE INDEX idx_game_entries_is_custom ON game_entries(is_custom);
+        CREATE UNIQUE INDEX idx_game_entries_builtin_key ON game_entries(builtin_key);
+      `);
+    });
+
+    migrate();
   }
 
   async down(): Promise<void> {
