@@ -17,6 +17,7 @@ export interface PlanningWeek {
 
 export interface PlanningWeekProjectionInput {
   classGroup: ClassGroup
+  subjectId: string
   blocks: PlanningBlock[]
   lessons: Lesson[]
 }
@@ -29,7 +30,9 @@ export function buildPlanningWeeks(input: PlanningWeekProjectionInput): Planning
 
   const state = normalizeState(input.classGroup.state)
   const states = state ? [state] : []
-  const classLessons = input.lessons.filter((lesson) => lesson.classGroupId === input.classGroup.id)
+  const classLessons = input.lessons.filter((lesson) =>
+    lesson.classGroupId === input.classGroup.id && lesson.subjectId === input.subjectId
+  )
   const lessonWeekdays = new Set(classLessons.map((lesson) => lesson.date.getDay()))
   const weeks: PlanningWeek[] = []
   const cursor = startOfWeek(range.start)
@@ -47,7 +50,7 @@ export function buildPlanningWeeks(input: PlanningWeekProjectionInput): Planning
       .sort(compareLessonsByDateAndStartTime)
 
     const weekBlocks = input.blocks
-      .filter((block) => block.classGroupId === input.classGroup.id)
+      .filter((block) => block.classGroupId === input.classGroup.id && block.subjectId === input.subjectId)
       .filter((block) => doesDateRangeOverlap(block.startDate, block.endDate, startDate, endDate))
       .filter((block) => weekLessons.some((lesson) => {
         const lessonDate = getDateKey(lesson.date)
