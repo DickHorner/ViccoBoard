@@ -46,11 +46,76 @@ describe('planning week projection', () => {
     expect(projectedWeek?.lessons.map((lesson) => lesson.title)).toEqual(['Dribbling'])
   })
 
-  it('keeps school-break markers visible in the week grid', () => {
-    const weeks = buildPlanningWeeks({ classGroup, blocks: [], lessons: [] })
+  it('keeps school-break markers visible when they affect a regular lesson weekday', () => {
+    const lessons: Lesson[] = [
+      {
+        id: 'lesson-monday',
+        classGroupId: 'class-1',
+        date: new Date('2026-10-12T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      }
+    ]
+
+    const weeks = buildPlanningWeeks({ classGroup, blocks: [], lessons })
     const autumnBreakWeek = weeks.find((week) => week.startDate === '2026-10-19')
 
     expect(autumnBreakWeek?.markers.map((marker) => marker.label)).toContain('Herbstferien')
+  })
+
+  it('does not show a weekend holiday when the class has no lesson on that weekday', () => {
+    const lessons: Lesson[] = [
+      {
+        id: 'lesson-monday',
+        classGroupId: 'class-1',
+        date: new Date('2026-09-28T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      }
+    ]
+
+    const weeks = buildPlanningWeeks({ classGroup, blocks: [], lessons })
+    const unityDayWeek = weeks.find((week) => week.startDate === '2026-09-28')
+
+    expect(unityDayWeek?.markers.map((marker) => marker.label)).not.toContain('Tag der Deutschen Einheit')
+  })
+
+  it('shows a holiday on a lesson weekday but omits a lesson scheduled on that holiday', () => {
+    const lessons: Lesson[] = [
+      {
+        id: 'lesson-before-holiday',
+        classGroupId: 'class-1',
+        date: new Date('2027-03-01T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      },
+      {
+        id: 'lesson-on-holiday',
+        classGroupId: 'class-1',
+        date: new Date('2027-03-08T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        title: 'Soll nicht geplant werden',
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      }
+    ]
+
+    const weeks = buildPlanningWeeks({ classGroup, blocks: [], lessons })
+    const holidayWeek = weeks.find((week) => week.startDate === '2027-03-08')
+
+    expect(holidayWeek?.markers.map((marker) => marker.label)).toContain('Internationaler Frauentag')
+    expect(holidayWeek?.lessons).toHaveLength(0)
   })
 
   it('rejects non-overlapping date ranges', () => {
