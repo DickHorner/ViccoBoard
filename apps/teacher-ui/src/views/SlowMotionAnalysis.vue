@@ -788,6 +788,13 @@ function placeMarker(nx: number, ny: number) {
   } else {
     kf.markers.push({ bodyPoint: bp, x: nx, y: ny, color })
   }
+
+  const bodyPointIndex = bodyPoints.findIndex(point => point.value === bp)
+  const nextBodyPoint = bodyPoints[bodyPointIndex + 1]
+  if (nextBodyPoint) {
+    selectedBodyPoint.value = nextBodyPoint.value
+  }
+
   nextTick(drawOverlay)
 }
 
