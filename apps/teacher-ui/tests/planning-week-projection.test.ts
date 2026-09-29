@@ -17,7 +17,6 @@ describe('planning week projection', () => {
       {
         id: 'block-1',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         title: 'Basketball',
         startDate: '2026-09-14',
@@ -31,7 +30,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-1',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2026-09-14T08:00:00.000Z'),
         startTime: '08:00',
@@ -55,7 +53,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-monday',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2026-10-12T08:00:00.000Z'),
         startTime: '08:00',
@@ -77,7 +74,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-monday',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2026-09-28T08:00:00.000Z'),
         startTime: '08:00',
@@ -99,7 +95,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-before-holiday',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2027-03-01T08:00:00.000Z'),
         startTime: '08:00',
@@ -111,7 +106,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-on-holiday',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2027-03-08T08:00:00.000Z'),
         startTime: '08:00',
@@ -146,7 +140,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-1',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2026-09-07T08:00:00.000Z'),
         startTime: '08:00',
@@ -158,7 +151,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-3',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2026-09-21T08:00:00.000Z'),
         startTime: '08:00',
@@ -196,7 +188,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-before-break',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2026-10-12T08:00:00.000Z'),
         startTime: '08:00',
@@ -208,7 +199,6 @@ describe('planning week projection', () => {
       {
         id: 'lesson-after-break',
         classGroupId: 'class-1',
-      subjectId: 'subject-sport',
         subjectId: 'subject-sport',
         date: new Date('2026-11-02T08:00:00.000Z'),
         startTime: '08:00',
