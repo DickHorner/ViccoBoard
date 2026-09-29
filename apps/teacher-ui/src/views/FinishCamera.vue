@@ -21,6 +21,18 @@
           </select>
         </div>
         <div class="form-group">
+          <label>{{ t('FINISH_CAMERA.line-orientation') }}</label>
+          <select
+            v-model="finishLineOrientation"
+            class="form-input"
+            :disabled="sessionActive"
+            @change="resetFinishLine"
+          >
+            <option value="vertical">{{ t('FINISH_CAMERA.line-vertical') }}</option>
+            <option value="horizontal">{{ t('FINISH_CAMERA.line-horizontal') }}</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>{{ t('FINISH_CAMERA.detection-threshold') }}</label>
           <input
             v-model.number="detectionThreshold"
@@ -71,7 +83,8 @@
 
         <div v-if="cameraActive" class="finish-line-info">
           <span v-if="finishLineSet">
-            🏁 {{ t('FINISH_CAMERA.line-at') }} y={{ finishLineY }}px
+            🏁 {{ t('FINISH_CAMERA.line-at') }}
+            {{ finishLineOrientation === 'vertical' ? `x=${finishLineX}px` : `y=${finishLineY}px` }}
             <button class="btn-icon btn-small" :title="t('FINISH_CAMERA.reset-line')" @click="resetFinishLine">✕</button>
           </span>
           <span v-else class="muted">{{ t('FINISH_CAMERA.no-line') }}</span>
@@ -220,7 +233,9 @@ const {
   detectionThreshold,
   displayCanvas,
   events,
+  finishLineOrientation,
   finishLineSet,
+  finishLineX,
   finishLineY,
   formatElapsed,
   formattedElapsed,
