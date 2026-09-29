@@ -41,19 +41,27 @@ export function buildPlanningWeeks(input: PlanningWeekProjectionInput): Planning
     const startDate = getDateKey(weekStart)
     const endDate = getDateKey(weekEnd)
 
+    const weekLessons = classLessons
+      .filter((lesson) => doesDateRangeOverlap(getDateKey(lesson.date), getDateKey(lesson.date), startDate, endDate))
+      .filter((lesson) => getScheduleCalendarMarkers(getDateKey(lesson.date), states).length === 0)
+      .sort(compareLessonsByDateAndStartTime)
+
+    const weekBlocks = input.blocks
+      .filter((block) => block.classGroupId === input.classGroup.id)
+      .filter((block) => doesDateRangeOverlap(block.startDate, block.endDate, startDate, endDate))
+      .filter((block) => weekLessons.some((lesson) => {
+        const lessonDate = getDateKey(lesson.date)
+        return lessonDate >= block.startDate && lessonDate <= block.endDate
+      }))
+
     weeks.push({
       key: startDate,
       startDate,
       endDate,
       label: formatWeekLabel(weekStart, weekEnd),
       markers: getWeekMarkers(weekStart, states, lessonWeekdays),
-      blocks: input.blocks
-        .filter((block) => block.classGroupId === input.classGroup.id)
-        .filter((block) => doesDateRangeOverlap(block.startDate, block.endDate, startDate, endDate)),
-      lessons: classLessons
-        .filter((lesson) => doesDateRangeOverlap(getDateKey(lesson.date), getDateKey(lesson.date), startDate, endDate))
-        .filter((lesson) => getScheduleCalendarMarkers(getDateKey(lesson.date), states).length === 0)
-        .sort(compareLessonsByDateAndStartTime)
+      blocks: weekBlocks,
+      lessons: weekLessons
     })
 
     cursor.setDate(cursor.getDate() + 7)
