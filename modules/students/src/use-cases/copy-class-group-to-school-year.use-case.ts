@@ -78,8 +78,7 @@ export class CopyClassGroupToSchoolYearUseCase {
       archived: false,
       state: sourceClassGroup.state,
       holidayCalendarRef: sourceClassGroup.holidayCalendarRef,
-      gradingScheme: sourceClassGroup.gradingScheme,
-      subjectProfile: sourceClassGroup.subjectProfile
+      gradingScheme: sourceClassGroup.gradingScheme
     });
   }
 
