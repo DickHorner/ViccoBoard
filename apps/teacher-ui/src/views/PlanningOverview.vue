@@ -24,13 +24,28 @@
           </select>
         </div>
 
+        <div class="form-group">
+          <label for="subject-select">Fach</label>
+          <select
+            id="subject-select"
+            v-model="selectedSubjectId"
+            :disabled="!selectedClass"
+            @change="handleSubjectChange"
+          >
+            <option value="">Fach wählen...</option>
+            <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
+              {{ subject.name }}
+            </option>
+          </select>
+        </div>
+
         <div v-if="selectedClass" class="class-summary">
           <strong>{{ selectedClass.name }}</strong>
           <span>{{ selectedClass.schoolYear }}</span>
           <span v-if="selectedClass.state">{{ selectedClass.state }}</span>
         </div>
 
-        <form v-if="selectedClass" class="block-form" @submit.prevent="handleSaveBlock">
+        <form v-if="selectedClass && selectedSubjectId" class="block-form" @submit.prevent="handleSaveBlock">
           <h2>{{ editingBlockId ? 'Themenblock bearbeiten' : 'Themenblock anlegen' }}</h2>
 
           <div class="form-group">
@@ -86,12 +101,14 @@
             <h2>Schuljahresraster</h2>
             <p class="panel-subtitle">
               {{ selectedClass ? selectedClass.schoolYear : 'Keine Klasse gewählt' }}
+              <template v-if="selectedSubject"> · {{ selectedSubject.name }}</template>
             </p>
           </div>
           <span>{{ selectedBlocks.length }} Themenblöcke</span>
         </div>
 
         <div v-if="!selectedClass" class="empty-state">Keine Klasse gewählt.</div>
+        <div v-else-if="!selectedSubjectId" class="empty-state">Kein Fach gewählt.</div>
         <div v-else-if="weeks.length === 0" class="empty-state">Ungültiges Schuljahr.</div>
         <template v-else>
           <p v-if="lessonError && !lessonFormWeekKey" class="error-text">{{ lessonError }}</p>
@@ -214,8 +231,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import type { ClassGroup, Lesson, PlanningBlock } from '@viccoboard/core'
-import { getSportBridge, useClassGroups, useLessons } from '../composables/useSportBridge'
+import type { ClassGroup, Lesson, PlanningBlock, Subject } from '@viccoboard/core'
+import { getSportBridge, useClassGroups, useLessons, useSubjects } from '../composables/useSportBridge'
 import { usePlanningBlocks } from '../composables/usePlanningBridge'
 import { buildPlanningWeeks, type PlanningWeek } from '../utils/planning-week-projection'
 import { getScheduleCalendarMarkers } from '../utils/schedule-calendar-markers'
@@ -237,6 +254,7 @@ interface LessonForm {
 
 const sportBridge = getSportBridge()
 const classGroups = useClassGroups()
+const subjectsRepository = useSubjects()
 const lessonsRepository = useLessons()
 const planningBlocks = usePlanningBlocks()
 
@@ -245,9 +263,11 @@ const saving = ref(false)
 const loadError = ref('')
 const saveError = ref('')
 const classes = ref<ClassGroup[]>([])
+const subjects = ref<Subject[]>([])
 const lessons = ref<Lesson[]>([])
 const blocks = ref<PlanningBlock[]>([])
 const selectedClassId = ref('')
+const selectedSubjectId = ref('')
 const editingBlockId = ref<string | null>(null)
 const lessonFormWeekKey = ref<string | null>(null)
 const lessonSaving = ref(false)
@@ -276,21 +296,34 @@ const selectedClass = computed(() =>
   classes.value.find((classGroup) => classGroup.id === selectedClassId.value) ?? null
 )
 
+const selectedSubject = computed(() =>
+  subjects.value.find((subject) => subject.id === selectedSubjectId.value) ?? null
+)
+
 const selectedBlocks = computed(() =>
-  selectedClass.value ? blocks.value.filter((block) => block.classGroupId === selectedClass.value!.id) : []
+  selectedClass.value && selectedSubjectId.value
+    ? blocks.value.filter((block) =>
+        block.classGroupId === selectedClass.value!.id && block.subjectId === selectedSubjectId.value
+      )
+    : []
 )
 
 const selectedLessons = computed(() =>
-  selectedClass.value ? lessons.value.filter((lesson) => lesson.classGroupId === selectedClass.value!.id) : []
+  selectedClass.value && selectedSubjectId.value
+    ? lessons.value.filter((lesson) =>
+        lesson.classGroupId === selectedClass.value!.id && lesson.subjectId === selectedSubjectId.value
+      )
+    : []
 )
 
 const weeks = computed(() => {
-  if (!selectedClass.value) {
+  if (!selectedClass.value || !selectedSubjectId.value) {
     return []
   }
 
   return buildPlanningWeeks({
     classGroup: selectedClass.value,
+    subjectId: selectedSubjectId.value,
     blocks: selectedBlocks.value,
     lessons: selectedLessons.value
   })
@@ -301,7 +334,12 @@ const loadData = async () => {
   loadError.value = ''
 
   try {
-    classes.value = await classGroups.findAll()
+    const [loadedClasses, loadedSubjects] = await Promise.all([
+      classGroups.findAll(),
+      subjectsRepository.findAll()
+    ])
+    classes.value = loadedClasses
+    subjects.value = loadedSubjects.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
     selectedClassId.value = activeClasses.value[0]?.id ?? ''
     await loadSelectedClassPlanning()
   } catch (error) {
@@ -316,6 +354,7 @@ const loadSelectedClassPlanning = async () => {
   if (!selectedClassId.value) {
     blocks.value = []
     lessons.value = []
+    selectedSubjectId.value = ''
     resetBlockForm()
     resetLessonForm()
     return
@@ -328,6 +367,7 @@ const loadSelectedClassPlanning = async () => {
 
   blocks.value = loadedBlocks
   lessons.value = loadedLessons
+  selectDefaultSubject()
   resetBlockForm()
   resetLessonForm()
 }
@@ -337,8 +377,32 @@ const handleClassChange = async () => {
   await loadSelectedClassPlanning()
 }
 
-const handleSaveBlock = async () => {
+const handleSubjectChange = () => {
+  saveError.value = ''
+  resetBlockForm()
+  resetLessonForm()
+}
+
+const selectDefaultSubject = () => {
   if (!selectedClass.value) {
+    selectedSubjectId.value = ''
+    return
+  }
+
+  const referencedSubjectIds = new Set([
+    ...blocks.value
+      .filter((block) => block.classGroupId === selectedClass.value!.id)
+      .map((block) => block.subjectId),
+    ...lessons.value
+      .filter((lesson) => lesson.classGroupId === selectedClass.value!.id)
+      .map((lesson) => lesson.subjectId)
+  ])
+  const referencedSubject = subjects.value.find((subject) => referencedSubjectIds.has(subject.id))
+  selectedSubjectId.value = referencedSubject?.id ?? subjects.value[0]?.id ?? ''
+}
+
+const handleSaveBlock = async () => {
+  if (!selectedClass.value || !selectedSubjectId.value) {
     return
   }
 
@@ -348,6 +412,7 @@ const handleSaveBlock = async () => {
   try {
     const payload = {
       classGroupId: selectedClass.value.id,
+      subjectId: selectedSubjectId.value,
       title: blockForm.value.title.trim(),
       startDate: blockForm.value.startDate,
       endDate: blockForm.value.endDate,
@@ -408,7 +473,7 @@ const resetLessonForm = () => {
 }
 
 const handleCreateLesson = async (week: PlanningWeek) => {
-  if (!selectedClass.value) {
+  if (!selectedClass.value || !selectedSubjectId.value) {
     return
   }
 
@@ -437,6 +502,7 @@ const handleCreateLesson = async (week: PlanningWeek) => {
 
     await sportBridge.createLessonUseCase.execute({
       classGroupId: selectedClass.value.id,
+      subjectId: selectedSubjectId.value,
       date: dateTime,
       startTime: lessonForm.value.startTime,
       durationMinutes: lessonForm.value.durationMinutes,
