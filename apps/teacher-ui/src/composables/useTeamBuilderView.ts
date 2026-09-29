@@ -83,7 +83,15 @@ export function useTeamBuilderView() {
     if (!useLatestAttendance.value) {
       students.value = allStudents
     } else {
-      const lesson = await sportBridge.lessonRepository.getMostRecent(selectedClassId.value)
+      const sportSubjectIds = new Set(
+        (await sportBridge.subjectRepository.findAll())
+          .filter((subject) => subject.workspaceProfile === 'sport')
+          .map((subject) => subject.id)
+      )
+      const lesson = (await sportBridge.lessonRepository.findByClassGroup(selectedClassId.value))
+        .filter((candidate) => sportSubjectIds.has(candidate.subjectId))
+        .sort((left, right) => right.date.getTime() - left.date.getTime())[0]
+
       if (!lesson) {
         warning.value = t('COMMON.error')
         students.value = allStudents
