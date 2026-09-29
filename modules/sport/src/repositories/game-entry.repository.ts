@@ -3,13 +3,13 @@
  * Manages persistence for the local sport game / exercise database.
  */
 
-import { Sport } from '@viccoboard/core';
+import { Sport, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 const uuidv4 = () => crypto.randomUUID();
 
 export interface CreateGameEntryInput {
   name: string;
-  category: Sport.GameCategory;
+  tags: string[];
   phase: Sport.GamePhase;
   difficulty: Sport.GameDifficulty;
   duration: number;
@@ -19,7 +19,6 @@ export interface CreateGameEntryInput {
   description: string;
   variation?: string;
   notes?: string;
-  sportType?: string;
   videoUrl?: string;
   builtinKey?: string;
   isCustom?: boolean;
@@ -32,7 +31,7 @@ export class GameEntryRepository {
     return {
       id: raw.id,
       name: raw.name,
-      category: raw.category as Sport.GameCategory,
+      tags: safeJsonParse(raw.tags, [], 'GameEntry.tags'),
       phase: raw.phase as Sport.GamePhase,
       difficulty: raw.difficulty as Sport.GameDifficulty,
       duration: Number(raw.duration ?? 0),
@@ -42,7 +41,6 @@ export class GameEntryRepository {
       description: raw.description ?? '',
       variation: raw.variation ?? undefined,
       notes: raw.notes ?? undefined,
-      sportType: raw.sport_type ?? undefined,
       videoUrl: raw.video_url ?? undefined,
       builtinKey: raw.builtin_key ?? undefined,
       isCustom: Boolean(raw.is_custom),
@@ -56,7 +54,7 @@ export class GameEntryRepository {
     const entry: Sport.GameEntry = {
       id: uuidv4(),
       name: input.name,
-      category: input.category,
+      tags: input.tags,
       phase: input.phase,
       difficulty: input.difficulty,
       duration: input.duration,
@@ -66,7 +64,6 @@ export class GameEntryRepository {
       description: input.description,
       variation: input.variation,
       notes: input.notes,
-      sportType: input.sportType,
       videoUrl: input.videoUrl,
       builtinKey: input.builtinKey,
       isCustom: input.isCustom ?? true,
@@ -77,7 +74,7 @@ export class GameEntryRepository {
     await this.adapter.insert('game_entries', {
       id: entry.id,
       name: entry.name,
-      category: entry.category,
+      tags: safeJsonStringify(entry.tags, 'GameEntry.tags'),
       phase: entry.phase,
       difficulty: entry.difficulty,
       duration: entry.duration,
@@ -87,7 +84,6 @@ export class GameEntryRepository {
       description: entry.description,
       variation: entry.variation ?? null,
       notes: entry.notes ?? null,
-      sport_type: entry.sportType ?? null,
       video_url: entry.videoUrl ?? null,
       builtin_key: entry.builtinKey ?? null,
       is_custom: entry.isCustom ? 1 : 0,
@@ -108,9 +104,9 @@ export class GameEntryRepository {
     return results.map((r) => this.toDomain(r));
   }
 
-  async findByCategory(category: Sport.GameCategory): Promise<Sport.GameEntry[]> {
-    const results = await this.adapter.getAll<any>('game_entries', { category });
-    return results.map((r) => this.toDomain(r));
+  async findByTag(tag: string): Promise<Sport.GameEntry[]> {
+    const entries = await this.findAll();
+    return entries.filter((entry) => entry.tags.includes(tag));
   }
 
   async update(
@@ -131,7 +127,7 @@ export class GameEntryRepository {
 
     await this.adapter.update('game_entries', id, {
       name: updated.name,
-      category: updated.category,
+      tags: safeJsonStringify(updated.tags, 'GameEntry.tags'),
       phase: updated.phase,
       difficulty: updated.difficulty,
       duration: updated.duration,
@@ -141,7 +137,6 @@ export class GameEntryRepository {
       description: updated.description,
       variation: updated.variation ?? null,
       notes: updated.notes ?? null,
-      sport_type: updated.sportType ?? null,
       video_url: updated.videoUrl ?? null,
       builtin_key: updated.builtinKey ?? null,
       last_modified: updated.lastModified.toISOString()

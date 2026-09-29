@@ -5,7 +5,7 @@ type SeedEntry = Omit<Sport.GameEntry, 'id' | 'isCustom' | 'createdAt' | 'lastMo
 export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
   {
     name: 'Trampolin',
-    category: 'koordination',
+    tags: ['Koordination', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -14,11 +14,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     goal: 'Sprungkoordination und sichere Landung',
     description: 'Der Geräteblock steigert Trampolinsprünge von einfachen Absprüngen und Landungen zu Drehungen, Kastensprüngen und Sprungkaskaden. Die Landeflächen werden durch Matten gesichert.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 238.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: 'Sprungbrett',
-    category: 'koordination',
+    tags: ['Koordination', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -27,11 +26,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     goal: 'Sprungkraft und Sprungkoordination',
     description: 'Sprungbretter werden in einen Hallen-Rundlauf eingebaut. Nach einem etwa 10–15 Meter langen Anlauf wird abgesprungen und auf einer abgestuften Mattenfläche sicher gelandet; bei geringerem Niveau wird die Landefläche näher an das Brett gerückt.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 240.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: 'Weichbodenmatten',
-    category: 'koordination',
+    tags: ['Koordination', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -40,11 +38,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     goal: 'Kraftausdauer, Sprungkoordination und Gerätetraining',
     description: 'Geräteblock mit Weichbodenmatten als weicher, instabiler Untergrund für koordinative, sprung- und kraftorientierte Aufgaben.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 242.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: 'Gymnastikball',
-    category: 'koordination',
+    tags: ['Koordination', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -53,11 +50,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     goal: 'Ballkoordination und Gleichgewicht',
     description: 'Der Gymnastikball wird in Boden- und Rumpfübungen integriert, etwa beim kontrollierten Führen zwischen den Beinen, beim teilweisen Klappmesser und beim Bridging mit Ballführung unter der Hüfte.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 244.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: 'Medizinball – einfach, aber effektiv',
-    category: 'kraft',
+    tags: ['Kraft', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -66,11 +62,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     goal: 'Ganzkörperkraft und funktionelle Bewegungsmuster',
     description: 'Der Medizinball wird für funktionelle Kraftaufgaben verwendet, unter anderem für statische und dynamische Liegestützvarianten auf einem oder zwei Bällen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 246.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: 'Langhantel',
-    category: 'kraft',
+    tags: ['Kraft', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -79,11 +74,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     goal: 'Kraft, Körperspannung und Koordination',
     description: 'Geräteblock mit Langhantelübungen als Bestandteil funktioneller Kraftarbeit im Hallen- und Zirkelkontext.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 248.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: 'Piratenspiel',
-    category: 'koordination',
+    tags: ['Koordination', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -93,6 +87,5 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     description: 'Viele Klein- und Großgeräte werden als „Inseln“ in der Halle verteilt. Die Teilnehmenden bewegen sich von Gerät zu Gerät, ohne den Hallenboden als „Meer“ zu berühren; kurze Belastungsphasen und sichere Geräteabstände sind zentral.',
     variation: 'Jäger mit Leibchen einsetzen oder gefangene Personen auf Geräten festsetzen und durch Mitspielende befreien lassen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 250.',
-    sportType: 'Fitness/Turnen'
   }
 ];

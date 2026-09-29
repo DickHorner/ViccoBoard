@@ -5,7 +5,7 @@ type SeedEntry = Omit<Sport.GameEntry, 'id' | 'isCustom' | 'createdAt' | 'lastMo
 export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
   {
     name: 'Flitze-Flitz-Zirkel',
-    category: 'koordination',
+    tags: ['Koordination', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -14,11 +14,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     goal: 'Schnelligkeit, Koordination',
     description: 'Ein Geräteparcours verbindet Springen, Balancieren, Klettern, Krabbeln, Rollen und Rutschen zu einer durchlaufenden Start-Ziel-Route. Stationen werden möglichst doppelt aufgebaut, damit zwei Personen parallel arbeiten können.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 252.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: '12 Monkeys – Power-Parcours',
-    category: 'koordination',
+    tags: ['Koordination', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -27,11 +26,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     goal: 'Kurzzeitausdauer, Koordination, Schnelligkeit',
     description: 'Ein anspruchsvollerer Geräteparcours kombiniert koordinative Hindernisse mit athletischen Elementen, besonders für die Beinarbeit. Die Stationen werden paarweise aufgebaut und ohne Pause nacheinander durchlaufen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 254.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: 'Fitness-Koordinationszirkel',
-    category: 'kraft',
+    tags: ['Kraft', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -40,11 +38,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     goal: 'Kurzzeitausdauer, extensive Kraftausdauer, Koordination',
     description: 'Kraft- und Koordinationsstationen wechseln sich in einem klassischen Zirkel ab. Vorgesehen sind etwa 30 Sekunden Belastung und 30 Sekunden Wechsel/Pause; instabile Gerätevarianten erhöhen den koordinativen Anspruch bekannter Übungen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 256.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: '„3-mal 10“ – Cross-fit „light“ 1',
-    category: 'kraft',
+    tags: ['Kraft', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -53,11 +50,10 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     goal: 'Kurzzeitausdauer, extensive Kraftausdauer',
     description: 'Dreiergruppen arbeiten an Stationen mit jeweils drei funktionellen Übungen. Pro Übung werden zehn Wiederholungen absolviert; danach wechseln die Personen ohne längere Pause innerhalb der Station weiter.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 258.',
-    sportType: 'Fitness/Turnen'
   },
   {
     name: '„three2five“ – Cross-fit „light“ 2',
-    category: 'kraft',
+    tags: ['Kraft', 'Fitness', 'Turnen'],
     phase: 'hauptteil',
     difficulty: 'fortgeschrittene',
     duration: 0,
@@ -66,6 +62,5 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     goal: 'Kurzzeitausdauer, extensive Kraftausdauer',
     description: 'Dreiergruppen absolvieren an jeder Station drei Übungen mit jeweils 30 Sekunden Belastung direkt hintereinander. Nach insgesamt 90 Sekunden folgt beim Stationswechsel eine kurze Erholung.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 260.',
-    sportType: 'Fitness/Turnen'
   }
 ];

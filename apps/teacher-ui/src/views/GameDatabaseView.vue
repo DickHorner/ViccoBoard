@@ -32,17 +32,25 @@
       />
     </div>
 
-    <!-- Category filter chips -->
-    <div class="filter-chips" role="group" :aria-label="t('UEBUNGEN.kategorie')">
+    <!-- Tag filter chips -->
+    <div class="filter-chips" role="group" :aria-label="t('UEBUNGEN.schlagworte')">
       <button
-        v-for="cat in CATEGORIES"
-        :key="cat.value ?? 'all'"
         class="chip"
-        :class="{ 'chip--active': selectedCategory === cat.value }"
+        :class="{ 'chip--active': selectedTag === null }"
         type="button"
-        @click="selectedCategory = cat.value"
+        @click="selectedTag = null"
       >
-        {{ cat.label }}
+        {{ t('UEBUNGEN.alle-schlagworte') }}
+      </button>
+      <button
+        v-for="tag in availableTags"
+        :key="tag"
+        class="chip"
+        :class="{ 'chip--active': selectedTag === tag }"
+        type="button"
+        @click="selectedTag = tag"
+      >
+        {{ tag }}
       </button>
     </div>
 
@@ -51,7 +59,7 @@
       <div class="filter-group">
         <label class="filter-label" for="phase-select">{{ t('UEBUNGEN.phase') }}</label>
         <select id="phase-select" v-model="selectedPhase" class="filter-select">
-          <option value="">{{ t('UEBUNGEN.alle-kategorien') }}</option>
+          <option value="">{{ t('UEBUNGEN.alle') }}</option>
           <option value="erwaermung">{{ t('UEBUNGEN.phase-erwaermung') }}</option>
           <option value="hauptteil">{{ t('UEBUNGEN.phase-hauptteil') }}</option>
           <option value="schluss">{{ t('UEBUNGEN.phase-schluss') }}</option>
@@ -61,7 +69,7 @@
       <div class="filter-group">
         <label class="filter-label" for="difficulty-select">{{ t('UEBUNGEN.schwierigkeit') }}</label>
         <select id="difficulty-select" v-model="selectedDifficulty" class="filter-select">
-          <option value="">{{ t('UEBUNGEN.alle-kategorien') }}</option>
+          <option value="">{{ t('UEBUNGEN.alle') }}</option>
           <option value="unbekannt">{{ t('UEBUNGEN.schwierigkeit-unbekannt') }}</option>
           <option value="anfaenger">{{ t('UEBUNGEN.schwierigkeit-anfaenger') }}</option>
           <option value="fortgeschrittene">{{ t('UEBUNGEN.schwierigkeit-fortgeschrittene') }}</option>
@@ -91,7 +99,6 @@
         v-for="entry in filteredEntries"
         :key="entry.id"
         class="game-card"
-        :class="`game-card--${entry.category}`"
         tabindex="0"
         role="button"
         :aria-expanded="expandedId === entry.id"
@@ -102,7 +109,7 @@
         <div class="game-card__header">
           <div class="game-card__meta">
             <div class="game-card__badges">
-              <span class="badge badge--category">{{ categoryLabel(entry.category) }}</span>
+              <span v-for="tag in entry.tags" :key="tag" class="badge badge--tag">{{ tag }}</span>
               <span class="badge badge--difficulty" :class="`badge--${entry.difficulty}`">
                 {{ difficultyLabel(entry.difficulty) }}
               </span>
@@ -188,22 +195,14 @@
               <input id="game-name" v-model="form.name" type="text" maxlength="120" required />
             </div>
 
-            <div class="form-group">
-              <label for="game-category">{{ t('UEBUNGEN.kategorie') }}</label>
-              <select id="game-category" v-model="form.category">
-                <option value="erwaermung">{{ t('UEBUNGEN.kategorie-erwaermung') }}</option>
-                <option value="ballspiel">{{ t('UEBUNGEN.kategorie-ballspiel') }}</option>
-                <option value="reaktionsspiel">{{ t('UEBUNGEN.kategorie-reaktionsspiel') }}</option>
-                <option value="laufspiel">{{ t('UEBUNGEN.kategorie-laufspiel') }}</option>
-                <option value="koordination">{{ t('UEBUNGEN.kategorie-koordination') }}</option>
-                <option value="kooperation">{{ t('UEBUNGEN.kategorie-kooperation') }}</option>
-                <option value="entspannung">{{ t('UEBUNGEN.kategorie-entspannung') }}</option>
-                <option value="kraft">{{ t('UEBUNGEN.kategorie-kraft') }}</option>
-                <option value="ausdauer">{{ t('UEBUNGEN.kategorie-ausdauer') }}</option>
-                <option value="schnelligkeit">{{ t('UEBUNGEN.kategorie-schnelligkeit') }}</option>
-                <option value="beweglichkeit">{{ t('UEBUNGEN.kategorie-beweglichkeit') }}</option>
-                <option value="sonstiges">{{ t('UEBUNGEN.kategorie-sonstiges') }}</option>
-              </select>
+            <div class="form-group form-group--wide">
+              <label for="game-tags">{{ t('UEBUNGEN.schlagworte') }}</label>
+              <input
+                id="game-tags"
+                v-model="form.tagsText"
+                type="text"
+                :placeholder="t('UEBUNGEN.schlagworte-hinweis')"
+              />
             </div>
 
             <div class="form-group">
@@ -238,11 +237,6 @@
             <div class="form-group">
               <label for="game-material">{{ t('UEBUNGEN.material') }}</label>
               <input id="game-material" v-model="form.material" type="text" maxlength="240" />
-            </div>
-
-            <div class="form-group">
-              <label for="game-sport-type">{{ t('UEBUNGEN.sportart') }}</label>
-              <input id="game-sport-type" v-model="form.sportType" type="text" maxlength="120" />
             </div>
 
             <div class="form-group form-group--wide">
@@ -325,14 +319,14 @@ const modalError = ref('')
 const saving = ref(false)
 
 const searchQuery = ref('')
-const selectedCategory = ref<Sport.GameCategory | null>(null)
+const selectedTag = ref<string | null>(null)
 const selectedPhase = ref<Sport.GamePhase | ''>('')
 const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
 
 interface GameForm {
   name: string
-  category: Sport.GameCategory
+  tagsText: string
   phase: Sport.GamePhase
   difficulty: Sport.GameDifficulty
   duration: number
@@ -342,14 +336,13 @@ interface GameForm {
   description: string
   variation: string
   notes: string
-  sportType: string
   videoUrl: string
 }
 
 function emptyGameForm(): GameForm {
   return {
     name: '',
-    category: 'sonstiges',
+    tagsText: '',
     phase: 'hauptteil',
     difficulty: 'unbekannt',
     duration: 0,
@@ -359,7 +352,6 @@ function emptyGameForm(): GameForm {
     description: '',
     variation: '',
     notes: '',
-    sportType: '',
     videoUrl: ''
   }
 }
@@ -383,30 +375,23 @@ const BUILT_IN_GAME_SEED_DATA = [
 ]
 const DIFFICULTY_ORDER: Sport.GameDifficulty[] = ['anfaenger', 'fortgeschrittene', 'profis', 'unbekannt']
 
-interface CategoryOption {
-  value: Sport.GameCategory | null
-  label: string
-}
+const availableTags = computed(() =>
+  Array.from(new Set(allEntries.value.flatMap((entry) => entry.tags))).sort((a, b) => a.localeCompare(b))
+)
 
-const CATEGORIES = computed<CategoryOption[]>(() => [
-  { value: null, label: t('UEBUNGEN.alle-kategorien') },
-  { value: 'erwaermung', label: t('UEBUNGEN.kategorie-erwaermung') },
-  { value: 'ballspiel', label: t('UEBUNGEN.kategorie-ballspiel') },
-  { value: 'reaktionsspiel', label: t('UEBUNGEN.kategorie-reaktionsspiel') },
-  { value: 'laufspiel', label: t('UEBUNGEN.kategorie-laufspiel') },
-  { value: 'koordination', label: t('UEBUNGEN.kategorie-koordination') },
-  { value: 'kooperation', label: t('UEBUNGEN.kategorie-kooperation') },
-  { value: 'entspannung', label: t('UEBUNGEN.kategorie-entspannung') },
-  { value: 'kraft', label: t('UEBUNGEN.kategorie-kraft') },
-  { value: 'ausdauer', label: t('UEBUNGEN.kategorie-ausdauer') },
-  { value: 'schnelligkeit', label: t('UEBUNGEN.kategorie-schnelligkeit') },
-  { value: 'beweglichkeit', label: t('UEBUNGEN.kategorie-beweglichkeit') },
-  { value: 'sonstiges', label: t('UEBUNGEN.kategorie-sonstiges') }
-])
+function parseTags(value: string): string[] {
+  const tags: string[] = []
+  const seen = new Set<string>()
 
-function categoryLabel(cat: Sport.GameCategory): string {
-  const found = CATEGORIES.value.find((c) => c.value === cat)
-  return found ? found.label : cat
+  for (const part of value.split(',')) {
+    const tag = part.trim()
+    const normalized = tag.toLowerCase()
+    if (!tag || seen.has(normalized)) continue
+    seen.add(normalized)
+    tags.push(tag)
+  }
+
+  return tags
 }
 
 function difficultyLabel(d: Sport.GameDifficulty): string {
@@ -440,11 +425,11 @@ const filteredEntries = computed<Sport.GameEntry[]>(() => {
   const q = searchQuery.value.toLowerCase().trim()
 
   let result = allEntries.value.filter((e) => {
-    if (selectedCategory.value && e.category !== selectedCategory.value) return false
+    if (selectedTag.value && !e.tags.includes(selectedTag.value)) return false
     if (selectedPhase.value && e.phase !== selectedPhase.value) return false
     if (selectedDifficulty.value && e.difficulty !== selectedDifficulty.value) return false
     if (q) {
-      const haystack = `${e.name} ${e.goal} ${e.description} ${e.sportType ?? ''}`.toLowerCase()
+      const haystack = `${e.name} ${e.goal} ${e.description} ${e.tags.join(' ')}`.toLowerCase()
       if (!haystack.includes(q)) return false
     }
     return true
@@ -516,7 +501,7 @@ function openEditModal(entry: Sport.GameEntry): void {
   editingEntry.value = entry
   form.value = {
     name: entry.name,
-    category: entry.category,
+    tagsText: entry.tags.join(', '),
     phase: entry.phase,
     difficulty: entry.difficulty,
     duration: entry.duration,
@@ -526,7 +511,6 @@ function openEditModal(entry: Sport.GameEntry): void {
     description: entry.description,
     variation: entry.variation ?? '',
     notes: entry.notes ?? '',
-    sportType: entry.sportType ?? '',
     videoUrl: entry.videoUrl ?? ''
   }
   modalError.value = ''
@@ -578,7 +562,7 @@ async function saveModal(): Promise<void> {
 
   const input = {
     name,
-    category: form.value.category,
+    tags: parseTags(form.value.tagsText),
     phase: form.value.phase,
     difficulty: form.value.difficulty,
     duration: Math.max(0, Number(form.value.duration) || 0),
@@ -588,7 +572,6 @@ async function saveModal(): Promise<void> {
     description: form.value.description.trim(),
     variation: form.value.variation.trim() || undefined,
     notes: form.value.notes.trim() || undefined,
-    sportType: form.value.sportType.trim() || undefined,
     videoUrl: videoUrl ?? undefined
   }
 
