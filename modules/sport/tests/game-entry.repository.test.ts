@@ -10,7 +10,8 @@ import {
   InitialSchemaMigration,
   GradingSchemaMigration,
   GameDatabaseSchemaMigration,
-  GameEntryMetadataMigration
+  GameEntryMetadataMigration,
+  GameEntryTagsMigration
 } from '@viccoboard/storage/node';
 import type { StorageAdapter } from '@viccoboard/storage/node';
 
@@ -26,6 +27,7 @@ describe('GameEntryRepository', () => {
     storage.registerMigration(new GradingSchemaMigration(storage));
     storage.registerMigration(new GameDatabaseSchemaMigration(storage));
     storage.registerMigration(new GameEntryMetadataMigration(storage));
+    storage.registerMigration(new GameEntryTagsMigration(storage));
     await storage.migrate();
 
     adapter = storage.getAdapter();
@@ -39,7 +41,7 @@ describe('GameEntryRepository', () => {
   it('creates and retrieves a game entry by id', async () => {
     const entry = await repository.create({
       name: 'Zahlenball',
-      category: 'erwaermung',
+      tags: ['Aufwärmen'],
       phase: 'erwaermung',
       difficulty: 'anfaenger',
       duration: 5,
@@ -52,7 +54,7 @@ describe('GameEntryRepository', () => {
 
     expect(entry.id).toBeDefined();
     expect(entry.name).toBe('Zahlenball');
-    expect(entry.category).toBe('erwaermung');
+    expect(entry.tags).toEqual(['Aufwärmen']);
     expect(entry.difficulty).toBe('anfaenger');
     expect(entry.duration).toBe(5);
     expect(entry.isCustom).toBe(false);
@@ -70,7 +72,7 @@ describe('GameEntryRepository', () => {
   it('finds all entries', async () => {
     await repository.create({
       name: 'Spiel A',
-      category: 'ballspiel',
+      tags: ['Ballspiel'],
       phase: 'hauptteil',
       difficulty: 'fortgeschrittene',
       duration: 20,
@@ -82,7 +84,7 @@ describe('GameEntryRepository', () => {
 
     await repository.create({
       name: 'Spiel B',
-      category: 'laufspiel',
+      tags: ['Laufspiel'],
       phase: 'erwaermung',
       difficulty: 'anfaenger',
       duration: 10,
@@ -96,10 +98,10 @@ describe('GameEntryRepository', () => {
     expect(all.length).toBe(2);
   });
 
-  it('filters by category', async () => {
+  it('filters by tag', async () => {
     await repository.create({
       name: 'Ballspiel 1',
-      category: 'ballspiel',
+      tags: ['Ballspiel'],
       phase: 'hauptteil',
       difficulty: 'anfaenger',
       duration: 15,
@@ -111,7 +113,7 @@ describe('GameEntryRepository', () => {
 
     await repository.create({
       name: 'Laufspiel 1',
-      category: 'laufspiel',
+      tags: ['Laufspiel'],
       phase: 'erwaermung',
       difficulty: 'anfaenger',
       duration: 8,
@@ -121,7 +123,7 @@ describe('GameEntryRepository', () => {
       isCustom: false
     });
 
-    const ballGames = await repository.findByCategory('ballspiel');
+    const ballGames = await repository.findByTag('Ballspiel');
     expect(ballGames.length).toBe(1);
     expect(ballGames[0].name).toBe('Ballspiel 1');
   });
@@ -129,7 +131,7 @@ describe('GameEntryRepository', () => {
   it('updates an entry and preserves built-in identity', async () => {
     const entry = await repository.create({
       name: 'Original',
-      category: 'koordination',
+      tags: ['Koordination'],
       phase: 'hauptteil',
       difficulty: 'fortgeschrittene',
       duration: 10,
@@ -147,7 +149,7 @@ describe('GameEntryRepository', () => {
 
     expect(updated.name).toBe('Aktualisiert');
     expect(updated.duration).toBe(15);
-    expect(updated.category).toBe('koordination');
+    expect(updated.tags).toEqual(['Koordination']);
     expect(updated.builtinKey).toBe('core:original');
 
     const found = await repository.findById(entry.id);
@@ -158,7 +160,7 @@ describe('GameEntryRepository', () => {
   it('deletes an entry', async () => {
     const entry = await repository.create({
       name: 'Zu löschendes Spiel',
-      category: 'sonstiges',
+      tags: ['Sonstiges'],
       phase: 'schluss',
       difficulty: 'anfaenger',
       duration: 5,
@@ -179,7 +181,7 @@ describe('GameEntryRepository', () => {
 
     await repository.create({
       name: 'Spiel 1',
-      category: 'erwaermung',
+      tags: ['Aufwärmen'],
       phase: 'erwaermung',
       difficulty: 'anfaenger',
       duration: 5,
@@ -195,7 +197,7 @@ describe('GameEntryRepository', () => {
   it('persists optional fields correctly', async () => {
     const entry = await repository.create({
       name: 'Mit Variationen',
-      category: 'reaktionsspiel',
+      tags: ['Reaktion', 'Basketball'],
       phase: 'erwaermung',
       difficulty: 'anfaenger',
       duration: 7,
@@ -205,7 +207,6 @@ describe('GameEntryRepository', () => {
       description: 'Grundbeschreibung',
       variation: 'Variante A oder B',
       notes: 'Sicherheit beachten',
-      sportType: 'Allgemein',
       videoUrl: 'https://example.com/video',
       builtinKey: 'core:mit-variationen',
       isCustom: false
@@ -215,7 +216,7 @@ describe('GameEntryRepository', () => {
     expect(found!.material).toBe('Farbkarten');
     expect(found!.variation).toBe('Variante A oder B');
     expect(found!.notes).toBe('Sicherheit beachten');
-    expect(found!.sportType).toBe('Allgemein');
+    expect(found!.tags).toEqual(['Reaktion', 'Basketball']);
     expect(found!.videoUrl).toBe('https://example.com/video');
     expect(found!.builtinKey).toBe('core:mit-variationen');
   });
