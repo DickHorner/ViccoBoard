@@ -118,6 +118,50 @@ describe('planning week projection', () => {
     expect(holidayWeek?.lessons).toHaveLength(0)
   })
 
+  it('keeps sequence anchors and later lesson dates fixed when one lesson is removed', () => {
+    const block: PlanningBlock = {
+      id: 'block-fixed',
+      classGroupId: 'class-1',
+      title: 'Basketball',
+      startDate: '2026-09-07',
+      endDate: '2026-09-28',
+      color: 'blue',
+      createdAt: now,
+      lastModified: now
+    }
+    const lessons: Lesson[] = [
+      {
+        id: 'lesson-1',
+        classGroupId: 'class-1',
+        date: new Date('2026-09-07T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      },
+      {
+        id: 'lesson-3',
+        classGroupId: 'class-1',
+        date: new Date('2026-09-21T08:00:00.000Z'),
+        startTime: '08:00',
+        durationMinutes: 45,
+        attendance: [],
+        createdAt: now,
+        lastModified: now
+      }
+    ]
+
+    const weeks = buildPlanningWeeks({ classGroup, blocks: [block], lessons })
+    const missingLessonWeek = weeks.find((week) => week.startDate === '2026-09-14')
+    const laterLessonWeek = weeks.find((week) => week.startDate === '2026-09-21')
+
+    expect(missingLessonWeek?.blocks[0]?.startDate).toBe('2026-09-07')
+    expect(missingLessonWeek?.blocks[0]?.endDate).toBe('2026-09-28')
+    expect(missingLessonWeek?.lessons).toHaveLength(0)
+    expect(laterLessonWeek?.lessons[0]?.date.toISOString()).toBe('2026-09-21T08:00:00.000Z')
+  })
+
   it('rejects non-overlapping date ranges', () => {
     expect(doesDateRangeOverlap('2026-09-01', '2026-09-10', '2026-09-11', '2026-09-20')).toBe(false)
     expect(doesDateRangeOverlap('2026-09-01', '2026-09-10', '2026-09-10', '2026-09-20')).toBe(true)
