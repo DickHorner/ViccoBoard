@@ -206,6 +206,14 @@ export {
   PUSHUP_PARTIAL_QUALITY_MAX,
 } from './services/pushup-repetition-counter.service.js';
 
+export { JumpRopeRepetitionCounter } from './services/jump-rope-repetition-counter.service.js';
+export {
+  JUMP_ROPE_MAX_PERSONS,
+  JUMP_ROPE_MIN_AMPLITUDE,
+  JUMP_ROPE_MIN_INTERVAL_MS,
+  JUMP_ROPE_MAX_CYCLE_MS,
+} from './services/jump-rope-repetition-counter.service.js';
+
 export { BasketballShotCounter } from './services/basketball-shot-counter.service.js';
 export type { BasketballMotionObservation } from './services/basketball-shot-counter.service.js';
 
