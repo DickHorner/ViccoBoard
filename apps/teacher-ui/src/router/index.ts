@@ -317,6 +317,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Basketball Trefferquote', parent: '/subjects/sport' }
   },
   {
+    path: '/tools/jump-rope-tracking',
+    name: 'jump-rope-tracking',
+    component: () => import('../views/JumpRopeTracking.vue'),
+    meta: { title: 'Seilspringen Tracking', parent: '/subjects/sport' }
+  },
+  {
     path: '/tools/slow-motion',
     name: 'slow-motion',
     component: () => import('../views/SlowMotionAnalysis.vue'),
