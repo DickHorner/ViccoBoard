@@ -20,6 +20,7 @@ const PATCH_RADIUS = 4
 const SEARCH_RADIUS = 12
 const MAX_FRAME_SCORE = 32
 const MAX_ANCHOR_SCORE = 72
+const MIN_TEMPLATE_CONTRAST = 18
 
 export function createLocalPointTracker(
   frame: PixelFrame,
@@ -29,7 +30,7 @@ export function createLocalPointTracker(
   const centerX = Math.round(x)
   const centerY = Math.round(y)
   const template = extractGrayPatch(frame, centerX, centerY, PATCH_RADIUS)
-  if (!template) {
+  if (!template || getTemplateContrast(template) < MIN_TEMPLATE_CONTRAST) {
     return null
   }
 
@@ -128,6 +129,18 @@ function extractGrayPatch(
   }
 
   return patch
+}
+
+function getTemplateContrast(template: Uint8Array): number {
+  let min = 255
+  let max = 0
+
+  for (const value of template) {
+    min = Math.min(min, value)
+    max = Math.max(max, value)
+  }
+
+  return max - min
 }
 
 function scorePatch(
