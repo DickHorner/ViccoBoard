@@ -81,8 +81,9 @@ export function useTrackingBasketballView() {
   async function startCamera(): Promise<void> {
     cameraError.value = ''
     const requestId = ++cameraRequestId
+    let requestedStream: MediaStream | null = null
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      requestedStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: CAPTURE_W },
           height: { ideal: CAPTURE_H },
@@ -93,24 +94,20 @@ export function useTrackingBasketballView() {
       })
 
       if (requestId !== cameraRequestId || disposed) {
-        for (const track of stream.getTracks()) track.stop()
+        for (const track of requestedStream.getTracks()) track.stop()
         return
       }
 
-      mediaStream.value = stream
+      mediaStream.value = requestedStream
       const video = liveVideo.value
       if (!video) throw new Error('Video element not available')
-      video.srcObject = stream
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve()
-        video.onerror = (event) => reject(event)
-      })
+      video.srcObject = requestedStream
       await video.play()
 
       if (requestId !== cameraRequestId || disposed) {
-        for (const track of stream.getTracks()) track.stop()
-        if (mediaStream.value === stream) mediaStream.value = null
-        if (video.srcObject === stream) video.srcObject = null
+        for (const track of requestedStream.getTracks()) track.stop()
+        if (mediaStream.value === requestedStream) mediaStream.value = null
+        if (video.srcObject === requestedStream) video.srcObject = null
         return
       }
 
@@ -124,7 +121,10 @@ export function useTrackingBasketballView() {
       cameraActive.value = true
       startRenderLoop()
     } catch (error) {
-      if (requestId !== cameraRequestId || disposed) return
+      if (requestId !== cameraRequestId || disposed) {
+        requestedStream?.getTracks().forEach(track => track.stop())
+        return
+      }
       if (mediaStream.value) {
         for (const track of mediaStream.value.getTracks()) track.stop()
         mediaStream.value = null
