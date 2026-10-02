@@ -139,5 +139,9 @@ export class BasketballShotCounter {
     ) {
       throw new Error('Basketball motion coordinates must be between 0 and 1');
     }
+
+    if (typeof observation.rimOcclusionObserved !== 'boolean') {
+      throw new Error('rimOcclusionObserved must be a boolean');
+    }
   }
 }
