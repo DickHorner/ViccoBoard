@@ -39,7 +39,7 @@
       "error-title": "Error",
       "retry": "Try again",
       "define-zone": "Define target zone",
-      "zone-hint": "Drag on the video to mark the target area (e.g. basket).",
+      "zone-hint": "Mark the hoop so the drawn center line lies on the front rim.",
       "zone-defined": "Target zone defined",
       "clear-zone": "Clear zone",
       "stats": {
