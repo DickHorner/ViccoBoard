@@ -291,6 +291,9 @@ async function initCamera() {
     await video.play()
 
     if (requestId !== cameraRequestId || disposed) {
+      requestedStream.getTracks().forEach(track => track.stop())
+      if (stream === requestedStream) stream = null
+      if (video.srcObject === requestedStream) video.srcObject = null
       return
     }
 
@@ -304,6 +307,8 @@ async function initCamera() {
       requestedStream?.getTracks().forEach(track => track.stop())
       return
     }
+
+    stopCamera()
 
     if (error instanceof DOMException && error.name === 'NotAllowedError') {
       cameraError.value = t('TRACKING.jump-rope.noCameraPermission')
