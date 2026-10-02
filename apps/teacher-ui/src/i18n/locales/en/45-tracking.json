@@ -26,6 +26,11 @@
         "good": "Good",
         "partial": "Partial",
         "bad": "Bad"
+      },
+      "regions": {
+        "title": "Person regions",
+        "reset": "Reset automatic split",
+        "hint": "Select a person, then drag a new region for them on the camera image."
       }
     },
     "basketball": {
