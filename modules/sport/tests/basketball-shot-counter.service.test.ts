@@ -1,0 +1,104 @@
+import { describe, expect, it } from '@jest/globals';
+import {
+  BasketballShotCounter,
+  BASKETBALL_ENTRY_Y_MAX,
+  BASKETBALL_EXIT_Y_MIN,
+  BASKETBALL_TRAJECTORY_TIMEOUT_MS,
+} from '../src/services/basketball-shot-counter.service';
+
+describe('BasketballShotCounter', () => {
+  it('counts a downward top-to-bottom trajectory through the hoop zone', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.50, y: BASKETBALL_ENTRY_Y_MAX - 0.08 }, 0);
+    counter.processFrame({ x: 0.52, y: 0.50 }, 40);
+    counter.processFrame({ x: 0.51, y: BASKETBALL_EXIT_Y_MIN + 0.08 }, 80);
+
+    expect(counter.getCount()).toBe(1);
+  });
+
+  it('does not count a horizontal crossing through the zone', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.10, y: 0.30 }, 0);
+    counter.processFrame({ x: 0.35, y: 0.31 }, 40);
+    counter.processFrame({ x: 0.65, y: 0.32 }, 80);
+    counter.processFrame({ x: 0.90, y: 0.31 }, 120);
+
+    expect(counter.getCount()).toBe(0);
+  });
+
+  it('does not count bottom-to-top motion', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.50, y: 0.80 }, 0);
+    counter.processFrame({ x: 0.50, y: 0.55 }, 40);
+    counter.processFrame({ x: 0.50, y: 0.25 }, 80);
+
+    expect(counter.getCount()).toBe(0);
+  });
+
+  it('rejects a downward path with too much lateral drift', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.15, y: 0.25 }, 0);
+    counter.processFrame({ x: 0.50, y: 0.48 }, 40);
+    counter.processFrame({ x: 0.75, y: 0.75 }, 80);
+
+    expect(counter.getCount()).toBe(0);
+  });
+
+  it('tolerates small vertical jitter while the overall path moves down', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.48, y: 0.28 }, 0);
+    counter.processFrame({ x: 0.49, y: 0.45 }, 40);
+    counter.processFrame({ x: 0.50, y: 0.41 }, 80);
+    counter.processFrame({ x: 0.51, y: 0.68 }, 120);
+
+    expect(counter.getCount()).toBe(1);
+  });
+
+  it('expires an incomplete trajectory instead of joining unrelated motion later', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.50, y: 0.25 }, 0);
+    counter.processFrame(null, BASKETBALL_TRAJECTORY_TIMEOUT_MS + 1);
+    counter.processFrame({ x: 0.50, y: 0.75 }, BASKETBALL_TRAJECTORY_TIMEOUT_MS + 40);
+
+    expect(counter.getCount()).toBe(0);
+  });
+
+  it('counts separate downward trajectories independently', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.50, y: 0.25 }, 0);
+    counter.processFrame({ x: 0.50, y: 0.75 }, 50);
+    counter.processFrame({ x: 0.48, y: 0.24 }, 200);
+    counter.processFrame({ x: 0.49, y: 0.74 }, 250);
+
+    expect(counter.getCount()).toBe(2);
+  });
+
+  it('resetTrajectory clears only the in-flight path and preserves completed shots', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.50, y: 0.25 }, 0);
+    counter.processFrame({ x: 0.50, y: 0.75 }, 50);
+    counter.processFrame({ x: 0.50, y: 0.25 }, 100);
+    counter.resetTrajectory();
+    counter.processFrame({ x: 0.50, y: 0.75 }, 140);
+
+    expect(counter.getCount()).toBe(1);
+  });
+
+  it('reset clears count and any armed trajectory', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.50, y: 0.25 }, 0);
+    counter.reset();
+    counter.processFrame({ x: 0.50, y: 0.75 }, 40);
+
+    expect(counter.getCount()).toBe(0);
+  });
+});

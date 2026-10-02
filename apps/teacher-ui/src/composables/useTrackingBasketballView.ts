@@ -1,5 +1,6 @@
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { BasketballShotCounter } from '@viccoboard/sport'
 
 import { getSportBridge } from './useSportBridge'
 
@@ -17,9 +18,7 @@ interface DrawOrigin {
 
 const CAPTURE_W = 640
 const CAPTURE_H = 360
-const SHOT_COOLDOWN_MS = 1000
 const MOTION_PIXEL_THRESHOLD = 30
-const ZONE_EXIT_THRESHOLD_MULTIPLIER = 0.4
 const MIN_ZONE_SIZE = 10
 
 export function useTrackingBasketballView() {
@@ -50,8 +49,7 @@ export function useTrackingBasketballView() {
   let prevFrameData: ImageData | null = null
   let rafId: number | null = null
 
-  let ballInZone = false
-  let cooldownUntil = 0
+  const shotCounter = new BasketballShotCounter()
 
   function getMotionThreshold(): number {
     return 0.25 - (sensitivity.value - 1) * (0.21 / 9)
@@ -202,29 +200,41 @@ export function useTrackingBasketballView() {
     const d1 = currentFrame.data
     const d2 = prevFrameData.data
     let changedPixels = 0
+    let totalMotion = 0
+    let weightedX = 0
+    let weightedY = 0
     const totalPixels = w * h
 
     for (let i = 0; i < d1.length; i += 4) {
       const dr = Math.abs(d1[i] - d2[i])
       const dg = Math.abs(d1[i + 1] - d2[i + 1])
       const db = Math.abs(d1[i + 2] - d2[i + 2])
-      if ((dr + dg + db) / 3 > MOTION_PIXEL_THRESHOLD) changedPixels++
+      const motion = (dr + dg + db) / 3
+      if (motion <= MOTION_PIXEL_THRESHOLD) continue
+
+      const pixelIndex = i / 4
+      const pixelX = pixelIndex % w
+      const pixelY = Math.floor(pixelIndex / w)
+      changedPixels++
+      totalMotion += motion
+      weightedX += motion * pixelX
+      weightedY += motion * pixelY
     }
 
     const motionFraction = changedPixels / totalPixels
     const threshold = getMotionThreshold()
     const now = Date.now()
 
-    if (!ballInZone && motionFraction > threshold) {
-      ballInZone = true
-    } else if (ballInZone && motionFraction < threshold * ZONE_EXIT_THRESHOLD_MULTIPLIER) {
-      if (now > cooldownUntil) {
-        shotCount.value++
-        cooldownUntil = now + SHOT_COOLDOWN_MS
-      }
-      ballInZone = false
+    if (motionFraction > threshold && totalMotion > 0) {
+      shotCounter.processFrame({
+        x: weightedX / totalMotion / (w - 1),
+        y: weightedY / totalMotion / (h - 1)
+      }, now)
+    } else {
+      shotCounter.processFrame(null, now)
     }
 
+    shotCount.value = shotCounter.getCount()
     prevFrameData = currentFrame
   }
 
@@ -259,6 +269,7 @@ export function useTrackingBasketballView() {
     }
     if (Math.abs(draftZone.w) > MIN_ZONE_SIZE && Math.abs(draftZone.h) > MIN_ZONE_SIZE) {
       targetZone.value = normalizeRect(draftZone)
+      shotCounter.resetTrajectory()
     }
     draftZone = null
     isDefiningZone = false
@@ -298,14 +309,14 @@ export function useTrackingBasketballView() {
   function clearZone(): void {
     targetZone.value = null
     prevFrameData = null
+    shotCounter.resetTrajectory()
   }
 
   function startTracking(): void {
     if (!targetZone.value) return
     trackingActive.value = true
     sessionSaved.value = false
-    ballInZone = false
-    cooldownUntil = 0
+    shotCounter.resetTrajectory()
     prevFrameData = null
     sessionElapsedMs.value = 0
     sessionStartTime = Date.now()
@@ -317,6 +328,7 @@ export function useTrackingBasketballView() {
   function stopTracking(): void {
     if (!trackingActive.value) return
     trackingActive.value = false
+    shotCounter.resetTrajectory()
     if (timerHandle !== null) {
       clearInterval(timerHandle)
       timerHandle = null
@@ -326,10 +338,9 @@ export function useTrackingBasketballView() {
 
   function resetSession(): void {
     if (trackingActive.value) return
-    shotCount.value = 0
+    shotCounter.reset()
+    shotCount.value = shotCounter.getCount()
     sessionElapsedMs.value = 0
-    ballInZone = false
-    cooldownUntil = 0
     prevFrameData = null
     sessionSaved.value = false
   }

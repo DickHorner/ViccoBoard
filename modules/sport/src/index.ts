@@ -206,6 +206,9 @@ export {
   PUSHUP_PARTIAL_QUALITY_MAX,
 } from './services/pushup-repetition-counter.service.js';
 
+export { BasketballShotCounter } from './services/basketball-shot-counter.service.js';
+export type { BasketballMotionObservation } from './services/basketball-shot-counter.service.js';
+
 export { SavePushupSessionUseCase } from './use-cases/save-pushup-session.use-case.js';
 export type {
   SavePushupSessionInput,
