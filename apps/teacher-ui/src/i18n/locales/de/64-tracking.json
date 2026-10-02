@@ -39,7 +39,7 @@
       "error-title": "Fehler",
       "retry": "Erneut versuchen",
       "define-zone": "Zielbereich festlegen",
-      "zone-hint": "Ziehe auf dem Kamerabild, um den Zielbereich zu markieren (z. B. Korb).",
+      "zone-hint": "Markiere den Korb so, dass die eingezeichnete Mittellinie auf dem vorderen Korbring liegt.",
       "zone-defined": "Zielbereich festgelegt",
       "clear-zone": "Bereich löschen",
       "stats": {
