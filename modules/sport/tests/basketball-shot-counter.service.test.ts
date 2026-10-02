@@ -83,9 +83,11 @@ describe('BasketballShotCounter', () => {
     const counter = new BasketballShotCounter();
 
     counter.processFrame({ x: 0.50, y: 0.25, rimOcclusionObserved: false }, 0);
+    counter.processFrame({ x: 0.50, y: 0.50, rimOcclusionObserved: true }, 25);
     counter.processFrame({ x: 0.50, y: 0.75, rimOcclusionObserved: false }, 50);
     counter.processFrame({ x: 0.48, y: 0.24, rimOcclusionObserved: false }, 200);
-    counter.processFrame({ x: 0.49, y: 0.74, rimOcclusionObserved: true }, 250);
+    counter.processFrame({ x: 0.49, y: 0.50, rimOcclusionObserved: true }, 225);
+    counter.processFrame({ x: 0.49, y: 0.74, rimOcclusionObserved: false }, 250);
 
     expect(counter.getCount()).toBe(2);
   });
@@ -94,6 +96,7 @@ describe('BasketballShotCounter', () => {
     const counter = new BasketballShotCounter();
 
     counter.processFrame({ x: 0.50, y: 0.25, rimOcclusionObserved: false }, 0);
+    counter.processFrame({ x: 0.50, y: 0.50, rimOcclusionObserved: true }, 25);
     counter.processFrame({ x: 0.50, y: 0.75, rimOcclusionObserved: false }, 50);
     counter.processFrame({ x: 0.50, y: 0.25, rimOcclusionObserved: false }, 100);
     counter.resetTrajectory();
