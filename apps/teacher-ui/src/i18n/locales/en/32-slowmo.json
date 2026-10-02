@@ -45,7 +45,7 @@
     "trackingStopped": "Tracking stopped.",
     "trackingLost": "Tracking lost: {point}. Playback stopped.",
     "trackingInterrupted": "Tracking stopped: video-frame time jump was too large.",
-    "trackingCannotStart": "Tracking cannot start for {point}: marker is too close to the frame edge.",
+    "trackingCannotStart": "Tracking cannot start for {point}: marker is too close to the frame edge or in an area with too little visual structure.",
     "trackingUnavailable": "Tracking could not process this video frame.",
     "addKeyframe": "Add keyframe",
     "clearMarkers": "Clear markers",
