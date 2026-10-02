@@ -75,9 +75,10 @@ export function useVideoDelayView() {
   async function startCamera(): Promise<void> {
     cameraError.value = ''
     const requestId = ++cameraRequestId
+    let requestedStream: MediaStream | null = null
     const { w, h } = RESOLUTION_MAP[selectedResolution.value]
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      requestedStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: w },
           height: { ideal: h },
@@ -87,24 +88,20 @@ export function useVideoDelayView() {
       })
 
       if (requestId !== cameraRequestId) {
-        for (const track of stream.getTracks()) track.stop()
+        for (const track of requestedStream.getTracks()) track.stop()
         return
       }
 
-      mediaStream.value = stream
+      mediaStream.value = requestedStream
       const video = liveVideo.value
       if (!video) throw new Error('Video element not available')
-      video.srcObject = stream
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve()
-        video.onerror = (event) => reject(event)
-      })
+      video.srcObject = requestedStream
       await video.play()
 
       if (requestId !== cameraRequestId) {
-        for (const track of stream.getTracks()) track.stop()
-        if (mediaStream.value === stream) mediaStream.value = null
-        if (video.srcObject === stream) video.srcObject = null
+        for (const track of requestedStream.getTracks()) track.stop()
+        if (mediaStream.value === requestedStream) mediaStream.value = null
+        if (video.srcObject === requestedStream) video.srcObject = null
         return
       }
 
@@ -116,7 +113,10 @@ export function useVideoDelayView() {
       cameraActive.value = true
       startRenderLoop()
     } catch (error) {
-      if (requestId !== cameraRequestId) return
+      if (requestId !== cameraRequestId) {
+        requestedStream?.getTracks().forEach(track => track.stop())
+        return
+      }
       stopCamera()
       const message = error instanceof Error ? error.message : String(error)
       if (message.toLowerCase().includes('permission') || message.toLowerCase().includes('notallowed')) {
