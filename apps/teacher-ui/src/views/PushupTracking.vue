@@ -291,7 +291,7 @@ let counter: PushupRepetitionCounter | null = null
 let captureIntervalId: ReturnType<typeof setInterval> | null = null
 let elapsedIntervalId: ReturnType<typeof setInterval> | null = null
 let sessionStartedAt: Date | null = null
-let prevFrameData: ImageData[] = []
+let prevFrameData: Array<ImageData | null> = []
 let frameCount = 0
 let fpsWindowStart = 0
 
@@ -337,7 +337,13 @@ function displayRegion(index: number): PersonRegion {
   if (editingRegionIndex.value === index && draftRegion.value) {
     return draftRegion.value
   }
-  return personRegions.value[index] ?? createDefaultPersonRegions()[index]
+  const count = Math.max(1, configMaxPersons.value)
+  return personRegions.value[index] ?? {
+    x: index / count,
+    y: 0,
+    w: 1 / count,
+    h: 1,
+  }
 }
 
 function regionStyle(region: PersonRegion): Record<string, string> {
@@ -402,7 +408,7 @@ function onRegionEnd() {
   const region = draftRegion.value
   if (index !== null && region && region.w >= 0.08 && region.h >= 0.12) {
     personRegions.value[index] = region
-    prevFrameData[index] = undefined as unknown as ImageData
+    prevFrameData[index] = null
   }
 
   editingRegionIndex.value = null
