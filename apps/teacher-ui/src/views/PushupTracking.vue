@@ -91,7 +91,7 @@
           @touchstart.prevent="onTouchRegionStart"
           @touchmove.prevent="onTouchRegionMove"
           @touchend.prevent="onRegionEnd"
-        />
+        ></div>
       </div>
 
       <div v-if="cameraActive && !isTracking" class="region-controls card">
