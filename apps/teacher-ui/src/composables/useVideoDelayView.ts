@@ -50,6 +50,7 @@ export function useVideoDelayView() {
   const frameBuffer: BufferFrame[] = []
   let rafId: number | null = null
   let lastCaptureTs = 0
+  let cameraRequestId = 0
 
   const captureW = computed(() => RESOLUTION_MAP[selectedResolution.value].w)
   const captureH = computed(() => RESOLUTION_MAP[selectedResolution.value].h)
@@ -73,6 +74,7 @@ export function useVideoDelayView() {
 
   async function startCamera(): Promise<void> {
     cameraError.value = ''
+    const requestId = ++cameraRequestId
     const { w, h } = RESOLUTION_MAP[selectedResolution.value]
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -84,6 +86,11 @@ export function useVideoDelayView() {
         audio: false
       })
 
+      if (requestId !== cameraRequestId) {
+        for (const track of stream.getTracks()) track.stop()
+        return
+      }
+
       mediaStream.value = stream
       const video = liveVideo.value
       if (!video) throw new Error('Video element not available')
@@ -94,6 +101,13 @@ export function useVideoDelayView() {
       })
       await video.play()
 
+      if (requestId !== cameraRequestId) {
+        for (const track of stream.getTracks()) track.stop()
+        if (mediaStream.value === stream) mediaStream.value = null
+        if (video.srcObject === stream) video.srcObject = null
+        return
+      }
+
       captureCanvas = document.createElement('canvas')
       captureCanvas.width = w
       captureCanvas.height = h
@@ -102,6 +116,8 @@ export function useVideoDelayView() {
       cameraActive.value = true
       startRenderLoop()
     } catch (error) {
+      if (requestId !== cameraRequestId) return
+      stopCamera()
       const message = error instanceof Error ? error.message : String(error)
       if (message.toLowerCase().includes('permission') || message.toLowerCase().includes('notallowed')) {
         cameraError.value = t('DELAY.noCameraPermission')
@@ -112,6 +128,7 @@ export function useVideoDelayView() {
   }
 
   function stopCamera(): void {
+    cameraRequestId += 1
     cameraActive.value = false
     stopRenderLoop()
     if (mediaStream.value) {
@@ -150,10 +167,15 @@ export function useVideoDelayView() {
 
   function captureFrameAsync(): void {
     if (!captureCtx || !captureCanvas || !liveVideo.value) return
+    const requestId = cameraRequestId
     const video = liveVideo.value
     if (video.readyState < 2 || video.paused) return
     captureCtx.drawImage(video, 0, 0, captureCanvas.width, captureCanvas.height)
     createImageBitmap(captureCanvas).then((bmp) => {
+      if (requestId !== cameraRequestId || !cameraActive.value) {
+        bmp.close()
+        return
+      }
       frameBuffer.push({ t: Date.now(), bmp })
       trimBuffer()
     }).catch(() => {})
@@ -341,7 +363,7 @@ export function useVideoDelayView() {
   }
 
   onBeforeUnmount(() => {
-    if (cameraActive.value) stopCamera()
+    stopCamera()
   })
 
   return {
