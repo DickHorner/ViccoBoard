@@ -137,14 +137,27 @@ function scorePatch(
   centerY: number,
   radius: number
 ): number {
-  const candidate = extractGrayPatch(frame, centerX, centerY, radius)
-  if (!candidate || candidate.length !== template.length) {
+  if (
+    centerX - radius < 0 ||
+    centerY - radius < 0 ||
+    centerX + radius >= frame.width ||
+    centerY + radius >= frame.height
+  ) {
     return Number.POSITIVE_INFINITY
   }
 
   let difference = 0
-  for (let index = 0; index < template.length; index += 1) {
-    difference += Math.abs(template[index] - candidate[index])
+  let templateIndex = 0
+
+  for (let y = centerY - radius; y <= centerY + radius; y += 1) {
+    for (let x = centerX - radius; x <= centerX + radius; x += 1) {
+      const sourceIndex = (y * frame.width + x) * 4
+      const gray = Math.round(
+        (frame.data[sourceIndex] + frame.data[sourceIndex + 1] + frame.data[sourceIndex + 2]) / 3
+      )
+      difference += Math.abs(template[templateIndex] - gray)
+      templateIndex += 1
+    }
   }
 
   return difference / template.length
