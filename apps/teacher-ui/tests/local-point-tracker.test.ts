@@ -88,6 +88,12 @@ describe('local point tracker', () => {
     expect(result.status).toBe('lost')
   })
 
+  it('rejects low-information seed patches instead of reporting false tracking', () => {
+    const frame = createFrame()
+
+    expect(createLocalPointTracker(frame, 20, 18)).toBeNull()
+  })
+
   it('rejects seed points too close to the frame edge', () => {
     const frame = createFrame()
     paintPattern(frame, 4, 4)
