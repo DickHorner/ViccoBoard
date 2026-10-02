@@ -12,7 +12,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     ageGroup: 'ca. 10–14 Jahre',
     material: 'Trampoline, große Kästen, Weichbodenmatten (oder Niedersprungmatten), Langbänke und kleine Kästen, Turnmatten, Reifen, Turnseile, Reckstangen, Kastenmittelteile, Hütchen',
     goal: 'Schnelligkeit, Koordination',
-    description: 'Ein Geräteparcours verbindet Springen, Balancieren, Klettern, Krabbeln, Rollen und Rutschen zu einer durchlaufenden Start-Ziel-Route. Stationen werden möglichst doppelt aufgebaut, damit zwei Personen parallel arbeiten können.',
+    description: 'Die Geräte werden als fortlaufende Start-Ziel-Route mit etwa zehn bis vierzehn unterschiedlichen Bewegungsstationen aufgebaut; jede Station existiert parallel zweimal, damit zwei Personen gleichzeitig starten können. Der Parcours verbindet Springen, Balancieren, Klettern, Krabbeln, Rollen und Rutschen, etwa Trampolinsprung, Rolle vorwärts, Bankwaage, Drehsprung, Slalom, Reifenkrabbeln, Seilschwingen und Balancieren über eine Reckstange. Ein Durchgang dauert ungefähr eine bis anderthalb Minuten; die Paare starten versetzt und können mehrere Durchgänge mit ausreichender Pause absolvieren.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 252.',
   },
   {
@@ -24,7 +24,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     ageGroup: 'ca. 14–40 Jahre',
     material: 'Medizinbälle, Kastenmittelteile, Langbänke, Trampoline, Reckstangen, Weichbodenmatten (oder Niedersprungmatten), Matten, Reifen, Hütchen, Basketballbrett oder Turnringe',
     goal: 'Kurzzeitausdauer, Koordination, Schnelligkeit',
-    description: 'Ein anspruchsvollerer Geräteparcours kombiniert koordinative Hindernisse mit athletischen Elementen, besonders für die Beinarbeit. Die Stationen werden paarweise aufgebaut und ohne Pause nacheinander durchlaufen.',
+    description: 'Der Parcours folgt wie der Flitze-Flitz-Zirkel einer festen Start-Ziel-Route mit jeweils doppelt aufgebauten Stationen, steigert aber den athletischen Anspruch und legt den Schwerpunkt auf Beinarbeit. Die zwölf Aufgaben werden ohne Pause hintereinander in festen Wiederholungszahlen absolviert, darunter Jump-and-Reach-Sprints, Hocksprünge über Medizinball, Bankwaagen-Sprint, Dreh- und Trampolinsprünge, Slalom, Einbein- und Ausfallsprünge sowie Seitwärtssprünge durch Reifen. Ein kompletter Durchgang dauert etwa ein bis zwei Minuten und beansprucht damit vor allem Kurzzeitausdauer, Koordination und Schnelligkeit.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 254.',
   },
   {
@@ -36,7 +36,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     ageGroup: 'ca. 14–40 Jahre',
     material: 'Weichbodenmatten (oder Niedersprungmatten), Basketbälle, Gymnastikbälle, Pezzibälle®, Reckstangen, Matten, Seile, Kästen, Teppichfliesen, Medizinbälle, Langbank',
     goal: 'Kurzzeitausdauer, extensive Kraftausdauer, Koordination',
-    description: 'Kraft- und Koordinationsstationen wechseln sich in einem klassischen Zirkel ab. Vorgesehen sind etwa 30 Sekunden Belastung und 30 Sekunden Wechsel/Pause; instabile Gerätevarianten erhöhen den koordinativen Anspruch bekannter Übungen.',
+    description: 'Der klassische Stationszirkel arbeitet im 1:1-Rhythmus: 30 Sekunden Belastung, 30 Sekunden Pause und anschließend Stationswechsel; vorgesehen sind zwei bis drei Durchgänge. Die Stationen wechseln Muskelgruppen und verbinden bekannte Kraftübungen mit bewusst instabilen Unterlagen wie Ringen, Pezziball, Medizinball, Weichbodenmatte oder Bankwaage. Beispiele sind Skipping auf der Weichbodenmatte, Twists mit Ball, Bridging, Slides, Liegestützvarianten, Seilspringen, schräge Klimmzüge und Ballzuspiel auf der Bankwaage.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 256.',
   },
   {
@@ -48,7 +48,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     ageGroup: 'ca. 14–40 Jahre',
     material: 'Reckstange, Kasten, Sprossenwand, Langbank, Medizinbälle, Turnmatten, Turnringe, Weichbodenmatten, Seil',
     goal: 'Kurzzeitausdauer, extensive Kraftausdauer',
-    description: 'Dreiergruppen arbeiten an Stationen mit jeweils drei funktionellen Übungen. Pro Übung werden zehn Wiederholungen absolviert; danach wechseln die Personen ohne längere Pause innerhalb der Station weiter.',
+    description: 'Je drei Personen arbeiten an einer Station mit drei verschiedenen funktionellen Übungen. Jede Übung wird zehnmal ausgeführt und dauert ungefähr 15 Sekunden; danach wechseln die drei innerhalb der Station ohne längere Pause im Uhrzeigersinn weiter, sodass pro Station etwa 45 Sekunden Belastung entstehen. Die Stationen kombinieren mehrere Gelenke und Bewegungsmuster, beispielsweise Bauchheben, Kreuzheben und Umsetzen mit Reckstange, Kastensprünge, Medizinball- und Ringübungen sowie Skipping und Ausfallschritte auf Matten.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 258.',
   },
   {
@@ -60,7 +60,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7C: SeedEntry[] = [
     ageGroup: 'ca. 14–40 Jahre',
     material: '3 Paar Turnringe, 3 Reckstangen, 3 Paar Kletterseile, 4 Medizinbälle, 3 Langbänke, Turnmatten',
     goal: 'Kurzzeitausdauer, extensive Kraftausdauer',
-    description: 'Dreiergruppen absolvieren an jeder Station drei Übungen mit jeweils 30 Sekunden Belastung direkt hintereinander. Nach insgesamt 90 Sekunden folgt beim Stationswechsel eine kurze Erholung.',
+    description: 'Auch hier arbeiten jeweils drei Personen an einer Station mit drei Übungen, diesmal jedoch zeitgesteuert. Jede Übung dauert 30 Sekunden, danach wird innerhalb der Station ohne Pause gewechselt; damit entstehen 90 Sekunden Belastung pro Station, gefolgt von etwa 60 Sekunden Pause beim Stationswechsel. Die fünf Stationen nutzen unter anderem Ringe, Reckstangen, verknotete Kletterseile, Medizinbälle und Langbänke für Liegestütz, Klimmzug, Seitstütz, Ausfallschritt, Kreuzheben, Umsetzen, Bauchroller, Bridging, Kniebeuge, Stoßen und Dips.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 260.',
   }
 ];
