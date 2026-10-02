@@ -85,7 +85,7 @@
         </div>
 
         <div
-          v-if="editingRegionIndex !== null"
+          v-if="editingRegionIndex !== null && !isTracking"
           class="person-region-editor"
           @mousedown="onRegionStart"
           @mousemove="onRegionMove"
@@ -513,9 +513,31 @@ async function saveSession() {
 
 function captureAndAnalyse() {
   const video = videoEl.value
-  if (!analysisCtx || !counter || !video || video.readyState < 2) return
+  if (
+    !analysisCtx ||
+    !counter ||
+    !video ||
+    video.readyState < 2 ||
+    video.videoWidth <= 0 ||
+    video.videoHeight <= 0
+  ) return
 
-  analysisCtx.drawImage(video, 0, 0, captureW, captureH)
+  const captureAspect = captureW / captureH
+  const videoAspect = video.videoWidth / video.videoHeight
+  let sourceX = 0
+  let sourceY = 0
+  let sourceW = video.videoWidth
+  let sourceH = video.videoHeight
+
+  if (videoAspect > captureAspect) {
+    sourceW = video.videoHeight * captureAspect
+    sourceX = (video.videoWidth - sourceW) / 2
+  } else {
+    sourceH = video.videoWidth / captureAspect
+    sourceY = (video.videoHeight - sourceH) / 2
+  }
+
+  analysisCtx.drawImage(video, sourceX, sourceY, sourceW, sourceH, 0, 0, captureW, captureH)
 
   frameCount += 1
   const now = Date.now()
