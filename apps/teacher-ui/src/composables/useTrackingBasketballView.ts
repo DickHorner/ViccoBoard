@@ -80,6 +80,7 @@ export function useTrackingBasketballView() {
 
   async function startCamera(): Promise<void> {
     cameraError.value = ''
+    const requestId = ++cameraRequestId
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -91,6 +92,11 @@ export function useTrackingBasketballView() {
         audio: false
       })
 
+      if (requestId !== cameraRequestId || disposed) {
+        for (const track of stream.getTracks()) track.stop()
+        return
+      }
+
       mediaStream.value = stream
       const video = liveVideo.value
       if (!video) throw new Error('Video element not available')
@@ -100,6 +106,13 @@ export function useTrackingBasketballView() {
         video.onerror = (event) => reject(event)
       })
       await video.play()
+
+      if (requestId !== cameraRequestId || disposed) {
+        for (const track of stream.getTracks()) track.stop()
+        if (mediaStream.value === stream) mediaStream.value = null
+        if (video.srcObject === stream) video.srcObject = null
+        return
+      }
 
       captureCanvas = document.createElement('canvas')
       captureCanvas.width = CAPTURE_W
@@ -111,6 +124,14 @@ export function useTrackingBasketballView() {
       cameraActive.value = true
       startRenderLoop()
     } catch (error) {
+      if (requestId !== cameraRequestId || disposed) return
+      if (mediaStream.value) {
+        for (const track of mediaStream.value.getTracks()) track.stop()
+        mediaStream.value = null
+      }
+      if (liveVideo.value) liveVideo.value.srcObject = null
+      cameraActive.value = false
+      stopRenderLoop()
       const message = error instanceof Error ? error.message : String(error)
       if (message.toLowerCase().includes('permission') || message.toLowerCase().includes('notallowed')) {
         cameraError.value = t('TRACKING.basketball.noCameraPermission')
@@ -121,6 +142,7 @@ export function useTrackingBasketballView() {
   }
 
   function stopCamera(): void {
+    cameraRequestId += 1
     stopTracking()
     cameraActive.value = false
     stopRenderLoop()
@@ -389,18 +411,25 @@ export function useTrackingBasketballView() {
         startedAt: new Date(sessionStartTime),
         endedAt: new Date()
       })
-      sessionSaved.value = true
+      if (!disposed) sessionSaved.value = true
     } catch (error) {
       console.warn('Failed to save basketball tracking session:', error)
     }
   }
 
   onBeforeUnmount(() => {
+    disposed = true
+    cameraRequestId += 1
     stopRenderLoop()
-    if (timerHandle !== null) clearInterval(timerHandle)
+    if (timerHandle !== null) {
+      clearInterval(timerHandle)
+      timerHandle = null
+    }
     if (mediaStream.value) {
       for (const track of mediaStream.value.getTracks()) track.stop()
+      mediaStream.value = null
     }
+    if (liveVideo.value) liveVideo.value.srcObject = null
   })
 
   return {
