@@ -82,7 +82,7 @@
         </div>
 
         <div
-          v-if="editingRegionIndex !== null"
+v-if="editingRegionIndex !== null && !isTracking"
           class="person-region-editor"
           @mousedown="onRegionStart"
           @mousemove="onRegionMove"
