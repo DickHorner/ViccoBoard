@@ -50,6 +50,8 @@ export function useTrackingBasketballView() {
   let prevFrameData: ImageData | null = null
   let rimReferenceFrame: ImageData | null = null
   let rafId: number | null = null
+  let cameraRequestId = 0
+  let disposed = false
 
   const shotCounter = new BasketballShotCounter()
 
