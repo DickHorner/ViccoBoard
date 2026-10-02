@@ -170,7 +170,7 @@ export function useFinishCameraView() {
 
       mediaStream.value = requestedStream
       const video = liveVideo.value
-      if (!video) return
+      if (!video) throw new Error('Video element not available')
       video.srcObject = requestedStream
       await video.play()
 
