@@ -266,6 +266,7 @@
             preload="auto"
             @loadedmetadata="onVideoLoaded"
             @timeupdate="onTimeUpdate"
+            @seeked="onVideoSeeked"
             @ended="onVideoEnded"
           />
           <canvas
@@ -914,9 +915,9 @@ function stopPointTrackingLoop() {
   }
 }
 
-function trackCurrentVideoFrame() {
+function trackCurrentVideoFrame(allowPaused = false) {
   const video = videoEl.value
-  if (!video || video.paused || video.ended) {
+  if (!video || video.ended || (!allowPaused && video.paused)) {
     return
   }
 
@@ -1205,6 +1206,15 @@ function onVideoLoaded() {
 function onTimeUpdate() {
   if (!videoEl.value) return
   currentTime.value = videoEl.value.currentTime
+  nextTick(drawOverlay)
+}
+
+function onVideoSeeked() {
+  if (!videoEl.value) return
+  currentTime.value = videoEl.value.currentTime
+  if (pointTrackingStatus.value === 'tracking') {
+    trackCurrentVideoFrame(true)
+  }
   nextTick(drawOverlay)
 }
 
