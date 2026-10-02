@@ -235,6 +235,7 @@ const captureH = 240
 
 let analysisCtx: CanvasRenderingContext2D | null = null
 let stream: MediaStream | null = null
+let cameraRequestId = 0
 
 const persons = ref<PersonState[]>([])
 const personRegions = ref<PersonRegion[]>([])
@@ -263,9 +264,10 @@ const average = computed(() =>
 
 async function initCamera() {
   cameraError.value = null
+  const requestId = ++cameraRequestId
 
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
+    const requestedStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: 'environment',
         width: { ideal: captureW * 2 },
@@ -274,9 +276,20 @@ async function initCamera() {
       audio: false,
     })
 
+    if (requestId !== cameraRequestId) {
+      requestedStream.getTracks().forEach(track => track.stop())
+      return
+    }
+
+    stream = requestedStream
+
     if (videoEl.value) {
-      videoEl.value.srcObject = stream
+      videoEl.value.srcObject = requestedStream
       await videoEl.value.play()
+    }
+
+    if (requestId !== cameraRequestId) {
+      return
     }
 
     if (analysisCanvas.value) {
@@ -285,6 +298,8 @@ async function initCamera() {
 
     cameraActive.value = true
   } catch (error) {
+    if (requestId !== cameraRequestId) return
+
     if (error instanceof DOMException && error.name === 'NotAllowedError') {
       cameraError.value = t('TRACKING.jump-rope.noCameraPermission')
     } else if (error instanceof DOMException && error.name === 'NotFoundError') {
@@ -296,6 +311,7 @@ async function initCamera() {
 }
 
 function stopCamera() {
+  cameraRequestId += 1
   stream?.getTracks().forEach(track => track.stop())
   stream = null
 
