@@ -1285,10 +1285,11 @@ async function startCapturePreview() {
   }
 
   const requestId = ++captureRequestId
+  let requestedStream: MediaStream | null = null
 
   try {
     captureError.value = ''
-    const requestedStream = await navigator.mediaDevices.getUserMedia({
+    requestedStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: { ideal: 'environment' },
         width: { ideal: 1280 },
@@ -1307,19 +1308,22 @@ async function startCapturePreview() {
     await nextTick()
     if (requestId !== captureRequestId || disposed) return
 
-    if (captureVideoEl.value) {
-      captureVideoEl.value.srcObject = requestedStream
-      await captureVideoEl.value.play()
-    }
+    const video = captureVideoEl.value
+    if (!video) throw new Error('Video element not available')
+    video.srcObject = requestedStream
+    await video.play()
 
     if (requestId !== captureRequestId || disposed) {
       requestedStream.getTracks().forEach(track => track.stop())
       if (captureStream === requestedStream) captureStream = null
-      if (captureVideoEl.value?.srcObject === requestedStream) captureVideoEl.value.srcObject = null
+      if (video.srcObject === requestedStream) video.srcObject = null
       return
     }
   } catch (error) {
-    if (requestId !== captureRequestId || disposed) return
+    if (requestId !== captureRequestId || disposed) {
+      requestedStream?.getTracks().forEach(track => track.stop())
+      return
+    }
     stopCapturePreview()
     captureError.value = error instanceof Error ? error.message : t('SLOWMO.captureFailed')
   }
