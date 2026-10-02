@@ -138,6 +138,12 @@ const entries = [
     description: 'Echtzeit-Trefferzähler: Zielbereich im Kamerabild definieren und Treffer automatisch zählen.'
   },
   {
+    to: '/tools/jump-rope-tracking',
+    eyebrow: 'Tool',
+    title: 'Seilspringen Tracking',
+    description: 'Sprünge per Kamera für bis zu vier Personen gleichzeitig zählen.'
+  },
+  {
     to: '/tools/slow-motion',
     eyebrow: 'Tool',
     title: 'Slow Motion Analyse',
