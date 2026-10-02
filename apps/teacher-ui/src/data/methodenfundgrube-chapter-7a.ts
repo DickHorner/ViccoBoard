@@ -12,7 +12,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7A: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Turnseile',
     goal: 'Kraft, Körperspannung und Koordination',
-    description: 'Turnseile werden als instabile Aufhängung für bekannte Kräftigungsübungen genutzt. Gezeigt werden unter anderem schräge Klimmzüge, Liegestützvarianten, Seitstütz/Liegestütz, Bauchroller und Bridging; die Instabilität erhöht die Anforderungen an Rumpfstabilität und Koordination.',
+    description: 'Die fest installierten Turn- bzw. Kletterseile werden nicht nur zum Klettern verwendet, sondern als instabile Aufhängung für Kraft- und Stützübungen. An den Seilenden lassen sich schräge Klimmzüge, Liegestütze und Seitstütze ausführen; bei verknoteten Seilenden können die Füße eingehängt werden, um Bauchroller oder Bridging zu ergänzen. Durch die frei bewegliche Aufhängung müssen neben der eigentlichen Kraftbewegung ständig Körperspannung, Rumpfstabilität und Koordination gehalten werden.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 224.',
   },
   {
@@ -24,7 +24,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7A: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Turnringe',
     goal: 'Kraft, Körperspannung und Koordination',
-    description: 'Turnringe dienen als einfaches Schlingentraining in der Halle. Der Übungsblock kombiniert Liegestütz, Bridging, schräge Klimmzüge, Seit-/Liegestütz und Bauchroller mit erhöhter Rumpf- und Stützarbeit.',
+    description: 'Die Turnringe werden wie ein einfaches Schlingentraining genutzt. Mit Händen an den Ringen entstehen instabile Liegestütz- und Zugpositionen, mit den Füßen in tief eingestellten bzw. verbundenen Ringen Bridging, Seitstütz und Bauchroller. Je nach Körperwinkel lassen sich schräge Klimmzüge und weitere Druck- oder Zugübungen dosieren; die beweglichen Ringe erhöhen dabei bewusst die Anforderungen an Körperspannung und Bewegungskontrolle.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 226.',
   },
   {
@@ -36,7 +36,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7A: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Langbank, Turnringe, Turnmatten',
     goal: 'Gleichgewicht, Körperspannung und Koordination',
-    description: 'Eine Langbank wird sehr niedrig in Turnringen aufgehängt und mit Matten gesichert. Auf der instabilen Bank werden sitzende oder stehende Balanceaufgaben, Ballzuspiel sowie Stützübungen durchgeführt.',
+    description: 'Eine Langbank wird mit ihren Füßen in tief eingestellte Turnringe eingehängt, sodass sie nur etwa 10 bis 20 Zentimeter über dem Boden frei schwingen kann; darunter liegen Sicherungsmatten. Auf dieser instabilen Bank wird zunächst sitzend oder stehend balanciert, später auch paarweise mit Ballzuspiel. Zusätzlich dient sie als bewegliche Stützfläche für Liegestütze mit Händen oder Füßen auf der Bank sowie weitere Rumpf- und Stützübungen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 228.',
   },
   {
@@ -48,7 +48,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7A: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Turnringe, Reckstange, Turnmatten',
     goal: 'Kraft, Körperspannung und Koordination',
-    description: 'Eine Reckstange wird niedrig in zwei Turnringen aufgehängt und mit Matten gesichert. Die instabile Konstruktion wird für Balancieren, paarweises Ballzuspiel sowie Druck- und Zugübungen wie Dips, Liegestütz und schräge Klimmzüge verwendet.',
+    description: 'Eine Reckstange wird quer in zwei tief eingestellte Turnringe gehängt und gegen Verrutschen gesichert; sie befindet sich nur etwa 10 bis 20 Zentimeter über Matten. Die frei schwingende Stange kann wie eine kleine Slackline zum Balancieren, auch mit Ballzuspiel, genutzt werden. Außerdem entstehen daraus instabile Stütz- und Zugübungen wie Liegestütz, Seitstütz, Bridging, Dips oder schräger Klimmzug, bei denen Rumpfstabilität und Körperspannung zusätzlich gefordert sind.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 230.',
   },
   {
@@ -60,7 +60,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7A: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Langbank',
     goal: 'Gleichgewicht und koordinative Ballaufgaben',
-    description: 'Geräteblock mit Balance- und Koordinationsaufgaben an der Langbank, unter anderem Bankwaagen in Partneraufstellung mit seitlichem Ballzuspiel.',
+    description: 'Eine umgedrehte Langbank wird mittig auf einem niedrigen Kasten oder Sprungbrett so aufgelegt, dass eine „Bankwaage“ entsteht; der Bereich wird mit Matten gesichert. Darauf balancieren zwei Personen zunächst gemeinsam und kombinieren das Gleichgewicht später mit direkten oder indirekten Pässen sowie Würfen zum Basketballkorb. Mehrere Bankwaagen können nebeneinander stehen, sodass auch seitliche Zuspiele zwischen den Geräten möglich werden.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 232.',
   },
   {
@@ -72,7 +72,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7A: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Reckstange',
     goal: 'Kraft, Körperspannung und Koordination',
-    description: 'Geräteblock mit Kraft- und Stützübungen an der Reckstange. Die Übungsformen nutzen das vorhandene Turngerät für Zug-, Halte- und Körperspannungsarbeit.',
+    description: 'Die Reckstange wird vielseitig außerhalb des klassischen Reckturnens eingesetzt. Niedrig auf zwei Kastenoberteilen aufgelegt dient sie als schmale Balancierstrecke, auf der auch Ballübergaben möglich sind; höher aufgelegt ermöglicht sie schräge Klimm- und Liegestütze. Als handliche Ersatz-„Langhantel“ kann sie außerdem für Kniebeugen, Stoßen, Kreuzheben sowie Umsetzen mit anschließender Kniebeuge verwendet werden; Holzstäbe eignen sich für die reine Technikschulung.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 234.',
   },
   {
@@ -84,7 +84,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7A: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Medizinball',
     goal: 'Gleichgewicht, Stabilisation und Koordination',
-    description: 'Der Medizinball wird als instabile Stütz- oder Standfläche eingesetzt, um bekannte Übungen koordinativ anspruchsvoller zu machen und zusätzliche Stabilisationsarbeit zu erzeugen.',
+    description: 'Der Medizinball dient als instabile Stand- und Stützfläche statt nur als Wurfgerät. Geübt wird beid- oder einbeiniges Stehen, zunächst mit offenen Augen und einfachen Armbewegungen, später mit geschlossenen Augen, Slides oder Sprüngen aus verschiedenen Richtungen auf den Ball. Mehrere Medizinbälle können zusätzlich unter einer Weichbodenmatte verteilt werden, um eine größere instabile Fläche für Stütz- und Koordinationsaufgaben zu erzeugen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 236.',
   }
 ];
