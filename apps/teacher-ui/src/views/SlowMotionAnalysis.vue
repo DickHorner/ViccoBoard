@@ -355,9 +355,11 @@
             ⏹ {{ t('SLOWMO.stopTracking') }}
           </button>
           <span
-            v-if="trackingMessage"
             class="tracking-status"
             :class="{ 'tracking-status--lost': pointTrackingStatus === 'lost' }"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
           >
             {{ trackingMessage }}
           </span>
