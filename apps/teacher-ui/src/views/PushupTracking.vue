@@ -221,8 +221,9 @@ let disposed = false
 async function initCamera() {
   cameraError.value = null
   const requestId = ++cameraRequestId
+  let requestedStream: MediaStream | null = null
   try {
-    const requestedStream = await navigator.mediaDevices.getUserMedia({
+    requestedStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: 'environment',
         width: { ideal: captureW * 2 },
@@ -237,15 +238,15 @@ async function initCamera() {
 
     stream = requestedStream
 
-    if (videoEl.value) {
-      videoEl.value.srcObject = requestedStream
-      await videoEl.value.play()
-    }
+    const video = videoEl.value
+    if (!video) throw new Error('Video element not available')
+    video.srcObject = requestedStream
+    await video.play()
 
     if (requestId !== cameraRequestId || disposed) {
       requestedStream.getTracks().forEach(track => track.stop())
       if (stream === requestedStream) stream = null
-      if (videoEl.value?.srcObject === requestedStream) videoEl.value.srcObject = null
+      if (video.srcObject === requestedStream) video.srcObject = null
       return
     }
     // Cache the canvas context immediately after camera is ready
@@ -254,7 +255,10 @@ async function initCamera() {
     }
     cameraActive.value = true
   } catch (err) {
-    if (requestId !== cameraRequestId || disposed) return
+    if (requestId !== cameraRequestId || disposed) {
+      requestedStream?.getTracks().forEach(track => track.stop())
+      return
+    }
     stopCamera()
     // Provide friendly messages for the most common permission errors
     if (err instanceof DOMException && err.name === 'NotAllowedError') {
