@@ -12,7 +12,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Trampolin, Kästen, Weichbodenmatte',
     goal: 'Sprungkoordination und sichere Landung',
-    description: 'Der Geräteblock steigert Trampolinsprünge von einfachen Absprüngen und Landungen zu Drehungen, Kastensprüngen und Sprungkaskaden. Die Landeflächen werden durch Matten gesichert.',
+    description: 'Das Minitrampolin wird für eine freiwillige, schrittweise aufgebaute Sprungreihe genutzt; Anlauf, Absprung und sichere Landung werden dabei jeweils abgesichert. Begonnen wird mit einfachen Sprüngen auf eine Matte bzw. auf niedrige Kästen, danach folgen seitliche Varianten, halbe und ganze Drehungen, einbeinige Landungen und schließlich Sprünge über Kästen. Später können Sprungkaskaden mit zwei Trampolinen oder Sprünge zum Basketballkorb hinzukommen. Die Schwierigkeit steigt nur, wenn die vorherige Stufe sicher beherrscht wird.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 238.',
   },
   {
@@ -24,7 +24,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Sprungbrett, Turnmatten, Weichbodenmatten',
     goal: 'Sprungkraft und Sprungkoordination',
-    description: 'Sprungbretter werden in einen Hallen-Rundlauf eingebaut. Nach einem etwa 10–15 Meter langen Anlauf wird abgesprungen und auf einer abgestuften Mattenfläche sicher gelandet; bei geringerem Niveau wird die Landefläche näher an das Brett gerückt.',
+    description: 'Das Sprungbrett wird nicht nur für den klassischen Geräte- oder Weitsprung verwendet. Nach schnellem Anlauf folgt ein einbeiniger Absprung auf eine Weichboden- bzw. Niedersprungmatte; kleine Hindernisse können vor dem Brett die aktive Absprungbewegung unterstützen. Zwei gegeneinander gelegte Sprungbretter ermöglichen außerdem beidbeinige Wechselsprünge. Für einen Rundlauf werden mehrere Anlauf- und Landestationen mit Matten aufgebaut.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 240.',
   },
   {
@@ -36,7 +36,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Weichbodenmatten',
     goal: 'Kraftausdauer, Sprungkoordination und Gerätetraining',
-    description: 'Geräteblock mit Weichbodenmatten als weicher, instabiler Untergrund für koordinative, sprung- und kraftorientierte Aufgaben.',
+    description: 'Weichbodenmatten werden schon im Aufwärmen aktiv genutzt, bevor sie später als Landefläche für andere Inhalte gebraucht werden. Möglich sind Matten-Rutschen und -Tragen, Skipping, Ausfallschritte, Hoch-Tief- und Einbeinsprünge, Seilspringen sowie Rollen und kontrollierte turnerische Landungen auf der weichen Fläche. Für zusätzliche Instabilität kann eine Matte auf mehrere Medizinbälle gelegt werden; die Aufgaben werden dann entsprechend kontrollierter ausgeführt.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 242.',
   },
   {
@@ -48,7 +48,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Gymnastikball',
     goal: 'Ballkoordination und Gleichgewicht',
-    description: 'Der Gymnastikball wird in Boden- und Rumpfübungen integriert, etwa beim kontrollierten Führen zwischen den Beinen, beim teilweisen Klappmesser und beim Bridging mit Ballführung unter der Hüfte.',
+    description: 'Der kleine Gymnastikball wird als leichtes Koordinationsgerät für Einzelübungen im Stand und in Rückenlage verwendet. Im Grätsch- oder Ausfallschritt wird er in Achterbewegungen durch die Beine geführt oder zwischen vorderer und hinterer Handposition gewechselt; im Einbeinstand werden Ballübergaben mit Gegenbewegungen des freien Beins kombiniert. In Rückenlage kommen Übungen wie Ballführung durch angehobene Beine, aktives Aufrollen, halbes Klappmesser oder Bridging mit Ballübergabe hinzu. Sichere Varianten können auch mit geschlossenen Augen ausgeführt werden.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 244.',
   },
   {
@@ -60,7 +60,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Medizinball',
     goal: 'Ganzkörperkraft und funktionelle Bewegungsmuster',
-    description: 'Der Medizinball wird für funktionelle Kraftaufgaben verwendet, unter anderem für statische und dynamische Liegestützvarianten auf einem oder zwei Bällen.',
+    description: 'Der Medizinball wird für mehrgelenkige Kraftübungen eingesetzt. Aus Kniebeugen kann er zur Wand gestoßen oder nach oben geführt werden; große Ausfallschritte werden mit Rotation, Auf-Ab-Bewegung oder zusätzlicher Ballführung kombiniert. Im Stütz entstehen statische oder dynamische Liegestütze mit einem oder zwei Medizinbällen. Bei wenig Material arbeiten Paare abwechselnd in kurzen Belastungsphasen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 246.',
   },
   {
@@ -72,7 +72,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     ageGroup: 'nicht angegeben',
     material: 'Langhantel',
     goal: 'Kraft, Körperspannung und Koordination',
-    description: 'Geräteblock mit Langhantelübungen als Bestandteil funktioneller Kraftarbeit im Hallen- und Zirkelkontext.',
+    description: 'Eine Reckstange oder ein Holzstab dient als leichte Langhantel für die technische Schulung komplexer Ganzkörperbewegungen. Ausgeführt werden Umsetzen, Umsetzen mit Stoßen, Kniebeugen bzw. Front-Squats, Ausfallschritte mit Stoß- oder Rotationsbewegung sowie Kreuzheben und Kombinationen daraus. Die Übungen werden schrittweise gekoppelt, sodass erst die Einzelbewegungen und anschließend längere Bewegungsfolgen entstehen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 248.',
   },
   {
@@ -84,7 +84,7 @@ export const METHODENFUNDGRUBE_CHAPTER_7B: SeedEntry[] = [
     ageGroup: 'ca. 10–14 Jahre',
     material: 'alle verfügbaren Klein- und Großgeräte (siehe Fotos)',
     goal: 'Schnelligkeit, Koordination',
-    description: 'Viele Klein- und Großgeräte werden als „Inseln“ in der Halle verteilt. Die Teilnehmenden bewegen sich von Gerät zu Gerät, ohne den Hallenboden als „Meer“ zu berühren; kurze Belastungsphasen und sichere Geräteabstände sind zentral.',
+    description: 'Nahezu alle verfügbaren Klein- und Großgeräte werden als „Inseln“ in der Halle verteilt, zwischen denen sich die Spielenden bewegen, ohne den Hallenboden als „Meer“ zu berühren. Matten, Kästen, Bänke, Barren, Pferd, Bock, Trampolin, Reifen, Seile, Ringe und Klettergeräte bilden dabei unterschiedliche Wege. Gespielt wird in kurzen Fangphasen von etwa zwei bis drei Minuten; Varianten setzen mehrere markierte Jäger ein, ermöglichen Befreiungen von gefangenen Personen oder führen eine „Energiekugel“ bzw. einen Ball als Rückkehrmechanismus ins Spiel ein.',
     variation: 'Jäger mit Leibchen einsetzen oder gefangene Personen auf Geräten festsetzen und durch Mitspielende befreien lassen.',
     notes: 'Quelle: Christian Koch, Die große Methodenfundgrube Sport, S. 250.',
   }
