@@ -299,7 +299,7 @@
         <!-- Frame & playback buttons -->
         <div class="btn-row">
           <button class="btn btn-icon" :title="t('SLOWMO.frameBack')" @click="stepFrame(-1)">⏮</button>
-          <button class="btn btn-icon" @click="togglePlay">
+          <button class="btn btn-icon" :disabled="pointTrackingStatus === 'lost'" @click="togglePlay">
             {{ isPlaying ? '⏸' : '▶' }}
           </button>
           <button class="btn btn-icon" :title="t('SLOWMO.frameForward')" @click="stepFrame(1)">⏭</button>
@@ -341,12 +341,37 @@
           </div>
         </div>
 
+        <div class="tracking-row">
+          <button
+            v-if="pointTrackingStatus !== 'tracking'"
+            class="btn btn-secondary"
+            :disabled="!canStartPointTracking"
+            @click="startPointTracking"
+          >
+            🎯 {{ t('SLOWMO.startTracking') }}
+          </button>
+          <button v-else class="btn btn-secondary" @click="stopPointTracking">
+            ⏹ {{ t('SLOWMO.stopTracking') }}
+          </button>
+          <span
+            v-if="trackingMessage"
+            class="tracking-status"
+            :class="{ 'tracking-status--lost': pointTrackingStatus === 'lost' }"
+          >
+            {{ trackingMessage }}
+          </span>
+        </div>
+
         <!-- Keyframe management -->
         <div class="keyframe-row">
           <button class="btn btn-secondary" @click="addKeyframe">
             🔑 {{ t('SLOWMO.addKeyframe') }} @ {{ formatTime(currentTime) }}
           </button>
-          <button class="btn btn-secondary" @click="clearCurrentMarkers" :disabled="currentFrameMarkers.length === 0">
+          <button
+            class="btn btn-secondary"
+            @click="clearCurrentMarkers"
+            :disabled="!currentExactKeyframe || currentExactKeyframe.markers.length === 0"
+          >
             🗑 {{ t('SLOWMO.clearMarkers') }}
           </button>
         </div>
@@ -420,6 +445,12 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { createUuid as uuidv4 } from '@/utils/uuid'
 import { getSportBridge } from '../composables/useSportBridge'
+import {
+  createLocalPointTracker,
+  trackLocalPoint,
+  type LocalPointTrackerState,
+  type PixelFrame
+} from '../utils/local-point-tracker'
 import type { Sport } from '@viccoboard/core'
 
 const { t } = useI18n()
@@ -481,6 +512,9 @@ const KEYFRAME_TIME_TOLERANCE_SEC = 0.02
 const KEYFRAME_HIGHLIGHT_TOLERANCE_SEC = 0.04
 /** Assumed frame rate used for frame-stepping when the video does not expose FPS. */
 const DEFAULT_FPS = 30
+const TRACKING_CAPTURE_WIDTH = 480
+const MIN_TRACKING_TIME_STEP_SEC = 0.5 / DEFAULT_FPS
+const MAX_TRACKING_FRAME_GAP_SEC = 4 / DEFAULT_FPS
 
 // ---------------------------------------------------------------------------
 // State – navigation
@@ -551,10 +585,29 @@ const drawingRefLine = ref(false)
 const refLineStart = ref<{ x: number; y: number } | null>(null)
 const notes = ref('')
 
+type PointTrackingStatus = 'idle' | 'tracking' | 'stopped' | 'lost'
+const pointTrackingStatus = ref<PointTrackingStatus>('idle')
+const trackingMessage = ref('')
+const trackedMarkers = ref<Array<{ bodyPoint: BodyPointKey; x: number; y: number; color?: string }>>([])
+const pointTrackers = new Map<BodyPointKey, LocalPointTrackerState>()
+let trackingCanvas: HTMLCanvasElement | null = null
+let trackingContext: CanvasRenderingContext2D | null = null
+let trackingRafId: number | null = null
+let lastTrackingVideoTime = 0
+
+const currentExactKeyframe = computed(() =>
+  keyframes.value.find(kf => Math.abs(kf.timeSec - currentTime.value) < KEYFRAME_TIME_TOLERANCE_SEC)
+)
+
+const canStartPointTracking = computed(() =>
+  pointTrackingStatus.value !== 'tracking' &&
+  (currentExactKeyframe.value?.markers.length ?? 0) > 0
+)
+
 // ---------------------------------------------------------------------------
 // Computed – current frame markers (interpolated if between keyframes)
 // ---------------------------------------------------------------------------
-const currentFrameMarkers = computed<Array<{ bodyPoint: BodyPointKey; x: number; y: number; color?: string }>>(() => {
+const manualFrameMarkers = computed<Array<{ bodyPoint: BodyPointKey; x: number; y: number; color?: string }>>(() => {
   if (keyframes.value.length === 0) return []
   const t2 = currentTime.value
 
@@ -591,6 +644,10 @@ const currentFrameMarkers = computed<Array<{ bodyPoint: BodyPointKey; x: number;
   }
   return merged
 })
+
+const currentFrameMarkers = computed(() =>
+  pointTrackingStatus.value === 'idle' ? manualFrameMarkers.value : trackedMarkers.value
+)
 
 // ---------------------------------------------------------------------------
 // Computed – angles (connected chains on left and right sides)
@@ -720,6 +777,205 @@ watch([currentFrameMarkers, referenceLines], () => {
 }, { deep: true })
 
 // ---------------------------------------------------------------------------
+// Local point tracking
+// ---------------------------------------------------------------------------
+function ensureTrackingSurface(): boolean {
+  const video = videoEl.value
+  if (!video || video.videoWidth <= 0 || video.videoHeight <= 0) {
+    return false
+  }
+
+  const width = Math.min(TRACKING_CAPTURE_WIDTH, video.videoWidth)
+  const height = Math.max(1, Math.round(video.videoHeight * (width / video.videoWidth)))
+
+  if (!trackingCanvas) {
+    trackingCanvas = document.createElement('canvas')
+  }
+  if (trackingCanvas.width !== width || trackingCanvas.height !== height) {
+    trackingCanvas.width = width
+    trackingCanvas.height = height
+    trackingContext = null
+  }
+  if (!trackingContext) {
+    trackingContext = trackingCanvas.getContext('2d', { willReadFrequently: true })
+  }
+
+  return trackingContext !== null
+}
+
+function captureTrackingFrame(): PixelFrame | null {
+  const video = videoEl.value
+  if (!video || !ensureTrackingSurface() || !trackingCanvas || !trackingContext) {
+    return null
+  }
+
+  trackingContext.drawImage(video, 0, 0, trackingCanvas.width, trackingCanvas.height)
+  return trackingContext.getImageData(0, 0, trackingCanvas.width, trackingCanvas.height)
+}
+
+function startPointTracking() {
+  const video = videoEl.value
+  const keyframe = currentExactKeyframe.value
+  if (!video || !keyframe || keyframe.markers.length === 0) {
+    return
+  }
+
+  video.pause()
+  isPlaying.value = false
+
+  const frame = captureTrackingFrame()
+  if (!frame) {
+    trackingMessage.value = t('SLOWMO.trackingUnavailable')
+    return
+  }
+
+  const seededTrackers = new Map<BodyPointKey, LocalPointTrackerState>()
+  for (const marker of keyframe.markers) {
+    const state = createLocalPointTracker(
+      frame,
+      marker.x * (frame.width - 1),
+      marker.y * (frame.height - 1)
+    )
+    if (!state) {
+      trackingMessage.value = t('SLOWMO.trackingCannotStart', {
+        point: bodyPoints.find(point => point.value === marker.bodyPoint)?.label ?? marker.bodyPoint
+      })
+      return
+    }
+    seededTrackers.set(marker.bodyPoint, state)
+  }
+
+  pointTrackers.clear()
+  for (const [bodyPoint, state] of seededTrackers) {
+    pointTrackers.set(bodyPoint, state)
+  }
+  trackedMarkers.value = keyframe.markers.map(marker => ({ ...marker }))
+  pointTrackingStatus.value = 'tracking'
+  trackingMessage.value = t('SLOWMO.trackingRunning')
+  lastTrackingVideoTime = video.currentTime
+  startPointTrackingLoop()
+}
+
+function stopPointTracking() {
+  const video = videoEl.value
+  video?.pause()
+  isPlaying.value = false
+  stopPointTrackingLoop()
+  pointTrackingStatus.value = 'stopped'
+  trackingMessage.value = t('SLOWMO.trackingStopped')
+}
+
+function resetPointTracking() {
+  stopPointTrackingLoop()
+  pointTrackingStatus.value = 'idle'
+  trackingMessage.value = ''
+  trackedMarkers.value = []
+  pointTrackers.clear()
+  lastTrackingVideoTime = 0
+}
+
+function losePointTracking(bodyPoint?: BodyPointKey, messageKey = 'SLOWMO.trackingLost') {
+  const video = videoEl.value
+  video?.pause()
+  isPlaying.value = false
+  stopPointTrackingLoop()
+  pointTrackingStatus.value = 'lost'
+  trackingMessage.value = bodyPoint
+    ? t(messageKey, {
+        point: bodyPoints.find(point => point.value === bodyPoint)?.label ?? bodyPoint
+      })
+    : t(messageKey)
+}
+
+function startPointTrackingLoop() {
+  if (trackingRafId !== null) {
+    return
+  }
+
+  const run = () => {
+    trackingRafId = null
+    if (pointTrackingStatus.value !== 'tracking') {
+      return
+    }
+
+    trackCurrentVideoFrame()
+    if (pointTrackingStatus.value === 'tracking') {
+      trackingRafId = requestAnimationFrame(run)
+    }
+  }
+
+  trackingRafId = requestAnimationFrame(run)
+}
+
+function stopPointTrackingLoop() {
+  if (trackingRafId !== null) {
+    cancelAnimationFrame(trackingRafId)
+    trackingRafId = null
+  }
+}
+
+function trackCurrentVideoFrame() {
+  const video = videoEl.value
+  if (!video || video.paused || video.ended) {
+    return
+  }
+
+  const videoTime = video.currentTime
+  const elapsed = videoTime - lastTrackingVideoTime
+  if (elapsed < MIN_TRACKING_TIME_STEP_SEC) {
+    return
+  }
+  if (elapsed <= 0 || elapsed > MAX_TRACKING_FRAME_GAP_SEC) {
+    losePointTracking(undefined, 'SLOWMO.trackingInterrupted')
+    return
+  }
+
+  const frame = captureTrackingFrame()
+  if (!frame) {
+    losePointTracking(undefined, 'SLOWMO.trackingUnavailable')
+    return
+  }
+
+  const nextMarkers: typeof trackedMarkers.value = []
+  const nextStates = new Map<BodyPointKey, LocalPointTrackerState>()
+  let lostPoint: BodyPointKey | undefined
+
+  for (const marker of trackedMarkers.value) {
+    const state = pointTrackers.get(marker.bodyPoint)
+    if (!state) {
+      lostPoint = marker.bodyPoint
+      break
+    }
+
+    const result = trackLocalPoint(frame, state)
+    if (result.status === 'lost') {
+      lostPoint = marker.bodyPoint
+      break
+    }
+
+    nextStates.set(marker.bodyPoint, result.state)
+    nextMarkers.push({
+      ...marker,
+      x: result.state.x / (frame.width - 1),
+      y: result.state.y / (frame.height - 1)
+    })
+  }
+
+  trackedMarkers.value = nextMarkers
+  if (lostPoint) {
+    losePointTracking(lostPoint)
+    return
+  }
+
+  pointTrackers.clear()
+  for (const [bodyPoint, state] of nextStates) {
+    pointTrackers.set(bodyPoint, state)
+  }
+  lastTrackingVideoTime = videoTime
+  currentTime.value = videoTime
+}
+
+// ---------------------------------------------------------------------------
 // Canvas interaction – place marker / ref line
 // ---------------------------------------------------------------------------
 function canvasCoords(event: MouseEvent | Touch): { nx: number; ny: number } {
@@ -766,6 +1022,7 @@ function handleCanvasInteraction(event: MouseEvent | Touch) {
   }
 
   // Place / update marker in the active keyframe (or nearest)
+  resetPointTracking()
   placeMarker(nx, ny)
 }
 
@@ -802,6 +1059,7 @@ function placeMarker(nx: number, ny: number) {
 // Keyframe management
 // ---------------------------------------------------------------------------
 function addKeyframe() {
+  resetPointTracking()
   const t2 = currentTime.value
   if (keyframes.value.some(kf => Math.abs(kf.timeSec - t2) < KEYFRAME_TIME_TOLERANCE_SEC)) return
   keyframes.value.push({ id: uuidv4(), timeSec: t2, markers: [] })
@@ -809,12 +1067,14 @@ function addKeyframe() {
 }
 
 function deleteKeyframe(id: string) {
+  resetPointTracking()
   keyframes.value = keyframes.value.filter(kf => kf.id !== id)
   nextTick(drawOverlay)
 }
 
 function jumpToKeyframe(kf: LocalKeyframe) {
   if (!videoEl.value) return
+  resetPointTracking()
   videoEl.value.currentTime = kf.timeSec
   currentTime.value = kf.timeSec
   nextTick(drawOverlay)
@@ -825,6 +1085,7 @@ function nearKeyframe(kf: LocalKeyframe): boolean {
 }
 
 function clearCurrentMarkers() {
+  resetPointTracking()
   const kf = keyframes.value.find(k => Math.abs(k.timeSec - currentTime.value) < KEYFRAME_TIME_TOLERANCE_SEC)
   if (kf) kf.markers = []
   nextTick(drawOverlay)
@@ -867,6 +1128,9 @@ function revokeActiveVideoUrl() {
 }
 
 function resetLoadedVideoState() {
+  resetPointTracking()
+  trackingCanvas = null
+  trackingContext = null
   if (videoEl.value) {
     videoEl.value.pause()
     videoEl.value.removeAttribute('src')
@@ -946,6 +1210,11 @@ function onTimeUpdate() {
 
 function onVideoEnded() {
   isPlaying.value = false
+  if (pointTrackingStatus.value === 'tracking') {
+    stopPointTrackingLoop()
+    pointTrackingStatus.value = 'stopped'
+    trackingMessage.value = t('SLOWMO.trackingStopped')
+  }
 }
 
 function togglePlay() {
@@ -955,6 +1224,9 @@ function togglePlay() {
     v.pause()
     isPlaying.value = false
   } else {
+    if (pointTrackingStatus.value === 'stopped') {
+      resetPointTracking()
+    }
     v.playbackRate = playbackRate.value
     v.play().catch(() => { /* ignore */ })
     isPlaying.value = true
@@ -969,6 +1241,9 @@ function setSpeed(sp: number) {
 function stepFrame(dir: 1 | -1) {
   const v = videoEl.value
   if (!v) return
+  if (dir < 0 || pointTrackingStatus.value === 'lost' || pointTrackingStatus.value === 'stopped') {
+    resetPointTracking()
+  }
   v.pause()
   isPlaying.value = false
   const step = dir / nominalFps
@@ -978,6 +1253,7 @@ function stepFrame(dir: 1 | -1) {
 function onScrub(event: Event) {
   const v = videoEl.value
   if (!v) return
+  resetPointTracking()
   const val = parseFloat((event.target as HTMLInputElement).value)
   v.currentTime = val
   currentTime.value = val
@@ -1219,6 +1495,7 @@ function showSaveMessage(msg: string) {
 
 onUnmounted(() => {
   if (saveTimer) clearTimeout(saveTimer)
+  resetPointTracking()
   stopCapturePreview()
   stopRecordingTimer()
   revokeActiveVideoUrl()
