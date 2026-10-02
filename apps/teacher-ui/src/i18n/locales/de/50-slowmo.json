@@ -45,7 +45,7 @@
     "trackingStopped": "Tracking gestoppt.",
     "trackingLost": "Tracking verloren: {point}. Wiedergabe gestoppt.",
     "trackingInterrupted": "Tracking gestoppt: Zeitsprung zwischen Videoframes zu groß.",
-    "trackingCannotStart": "Tracking kann für {point} nicht starten: Marker liegt zu nah am Bildrand.",
+    "trackingCannotStart": "Tracking kann für {point} nicht starten: Marker liegt zu nah am Bildrand oder in einem Bereich mit zu wenig Bildstruktur.",
     "trackingUnavailable": "Tracking konnte auf diesem Videoframe nicht ausgeführt werden.",
     "addKeyframe": "Keyframe setzen",
     "clearMarkers": "Marker löschen",
