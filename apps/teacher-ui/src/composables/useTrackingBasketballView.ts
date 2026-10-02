@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n'
 import { BasketballShotCounter } from '@viccoboard/sport'
 
 import { getSportBridge } from './useSportBridge'
+import { hasBasketballRimOcclusionEvidence } from '../utils/basketball-rim-occlusion'
 
 interface ZoneRect {
   x: number
@@ -47,6 +48,7 @@ export function useTrackingBasketballView() {
   let captureCanvas: HTMLCanvasElement | null = null
   let captureCtx: CanvasRenderingContext2D | null = null
   let prevFrameData: ImageData | null = null
+  let rimReferenceFrame: ImageData | null = null
   let rafId: number | null = null
 
   const shotCounter = new BasketballShotCounter()
@@ -128,6 +130,7 @@ export function useTrackingBasketballView() {
     }
     if (liveVideo.value) liveVideo.value.srcObject = null
     prevFrameData = null
+    rimReferenceFrame = null
     draftZone = null
     isDefiningZone = false
   }
@@ -175,6 +178,10 @@ export function useTrackingBasketballView() {
     ctx.lineWidth = 3
     ctx.setLineDash(isDraft ? [8, 4] : [])
     ctx.strokeRect(zone.x, zone.y, zone.w, zone.h)
+    ctx.beginPath()
+    ctx.moveTo(zone.x, zone.y + zone.h / 2)
+    ctx.lineTo(zone.x + zone.w, zone.y + zone.h / 2)
+    ctx.stroke()
     ctx.fillStyle = isDraft ? 'rgba(255, 200, 0, 0.08)' : 'rgba(255, 80, 0, 0.10)'
     ctx.fillRect(zone.x, zone.y, zone.w, zone.h)
     ctx.setLineDash([])
@@ -194,6 +201,7 @@ export function useTrackingBasketballView() {
     const currentFrame = ctx.getImageData(x, y, w, h)
     if (!prevFrameData || prevFrameData.width !== w || prevFrameData.height !== h) {
       prevFrameData = currentFrame
+      rimReferenceFrame = currentFrame
       return
     }
 
@@ -203,6 +211,10 @@ export function useTrackingBasketballView() {
     let totalMotion = 0
     let weightedX = 0
     let weightedY = 0
+    let minMotionX = w
+    let maxMotionX = -1
+    let minMotionY = h
+    let maxMotionY = -1
     const totalPixels = w * h
 
     for (let i = 0; i < d1.length; i += 4) {
@@ -219,6 +231,10 @@ export function useTrackingBasketballView() {
       totalMotion += motion
       weightedX += motion * pixelX
       weightedY += motion * pixelY
+      minMotionX = Math.min(minMotionX, pixelX)
+      maxMotionX = Math.max(maxMotionX, pixelX)
+      minMotionY = Math.min(minMotionY, pixelY)
+      maxMotionY = Math.max(maxMotionY, pixelY)
     }
 
     const motionFraction = changedPixels / totalPixels
@@ -226,9 +242,19 @@ export function useTrackingBasketballView() {
     const now = Date.now()
 
     if (motionFraction > threshold && totalMotion > 0) {
+      const rimOcclusionObserved = rimReferenceFrame
+        ? hasBasketballRimOcclusionEvidence(rimReferenceFrame, currentFrame, {
+            minX: minMotionX,
+            maxX: maxMotionX,
+            minY: minMotionY,
+            maxY: maxMotionY
+          })
+        : false
+
       shotCounter.processFrame({
         x: weightedX / totalMotion / (w - 1),
-        y: weightedY / totalMotion / (h - 1)
+        y: weightedY / totalMotion / (h - 1),
+        rimOcclusionObserved
       }, now)
     } else {
       shotCounter.processFrame(null, now)
@@ -270,6 +296,7 @@ export function useTrackingBasketballView() {
     if (Math.abs(draftZone.w) > MIN_ZONE_SIZE && Math.abs(draftZone.h) > MIN_ZONE_SIZE) {
       targetZone.value = normalizeRect(draftZone)
       shotCounter.resetTrajectory()
+      rimReferenceFrame = null
     }
     draftZone = null
     isDefiningZone = false
@@ -309,6 +336,7 @@ export function useTrackingBasketballView() {
   function clearZone(): void {
     targetZone.value = null
     prevFrameData = null
+    rimReferenceFrame = null
     shotCounter.resetTrajectory()
   }
 
@@ -318,6 +346,7 @@ export function useTrackingBasketballView() {
     sessionSaved.value = false
     shotCounter.resetTrajectory()
     prevFrameData = null
+    rimReferenceFrame = null
     sessionElapsedMs.value = 0
     sessionStartTime = Date.now()
     timerHandle = setInterval(() => {
@@ -342,6 +371,7 @@ export function useTrackingBasketballView() {
     shotCount.value = shotCounter.getCount()
     sessionElapsedMs.value = 0
     prevFrameData = null
+    rimReferenceFrame = null
     sessionSaved.value = false
   }
 
