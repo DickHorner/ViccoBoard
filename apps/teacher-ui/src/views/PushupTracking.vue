@@ -515,8 +515,9 @@ function captureAndAnalyse() {
     const regionH = bottom - y
     const currentFrame = analysisCtx.getImageData(x, y, regionW, regionH)
 
-    if (prevFrameData[p]) {
-      const height = estimateNormalizedHeight(currentFrame, prevFrameData[p], regionH)
+    const previousFrame = prevFrameData[p]
+    if (previousFrame) {
+      const height = estimateNormalizedHeight(currentFrame, previousFrame, regionH)
       if (height !== null) {
         counter.processFrame(p, height)
         // Sync reactive state
