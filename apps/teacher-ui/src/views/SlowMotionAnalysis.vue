@@ -856,7 +856,6 @@ function startPointTracking() {
   pointTrackingStatus.value = 'tracking'
   trackingMessage.value = t('SLOWMO.trackingRunning')
   lastTrackingVideoTime = video.currentTime
-  startPointTrackingLoop()
 }
 
 function stopPointTracking() {
@@ -902,7 +901,7 @@ function startPointTrackingLoop() {
     }
 
     trackCurrentVideoFrame()
-    if (pointTrackingStatus.value === 'tracking') {
+    if (pointTrackingStatus.value === 'tracking' && !videoEl.value?.paused) {
       trackingRafId = requestAnimationFrame(run)
     }
   }
@@ -1235,6 +1234,7 @@ function togglePlay() {
   if (isPlaying.value) {
     v.pause()
     isPlaying.value = false
+    stopPointTrackingLoop()
   } else {
     if (pointTrackingStatus.value === 'stopped') {
       resetPointTracking()
@@ -1242,6 +1242,9 @@ function togglePlay() {
     v.playbackRate = playbackRate.value
     v.play().catch(() => { /* ignore */ })
     isPlaying.value = true
+    if (pointTrackingStatus.value === 'tracking') {
+      startPointTrackingLoop()
+    }
   }
 }
 
