@@ -236,6 +236,7 @@ const captureH = 240
 let analysisCtx: CanvasRenderingContext2D | null = null
 let stream: MediaStream | null = null
 let cameraRequestId = 0
+let disposed = false
 
 const persons = ref<PersonState[]>([])
 const personRegions = ref<PersonRegion[]>([])
@@ -276,7 +277,7 @@ async function initCamera() {
       audio: false,
     })
 
-    if (requestId !== cameraRequestId) {
+    if (requestId !== cameraRequestId || disposed) {
       requestedStream.getTracks().forEach(track => track.stop())
       return
     }
@@ -288,7 +289,7 @@ async function initCamera() {
       await videoEl.value.play()
     }
 
-    if (requestId !== cameraRequestId) {
+    if (requestId !== cameraRequestId || disposed) {
       return
     }
 
@@ -298,7 +299,7 @@ async function initCamera() {
 
     cameraActive.value = true
   } catch (error) {
-    if (requestId !== cameraRequestId) return
+    if (requestId !== cameraRequestId || disposed) return
 
     if (error instanceof DOMException && error.name === 'NotAllowedError') {
       cameraError.value = t('TRACKING.jump-rope.noCameraPermission')
@@ -521,9 +522,9 @@ async function saveSession() {
       endedAt: new Date(),
     })
 
-    sessionSaved.value = true
+    if (!disposed) sessionSaved.value = true
   } catch {
-    saveError.value = true
+    if (!disposed) saveError.value = true
   }
 }
 
@@ -649,10 +650,12 @@ watch(configMaxPersons, () => {
 onMounted(async () => {
   initPersons()
   resetPersonRegions()
-  classes.value = await SportBridge.classGroupRepository.findAll()
+  const loadedClasses = await SportBridge.classGroupRepository.findAll()
+  if (!disposed) classes.value = loadedClasses
 })
 
 onBeforeUnmount(() => {
+  disposed = true
   if (captureIntervalId !== null) clearInterval(captureIntervalId)
   if (elapsedIntervalId !== null) clearInterval(elapsedIntervalId)
   stopCamera()
