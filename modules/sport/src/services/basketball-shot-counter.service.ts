@@ -3,6 +3,8 @@ export interface BasketballMotionObservation {
   x: number;
   /** Vertical position within the target zone, normalized to [0, 1], top = 0. */
   y: number;
+  /** True when the front rim remains visible while the moving blob crosses its plane. */
+  rimOcclusionObserved: boolean;
 }
 
 export const BASKETBALL_ENTRY_Y_MAX = 0.42;
@@ -19,6 +21,7 @@ interface ArmedState {
   startY: number;
   lastY: number;
   startedAtMs: number;
+  sawRimOcclusion: boolean;
 }
 
 /**
@@ -71,13 +74,18 @@ export class BasketballShotCounter {
       return;
     }
 
+    this.armed.sawRimOcclusion =
+      this.armed.sawRimOcclusion || observation.rimOcclusionObserved;
+
     const verticalTravel = observation.y - this.armed.startY;
     if (
       observation.y >= BASKETBALL_EXIT_Y_MIN &&
       verticalTravel >= BASKETBALL_MIN_VERTICAL_TRAVEL &&
       verticalTravel > horizontalDrift
     ) {
-      this.count += 1;
+      if (this.armed.sawRimOcclusion) {
+        this.count += 1;
+      }
       this.clearTrajectory();
       return;
     }
@@ -105,6 +113,7 @@ export class BasketballShotCounter {
       startY: observation.y,
       lastY: observation.y,
       startedAtMs: timestampMs,
+      sawRimOcclusion: observation.rimOcclusionObserved,
     };
   }
 
