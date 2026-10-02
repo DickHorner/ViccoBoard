@@ -94,6 +94,10 @@ export class BasketballShotCounter {
     this.clearTrajectory();
   }
 
+  resetTrajectory(): void {
+    this.clearTrajectory();
+  }
+
   private arm(observation: BasketballMotionObservation, timestampMs: number): void {
     this.phase = 'armed';
     this.armed = {
