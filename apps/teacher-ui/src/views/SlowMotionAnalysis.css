@@ -147,6 +147,9 @@
 .form-select { border: 1px solid var(--color-border, #ccc); border-radius: 6px; padding: 0.4rem 0.6rem; background: var(--color-input-bg, #fff); color: inherit; font-size: 0.9rem; }
 .bp-legend { display: flex; gap: 4px; flex-wrap: wrap; }
 .bp-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
+.tracking-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.tracking-status { font-size: 0.82rem; color: var(--color-muted, #666); }
+.tracking-status--lost { font-weight: 600; color: var(--color-danger, #b91c1c); }
 .keyframe-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .keyframes-list-wrap { display: flex; flex-direction: column; gap: 0.25rem; }
 .keyframes-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem; max-height: 140px; overflow-y: auto; }
