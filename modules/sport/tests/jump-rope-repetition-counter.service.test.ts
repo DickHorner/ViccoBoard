@@ -6,6 +6,11 @@ import {
 } from '../src/services/jump-rope-repetition-counter.service';
 
 describe('JumpRopeRepetitionCounter', () => {
+  it('rejects unsupported person counts', () => {
+    expect(() => new JumpRopeRepetitionCounter(0)).toThrow()
+    expect(() => new JumpRopeRepetitionCounter(5)).toThrow()
+  })
+
   it('counts one complete rise-and-return cycle', () => {
     const counter = new JumpRopeRepetitionCounter(1);
 
