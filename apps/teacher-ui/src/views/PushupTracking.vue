@@ -215,11 +215,14 @@ const captureH = 240
 let analysisCtx: CanvasRenderingContext2D | null = null
 
 let stream: MediaStream | null = null
+let cameraRequestId = 0
+let disposed = false
 
 async function initCamera() {
   cameraError.value = null
+  const requestId = ++cameraRequestId
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
+    const requestedStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: 'environment',
         width: { ideal: captureW * 2 },
@@ -227,9 +230,23 @@ async function initCamera() {
       },
       audio: false,
     })
+    if (requestId !== cameraRequestId || disposed) {
+      requestedStream.getTracks().forEach(track => track.stop())
+      return
+    }
+
+    stream = requestedStream
+
     if (videoEl.value) {
-      videoEl.value.srcObject = stream
+      videoEl.value.srcObject = requestedStream
       await videoEl.value.play()
+    }
+
+    if (requestId !== cameraRequestId || disposed) {
+      requestedStream.getTracks().forEach(track => track.stop())
+      if (stream === requestedStream) stream = null
+      if (videoEl.value?.srcObject === requestedStream) videoEl.value.srcObject = null
+      return
     }
     // Cache the canvas context immediately after camera is ready
     if (analysisCanvas.value) {
@@ -237,6 +254,8 @@ async function initCamera() {
     }
     cameraActive.value = true
   } catch (err) {
+    if (requestId !== cameraRequestId || disposed) return
+    stopCamera()
     // Provide friendly messages for the most common permission errors
     if (err instanceof DOMException && err.name === 'NotAllowedError') {
       cameraError.value = t('DELAY.cameraPermissionDenied') ||
@@ -251,6 +270,7 @@ async function initCamera() {
 }
 
 function stopCamera() {
+  cameraRequestId += 1
   stream?.getTracks().forEach(t => t.stop())
   stream = null
   if (videoEl.value) videoEl.value.srcObject = null
@@ -480,9 +500,9 @@ async function saveSession() {
         personRegions: personRegions.value.map(region => ({ ...region })),
       },
     })
-    sessionSaved.value = true
+    if (!disposed) sessionSaved.value = true
   } catch {
-    saveError.value = true
+    if (!disposed) saveError.value = true
   }
 }
 
@@ -630,14 +650,14 @@ watch(configMaxPersons, () => {
 onMounted(async () => {
   initPersons()
   resetPersonRegions()
-  classes.value = await SportBridge.classGroupRepository.findAll()
+  const loadedClasses = await SportBridge.classGroupRepository.findAll()
+  if (!disposed) classes.value = loadedClasses
 })
 
 onBeforeUnmount(() => {
-  if (isTracking.value) {
-    if (captureIntervalId !== null) clearInterval(captureIntervalId)
-    if (elapsedIntervalId !== null) clearInterval(elapsedIntervalId)
-  }
+  disposed = true
+  if (captureIntervalId !== null) clearInterval(captureIntervalId)
+  if (elapsedIntervalId !== null) clearInterval(elapsedIntervalId)
   stopCamera()
 })
 </script>
