@@ -80,6 +80,18 @@ describe('BasketballShotCounter', () => {
     expect(counter.getCount()).toBe(2);
   });
 
+  it('resetTrajectory clears only the in-flight path and preserves completed shots', () => {
+    const counter = new BasketballShotCounter();
+
+    counter.processFrame({ x: 0.50, y: 0.25 }, 0);
+    counter.processFrame({ x: 0.50, y: 0.75 }, 50);
+    counter.processFrame({ x: 0.50, y: 0.25 }, 100);
+    counter.resetTrajectory();
+    counter.processFrame({ x: 0.50, y: 0.75 }, 140);
+
+    expect(counter.getCount()).toBe(1);
+  });
+
   it('reset clears count and any armed trajectory', () => {
     const counter = new BasketballShotCounter();
 
