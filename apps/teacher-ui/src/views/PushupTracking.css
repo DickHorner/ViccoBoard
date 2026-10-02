@@ -92,11 +92,12 @@
 .person-zones {
   position: absolute;
   inset: 0;
-  display: grid;
-  gap: 0;
+  pointer-events: none;
 }
 
 .person-zone {
+  position: absolute;
+  box-sizing: border-box;
   border: 2px solid rgba(255, 255, 255, 0.3);
   display: flex;
   flex-direction: column;
@@ -116,6 +117,66 @@
 
 .person-zone.quality-bad {
   border-color: rgba(239, 68, 68, 0.5);
+}
+
+.person-zone--editing {
+  border-color: rgba(14, 116, 144, 0.95);
+  border-style: dashed;
+}
+
+.person-region-editor {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.region-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.region-controls__header,
+.region-controls__buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.region-controls__header {
+  justify-content: space-between;
+}
+
+.region-reset {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 0.9rem;
+}
+
+.region-button {
+  min-width: 48px;
+  min-height: 40px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  border-radius: 8px;
+  background: white;
+  color: #0f172a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.region-button--active {
+  border-color: #0f766e;
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f766e;
+}
+
+.region-hint {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.85rem;
 }
 
 .person-label {

@@ -51,7 +51,7 @@
     <!-- Main tracking area -->
     <div v-show="cameraActive" class="tracking-layout">
       <!-- Video + person zones overlay -->
-      <div class="video-wrapper card">
+      <div ref="videoWrapper" class="video-wrapper card">
         <video
           ref="videoEl"
           class="camera-feed"
@@ -61,13 +61,17 @@
         />
         <!-- Hidden canvas used for frame analysis -->
         <canvas ref="analysisCanvas" class="hidden-canvas" :width="captureW" :height="captureH" />
-        <!-- Person zone overlays -->
-        <div class="person-zones" :style="{ gridTemplateColumns: `repeat(${configMaxPersons}, 1fr)` }">
+        <!-- Person region overlays -->
+        <div class="person-zones">
           <div
             v-for="(person, i) in persons"
             :key="i"
             class="person-zone"
-            :class="`quality-${person.quality}`"
+            :class="[
+              `quality-${person.quality}`,
+              { 'person-zone--editing': editingRegionIndex === i }
+            ]"
+            :style="regionStyle(displayRegion(i))"
           >
             <span class="person-label">P{{ i + 1 }}</span>
             <span class="person-count">{{ person.count }}</span>
@@ -76,6 +80,40 @@
             </span>
           </div>
         </div>
+
+        <div
+          v-if="editingRegionIndex !== null && !isTracking"
+          class="person-region-editor"
+          @mousedown="onRegionStart"
+          @mousemove="onRegionMove"
+          @mouseup="onRegionEnd"
+          @mouseleave="onRegionEnd"
+          @touchstart.prevent="onTouchRegionStart"
+          @touchmove.prevent="onTouchRegionMove"
+          @touchend.prevent="onRegionEnd"
+        ></div>
+      </div>
+
+      <div v-if="cameraActive && !isTracking" class="region-controls card">
+        <div class="region-controls__header">
+          <strong>{{ t('TRACKING.pushups.regions.title') }}</strong>
+          <button class="btn-secondary region-reset" type="button" @click="resetPersonRegions">
+            {{ t('TRACKING.pushups.regions.reset') }}
+          </button>
+        </div>
+        <div class="region-controls__buttons">
+          <button
+            v-for="(_person, i) in persons"
+            :key="i"
+            class="region-button"
+            :class="{ 'region-button--active': editingRegionIndex === i }"
+            type="button"
+            @click="beginRegionEdit(i)"
+          >
+            P{{ i + 1 }}
+          </button>
+        </div>
+        <p class="region-hint">{{ t('TRACKING.pushups.regions.hint') }}</p>
       </div>
 
       <!-- Live stats bar -->
@@ -144,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import {
@@ -165,6 +203,7 @@ const classes = ref<ClassGroup[]>([])
 
 // ── Camera ────────────────────────────────────────────────────────────────
 const videoEl = ref<HTMLVideoElement | null>(null)
+const videoWrapper = ref<HTMLDivElement | null>(null)
 const analysisCanvas = ref<HTMLCanvasElement | null>(null)
 const cameraActive = ref(false)
 const cameraError = ref<string | null>(null)
@@ -225,7 +264,23 @@ interface PersonState {
   quality: PushupQuality
 }
 
+interface PersonRegion {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+interface RegionPoint {
+  x: number
+  y: number
+}
+
 const persons = ref<PersonState[]>([])
+const personRegions = ref<PersonRegion[]>([])
+const editingRegionIndex = ref<number | null>(null)
+const draftRegion = ref<PersonRegion | null>(null)
+let regionOrigin: RegionPoint | null = null
 const isTracking = ref(false)
 const elapsedSeconds = ref(0)
 const measuredFps = ref(0)
@@ -236,7 +291,7 @@ let counter: PushupRepetitionCounter | null = null
 let captureIntervalId: ReturnType<typeof setInterval> | null = null
 let elapsedIntervalId: ReturnType<typeof setInterval> | null = null
 let sessionStartedAt: Date | null = null
-let prevFrameData: ImageData[] = []
+let prevFrameData: Array<ImageData | null> = []
 let frameCount = 0
 let fpsWindowStart = 0
 
@@ -251,6 +306,114 @@ function initPersons() {
     quality: 'good' as PushupQuality,
   }))
   prevFrameData = []
+}
+
+function createDefaultPersonRegions(): PersonRegion[] {
+  const count = configMaxPersons.value
+  return Array.from({ length: count }, (_value, index) => ({
+    x: index / count,
+    y: 0,
+    w: 1 / count,
+    h: 1,
+  }))
+}
+
+function resetPersonRegions() {
+  personRegions.value = createDefaultPersonRegions()
+  editingRegionIndex.value = null
+  draftRegion.value = null
+  regionOrigin = null
+  prevFrameData = []
+}
+
+function beginRegionEdit(index: number) {
+  if (isTracking.value) return
+  editingRegionIndex.value = editingRegionIndex.value === index ? null : index
+  draftRegion.value = null
+  regionOrigin = null
+}
+
+function displayRegion(index: number): PersonRegion {
+  if (editingRegionIndex.value === index && draftRegion.value) {
+    return draftRegion.value
+  }
+  const count = Math.max(1, configMaxPersons.value)
+  return personRegions.value[index] ?? {
+    x: index / count,
+    y: 0,
+    w: 1 / count,
+    h: 1,
+  }
+}
+
+function regionStyle(region: PersonRegion): Record<string, string> {
+  return {
+    left: `${region.x * 100}%`,
+    top: `${region.y * 100}%`,
+    width: `${region.w * 100}%`,
+    height: `${region.h * 100}%`,
+  }
+}
+
+function getRegionPoint(event: MouseEvent | Touch): RegionPoint | null {
+  const wrapper = videoWrapper.value
+  if (!wrapper) return null
+
+  const rect = wrapper.getBoundingClientRect()
+  if (rect.width <= 0 || rect.height <= 0) return null
+
+  return {
+    x: Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width)),
+    y: Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height)),
+  }
+}
+
+function buildRegion(a: RegionPoint, b: RegionPoint): PersonRegion {
+  return {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    w: Math.abs(b.x - a.x),
+    h: Math.abs(b.y - a.y),
+  }
+}
+
+function onRegionStart(event: MouseEvent) {
+  if (editingRegionIndex.value === null) return
+  regionOrigin = getRegionPoint(event)
+  if (regionOrigin) draftRegion.value = { x: regionOrigin.x, y: regionOrigin.y, w: 0, h: 0 }
+}
+
+function onRegionMove(event: MouseEvent) {
+  if (editingRegionIndex.value === null || !regionOrigin) return
+  const point = getRegionPoint(event)
+  if (point) draftRegion.value = buildRegion(regionOrigin, point)
+}
+
+function onTouchRegionStart(event: TouchEvent) {
+  const touch = event.touches[0]
+  if (!touch || editingRegionIndex.value === null) return
+  regionOrigin = getRegionPoint(touch)
+  if (regionOrigin) draftRegion.value = { x: regionOrigin.x, y: regionOrigin.y, w: 0, h: 0 }
+}
+
+function onTouchRegionMove(event: TouchEvent) {
+  const touch = event.touches[0]
+  if (!touch || editingRegionIndex.value === null || !regionOrigin) return
+  const point = getRegionPoint(touch)
+  if (point) draftRegion.value = buildRegion(regionOrigin, point)
+}
+
+function onRegionEnd() {
+  const index = editingRegionIndex.value
+  const region = draftRegion.value
+  if (index !== null && region && region.w >= 0.08 && region.h >= 0.12) {
+    personRegions.value[index] = region
+    prevFrameData[index] = null
+  }
+
+  editingRegionIndex.value = null
+  draftRegion.value = null
+  regionOrigin = null
 }
 
 function startTracking() {
@@ -312,7 +475,10 @@ async function saveSession() {
       durationSeconds: elapsedSeconds.value,
       persons: personData,
       classGroupId: selectedClassId.value || undefined,
-      metadata: { startedAt: sessionStartedAt },
+      metadata: {
+        startedAt: sessionStartedAt,
+        personRegions: personRegions.value.map(region => ({ ...region })),
+      },
     })
     sessionSaved.value = true
   } catch {
@@ -323,9 +489,31 @@ async function saveSession() {
 // ── Frame analysis ────────────────────────────────────────────────────────
 function captureAndAnalyse() {
   const video = videoEl.value
-  if (!analysisCtx || !counter || !video || video.readyState < 2) return
+  if (
+    !analysisCtx ||
+    !counter ||
+    !video ||
+    video.readyState < 2 ||
+    video.videoWidth <= 0 ||
+    video.videoHeight <= 0
+  ) return
 
-  analysisCtx.drawImage(video, 0, 0, captureW, captureH)
+  const captureAspect = captureW / captureH
+  const videoAspect = video.videoWidth / video.videoHeight
+  let sourceX = 0
+  let sourceY = 0
+  let sourceW = video.videoWidth
+  let sourceH = video.videoHeight
+
+  if (videoAspect > captureAspect) {
+    sourceW = video.videoHeight * captureAspect
+    sourceX = (video.videoWidth - sourceW) / 2
+  } else {
+    sourceH = video.videoWidth / captureAspect
+    sourceY = (video.videoHeight - sourceH) / 2
+  }
+
+  analysisCtx.drawImage(video, sourceX, sourceY, sourceW, sourceH, 0, 0, captureW, captureH)
 
   // FPS measurement
   frameCount++
@@ -337,14 +525,21 @@ function captureAndAnalyse() {
     fpsWindowStart = now
   }
 
-  const zoneW = Math.floor(captureW / configMaxPersons.value)
-
   for (let p = 0; p < configMaxPersons.value; p++) {
-    const x = p * zoneW
-    const currentFrame = analysisCtx.getImageData(x, 0, zoneW, captureH)
+    const region = personRegions.value[p]
+    if (!region) continue
 
-    if (prevFrameData[p]) {
-      const height = estimateNormalizedHeight(currentFrame, prevFrameData[p], captureH)
+    const x = Math.max(0, Math.min(captureW - 1, Math.floor(region.x * captureW)))
+    const y = Math.max(0, Math.min(captureH - 1, Math.floor(region.y * captureH)))
+    const right = Math.max(x + 1, Math.min(captureW, Math.ceil((region.x + region.w) * captureW)))
+    const bottom = Math.max(y + 1, Math.min(captureH, Math.ceil((region.y + region.h) * captureH)))
+    const regionW = right - x
+    const regionH = bottom - y
+    const currentFrame = analysisCtx.getImageData(x, y, regionW, regionH)
+
+    const previousFrame = prevFrameData[p]
+    if (previousFrame) {
+      const height = estimateNormalizedHeight(currentFrame, previousFrame, regionH)
       if (height !== null) {
         counter.processFrame(p, height)
         // Sync reactive state
@@ -426,8 +621,15 @@ function formatDuration(seconds: number): string {
 }
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────
+watch(configMaxPersons, () => {
+  if (isTracking.value) return
+  initPersons()
+  resetPersonRegions()
+})
+
 onMounted(async () => {
   initPersons()
+  resetPersonRegions()
   classes.value = await SportBridge.classGroupRepository.findAll()
 })
 

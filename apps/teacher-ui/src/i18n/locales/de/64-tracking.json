@@ -26,6 +26,11 @@
         "good": "Gut",
         "partial": "Teilweise",
         "bad": "Schlecht"
+      },
+      "regions": {
+        "title": "Bereiche der Personen",
+        "reset": "Automatische Aufteilung",
+        "hint": "Person auswählen und den zugehörigen Bereich im Kamerabild neu aufziehen."
       }
     },
     "basketball": {
