@@ -1,0 +1,293 @@
+.jump-rope-view {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h2 {
+  margin: 0.5rem 0 0;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0f766e;
+  font-size: 0.9rem;
+  padding: 0;
+}
+
+.card {
+  background: white;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.config-card h3 {
+  margin: 0 0 1rem;
+}
+
+.form-row,
+.region-controls__header,
+.region-controls__buttons,
+.controls-card,
+.stats-bar {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.form-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+}
+
+.tracking-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.video-wrapper {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  background: #0f172a;
+  aspect-ratio: 4 / 3;
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hidden-canvas {
+  display: none;
+}
+
+.person-zones {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.person-zone {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.75rem;
+}
+
+.person-zone--editing {
+  border-color: rgba(14, 116, 144, 0.95);
+  border-style: dashed;
+}
+
+.person-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: rgba(15, 23, 42, 0.65);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.person-count {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+}
+
+.person-region-editor {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.region-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.region-controls__header {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.region-controls__buttons {
+  gap: 0.5rem;
+}
+
+.region-button {
+  min-width: 48px;
+  min-height: 40px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  border-radius: 8px;
+  background: white;
+  color: #0f172a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.region-button--active {
+  border-color: #0f766e;
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f766e;
+}
+
+.region-reset {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 0.9rem;
+}
+
+.region-hint {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.stats-bar {
+  padding: 1rem 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 70px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.controls-card {
+  align-items: center;
+}
+
+.btn-primary,
+.btn-danger,
+.btn-secondary {
+  min-height: 48px;
+  padding: 0 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 1;
+}
+
+.btn-primary {
+  background: #0f766e;
+  color: white;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.idle-hint {
+  color: #64748b;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+.idle-hint p {
+  margin: 0;
+}
+
+.error-banner {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-retry {
+  padding: 0.4rem 1rem;
+  border: 1px solid #991b1b;
+  border-radius: 8px;
+  background: transparent;
+  color: #991b1b;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.warning-banner {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 18px;
+  padding: 1rem 1.5rem;
+  color: #92400e;
+}
+
+.success-banner {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
+}

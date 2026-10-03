@@ -39,7 +39,7 @@
       "error-title": "Fehler",
       "retry": "Erneut versuchen",
       "define-zone": "Zielbereich festlegen",
-      "zone-hint": "Ziehe auf dem Kamerabild, um den Zielbereich zu markieren (z. B. Korb).",
+      "zone-hint": "Markiere den Korb so, dass die eingezeichnete Mittellinie auf dem vorderen Korbring liegt.",
       "zone-defined": "Zielbereich festgelegt",
       "clear-zone": "Bereich löschen",
       "stats": {
@@ -64,6 +64,36 @@
       "start-camera": "Kamera starten",
       "stop-camera": "Kamera stoppen",
       "noCameraPermission": "Kamerazugriff verweigert. Bitte Kameraberechtigung in den Einstellungen aktivieren."
+    },
+    "jump-rope": {
+      "title": "Seilspringen Tracking",
+      "fps-label": "FPS:",
+      "persons-label": "Max. Personen:",
+      "error-title": "Fehler",
+      "retry": "Erneut versuchen",
+      "status": {
+        "ready": "Kamera starten, Personenbereiche prüfen und anschließend das Tracking beginnen."
+      },
+      "regions": {
+        "title": "Bereiche der Personen",
+        "reset": "Automatische Aufteilung",
+        "hint": "Die Bereiche starten als gleich breite Bildteile. Person auswählen und den Bereich im Kamerabild bei Bedarf neu aufziehen."
+      },
+      "stats": {
+        "total-reps": "Sprünge gesamt",
+        "average": "Durchschnitt",
+        "fps": "FPS"
+      },
+      "controls": {
+        "start-camera": "Kamera starten",
+        "start": "Tracking starten",
+        "stop": "Tracking stoppen",
+        "reset": "Zähler zurücksetzen"
+      },
+      "session-saved": "Session gespeichert.",
+      "session-save-error": "Session konnte nicht gespeichert werden.",
+      "noCameraPermission": "Kamerazugriff verweigert. Bitte Kameraberechtigung in den Einstellungen aktivieren.",
+      "cameraNotFound": "Keine Kamera auf diesem Gerät gefunden."
     }
   }
 }
