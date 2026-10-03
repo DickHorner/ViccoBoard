@@ -14,12 +14,12 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
-    "@primeuix/themes": "^3.0.1",
+    "@primeuix/themes": "^2.0.3",
     "@viccoboard/core": "*",
     "dexie": "^4.4.6",
     "pinia": "^4.0.3",
-    "primeicons": "^8.0.1",
-    "primevue": "^5.0.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.5.5",
     "vue": "^3.5.43",
     "vue-i18n": "^11.4.12",
     "vue-router": "^5.3.1"
