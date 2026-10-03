@@ -67,6 +67,9 @@ export function useFinishCameraView() {
   let captureCtx: CanvasRenderingContext2D | null = null
   let prevFrameData: ImageData | null = null
   let rafId: number | null = null
+  let cameraRequestId = 0
+  let studentsRequestId = 0
+  let disposed = false
 
   const finishLineOrientation = ref<FinishLineOrientation>('vertical')
   const finishLineX = ref(Math.round(CANVAS_W / 2))
@@ -83,34 +86,51 @@ export function useFinishCameraView() {
 
   const events = ref<EventWithFrame[]>([])
   const toast = ref({ show: false, message: '', type: 'success' as 'success' | 'error' })
+  let toastTimerId: ReturnType<typeof setTimeout> | null = null
 
   const unassignedCount = computed(() => events.value.filter(event => !event.studentId).length)
   const hasAssignedEvents = computed(() => events.value.some(event => event.studentId))
   const formattedElapsed = computed(() => formatElapsed(totalElapsedMs.value))
 
   onBeforeUnmount(() => {
+    disposed = true
+    studentsRequestId += 1
+    if (toastTimerId !== null) clearTimeout(toastTimerId)
     stopCamera()
     stopStopwatch()
   })
 
   function showToast(message: string, type: 'success' | 'error' = 'success'): void {
+    if (disposed) return
     toast.value = { show: true, message, type }
-    setTimeout(() => { toast.value.show = false }, 2500)
+    if (toastTimerId !== null) clearTimeout(toastTimerId)
+    toastTimerId = setTimeout(() => {
+      if (!disposed) toast.value.show = false
+      toastTimerId = null
+    }, 2500)
   }
 
   async function loadStudents(): Promise<void> {
-    if (!selectedClassId.value) {
+    const requestId = ++studentsRequestId
+    const classGroupId = selectedClassId.value
+    if (!classGroupId) {
       students.value = []
       mittelstreckeCategories.value = []
       return
     }
     try {
-      students.value = await studentsBridge.studentRepository.findByClassGroup(selectedClassId.value)
-      const allCategories = await sportBridge.gradeCategoryRepository.findByClassGroup(selectedClassId.value)
+      const loadedStudents = await studentsBridge.studentRepository.findByClassGroup(classGroupId)
+      if (disposed || requestId !== studentsRequestId || selectedClassId.value !== classGroupId) return
+
+      const allCategories = await sportBridge.gradeCategoryRepository.findByClassGroup(classGroupId)
+      if (disposed || requestId !== studentsRequestId || selectedClassId.value !== classGroupId) return
+
+      students.value = loadedStudents
       mittelstreckeCategories.value = allCategories.filter(
         (category: Sport.GradeCategory) => category.type === 'time' || category.type === 'mittelstrecke'
       )
     } catch {
+      if (disposed || requestId !== studentsRequestId) return
       students.value = []
       mittelstreckeCategories.value = []
     }
@@ -118,9 +138,10 @@ export function useFinishCameraView() {
 
   ;(async () => {
     try {
-      classes.value = await sportBridge.classGroupRepository.findAll()
+      const loadedClasses = await sportBridge.classGroupRepository.findAll()
+      if (!disposed) classes.value = loadedClasses
     } catch {
-      classes.value = []
+      if (!disposed) classes.value = []
     }
   })()
 
@@ -135,20 +156,30 @@ export function useFinishCameraView() {
 
   async function startCamera(): Promise<void> {
     cameraError.value = ''
+    const requestId = ++cameraRequestId
+    let requestedStream: MediaStream | null = null
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      requestedStream = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: CANVAS_W }, height: { ideal: CANVAS_H }, frameRate: { ideal: 30 } },
         audio: false
       })
-      mediaStream.value = stream
+      if (requestId !== cameraRequestId || disposed) {
+        for (const track of requestedStream.getTracks()) track.stop()
+        return
+      }
+
+      mediaStream.value = requestedStream
       const video = liveVideo.value
-      if (!video) return
-      video.srcObject = stream
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve()
-        video.onerror = (event) => reject(event)
-      })
+      if (!video) throw new Error('Video element not available')
+      video.srcObject = requestedStream
       await video.play()
+
+      if (requestId !== cameraRequestId || disposed) {
+        for (const track of requestedStream.getTracks()) track.stop()
+        if (mediaStream.value === requestedStream) mediaStream.value = null
+        if (video.srcObject === requestedStream) video.srcObject = null
+        return
+      }
 
       captureCanvas = document.createElement('canvas')
       captureCanvas.width = CANVAS_W
@@ -158,6 +189,11 @@ export function useFinishCameraView() {
       cameraActive.value = true
       startRenderLoop()
     } catch (error) {
+      if (requestId !== cameraRequestId || disposed) {
+        requestedStream?.getTracks().forEach(track => track.stop())
+        return
+      }
+      stopCamera()
       const message = error instanceof Error ? error.message : String(error)
       cameraError.value = message.toLowerCase().includes('permission') || message.toLowerCase().includes('notallowed')
         ? t('FINISH_CAMERA.no-camera-permission')
@@ -166,6 +202,7 @@ export function useFinishCameraView() {
   }
 
   function stopCamera(): void {
+    cameraRequestId += 1
     cameraActive.value = false
     stopRenderLoop()
     if (mediaStream.value) {
@@ -401,12 +438,12 @@ export function useFinishCameraView() {
         totalElapsedMs: totalElapsedMs.value,
         endedAt: new Date()
       })
-      showToast(t('FINISH_CAMERA.saved'))
+      if (!disposed) showToast(t('FINISH_CAMERA.saved'))
     } catch (error) {
-      showToast(t('FINISH_CAMERA.save-error'), 'error')
+      if (!disposed) showToast(t('FINISH_CAMERA.save-error'), 'error')
       console.error('[FinishCamera] save error', error)
     } finally {
-      saving.value = false
+      if (!disposed) saving.value = false
     }
   }
 
@@ -425,6 +462,8 @@ export function useFinishCameraView() {
         totalElapsedMs: totalElapsedMs.value,
         endedAt: new Date()
       })
+      if (disposed) return
+
       await router.push({
         name: 'mittelstrecke',
         query: {
@@ -434,10 +473,10 @@ export function useFinishCameraView() {
         }
       })
     } catch (error) {
-      showToast(t('FINISH_CAMERA.send-error'), 'error')
+      if (!disposed) showToast(t('FINISH_CAMERA.send-error'), 'error')
       console.error('[FinishCamera] send error', error)
     } finally {
-      sending.value = false
+      if (!disposed) sending.value = false
     }
   }
 

@@ -567,6 +567,8 @@ let mediaRecorder: MediaRecorder | null = null
 let recordingChunks: Blob[] = []
 let recordingTimerHandle: ReturnType<typeof setInterval> | null = null
 let recordingStartedAt = 0
+let captureRequestId = 0
+let disposed = false
 let activeVideoUrl: string | null = null
 let pendingVideoSource: { url: string; fileName: string; sourceKind: 'upload' | 'recorded'; blob: Blob | null } | null = null
 
@@ -1282,9 +1284,12 @@ async function startCapturePreview() {
     return
   }
 
+  const requestId = ++captureRequestId
+  let requestedStream: MediaStream | null = null
+
   try {
     captureError.value = ''
-    captureStream = await navigator.mediaDevices.getUserMedia({
+    requestedStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: { ideal: 'environment' },
         width: { ideal: 1280 },
@@ -1292,19 +1297,40 @@ async function startCapturePreview() {
       },
       audio: false
     })
+
+    if (requestId !== captureRequestId || disposed) {
+      requestedStream.getTracks().forEach(track => track.stop())
+      return
+    }
+
+    captureStream = requestedStream
     cameraPreviewActive.value = true
     await nextTick()
-    if (captureVideoEl.value) {
-      captureVideoEl.value.srcObject = captureStream
-      await captureVideoEl.value.play()
+    if (requestId !== captureRequestId || disposed) return
+
+    const video = captureVideoEl.value
+    if (!video) throw new Error('Video element not available')
+    video.srcObject = requestedStream
+    await video.play()
+
+    if (requestId !== captureRequestId || disposed) {
+      requestedStream.getTracks().forEach(track => track.stop())
+      if (captureStream === requestedStream) captureStream = null
+      if (video.srcObject === requestedStream) video.srcObject = null
+      return
     }
   } catch (error) {
-    captureError.value = error instanceof Error ? error.message : t('SLOWMO.captureFailed')
+    if (requestId !== captureRequestId || disposed) {
+      requestedStream?.getTracks().forEach(track => track.stop())
+      return
+    }
     stopCapturePreview()
+    captureError.value = error instanceof Error ? error.message : t('SLOWMO.captureFailed')
   }
 }
 
 function stopCapturePreview() {
+  captureRequestId += 1
   if (recordingActive.value) {
     stopRecording()
   }
@@ -1334,7 +1360,7 @@ function stopRecordingTimer() {
 }
 
 async function startRecording() {
-  if (recordingActive.value) return
+  if (recordingActive.value || disposed) return
   if (!cameraPreviewActive.value || !captureStream) {
     await startCapturePreview()
   }
@@ -1352,13 +1378,18 @@ async function startRecording() {
       ? new MediaRecorder(captureStream, { mimeType })
       : new MediaRecorder(captureStream)
     mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
+      if (!disposed && event.data.size > 0) {
         recordingChunks.push(event.data)
       }
     }
     mediaRecorder.onstop = () => {
       stopRecordingTimer()
       recordingActive.value = false
+      if (disposed) {
+        recordingChunks = []
+        mediaRecorder = null
+        return
+      }
       const finalMimeType = mediaRecorder?.mimeType || mimeType || 'video/webm'
       const blob = new Blob(recordingChunks, { type: finalMimeType })
       const extension = finalMimeType.includes('mp4') ? 'mp4' : 'webm'
@@ -1369,7 +1400,9 @@ async function startRecording() {
       const fileName = `${baseName}.${extension}`
       queueVideoSource(URL.createObjectURL(blob), fileName, 'recorded', blob)
       if (activeTab.value === 'analyze') {
-        nextTick(attachQueuedVideoSource)
+        nextTick(() => {
+          if (!disposed) attachQueuedVideoSource()
+        })
       }
     }
     mediaRecorder.start()
@@ -1408,9 +1441,9 @@ function deleteCurrentVideo() {
 async function loadSessions() {
   try {
     const raw = await bridge.toolSessionRepository.findByToolType('slow-motion')
-    sessions.value = raw as unknown as SessionRecord[]
+    if (!disposed) sessions.value = raw as unknown as SessionRecord[]
   } catch {
-    sessions.value = []
+    if (!disposed) sessions.value = []
   }
 }
 
@@ -1428,6 +1461,7 @@ async function saveSession() {
       notes: notes.value || undefined,
       referenceLines: referenceLines.value
     })
+    if (disposed) return
     showSaveMessage(t('SLOWMO.saved'))
     if (!currentSessionId.value) {
       // After first save we get an ID via reload
@@ -1436,7 +1470,7 @@ async function saveSession() {
       if (found) currentSessionId.value = found.id
     }
   } catch (err) {
-    showSaveMessage(`❌ ${err instanceof Error ? err.message : String(err)}`)
+    if (!disposed) showSaveMessage(`❌ ${err instanceof Error ? err.message : String(err)}`)
   }
 }
 
@@ -1509,6 +1543,7 @@ function showSaveMessage(msg: string) {
 }
 
 onUnmounted(() => {
+  disposed = true
   if (saveTimer) clearTimeout(saveTimer)
   resetPointTracking()
   stopCapturePreview()
