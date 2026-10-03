@@ -64,6 +64,7 @@ describe('formatToolLabel', () => {
     expect(formatToolLabel('slow-motion')).toBe('Slow Motion Analyse')
     expect(formatToolLabel('video-delay')).toBe('Video Delay')
     expect(formatToolLabel('finish-camera')).toBe('Zielkamera')
+    expect(formatToolLabel('jump-rope-tracking')).toBe('Seilspringen Tracking')
   })
 
   it('is case-insensitive', () => {
@@ -83,6 +84,7 @@ describe('SPORT_TOOL_ROUTES', () => {
     expect(SPORT_TOOL_ROUTES['finish-camera']).toBe('/tools/finish-camera')
     expect(SPORT_TOOL_ROUTES['pushup-tracking']).toBe('/tools/pushup-tracking')
     expect(SPORT_TOOL_ROUTES['tracking-basketball']).toBe('/tools/tracking-basketball')
+    expect(SPORT_TOOL_ROUTES['jump-rope-tracking']).toBe('/tools/jump-rope-tracking')
     expect(SPORT_TOOL_ROUTES['slow-motion']).toBe('/tools/slow-motion')
   })
 })
