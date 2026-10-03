@@ -10,6 +10,25 @@
     "save": "Speichern",
     "fill_all_fields": "Bitte alle Felder ausfüllen",
     "error": "Fehler",
-    "success": "Erfolgreich"
+    "success": "Erfolgreich",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
+    "continue": "Fortsetzen",
+    "stop": "Stopp",
+    "reset": "Zurücksetzen",
+    "cancel": "Abbrechen",
+    "retry": "Erneut versuchen",
+    "no-results": "Keine Ergebnisse",
+    "archive": "Archivieren",
+    "unarchive": "Wiederherstellen",
+    "none": "Keine",
+    "alle": "Alle",
+    "archivierte-anzeigen": "Archivierte anzeigen",
+    "start-all": "Alle starten",
+    "stop-all": "Alle stoppen",
+    "reset-all": "Alle zurücksetzen",
+    "save-all": "Alle speichern",
+    "export": "Exportieren"
   }
 }
