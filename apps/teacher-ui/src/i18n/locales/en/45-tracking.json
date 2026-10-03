@@ -64,6 +64,36 @@
       "start-camera": "Start Camera",
       "stop-camera": "Stop Camera",
       "noCameraPermission": "Camera access denied. Please enable camera permission in your device settings."
+    },
+    "jump-rope": {
+      "title": "Jump-rope Tracking",
+      "fps-label": "FPS:",
+      "persons-label": "Max. persons:",
+      "error-title": "Error",
+      "retry": "Try again",
+      "status": {
+        "ready": "Start the camera, check the person regions, then start tracking."
+      },
+      "regions": {
+        "title": "Person regions",
+        "reset": "Reset automatic split",
+        "hint": "Regions start as equal-width image sections. Select a person and redraw the region if needed."
+      },
+      "stats": {
+        "total-reps": "Total jumps",
+        "average": "Average",
+        "fps": "FPS"
+      },
+      "controls": {
+        "start-camera": "Start camera",
+        "start": "Start tracking",
+        "stop": "Stop tracking",
+        "reset": "Reset counter"
+      },
+      "session-saved": "Session saved.",
+      "session-save-error": "Session could not be saved.",
+      "noCameraPermission": "Camera access denied. Please enable camera permission in your device settings.",
+      "cameraNotFound": "No camera found on this device."
     }
   }
 }

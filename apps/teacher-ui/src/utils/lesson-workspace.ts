@@ -42,6 +42,7 @@ const SPORT_TOOL_LABELS: Record<string, string> = {
   'finish-camera': 'Zielkamera',
   'pushup-tracking': 'Liegestuetze Tracking',
   'tracking-basketball': 'Basketball Trefferquote',
+  'jump-rope-tracking': 'Seilspringen Tracking',
   'slow-motion': 'Slow Motion Analyse',
 }
 
@@ -66,6 +67,7 @@ export const SPORT_TOOL_ROUTES: Record<string, string> = {
   'finish-camera': '/tools/finish-camera',
   'pushup-tracking': '/tools/pushup-tracking',
   'tracking-basketball': '/tools/tracking-basketball',
+  'jump-rope-tracking': '/tools/jump-rope-tracking',
   'slow-motion': '/tools/slow-motion',
 }
 
