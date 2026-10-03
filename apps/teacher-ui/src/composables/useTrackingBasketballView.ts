@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n'
 import { BasketballShotCounter } from '@viccoboard/sport'
 
 import { getSportBridge } from './useSportBridge'
+import { hasBasketballRimOcclusionEvidence } from '../utils/basketball-rim-occlusion'
 
 interface ZoneRect {
   x: number
@@ -47,7 +48,10 @@ export function useTrackingBasketballView() {
   let captureCanvas: HTMLCanvasElement | null = null
   let captureCtx: CanvasRenderingContext2D | null = null
   let prevFrameData: ImageData | null = null
+  let rimReferenceFrame: ImageData | null = null
   let rafId: number | null = null
+  let cameraRequestId = 0
+  let disposed = false
 
   const shotCounter = new BasketballShotCounter()
 
@@ -78,8 +82,10 @@ export function useTrackingBasketballView() {
 
   async function startCamera(): Promise<void> {
     cameraError.value = ''
+    const requestId = ++cameraRequestId
+    let requestedStream: MediaStream | null = null
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      requestedStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: CAPTURE_W },
           height: { ideal: CAPTURE_H },
@@ -89,15 +95,23 @@ export function useTrackingBasketballView() {
         audio: false
       })
 
-      mediaStream.value = stream
+      if (requestId !== cameraRequestId || disposed) {
+        for (const track of requestedStream.getTracks()) track.stop()
+        return
+      }
+
+      mediaStream.value = requestedStream
       const video = liveVideo.value
       if (!video) throw new Error('Video element not available')
-      video.srcObject = stream
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve()
-        video.onerror = (event) => reject(event)
-      })
+      video.srcObject = requestedStream
       await video.play()
+
+      if (requestId !== cameraRequestId || disposed) {
+        for (const track of requestedStream.getTracks()) track.stop()
+        if (mediaStream.value === requestedStream) mediaStream.value = null
+        if (video.srcObject === requestedStream) video.srcObject = null
+        return
+      }
 
       captureCanvas = document.createElement('canvas')
       captureCanvas.width = CAPTURE_W
@@ -109,6 +123,17 @@ export function useTrackingBasketballView() {
       cameraActive.value = true
       startRenderLoop()
     } catch (error) {
+      if (requestId !== cameraRequestId || disposed) {
+        requestedStream?.getTracks().forEach(track => track.stop())
+        return
+      }
+      if (mediaStream.value) {
+        for (const track of mediaStream.value.getTracks()) track.stop()
+        mediaStream.value = null
+      }
+      if (liveVideo.value) liveVideo.value.srcObject = null
+      cameraActive.value = false
+      stopRenderLoop()
       const message = error instanceof Error ? error.message : String(error)
       if (message.toLowerCase().includes('permission') || message.toLowerCase().includes('notallowed')) {
         cameraError.value = t('TRACKING.basketball.noCameraPermission')
@@ -119,6 +144,7 @@ export function useTrackingBasketballView() {
   }
 
   function stopCamera(): void {
+    cameraRequestId += 1
     stopTracking()
     cameraActive.value = false
     stopRenderLoop()
@@ -128,6 +154,7 @@ export function useTrackingBasketballView() {
     }
     if (liveVideo.value) liveVideo.value.srcObject = null
     prevFrameData = null
+    rimReferenceFrame = null
     draftZone = null
     isDefiningZone = false
   }
@@ -175,6 +202,10 @@ export function useTrackingBasketballView() {
     ctx.lineWidth = 3
     ctx.setLineDash(isDraft ? [8, 4] : [])
     ctx.strokeRect(zone.x, zone.y, zone.w, zone.h)
+    ctx.beginPath()
+    ctx.moveTo(zone.x, zone.y + zone.h / 2)
+    ctx.lineTo(zone.x + zone.w, zone.y + zone.h / 2)
+    ctx.stroke()
     ctx.fillStyle = isDraft ? 'rgba(255, 200, 0, 0.08)' : 'rgba(255, 80, 0, 0.10)'
     ctx.fillRect(zone.x, zone.y, zone.w, zone.h)
     ctx.setLineDash([])
@@ -194,6 +225,7 @@ export function useTrackingBasketballView() {
     const currentFrame = ctx.getImageData(x, y, w, h)
     if (!prevFrameData || prevFrameData.width !== w || prevFrameData.height !== h) {
       prevFrameData = currentFrame
+      rimReferenceFrame = currentFrame
       return
     }
 
@@ -203,6 +235,10 @@ export function useTrackingBasketballView() {
     let totalMotion = 0
     let weightedX = 0
     let weightedY = 0
+    let minMotionX = w
+    let maxMotionX = -1
+    let minMotionY = h
+    let maxMotionY = -1
     const totalPixels = w * h
 
     for (let i = 0; i < d1.length; i += 4) {
@@ -219,6 +255,10 @@ export function useTrackingBasketballView() {
       totalMotion += motion
       weightedX += motion * pixelX
       weightedY += motion * pixelY
+      minMotionX = Math.min(minMotionX, pixelX)
+      maxMotionX = Math.max(maxMotionX, pixelX)
+      minMotionY = Math.min(minMotionY, pixelY)
+      maxMotionY = Math.max(maxMotionY, pixelY)
     }
 
     const motionFraction = changedPixels / totalPixels
@@ -226,9 +266,19 @@ export function useTrackingBasketballView() {
     const now = Date.now()
 
     if (motionFraction > threshold && totalMotion > 0) {
+      const rimOcclusionObserved = rimReferenceFrame
+        ? hasBasketballRimOcclusionEvidence(rimReferenceFrame, currentFrame, {
+            minX: minMotionX,
+            maxX: maxMotionX,
+            minY: minMotionY,
+            maxY: maxMotionY
+          })
+        : false
+
       shotCounter.processFrame({
         x: weightedX / totalMotion / (w - 1),
-        y: weightedY / totalMotion / (h - 1)
+        y: weightedY / totalMotion / (h - 1),
+        rimOcclusionObserved
       }, now)
     } else {
       shotCounter.processFrame(null, now)
@@ -270,6 +320,7 @@ export function useTrackingBasketballView() {
     if (Math.abs(draftZone.w) > MIN_ZONE_SIZE && Math.abs(draftZone.h) > MIN_ZONE_SIZE) {
       targetZone.value = normalizeRect(draftZone)
       shotCounter.resetTrajectory()
+      rimReferenceFrame = null
     }
     draftZone = null
     isDefiningZone = false
@@ -309,6 +360,7 @@ export function useTrackingBasketballView() {
   function clearZone(): void {
     targetZone.value = null
     prevFrameData = null
+    rimReferenceFrame = null
     shotCounter.resetTrajectory()
   }
 
@@ -318,6 +370,7 @@ export function useTrackingBasketballView() {
     sessionSaved.value = false
     shotCounter.resetTrajectory()
     prevFrameData = null
+    rimReferenceFrame = null
     sessionElapsedMs.value = 0
     sessionStartTime = Date.now()
     timerHandle = setInterval(() => {
@@ -342,6 +395,7 @@ export function useTrackingBasketballView() {
     shotCount.value = shotCounter.getCount()
     sessionElapsedMs.value = 0
     prevFrameData = null
+    rimReferenceFrame = null
     sessionSaved.value = false
   }
 
@@ -359,18 +413,25 @@ export function useTrackingBasketballView() {
         startedAt: new Date(sessionStartTime),
         endedAt: new Date()
       })
-      sessionSaved.value = true
+      if (!disposed) sessionSaved.value = true
     } catch (error) {
       console.warn('Failed to save basketball tracking session:', error)
     }
   }
 
   onBeforeUnmount(() => {
+    disposed = true
+    cameraRequestId += 1
     stopRenderLoop()
-    if (timerHandle !== null) clearInterval(timerHandle)
+    if (timerHandle !== null) {
+      clearInterval(timerHandle)
+      timerHandle = null
+    }
     if (mediaStream.value) {
       for (const track of mediaStream.value.getTracks()) track.stop()
+      mediaStream.value = null
     }
+    if (liveVideo.value) liveVideo.value.srcObject = null
   })
 
   return {
