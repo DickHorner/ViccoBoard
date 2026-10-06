@@ -7,6 +7,27 @@
     "loading": "Loading...",
     "fill_all_fields": "Please fill all fields",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "back": "Back",
+    "save": "Save",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "continue": "Continue",
+    "stop": "Stop",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "no-results": "No results",
+    "archive": "Archive",
+    "unarchive": "Restore",
+    "none": "None",
+    "alle": "All",
+    "archivierte-anzeigen": "Show archived",
+    "start-all": "Start all",
+    "stop-all": "Stop all",
+    "reset-all": "Reset all",
+    "save-all": "Save all",
+    "export": "Export"
   }
 }

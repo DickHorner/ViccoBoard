@@ -108,6 +108,41 @@ describe('i18n - Sport Locale Parity', () => {
     });
   });
 
+  describe('2b. Common control labels', () => {
+    const requiredCommonKeys = [
+      'back',
+      'save',
+      'start',
+      'pause',
+      'resume',
+      'continue',
+      'stop',
+      'reset',
+      'cancel',
+      'retry',
+      'no-results',
+      'archive',
+      'unarchive',
+      'none',
+      'alle',
+      'archivierte-anzeigen',
+      'start-all',
+      'stop-all',
+      'reset-all',
+      'save-all',
+      'export',
+    ];
+
+    it.each(['de', 'en'] as const)('defines visible COMMON controls in %s', async (locale) => {
+      const messages = locale === 'de' ? (await loadDe()).default : (await loadEn()).default;
+
+      for (const key of requiredCommonKeys) {
+        expect(messages.COMMON[key]).toBeDefined();
+        expect(messages.COMMON[key]).not.toBe(`COMMON.${key}`);
+      }
+    });
+  });
+
   describe('3. Key Count Statistics', () => {
     
     it('should have at least 50 top-level keys', async () => {
