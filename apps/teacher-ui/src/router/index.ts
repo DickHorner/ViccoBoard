@@ -341,15 +341,11 @@ export function resolveBackFallbackPath(route: RouteLocationNormalizedLoaded): s
 }
 
 export function getSafeBackNavigationTarget(
-  route: RouteLocationNormalizedLoaded,
-  internalBackTarget?: string | null
+  route: RouteLocationNormalizedLoaded
 ): string | null {
-  if (internalBackTarget && internalBackTarget !== route.fullPath) {
-    return null
-  }
-
-  const fallbackPath = resolveBackFallbackPath(route)
-  return fallbackPath === route.fullPath ? '/' : fallbackPath
+  const parentPath = route.meta.parent
+  if (!parentPath) return null
+  return parentPath === route.fullPath ? '/' : parentPath
 }
 
 const router = createRouter({
@@ -372,12 +368,7 @@ const router = createRouter({
 const originalBack = router.back.bind(router)
 
 router.back = () => {
-  const internalBackTarget =
-    typeof window !== 'undefined' && typeof window.history.state?.back === 'string'
-      ? window.history.state.back
-      : null
-
-  const target = getSafeBackNavigationTarget(router.currentRoute.value, internalBackTarget)
+  const target = getSafeBackNavigationTarget(router.currentRoute.value)
   if (target === null) {
     originalBack()
     return

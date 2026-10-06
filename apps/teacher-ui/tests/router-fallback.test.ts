@@ -20,21 +20,21 @@ describe('router fallback navigation', () => {
     expect(resolveBackFallbackPath(route)).toBe('/exams')
   })
 
-  it('uses the parent fallback when no internal history target exists', () => {
+  it('uses the declared route parent for in-app back navigation', () => {
     const route = router.resolve('/settings/catalogs')
 
-    expect(getSafeBackNavigationTarget(route, null)).toBe('/settings')
+    expect(getSafeBackNavigationTarget(route)).toBe('/settings')
   })
 
-  it('keeps browser back behavior when an internal history target exists', () => {
-    const route = router.resolve('/settings/catalogs')
-
-    expect(getSafeBackNavigationTarget(route, '/settings')).toBeNull()
-  })
-
-  it('falls back to the route parent when the recorded back target equals the current route', () => {
+  it('ignores chronological browser history for hierarchical in-app back navigation', () => {
     const route = router.resolve('/tools/scoreboard')
 
-    expect(getSafeBackNavigationTarget(route, route.fullPath)).toBe('/subjects/sport')
+    expect(getSafeBackNavigationTarget(route)).toBe('/subjects/sport')
+  })
+
+  it('keeps native browser-back behavior available on routes without a parent', () => {
+    const route = router.resolve('/')
+
+    expect(getSafeBackNavigationTarget(route)).toBeNull()
   })
 })

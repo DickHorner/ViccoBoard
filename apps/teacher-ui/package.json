@@ -14,7 +14,7 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
-    "@primeuix/themes": "^3.0.1",
+    "@primeuix/themes": "^2.0.3",
     "@viccoboard/core": "*",
     "dexie": "^4.4.6",
     "pinia": "^4.0.3",
