@@ -2,6 +2,9 @@ name: Local iPad Build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - build/local-ipad-2026-10-09
 
 permissions:
   contents: read
