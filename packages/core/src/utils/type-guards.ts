@@ -16,6 +16,7 @@ export function isValidGradeCategoryType(value: unknown): value is GradeCategory
   return typeof value === 'string' && [
     'criteria',
     'time',
+    'performance',
     'cooper',
     'shuttle',
     'mittelstrecke',

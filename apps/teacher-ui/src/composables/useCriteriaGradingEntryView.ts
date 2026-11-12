@@ -8,15 +8,6 @@ import { useSportBridge } from './useSportBridge'
 import { useStudents, getStudentsBridge } from './useStudentsBridge'
 import { useToast } from './useToast'
 
-const DEFAULT_GRADING_THRESHOLDS: Array<{ minPercentage: number; grade: string }> = [
-  { minPercentage: 92, grade: '1' },
-  { minPercentage: 81, grade: '2' },
-  { minPercentage: 67, grade: '3' },
-  { minPercentage: 50, grade: '4' },
-  { minPercentage: 30, grade: '5' },
-  { minPercentage: 0, grade: '6' }
-]
-
 type CriterionConfig = {
   id: string
   name: string
@@ -65,19 +56,14 @@ export function useCriteriaGradingEntryView() {
     name: '',
     description: '',
     minValue: 0,
-    maxValue: 10,
-    weight: 100
+    maxValue: 3,
+    weight: 1
   })
 
   const criteria = computed<CriterionConfig[]>(() => {
     if (!category.value) return []
     const config = category.value.configuration as Sport.CriteriaGradingConfig
     return config.criteria || []
-  })
-
-  const remainingWeight = computed(() => {
-    const totalWeight = criteria.value.reduce((sum, criterion) => sum + criterion.weight, 0)
-    return Math.max(0, 100 - totalWeight)
   })
 
   async function loadData() {
@@ -211,37 +197,35 @@ export function useCriteriaGradingEntryView() {
     return unsavedStudents.value.has(studentId)
   }
 
-  function calculateTotal(studentId: string): number {
+  function gradingResult(studentId: string) {
     const studentGrades = gradeEntries.value.get(studentId)
-    if (!studentGrades) return 0
+    if (!studentGrades || criteria.value.length === 0) return null
 
-    let total = 0
-    for (const criterion of criteria.value) {
-      total += (studentGrades.get(criterion.id) || 0) * (criterion.weight / 100)
+    const scores = criteria.value.map((criterion) => ({
+      criterionId: criterion.id,
+      value: studentGrades.get(criterion.id) ?? criterion.minValue
+    }))
+
+    try {
+      const gradingScale = (category.value as Sport.GradeCategory & {
+        gradingScale?: Array<{ minPercentage: number; grade: string }>
+      } | null)?.gradingScale
+
+      return SportBridge.value?.criteriaGradingEngine.calculateGradeFromValues(
+        { criteria: criteria.value, scores },
+        gradingScale
+      ) ?? null
+    } catch {
+      return null
     }
-    return total
+  }
+
+  function calculateTotal(studentId: string): number {
+    return gradingResult(studentId)?.totalPoints ?? 0
   }
 
   function calculateGrade(studentId: string): string {
-    const total = calculateTotal(studentId)
-    const maxPossible = criteria.value.reduce(
-      (sum, criterion) => sum + (criterion.maxValue * (criterion.weight / 100)),
-      0
-    )
-    if (maxPossible === 0) return '—'
-
-    const percentage = (total / maxPossible) * 100
-    const categoryGradingScale = (category.value as Sport.GradeCategory & {
-      gradingScale?: Array<{ minPercentage: number; grade: string }>
-    } | null)?.gradingScale
-    const gradingScale = categoryGradingScale && categoryGradingScale.length > 0
-      ? categoryGradingScale
-      : DEFAULT_GRADING_THRESHOLDS
-
-    for (const threshold of gradingScale) {
-      if (percentage >= threshold.minPercentage) return threshold.grade
-    }
-    return gradingScale[gradingScale.length - 1]?.grade ?? '—'
+    return gradingResult(studentId)?.grade ?? '—'
   }
 
   async function saveStudentGrade(studentId: string) {
@@ -292,10 +276,6 @@ export function useCriteriaGradingEntryView() {
 
   async function addCriterion() {
     if (!newCriterion.value.name || !category.value) return
-    if (newCriterion.value.weight > remainingWeight.value) {
-      toast.warning(`Die Gewichtung darf ${remainingWeight.value}% nicht überschreiten.`)
-      return
-    }
     if (newCriterion.value.minValue >= newCriterion.value.maxValue) {
       toast.error('Der Minimalwert muss kleiner als der Maximalwert sein.')
       return
@@ -330,8 +310,8 @@ export function useCriteriaGradingEntryView() {
         name: '',
         description: '',
         minValue: 0,
-        maxValue: 10,
-        weight: 100
+        maxValue: 3,
+        weight: 1
       }
       showAddCriterionModal.value = false
     } catch {
@@ -414,7 +394,6 @@ export function useCriteriaGradingEntryView() {
     onSelfAssessmentChange,
     participationOptions,
     participationStatus,
-    remainingWeight,
     removeCriterion,
     saveAllGrades,
     saveComment,

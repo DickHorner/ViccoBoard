@@ -96,6 +96,13 @@ export { UpdateTournamentMatchUseCase } from './use-cases/update-tournament-matc
 export type { UpdateTournamentMatchInput } from './use-cases/update-tournament-match.use-case.js';
 
 export { SaveCooperSessionUseCase } from './use-cases/save-cooper-session.use-case.js';
+export { SaveSportExamSessionUseCase } from './use-cases/save-sport-exam-session.use-case.js';
+export type {
+  SaveSportExamSessionInput,
+  SportExamStudentEntry,
+  SportExamStudentState,
+  SportExamSessionMetadata
+} from './use-cases/save-sport-exam-session.use-case.js';
 export type {
   SaveCooperSessionInput,
   CooperSessionStudentEntry,
@@ -148,6 +155,11 @@ export type {
   ScoreboardLookup
 } from './services/tournament.service.js';
 export { TimeGradingService } from './services/time-grading.service.js';
+export { PerformanceTableGradingService } from './services/performance-table-grading.service.js';
+export type {
+  PerformanceTableGradingInput,
+  PerformanceTableGradingResult
+} from './services/performance-table-grading.service.js';
 export type {
   TimeToGradeInput,
   TimeToGradeResult,

@@ -68,7 +68,8 @@ export class TableImportService {
       return { valid: false, errors };
     }
 
-    const headers = this.parseCsvRow(lines[0]);
+    const delimiter = this.detectDelimiter(lines[0]);
+    const headers = this.parseCsvRow(lines[0], delimiter);
 
     if (headers.length < 2) {
       errors.push({
@@ -92,7 +93,7 @@ export class TableImportService {
 
     for (let i = 1; i < lines.length; i++) {
       const rowNum = i + 1;
-      const cells = this.parseCsvRow(lines[i]);
+      const cells = this.parseCsvRow(lines[i], delimiter);
 
       if (cells.length !== headers.length) {
         errors.push({
@@ -102,17 +103,13 @@ export class TableImportService {
         continue;
       }
 
-      const rowKey: Record<string, string> = {};
+      const rowKey: Record<string, string | number> = {};
       for (const header of keyHeaders) {
         const idx = headers.indexOf(header);
         const cell = cells[idx];
-        if (cell === '') {
-          errors.push({
-            row: rowNum,
-            message: `Row ${rowNum}: key column "${header}" must not be empty.`
-          });
+        if (cell !== '') {
+          rowKey[header] = this.parseCellValue(cell);
         }
-        rowKey[header] = cell;
       }
 
       const rawValue = cells[valueIndex];
@@ -123,9 +120,16 @@ export class TableImportService {
         });
       }
 
+      if (Object.keys(rowKey).length === 0) {
+        errors.push({
+          row: rowNum,
+          message: `Row ${rowNum}: at least one key column must contain a value.`
+        });
+      }
+
       entries.push({
         key: rowKey,
-        value: rawValue
+        value: this.parseCellValue(rawValue)
       });
     }
 
@@ -139,13 +143,13 @@ export class TableImportService {
       dimensionValueMap.set(header, new Set());
     }
     for (const entry of entries) {
-      for (const [dim, val] of Object.entries(entry.key as Record<string, string>)) {
-        dimensionValueMap.get(dim)?.add(val);
+      for (const [dim, val] of Object.entries(entry.key)) {
+        dimensionValueMap.get(dim)?.add(String(val));
       }
     }
 
     const dimensions: Sport.TableDimension[] = keyHeaders.map((header) => ({
-      name: 'custom' as Sport.TableDimension['name'],
+      name: header,
       values: Array.from(dimensionValueMap.get(header) ?? [])
     }));
 
@@ -166,7 +170,7 @@ export class TableImportService {
   /**
    * Parse a single CSV row, handling quoted fields.
    */
-  parseCsvRow(line: string): string[] {
+  parseCsvRow(line: string, delimiter = ','): string[] {
     const result: string[] = [];
     let current = '';
     let inQuotes = false;
@@ -181,7 +185,7 @@ export class TableImportService {
         } else {
           inQuotes = !inQuotes;
         }
-      } else if (ch === ',' && !inQuotes) {
+      } else if (ch === delimiter && !inQuotes) {
         result.push(current.trim());
         current = '';
       } else {
@@ -191,5 +195,30 @@ export class TableImportService {
 
     result.push(current.trim());
     return result;
+  }
+
+  private detectDelimiter(headerLine: string): ',' | ';' | '\t' {
+    const candidates: Array<',' | ';' | '\t'> = [',', ';', '\t'];
+    let best: ',' | ';' | '\t' = ',';
+    let bestCount = -1;
+
+    for (const candidate of candidates) {
+      const count = this.parseCsvRow(headerLine, candidate).length;
+      if (count > bestCount) {
+        best = candidate;
+        bestCount = count;
+      }
+    }
+
+    return best;
+  }
+
+  private parseCellValue(value: string): string | number {
+    const normalized = value.trim().replace(',', '.');
+    if (normalized !== '' && /^-?\d+(?:\.\d+)?$/.test(normalized)) {
+      const numeric = Number(normalized);
+      if (Number.isFinite(numeric)) return numeric;
+    }
+    return value.trim();
   }
 }

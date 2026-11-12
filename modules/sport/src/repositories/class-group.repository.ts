@@ -22,6 +22,7 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
       id: row.id,
       name: row.name,
       schoolYear: row.school_year,
+      gradeLevel: row.grade_level ?? undefined,
       color: row.color || undefined,
       archived,
       state: row.state || undefined,
@@ -41,6 +42,7 @@ export class ClassGroupRepository extends AdapterRepository<ClassGroup> {
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.name !== undefined) row.name = entity.name;
     if (entity.schoolYear !== undefined) row.school_year = entity.schoolYear;
+    if (entity.gradeLevel !== undefined) row.grade_level = entity.gradeLevel;
     if (entity.color !== undefined) row.color = entity.color;
     if (entity.archived !== undefined) row.archived = entity.archived ? 1 : 0;
     if (entity.state !== undefined) row.state = entity.state;

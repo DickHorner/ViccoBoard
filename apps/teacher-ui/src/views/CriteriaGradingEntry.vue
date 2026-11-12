@@ -38,14 +38,14 @@
 
         <div class="criteria-actions">
           <button
-            v-if="criteria.length < 8"
+            v-if="criteria.length < 50"
             class="btn-secondary btn-small"
             @click="showAddCriterionModal = true"
           >
             + Kriterium hinzufügen
           </button>
-          <span v-if="criteria.length >= 8" class="info-note">
-            Maximum 8 Kriterien erreicht
+          <span v-if="criteria.length >= 50" class="info-note">
+            Maximum 50 Kriterien erreicht
           </span>
           <label class="self-assessment-toggle">
             <input type="checkbox" :checked="selfAssessmentEnabled" @change="setSelfAssessmentEnabled(($event.target as HTMLInputElement).checked)">
@@ -58,7 +58,7 @@
             <div class="criterion-info">
               <strong>{{ criterion.name }}</strong>
               <span class="criterion-range">
-                ({{ criterion.minValue }} - {{ criterion.maxValue }} Punkte, Gewicht: {{ criterion.weight }}%)
+                ({{ criterion.minValue }}–{{ criterion.maxValue }} Punkte, Gewicht: {{ criterion.weight }})
               </span>
               <p v-if="criterion.description" class="criterion-description">
                 {{ criterion.description }}
@@ -239,17 +239,16 @@
             </div>
 
             <div class="form-group">
-              <label for="criterion-weight">Gewicht (%)*</label>
+              <label for="criterion-weight">Gewichtung*</label>
               <input
                 id="criterion-weight"
                 v-model.number="newCriterion.weight"
                 type="number"
                 min="0"
-                max="100"
                 required
-                placeholder="0-100"
+                placeholder="z. B. 1"
               />
-              <small>Verbleibende Gewichtung: {{ remainingWeight }}%</small>
+              <small>Relative Gewichtung: 1 = normal, 2 = doppelt.</small>
             </div>
 
             <div class="modal-actions">
@@ -321,7 +320,6 @@ const {
   onSelfAssessmentChange,
   participationOptions,
   participationStatus,
-  remainingWeight,
   removeCriterion,
   saveAllGrades,
   saveComment,

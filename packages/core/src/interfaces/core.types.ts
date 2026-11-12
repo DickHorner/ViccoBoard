@@ -50,6 +50,7 @@ export interface ClassGroup {
   id: string;
   name: string;
   schoolYear: string;
+  gradeLevel?: number;
   color?: string;
   archived?: boolean;
   state?: string; // Bundesland
@@ -91,6 +92,7 @@ export interface StudentModuleProfile {
 
 export interface SportStudentProfile extends StudentModuleProfile {
   moduleKey: 'sport';
+  bodyHeightCm?: number;
   medicalNotes?: string;
   asthma?: boolean;
   diabetes?: boolean;

@@ -9,6 +9,7 @@ import { ClassGroupRepository } from '../repositories/class-group.repository.js'
 export interface CreateClassInput {
   name: string;
   schoolYear: string;
+  gradeLevel?: number;
   state?: string;
   gradingScheme?: string;
 }
@@ -34,6 +35,7 @@ export class CreateClassUseCase {
     const classGroup = await this.classGroupRepo.create({
       name: input.name,
       schoolYear: input.schoolYear,
+      gradeLevel: input.gradeLevel,
       state: input.state,
       gradingScheme: input.gradingScheme || 'default'
     });
@@ -48,6 +50,13 @@ export class CreateClassUseCase {
 
     if (!input.schoolYear || input.schoolYear.trim().length === 0) {
       throw new Error('School year is required');
+    }
+
+    if (
+      input.gradeLevel !== undefined &&
+      (!Number.isInteger(input.gradeLevel) || input.gradeLevel < 1 || input.gradeLevel > 13)
+    ) {
+      throw new Error('Grade level must be an integer between 1 and 13');
     }
 
     // Validate school year format (e.g., "2023/2024")

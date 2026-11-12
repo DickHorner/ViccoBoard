@@ -20,6 +20,8 @@ function getDefaultConfiguration(type: NewCategoryForm['type']): Sport.GradeCate
       return { type: 'criteria', criteria: [], allowSelfAssessment: false, selfAssessmentViaWOW: false }
     case 'time':
       return { type: 'time', bestGrade: 1, worstGrade: 6, linearMapping: true, adjustableAfterwards: true }
+    case 'performance':
+      return { type: 'performance', measurementType: 'number', measurementLabel: 'Leistung' }
     case 'cooper':
       return { type: 'cooper', SportType: 'running', distanceUnit: 'meters', autoEvaluation: true }
     case 'shuttle':
@@ -110,6 +112,7 @@ export function useGradingOverviewView() {
     const labels: Record<Sport.GradeCategoryType, string> = {
       criteria: 'Kriterienbasiert',
       time: 'Zeitbasiert',
+      performance: 'Messwert nach Tabelle',
       cooper: 'Cooper-Test',
       shuttle: 'Shuttle-Run',
       mittelstrecke: 'Mittelstrecke',
@@ -136,6 +139,7 @@ export function useGradingOverviewView() {
     const routeMap: Partial<Record<Sport.GradeCategoryType, string>> = {
       criteria: 'criteria',
       time: 'time',
+      performance: 'performance',
       cooper: 'cooper',
       shuttle: 'shuttle',
       mittelstrecke: 'mittelstrecke',
