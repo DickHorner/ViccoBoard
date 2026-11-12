@@ -154,8 +154,16 @@ export function useCriteriaGradingEntryView() {
       scores = new Map<string, number>()
       selfAssessmentEntries.value.set(studentId, scores)
     }
-    if (rawValue === '') scores.delete(criterionId)
-    else scores.set(criterionId, Number(rawValue))
+    const criterion = criteria.value.find(item => item.id === criterionId)
+    const value = Number(rawValue)
+    if (
+      rawValue.trim() === '' || !criterion || !Number.isFinite(value) ||
+      value < criterion.minValue || value > criterion.maxValue
+    ) {
+      scores.delete(criterionId)
+    } else {
+      scores.set(criterionId, value)
+    }
     unsavedStudents.value.add(studentId)
     hasUnsavedChanges.value = true
   }
@@ -187,9 +195,9 @@ export function useCriteriaGradingEntryView() {
     let value: number | undefined
     if (typeof rawValue === 'number') {
       value = rawValue
-    } else if (typeof rawValue === 'string') {
+    } else if (typeof rawValue === 'string' && rawValue.trim() !== '') {
       const parsed = Number(rawValue)
-      value = Number.isNaN(parsed) ? undefined : parsed
+      value = Number.isFinite(parsed) ? parsed : undefined
     } else if (rawValue && typeof rawValue === 'object' && 'target' in rawValue) {
       const eventTarget = (rawValue as { target: HTMLInputElement | null }).target
       if (eventTarget?.value) {
