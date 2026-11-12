@@ -13,6 +13,10 @@ export interface SportExamStudentEntry {
   state: SportExamStudentState;
   rawValue?: string;
   value?: number;
+  criterionScores?: Record<string, number>;
+  criteriaTotalPoints?: number;
+  criteriaMaxPoints?: number;
+  criteriaPercentage?: number;
   calculatedGrade?: string | number;
   comment?: string;
   bodyHeightCm?: number;
@@ -24,12 +28,13 @@ export interface SaveSportExamSessionInput {
   lessonId?: string;
   categoryId: string;
   tableId?: string;
+  assessmentType?: 'performance' | 'criteria';
   examDate: string;
   announced: boolean;
   sport?: string;
   discipline?: string;
-  measurementType: 'number' | 'time';
-  normalization: Sport.PerformanceNormalization;
+  measurementType?: 'number' | 'time';
+  normalization?: Sport.PerformanceNormalization;
   unit?: string;
   entries: SportExamStudentEntry[];
 }
@@ -37,12 +42,13 @@ export interface SaveSportExamSessionInput {
 export interface SportExamSessionMetadata {
   categoryId: string;
   tableId?: string;
+  assessmentType: 'performance' | 'criteria';
   examDate: string;
   announced: boolean;
   sport?: string;
   discipline?: string;
-  measurementType: 'number' | 'time';
-  normalization: Sport.PerformanceNormalization;
+  measurementType?: 'number' | 'time';
+  normalization?: Sport.PerformanceNormalization;
   unit?: string;
   studentStates: Array<{
     studentId: string;
@@ -70,6 +76,7 @@ export class SaveSportExamSessionUseCase {
       throw new Error('entries must not be empty');
     }
 
+    const assessmentType = input.assessmentType ?? 'performance';
     const studentIds = new Set<string>();
     for (const entry of input.entries) {
       if (!entry.studentId) throw new Error('studentId is required');
@@ -79,9 +86,14 @@ export class SaveSportExamSessionUseCase {
       studentIds.add(entry.studentId);
 
       if (entry.state === 'ready') {
-        if (!Number.isFinite(entry.value) || entry.value! < 0) {
-          throw new Error(`Performance value missing for student: ${entry.studentId}`);
+        if (assessmentType === 'performance') {
+          if (!Number.isFinite(entry.value) || entry.value! < 0) {
+            throw new Error(`Performance value missing for student: ${entry.studentId}`);
+          }
+        } else if (!entry.criterionScores || Object.keys(entry.criterionScores).length === 0) {
+          throw new Error(`Criterion scores missing for student: ${entry.studentId}`);
         }
+
         if (entry.calculatedGrade === undefined) {
           throw new Error(`Calculated grade missing for student: ${entry.studentId}`);
         }
@@ -97,6 +109,7 @@ export class SaveSportExamSessionUseCase {
       sessionMetadata: {
         categoryId: input.categoryId,
         tableId: input.tableId,
+        assessmentType,
         examDate: input.examDate,
         announced: input.announced,
         sport: input.sport,
@@ -127,15 +140,22 @@ export class SaveSportExamSessionUseCase {
           categoryId: input.categoryId,
           measurements: missingKit
             ? { state: 'missing-kit' }
-            : {
-                value: entry.value,
-                rawValue: entry.rawValue,
-                measurementType: input.measurementType,
-                normalization: input.normalization,
-                bodyHeightCm: entry.bodyHeightCm,
-                unit: input.unit,
-                tableId: input.tableId
-              },
+            : assessmentType === 'criteria'
+              ? {
+                  criteria: entry.criterionScores,
+                  totalPoints: entry.criteriaTotalPoints,
+                  maxPoints: entry.criteriaMaxPoints,
+                  percentage: entry.criteriaPercentage
+                }
+              : {
+                  value: entry.value,
+                  rawValue: entry.rawValue,
+                  measurementType: input.measurementType,
+                  normalization: input.normalization,
+                  bodyHeightCm: entry.bodyHeightCm,
+                  unit: input.unit,
+                  tableId: input.tableId
+                },
           calculatedGrade: missingKit ? 6 : entry.calculatedGrade,
           timestamp: now,
           comment: entry.comment,
