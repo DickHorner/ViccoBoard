@@ -43,9 +43,17 @@
 
       <div v-if="selectedCategory" class="exam-meta">
         <strong>{{ categoryLabel(selectedCategory) }}</strong>
-        <span v-if="selectedConfig?.measurementLabel">{{ selectedConfig.measurementLabel }}</span>
-        <span v-if="selectedConfig?.unit">· {{ selectedConfig.unit }}</span>
-        <span v-if="selectedConfig?.normalization === 'body-height-percent'">· relativ zur Körpergröße</span>
+        <template v-if="isCriteriaAssessment">
+          <span>· {{ criteriaConfig?.criteria.length ?? 0 }} Beobachtungskriterien</span>
+          <button class="btn-link" type="button" @click="router.push(`/grading/criteria/${selectedCategory.id}`)">
+            Kriterien bearbeiten
+          </button>
+        </template>
+        <template v-else>
+          <span v-if="selectedConfig?.measurementLabel">{{ selectedConfig.measurementLabel }}</span>
+          <span v-if="selectedConfig?.unit">· {{ selectedConfig.unit }}</span>
+          <span v-if="selectedConfig?.normalization === 'body-height-percent'">· relativ zur Körpergröße</span>
+        </template>
       </div>
 
       <p v-if="contextWarning" class="warning">{{ contextWarning }}</p>
@@ -68,9 +76,18 @@
             <tr>
               <th>Schüler</th>
               <th>Status</th>
-              <th v-if="isRelative">Körpergröße</th>
-              <th>{{ selectedConfig?.measurementLabel || 'Messwert' }}</th>
-              <th v-if="isRelative">Relativwert</th>
+              <template v-if="isCriteriaAssessment">
+                <th v-for="criterion in criteriaConfig?.criteria ?? []" :key="criterion.id">
+                  {{ criterion.name }}<br>
+                  <span class="criterion-range">{{ criterion.minValue }}–{{ criterion.maxValue }}</span>
+                </th>
+                <th>Gesamt</th>
+              </template>
+              <template v-else>
+                <th v-if="isRelative">Körpergröße</th>
+                <th>{{ selectedConfig?.measurementLabel || 'Messwert' }}</th>
+                <th v-if="isRelative">Relativwert</th>
+              </template>
               <th>Note</th>
               <th>Hinweis</th>
             </tr>
@@ -94,33 +111,51 @@
                   <option value="missing-kit">Sportsachen vergessen</option>
                 </select>
               </td>
-              <td v-if="isRelative">
-                <input
-                  class="value-input"
-                  type="number"
-                  inputmode="decimal"
-                  min="1"
-                  max="260"
-                  :value="bodyHeights.get(student.id) || ''"
-                  :disabled="states.get(student.id) !== 'ready'"
-                  @input="setBodyHeight(student, ($event.target as HTMLInputElement).value)"
-                  @blur="saveBodyHeight(student)"
-                />
-                cm
-              </td>
-              <td>
-                <input
-                  class="value-input"
-                  type="text"
-                  inputmode="decimal"
-                  :placeholder="selectedConfig?.measurementType === 'time' ? '12,84' : '0'"
-                  :value="values.get(student.id) || ''"
-                  :disabled="states.get(student.id) !== 'ready'"
-                  @input="setValue(student, ($event.target as HTMLInputElement).value)"
-                />
-                <span v-if="selectedConfig?.unit" class="unit">{{ selectedConfig.unit }}</span>
-              </td>
-              <td v-if="isRelative">{{ normalizedDisplay(student) }}</td>
+              <template v-if="isCriteriaAssessment">
+                <td v-for="criterion in criteriaConfig?.criteria ?? []" :key="criterion.id" class="criterion-score-cell">
+                  <input
+                    class="criterion-input"
+                    type="number"
+                    inputmode="decimal"
+                    :min="criterion.minValue"
+                    :max="criterion.maxValue"
+                    step="0.5"
+                    :value="criterionScore(student.id, criterion.id)"
+                    :disabled="states.get(student.id) !== 'ready'"
+                    @input="setCriterionScore(student, criterion, ($event.target as HTMLInputElement).value)"
+                  />
+                </td>
+                <td class="total-cell">{{ criteriaTotalDisplay(student) }}</td>
+              </template>
+              <template v-else>
+                <td v-if="isRelative">
+                  <input
+                    class="value-input"
+                    type="number"
+                    inputmode="decimal"
+                    min="1"
+                    max="260"
+                    :value="bodyHeights.get(student.id) || ''"
+                    :disabled="states.get(student.id) !== 'ready'"
+                    @input="setBodyHeight(student, ($event.target as HTMLInputElement).value)"
+                    @blur="saveBodyHeight(student)"
+                  />
+                  cm
+                </td>
+                <td>
+                  <input
+                    class="value-input"
+                    type="text"
+                    inputmode="decimal"
+                    :placeholder="selectedConfig?.measurementType === 'time' ? '12,84' : '0'"
+                    :value="values.get(student.id) || ''"
+                    :disabled="states.get(student.id) !== 'ready'"
+                    @input="setValue(student, ($event.target as HTMLInputElement).value)"
+                  />
+                  <span v-if="selectedConfig?.unit" class="unit">{{ selectedConfig.unit }}</span>
+                </td>
+                <td v-if="isRelative">{{ normalizedDisplay(student) }}</td>
+              </template>
               <td class="grade-cell">
                 <strong v-if="states.get(student.id) === 'missing-kit'">6</strong>
                 <strong v-else-if="grades.has(student.id)">{{ formatGrade(grades.get(student.id)) }}</strong>
@@ -190,6 +225,7 @@ const states = ref<Map<string, SportExamStudentState>>(new Map())
 const attendanceSources = ref<Map<string, 'lesson' | 'calendar'>>(new Map())
 const attendanceLabels = ref<Map<string, string>>(new Map())
 const values = ref<Map<string, string>>(new Map())
+const criterionScores = ref<Map<string, Map<string, number>>>(new Map())
 const grades = ref<Map<string, string | number>>(new Map())
 const bodyHeights = ref<Map<string, number>>(new Map())
 const sportProfiles = ref<Map<string, SportStudentProfile>>(new Map())
@@ -203,12 +239,21 @@ const selectedConfig = computed(() =>
     : null
 )
 
+const criteriaConfig = computed(() =>
+  selectedCategory.value?.configuration.type === 'criteria'
+    ? selectedCategory.value.configuration
+    : null
+)
+
+const isCriteriaAssessment = computed(() => criteriaConfig.value !== null)
+
 const isRelative = computed(() =>
   selectedConfig.value?.normalization === 'body-height-percent'
 )
 
 const canSave = computed(() => {
-  if (!selectedCategory.value || !selectedTable.value) return false
+  if (!selectedCategory.value) return false
+  if (!isCriteriaAssessment.value && !selectedTable.value) return false
   return students.value.some((student) => {
     const state = states.value.get(student.id)
     if (state === 'missing-kit') return true
@@ -232,7 +277,7 @@ async function loadClassContext(): Promise<void> {
   if (!selectedClassId.value) return
 
   categories.value = (await sportBridge.gradeCategoryRepository.findByClassGroup(selectedClassId.value))
-    .filter((category) => category.type === 'performance')
+    .filter((category) => category.type === 'performance' || category.type === 'criteria')
 
   await loadRoster()
 }
@@ -244,6 +289,14 @@ async function loadCategory(): Promise<void> {
 
   selectedTable.value = null
   contextWarning.value = ''
+
+  if (isCriteriaAssessment.value) {
+    if ((criteriaConfig.value?.criteria.length ?? 0) === 0) {
+      contextWarning.value = 'Für diese Bewertung sind noch keine Beobachtungskriterien definiert.'
+    }
+    recalculateAll()
+    return
+  }
 
   const config = selectedConfig.value
   if (!config) return
@@ -267,6 +320,7 @@ async function loadRoster(): Promise<void> {
   attendanceSources.value = new Map()
   attendanceLabels.value = new Map()
   values.value = new Map()
+  criterionScores.value = new Map()
   grades.value = new Map()
   bodyHeights.value = new Map()
   sportProfiles.value = new Map()
