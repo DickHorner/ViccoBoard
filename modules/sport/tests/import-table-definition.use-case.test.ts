@@ -48,8 +48,8 @@ describe('ImportTableDefinitionUseCase', () => {
       expect(result.success).toBe(true);
       expect(result.definition?.entries).toHaveLength(6);
       expect(result.definition?.entries[0]).toEqual({
-        key: { min_meters: '3200', max_meters: '9999' },
-        value: '1'
+        key: { min_meters: 3200, max_meters: 9999 },
+        value: 1
       });
     });
 

@@ -27,6 +27,18 @@ export interface CriteriaGradingResult extends Grade {
   totalWeightedScore: number;
 }
 
+export interface CriteriaGradeThreshold {
+  minPercentage: number;
+  grade: string;
+}
+
+export interface CriteriaValueGradingResult {
+  totalPoints: number;
+  maxPoints: number;
+  percentage: number;
+  grade: string;
+}
+
 export interface CriteriaBreakdown {
   criterionId: string;
   criterionName: string;
@@ -37,7 +49,7 @@ export interface CriteriaBreakdown {
 }
 
 export class CriteriaGradingEngine {
-  private static readonly MAX_CRITERIA = 8;
+  private static readonly MAX_CRITERIA = 50;
   private static readonly MIN_SCORE = 0;
   private static readonly MAX_SCORE = 100;
 
@@ -154,13 +166,83 @@ export class CriteriaGradingEngine {
    * - Grade 5: 30% ≤ score < 50%
    * - Grade 6: 0% ≤ score < 30%
    */
-  private convertToGradeDisplay(percentage: number): string {
+  private convertToGradeDisplay(
+    percentage: number,
+    gradingScale?: CriteriaGradeThreshold[]
+  ): string {
+    if (gradingScale && gradingScale.length > 0) {
+      const ordered = [...gradingScale].sort((left, right) => right.minPercentage - left.minPercentage);
+      for (const threshold of ordered) {
+        if (percentage >= threshold.minPercentage) return threshold.grade;
+      }
+      return ordered[ordered.length - 1]?.grade ?? '6';
+    }
+
     if (percentage >= 92) return '1';
     if (percentage >= 81) return '2';
     if (percentage >= 67) return '3';
     if (percentage >= 50) return '4';
     if (percentage >= 30) return '5';
     return '6';
+  }
+
+  /**
+   * Calculate a grade from raw criterion values such as 0-3 points.
+   * Criterion weights are treated as relative weights.
+   */
+  calculateGradeFromValues(
+    input: CriteriaGradingInput,
+    gradingScale?: CriteriaGradeThreshold[]
+  ): CriteriaValueGradingResult {
+    if (!input.criteria || input.criteria.length === 0) {
+      throw new Error('At least one criterion is required');
+    }
+    if (input.criteria.length > CriteriaGradingEngine.MAX_CRITERIA) {
+      throw new Error(`Maximum ${CriteriaGradingEngine.MAX_CRITERIA} criteria allowed`);
+    }
+    if (!input.scores || input.scores.length === 0) {
+      throw new Error('At least one score is required');
+    }
+
+    const scoreMap = new Map(input.scores.map(score => [score.criterionId, score.value]));
+    const totalWeight = input.criteria.reduce((sum, criterion) => sum + criterion.weight, 0);
+    if (totalWeight <= 0) {
+      throw new Error('Total weight must be greater than zero');
+    }
+
+    let totalPoints = 0;
+    let maxPoints = 0;
+    let weightedPoints = 0;
+    let weightedMax = 0;
+
+    for (const criterion of input.criteria) {
+      const score = scoreMap.get(criterion.id);
+      if (score === undefined) {
+        throw new Error(`Missing score for criterion: ${criterion.name || criterion.id}`);
+      }
+      if (score < criterion.minValue || score > criterion.maxValue) {
+        throw new Error(
+          `Score for ${criterion.name || criterion.id} must be between ${criterion.minValue} and ${criterion.maxValue}`
+        );
+      }
+
+      totalPoints += score;
+      maxPoints += criterion.maxValue;
+      weightedPoints += score * criterion.weight;
+      weightedMax += criterion.maxValue * criterion.weight;
+    }
+
+    if (weightedMax <= 0) {
+      throw new Error('Maximum weighted score must be greater than zero');
+    }
+
+    const percentage = Math.round((weightedPoints / weightedMax) * 10000) / 100;
+    return {
+      totalPoints: Math.round(totalPoints * 100) / 100,
+      maxPoints: Math.round(maxPoints * 100) / 100,
+      percentage,
+      grade: this.convertToGradeDisplay(percentage, gradingScale)
+    };
   }
 
   /**

@@ -179,6 +179,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Stundenarbeitsbereich', parent: '/lessons' }
   },
   {
+    path: '/subjects/sport/exam',
+    name: 'sport-exam',
+    component: () => import('../views/SportExam.vue'),
+    meta: { title: 'Sportprüfung', parent: '/subjects/sport' }
+  },
+  {
     path: '/grading',
     name: 'grading-overview',
     component: () => import('../views/GradingOverview.vue'),
@@ -195,6 +201,12 @@ const routes: RouteRecordRaw[] = [
     name: 'time-grading',
     component: () => import('../views/TimeGradingEntry.vue'),
     meta: { title: 'Zeitbewertung', parent: '/grading' }
+  },
+  {
+    path: '/grading/performance/:id',
+    name: 'performance-grading',
+    component: () => import('../views/PerformanceGradingEntry.vue'),
+    meta: { title: 'Messwertbewertung', parent: '/grading' }
   },
   {
     path: '/grading/cooper/:id',

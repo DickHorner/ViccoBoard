@@ -54,6 +54,12 @@ const sportabzeichenStandardCount = ref(0)
 
 const entries = [
   {
+    to: '/subjects/sport/exam',
+    eyebrow: 'Prüfung',
+    title: 'Sportprüfung',
+    description: 'Klasse und Disziplin wählen, Abwesenheiten abgleichen, Messwerte erfassen und Noten live berechnen.'
+  },
+  {
     to: '/grading',
     eyebrow: 'Bewertung',
     title: 'Bewertung & Tests',

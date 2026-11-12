@@ -113,6 +113,50 @@
             <input id="modal-description" v-model="form.description" type="text" maxlength="200" class="form-input" placeholder="Optionale Beschreibung" />
           </div>
 
+          <template v-if="!editingTable">
+            <div class="form-group">
+              <label for="modal-measurement-type">Schnelltabelle</label>
+              <select id="modal-measurement-type" v-model="form.measurementType" class="form-select">
+                <option value="number">Zahl – höher ist besser</option>
+                <option value="time">Zeit – niedriger ist besser</option>
+              </select>
+              <p class="form-hint">
+                Optional: Grenzwerte direkt eingeben. Bei Zahlen gilt „ab Grenzwert“, bei Zeiten „bis Grenzwert“.
+              </p>
+            </div>
+
+            <div class="quick-rows" aria-label="Grenzwerte">
+              <div v-for="(row, index) in form.quickRows" :key="index" class="quick-row">
+                <label :for="`threshold-${index}`">
+                  {{ form.measurementType === 'time' ? 'Bis' : 'Ab' }}
+                </label>
+                <input
+                  :id="`threshold-${index}`"
+                  v-model="row.threshold"
+                  type="text"
+                  inputmode="decimal"
+                  class="form-input"
+                  :placeholder="form.measurementType === 'time' ? '12,50' : '15'"
+                />
+                <label :for="`grade-${index}`">Note</label>
+                <input
+                  :id="`grade-${index}`"
+                  v-model="row.grade"
+                  type="text"
+                  inputmode="decimal"
+                  class="form-input"
+                  placeholder="1"
+                />
+                <button type="button" class="btn-text btn-small" @click="removeQuickRow(index)">
+                  Entfernen
+                </button>
+              </div>
+              <button type="button" class="btn-secondary btn-small" @click="addQuickRow">
+                + Grenzwert
+              </button>
+            </div>
+          </template>
+
           <div v-if="modalError" class="error-banner" role="alert">{{ modalError }}</div>
 
           <div class="modal-footer">
@@ -148,6 +192,7 @@
 import { useTableManagementView } from '../composables/useTableManagementView'
 
 const {
+  addQuickRow,
   closeModal,
   confirmDelete,
   deleteTarget,
@@ -165,6 +210,7 @@ const {
   openCreateModal,
   openEditModal,
   previewId,
+  removeQuickRow,
   saveModal,
   saving,
   showModal,

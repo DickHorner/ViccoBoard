@@ -19,8 +19,8 @@ describe('TableImportService', () => {
       expect(result.definition!.source).toBe('imported');
       expect(result.definition!.active).toBe(true);
       expect(result.definition!.entries).toHaveLength(2);
-      expect(result.definition!.entries[0].key).toEqual({ min_meters: '3200' });
-      expect(result.definition!.entries[0].value).toBe('1');
+      expect(result.definition!.entries[0].key).toEqual({ min_meters: 3200 });
+      expect(result.definition!.entries[0].value).toBe(1);
     });
 
     test('parses a multi-key CSV', () => {
@@ -30,8 +30,8 @@ describe('TableImportService', () => {
       expect(result.valid).toBe(true);
       expect(result.definition!.entries).toHaveLength(2);
       expect(result.definition!.entries[1].key).toEqual({
-        min_meters: '2800',
-        max_meters: '3199'
+        min_meters: 2800,
+        max_meters: 3199
       });
       expect(result.definition!.dimensions).toHaveLength(2);
     });
@@ -65,7 +65,7 @@ describe('TableImportService', () => {
       const result = service.parseCsv('Quoted Table', csv);
 
       expect(result.valid).toBe(true);
-      expect(result.definition!.entries[0].key).toEqual({ 'key col': '3200' });
+      expect(result.definition!.entries[0].key).toEqual({ 'key col': 3200 });
     });
 
     test('omits description when not provided', () => {
@@ -88,9 +88,35 @@ describe('TableImportService', () => {
       const result = service.parseCsv('Age Table', csv);
 
       expect(result.valid).toBe(true);
-      const ageDim = result.definition!.dimensions.find((d) => d.name === 'custom');
+      const ageDim = result.definition!.dimensions.find((d) => d.name === 'age');
       expect(ageDim).toBeDefined();
       expect(ageDim!.values.sort()).toEqual(['10', '12']);
+    });
+
+    test('parses semicolon-separated multidimensional master tables with optional range cells', () => {
+      const csv = [
+        'sport;discipline;gradeLevel;gender;normalization;minValue;maxValue;value',
+        'Leichtathletik;Weitsprung;9;m;raw;5;;1',
+        'Leichtathletik;Weitsprung;9;m;raw;4;4,99;2',
+        'Leichtathletik;Hochsprung;9;f;body-height-percent;85;;1'
+      ].join('\n');
+
+      const result = service.parseCsv('Leichtathletik Master', csv);
+
+      expect(result.valid).toBe(true);
+      expect(result.definition!.entries[0]).toEqual({
+        key: {
+          sport: 'Leichtathletik',
+          discipline: 'Weitsprung',
+          gradeLevel: 9,
+          gender: 'm',
+          normalization: 'raw',
+          minValue: 5
+        },
+        value: 1
+      });
+      expect(result.definition!.dimensions.map((dimension) => dimension.name)).toContain('discipline');
+      expect(result.definition!.dimensions.map((dimension) => dimension.name)).toContain('gradeLevel');
     });
   });
 

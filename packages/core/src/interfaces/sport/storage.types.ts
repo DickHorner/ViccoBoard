@@ -43,7 +43,7 @@ export interface TableDefinition {
 }
 
 export interface TableDimension {
-  name: 'age' | 'gender' | 'Sport' | 'discipline' | 'custom';
+  name: string;
   values: string[];
 }
 
