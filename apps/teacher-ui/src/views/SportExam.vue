@@ -428,6 +428,55 @@ function setValue(student: Student, rawValue: string): void {
   recalculate(student)
 }
 
+function criterionScore(studentId: string, criterionId: string): number | '' {
+  return criterionScores.value.get(studentId)?.get(criterionId) ?? ''
+}
+
+function setCriterionScore(student: Student, criterion: Sport.Criterion, rawValue: string): void {
+  let scores = criterionScores.value.get(student.id)
+  if (!scores) {
+    scores = new Map<string, number>()
+    criterionScores.value.set(student.id, scores)
+  }
+
+  if (rawValue === '') {
+    scores.delete(criterion.id)
+  } else {
+    const value = Number(rawValue)
+    if (Number.isFinite(value) && value >= criterion.minValue && value <= criterion.maxValue) {
+      scores.set(criterion.id, value)
+    } else {
+      scores.delete(criterion.id)
+    }
+  }
+
+  recalculate(student)
+}
+
+function criteriaResult(student: Student) {
+  const config = criteriaConfig.value
+  const scores = criterionScores.value.get(student.id)
+  if (!config || !scores || config.criteria.length === 0) return null
+  if (config.criteria.some((criterion) => !scores.has(criterion.id))) return null
+
+  try {
+    return sportBridge.criteriaGradingEngine.calculateGradeFromValues({
+      criteria: config.criteria,
+      scores: config.criteria.map((criterion) => ({
+        criterionId: criterion.id,
+        value: scores.get(criterion.id)!
+      }))
+    })
+  } catch {
+    return null
+  }
+}
+
+function criteriaTotalDisplay(student: Student): string {
+  const result = criteriaResult(student)
+  return result ? `${formatNumber(result.totalPoints)} / ${formatNumber(result.maxPoints)}` : '—'
+}
+
 function parseMeasurement(raw: string): number | null {
   const normalized = raw.trim().replace(',', '.')
   if (!normalized) return null
@@ -481,7 +530,19 @@ function buildContext(student: Student): Record<string, unknown> {
 }
 
 function recalculate(student: Student): void {
-  if (states.value.get(student.id) !== 'ready' || !selectedTable.value || !selectedConfig.value) {
+  if (states.value.get(student.id) !== 'ready') {
+    grades.value.delete(student.id)
+    return
+  }
+
+  if (isCriteriaAssessment.value) {
+    const result = criteriaResult(student)
+    if (result) grades.value.set(student.id, result.grade)
+    else grades.value.delete(student.id)
+    return
+  }
+
+  if (!selectedTable.value || !selectedConfig.value) {
     grades.value.delete(student.id)
     return
   }
@@ -550,29 +611,46 @@ function rowClass(studentId: string): Record<string, boolean> {
 }
 
 async function saveExam(): Promise<void> {
-  if (!selectedCategory.value || !selectedConfig.value || !selectedTable.value) return
+  if (!selectedCategory.value) return
+  if (!isCriteriaAssessment.value && (!selectedConfig.value || !selectedTable.value)) return
 
   const entries = students.value.map((student) => {
     const state = states.value.get(student.id) ?? 'ready'
     const rawValue = values.value.get(student.id)
-    const value = state === 'ready' ? gradingValue(student) ?? undefined : undefined
+    const value = !isCriteriaAssessment.value && state === 'ready'
+      ? gradingValue(student) ?? undefined
+      : undefined
+    const criteria = state === 'ready' ? criteriaResult(student) : null
+    const scores = criterionScores.value.get(student.id)
+
     return {
       studentId: student.id,
       state,
       rawValue,
       value,
+      criterionScores: isCriteriaAssessment.value && scores ? Object.fromEntries(scores) : undefined,
+      criteriaTotalPoints: criteria?.totalPoints,
+      criteriaMaxPoints: criteria?.maxPoints,
+      criteriaPercentage: criteria?.percentage,
       calculatedGrade: state === 'ready' ? grades.value.get(student.id) : undefined,
       bodyHeightCm: isRelative.value ? bodyHeights.value.get(student.id) : undefined,
       attendanceSource: attendanceSources.value.get(student.id)
     }
   })
 
-  const invalidReady = entries.find(
-    (entry) => entry.state === 'ready' && (entry.value === undefined || entry.calculatedGrade === undefined)
-  )
+  const invalidReady = entries.find((entry) => {
+    if (entry.state !== 'ready' || entry.calculatedGrade === undefined) return entry.state === 'ready'
+    return isCriteriaAssessment.value
+      ? !entry.criterionScores
+      : entry.value === undefined
+  })
   if (invalidReady) {
     const student = students.value.find((candidate) => candidate.id === invalidReady.studentId)
-    toast.error(`Für ${student?.firstName ?? 'einen Schüler'} fehlt ein gültiger Messwert oder Tabellenwert.`)
+    toast.error(
+      isCriteriaAssessment.value
+        ? `Für ${student?.firstName ?? 'einen Schüler'} sind noch nicht alle Kriterien bewertet.`
+        : `Für ${student?.firstName ?? 'einen Schüler'} fehlt ein gültiger Messwert oder Tabellenwert.`
+    )
     return
   }
 
@@ -581,14 +659,15 @@ async function saveExam(): Promise<void> {
     const session = await sportBridge.saveSportExamSessionUseCase.execute({
       classGroupId: selectedClassId.value,
       categoryId: selectedCategory.value.id,
-      tableId: selectedTable.value.id,
+      tableId: selectedTable.value?.id,
+      assessmentType: isCriteriaAssessment.value ? 'criteria' : 'performance',
       examDate: examDate.value,
       announced: announced.value,
-      sport: selectedConfig.value.sport,
-      discipline: selectedConfig.value.discipline,
-      measurementType: selectedConfig.value.measurementType,
-      normalization: selectedConfig.value.normalization ?? 'raw',
-      unit: selectedConfig.value.unit,
+      sport: selectedConfig.value?.sport,
+      discipline: selectedConfig.value?.discipline,
+      measurementType: selectedConfig.value?.measurementType,
+      normalization: selectedConfig.value?.normalization,
+      unit: selectedConfig.value?.unit,
       entries
     })
     savedSessionId.value = session.id
@@ -605,6 +684,10 @@ function formatGrade(grade: string | number | undefined): string {
   return typeof grade === 'number' && !Number.isInteger(grade)
     ? grade.toFixed(2).replace('.', ',')
     : String(grade)
+}
+
+function formatNumber(value: number): string {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1).replace('.', ',')
 }
 
 function formatDate(value: string): string {
@@ -629,7 +712,7 @@ function localDateString(date: Date): string {
 .card { background: white; border: 1px solid rgba(15,23,42,.08); border-radius: 16px; padding: 1rem; }
 .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; align-items: end; }
 .setup-grid label { display: flex; flex-direction: column; gap: .35rem; font-weight: 600; }
-.form-input, .status-select, .value-input { min-height: 44px; border: 1px solid #cbd5e1; border-radius: 8px; padding: .5rem .65rem; background: white; }
+.form-input, .status-select, .value-input, .criterion-input { min-height: 44px; border: 1px solid #cbd5e1; border-radius: 8px; padding: .5rem .65rem; background: white; }
 .announced-toggle { flex-direction: row !important; align-items: center; min-height: 44px; }
 .exam-meta { margin-top: 1rem; display: flex; gap: .5rem; flex-wrap: wrap; }
 .warning { color: #92400e; background: #fffbeb; padding: .75rem; border-radius: 8px; }
@@ -641,6 +724,10 @@ function localDateString(date: Date): string {
 .exam-table th, .exam-table td { padding: .65rem; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
 .student-name { font-weight: 600; white-space: nowrap; }
 .value-input { width: 100px; }
+.criterion-input { width: 72px; }
+.criterion-score-cell, .total-cell { text-align: center !important; }
+.criterion-range { color: #64748b; font-size: .75rem; font-weight: 400; }
+.btn-link { border: 0; background: none; color: #0066cc; cursor: pointer; padding: 0; }
 .unit { margin-left: .35rem; color: #64748b; }
 .grade-cell { text-align: center !important; }
 .note-cell { min-width: 140px; }
