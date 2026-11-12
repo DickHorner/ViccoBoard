@@ -38,6 +38,7 @@ import {
   RecordSportabzeichenResultUseCase,
   RecordTimerResultUseCase,
   SaveCooperSessionUseCase,
+  SaveSportExamSessionUseCase,
   SavePushupSessionUseCase,
   SaveScoreboardSessionUseCase,
   SaveMultistopSessionUseCase,
@@ -122,6 +123,7 @@ interface SportBridge {
   saveTeamAssignmentUseCase: SaveTeamAssignmentUseCase;
   saveScoreboardSessionUseCase: SaveScoreboardSessionUseCase;
   saveCooperSessionUseCase: SaveCooperSessionUseCase;
+  saveSportExamSessionUseCase: SaveSportExamSessionUseCase;
   saveMultistopSessionUseCase: SaveMultistopSessionUseCase;
   saveFinishCameraSessionUseCase: SaveFinishCameraSessionUseCase;
   savePushupSessionUseCase: SavePushupSessionUseCase;
@@ -210,6 +212,10 @@ export function initializeSportBridge(): SportBridge {
     performanceEntryRepository,
     cooperTestConfigRepository
   );
+  const saveSportExamSessionUseCase = new SaveSportExamSessionUseCase(
+    toolSessionRepository,
+    performanceEntryRepository
+  );
   const saveMultistopSessionUseCase = new SaveMultistopSessionUseCase(toolSessionRepository);
   const saveFinishCameraSessionUseCase = new SaveFinishCameraSessionUseCase(toolSessionRepository);
   const savePushupSessionUseCase = new SavePushupSessionUseCase(toolSessionRepository);
@@ -279,6 +285,7 @@ export function initializeSportBridge(): SportBridge {
     saveTeamAssignmentUseCase,
     saveScoreboardSessionUseCase,
     saveCooperSessionUseCase,
+    saveSportExamSessionUseCase,
     saveMultistopSessionUseCase,
     saveFinishCameraSessionUseCase,
     savePushupSessionUseCase,
