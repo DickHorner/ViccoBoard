@@ -61,6 +61,29 @@
           </div>
 
           <div class="form-group">
+            <label for="sport-name">Sportart</label>
+            <input id="sport-name" v-model="sportName" class="time-input" type="text" maxlength="80" placeholder="z. B. Leichtathletik" />
+          </div>
+
+          <div class="form-group">
+            <label for="discipline-name">Disziplin</label>
+            <input id="discipline-name" v-model="disciplineName" class="time-input" type="text" maxlength="80" placeholder="z. B. 100m" />
+          </div>
+
+          <div class="form-group">
+            <label for="grade-level">Klassenstufe</label>
+            <input id="grade-level" v-model.number="gradeLevel" class="time-input" type="number" min="1" max="13" placeholder="z. B. 9" />
+          </div>
+
+          <div class="form-group">
+            <label for="normalization">Wertung</label>
+            <select id="normalization" v-model="normalization" class="form-select" @change="recalculateAll">
+              <option value="raw">Rohwert</option>
+              <option value="body-height-percent">relativ zur Körpergröße (%)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label for="grading-table">Bewertungstabelle</label>
             <select id="grading-table" v-model="selectedTableId" class="form-select" @change="recalculateAll">
               <option value="">Tabelle auswählen...</option>
@@ -107,6 +130,8 @@
               <tr>
                 <th class="student-col">Schüler</th>
                 <th class="time-col">{{ measurementLabel || 'Messwert' }}</th>
+                <th v-if="normalization === 'body-height-percent'" class="seconds-col">Körpergröße (cm)</th>
+                <th v-if="normalization === 'body-height-percent'" class="seconds-col">Relativwert</th>
                 <th v-if="measurementUnit" class="seconds-col">Einheit</th>
                 <th class="grade-col">Note</th>
               </tr>
@@ -127,6 +152,22 @@
                     :disabled="saving"
                     @input="onValueChange(student, ($event.target as HTMLInputElement).value)"
                   />
+                </td>
+                <td v-if="normalization === 'body-height-percent'" class="input-cell">
+                  <input
+                    class="time-input"
+                    :value="bodyHeights.get(student.id) || ''"
+                    type="number"
+                    inputmode="decimal"
+                    min="1"
+                    max="260"
+                    placeholder="cm"
+                    @input="onBodyHeightChange(student, ($event.target as HTMLInputElement).value)"
+                    @blur="saveBodyHeight(student)"
+                  />
+                </td>
+                <td v-if="normalization === 'body-height-percent'" class="seconds-cell">
+                  {{ formatNormalizedValue(student) }}
                 </td>
                 <td v-if="measurementUnit" class="seconds-cell">{{ measurementUnit }}</td>
                 <td class="grade-cell">
@@ -184,6 +225,12 @@ const selectedTableId = ref('')
 const measurementType = ref<'number' | 'time'>('number')
 const measurementLabel = ref('Leistung')
 const measurementUnit = ref('')
+const sportName = ref('')
+const disciplineName = ref('')
+const gradeLevel = ref<number | undefined>(undefined)
+const normalization = ref<Sport.PerformanceNormalization>('raw')
+const bodyHeights = ref<Map<string, number>>(new Map())
+const sportProfiles = ref<Map<string, import('@viccoboard/core').SportStudentProfile>>(new Map())
 const values = ref<Map<string, string>>(new Map())
 const grades = ref<Map<string, string | number>>(new Map())
 const dirtyStudents = ref<Set<string>>(new Set())
@@ -211,15 +258,34 @@ async function loadData(): Promise<void> {
     measurementType.value = config.measurementType
     measurementLabel.value = config.measurementLabel
     measurementUnit.value = config.unit ?? ''
+    sportName.value = config.sport ?? ''
+    disciplineName.value = config.discipline ?? ''
+    normalization.value = config.normalization ?? 'raw'
 
-    const [loadedStudents, loadedTables, entries] = await Promise.all([
+    const [loadedStudents, loadedTables, entries, classGroup] = await Promise.all([
       studentsBridge.studentRepository.findByClassGroup(loadedCategory.classGroupId),
       sportBridge.tableDefinitionRepository.findAll(),
-      sportBridge.performanceEntryRepository.findByCategory(categoryId)
+      sportBridge.performanceEntryRepository.findByCategory(categoryId),
+      sportBridge.classGroupRepository.findById(loadedCategory.classGroupId)
     ])
 
+    gradeLevel.value = config.gradeLevel ?? classGroup?.gradeLevel
     students.value = loadedStudents
     tables.value = loadedTables
+
+    const profiles = await Promise.all(
+      loadedStudents.map((student) => studentsBridge.sportStudentProfileRepository.findByStudentId(student.id))
+    )
+    sportProfiles.value = new Map()
+    bodyHeights.value = new Map()
+    loadedStudents.forEach((student, index) => {
+      const profile = profiles[index]
+      if (!profile) return
+      sportProfiles.value.set(student.id, profile)
+      if (profile.bodyHeightCm !== undefined) {
+        bodyHeights.value.set(student.id, profile.bodyHeightCm)
+      }
+    })
 
     const latestByStudent = new Map<string, Sport.PerformanceEntry>()
     for (const entry of entries) {
@@ -299,12 +365,27 @@ function buildContext(student: Student): Record<string, unknown> {
     gender: student.gender,
     genderLong: student.gender === 'm' ? 'male' : student.gender === 'f' ? 'female' : undefined,
     age: calculateAgeFromDateOfBirth(student.dateOfBirth) ?? undefined,
-    dateOfBirth: student.dateOfBirth
+    dateOfBirth: student.dateOfBirth,
+    gradeLevel: gradeLevel.value,
+    sport: sportName.value.trim() || undefined,
+    discipline: disciplineName.value.trim() || undefined,
+    measurementType: measurementType.value,
+    normalization: normalization.value
   }
 }
 
-function calculateGrade(student: Student, rawValue: string): string | number | undefined {
+function normalizedMeasurement(student: Student, rawValue: string): number | null {
   const value = parseMeasurement(rawValue)
+  if (value === null) return null
+  if (normalization.value === 'raw') return value
+
+  const bodyHeightCm = bodyHeights.value.get(student.id)
+  if (!bodyHeightCm || bodyHeightCm <= 0) return null
+  return (value / bodyHeightCm) * 100
+}
+
+function calculateGrade(student: Student, rawValue: string): string | number | undefined {
+  const value = normalizedMeasurement(student, rawValue)
   const table = tables.value.find(candidate => candidate.id === selectedTableId.value)
 
   if (value === null || !table) return undefined
@@ -366,7 +447,11 @@ async function saveConfiguration(): Promise<void> {
         gradingTable: selectedTableId.value || undefined,
         measurementType: measurementType.value,
         measurementLabel: measurementLabel.value.trim(),
-        unit: measurementUnit.value.trim() || undefined
+        unit: measurementUnit.value.trim() || undefined,
+        sport: sportName.value.trim() || undefined,
+        discipline: disciplineName.value.trim() || undefined,
+        gradeLevel: gradeLevel.value,
+        normalization: normalization.value
       }
     })
 
@@ -399,9 +484,10 @@ async function saveAll(): Promise<void> {
     const rawValue = values.value.get(student.id)?.trim() ?? ''
     if (!rawValue) continue
 
-    const value = parseMeasurement(rawValue)
+    const rawMeasurement = parseMeasurement(rawValue)
+    const value = normalizedMeasurement(student, rawValue)
     const grade = grades.value.get(student.id)
-    if (value === null) {
+    if (rawMeasurement === null || value === null) {
       toast.error(`Ungültiger Messwert bei ${student.firstName} ${student.lastName}.`)
       return
     }
@@ -425,7 +511,12 @@ async function saveAll(): Promise<void> {
           measurements: {
             value,
             rawValue,
+            rawMeasurement,
             measurementType: measurementType.value,
+            normalization: normalization.value,
+            bodyHeightCm: normalization.value === 'body-height-percent'
+              ? bodyHeights.value.get(student.id)
+              : undefined,
             unit: measurementUnit.value.trim() || undefined,
             tableId: selectedTableId.value
           },
@@ -441,6 +532,47 @@ async function saveAll(): Promise<void> {
   } finally {
     saving.value = false
   }
+}
+
+function onBodyHeightChange(student: Student, rawValue: string): void {
+  const value = Number(rawValue)
+  if (Number.isFinite(value) && value > 0) {
+    bodyHeights.value.set(student.id, value)
+  } else {
+    bodyHeights.value.delete(student.id)
+  }
+
+  const rawMeasurement = values.value.get(student.id)
+  if (rawMeasurement) {
+    onValueChange(student, rawMeasurement)
+  }
+}
+
+async function saveBodyHeight(student: Student): Promise<void> {
+  const bodyHeightCm = bodyHeights.value.get(student.id)
+  if (!bodyHeightCm) return
+
+  const existing = sportProfiles.value.get(student.id)
+  try {
+    const saved = existing
+      ? await studentsBridge.sportStudentProfileRepository.update(existing.id, { bodyHeightCm })
+      : await studentsBridge.sportStudentProfileRepository.create({
+          studentId: student.id,
+          moduleKey: 'sport',
+          bodyHeightCm
+        })
+
+    sportProfiles.value.set(student.id, saved)
+  } catch (saveError) {
+    toast.error(saveError instanceof Error ? saveError.message : 'Körpergröße konnte nicht gespeichert werden.')
+  }
+}
+
+function formatNormalizedValue(student: Student): string {
+  const rawValue = values.value.get(student.id)
+  if (!rawValue) return '—'
+  const value = normalizedMeasurement(student, rawValue)
+  return value === null ? '—' : `${value.toFixed(1).replace('.', ',')} %`
 }
 
 function formatGrade(grade: string | number | undefined): string {
