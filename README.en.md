@@ -133,7 +133,7 @@ Help with real classroom testing, anonymized rubrics, issue reports, accessibili
 <!-- Badges -->
 [badge-ci]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/ci.yml?branch=main&label=CI
 [badge-codeql]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/codeql.yml?branch=main&label=CodeQL
-[badge-scorecard]: https://api.securityscorecards.dev/projects/github.com/DickHorner/ViccoBoard/badge
+[badge-scorecard]: https://api.scorecard.dev/projects/github.com/DickHorner/ViccoBoard/badge
 [badge-bestpractices]: https://www.bestpractices.dev/projects/12057/badge
 [badge-license]: https://img.shields.io/github/license/DickHorner/ViccoBoard
 [badge-contributors]: https://img.shields.io/github/contributors/DickHorner/ViccoBoard
