@@ -90,7 +90,8 @@
 
         <div class="card-content">
           <p class="info-note">
-            💡 Änderungen werden automatisch gespeichert. Bewegen Sie sich zwischen Feldern mit Tab.
+            Lehrkraftwerte werden nach Verlassen des Feldes gespeichert.
+            Für die Schüler-Selbsteinschätzung kann der iPad-Übergabemodus genutzt werden.
           </p>
 
           <div class="grading-table-wrapper">
@@ -163,14 +164,18 @@
                     :key="`self-${criterion.id}`"
                     class="self-assessment-cell"
                   >
-                    <select
+                    <input
+                      type="number"
+                      inputmode="decimal"
+                      step="any"
+                      :min="criterion.minValue"
+                      :max="criterion.maxValue"
                       :value="getSelfAssessmentValue(student.id, criterion.id)"
                       :disabled="saving"
-                      @change="onSelfAssessmentChange(student.id, criterion.id, ($event.target as HTMLSelectElement).value)"
-                    >
-                      <option value="">—</option>
-                      <option v-for="value in 6" :key="value" :value="value - 1">{{ value - 1 }}</option>
-                    </select>
+                      class="grade-input"
+                      @input="onSelfAssessmentChange(student.id, criterion.id, ($event.target as HTMLInputElement).value)"
+                      @blur="saveStudentGrade(student.id)"
+                    />
                   </td>
                   <td class="total-cell">
                     <strong>{{ calculateTotal(student.id).toFixed(1) }}</strong>
@@ -179,6 +184,15 @@
                     <span class="calculated-grade">{{ calculateGrade(student.id) }}</span>
                   </td>
                   <td class="actions-cell">
+                    <button
+                      v-if="selfAssessmentEnabled"
+                      type="button"
+                      class="btn-secondary btn-small handoff-button"
+                      :disabled="saving"
+                      @click="prepareHandoff(student.id)"
+                    >
+                      iPad übergeben
+                    </button>
                     <button class="btn-text-small" title="Kommentar hinzufügen" @click="addComment(student.id)">
                       💬
                     </button>
@@ -196,6 +210,45 @@
         </div>
       </section>
     </div>
+
+    <div v-if="handoffCandidateId" class="modal-overlay" @click="handoffCandidateId = null">
+      <div class="modal" @click.stop>
+        <div class="modal-header"><h3>Selbsteinschätzung vorbereiten</h3></div>
+        <div class="modal-content">
+          <p>Lege eine temporäre PIN fest, bevor Du das iPad übergibst. Die Schüleransicht zeigt keine Lehrkraftwerte.</p>
+          <div class="form-group">
+            <label for="handoff-pin">Lehrkraft-PIN (4–6 Ziffern)</label>
+            <input
+              id="handoff-pin"
+              v-model="pinDraft"
+              type="password"
+              inputmode="numeric"
+              pattern="[0-9]{4,6}"
+              maxlength="6"
+              autocomplete="off"
+              @keydown.enter.prevent="startHandoff"
+            />
+            <small>Nur eine Übergabesperre, kein sicherer Zugriffsschutz für die App oder gespeicherte Schülerdaten.</small>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" @click="handoffCandidateId = null">Abbrechen</button>
+            <button type="button" class="btn-primary" @click="startHandoff">Schüleransicht starten</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <CriteriaSelfAssessmentHandoff
+      v-if="handoffStudent && handoffPin"
+      :student-name="`${handoffStudent.firstName} ${handoffStudent.lastName}`"
+      :category-name="category?.name ?? 'Mitarbeit'"
+      :criteria="criteria"
+      :teacher-scores="handoffTeacherScores"
+      :initial-scores="handoffInitialScores"
+      :pin="handoffPin"
+      :save-assessment="saveHandoffAssessment"
+      @close="closeHandoff"
+    />
 
     <div v-if="showAddCriterionModal" class="modal-overlay" @click="showAddCriterionModal = false">
       <div class="modal" @click.stop>
@@ -299,6 +352,7 @@
 
 <script setup lang="ts">
 import { useCriteriaGradingEntryView } from '../composables/useCriteriaGradingEntryView'
+import CriteriaSelfAssessmentHandoff from '../components/CriteriaSelfAssessmentHandoff.vue'
 
 const {
   addComment,
@@ -312,23 +366,33 @@ const {
   error,
   getGradeValue,
   getSelfAssessmentValue,
+  handoffCandidateId,
+  handoffInitialScores,
+  handoffPin,
+  handoffStudent,
+  handoffTeacherScores,
   hasUnsavedChanges,
   hasUnsavedChangesForStudent,
   loading,
   newCriterion,
   onGradeChange,
   onSelfAssessmentChange,
+  pinDraft,
   participationOptions,
+  prepareHandoff,
   participationStatus,
   removeCriterion,
   saveAllGrades,
   saveComment,
+  saveHandoffAssessment,
   saveStudentGrade,
   saving,
   setParticipation,
   setSelfAssessmentEnabled,
   selfAssessmentEnabled,
   showAddCriterionModal,
+  startHandoff,
+  closeHandoff,
   showCommentModal,
   students,
   toggleBulkMode
