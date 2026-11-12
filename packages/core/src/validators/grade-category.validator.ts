@@ -57,8 +57,8 @@ export class GradeCategoryValidator {
     // Type validation
     if (!data.type) {
       errors.push('Type is required');
-    } else if (!['criteria', 'time', 'cooper', 'shuttle', 'mittelstrecke', 'Sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
-      errors.push('Type must be one of: criteria, time, cooper, shuttle, mittelstrecke, Sportabzeichen, bjs, verbal');
+    } else if (!['criteria', 'time', 'performance', 'cooper', 'shuttle', 'mittelstrecke', 'Sportabzeichen', 'bjs', 'verbal'].includes(data.type)) {
+      errors.push('Type must be one of: criteria, time, performance, cooper, shuttle, mittelstrecke, Sportabzeichen, bjs, verbal');
     }
 
     // Weight validation
@@ -107,6 +107,18 @@ export class GradeCategoryValidator {
         }
         if (typeof config.lowerIsBetter !== 'undefined' && typeof config.lowerIsBetter !== 'boolean') {
           errors.push('lowerIsBetter must be a boolean');
+        }
+        break;
+
+      case 'performance':
+        if (config.gradingTable && typeof config.gradingTable !== 'string') {
+          errors.push('Performance grading table must be a string');
+        }
+        if (!['number', 'time'].includes(config.measurementType)) {
+          errors.push('Performance measurement type must be number or time');
+        }
+        if (typeof config.measurementLabel !== 'string' || config.measurementLabel.trim().length === 0) {
+          errors.push('Performance measurement label is required');
         }
         break;
 
