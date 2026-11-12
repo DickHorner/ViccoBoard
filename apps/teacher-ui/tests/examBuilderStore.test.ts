@@ -496,6 +496,26 @@ describe('P5-3: examBuilderStore', () => {
       expect(store.getCriteriaConsistencyWarnings()).toHaveLength(0)
     })
 
+    it('preserves the learner instructions and expectation-horizon criteria on round-trip', () => {
+      const store = useExamBuilderStore()
+      store.title = 'Prüfung mit EWH'
+      store.addTask()
+      store.tasks[0].title = 'Erläuterung'
+      store.tasks[0].description = 'Erläutere das zugrunde liegende Prinzip.'
+      store.addCriterion(store.tasks[0])
+      store.tasks[0].criteria[0].text = 'Das Prinzip wird fachlich korrekt erklärt.'
+      store.tasks[0].criteria[0].points = 2
+
+      const exam = store.buildExam()
+      expect(exam.structure.tasks[0].description).toBe('Erläutere das zugrunde liegende Prinzip.')
+      expect(exam.structure.tasks[0].criteria[0].text).toBe('Das Prinzip wird fachlich korrekt erklärt.')
+
+      store.reset()
+      store.hydrateFromExam(exam)
+      expect(store.tasks[0].description).toBe('Erläutere das zugrunde liegende Prinzip.')
+      expect(store.tasks[0].criteria[0].text).toBe('Das Prinzip wird fachlich korrekt erklärt.')
+    })
+
     it('criteria points are preserved through buildExam and hydrateFromExam round-trip', () => {
       const store = useExamBuilderStore()
       store.title = 'Kriterien Round-Trip'
