@@ -218,7 +218,7 @@ Sicherheitslücken bitte **nicht** als öffentliches Issue melden: [SECURITY.md]
 <!-- Badges -->
 [badge-ci]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/ci.yml?branch=main&label=CI
 [badge-codeql]: https://img.shields.io/github/actions/workflow/status/DickHorner/ViccoBoard/codeql.yml?branch=main&label=CodeQL
-[badge-scorecard]: https://api.securityscorecards.dev/projects/github.com/DickHorner/ViccoBoard/badge
+[badge-scorecard]: https://api.scorecard.dev/projects/github.com/DickHorner/ViccoBoard/badge
 [badge-bestpractices]: https://www.bestpractices.dev/projects/12057/badge
 [badge-license]: https://img.shields.io/github/license/DickHorner/ViccoBoard
 [badge-contributors]: https://img.shields.io/github/contributors/DickHorner/ViccoBoard
@@ -242,5 +242,5 @@ Sicherheitslücken bitte **nicht** als öffentliches Issue melden: [SECURITY.md]
 [pulls]: https://github.com/DickHorner/ViccoBoard/pulls
 [vue]: https://vuejs.org/
 [typescript]: https://www.typescriptlang.org/
-[privacy]: #-%EF%B4%90-privacy--sicherheit
-[ipad]: #-%F0%9F%93%B1-ipad-first-web-first-unterricht-first
+[privacy]: #privacy--sicherheit
+[ipad]: #ipad-first-web-first-unterricht-first
