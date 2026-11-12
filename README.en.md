@@ -9,7 +9,7 @@
 [![License][badge-license]][license] [![Contributors][badge-contributors]][contributors] [![Last commit][badge-last-commit]][commits] [![Issues][badge-issues]][issues] [![Pull requests][badge-prs]][pulls]  
 [![Vue 3][badge-vue]][vue] [![TypeScript][badge-typescript]][typescript] [![Local-first][badge-local]][privacy] [![iPadOS Safari][badge-ipad]][ipad]
 
-[**Explore features**](#features) · [**Get started**](#get-started) · [**Privacy**](#privacy-and-security) · [**Contribute**](#contributing)
+[**Explore features**](#features) · [**Get started**](#get-started) · [**npm scripts**](#npm-scripts) · [**Privacy**](#privacy-and-security) · [**Contribute**](#contributing)
 
 [Deutsch](./README.md) · [English](./README.en.md)
 
