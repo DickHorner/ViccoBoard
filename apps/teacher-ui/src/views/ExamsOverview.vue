@@ -5,10 +5,16 @@
         <h1>Prüfungen</h1>
         <p class="subtitle">Prüfungen für KBR erstellen und verwalten.</p>
       </div>
-      <button class="primary" type="button" @click="createNew">
-        Neue Prüfung
-      </button>
+      <div class="header-actions">
+        <input ref="examImportInput" type="file" accept=".json,application/json" hidden @change="importExamFile" />
+        <button class="ghost" type="button" :disabled="importing" @click="examImportInput?.click()">
+          {{ importing ? 'Import läuft…' : 'Prüfung aus ChatGPT importieren' }}
+        </button>
+        <button class="primary" type="button" @click="createNew">Neue Prüfung</button>
+      </div>
     </header>
+
+    <p v-if="importError" class="state-card import-error" role="alert">{{ importError }}</p>
 
     <div v-if="loading" class="state-card">Prüfungen werden geladen…</div>
 
@@ -81,6 +87,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
+import { parseExamDefinition } from '@viccoboard/exams'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { formatGermanDate } from '../utils/locale-format'
 
@@ -88,6 +95,9 @@ const router = useRouter()
 const { examRepository } = useExamsBridge()
 const exams = ref<ExamsTypes.Exam[]>([])
 const loading = ref(true)
+const importing = ref(false)
+const importError = ref('')
+const examImportInput = ref<HTMLInputElement | null>(null)
 
 const isTemplateExam = (exam: ExamsTypes.Exam) => {
   return exam.kind === 'template' || (
@@ -134,6 +144,27 @@ const loadExams = async () => {
   const result = await examRepository?.findAll() ?? []
   exams.value = result
   loading.value = false
+}
+
+const importExamFile = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  importError.value = ''
+  importing.value = true
+  try {
+    if (!examRepository) throw new Error('Prüfungsspeicher nicht verfügbar.')
+    if (file.size > 1024 * 1024) throw new Error('Importdatei überschreitet 1 MiB.')
+    const exam = parseExamDefinition(JSON.parse(await file.text()))
+    const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...payload } = exam
+    const created = await examRepository.create(payload)
+    router.push(`/exams/${created.id}`)
+  } catch (error) {
+    importError.value = error instanceof Error ? error.message : 'Prüfung konnte nicht importiert werden.'
+  } finally {
+    importing.value = false
+  }
 }
 
 const createNew = () => {
@@ -213,6 +244,17 @@ onMounted(() => {
   justify-content: space-between;
   gap: 2rem;
   flex-wrap: wrap;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.import-error {
+  color: #991b1b;
 }
 
 .subtitle {

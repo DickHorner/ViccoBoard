@@ -70,6 +70,7 @@ export {
 
 // Use cases
 export * from './use-cases/create-exam.use-case.js';
+export * from './use-cases/import-exam-definition.use-case.js';
 export * from './use-cases/record-correction.use-case.js';
 export * from './use-cases/calculate-grade.use-case.js';
 export * from './use-cases/get-correction-sheet-preset.use-case.js';

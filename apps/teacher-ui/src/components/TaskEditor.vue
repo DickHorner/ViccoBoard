@@ -58,6 +58,16 @@
       />
     </div>
 
+    <div class="field">
+      <label :for="`task-description-${task.id}`">Aufgabenstellung</label>
+      <textarea
+        :id="`task-description-${task.id}`"
+        v-model="task.description"
+        rows="3"
+        placeholder="Arbeitsauftrag für die Lernenden"
+      ></textarea>
+    </div>
+
     <div class="task-library-fields">
       <label class="choice-toggle">
         <input v-model="task.reusable" type="checkbox" />
