@@ -130,6 +130,43 @@ describe('SaveSportExamSessionUseCase', () => {
     expect(entries[0].metadata?.sessionId).toBe(session.id);
   });
 
+  test('persists criteria scores and summary for a criteria-based sport exam', async () => {
+    const session = await useCase.execute({
+      classGroupId,
+      categoryId,
+      assessmentType: 'criteria',
+      examDate: '2026-11-12',
+      announced: true,
+      entries: [
+        {
+          studentId: student1Id,
+          state: 'ready',
+          criterionScores: {
+            anticipation: 3,
+            passing: 2,
+            communication: 3
+          },
+          criteriaTotalPoints: 8,
+          criteriaMaxPoints: 9,
+          criteriaPercentage: 88.89,
+          calculatedGrade: 2
+        }
+      ]
+    });
+
+    const entries = await performanceRepository.findByCategory(categoryId);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].measurements.criteria).toEqual({
+      anticipation: 3,
+      passing: 2,
+      communication: 3
+    });
+    expect(entries[0].measurements.totalPoints).toBe(8);
+    expect(entries[0].measurements.maxPoints).toBe(9);
+    expect(Number(entries[0].calculatedGrade)).toBe(2);
+    expect((session.sessionMetadata as Record<string, unknown>).assessmentType).toBe('criteria');
+  });
+
   test('stores missing sports kit as grade 6 without a fabricated measurement', async () => {
     await useCase.execute({
       classGroupId,
