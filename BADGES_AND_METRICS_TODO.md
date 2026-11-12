@@ -56,24 +56,31 @@ This file tracks useful badges/metrics that were **not** auto-added because they
   - Enable dependency scanning.
   - Add Snyk workflow/badge after first scan.
 
-## 6) OpenSSF Best Practices Badge
+## Already available — restored in README
 
-- **Signals:** Open source process maturity (policy/process checklist).
-- **Why not auto-added:** Badge requires a project entry tied to a signed-in maintainer account on bestpractices.dev.
-- **User inputs needed:** Maintainer login and one-time project registration.
-- **Setup steps:**
-  - Open [docs/ossf-badge/PLAYBOOK.md](./docs/ossf-badge/PLAYBOOK.md).
-  - Sign in at https://www.bestpractices.dev/en/login.
-  - Create project at https://www.bestpractices.dev/en/projects/new using repo URL.
-  - Add badge URL once project ID exists.
+The README badges are rendered from live data where supported:
 
-## 7) CII Best Practices Badge (legacy ecosystem)
+- **CI** — `ci.yml`, push/PR status
+- **CodeQL** — `codeql.yml`, push/PR status
+- **OpenSSF Scorecard** — `scorecard.yml` with `publish_results: true`, public supply-chain score
+- **OpenSSF Best Practices** — existing project [12057](https://www.bestpractices.dev/projects/12057), publicly indexed as *in progress*, with **96%** in an older directory snapshot (**not Passing**)
+- **MIT License** — root `LICENSE`
+- **Contributors, last commit, open issues and PRs** — public GitHub metadata
+- **Vue 3, TypeScript, iPad Safari target, local-first** — informational static badges, not independent security certification
 
-- **Signals:** Historic OSS process quality marker.
-- **Why not auto-added:** Legacy program state and manual onboarding requirements.
-- **User inputs needed:** Decision whether to use modern OpenSSF Best Practices instead.
-- **Setup steps:**
-  - Prefer OpenSSF Best Practices badge unless explicit CII requirement exists.
+**Important:** OpenSSF Scorecard (numeric automated checks) and Best Practices (maintainer-answered process criteria) are different systems. Both were restored as badges. The Best Practices progress still needs maintainer action to reach an officially awarded level. See [the playbook](./docs/ossf-badge/PLAYBOOK.md).
+
+## 6) OpenSSF Best Practices (maintainer follow-up)
+
+- Project **12057 already exists**, so do **not** register a duplicate.
+- Open https://www.bestpractices.dev/projects/12057.
+- Review remaining criteria with actual evidence. The publicly indexed 96% snapshot is below the Passing threshold; verify live progress on the project page.
+- Badge is already in `README.md` and `README.en.md`.
+- Confirm the official badge status at the project's site before announcing certification.
+
+## 7) CII Best Practices (same program)
+
+The OpenSSF Best Practices Badge is the successor branding for CII Best Practices. This is **not** a third badge to pursue.
 
 ## 8) npm Downloads Badge
 
