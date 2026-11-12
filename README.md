@@ -9,7 +9,7 @@
 [![License][badge-license]][license] [![Contributors][badge-contributors]][contributors] [![Last commit][badge-last-commit]][commits] [![Issues][badge-issues]][issues] [![Pull requests][badge-prs]][pulls]  
 [![Vue 3][badge-vue]][vue] [![TypeScript][badge-typescript]][typescript] [![Local-first][badge-local]][privacy] [![iPadOS Safari][badge-ipad]][ipad]
 
-[**Funktionen entdecken**](#-alles-an-einem-ort) · [**Schnellstart**](#-schnellstart) · [**Datenschutz verstehen**](#-privacy--sicherheit) · [**Mitmachen**](#-mitmachen)
+[**Funktionen entdecken**](#-alles-an-einem-ort) · [**Schnellstart**](#-schnellstart) · [**npm-Skripte**](#-npm-skripte) · [**Datenschutz verstehen**](#-privacy--sicherheit) · [**Mitmachen**](#-mitmachen)
 
 [Deutsch](./README.md) · [English](./README.en.md)
 
@@ -145,6 +145,65 @@ npm run build:ipad:local
 ```
 
 Das passende manuell startbare GitHub-Workflow heißt [Local iPad Build](./.github/workflows/daily-driver-build.yml). **Eine veröffentlichte stabile Release-Version gibt es aktuell noch nicht.** Die [Release-Pipeline](./.github/workflows/release.yml) ist vorhanden, ersetzt aber keine veröffentlichte Release-Datei.
+
+## 🧰 npm-Skripte
+
+Alle Befehle werden im Repository-Root ausgeführt. Die folgenden Skripte sind in der Root-`package.json` und in den sieben Workspace-`package.json`-Dateien definiert. Voraussetzung: Abhängigkeiten sind installiert (`npm install`).
+
+### Entwicklung und Builds (Root)
+
+| Befehl | Zweck |
+| --- | --- |
+| `npm run dev` | Startet die Teacher-UI im Vite-Entwicklungsmodus. |
+| `npm run dev:ui` | Alias für `dev`. |
+| `npm run build` | Build mit Eingabedatei-Hash und Output-Prüfung; überspringt unveränderte Builds. |
+| `npm run build:all` | Baut alle sechs Pakete/Fachmodule und anschließend die Teacher-UI neu. |
+| `npm run build:packages` | Kompiliert nur `core`, `plugins`, `storage`, `students`, `exams` und `sport`. |
+| `npm run build:ipad` | Baut Pakete und Teacher-UI; derzeit funktional wie `build:all`, **kein** Einzeldatei-Export. |
+| `npm run build:ipad:local` | Erzeugt nach dem iPad-local-Build eine einzelne `release-artifacts/viccoboard.html`. |
+| `npm run install:all` | Führt `npm install` und anschließend `npm install --workspaces` aus. |
+
+Mit `npm run build -- --force` lässt sich der Hash-Cache des Standard-Builds bewusst umgehen.
+
+### Qualität, Hooks und OpenSSF (Root)
+
+| Befehl | Zweck |
+| --- | --- |
+| `npm run typecheck` | Baut die Pakete und prüft anschließend die Vue-/TypeScript-Typen der Teacher-UI. |
+| `npm run test` | Startet die Tests für `storage`, `students`, `exams`, `sport` und `teacher-ui`. Tests aus `core` und `plugins` sind hier **nicht** enthalten. |
+| `npm run lint:docs` | Prüft Dokumentations-Guardrails. |
+| `npm run lint:workflows` | Prüft die OpenSSF-Scorecard-Workflow-Konfiguration und deren Berechtigungen. |
+| `npm run lint:openssf` | Prüft die im Repository definierten OpenSSF-Voraussetzungen. |
+| `npm run hooks:check` | Lokales Pre-Push-Gate: Repository-Regeln, Dokumentationschecks, Paket-Build, Tests und Gesamt-Build. |
+| `npm run hooks:install` | Konfiguriert `.githooks` als Git-Hook-Verzeichnis. |
+| `npm run prepare` | Führt `hooks:install` im npm-Lebenszyklus aus (auch bei regulärem `npm install`). |
+| `npm run scorecard:zeros` | Ruft öffentliche GitHub-/OpenSSF-Daten ab und untersucht die Scorecard-Checks `Maintained`, `Code-Review` und `CII-Best-Practices`. Benötigt Netzwerkzugriff. |
+| `npm run badge:bestpractices -- 12057` | Setzt die OpenSSF-Best-Practices-Badge-Links in beiden READMEs auf Projekt 12057. **Verändert Dateien.** |
+
+**Bekannte Einschränkung:** `hooks:check` enthält derzeit noch eine Prüfung auf die frühere README-Sprachumschaltung und die Überschrift `## Inhaltsverzeichnis`. Diese Marker sind im neuen README nicht mehr vorhanden; das Hook-Gate scheitert bis zu einer Anpassung an dieser Prüfung.
+
+### Workspace-Skripte
+
+Workspace-Befehle werden vom Root aus mit `npm run <skript> --workspace=<name>` gestartet:
+
+| Workspace | Verfügbare Skripte |
+| --- | --- |
+| `teacher-ui` | `dev` (Vite), `build` (Vue-Typecheck + Vite), `preview` (lokale Vorschau), `test` (Jest), `test:watch`, `test:coverage`, `typecheck` |
+| `@viccoboard/core` | `build` (TypeScript), `test` (Jest), `lint` (ESLint) |
+| `@viccoboard/plugins` | `build` (TypeScript), `test` (Jest), `lint` (ESLint) |
+| `@viccoboard/storage` | `build` (TypeScript), `test` (Jest), `lint` (ESLint) |
+| `@viccoboard/students` | `build` (TypeScript), `test` (Jest, auch ohne Tests erfolgreich), `dev` (TypeScript-Watch) |
+| `@viccoboard/exams` | `build` (TypeScript), `test` (Jest), `dev` (TypeScript-Watch) |
+| `@viccoboard/sport` | `build` (TypeScript), `test` (Jest), `dev` (TypeScript-Watch) |
+
+Beispiele:
+
+```bash
+npm run test --workspace=@viccoboard/sport
+npm run typecheck --workspace=teacher-ui
+npm run test:coverage --workspace=teacher-ui
+npm run preview --workspace=teacher-ui
+```
 
 ## 🏗️ Unter der Haube
 
