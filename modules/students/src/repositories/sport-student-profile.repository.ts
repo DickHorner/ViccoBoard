@@ -12,6 +12,9 @@ export class SportStudentProfileRepository extends AdapterRepository<SportStuden
       id: row.id as string,
       studentId: row.student_id as string,
       moduleKey: 'sport',
+      bodyHeightCm: row.body_height_cm === null || row.body_height_cm === undefined
+        ? undefined
+        : Number(row.body_height_cm),
       medicalNotes: row.medical_notes as string | undefined,
       asthma: Boolean(row.asthma),
       diabetes: Boolean(row.diabetes),
@@ -33,6 +36,7 @@ export class SportStudentProfileRepository extends AdapterRepository<SportStuden
     if (entity.id !== undefined) row.id = entity.id;
     if (entity.studentId !== undefined) row.student_id = entity.studentId;
     if (entity.moduleKey !== undefined) row.module_key = entity.moduleKey;
+    if (entity.bodyHeightCm !== undefined) row.body_height_cm = entity.bodyHeightCm;
     if (entity.medicalNotes !== undefined) row.medical_notes = entity.medicalNotes;
     if (entity.asthma !== undefined) row.asthma = entity.asthma ? 1 : 0;
     if (entity.diabetes !== undefined) row.diabetes = entity.diabetes ? 1 : 0;
