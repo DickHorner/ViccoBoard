@@ -126,7 +126,7 @@ describe('SaveSportExamSessionUseCase', () => {
     const entries = await performanceRepository.findByCategory(categoryId);
     expect(entries).toHaveLength(1);
     expect(entries[0].studentId).toBe(student1Id);
-    expect(entries[0].calculatedGrade).toBe(1);
+    expect(Number(entries[0].calculatedGrade)).toBe(1);
     expect(entries[0].metadata?.sessionId).toBe(session.id);
   });
 
@@ -148,7 +148,7 @@ describe('SaveSportExamSessionUseCase', () => {
 
     const entries = await performanceRepository.findByCategory(categoryId);
     expect(entries).toHaveLength(1);
-    expect(entries[0].calculatedGrade).toBe(6);
+    expect(Number(entries[0].calculatedGrade)).toBe(6);
     expect(entries[0].measurements).toEqual({ state: 'missing-kit' });
   });
 
