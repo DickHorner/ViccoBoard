@@ -28,6 +28,7 @@ export interface CriterionDraft {
 export interface TaskDraft {
   id: string
   title: string
+  description: string
   points: number
   bonusPoints: number
   isChoice: boolean
@@ -89,6 +90,7 @@ function toTaskDraft(task: ExamsTypes.TaskNode, subtasks: TaskDraft[] = []): Tas
   return {
     id: task.id,
     title: task.title,
+    description: task.description ?? '',
     points: task.points,
     bonusPoints: task.bonusPoints ?? 0,
     isChoice: task.isChoice,
@@ -253,6 +255,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
   const newTask = (): TaskDraft => ({
     id: createUuid(),
     title: '',
+    description: '',
     points: 0,
     bonusPoints: 0,
     isChoice: false,
@@ -322,7 +325,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
         level,
         order: index + 1,
         title: task.title.trim() || `Task ${index + 1}`,
-        description: undefined,
+        description: task.description.trim() || undefined,
         points: taskPoints,
         bonusPoints: Number(task.bonusPoints) || 0,
         isChoice: task.isChoice,
