@@ -28,6 +28,7 @@ import {
   LessonPartRepository,
   LessonRepository,
   PerformanceEntryRepository,
+  PerformanceTableGradingService,
   RecordAttendanceUseCase,
   RecordCooperTestResultUseCase,
   RecordDiceRollUseCase,
@@ -131,6 +132,7 @@ interface SportBridge {
 
   criteriaGradingEngine: CriteriaGradingEngine;
   timeGradingService: TimeGradingService;
+  performanceTableGradingService: PerformanceTableGradingService;
   cooperTestService: CooperTestService;
   shuttleRunService: ShuttleRunService;
   sportabzeichenService: SportabzeichenService;
@@ -227,6 +229,7 @@ export function initializeSportBridge(): SportBridge {
 
   const criteriaGradingEngine = new CriteriaGradingEngine();
   const timeGradingService = new TimeGradingService();
+  const performanceTableGradingService = new PerformanceTableGradingService();
   const cooperTestService = new CooperTestService();
   const shuttleRunService = new ShuttleRunService();
   const sportabzeichenService = new SportabzeichenService();
@@ -286,6 +289,7 @@ export function initializeSportBridge(): SportBridge {
 
     criteriaGradingEngine,
     timeGradingService,
+    performanceTableGradingService,
     cooperTestService,
     shuttleRunService,
     sportabzeichenService,
@@ -344,6 +348,7 @@ export function useSportBridge() {
     useRecordAttendance: computed(() => bridge.value?.recordAttendanceUseCase),
     useCriteriaGrading: computed(() => bridge.value?.criteriaGradingEngine),
     useTimeGrading: computed(() => bridge.value?.timeGradingService),
+    usePerformanceTableGrading: computed(() => bridge.value?.performanceTableGradingService),
     useCooperTest: computed(() => bridge.value?.cooperTestService),
     useShuttleRun: computed(() => bridge.value?.shuttleRunService)
   };
@@ -369,6 +374,7 @@ export {
   LessonPartRepository,
   LessonRepository,
   PerformanceEntryRepository,
+  PerformanceTableGradingService,
   RecordAttendanceUseCase,
   RecordGradeUseCase,
   SaveTableDefinitionUseCase,
