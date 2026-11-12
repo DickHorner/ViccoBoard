@@ -24,7 +24,9 @@ export function useTableManagementView() {
   const form = ref({
     name: '',
     type: 'simple' as 'simple' | 'complex',
-    description: ''
+    description: '',
+    measurementType: 'number' as 'number' | 'time',
+    quickRows: [{ threshold: '', grade: '' }]
   })
 
   onMounted(async () => {
@@ -73,7 +75,13 @@ export function useTableManagementView() {
 
   function openCreateModal(): void {
     editingTable.value = null
-    form.value = { name: '', type: 'simple', description: '' }
+    form.value = {
+      name: '',
+      type: 'simple',
+      description: '',
+      measurementType: 'number',
+      quickRows: [{ threshold: '', grade: '' }]
+    }
     modalError.value = ''
     showModal.value = true
   }
@@ -83,7 +91,9 @@ export function useTableManagementView() {
     form.value = {
       name: table.name,
       type: table.type,
-      description: table.description ?? ''
+      description: table.description ?? '',
+      measurementType: 'number',
+      quickRows: [{ threshold: '', grade: '' }]
     }
     modalError.value = ''
     showModal.value = true
@@ -113,14 +123,57 @@ export function useTableManagementView() {
         })
         toast.success('Tabelle aktualisiert.')
       } else {
+        const quickRows = form.value.quickRows.filter(
+          row => row.threshold.trim().length > 0 || row.grade.trim().length > 0
+        )
+        const entries: Sport.TableEntry[] = []
+        const dimensionValues: string[] = []
+        const keyName = form.value.measurementType === 'time' ? 'maxTime' : 'minValue'
+
+        for (const row of quickRows) {
+          if (!row.threshold.trim() || !row.grade.trim()) {
+            throw new Error('Jeder Grenzwert benötigt einen Wert und eine Note.')
+          }
+
+          const threshold = Number(row.threshold.trim().replace(',', '.'))
+          if (!Number.isFinite(threshold) || threshold < 0) {
+            throw new Error(`Ungültiger Grenzwert: ${row.threshold}`)
+          }
+
+          const normalizedGrade = row.grade.trim().replace(',', '.')
+          const numericGrade = Number(normalizedGrade)
+          const grade = Number.isFinite(numericGrade) ? numericGrade : row.grade.trim()
+
+          entries.push({
+            key: { [keyName]: threshold },
+            value: grade
+          })
+          dimensionValues.push(String(threshold))
+        }
+
+        entries.sort((a, b) => {
+          const aValue = Number(a.key[keyName])
+          const bValue = Number(b.key[keyName])
+          return form.value.measurementType === 'time'
+            ? aValue - bValue
+            : bValue - aValue
+        })
+
+        const dimensions: Sport.TableDimension[] = entries.length > 0
+          ? [{
+              name: keyName as Sport.TableDimension['name'],
+              values: dimensionValues
+            }]
+          : []
+
         await bridge.saveTableDefinitionUseCase.execute({
           name: form.value.name,
           type: form.value.type,
           description: form.value.description || undefined,
           source: 'local',
-          dimensions: [],
+          dimensions,
           mappingRules: [],
-          entries: []
+          entries
         })
         toast.success('Tabelle erstellt.')
       }
@@ -131,6 +184,18 @@ export function useTableManagementView() {
     } finally {
       saving.value = false
     }
+  }
+
+  function addQuickRow(): void {
+    form.value.quickRows.push({ threshold: '', grade: '' })
+  }
+
+  function removeQuickRow(index: number): void {
+    if (form.value.quickRows.length === 1) {
+      form.value.quickRows[0] = { threshold: '', grade: '' }
+      return
+    }
+    form.value.quickRows.splice(index, 1)
   }
 
   function confirmDelete(table: Sport.TableDefinition): void {
@@ -289,6 +354,7 @@ export function useTableManagementView() {
   }
 
   return {
+    addQuickRow,
     closeModal,
     confirmDelete,
     deleteTarget,
@@ -306,6 +372,7 @@ export function useTableManagementView() {
     openCreateModal,
     openEditModal,
     previewId,
+    removeQuickRow,
     saveModal,
     saving,
     showModal,
