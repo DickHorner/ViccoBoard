@@ -9,7 +9,7 @@
 [![License][badge-license]][license] [![Contributors][badge-contributors]][contributors] [![Last commit][badge-last-commit]][commits] [![Issues][badge-issues]][issues] [![Pull requests][badge-prs]][pulls]  
 [![Vue 3][badge-vue]][vue] [![TypeScript][badge-typescript]][typescript] [![Local-first][badge-local]][privacy] [![iPadOS Safari][badge-ipad]][ipad]
 
-[**Funktionen entdecken**](#-alles-an-einem-ort) · [**Schnellstart**](#-schnellstart) · [**Datenschutz verstehen**](#-privacy--sicherheit) · [**Mitmachen**](#-mitmachen)
+[**Funktionen entdecken**](#-alles-an-einem-ort) · [**Schnellstart**](#-schnellstart) · [**npm-Skripte**](#-npm-skripte) · [**Datenschutz verstehen**](#-privacy--sicherheit) · [**Mitmachen**](#-mitmachen)
 
 [Deutsch](./README.md) · [English](./README.en.md)
 
