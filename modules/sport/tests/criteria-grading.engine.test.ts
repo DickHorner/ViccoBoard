@@ -57,7 +57,7 @@ describe('CriteriaGradingEngine', () => {
       expect(result.displayValue).toBe('3'); // 80% is grade 3 (67-80.99%)
     });
 
-    test('handles maximum 8 criteria', () => {
+    test('handles multiple criteria', () => {
       const criteria: Criterion[] = Array.from({ length: 8 }, (_, i) => ({
         id: `c${i}`,
         name: `Criterion ${i}`,
@@ -150,6 +150,59 @@ describe('CriteriaGradingEngine', () => {
     });
   });
 
+  describe('calculateGradeFromValues', () => {
+    test('grades equal 0-3 observation criteria by their combined percentage', () => {
+      const criteria: Criterion[] = [
+        { id: 'anticipation', name: 'Antizipation', weight: 1, minValue: 0, maxValue: 3 },
+        { id: 'passing', name: 'Sicheres Zuspiel', weight: 1, minValue: 0, maxValue: 3 },
+        { id: 'communication', name: 'Kommunikation', weight: 1, minValue: 0, maxValue: 3 }
+      ];
+
+      const result = engine.calculateGradeFromValues({
+        criteria,
+        scores: [
+          { criterionId: 'anticipation', value: 3 },
+          { criterionId: 'passing', value: 2 },
+          { criterionId: 'communication', value: 3 }
+        ]
+      });
+
+      expect(result.totalPoints).toBe(8);
+      expect(result.maxPoints).toBe(9);
+      expect(result.percentage).toBe(88.89);
+      expect(result.grade).toBe('2');
+    });
+
+    test('supports relative criterion weights', () => {
+      const criteria: Criterion[] = [
+        { id: 'technique', name: 'Technik', weight: 2, minValue: 0, maxValue: 3 },
+        { id: 'communication', name: 'Kommunikation', weight: 1, minValue: 0, maxValue: 3 }
+      ];
+
+      const result = engine.calculateGradeFromValues({
+        criteria,
+        scores: [
+          { criterionId: 'technique', value: 3 },
+          { criterionId: 'communication', value: 0 }
+        ]
+      });
+
+      expect(result.percentage).toBe(66.67);
+      expect(result.grade).toBe('4');
+    });
+
+    test('rejects a raw score outside the configured criterion range', () => {
+      const criteria: Criterion[] = [
+        { id: 'passing', name: 'Zuspiel', weight: 1, minValue: 0, maxValue: 3 }
+      ];
+
+      expect(() => engine.calculateGradeFromValues({
+        criteria,
+        scores: [{ criterionId: 'passing', value: 4 }]
+      })).toThrow('Score for Zuspiel must be between 0 and 3');
+    });
+  });
+
   describe('validation', () => {
     test('throws error for no criteria', () => {
       const input: CriteriaGradingInput = {
@@ -160,8 +213,8 @@ describe('CriteriaGradingEngine', () => {
       expect(() => engine.calculateGrade(input)).toThrow('At least one criterion is required');
     });
 
-    test('throws error for more than 8 criteria', () => {
-      const criteria: Criterion[] = Array.from({ length: 9 }, (_, i) => ({
+    test('throws error for more than 50 criteria', () => {
+      const criteria: Criterion[] = Array.from({ length: 51 }, (_, i) => ({
         id: `c${i}`,
         name: `Criterion ${i}`,
         weight: 1,
@@ -174,7 +227,7 @@ describe('CriteriaGradingEngine', () => {
         value: 75
       }));
 
-      expect(() => engine.calculateGrade({ criteria, scores })).toThrow('Maximum 8 criteria allowed');
+      expect(() => engine.calculateGrade({ criteria, scores })).toThrow('Maximum 50 criteria allowed');
     });
 
     test('throws error for no scores', () => {
@@ -330,8 +383,8 @@ describe('CriteriaGradingEngine', () => {
       expect(result.errors).toContain('At least one criterion is required');
     });
 
-    test('detects too many criteria', () => {
-      const criteria: Criterion[] = Array.from({ length: 9 }, (_, i) => ({
+    test('detects more than 50 criteria', () => {
+      const criteria: Criterion[] = Array.from({ length: 51 }, (_, i) => ({
         id: `c${i}`,
         name: `Criterion ${i}`,
         weight: 1,
@@ -342,7 +395,7 @@ describe('CriteriaGradingEngine', () => {
       const result = engine.validateCriteria(criteria);
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Maximum 8 criteria allowed');
+      expect(result.errors).toContain('Maximum 50 criteria allowed');
     });
 
     test('detects missing criterion name', () => {
