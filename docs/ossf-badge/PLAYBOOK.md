@@ -7,7 +7,7 @@ ViccoBoard tracks **two separate OpenSSF signals**. Neither is a substitute for 
 - **Registered project:** [ViccoBoard — project 12057](https://www.bestpractices.dev/projects/12057)
 - **Official badge:** `https://www.bestpractices.dev/projects/12057/badge`
 - **Public project listing:** [Best Practices project directory](https://www.bestpractices.dev/de/projects?status=in_progress)
-- The publicly indexed listing showed **96% progress** at the time this README update was drafted. That is **not** a Passing badge; the value can change. Use the official project page for the live state.
+- A publicly indexed directory snapshot showed **96% progress** (potentially stale). This is **not** a Passing badge. Use the official project page for the live state.
 - **Maintainer action:** sign in at [bestpractices.dev](https://www.bestpractices.dev/en/login) and complete/review the outstanding items. Do **not** create a duplicate project.
 
 Evidence to use for applicable criteria:
