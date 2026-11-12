@@ -120,6 +120,18 @@ export class GradeCategoryValidator {
         if (typeof config.measurementLabel !== 'string' || config.measurementLabel.trim().length === 0) {
           errors.push('Performance measurement label is required');
         }
+        if (
+          config.gradeLevel !== undefined &&
+          (!Number.isInteger(config.gradeLevel) || config.gradeLevel < 1 || config.gradeLevel > 13)
+        ) {
+          errors.push('Performance grade level must be an integer between 1 and 13');
+        }
+        if (
+          config.normalization !== undefined &&
+          !['raw', 'body-height-percent'].includes(config.normalization)
+        ) {
+          errors.push('Performance normalization must be raw or body-height-percent');
+        }
         break;
 
       case 'cooper':
