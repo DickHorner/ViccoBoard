@@ -28,15 +28,16 @@ export function useDashboardView() {
   const creating = ref(false);
   const error = ref('');
 
-  const newClass = ref<{ name: string; schoolYear: string; gradingScheme: string; color: string }>({
+  const newClass = ref<{ name: string; schoolYear: string; gradeLevel?: number; gradingScheme: string; color: string }>({
     name: '',
     schoolYear: '',
+    gradeLevel: undefined,
     gradingScheme: DEFAULT_GRADING_SCHEME,
     color: ''
   });
 
   const showEditModal = ref(false);
-  const editClassData = ref<{ id: string; name: string; schoolYear: string; gradingScheme: string; color: string }>({
+  const editClassData = ref<{ id: string; name: string; schoolYear: string; gradeLevel?: number; gradingScheme: string; color: string }>({
     id: '',
     name: '',
     schoolYear: '',
@@ -164,12 +165,13 @@ export function useDashboardView() {
       await classGroups.create({
         name: newClass.value.name.trim(),
         schoolYear: newClass.value.schoolYear.trim(),
+        gradeLevel: newClass.value.gradeLevel,
         gradingScheme: newClass.value.gradingScheme,
         color: newClass.value.color || undefined
       });
 
       await loadData();
-      newClass.value = { name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' };
+      newClass.value = { name: '', schoolYear: '', gradeLevel: undefined, gradingScheme: DEFAULT_GRADING_SCHEME, color: '' };
       showCreateModal.value = false;
     } catch (err) {
       console.error('Failed to create class:', err);
@@ -194,7 +196,7 @@ export function useDashboardView() {
   const closeModal = () => {
     showCreateModal.value = false;
     error.value = '';
-    newClass.value = { name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' };
+    newClass.value = { name: '', schoolYear: '', gradeLevel: undefined, gradingScheme: DEFAULT_GRADING_SCHEME, color: '' };
   };
 
   const editClass = (cls: ClassGroup) => {
@@ -202,6 +204,7 @@ export function useDashboardView() {
       id: cls.id,
       name: cls.name,
       schoolYear: cls.schoolYear,
+      gradeLevel: cls.gradeLevel,
       gradingScheme: cls.gradingScheme || DEFAULT_GRADING_SCHEME,
       color: cls.color || ''
     };
@@ -216,6 +219,7 @@ export function useDashboardView() {
       await classGroups.update(editClassData.value.id, {
         name: editClassData.value.name.trim(),
         schoolYear: editClassData.value.schoolYear.trim(),
+        gradeLevel: editClassData.value.gradeLevel,
         gradingScheme: editClassData.value.gradingScheme,
         color: editClassData.value.color || undefined
       });
@@ -233,7 +237,7 @@ export function useDashboardView() {
   const closeEditModal = () => {
     showEditModal.value = false;
     editError.value = '';
-    editClassData.value = { id: '', name: '', schoolYear: '', gradingScheme: DEFAULT_GRADING_SCHEME, color: '' };
+    editClassData.value = { id: '', name: '', schoolYear: '', gradeLevel: undefined, gradingScheme: DEFAULT_GRADING_SCHEME, color: '' };
   };
 
   const getClassColorStyle = (color?: string) => {
