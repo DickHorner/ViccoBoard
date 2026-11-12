@@ -197,6 +197,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Zeitbewertung', parent: '/grading' }
   },
   {
+    path: '/grading/performance/:id',
+    name: 'performance-grading',
+    component: () => import('../views/PerformanceGradingEntry.vue'),
+    meta: { title: 'Messwertbewertung', parent: '/grading' }
+  },
+  {
     path: '/grading/cooper/:id',
     name: 'cooper-grading',
     component: () => import('../views/CooperGradingEntry.vue'),
