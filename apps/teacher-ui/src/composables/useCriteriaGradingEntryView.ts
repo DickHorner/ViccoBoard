@@ -207,10 +207,14 @@ export function useCriteriaGradingEntryView() {
     }))
 
     try {
-      return SportBridge.value?.criteriaGradingEngine.calculateGradeFromValues({
-        criteria: criteria.value,
-        scores
-      }) ?? null
+      const gradingScale = (category.value as Sport.GradeCategory & {
+        gradingScale?: Array<{ minPercentage: number; grade: string }>
+      } | null)?.gradingScale
+
+      return SportBridge.value?.criteriaGradingEngine.calculateGradeFromValues(
+        { criteria: criteria.value, scores },
+        gradingScale
+      ) ?? null
     } catch {
       return null
     }
