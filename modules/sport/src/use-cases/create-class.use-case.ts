@@ -50,6 +50,13 @@ export class CreateClassUseCase {
       throw new Error('School year is required');
     }
 
+    if (
+      input.gradeLevel !== undefined &&
+      (!Number.isInteger(input.gradeLevel) || input.gradeLevel < 1 || input.gradeLevel > 13)
+    ) {
+      throw new Error('Grade level must be an integer between 1 and 13');
+    }
+
     // Validate school year format (e.g., "2023/2024")
     const yearPattern = /^\d{4}\/\d{4}$/;
     if (!yearPattern.test(input.schoolYear)) {
