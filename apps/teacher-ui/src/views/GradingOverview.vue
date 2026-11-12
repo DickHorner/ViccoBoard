@@ -151,6 +151,7 @@
                 <option value="">Typ auswählen...</option>
                 <option value="criteria">Kriterienbasiert</option>
                 <option value="time">Zeitbasiert</option>
+                <option value="performance">Messwert nach Tabelle</option>
                 <option value="cooper">Cooper-Test</option>
                 <option value="shuttle">Shuttle-Run</option>
                 <option value="mittelstrecke">Mittelstrecke</option>
