@@ -103,7 +103,7 @@ export class TableImportService {
         continue;
       }
 
-      const rowKey: Record<string, string> = {};
+      const rowKey: Record<string, string | number> = {};
       for (const header of keyHeaders) {
         const idx = headers.indexOf(header);
         const cell = cells[idx];
