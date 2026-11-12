@@ -70,20 +70,6 @@ The README badges are rendered from live data where supported:
 
 **Important:** OpenSSF Scorecard (numeric automated checks) and Best Practices (maintainer-answered process criteria) are different systems. Both were restored as badges. The Best Practices progress still needs maintainer action to reach an officially awarded level. See [the playbook](./docs/ossf-badge/PLAYBOOK.md).
 
-## Optional additional badges (require real service data)
-
-### Codecov, SonarCloud, Codacy
-
-Coverage, quality gate and maintainability badges require connecting the corresponding service and producing actual reports. No placeholder quality score should be displayed.
-
-### Snyk
-
-Vulnerability-monitoring badge only after Snyk app/project onboarding. CodeQL and OpenSSF Scorecard already run, but neither is equivalent to Snyk.
-
-### Code Climate and alternatives
-
-The original Code Climate Maintainability service and branding may change; check current availability before setting up a new connection. Prefer a single durable code-quality service rather than several redundant grades.
-
 ## 6) OpenSSF Best Practices (maintainer follow-up)
 
 - Project **12057 already exists**, so do **not** register a duplicate.
