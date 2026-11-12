@@ -49,4 +49,4 @@ ViccoBoard akzeptiert eine UTF-8-kodierte JSON-Datei. Die Version beschreibt ein
 
 Teacher Workbench: Fertige Aufgaben und Erwartungshorizont prüfen; auf Anforderung „Für ViccoBoard exportieren“ die **gesamte JSON-Datei gemäß v1** erzeugen, ohne Schülerdaten und ohne Markdown-Hülle in der Datei.
 
-ViccoBoard: `Prüfungen` → `JSON importieren` → Datei auswählen. Bei gültiger Datei entsteht eine neue Vorlage und der Prüfungseditor öffnet sich. Prüfungsaufgaben, Kriterien, Einzel-/Gesamtpunkte und Notenschlüssel vor dem Einsatz prüfen. Der Import erfordert keine Cloud-Kommunikation.
+ViccoBoard: `Prüfungen` → `Prüfung aus ChatGPT importieren` → Datei auswählen. Bei gültiger Datei entsteht eine neue Vorlage und der Prüfungseditor öffnet sich. Prüfungsaufgaben, Kriterien, Einzel-/Gesamtpunkte und Notenschlüssel vor dem Einsatz prüfen. Der Import erfordert keine Cloud-Kommunikation.
