@@ -294,6 +294,31 @@
   min-height: 44px;
 }
 
+.form-hint {
+  margin: 0.25rem 0 0;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.quick-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quick-row {
+  display: grid;
+  grid-template-columns: auto minmax(80px, 1fr) auto minmax(70px, 0.7fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quick-row label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -318,6 +343,15 @@
 }
 
 @media (max-width: 600px) {
+  .quick-row {
+    grid-template-columns: auto 1fr auto 1fr;
+  }
+
+  .quick-row .btn-text {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
   .table-card-header {
     flex-direction: column;
   }
