@@ -474,6 +474,7 @@ async function saveAll(): Promise<void> {
   const pending: Array<{
     student: Student
     rawValue: string
+    rawMeasurement: number
     value: number
     grade: string | number
   }> = []
@@ -496,7 +497,7 @@ async function saveAll(): Promise<void> {
       return
     }
 
-    pending.push({ student, rawValue, value, grade })
+    pending.push({ student, rawValue, rawMeasurement, value, grade })
   }
 
   if (pending.length === 0) return
@@ -504,7 +505,7 @@ async function saveAll(): Promise<void> {
   saving.value = true
   try {
     await Promise.all(
-      pending.map(({ student, rawValue, value, grade }) =>
+      pending.map(({ student, rawValue, rawMeasurement, value, grade }) =>
         sportBridge.recordGradeUseCase.execute({
           studentId: student.id,
           categoryId,
