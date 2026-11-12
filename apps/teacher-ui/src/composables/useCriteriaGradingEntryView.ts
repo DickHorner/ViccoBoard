@@ -391,7 +391,7 @@ export function useCriteriaGradingEntryView() {
 
   function startHandoff(): void {
     if (!handoffCandidateId.value) return
-    if (!/^\\d{4,6}$/.test(pinDraft.value)) {
+    if (!/^\d{4,6}$/.test(pinDraft.value)) {
       toast.warning('Bitte eine PIN mit 4 bis 6 Ziffern festlegen.')
       return
     }
