@@ -41,6 +41,7 @@ export function useDashboardView() {
     id: '',
     name: '',
     schoolYear: '',
+    gradeLevel: undefined,
     gradingScheme: DEFAULT_GRADING_SCHEME,
     color: ''
   });
