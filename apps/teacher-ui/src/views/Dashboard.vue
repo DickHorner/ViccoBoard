@@ -238,6 +238,11 @@
           </div>
 
           <div class="form-group">
+            <label for="gradeLevel">Klassenstufe</label>
+            <input id="gradeLevel" v-model.number="newClass.gradeLevel" type="number" min="1" max="13" class="form-input" placeholder="z. B. 9" />
+          </div>
+
+          <div class="form-group">
             <label for="gradingScheme">{{ t('KLASSEN.notenschema') }}</label>
             <select id="gradingScheme" v-model="newClass.gradingScheme" class="form-input">
               <option v-for="(label, key) in gradingSchemes" :key="key" :value="key">
@@ -290,6 +295,11 @@
             <label for="editSchoolYear">Schuljahr *</label>
             <input id="editSchoolYear" v-model="editClassData.schoolYear" type="text" pattern="\d{4}/\d{4}" required class="form-input" />
             <small class="form-hint">Format: YYYY/YYYY</small>
+          </div>
+
+          <div class="form-group">
+            <label for="editGradeLevel">Klassenstufe</label>
+            <input id="editGradeLevel" v-model.number="editClassData.gradeLevel" type="number" min="1" max="13" class="form-input" placeholder="z. B. 9" />
           </div>
 
           <div class="form-group">
