@@ -83,6 +83,65 @@ npm run build:ipad:local
 
 A [manual GitHub Actions workflow](./.github/workflows/daily-driver-build.yml) creates a local iPad artifact. **No stable GitHub Release is published yet.**
 
+## npm scripts
+
+Run the following commands from the repository root after installing dependencies (`npm install`). This reference covers the root `package.json` and all seven workspace `package.json` files.
+
+### Development and builds (root)
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the teacher UI through Vite. |
+| `npm run dev:ui` | Alias for `dev`. |
+| `npm run build` | Hash- and output-aware build; skips work when inputs and outputs are unchanged. |
+| `npm run build:all` | Rebuild all six packages/modules, then the teacher UI. |
+| `npm run build:packages` | Compile `core`, `plugins`, `storage`, `students`, `exams` and `sport` only. |
+| `npm run build:ipad` | Build packages and teacher UI; currently equivalent to `build:all`, **not** a single-file export. |
+| `npm run build:ipad:local` | Generate a single `release-artifacts/viccoboard.html` after the iPad-local build. |
+| `npm run install:all` | Run `npm install` followed by `npm install --workspaces`. |
+
+Force the standard build to ignore its hash cache with `npm run build -- --force`.
+
+### Quality checks, hooks and OpenSSF (root)
+
+| Command | Purpose |
+| --- | --- |
+| `npm run typecheck` | Build packages, then run Vue/TypeScript type checking for teacher UI. |
+| `npm run test` | Run tests for `storage`, `students`, `exams`, `sport` and `teacher-ui`. The `core` and `plugins` test scripts are **not** included. |
+| `npm run lint:docs` | Validate documentation guardrails. |
+| `npm run lint:workflows` | Check the OpenSSF Scorecard workflow configuration and permissions. |
+| `npm run lint:openssf` | Check repository-specific OpenSSF prerequisites. |
+| `npm run hooks:check` | Local pre-push gate for repository conventions, documentation, package build, tests and full build. |
+| `npm run hooks:install` | Configure `.githooks` as the Git hooks directory. |
+| `npm run prepare` | Run `hooks:install` in the npm lifecycle (also during normal `npm install`). |
+| `npm run scorecard:zeros` | Fetch public GitHub/OpenSSF data and inspect the `Maintained`, `Code-Review` and `CII-Best-Practices` Scorecard checks. Requires network access. |
+| `npm run badge:bestpractices -- 12057` | Update the OpenSSF Best Practices badge links in both READMEs. **Modifies files.** |
+
+**Known issue:** `hooks:check` still looks for the previous README language-switch text and `## Inhaltsverzeichnis` heading. Both markers are absent from the new README, so the hook gate fails at that check until it is updated.
+
+### Workspace scripts
+
+Use `npm run <script> --workspace=<name>` from the repository root:
+
+| Workspace | Available scripts |
+| --- | --- |
+| `teacher-ui` | `dev` (Vite), `build` (Vue typecheck + Vite), `preview` (local preview), `test` (Jest), `test:watch`, `test:coverage`, `typecheck` |
+| `@viccoboard/core` | `build` (TypeScript), `test` (Jest), `lint` (ESLint) |
+| `@viccoboard/plugins` | `build` (TypeScript), `test` (Jest), `lint` (ESLint) |
+| `@viccoboard/storage` | `build` (TypeScript), `test` (Jest), `lint` (ESLint) |
+| `@viccoboard/students` | `build` (TypeScript), `test` (Jest, allows zero tests), `dev` (TypeScript watch) |
+| `@viccoboard/exams` | `build` (TypeScript), `test` (Jest), `dev` (TypeScript watch) |
+| `@viccoboard/sport` | `build` (TypeScript), `test` (Jest), `dev` (TypeScript watch) |
+
+Examples:
+
+```bash
+npm run test --workspace=@viccoboard/sport
+npm run typecheck --workspace=teacher-ui
+npm run test:coverage --workspace=teacher-ui
+npm run preview --workspace=teacher-ui
+```
+
 ## Architecture and quality
 
 ```text
