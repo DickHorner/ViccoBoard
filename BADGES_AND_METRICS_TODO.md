@@ -63,7 +63,7 @@ The README badges are rendered from live data where supported:
 - **CI** — `ci.yml`, push/PR status
 - **CodeQL** — `codeql.yml`, push/PR status
 - **OpenSSF Scorecard** — `scorecard.yml` with `publish_results: true`, public supply-chain score
-- **OpenSSF Best Practices** — existing project [12057](https://www.bestpractices.dev/projects/12057), currently listed as *in progress*; **96%** was publicly indexed when checked, **not Passing**
+- **OpenSSF Best Practices** — existing project [12057](https://www.bestpractices.dev/projects/12057), publicly indexed as *in progress*, with **96%** in an older directory snapshot (**not Passing**)
 - **MIT License** — root `LICENSE`
 - **Contributors, last commit, open issues and PRs** — public GitHub metadata
 - **Vue 3, TypeScript, iPad Safari target, local-first** — informational static badges, not independent security certification
@@ -74,7 +74,7 @@ The README badges are rendered from live data where supported:
 
 - Project **12057 already exists**, so do **not** register a duplicate.
 - Open https://www.bestpractices.dev/projects/12057.
-- Review remaining criteria with actual evidence. Current 96% indexed progress is below the Passing threshold.
+- Review remaining criteria with actual evidence. The publicly indexed 96% snapshot is below the Passing threshold; verify live progress on the project page.
 - Badge is already in `README.md` and `README.en.md`.
 - Confirm the official badge status at the project's site before announcing certification.
 
