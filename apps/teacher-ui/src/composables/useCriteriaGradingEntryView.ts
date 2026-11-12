@@ -7,6 +7,7 @@ import type { Sport, StatusOption } from '@viccoboard/core'
 import { useSportBridge } from './useSportBridge'
 import { useStudents, getStudentsBridge } from './useStudentsBridge'
 import { useToast } from './useToast'
+import { compareCriterionScores } from '../utils/criteria-comparison'
 
 type CriterionConfig = {
   id: string
@@ -48,6 +49,11 @@ export function useCriteriaGradingEntryView() {
   const participationStatus = ref<Map<string, string>>(new Map())
   const selfAssessmentEntries = ref<Map<string, Map<string, number>>>(new Map())
 
+  const handoffCandidateId = ref<string | null>(null)
+  const handoffStudentId = ref<string | null>(null)
+  const handoffPin = ref('')
+  const pinDraft = ref('')
+
   const selfAssessmentEnabled = computed(() =>
     Boolean((category.value?.configuration as Sport.CriteriaGradingConfig | undefined)?.allowSelfAssessment)
   )
@@ -66,6 +72,18 @@ export function useCriteriaGradingEntryView() {
     return config.criteria || []
   })
 
+  const handoffStudent = computed(() =>
+    students.value.find(student => student.id === handoffStudentId.value) ?? null
+  )
+
+  const handoffTeacherScores = computed<Record<string, number>>(() =>
+    Object.fromEntries(gradeEntries.value.get(handoffStudentId.value ?? '') ?? [])
+  )
+
+  const handoffInitialScores = computed<Record<string, number>>(() =>
+    Object.fromEntries(selfAssessmentEntries.value.get(handoffStudentId.value ?? '') ?? [])
+  )
+
   async function loadData() {
     loading.value = true
     error.value = null
@@ -82,7 +100,7 @@ export function useCriteriaGradingEntryView() {
         const entries = await performanceEntries.value?.findByStudentAndCategory(student.id, categoryId) ?? []
         if (entries.length === 0) continue
 
-        const latestEntry = entries[entries.length - 1]
+        const latestEntry = entries[0]
         const studentGrades = new Map<string, number>()
         if (latestEntry.measurements) {
           Object.entries(latestEntry.measurements).forEach(([criterionId, value]) => {
@@ -136,8 +154,16 @@ export function useCriteriaGradingEntryView() {
       scores = new Map<string, number>()
       selfAssessmentEntries.value.set(studentId, scores)
     }
-    if (rawValue === '') scores.delete(criterionId)
-    else scores.set(criterionId, Number(rawValue))
+    const criterion = criteria.value.find(item => item.id === criterionId)
+    const value = Number(rawValue)
+    if (
+      rawValue.trim() === '' || !criterion || !Number.isFinite(value) ||
+      value < criterion.minValue || value > criterion.maxValue
+    ) {
+      scores.delete(criterionId)
+    } else {
+      scores.set(criterionId, value)
+    }
     unsavedStudents.value.add(studentId)
     hasUnsavedChanges.value = true
   }
@@ -169,9 +195,9 @@ export function useCriteriaGradingEntryView() {
     let value: number | undefined
     if (typeof rawValue === 'number') {
       value = rawValue
-    } else if (typeof rawValue === 'string') {
+    } else if (typeof rawValue === 'string' && rawValue.trim() !== '') {
       const parsed = Number(rawValue)
-      value = Number.isNaN(parsed) ? undefined : parsed
+      value = Number.isFinite(parsed) ? parsed : undefined
     } else if (rawValue && typeof rawValue === 'object' && 'target' in rawValue) {
       const eventTarget = (rawValue as { target: HTMLInputElement | null }).target
       if (eventTarget?.value) {
@@ -201,9 +227,11 @@ export function useCriteriaGradingEntryView() {
     const studentGrades = gradeEntries.value.get(studentId)
     if (!studentGrades || criteria.value.length === 0) return null
 
+    if (criteria.value.some((criterion) => !studentGrades.has(criterion.id))) return null
+
     const scores = criteria.value.map((criterion) => ({
       criterionId: criterion.id,
-      value: studentGrades.get(criterion.id) ?? criterion.minValue
+      value: studentGrades.get(criterion.id)!
     }))
 
     try {
@@ -244,7 +272,7 @@ export function useCriteriaGradingEntryView() {
         studentId,
         categoryId,
         measurements,
-        calculatedGrade: calculateGrade(studentId),
+        calculatedGrade: gradingResult(studentId)?.grade,
         comment: comments.value.get(studentId),
         metadata: {
           selfAssessment: Object.fromEntries(selfAssessmentEntries.value.get(studentId) ?? [])
@@ -347,6 +375,65 @@ export function useCriteriaGradingEntryView() {
     }
   }
 
+  function prepareHandoff(studentId: string): void {
+    if (!selfAssessmentEnabled.value) {
+      toast.warning('Bitte zuerst die Selbsteinschätzung für diese Kategorie aktivieren.')
+      return
+    }
+    if (unsavedStudents.value.has(studentId)) {
+      toast.warning('Bitte die Lehrereinschätzung vor der Übergabe speichern.')
+      return
+    }
+
+    const teacherScores = Object.fromEntries(gradeEntries.value.get(studentId) ?? [])
+    try {
+      compareCriterionScores(criteria.value, teacherScores, teacherScores)
+    } catch {
+      toast.warning('Bitte zuerst alle Beobachtungskriterien als Lehrkraft bewerten.')
+      return
+    }
+
+    handoffCandidateId.value = studentId
+    pinDraft.value = ''
+  }
+
+  function startHandoff(): void {
+    if (!handoffCandidateId.value) return
+    if (!/^\d{4,6}$/.test(pinDraft.value)) {
+      toast.warning('Bitte eine PIN mit 4 bis 6 Ziffern festlegen.')
+      return
+    }
+    handoffPin.value = pinDraft.value
+    pinDraft.value = ''
+    handoffStudentId.value = handoffCandidateId.value
+    handoffCandidateId.value = null
+  }
+
+  function closeHandoff(): void {
+    handoffStudentId.value = null
+    handoffPin.value = ''
+  }
+
+  async function saveHandoffAssessment(scores: Record<string, number>): Promise<void> {
+    const studentId = handoffStudentId.value
+    const repository = performanceEntries.value
+    if (!studentId || !repository) throw new Error('Schülerbewertung ist nicht verfügbar.')
+
+    const teacherScores = Object.fromEntries(gradeEntries.value.get(studentId) ?? [])
+    compareCriterionScores(criteria.value, scores, teacherScores)
+
+    const latestEntry = await repository.getLatestEntry(studentId, categoryId)
+    if (!latestEntry) throw new Error('Die Lehrereinschätzung muss zuerst gespeichert werden.')
+
+    await repository.update(latestEntry.id, {
+      metadata: {
+        ...latestEntry.metadata,
+        selfAssessment: { ...scores }
+      }
+    })
+    selfAssessmentEntries.value.set(studentId, new Map(Object.entries(scores)))
+  }
+
   function toggleBulkMode() {
     bulkMode.value = !bulkMode.value
     toast.info('Der Bulk-Modus ist derzeit nicht verfügbar.')
@@ -386,23 +473,33 @@ export function useCriteriaGradingEntryView() {
     error,
     getGradeValue,
     getSelfAssessmentValue,
+    handoffCandidateId,
+    handoffInitialScores,
+    handoffPin,
+    handoffStudent,
+    handoffTeacherScores,
     hasUnsavedChanges,
     hasUnsavedChangesForStudent,
     loading,
     newCriterion,
     onGradeChange,
     onSelfAssessmentChange,
+    pinDraft,
     participationOptions,
+    prepareHandoff,
     participationStatus,
     removeCriterion,
     saveAllGrades,
     saveComment,
+    saveHandoffAssessment,
     saveStudentGrade,
     saving,
     setParticipation,
     setSelfAssessmentEnabled,
     selfAssessmentEnabled,
     showAddCriterionModal,
+    startHandoff,
+    closeHandoff,
     showCommentModal,
     students,
     toggleBulkMode
