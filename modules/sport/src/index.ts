@@ -148,6 +148,11 @@ export type {
   ScoreboardLookup
 } from './services/tournament.service.js';
 export { TimeGradingService } from './services/time-grading.service.js';
+export { PerformanceTableGradingService } from './services/performance-table-grading.service.js';
+export type {
+  PerformanceTableGradingInput,
+  PerformanceTableGradingResult
+} from './services/performance-table-grading.service.js';
 export type {
   TimeToGradeInput,
   TimeToGradeResult,
