@@ -35,6 +35,7 @@ export interface GradeCategory {
 export enum GradeCategoryType {
   Criteria = 'criteria',
   Time = 'time',
+  Performance = 'performance',
   Cooper = 'cooper',
   Shuttle = 'shuttle',
   Mittelstrecke = 'mittelstrecke',
@@ -46,6 +47,7 @@ export enum GradeCategoryType {
 export type GradeCategoryConfig =
   | CriteriaGradingConfig
   | TimeGradingConfig
+  | PerformanceGradingConfig
   | CooperGradingConfig
   | ShuttleGradingConfig
   | MittelstreckeGradingConfig
@@ -81,6 +83,14 @@ export interface TimeGradingConfig {
 export interface TimeBoundary {
   time: number;
   grade: number | string;
+}
+
+export interface PerformanceGradingConfig {
+  type: 'performance';
+  gradingTable?: string;
+  measurementType: 'number' | 'time';
+  measurementLabel: string;
+  unit?: string;
 }
 
 export interface CooperGradingConfig {
