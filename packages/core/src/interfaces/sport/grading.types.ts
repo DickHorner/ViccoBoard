@@ -85,12 +85,18 @@ export interface TimeBoundary {
   grade: number | string;
 }
 
+export type PerformanceNormalization = 'raw' | 'body-height-percent';
+
 export interface PerformanceGradingConfig {
   type: 'performance';
   gradingTable?: string;
   measurementType: 'number' | 'time';
   measurementLabel: string;
   unit?: string;
+  sport?: string;
+  discipline?: string;
+  gradeLevel?: number;
+  normalization?: PerformanceNormalization;
 }
 
 export interface CooperGradingConfig {
