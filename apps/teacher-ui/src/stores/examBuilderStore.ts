@@ -213,6 +213,7 @@ export function cloneTaskDraftFromNode(branch: ReusableTaskBranch): TaskDraft {
   return {
     id: createUuid(),
     title: branch.node.title,
+    description: branch.node.description ?? '',
     points: branch.node.points,
     bonusPoints: branch.node.bonusPoints ?? 0,
     isChoice: branch.node.isChoice,
