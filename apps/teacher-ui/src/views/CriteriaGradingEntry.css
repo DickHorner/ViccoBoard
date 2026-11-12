@@ -458,3 +458,8 @@
     flex: 1;
   }
 }
+
+.handoff-button {
+  white-space: nowrap;
+  margin-right: 0.35rem;
+}
