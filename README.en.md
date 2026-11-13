@@ -2,14 +2,14 @@
 
 <img src="./docs/assets/viccoboard-banner.svg" width="100%" alt="ViccoBoard — Organize. Assess. Give feedback." />
 
-**One teacher workspace for lessons, PE assessment, and exams.**  
+**A modular teacher workspace — with the PE subject module already integrated.**  
 *Local-first. Browser-based. Built for classroom realities.*
 
 [![CI][badge-ci]][ci] [![CodeQL][badge-codeql]][codeql] [![OpenSSF Scorecard][badge-scorecard]][scorecard] [![OpenSSF Best Practices][badge-bestpractices]][bestpractices]  
 [![License][badge-license]][license] [![Contributors][badge-contributors]][contributors] [![Last commit][badge-last-commit]][commits] [![Issues][badge-issues]][issues] [![Pull requests][badge-prs]][pulls]  
 [![Vue 3][badge-vue]][vue] [![TypeScript][badge-typescript]][typescript] [![Local-first][badge-local]][privacy] [![iPadOS Safari][badge-ipad]][ipad]
 
-[**Explore features**](#features) · [**Get started**](#get-started) · [**npm scripts**](#npm-scripts) · [**Privacy**](#privacy-and-security) · [**Contribute**](#contributing)
+[**Modular design**](#modular-by-design) · [**Explore features**](#features) · [**Get started**](#get-started) · [**npm scripts**](#npm-scripts) · [**Privacy**](#privacy-and-security) · [**Contribute**](#contributing)
 
 [Deutsch](./README.md) · [English](./README.en.md)
 
@@ -17,7 +17,18 @@
 
 ---
 
-> **Less administration. More teaching.** ViccoBoard brings class management, attendance, sports assessments, classroom tools, exam creation, marking, and analysis into one modular web application. Its default workflow stores data **locally in the browser**, without requiring a cloud account or application server.
+> **Less administration. More teaching.** ViccoBoard combines subject-independent teacher workflows with extensible subject modules. The **PE/Sport module is already integrated**, while classes, attendance, assessment, and exam workflows share a common base. The default application stores data **locally in the browser**, without requiring a cloud account or application server.
+
+## Modular by design
+
+**ViccoBoard is not limited to PE.** Shared teacher workflows — classes, student records, attendance, lesson organization, and local storage — form a subject-independent foundation. Subject-specific functionality lives in separate modules connected to the common interface.
+
+- **Integrated today: [Sport / Physical Education](./modules/sport/)**, with performance assessment, sport exams, grading tables, teaching tools, and statistics.
+- **Cross-subject: [exams and corrections (KBR)](./modules/exams/)**, providing tasks, assessment criteria, marking, and feedback.
+- **Shared foundation: [student management](./modules/students/)**, avoiding separate rosters for each subject.
+- **Extensible to other subjects:** New subject modules can be added under `modules/*` and reuse the shared foundation. Each requires its own domain logic, UI integration, and tests; no other subject module is currently integrated.
+
+The goal is to expand into more subjects **without rebuilding common teacher functionality for every subject**.
 
 ## Features
 
@@ -32,9 +43,11 @@
 Create a **Sportprüfung** by choosing the date, class and discipline. Enter running times, distances, repetitions, counts or rubric scores; see the calculated grade immediately and save a linked assessment session.
 
 - Performance tables, including multidimensional CSV data by grade level, discipline and gender.
+- Quick grading-table creation from thresholds and automatic conversion of measured performance into grades, including multidimensional and body-height-relative assessment.
 - Different grading directions (lower time / higher distance or count).
 - Relative performance, such as jump height as a percentage of body height.
 - Free observation criteria with 0–3-point or other configured ranges and relative weighting.
+- **Same-iPad self-assessment handoff:** save the teacher's criterion scores, let the student record their own, then reveal the comparison after a 4–6-digit teacher PIN. Results appear in a criterion table and, for 3–12 criteria, a radar chart. Differences do not automatically change the teacher's grade.
 - Cooper, shuttle run, middle-distance, sport badge (Sportabzeichen) and federal youth games (Bundesjugendspiele) workflows.
 - Class roster with absence hints, participation/passive/missing-kit states and an announced-exam indicator.
 - Session-linked performance records, student history and statistics.
@@ -47,7 +60,7 @@ ViccoBoard includes class/student records, lesson attendance, configurable statu
 
 ### KBR: exams and corrections
 
-The KBR workspace includes simple and structured exam editors, questions and points, grading keys, correction views, result analysis, support-tip libraries and export views. Advanced printing, sharing and integration options may still be incomplete; consult the [product plan](./Plan.md) and [roadmap](./docs/planning/ROADMAP.md).
+The KBR workspace includes simple and structured exam editors, questions and points, grading keys, correction views, result analysis, support-tip libraries and export views. It can also import **versioned JSON exam templates**, including student-facing task instructions and assessment criteria, from compatible external tools, whether created manually or with AI assistance. Import runs locally; it is not a direct AI service connection. See the [JSON format specification](./docs/integrations/viccoboard-exam-format.md). Advanced printing, sharing and integration options may still be incomplete; consult the [product plan](./Plan.md) and [roadmap](./docs/planning/ROADMAP.md).
 
 ## Privacy and security
 
@@ -81,7 +94,7 @@ For the local iPad HTML build:
 npm run build:ipad:local
 ```
 
-A [manual GitHub Actions workflow](./.github/workflows/daily-driver-build.yml) creates a local iPad artifact. **No stable GitHub Release is published yet.**
+The [Local iPad Build GitHub Actions workflow](./.github/workflows/daily-driver-build.yml) runs **after pushes to `main`** and can also be started manually. It checks the project and uploads the single-file iPad HTML build as a **7-day workflow artifact**. **No stable GitHub Release is published yet.**
 
 ## npm scripts
 
@@ -154,7 +167,7 @@ packages/storage/  IndexedDB and Node/SQLite adapters
 packages/plugins/  Shared plugin building blocks
 ```
 
-Development respects **`apps → modules → packages`** and module bridges/use cases. The maintainer quality gate is:
+Development respects **`apps → modules → packages`**: the application integrates subject modules such as Sport, which reuse shared types, interfaces, and storage components through module bridges/use cases. Additional subject modules can follow the same pattern without duplicating domain logic in Vue views. The maintainer quality gate is:
 
 ```bash
 npm run lint:docs
