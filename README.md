@@ -2,14 +2,14 @@
 
 <img src="./docs/assets/viccoboard-banner.svg" alt="ViccoBoard — Erfassen. Beurteilen. Rückmelden." width="100%" />
 
-**Eine Arbeitsoberfläche für Unterricht, Sport und Prüfungen.**  
+**Modularer Lehrkräfte-Workspace – mit integriertem Fachmodul Sport.**  
 *Local-first. Browserbasiert. Für den Schulalltag gebaut.*
 
 [![CI][badge-ci]][ci] [![CodeQL][badge-codeql]][codeql] [![OpenSSF Scorecard][badge-scorecard]][scorecard] [![OpenSSF Best Practices][badge-bestpractices]][bestpractices]  
 [![License][badge-license]][license] [![Contributors][badge-contributors]][contributors] [![Last commit][badge-last-commit]][commits] [![Issues][badge-issues]][issues] [![Pull requests][badge-prs]][pulls]  
 [![Vue 3][badge-vue]][vue] [![TypeScript][badge-typescript]][typescript] [![Local-first][badge-local]][privacy] [![iPadOS Safari][badge-ipad]][ipad]
 
-[**Funktionen entdecken**](#-alles-an-einem-ort) · [**Schnellstart**](#-schnellstart) · [**npm-Skripte**](#-npm-skripte) · [**Datenschutz verstehen**](#-privacy--sicherheit) · [**Mitmachen**](#-mitmachen)
+[**Modularer Aufbau**](#-modular-aufgebaut) · [**Funktionen entdecken**](#-alles-an-einem-ort) · [**Schnellstart**](#-schnellstart) · [**npm-Skripte**](#-npm-skripte) · [**Datenschutz verstehen**](#-privacy--sicherheit) · [**Mitmachen**](#-mitmachen)
 
 [Deutsch](./README.md) · [English](./README.en.md)
 
@@ -17,7 +17,18 @@
 
 ---
 
-> **Weniger Verwaltung. Mehr Unterricht.** ViccoBoard führt typische Lehrkräfte-Workflows zusammen: Klassen und Anwesenheiten verwalten, Leistungen unmittelbar bewerten, Sport-Tools im Unterricht einsetzen, Prüfungen erstellen, korrigieren und auswerten. Die Standardanwendung arbeitet mit **lokalen Browserdaten** statt mit einem verpflichtenden Cloud-Konto.
+> **Weniger Verwaltung. Mehr Unterricht.** ViccoBoard verbindet eine gemeinsame, fachübergreifende Basis mit erweiterbaren Fachmodulen: Klassen und Anwesenheiten verwalten, Leistungen unmittelbar bewerten, Fachwerkzeuge im Unterricht einsetzen, Prüfungen erstellen, korrigieren und auswerten. Das **Fachmodul Sport ist bereits integriert**. Die Standardanwendung arbeitet mit **lokalen Browserdaten** statt mit einem verpflichtenden Cloud-Konto.
+
+## 🧩 Modular aufgebaut
+
+**ViccoBoard ist keine reine Sport-App, sondern als Lehrkräfte-Plattform für unterschiedliche Unterrichtsfächer angelegt.** Fachneutrale Funktionen wie Klassen- und Schülerverwaltung, Anwesenheit, Unterrichtsorganisation und Datenspeicherung bilden die gemeinsame Basis. Fachspezifische Funktionen werden in getrennten Modulen entwickelt und in die gemeinsame Oberfläche eingebunden.
+
+- **Schon integriert: das Fachmodul [Sport](./modules/sport/)** mit Leistungsbewertung, Sportprüfungen, Tests, Tabellen, Unterrichtswerkzeugen und Statistiken.
+- **Fachübergreifend nutzbar: [Prüfungen und Korrektur (KBR)](./modules/exams/)** für Aufgaben, Erwartungshorizonte, Bewertung und Rückmeldung.
+- **Gemeinsam genutzte Grundlage: [Schülerverwaltung](./modules/students/)** statt separater Schülerlisten je Fach.
+- **Für weitere Fächer erweiterbar:** Zusätzliche Fachmodule können in `modules/*` entstehen und die vorhandene gemeinsame Basis nutzen. Dafür sind jeweils fachliche Logik, Oberflächenanbindung und Tests erforderlich; andere Fachmodule sind derzeit noch nicht integriert.
+
+So kann ViccoBoard um weitere Fächer wachsen, **ohne die allgemeinen Lehrkräftefunktionen für jedes Fach neu entwickeln zu müssen**.
 
 ## ✨ Alles an einem Ort
 
@@ -59,11 +70,16 @@ Die Bewertung verwendet die tatsächlichen Punkte und die konfigurierten Kriteri
 - **Kriterienbasierte Bewertung** mit eigenen Beobachtungsmerkmalen, Punkteskalen, relativer Gewichtung und Gesamtbewertung.
 - **Messwertbewertung** für Zeiten, Strecken, Höhen, Wiederholungen und Treffer.
 - **Bewertungstabellen** importieren und konfigurieren, einschließlich mehrdimensionaler CSV-Tabellen mit Klassenstufen, Disziplinen und Geschlechtszuordnung.
+- **Bewertungstabellen schnell selbst erstellen** über Grenzwerte und Messwerte anhand der gewählten Tabelle automatisch in Noten umrechnen – einschließlich mehrdimensionaler oder körpergrößenbezogener Bewertung.
 - **Unterschiedliche Bewertungsrichtungen**: bei Zeit gilt oft „weniger ist besser“, bei Strecke oder Anzahl häufig „mehr ist besser“.
 - **Relative Bewertung**, beispielsweise Hochsprunghöhe im Verhältnis zur Körpergröße.
 - **Sportprüfung im Live-Betrieb** mit Datum, Klassenliste, Anwesenheitshinweisen, Ergebnisseingabe, unmittelbarer Notenberechnung und Speicherung.
 - **Test- und Bewertungssysteme** für Cooper-Test, Shuttle-Run, Mittelstrecke, Sportabzeichen und Bundesjugendspiele.
 - **Notenübersicht, Leistungshistorie und Sportstatistiken**.
+
+**Selbst- und Fremdeinschätzung auf dem iPad**
+
+Bei der kriterienbasierten Bewertung kann die Lehrkraft ihre Werte zunächst speichern und das iPad anschließend zur **Selbsteinschätzung** an die Schülerin oder den Schüler übergeben. Nach Rückgabe wird die Lehrkraftbewertung erst nach Eingabe einer **4- bis 6-stelligen PIN** sichtbar. Beide Einschätzungen lassen sich kriterienweise in einer Tabelle und bei **3 bis 12 Kriterien** zusätzlich als Radardiagramm vergleichen. Unterschiede dienen als Gesprächsanlass und ändern die Lehrkraftnote nicht automatisch.
 
 **Live-Tools in der Halle und auf dem Platz**
 
@@ -87,6 +103,7 @@ Die Bewertung verwendet die tatsächlichen Punkte und die konfigurierten Kriteri
 KBR ist der zweite große Bereich neben Sport. Der Fokus liegt auf einer durchgehenden Arbeitskette:
 
 - **Prüfungen anlegen** – einfache und komplexere Aufgabenstrukturen im Prüfungseditor.
+- **Strukturierte Prüfungsvorlagen lokal importieren** – Aufgabenstellungen, Teilaufgaben und bewertbare Erwartungen aus einer kompatiblen, versionierten JSON-Datei übernehmen. Die Datei kann auch extern oder KI-gestützt erstellt werden; eine direkte KI-Anbindung ist für den Import nicht erforderlich. [JSON-Formatbeschreibung](./docs/integrations/viccoboard-exam-format.md).
 - **Aufgaben, Teilaufgaben, Kriterien und Punkte** verwalten.
 - **Notenschlüssel** und Bewertungsvorgaben anwenden.
 - **Korrekturen erfassen** – einschließlich kompakter Korrekturansichten und kriterienbezogener Eingabe.
@@ -144,7 +161,7 @@ Für ein lokales iPad-HTML-Artefakt:
 npm run build:ipad:local
 ```
 
-Das passende manuell startbare GitHub-Workflow heißt [Local iPad Build](./.github/workflows/daily-driver-build.yml). **Eine veröffentlichte stabile Release-Version gibt es aktuell noch nicht.** Die [Release-Pipeline](./.github/workflows/release.yml) ist vorhanden, ersetzt aber keine veröffentlichte Release-Datei.
+Der GitHub-Actions-Workflow [Local iPad Build](./.github/workflows/daily-driver-build.yml) startet **bei Änderungen auf `main` automatisch** und kann auch manuell ausgeführt werden. Er prüft den Build und stellt die einzelne iPad-HTML-Datei für **7 Tage als Workflow-Artefakt** bereit. **Eine veröffentlichte stabile Release-Version gibt es aktuell noch nicht.** Die [Release-Pipeline](./.github/workflows/release.yml) ist vorhanden, ersetzt aber keine veröffentlichte Release-Datei.
 
 ## 🧰 npm-Skripte
 
@@ -217,7 +234,7 @@ packages/storage/     IndexedDB im Browser, SQLite für Node-/Testpfade
 packages/plugins/     Gemeinsame Plugin-Bausteine
 ```
 
-Die Entwicklungsrichtung ist **`apps → modules → packages`**. Lehrkräfte-Workflows gehören in Fachmodule, statt Geschäftslogik in Vue-Seiten zu duplizieren.
+Die Entwicklungsrichtung ist **`apps → modules → packages`**: Die App bindet Fachmodule wie **Sport** ein; diese verwenden gemeinsame Typen, Schnittstellen und Speicherbausteine. Neue Fachmodule lassen sich nach diesem Muster ergänzen, ohne fachliche Geschäftslogik in Vue-Seiten oder in der fachneutralen Basis zu duplizieren.
 
 Qualitätschecks:
 
@@ -246,7 +263,7 @@ Die Befehle und ihr Umfang sind in [DEVELOPMENT.md](./DEVELOPMENT.md) beschriebe
 
 ## 🧭 Was bereits da ist – und was noch wächst
 
-**Verfügbar im Quellcode:** zentrale Schüler- und Unterrichtsbereiche, Sportbewertung, Prüfungs- und Korrekturoberflächen, zahlreiche Live-Tools, lokale Speicherung und Backups.
+**Verfügbar im Quellcode:** zentrale Schüler- und Unterrichtsbereiche, das integrierte Fachmodul Sport mit tabellengestützter Bewertung und iPad-Selbsteinschätzung, Prüfungs- und Korrekturoberflächen einschließlich JSON-Prüfungsvorlagenimport, zahlreiche Live-Tools, lokale Speicherung und Backups.
 
 **Noch nicht als abgeschlossen bewerben:** durchgängige Anbindung aller Live-Zähler an Sportprüfungssessions, direkte generische XLSX-Mastertabellenverarbeitung, vollständige Verschlüsselung/App-Sperre, alle im Plan vorgesehenen Cloud-/Sharing-Integrationen und ein stabiler Release-Download.
 
