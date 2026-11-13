@@ -28,7 +28,8 @@ export function useTournamentsView() {
   const form = ref({
     name: '',
     type: 'round-robin' as 'round-robin' | 'knockout' | 'adaptive',
-    teams: ['', '']
+    teams: ['', ''],
+    teamSize: 1
   });
   const scoreEntry = ref<{
     open: boolean;
@@ -59,6 +60,12 @@ export function useTournamentsView() {
     bridge = getSportBridge();
   } catch {
     bridge = null as never;
+  }
+
+  function matchTeamName(match: Sport.Match, side: 1 | 2): string {
+    const participantIds = side === 1 ? match.team1ParticipantIds : match.team2ParticipantIds;
+    if (participantIds?.length) return participantIds.map(teamName).join(' / ');
+    return teamName(side === 1 ? match.team1Id : match.team2Id);
   }
 
   function teamName(teamId: string): string {
@@ -178,7 +185,7 @@ export function useTournamentsView() {
   }
 
   function startCreate() {
-    form.value = { name: '', type: 'round-robin', teams: ['', ''] };
+    form.value = { name: '', type: 'round-robin', teams: ['', ''], teamSize: 1 };
     createError.value = '';
     selectedClassId.value = '';
     classStudents.value = [];
@@ -214,7 +221,7 @@ export function useTournamentsView() {
   async function submitCreate() {
     createError.value = '';
     const filledTeams = form.value.teams.map(n => n.trim()).filter(n => n.length > 0);
-    if (form.value.type === 'adaptive' && (!selectedClassId.value || classStudents.value.length < 2)) {
+    if (form.value.type === 'adaptive' && (!selectedClassId.value || classStudents.value.length < form.value.teamSize * 2)) {
       createError.value = t('TOURNAMENTS.adaptive_select_class');
       return;
     }
@@ -242,6 +249,7 @@ export function useTournamentsView() {
         classGroupId: form.value.type === 'adaptive' ? selectedClassId.value : 'default',
         name: form.value.name.trim(),
         type: form.value.type,
+        teamSize: form.value.type === 'adaptive' ? form.value.teamSize : undefined,
         teams
       });
 
@@ -347,7 +355,7 @@ export function useTournamentsView() {
       try {
         const teams: string[] = JSON.parse(handoff);
         if (Array.isArray(teams) && teams.length >= 2) {
-          form.value = { name: '', type: 'round-robin', teams };
+          form.value = { name: '', type: 'round-robin', teams, teamSize: 1 };
           view.value = 'create';
         }
       } catch {
@@ -380,6 +388,7 @@ export function useTournamentsView() {
     selectedScoreboardSessionId,
     scoreboardImportHint,
     teamName,
+    matchTeamName,
     formatType,
     matchesByRound,
     standings,
