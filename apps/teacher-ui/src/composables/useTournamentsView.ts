@@ -47,8 +47,13 @@ export function useTournamentsView() {
 
   let bridge: ReturnType<typeof getSportBridge>;
   const tournamentService = new TournamentService();
-  initializeStudentsBridge();
-  const studentsBridge = getStudentsBridge();
+  let studentsBridge: ReturnType<typeof getStudentsBridge>;
+  try {
+    initializeStudentsBridge();
+    studentsBridge = getStudentsBridge();
+  } catch {
+    studentsBridge = null as never;
+  }
 
   try {
     bridge = getSportBridge();
@@ -113,14 +118,14 @@ export function useTournamentsView() {
   }
 
   async function loadClassStudents() {
-    classStudents.value = selectedClassId.value
+    classStudents.value = studentsBridge && selectedClassId.value
       ? await studentsBridge.studentRepository.findByClassGroup(selectedClassId.value)
       : [];
     presentStudentIds.value = classStudents.value.map(student => student.id);
   }
 
   async function loadTournamentParticipants() {
-    if (!activeTournament.value || activeTournament.value.type !== 'adaptive') return;
+    if (!activeTournament.value || activeTournament.value.type !== 'adaptive' || !studentsBridge) return;
     selectedClassId.value = activeTournament.value.classGroupId;
     await loadClassStudents();
     const allowed = new Set(activeTournament.value.teams.flatMap(team => team.studentIds));
