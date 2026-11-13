@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: local-ipad-build-${{ github.ref }}
+  group: local-ipad-build-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
