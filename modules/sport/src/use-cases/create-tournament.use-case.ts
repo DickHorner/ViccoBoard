@@ -10,7 +10,7 @@ import { TournamentService } from '../services/tournament.service.js';
 export interface CreateTournamentInput {
   classGroupId: string;
   name: string;
-  type: 'round-robin' | 'knockout';
+  type: 'round-robin' | 'knockout' | 'adaptive';
   teams: Array<{
     id: string;
     name: string;
@@ -32,11 +32,15 @@ export class CreateTournamentUseCase {
     if (!input.name || !input.name.trim()) {
       throw new Error('Tournament name is required');
     }
-    if (!['round-robin', 'knockout'].includes(input.type)) {
-      throw new Error('type must be one of: round-robin, knockout');
+    if (!['round-robin', 'knockout', 'adaptive'].includes(input.type)) {
+      throw new Error('type must be one of: round-robin, knockout, adaptive');
     }
     if (!input.teams || input.teams.length < 2) {
       throw new Error('At least 2 teams are required');
+    }
+
+    if (input.type === 'adaptive' && (new Set(input.teams.flatMap(t => t.studentIds)).size !== input.teams.length || input.teams.some(t => t.studentIds.length !== 1))) {
+      throw new Error('Adaptive tournaments require distinct individual students');
     }
 
     const teams: Sport.Team[] = input.teams.map(t => ({
@@ -49,7 +53,9 @@ export class CreateTournamentUseCase {
     const tournamentId = crypto.randomUUID();
 
     let matches: Sport.Match[];
-    if (input.type === 'round-robin') {
+    if (input.type === 'adaptive') {
+      matches = [];
+    } else if (input.type === 'round-robin') {
       matches = this.tournamentService.generateRoundRobinSchedule(
         tournamentId,
         teams
