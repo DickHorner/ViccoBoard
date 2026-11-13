@@ -149,6 +149,19 @@ export function useTournamentsView() {
     }
   }
 
+  async function cancelAdaptiveMatch(matchId: string) {
+    if (!activeTournament.value || saving.value) return;
+    roundError.value = '';
+    saving.value = true;
+    try {
+      activeTournament.value = await bridge.drawAdaptiveRoundUseCase.cancelMatch(activeTournament.value.id, matchId);
+    } catch (error) {
+      roundError.value = (error as Error).message;
+    } finally {
+      saving.value = false;
+    }
+  }
+
   async function loadTournaments() {
     if (!bridge) return;
     loading.value = true;
@@ -354,6 +367,7 @@ export function useTournamentsView() {
     roundError,
     loadClassStudents,
     drawRound,
+    cancelAdaptiveMatch,
     scoreError,
     form,
     scoreEntry,
