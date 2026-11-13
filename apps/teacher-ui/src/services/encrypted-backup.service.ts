@@ -95,7 +95,7 @@ export async function decryptBackupContent(value: unknown, password: string): Pr
   }
 }
 
-async function deriveKey(password: string, salt: Uint8Array, iterations: number): Promise<CryptoKey> {
+async function deriveKey(password: string, salt: Uint8Array<ArrayBuffer>, iterations: number): Promise<CryptoKey> {
   const source = await crypto.subtle.importKey(
     'raw',
     new TextEncoder().encode(password),
@@ -120,14 +120,14 @@ function encodeBase64(bytes: Uint8Array): string {
   return parts.join('')
 }
 
-function decodeBase64(value: unknown): Uint8Array {
+function decodeBase64(value: unknown): Uint8Array<ArrayBuffer> {
   if (typeof value !== 'string' || value.length === 0 || value.length % 4 !== 0 ||
       !/^[A-Za-z0-9+/]*={0,2}$/.test(value)) {
     throw new Error('Die verschlüsselte Backup-Datei ist ungültig.')
   }
 
   const padding = value.endsWith('==') ? 2 : value.endsWith('=') ? 1 : 0
-  const bytes = new Uint8Array((value.length / 4) * 3 - padding)
+  const bytes = new Uint8Array(new ArrayBuffer((value.length / 4) * 3 - padding))
   let offset = 0
   for (let index = 0; index < value.length; index += BASE64_DECODE_CHUNK_SIZE) {
     const chunk = atob(value.slice(index, index + BASE64_DECODE_CHUNK_SIZE))
