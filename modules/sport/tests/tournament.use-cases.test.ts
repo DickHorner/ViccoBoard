@@ -160,6 +160,7 @@ describe('UpdateTournamentMatchUseCase', () => {
     storage.registerMigration(new InitialSchemaMigration(storage));
     storage.registerMigration(new GradingSchemaMigration(storage));
     storage.registerMigration(new TournamentSchemaMigration(storage));
+    storage.registerMigration(new TournamentTeamSizeMigration(storage));
     await storage.migrate();
 
     adapter = storage.getAdapter();
