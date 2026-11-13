@@ -53,35 +53,18 @@ export async function restoreLiveDataBackup(backup: LiveDataBackupFile): Promise
   assertBackupFile(backup)
 
   const db = getStorage().getDatabase()
-  let insertedRecords = 0
-  let mergedRecords = 0
-  let unchangedRecords = 0
-  let conflictRecords = 0
-  let importedStores = 0
-  const skippedStores: string[] = []
+  const missingStores = backup.stores
+    .filter((store) => !db.objectStoreNames.contains(store.name))
+    .map((store) => store.name)
 
-  for (const storeBackup of backup.stores) {
-    if (!db.objectStoreNames.contains(storeBackup.name)) {
-      skippedStores.push(storeBackup.name)
-      continue
-    }
-
-    importedStores += 1
-    const result = await restoreChangedRecords(db, storeBackup.name, storeBackup.records)
-    insertedRecords += result.insertedRecords
-    mergedRecords += result.mergedRecords
-    unchangedRecords += result.unchangedRecords
-    conflictRecords += result.conflictRecords
+  if (missingStores.length > 0) {
+    throw new Error(
+      'Diese Datenbereiche sind in der aktuellen ViccoBoard-Version nicht vorhanden: ' +
+      missingStores.join(', ') + '. Nichts wurde importiert.'
+    )
   }
 
-  return {
-    importedStores,
-    skippedStores,
-    insertedRecords,
-    mergedRecords,
-    unchangedRecords,
-    conflictRecords
-  }
+  return restoreChangedRecords(db, backup.stores)
 }
 
 export function parseLiveDataBackup(content: string): LiveDataBackupFile {
@@ -91,7 +74,7 @@ export function parseLiveDataBackup(content: string): LiveDataBackupFile {
 }
 
 function assertBackupFile(value: unknown): asserts value is LiveDataBackupFile {
-  if (!value || typeof value !== 'object') {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error('Die Backup-Datei ist ungültig.')
   }
 
@@ -100,8 +83,34 @@ function assertBackupFile(value: unknown): asserts value is LiveDataBackupFile {
     throw new Error('Die Backup-Datei hat kein unterstütztes ViccoBoard-Format.')
   }
 
-  if (!Array.isArray(backup.stores)) {
+  if (backup.databaseName !== VICCOBOARD_DATABASE_NAME) {
+    throw new Error('Das Backup gehört zu einer anderen Datenbank.')
+  }
+
+  if (typeof backup.exportedAt !== 'string' || !Number.isFinite(Date.parse(backup.exportedAt))) {
+    throw new Error('Das Backup hat kein gültiges Exportdatum.')
+  }
+
+  if (!Array.isArray(backup.stores) || backup.stores.length === 0) {
     throw new Error('Die Backup-Datei enthält keine Store-Daten.')
+  }
+
+  const storeNames = new Set<string>()
+  for (const store of backup.stores) {
+    if (!store || typeof store.name !== 'string' || !store.name ||
+        !Array.isArray(store.records) || storeNames.has(store.name)) {
+      throw new Error('Die Backup-Datei enthält ungültige oder doppelte Datenbereiche.')
+    }
+    storeNames.add(store.name)
+
+    const recordIds = new Set<string>()
+    for (const record of store.records) {
+      if (!record || typeof record !== 'object' || Array.isArray(record) ||
+          typeof record.id !== 'string' || !record.id || recordIds.has(record.id)) {
+        throw new Error('Das Backup enthält ungültige oder doppelte IDs in ' + store.name + '.')
+      }
+      recordIds.add(record.id)
+    }
   }
 }
 
@@ -116,69 +125,60 @@ function readAllRecords(db: IDBDatabase, storeName: string): Promise<Array<Recor
   })
 }
 
-function restoreChangedRecords(
-  db: IDBDatabase,
-  storeName: string,
-  records: Array<Record<string, unknown>>
-): Promise<{
-  insertedRecords: number
-  mergedRecords: number
-  unchangedRecords: number
-  conflictRecords: number
-}> {
-  if (records.length === 0) {
-    return Promise.resolve({
-      insertedRecords: 0,
-      mergedRecords: 0,
-      unchangedRecords: 0,
-      conflictRecords: 0
-    })
-  }
-
+function restoreChangedRecords(db: IDBDatabase, backupStores: LiveDataBackupStore[]): Promise<LiveDataRestoreResult> {
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(storeName, 'readwrite')
-    const store = tx.objectStore(storeName)
+    const tx = db.transaction(backupStores.map((store) => store.name), 'readwrite')
     let insertedRecords = 0
     let mergedRecords = 0
     let unchangedRecords = 0
-    let conflictRecords = 0
+    let failure: Error | null = null
 
-    tx.oncomplete = () => resolve({ insertedRecords, mergedRecords, unchangedRecords, conflictRecords })
-    tx.onerror = () => reject(tx.error)
-    tx.onabort = () => reject(tx.error ?? new Error('Die Wiederherstellung wurde abgebrochen.'))
+    tx.oncomplete = () => resolve({
+      importedStores: backupStores.length,
+      skippedStores: [],
+      insertedRecords,
+      mergedRecords,
+      unchangedRecords,
+      conflictRecords: 0
+    })
+    tx.onabort = () => reject(failure ?? tx.error ?? new Error('Die Wiederherstellung wurde abgebrochen.'))
 
-    for (const backupRecord of records) {
-      const id = backupRecord.id
-      if (typeof id !== 'string') {
-        tx.abort()
-        reject(new Error(`Backup-Datensatz in ${storeName} hat keine gültige ID.`))
-        return
+    for (const storeBackup of backupStores) {
+      const store = tx.objectStore(storeBackup.name)
+      for (const backupRecord of storeBackup.records) {
+        const request = store.get(backupRecord.id as string)
+        request.onsuccess = () => {
+          try {
+            const currentRecord = request.result as Record<string, unknown> | undefined
+            if (!currentRecord) {
+              store.put(backupRecord)
+              insertedRecords += 1
+              return
+            }
+
+            const merge = mergeBackupValue(currentRecord, backupRecord)
+            if (merge.conflict) {
+              failure = new Error(
+                'Konflikt bei Datensatz ' + String(backupRecord.id) + ' in ' + storeBackup.name +
+                '. Die Wiederherstellung wurde vollständig abgebrochen.'
+              )
+              tx.abort()
+              return
+            }
+
+            if (!merge.changed) {
+              unchangedRecords += 1
+              return
+            }
+
+            store.put(merge.value as Record<string, unknown>)
+            mergedRecords += 1
+          } catch (error) {
+            failure = error instanceof Error ? error : new Error('Fehler beim Wiederherstellen.')
+            tx.abort()
+          }
+        }
       }
-
-      const getRequest = store.get(id)
-      getRequest.onsuccess = () => {
-        const currentRecord = getRequest.result as Record<string, unknown> | undefined
-        if (!currentRecord) {
-          store.put(backupRecord)
-          insertedRecords += 1
-          return
-        }
-
-        const merge = mergeBackupValue(currentRecord, backupRecord)
-        if (merge.conflict) {
-          conflictRecords += 1
-          return
-        }
-
-        if (!merge.changed) {
-          unchangedRecords += 1
-          return
-        }
-
-        store.put(merge.value as Record<string, unknown>)
-        mergedRecords += 1
-      }
-      getRequest.onerror = () => reject(getRequest.error)
     }
   })
 }

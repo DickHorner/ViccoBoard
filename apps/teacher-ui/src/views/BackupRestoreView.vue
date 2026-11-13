@@ -14,14 +14,18 @@
       <h2>Wichtig</h2>
       <p>
         ViccoBoard speichert lokal im Browser. App-Dateien und lokale Daten sind getrennt.
-        Für Gerätewechsel brauchst Du eine Backup-Datei.
+        Für Gerätewechsel brauchst Du eine Backup-Datei. Die lokale Datenbank bleibt derzeit unverschlüsselt.
       </p>
     </section>
 
     <div class="backup-grid">
       <article class="backup-card">
         <h2>Backup exportieren</h2>
-        <p>Exportiert alle lokalen ViccoBoard-Daten aus IndexedDB als JSON-Datei.</p>
+        <p>Exportiert alle lokalen ViccoBoard-Daten als passwortgeschützte Backup-Datei.</p>
+        <label for="backup-password">Backup-Passwort (mindestens 12 Zeichen)</label>
+        <input id="backup-password" v-model="exportPassword" type="password" autocomplete="new-password" :disabled="busy" />
+        <label for="backup-password-confirm">Passwort wiederholen</label>
+        <input id="backup-password-confirm" v-model="exportPasswordConfirm" type="password" autocomplete="new-password" :disabled="busy" />
         <button type="button" :disabled="busy" @click="exportBackup">
           Backup-Datei herunterladen
         </button>
@@ -31,11 +35,13 @@
         <h2>Backup wiederherstellen</h2>
         <p>
           Importiert eine ViccoBoard-Backup-Datei differenziell. Neue Datensätze werden ergänzt,
-          nicht geänderte Datensätze bleiben unberührt.
+          nicht geänderte Datensätze bleiben unberührt. Ältere unverschlüsselte JSON-Backups bleiben lesbar.
         </p>
+        <label for="restore-password">Backup-Passwort (bei alten JSON-Dateien leer lassen)</label>
+        <input id="restore-password" v-model="restorePassword" type="password" autocomplete="off" :disabled="busy" />
         <input
           type="file"
-          accept="application/json,.json"
+          accept="application/json,.json,.viccobak"
           :disabled="busy"
           @change="handleRestoreFile"
         />
@@ -53,6 +59,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { decryptBackupContent, encryptBackupContent, isEncryptedBackup } from '../services/encrypted-backup.service'
 import {
   buildBackupFileName,
   createLiveDataBackup,
@@ -61,6 +68,9 @@ import {
 } from '../services/live-data-backup.service'
 
 const busy = ref(false)
+const exportPassword = ref('')
+const exportPasswordConfirm = ref('')
+const restorePassword = ref('')
 const statusMessage = ref('')
 const errorMessage = ref('')
 
@@ -70,19 +80,25 @@ async function exportBackup(): Promise<void> {
     statusMessage.value = ''
     errorMessage.value = ''
 
+    if (exportPassword.value !== exportPasswordConfirm.value) {
+      throw new Error('Die Backup-Passwörter stimmen nicht überein.')
+    }
     const backup = await createLiveDataBackup()
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const content = await encryptBackupContent(JSON.stringify(backup), exportPassword.value)
+    const blob = new Blob([content], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = buildBackupFileName()
+    link.download = buildBackupFileName().replace(/\.json$/, '.viccobak')
     link.click()
     URL.revokeObjectURL(url)
 
-    statusMessage.value = 'Backup-Datei wurde erstellt.'
+    statusMessage.value = 'Verschlüsseltes Backup wurde erstellt.'
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Backup konnte nicht erstellt werden.'
   } finally {
+    exportPassword.value = ''
+    exportPasswordConfirm.value = ''
     busy.value = false
   }
 }
@@ -105,7 +121,11 @@ async function handleRestoreFile(event: Event): Promise<void> {
     statusMessage.value = ''
     errorMessage.value = ''
 
-    const backup = parseLiveDataBackup(await file.text())
+    const raw = JSON.parse(await file.text()) as unknown
+    const decrypted = isEncryptedBackup(raw)
+      ? await decryptBackupContent(raw, restorePassword.value)
+      : JSON.stringify(raw)
+    const backup = parseLiveDataBackup(decrypted)
     const result = await restoreLiveDataBackup(backup)
     statusMessage.value = [
       `${result.insertedRecords} neu`,
@@ -121,6 +141,7 @@ async function handleRestoreFile(event: Event): Promise<void> {
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Backup konnte nicht importiert werden.'
   } finally {
+    restorePassword.value = ''
     busy.value = false
     input.value = ''
   }
@@ -172,6 +193,12 @@ async function handleRestoreFile(event: Event): Promise<void> {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.backup-card input[type='password'] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem;
 }
 
 .backup-card {
