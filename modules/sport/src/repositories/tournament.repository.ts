@@ -13,6 +13,7 @@ export interface CreateTournamentInput {
   classGroupId: string;
   name: string;
   type: Sport.Tournament['type'];
+  teamSize?: number;
   teams: Sport.Team[];
   matches: Sport.Match[];
 }
@@ -26,6 +27,7 @@ export class TournamentRepository {
       classGroupId: dbRecord.class_group_id,
       name: dbRecord.name,
       type: dbRecord.type as Sport.Tournament['type'],
+      teamSize: dbRecord.team_size ?? 1,
       teams:
         typeof dbRecord.teams === 'string'
           ? JSON.parse(dbRecord.teams)
@@ -47,6 +49,7 @@ export class TournamentRepository {
       classGroupId: input.classGroupId,
       name: input.name,
       type: input.type,
+      teamSize: input.teamSize ?? 1,
       teams: input.teams,
       matches: input.matches,
       status: 'planning',
@@ -59,6 +62,7 @@ export class TournamentRepository {
       class_group_id: tournament.classGroupId,
       name: tournament.name,
       type: tournament.type,
+      team_size: tournament.teamSize,
       teams: JSON.stringify(tournament.teams),
       matches: JSON.stringify(tournament.matches),
       status: tournament.status,
