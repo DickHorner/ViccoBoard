@@ -1,3 +1,4 @@
+/** @jest-environment node */
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 
