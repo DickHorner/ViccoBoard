@@ -362,4 +362,47 @@ describe('TournamentService', () => {
       expect(result.score2).toBe(0);
     });
   });
+  describe('adaptive individual tournaments', () => {
+    const players = ['A', 'B', 'C', 'D', 'E'].map((name, index) => ({
+      id: `p${index}`, name, studentIds: [`s${index}`]
+    }));
+
+    it('starts everyone at the same rating without matches', () => {
+      const standings = service.computeAdaptiveStandings(players, []);
+      expect(standings).toHaveLength(5);
+      expect(standings.every(s => s.rating === 1000 && s.played === 0)).toBe(true);
+    });
+
+    it('generates one round and a scoreless bye for odd attendance', () => {
+      const matches = service.generateAdaptiveRound('t', players, [], players.map(p => p.id), '2026-11-13');
+      expect(matches).toHaveLength(3);
+      expect(matches.filter(m => !m.team2Id)).toHaveLength(1);
+      expect(new Set(matches.flatMap(m => [m.team1Id, m.team2Id].filter(Boolean))).size).toBe(5);
+      expect(service.computeAdaptiveStandings(players, matches).every(s => s.played === 0)).toBe(true);
+    });
+
+    it('does not award points to absent players or byes', () => {
+      const round = service.generateAdaptiveRound('t', players, [], ['p0', 'p1', 'p2'], '2026-11-13');
+      const match = round.find(m => m.team2Id)!;
+      const done = round.map(m => m.id === match.id ? { ...m, status: 'completed' as const, score1: 3, score2: 1 } : m);
+      const standings = service.computeAdaptiveStandings(players, done);
+      expect(standings.find(s => s.teamId === 'p3')!.played).toBe(0);
+      expect(standings.find(s => s.teamId === 'p4')!.points).toBe(0);
+      expect(standings.reduce((sum, s) => sum + s.played, 0)).toBe(2);
+      expect(standings.reduce((sum, s) => sum + s.points, 0)).toBe(3);
+    });
+
+    it('requires completion or cancellation before another draw', () => {
+      const first = service.generateAdaptiveRound('t', players, [], ['p0', 'p1'], '2026-11-13');
+      expect(() => service.generateAdaptiveRound('t', players, first, ['p0', 'p1'], '2026-11-20')).toThrow();
+      const completed = first.map(m => ({ ...m, status: 'completed' as const, score1: 2, score2: 0 }));
+      expect(service.generateAdaptiveRound('t', players, completed, ['p0', 'p1'], '2026-11-20')[0].round).toBe(2);
+    });
+
+    it('rejects duplicate and unknown participants', () => {
+      expect(() => service.generateAdaptiveRound('t', players, [], ['p0', 'p0'], '2026-11-13')).toThrow();
+      expect(() => service.generateAdaptiveRound('t', players, [], ['p0', 'unknown'], '2026-11-13')).toThrow();
+    });
+  });
+
 });
