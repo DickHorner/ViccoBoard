@@ -130,8 +130,6 @@ Force the standard build to ignore its hash cache with `npm run build -- --force
 | `npm run scorecard:zeros` | Fetch public GitHub/OpenSSF data and inspect the `Maintained`, `Code-Review` and `CII-Best-Practices` Scorecard checks. Requires network access. |
 | `npm run badge:bestpractices -- 12057` | Update the OpenSSF Best Practices badge links in both READMEs. **Modifies files.** |
 
-**Known issue:** `hooks:check` still looks for the previous README language-switch text and `## Inhaltsverzeichnis` heading. Both markers are absent from the new README, so the hook gate fails at that check until it is updated.
-
 ### Workspace scripts
 
 Use `npm run <script> --workspace=<name>` from the repository root:
@@ -192,7 +190,7 @@ Help with real classroom testing, anonymized rubrics, issue reports, accessibili
 
 ## License
 
-[MIT](./LICENSE).
+[GNU General Public License v3.0 (GPL-3.0-only)](./LICENSE).
 
 ---
 

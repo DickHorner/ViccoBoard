@@ -197,8 +197,6 @@ Mit `npm run build -- --force` lässt sich der Hash-Cache des Standard-Builds be
 | `npm run scorecard:zeros` | Ruft öffentliche GitHub-/OpenSSF-Daten ab und untersucht die Scorecard-Checks `Maintained`, `Code-Review` und `CII-Best-Practices`. Benötigt Netzwerkzugriff. |
 | `npm run badge:bestpractices -- 12057` | Setzt die OpenSSF-Best-Practices-Badge-Links in beiden READMEs auf Projekt 12057. **Verändert Dateien.** |
 
-**Bekannte Einschränkung:** `hooks:check` enthält derzeit noch eine Prüfung auf die frühere README-Sprachumschaltung und die Überschrift `## Inhaltsverzeichnis`. Diese Marker sind im neuen README nicht mehr vorhanden; das Hook-Gate scheitert bis zu einer Anpassung an dieser Prüfung.
-
 ### Workspace-Skripte
 
 Workspace-Befehle werden vom Root aus mit `npm run <skript> --workspace=<name>` gestartet:
@@ -279,7 +277,7 @@ Sicherheitslücken bitte **nicht** als öffentliches Issue melden: [SECURITY.md]
 
 ## 📄 Lizenz
 
-[MIT License](./LICENSE).
+[GNU General Public License v3.0 (GPL-3.0-only)](./LICENSE).
 
 ---
 

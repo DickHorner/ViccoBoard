@@ -11,7 +11,7 @@ const LEGACY_PATH_PATTERNS = [
   new RegExp(LEGACY_LABEL_A, 'i'),
   new RegExp(`(^|[/_-])${LEGACY_LABEL_B}([/_\\-.]|$)`, 'i')
 ];
-const README_TAB_MARKERS = ['[Deutsch](./README.md) | [English](./README.en.md)', '## Inhaltsverzeichnis'];
+const README_LANGUAGE_LINKS = ['[Deutsch](./README.md)', '[English](./README.en.md)'];
 
 const BANNED_ROOT_ARTIFACTS = new Set([
   '$filePath',
@@ -212,11 +212,11 @@ function checkLegacyNaming(files) {
   }
 }
 
-function checkReadmeTabs() {
+function checkReadmeLanguageLinks() {
   const text = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
-  const missingMarkers = README_TAB_MARKERS.filter((marker) => !text.includes(marker));
+  const missingMarkers = README_LANGUAGE_LINKS.filter((marker) => !text.includes(marker));
   if (missingMarkers.length > 0) {
-    failWithList('README landing markers are missing.', missingMarkers);
+    failWithList('README language links are missing.', missingMarkers);
   }
 }
 
@@ -227,7 +227,7 @@ function main() {
 
   checkTrackedStructure(trackedFiles);
   checkLegacyNaming(trackedFiles);
-  checkReadmeTabs();
+  checkReadmeLanguageLinks();
 
   runNpmGate('lint:docs', 'Documentation guardrails');
   runNpmGate('lint:workflows', 'Workflow guardrails');

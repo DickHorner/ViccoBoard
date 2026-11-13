@@ -32,7 +32,7 @@
     "database"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "dependencies": {
     "@viccoboard/core": "*",
     "bcryptjs": "^3.0.3",

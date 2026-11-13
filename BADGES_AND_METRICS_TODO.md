@@ -64,7 +64,7 @@ The README badges are rendered from live data where supported:
 - **CodeQL** — `codeql.yml`, push/PR status
 - **OpenSSF Scorecard** — `scorecard.yml` with `publish_results: true`, public supply-chain score
 - **OpenSSF Best Practices** — existing project [12057](https://www.bestpractices.dev/projects/12057), publicly indexed as *in progress*, with **96%** in an older directory snapshot (**not Passing**)
-- **MIT License** — root `LICENSE`
+- **GNU GPL v3.0** — root `LICENSE`
 - **Contributors, last commit, open issues and PRs** — public GitHub metadata
 - **Vue 3, TypeScript, iPad Safari target, local-first** — informational static badges, not independent security certification
 

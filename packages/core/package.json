@@ -22,7 +22,7 @@
     "interfaces"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "devDependencies": {
     "@types/node": "^26.6.5",
     "typescript": "^7.0.2"
