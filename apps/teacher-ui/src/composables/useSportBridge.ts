@@ -19,6 +19,7 @@ import {
   CreateTournamentUseCase,
   CriteriaGradingEngine,
   DeleteGradeCategoryUseCase,
+  DrawAdaptiveRoundUseCase,
   DeleteTableDefinitionUseCase,
   FeedbackSessionRepository,
   GameEntryRepository,
@@ -130,6 +131,7 @@ interface SportBridge {
   saveSlowMotionSessionUseCase: SaveSlowMotionSessionUseCase;
   importTableDefinitionUseCase: ImportTableDefinitionUseCase;
   createTournamentUseCase: CreateTournamentUseCase;
+  drawAdaptiveRoundUseCase: DrawAdaptiveRoundUseCase;
   updateTournamentMatchUseCase: UpdateTournamentMatchUseCase;
 
   criteriaGradingEngine: CriteriaGradingEngine;
@@ -224,6 +226,7 @@ export function initializeSportBridge(): SportBridge {
     tableDefinitionRepository
   );
   const tournamentService = new TournamentService();
+  const drawAdaptiveRoundUseCase = new DrawAdaptiveRoundUseCase(tournamentRepository, tournamentService);
   const createTournamentUseCase = new CreateTournamentUseCase(
     tournamentRepository,
     tournamentService
@@ -292,6 +295,7 @@ export function initializeSportBridge(): SportBridge {
     saveSlowMotionSessionUseCase,
     importTableDefinitionUseCase,
     createTournamentUseCase,
+    drawAdaptiveRoundUseCase,
     updateTournamentMatchUseCase,
 
     criteriaGradingEngine,
