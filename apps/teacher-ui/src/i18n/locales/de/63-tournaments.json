@@ -55,6 +55,8 @@
     "adaptive_attendance_hint": "Heute spielende Schüler auswählen. Abwesende behalten ihre Wertung.",
     "adaptive_draw": "Nächste Paarungen auslosen",
     "adaptive_bye": "Setzt aus",
-    "adaptive_rating": "Rating"
+    "adaptive_rating": "Rating",
+    "adaptive_cancel_match": "Spiel absagen",
+    "adaptive_cancelled": "Abgesagt"
   }
 }
