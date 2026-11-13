@@ -33,3 +33,5 @@ export * from './migrations/indexeddb/024_planning_blocks.js';
 export * from './migrations/indexeddb/025_student_calendar_entries.js';
 export * from './migrations/indexeddb/026_game_entry_tags.js';
 export * from './migrations/indexeddb/027_subject_assignments.js';
+
+export * from './migrations/indexeddb/028_tournament_team_size.js';

@@ -7,6 +7,7 @@ export interface Tournament {
   classGroupId: string;
   name: string;
   type: 'knockout' | 'round-robin' | 'swiss' | 'adaptive' | 'custom';
+  teamSize?: number;
   teams: Team[];
   matches: Match[];
   status: 'planning' | 'in-progress' | 'completed';
@@ -26,6 +27,8 @@ export interface Match {
   tournamentId: string;
   team1Id: string;
   team2Id: string;
+  team1ParticipantIds?: string[];
+  team2ParticipantIds?: string[];
   score1?: number;
   score2?: number;
   round: number;

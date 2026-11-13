@@ -11,6 +11,7 @@ export interface CreateTournamentInput {
   classGroupId: string;
   name: string;
   type: 'round-robin' | 'knockout' | 'adaptive';
+  teamSize?: number;
   teams: Array<{
     id: string;
     name: string;
@@ -39,6 +40,13 @@ export class CreateTournamentUseCase {
       throw new Error('At least 2 teams are required');
     }
 
+    const teamSize = input.type === 'adaptive' ? (input.teamSize ?? 1) : 1;
+    if (!Number.isInteger(teamSize) || teamSize < 1 || teamSize > 6) {
+      throw new Error('Team size must be between 1 and 6');
+    }
+    if (input.type === 'adaptive' && input.teams.length < 2 * teamSize) {
+      throw new Error('Not enough students for the selected team size');
+    }
     if (input.type === 'adaptive' && (new Set(input.teams.flatMap(t => t.studentIds)).size !== input.teams.length || input.teams.some(t => t.studentIds.length !== 1))) {
       throw new Error('Adaptive tournaments require distinct individual students');
     }
@@ -74,6 +82,7 @@ export class CreateTournamentUseCase {
       classGroupId: input.classGroupId.trim(),
       name: input.name.trim(),
       type: input.type,
+      teamSize,
       teams,
       matches
     });

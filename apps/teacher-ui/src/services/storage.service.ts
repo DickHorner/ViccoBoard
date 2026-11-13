@@ -23,7 +23,8 @@ import {
   IndexedDBPlanningBlocksMigration,
   IndexedDBStudentCalendarEntriesMigration,
   IndexedDBGameEntryTagsMigration,
-  IndexedDBSubjectAssignmentsMigration
+  IndexedDBSubjectAssignmentsMigration,
+  IndexedDBTournamentTeamSizeMigration
 } from '@viccoboard/storage/browser';
 import type { StorageAdapter } from '@viccoboard/storage/browser';
 
@@ -66,6 +67,7 @@ export async function initializeStorage(): Promise<StorageAdapter> {
   storage.registerMigration(new IndexedDBStudentCalendarEntriesMigration());
   storage.registerMigration(new IndexedDBGameEntryTagsMigration());
   storage.registerMigration(new IndexedDBSubjectAssignmentsMigration());
+  storage.registerMigration(new IndexedDBTournamentTeamSizeMigration());
 
   await storage.initialize('');
 

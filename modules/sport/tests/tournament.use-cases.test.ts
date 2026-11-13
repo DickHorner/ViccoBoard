@@ -7,7 +7,7 @@ import { CreateTournamentUseCase } from '../src/use-cases/create-tournament.use-
 import { UpdateTournamentMatchUseCase } from '../src/use-cases/update-tournament-match.use-case';
 import { TournamentRepository } from '../src/repositories/tournament.repository';
 import { TournamentService } from '../src/services/tournament.service';
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, TournamentSchemaMigration } from '@viccoboard/storage/node';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, TournamentSchemaMigration, TournamentTeamSizeMigration } from '@viccoboard/storage/node';
 import type { StorageAdapter } from '@viccoboard/storage/node';
 
 const TEAM_A = { id: 'team-a', name: 'Team A', studentIds: [] };
@@ -47,6 +47,7 @@ describe('CreateTournamentUseCase', () => {
     storage.registerMigration(new InitialSchemaMigration(storage));
     storage.registerMigration(new GradingSchemaMigration(storage));
     storage.registerMigration(new TournamentSchemaMigration(storage));
+    storage.registerMigration(new TournamentTeamSizeMigration(storage));
     await storage.migrate();
 
     adapter = storage.getAdapter();
@@ -159,6 +160,7 @@ describe('UpdateTournamentMatchUseCase', () => {
     storage.registerMigration(new InitialSchemaMigration(storage));
     storage.registerMigration(new GradingSchemaMigration(storage));
     storage.registerMigration(new TournamentSchemaMigration(storage));
+    storage.registerMigration(new TournamentTeamSizeMigration(storage));
     await storage.migrate();
 
     adapter = storage.getAdapter();

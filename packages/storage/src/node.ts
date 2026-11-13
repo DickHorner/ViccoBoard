@@ -32,3 +32,5 @@ export * from './migrations/025_game_entry_metadata.js';
 export * from './migrations/026_lesson_random_student_history.js';
 export * from './migrations/027_game_entry_tags.js';
 export * from './migrations/028_subject_assignments.js';
+
+export * from './migrations/030_tournament_team_size.js';

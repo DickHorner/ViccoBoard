@@ -36,13 +36,22 @@ export class DrawAdaptiveRoundUseCase {
       throw new Error('Tournament is closed');
     }
 
-    const next = this.tournamentService.generateAdaptiveRound(
-      tournament.id,
-      tournament.teams,
-      tournament.matches,
-      input.participantIds,
-      input.sessionDate
-    );
+    const next = (tournament.teamSize ?? 1) === 1
+      ? this.tournamentService.generateAdaptiveRound(
+        tournament.id,
+        tournament.teams,
+        tournament.matches,
+        input.participantIds,
+        input.sessionDate
+      )
+      : this.tournamentService.generateRotatingTeamRound(
+        tournament.id,
+        tournament.teams,
+        tournament.matches,
+        input.participantIds,
+        input.sessionDate,
+        tournament.teamSize!
+      );
     return this.tournamentRepository.update(tournament.id, {
       matches: [...tournament.matches, ...next],
       status: 'in-progress'

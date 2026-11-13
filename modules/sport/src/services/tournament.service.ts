@@ -159,35 +159,44 @@ export class TournamentService {
       .sort((a, b) => a.round - b.round || a.sequence - b.sequence);
     for (const match of completed) {
       if (!Number.isFinite(match.score1) || !Number.isFinite(match.score2)) continue;
-      if (match.team1Id === match.team2Id) continue;
-      const a = standings.get(match.team1Id);
-      const b = standings.get(match.team2Id);
-      if (!a || !b) continue;
+      const first = match.team1ParticipantIds ?? [match.team1Id];
+      const second = match.team2ParticipantIds ?? [match.team2Id];
+      if (first.some(id => second.includes(id))) continue;
+      const a = first.map(id => standings.get(id));
+      const b = second.map(id => standings.get(id));
+      if (a.some(s => !s) || b.some(s => !s)) continue;
 
-      a.played++;
-      b.played++;
-      let actual = 0.5;
-      if (match.score1! > match.score2!) {
-        a.wins++;
-        a.points += 3;
-        b.losses++;
-        actual = 1;
-      } else if (match.score1! < match.score2!) {
-        b.wins++;
-        b.points += 3;
-        a.losses++;
-        actual = 0;
-      } else {
-        a.draws++;
-        b.draws++;
-        a.points++;
-        b.points++;
-      }
-
-      const expected = 1 / (1 + Math.pow(10, (b.rating - a.rating) / 400));
+      const firstRating = a.reduce((sum, s) => sum + s!.rating, 0) / a.length;
+      const secondRating = b.reduce((sum, s) => sum + s!.rating, 0) / b.length;
+      const actual = match.score1! > match.score2! ? 1 : match.score1! < match.score2! ? 0 : 0.5;
+      const expected = 1 / (1 + Math.pow(10, (secondRating - firstRating) / 400));
       const change = 32 * (actual - expected);
-      a.rating += change;
-      b.rating -= change;
+      for (const player of a) {
+        player!.played++;
+        player!.rating += change;
+        if (actual === 1) {
+          player!.wins++;
+          player!.points += 3;
+        } else if (actual === 0) {
+          player!.losses++;
+        } else {
+          player!.draws++;
+          player!.points++;
+        }
+      }
+      for (const player of b) {
+        player!.played++;
+        player!.rating -= change;
+        if (actual === 0) {
+          player!.wins++;
+          player!.points += 3;
+        } else if (actual === 1) {
+          player!.losses++;
+        } else {
+          player!.draws++;
+          player!.points++;
+        }
+      }
     }
 
     return [...standings.values()].sort(
@@ -286,6 +295,134 @@ export class TournamentService {
       });
     }
     return next;
+  }
+
+  /**
+   * Rotate temporary teams while keeping individual ratings and match rosters.
+   * A player who cannot fit into a full match receives a scoreless bye.
+   */
+  generateRotatingTeamRound(
+    tournamentId: string,
+    players: Sport.Team[],
+    matches: Sport.Match[],
+    participantIds: string[],
+    sessionDate: string,
+    teamSize: number
+  ): Sport.Match[] {
+    if (!Number.isInteger(teamSize) || teamSize < 2 || teamSize > 6) {
+      throw new Error('Team size must be between 2 and 6');
+    }
+    const ids = new Set(players.filter(player => player.studentIds.length === 1).map(player => player.id));
+    if (participantIds.length < teamSize * 2 ||
+        new Set(participantIds).size !== participantIds.length ||
+        participantIds.some(id => !ids.has(id))) {
+      throw new Error('Not enough distinct players for the selected team size');
+    }
+    if (matches.some(match => match.status === 'scheduled' || match.status === 'in-progress')) {
+      throw new Error('Complete or cancel all outstanding matches before drawing a new round');
+    }
+
+    const prior = new Map<string, number>();
+    const rests = new Map<string, number>();
+    for (const match of matches) {
+      if (match.status !== 'completed') continue;
+      if (!match.team2Id) {
+        rests.set(match.team1Id, (rests.get(match.team1Id) ?? 0) + 1);
+        continue;
+      }
+      if (match.score1 == null || match.score2 == null) continue;
+      for (const roster of [match.team1ParticipantIds ?? [match.team1Id], match.team2ParticipantIds ?? [match.team2Id]]) {
+        for (let i = 0; i < roster.length; i++) {
+          for (let j = i + 1; j < roster.length; j++) {
+            const key = [roster[i], roster[j]].sort().join('|');
+            prior.set(key, (prior.get(key) ?? 0) + 1);
+          }
+        }
+      }
+    }
+
+    const standings = new Map(this.computeAdaptiveStandings(players, matches).map(row => [row.teamId, row]));
+    const shuffled = [...participantIds];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    shuffled.sort((a, b) => (rests.get(b) ?? 0) - (rests.get(a) ?? 0) ||
+      standings.get(a)!.played - standings.get(b)!.played);
+    const playingCount = Math.floor(shuffled.length / (teamSize * 2)) * teamSize * 2;
+    const playing = shuffled.slice(0, playingCount);
+    const waiting = shuffled.slice(playingCount);
+    const round = Math.max(0, ...matches.map(match => match.round)) + 1;
+
+    const cost = (rosters: string[][]): number => {
+      let total = 0;
+      for (let i = 0; i < rosters.length; i += 2) {
+        const first = rosters[i];
+        const second = rosters[i + 1];
+        const rating = (ids: string[]) => ids.reduce((sum, id) => sum + standings.get(id)!.rating, 0) / ids.length;
+        total += Math.abs(rating(first) - rating(second)) / 10;
+        for (const roster of [first, second]) {
+          for (let j = 0; j < roster.length; j++) {
+            for (let k = j + 1; k < roster.length; k++) {
+              total += (prior.get([roster[j], roster[k]].sort().join('|')) ?? 0) * 100;
+            }
+          }
+        }
+      }
+      return total;
+    };
+
+    const rosters: string[][] = [];
+    for (let i = 0; i < playing.length; i += teamSize) {
+      rosters.push(playing.slice(i, i + teamSize));
+    }
+    let best = cost(rosters);
+    // Bounded local search: neither exhaustive permutations nor unbounded backtracking.
+    for (let attempt = 0; attempt < 150; attempt++) {
+      const a = Math.floor(Math.random() * rosters.length);
+      let b = Math.floor(Math.random() * (rosters.length - 1));
+      if (b >= a) b++;
+      const i = Math.floor(Math.random() * teamSize);
+      const j = Math.floor(Math.random() * teamSize);
+      [rosters[a][i], rosters[b][j]] = [rosters[b][j], rosters[a][i]];
+      const next = cost(rosters);
+      if (next <= best) {
+        best = next;
+      } else {
+        [rosters[a][i], rosters[b][j]] = [rosters[b][j], rosters[a][i]];
+      }
+    }
+
+    const generated: Sport.Match[] = [];
+    for (let i = 0; i < rosters.length; i += 2) {
+      const first = rosters[i];
+      const second = rosters[i + 1];
+      generated.push({
+        id: uuidv4(),
+        tournamentId,
+        team1Id: first[0],
+        team2Id: second[0],
+        team1ParticipantIds: [...first],
+        team2ParticipantIds: [...second],
+        round,
+        sequence: generated.length + 1,
+        sessionDate,
+        status: 'scheduled'
+      });
+    }
+    for (const id of waiting) {
+      generated.push({
+        id: uuidv4(),
+        tournamentId,
+        team1Id: id,
+        team2Id: '',
+        round,
+        sequence: generated.length + 1,
+        sessionDate,
+        status: 'completed'
+      });
+    }
+    return generated;
   }
 
   /**

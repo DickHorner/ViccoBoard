@@ -99,7 +99,8 @@ describe('useTournamentsView', () => {
     expect(view.form.value).toEqual({
       name: '',
       type: 'round-robin',
-      teams: ['Lions', 'Tigers', 'Bears']
+      teams: ['Lions', 'Tigers', 'Bears'],
+      teamSize: 1
     });
     expect(sessionStorage.getItem('scoreboard_handoff_teams')).toBeNull();
   });
