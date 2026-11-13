@@ -14,6 +14,16 @@ export class DrawAdaptiveRoundUseCase {
     private readonly tournamentService: TournamentService
   ) {}
 
+  async cancelMatch(tournamentId: string, matchId: string): Promise<Sport.Tournament> {
+    const tournament = await this.tournamentRepository.findById(tournamentId);
+    if (!tournament || tournament.type !== 'adaptive') throw new Error('Adaptive tournament not found');
+    const match = tournament.matches.find(m => m.id === matchId);
+    if (!match || match.status !== 'scheduled') throw new Error('Only scheduled matches can be cancelled');
+    return this.tournamentRepository.update(tournamentId, {
+      matches: tournament.matches.map(m => m.id === matchId ? { ...m, status: 'cancelled' } : m)
+    });
+  }
+
   async execute(input: DrawAdaptiveRoundInput): Promise<Sport.Tournament> {
     if (!input.tournamentId || !/^\d{4}-\d{2}-\d{2}$/.test(input.sessionDate)) {
       throw new Error('A tournament and valid session date are required');
