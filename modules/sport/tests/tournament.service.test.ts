@@ -405,4 +405,62 @@ describe('TournamentService', () => {
     });
   });
 
+  describe('adaptive rotating teams', () => {
+    const players = Array.from({ length: 16 }, (_, i) => ({
+      id: `p${i}`, name: `Player ${i}`, studentIds: [`s${i}`]
+    }));
+
+    it('supports team sizes from two to six', () => {
+      for (let teamSize = 2; teamSize <= 6; teamSize++) {
+        const present = players.slice(0, 2 * teamSize).map(player => player.id);
+        const matches = service.generateRotatingTeamRound('t', players, [], present, '2026-11-13', teamSize);
+        expect(matches).toHaveLength(1);
+        expect(matches[0].team1ParticipantIds).toHaveLength(teamSize);
+        expect(matches[0].team2ParticipantIds).toHaveLength(teamSize);
+        const all = [...matches[0].team1ParticipantIds!, ...matches[0].team2ParticipantIds!];
+        expect(new Set(all).size).toBe(2 * teamSize);
+      }
+    });
+
+    it('assigns a rest to every player who cannot fit in the round', () => {
+      const present = players.slice(0, 14).map(player => player.id);
+      const matches = service.generateRotatingTeamRound('t', players, [], present, '2026-11-13', 3);
+      const played = matches.filter(match => match.team2Id);
+      const rested = matches.filter(match => !match.team2Id);
+      expect(played).toHaveLength(2);
+      expect(rested).toHaveLength(2);
+      const all = [
+        ...played.flatMap(match => [...match.team1ParticipantIds!, ...match.team2ParticipantIds!]),
+        ...rested.map(match => match.team1Id)
+      ];
+      expect(new Set(all).size).toBe(14);
+    });
+
+    it('credits each individual in the winning team and none of the resting players', () => {
+      const present = players.slice(0, 7).map(player => player.id);
+      const matches = service.generateRotatingTeamRound('t', players, [], present, '2026-11-13', 3);
+      const played = matches.find(match => match.team2Id)!;
+      const completed = matches.map(match => match.id === played.id
+        ? { ...match, status: 'completed' as const, score1: 2, score2: 1 } : match);
+      const standings = service.computeAdaptiveStandings(players, completed);
+      for (const id of played.team1ParticipantIds!) {
+        expect(standings.find(row => row.teamId === id)!.wins).toBe(1);
+      }
+      for (const id of played.team2ParticipantIds!) {
+        expect(standings.find(row => row.teamId === id)!.losses).toBe(1);
+      }
+      const rested = matches.find(match => !match.team2Id)!.team1Id;
+      expect(standings.find(row => row.teamId === rested)!.played).toBe(0);
+      expect(standings.reduce((total, row) => total + row.played, 0)).toBe(6);
+    });
+
+    it('rejects invalid team sizes, duplicates and unresolved matches', () => {
+      const present = players.slice(0, 12).map(player => player.id);
+      expect(() => service.generateRotatingTeamRound('t', players, [], present, '2026-11-13', 7)).toThrow();
+      expect(() => service.generateRotatingTeamRound('t', players, [], ['p0', 'p0', ...present.slice(2)], '2026-11-13', 3)).toThrow();
+      const next = service.generateRotatingTeamRound('t', players, [], present, '2026-11-13', 3);
+      expect(() => service.generateRotatingTeamRound('t', players, next, present, '2026-11-20', 3)).toThrow();
+    });
+  });
+
 });
