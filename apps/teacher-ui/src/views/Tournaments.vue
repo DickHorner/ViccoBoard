@@ -63,6 +63,12 @@
         </div>
 
         <div v-if="form.type === 'adaptive'" class="form-group">
+          <label for="tournament-team-size">{{ t('TOURNAMENTS.adaptive_team_size') }}</label>
+          <select id="tournament-team-size" v-model.number="form.teamSize" class="form-select">
+            <option v-for="size in 6" :key="size" :value="size">{{ size }} {{ t('TOURNAMENTS.adaptive_vs') }} {{ size }}</option>
+          </select>
+        </div>
+        <div v-if="form.type === 'adaptive'" class="form-group">
           <label for="tournament-class">{{ t('TOURNAMENTS.adaptive_class') }}</label>
           <select id="tournament-class" v-model="selectedClassId" class="form-select" @change="loadClassStudents">
             <option value="">{{ t('TOURNAMENTS.adaptive_choose_class') }}</option>
@@ -148,7 +154,7 @@
             {{ team.name }}
           </label>
         </div>
-        <button class="btn-primary" type="button" :disabled="saving || presentStudentIds.length < 2" @click="drawRound">
+        <button class="btn-primary" type="button" :disabled="saving || presentStudentIds.length < 2 * (activeTournament.teamSize ?? 1)" @click="drawRound">
           {{ t('TOURNAMENTS.adaptive_draw') }}
         </button>
         <p v-if="roundError" class="error-text">{{ roundError }}</p>
@@ -168,9 +174,9 @@
               :key="match.id"
               class="match-row"
             >
-              <span class="team-name">{{ teamName(match.team1Id) }}</span>
+              <span class="team-name">{{ matchTeamName(match, 1) }}</span>
               <span class="vs-label">{{ match.team2Id ? t('TOURNAMENTS.vs') : '' }}</span>
-              <span class="team-name">{{ match.team2Id ? teamName(match.team2Id) : t('TOURNAMENTS.adaptive_bye') }}</span>
+              <span class="team-name">{{ match.team2Id ? matchTeamName(match, 2) : t('TOURNAMENTS.adaptive_bye') }}</span>
               <template v-if="match.status === 'completed' && match.team2Id">
                 <span class="score-display">{{ match.score1 }} : {{ match.score2 }}</span>
               </template>
@@ -279,7 +285,7 @@
         </div>
 
         <div class="score-entry-row">
-          <span class="team-name">{{ teamName(scoreEntry.match!.team1Id) }}</span>
+          <span class="team-name">{{ matchTeamName(scoreEntry.match!, 1) }}</span>
           <input
             v-model.number="scoreEntry.score1"
             class="score-input"
@@ -293,7 +299,7 @@
             type="number"
             min="0"
           />
-          <span class="team-name">{{ teamName(scoreEntry.match!.team2Id) }}</span>
+          <span class="team-name">{{ matchTeamName(scoreEntry.match!, 2) }}</span>
         </div>
         <p v-if="scoreError" class="error-text">{{ scoreError }}</p>
         <div class="modal-actions">
@@ -336,6 +342,7 @@ const {
   selectedScoreboardSessionId,
   scoreboardImportHint,
   teamName,
+  matchTeamName,
   formatType,
   matchesByRound,
   standings,
