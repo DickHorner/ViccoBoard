@@ -29,7 +29,7 @@ export class UpdateTournamentMatchUseCase {
     if (!input.matchId) {
       throw new Error('matchId is required');
     }
-    if (input.score1 < 0 || input.score2 < 0) {
+    if (!Number.isFinite(input.score1) || !Number.isFinite(input.score2) || input.score1 < 0 || input.score2 < 0) {
       throw new Error('Scores must be non-negative');
     }
 
@@ -54,8 +54,12 @@ export class UpdateTournamentMatchUseCase {
       );
     }
 
+    if (tournament.matches[matchIndex].status === 'cancelled' || !tournament.matches[matchIndex].team2Id) {
+      throw new Error('Cannot score a cancelled match or bye');
+    }
+
     // Update the specific match
-    let updatedMatch: Sport.Match = {
+    const updatedMatch: Sport.Match = {
       ...tournament.matches[matchIndex],
       score1: input.score1,
       score2: input.score2,
@@ -77,7 +81,9 @@ export class UpdateTournamentMatchUseCase {
 
     // Determine new tournament status
     const allDone = this.tournamentService.isTournamentComplete(updatedMatches);
-    const newStatus: Sport.Tournament['status'] = allDone
+    const newStatus: Sport.Tournament['status'] = tournament.type === 'adaptive'
+      ? 'in-progress'
+      : allDone
       ? 'completed'
       : 'in-progress';
 

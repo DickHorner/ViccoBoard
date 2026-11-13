@@ -19,6 +19,8 @@ jest.mock('vue-i18n', () => ({
 
 jest.mock('@viccoboard/sport', () => ({
   TournamentService: class TournamentService {
+    computeAdaptiveStandings() { return []; }
+
     computeRoundRobinStandings() {
       return [];
     }
@@ -62,6 +64,8 @@ jest.mock('../src/composables/useSportBridge', () => ({
       findAll: mockFindToolSessions,
       findByClassGroup: jest.fn().mockResolvedValue([])
     },
+    classGroupRepository: { findAll: jest.fn().mockResolvedValue([]) },
+    drawAdaptiveRoundUseCase: { execute: jest.fn(), cancelMatch: jest.fn() },
     createTournamentUseCase: {
       execute: jest.fn()
     },
@@ -69,6 +73,11 @@ jest.mock('../src/composables/useSportBridge', () => ({
       execute: jest.fn()
     }
   })
+}));
+
+jest.mock('../src/composables/useStudentsBridge', () => ({
+  initializeStudentsBridge: jest.fn(),
+  getStudentsBridge: () => ({ studentRepository: { findByClassGroup: jest.fn().mockResolvedValue([]) } })
 }));
 
 import { useTournamentsView } from '../src/composables/useTournamentsView';

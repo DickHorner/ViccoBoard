@@ -6,7 +6,7 @@ export interface Tournament {
   id: string;
   classGroupId: string;
   name: string;
-  type: 'knockout' | 'round-robin' | 'swiss' | 'custom';
+  type: 'knockout' | 'round-robin' | 'swiss' | 'adaptive' | 'custom';
   teams: Team[];
   matches: Match[];
   status: 'planning' | 'in-progress' | 'completed';
@@ -30,7 +30,8 @@ export interface Match {
   score2?: number;
   round: number;
   sequence: number;
-  status: 'scheduled' | 'in-progress' | 'completed';
+  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
+  sessionDate?: string;
   startTime?: Date;
   endTime?: Date;
 }

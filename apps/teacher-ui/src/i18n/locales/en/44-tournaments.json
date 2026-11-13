@@ -8,7 +8,8 @@
       "knockout": "Knockout",
       "groups_playoff": "Groups + Playoffs",
       "fields_bracket": "Fields → Finals",
-      "random_students": "Random Teams"
+      "random_students": "Random Teams",
+      "adaptive": "Adaptive ongoing tournament"
     },
     "mode_info": {
       "title": "Modes explained:",
@@ -45,6 +46,17 @@
     "confirm_delete": "Delete tournament?",
     "import_from_scoreboard": "Import from Scoreboard",
     "select_scoreboard_session": "Select scoreboard session …",
-    "scoreboard_imported": "Scores imported from scoreboard session"
+    "scoreboard_imported": "Scores imported from scoreboard session",
+    "adaptive_class": "Class",
+    "adaptive_choose_class": "Select class",
+    "adaptive_select_class": "Select a class with at least two students.",
+    "adaptive_players": "Players",
+    "adaptive_today": "Next round",
+    "adaptive_attendance_hint": "Select today's participants. Absent students keep their rating.",
+    "adaptive_draw": "Draw next pairings",
+    "adaptive_bye": "Bye",
+    "adaptive_rating": "Rating",
+    "adaptive_cancel_match": "Cancel match",
+    "adaptive_cancelled": "Cancelled"
   }
 }

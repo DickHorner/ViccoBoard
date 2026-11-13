@@ -28,7 +28,7 @@
           </div>
           <div class="tournament-meta">
             <span>{{ formatType(tournament.type) }}</span>
-            <span>{{ tournament.teams.length }} {{ t('TOURNAMENT.teams') }}</span>
+            <span>{{ tournament.teams.length }} {{ tournament.type === 'adaptive' ? t('TOURNAMENTS.adaptive_players') : t('TOURNAMENT.teams') }}</span>
           </div>
         </li>
       </ul>
@@ -58,10 +58,19 @@
           <select v-model="form.type" class="form-select">
             <option value="round-robin">{{ t('TOURNAMENTS.mode.round_robin') }}</option>
             <option value="knockout">{{ t('TOURNAMENTS.mode.knockout') }}</option>
+            <option value="adaptive">{{ t('TOURNAMENTS.mode.adaptive') }}</option>
           </select>
         </div>
 
-        <div class="form-group">
+        <div v-if="form.type === 'adaptive'" class="form-group">
+          <label for="tournament-class">{{ t('TOURNAMENTS.adaptive_class') }}</label>
+          <select id="tournament-class" v-model="selectedClassId" class="form-select" @change="loadClassStudents">
+            <option value="">{{ t('TOURNAMENTS.adaptive_choose_class') }}</option>
+            <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
+          </select>
+          <p>{{ classStudents.length }} {{ t('TOURNAMENTS.adaptive_players') }}</p>
+        </div>
+        <div v-else class="form-group">
           <label>{{ t('TOURNAMENTS.teams_label') }}</label>
           <ul class="team-list-editor">
             <li v-for="(_, idx) in form.teams" :key="idx" class="team-list-row">
@@ -117,7 +126,7 @@
           @click="detailTab = 'matches'"
         >{{ t('TOURNAMENT.matches') }}</button>
         <button
-          v-if="activeTournament.type === 'round-robin'"
+          v-if="activeTournament.type === 'round-robin' || activeTournament.type === 'adaptive'"
           :class="['tab-btn', { active: detailTab === 'standings' }]"
           type="button"
           @click="detailTab = 'standings'"
@@ -130,6 +139,21 @@
         >{{ t('TOURNAMENTS.bracket') }}</button>
       </div>
 
+      <section v-if="activeTournament.type === 'adaptive'" class="card adaptive-round-panel">
+        <h3>{{ t('TOURNAMENTS.adaptive_today') }}</h3>
+        <p>{{ t('TOURNAMENTS.adaptive_attendance_hint') }}</p>
+        <div class="adaptive-players">
+          <label v-for="team in activeTournament.teams" :key="team.id" class="adaptive-player">
+            <input v-model="presentStudentIds" type="checkbox" :value="team.studentIds[0]" />
+            {{ team.name }}
+          </label>
+        </div>
+        <button class="btn-primary" type="button" :disabled="saving || presentStudentIds.length < 2" @click="drawRound">
+          {{ t('TOURNAMENTS.adaptive_draw') }}
+        </button>
+        <p v-if="roundError" class="error-text">{{ roundError }}</p>
+      </section>
+
       <!-- Matches tab -->
       <div v-if="detailTab === 'matches'" class="matches-section">
         <div
@@ -137,7 +161,7 @@
           :key="round.round"
           class="round-section"
         >
-          <h3 class="round-header">{{ t('TOURNAMENT.round') }} {{ round.round }}</h3>
+          <h3 class="round-header">{{ t('TOURNAMENT.round') }} {{ round.round }} <small v-if="round.matches[0]?.sessionDate">{{ round.matches[0].sessionDate }}</small></h3>
           <ul class="match-list">
             <li
               v-for="match in round.matches"
@@ -145,17 +169,19 @@
               class="match-row"
             >
               <span class="team-name">{{ teamName(match.team1Id) }}</span>
-              <span class="vs-label">{{ t('TOURNAMENTS.vs') }}</span>
-              <span class="team-name">{{ teamName(match.team2Id) }}</span>
-              <template v-if="match.status === 'completed'">
+              <span class="vs-label">{{ match.team2Id ? t('TOURNAMENTS.vs') : '' }}</span>
+              <span class="team-name">{{ match.team2Id ? teamName(match.team2Id) : t('TOURNAMENTS.adaptive_bye') }}</span>
+              <template v-if="match.status === 'completed' && match.team2Id">
                 <span class="score-display">{{ match.score1 }} : {{ match.score2 }}</span>
               </template>
               <button
-                v-if="match.team1Id && match.team2Id && match.status !== 'completed'"
+                v-if="match.team1Id && match.team2Id && match.status !== 'completed' && match.status !== 'cancelled'"
                 class="btn-secondary btn-sm"
                 type="button"
                 @click="openScoreEntry(match)"
               >{{ t('TOURNAMENTS.enter_result') }}</button>
+              <button v-if="activeTournament.type === 'adaptive' && match.status === 'scheduled'" class="btn-secondary btn-sm" type="button" :disabled="saving" @click="cancelAdaptiveMatch(match.id)">{{ t('TOURNAMENTS.adaptive_cancel_match') }}</button>
+              <span v-if="match.status === 'cancelled'">{{ t('TOURNAMENTS.adaptive_cancelled') }}</span>
             </li>
           </ul>
         </div>
@@ -172,8 +198,9 @@
               <th>{{ t('TOURNAMENT.table_cols.wins') }}</th>
               <th>{{ t('TOURNAMENT.table_cols.draws') }}</th>
               <th>{{ t('TOURNAMENT.table_cols.losses') }}</th>
-              <th>{{ t('TOURNAMENT.table_cols.goals') }}</th>
+              <th v-if="activeTournament.type === 'round-robin'">{{ t('TOURNAMENT.table_cols.goals') }}</th>
               <th>{{ t('TOURNAMENT.table_cols.points') }}</th>
+              <th v-if="activeTournament.type === 'adaptive'">{{ t('TOURNAMENTS.adaptive_rating') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -184,8 +211,9 @@
               <td>{{ row.wins }}</td>
               <td>{{ row.draws }}</td>
               <td>{{ row.losses }}</td>
-              <td>{{ row.goalsFor }}:{{ row.goalsAgainst }}</td>
+              <td v-if="activeTournament.type === 'round-robin'">{{ 'goalsFor' in row ? row.goalsFor : 0 }}:{{ 'goalsAgainst' in row ? row.goalsAgainst : 0 }}</td>
               <td class="points-cell">{{ row.points }}</td>
+              <td v-if="activeTournament.type === 'adaptive'">{{ 'rating' in row ? Math.round(row.rating) : '' }}</td>
             </tr>
           </tbody>
         </table>
@@ -293,6 +321,14 @@ const {
   tournaments,
   activeTournament,
   createError,
+  classes,
+  classStudents,
+  selectedClassId,
+  presentStudentIds,
+  roundError,
+  loadClassStudents,
+  drawRound,
+  cancelAdaptiveMatch,
   scoreError,
   form,
   scoreEntry,

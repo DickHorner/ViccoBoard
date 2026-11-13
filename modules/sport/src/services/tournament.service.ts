@@ -2,9 +2,7 @@
  * Tournament Service
  *
  * Handles scheduling and standings logic for tournaments.
- * Supports two formats:
- *  - round-robin:  every team plays every other team once
- *  - knockout:     single-elimination bracket
+ * Supports round-robin, knockout, and adaptive individual rounds.
  *
  * Pure domain logic — no persistence dependencies.
  */
@@ -36,6 +34,17 @@ export interface RoundRobinStanding {
   goalsAgainst: number;
   goalDiff: number;
   points: number;
+}
+
+export interface AdaptiveStanding {
+  teamId: string;
+  teamName: string;
+  played: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  points: number;
+  rating: number;
 }
 
 export interface KnockoutBracket {
@@ -121,6 +130,162 @@ export class TournamentService {
       rotating.push(rotating.shift()!);
     }
     return matches;
+  }
+
+  /**
+   * Rating is derived from completed matches, not persisted separately.
+   * All players start at 1000; only actual results change their rating.
+   */
+  computeAdaptiveStandings(
+    teams: Sport.Team[],
+    matches: Sport.Match[]
+  ): AdaptiveStanding[] {
+    const standings = new Map<string, AdaptiveStanding>();
+    for (const team of teams) {
+      standings.set(team.id, {
+        teamId: team.id,
+        teamName: team.name,
+        played: 0,
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        points: 0,
+        rating: 1000
+      });
+    }
+
+    const completed = matches
+      .filter(m => m.status === 'completed' && m.team2Id && m.score1 != null && m.score2 != null)
+      .sort((a, b) => a.round - b.round || a.sequence - b.sequence);
+    for (const match of completed) {
+      if (!Number.isFinite(match.score1) || !Number.isFinite(match.score2)) continue;
+      if (match.team1Id === match.team2Id) continue;
+      const a = standings.get(match.team1Id);
+      const b = standings.get(match.team2Id);
+      if (!a || !b) continue;
+
+      a.played++;
+      b.played++;
+      let actual = 0.5;
+      if (match.score1! > match.score2!) {
+        a.wins++;
+        a.points += 3;
+        b.losses++;
+        actual = 1;
+      } else if (match.score1! < match.score2!) {
+        b.wins++;
+        b.points += 3;
+        a.losses++;
+        actual = 0;
+      } else {
+        a.draws++;
+        b.draws++;
+        a.points++;
+        b.points++;
+      }
+
+      const expected = 1 / (1 + Math.pow(10, (b.rating - a.rating) / 400));
+      const change = 32 * (actual - expected);
+      a.rating += change;
+      b.rating -= change;
+    }
+
+    return [...standings.values()].sort(
+      (a, b) => b.rating - a.rating || b.points - a.points || a.teamName.localeCompare(b.teamName)
+    );
+  }
+
+  /**
+   * Schedule only the next round. Unavailable players never lose points.
+   * Opponent repeats are avoided where practical; an odd player gets a
+   * scoreless bye, preferring players with fewer previous byes.
+   */
+  generateAdaptiveRound(
+    tournamentId: string,
+    teams: Sport.Team[],
+    matches: Sport.Match[],
+    participantIds: string[],
+    sessionDate: string
+  ): Sport.Match[] {
+    const validIds = new Set(teams.filter(t => t.studentIds.length === 1).map(t => t.id));
+    if (participantIds.length < 2 || new Set(participantIds).size !== participantIds.length ||
+        participantIds.some(id => !validIds.has(id))) {
+      throw new Error('At least two distinct individual tournament participants are required');
+    }
+    if (matches.some(m => m.status === 'scheduled' || m.status === 'in-progress')) {
+      throw new Error('Complete or cancel all outstanding matches before drawing a new round');
+    }
+
+    const standings = this.computeAdaptiveStandings(teams, matches);
+    const byId = new Map(standings.map(s => [s.teamId, s]));
+    const byeCount = new Map<string, number>();
+    const opponents = new Map<string, number>();
+    for (const match of matches) {
+      if (match.status !== 'completed') continue;
+      if (!match.team2Id) {
+        byeCount.set(match.team1Id, (byeCount.get(match.team1Id) ?? 0) + 1);
+      } else if (match.score1 != null && match.score2 != null) {
+        const key = [match.team1Id, match.team2Id].sort().join('|');
+        opponents.set(key, (opponents.get(key) ?? 0) + 1);
+      }
+    }
+
+    const shuffled = [...participantIds];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    let byeId: string | undefined;
+    if (shuffled.length % 2 === 1) {
+      shuffled.sort((a, b) =>
+        (byeCount.get(a) ?? 0) - (byeCount.get(b) ?? 0) ||
+        (byId.get(b)!.played - byId.get(a)!.played)
+      );
+      byeId = shuffled.shift();
+    }
+    shuffled.sort((a, b) => byId.get(b)!.rating - byId.get(a)!.rating);
+
+    const round = Math.max(0, ...matches.map(m => m.round)) + 1;
+    const next: Sport.Match[] = [];
+    while (shuffled.length >= 2) {
+      const first = shuffled.shift()!;
+      let bestIndex = 0;
+      let bestCost = Infinity;
+      for (let i = 0; i < shuffled.length; i++) {
+        const second = shuffled[i];
+        const repeats = opponents.get([first, second].sort().join('|')) ?? 0;
+        const cost = repeats * 1000 + Math.abs(byId.get(first)!.rating - byId.get(second)!.rating);
+        if (cost < bestCost) {
+          bestCost = cost;
+          bestIndex = i;
+        }
+      }
+      const second = shuffled.splice(bestIndex, 1)[0];
+      next.push({
+        id: uuidv4(),
+        tournamentId,
+        team1Id: first,
+        team2Id: second,
+        round,
+        sequence: next.length + 1,
+        sessionDate,
+        status: 'scheduled'
+      });
+    }
+    if (byeId) {
+      next.push({
+        id: uuidv4(),
+        tournamentId,
+        team1Id: byeId,
+        team2Id: '',
+        round,
+        sequence: next.length + 1,
+        sessionDate,
+        status: 'completed'
+      });
+    }
+    return next;
   }
 
   /**

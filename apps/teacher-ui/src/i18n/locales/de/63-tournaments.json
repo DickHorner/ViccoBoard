@@ -8,7 +8,8 @@
       "knockout": "K.-o.-System",
       "groups_playoff": "Gruppen + Playoffs",
       "fields_bracket": "Felder → Finale",
-      "random_students": "Zufällige Teams"
+      "random_students": "Zufällige Teams",
+      "adaptive": "Dauerturnier (adaptiv)"
     },
     "mode_info": {
       "title": "Modi erklärt:",
@@ -45,6 +46,17 @@
     "confirm_delete": "Turnier wirklich löschen?",
     "import_from_scoreboard": "Aus Scoreboard übernehmen",
     "select_scoreboard_session": "Scoreboard-Session auswählen …",
-    "scoreboard_imported": "Ergebnis aus Scoreboard-Session übernommen"
+    "scoreboard_imported": "Ergebnis aus Scoreboard-Session übernommen",
+    "adaptive_class": "Klasse",
+    "adaptive_choose_class": "Klasse auswählen",
+    "adaptive_select_class": "Bitte eine Klasse mit mindestens zwei Schülern auswählen.",
+    "adaptive_players": "Spieler",
+    "adaptive_today": "Nächste Runde",
+    "adaptive_attendance_hint": "Heute spielende Schüler auswählen. Abwesende behalten ihre Wertung.",
+    "adaptive_draw": "Nächste Paarungen auslosen",
+    "adaptive_bye": "Setzt aus",
+    "adaptive_rating": "Rating",
+    "adaptive_cancel_match": "Spiel absagen",
+    "adaptive_cancelled": "Abgesagt"
   }
 }

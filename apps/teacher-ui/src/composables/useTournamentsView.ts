@@ -1,10 +1,11 @@
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import type { Sport } from '@viccoboard/core';
+import type { ClassGroup, Student, Sport } from '@viccoboard/core';
 import { TournamentService, type ScoreboardSessionMetadata } from '@viccoboard/sport';
 
 import { getSportBridge } from './useSportBridge';
+import { getStudentsBridge, initializeStudentsBridge } from './useStudentsBridge';
 
 type View = 'list' | 'create' | 'detail';
 
@@ -18,10 +19,15 @@ export function useTournamentsView() {
   const tournaments = ref<Sport.Tournament[]>([]);
   const activeTournament = ref<Sport.Tournament | null>(null);
   const createError = ref('');
+  const classes = ref<ClassGroup[]>([]);
+  const classStudents = ref<Student[]>([]);
+  const selectedClassId = ref('');
+  const presentStudentIds = ref<string[]>([]);
+  const roundError = ref('');
   const scoreError = ref('');
   const form = ref({
     name: '',
-    type: 'round-robin' as 'round-robin' | 'knockout',
+    type: 'round-robin' as 'round-robin' | 'knockout' | 'adaptive',
     teams: ['', '']
   });
   const scoreEntry = ref<{
@@ -41,6 +47,13 @@ export function useTournamentsView() {
 
   let bridge: ReturnType<typeof getSportBridge>;
   const tournamentService = new TournamentService();
+  let studentsBridge: ReturnType<typeof getStudentsBridge>;
+  try {
+    initializeStudentsBridge();
+    studentsBridge = getStudentsBridge();
+  } catch {
+    studentsBridge = null as never;
+  }
 
   try {
     bridge = getSportBridge();
@@ -57,6 +70,7 @@ export function useTournamentsView() {
   function formatType(type: string): string {
     if (type === 'round-robin') return t('TOURNAMENTS.mode.round_robin');
     if (type === 'knockout') return t('TOURNAMENTS.mode.knockout');
+    if (type === 'adaptive') return t('TOURNAMENTS.mode.adaptive');
     return type;
   }
 
@@ -78,7 +92,10 @@ export function useTournamentsView() {
   });
 
   const standings = computed(() => {
-    if (!activeTournament.value || activeTournament.value.type !== 'round-robin') return [];
+    if (!activeTournament.value || !['round-robin', 'adaptive'].includes(activeTournament.value.type)) return [];
+    if (activeTournament.value.type === 'adaptive') {
+      return tournamentService.computeAdaptiveStandings(activeTournament.value.teams, activeTournament.value.matches);
+    }
     return tournamentService.computeRoundRobinStandings(
       activeTournament.value.teams,
       activeTournament.value.matches
@@ -95,6 +112,61 @@ export function useTournamentsView() {
     );
   });
 
+  async function loadClasses() {
+    if (!bridge) return;
+    classes.value = await bridge.classGroupRepository.findAll();
+  }
+
+  async function loadClassStudents() {
+    classStudents.value = studentsBridge && selectedClassId.value
+      ? await studentsBridge.studentRepository.findByClassGroup(selectedClassId.value)
+      : [];
+    presentStudentIds.value = classStudents.value.map(student => student.id);
+  }
+
+  async function loadTournamentParticipants() {
+    if (!activeTournament.value || activeTournament.value.type !== 'adaptive' || !studentsBridge) return;
+    selectedClassId.value = activeTournament.value.classGroupId;
+    await loadClassStudents();
+    const allowed = new Set(activeTournament.value.teams.flatMap(team => team.studentIds));
+    presentStudentIds.value = presentStudentIds.value.filter(id => allowed.has(id));
+  }
+
+  async function drawRound() {
+    if (!activeTournament.value || saving.value) return;
+    roundError.value = '';
+    saving.value = true;
+    try {
+      const teamIds = activeTournament.value.teams
+        .filter(team => presentStudentIds.value.includes(team.studentIds[0]))
+        .map(team => team.id);
+      const today = new Date();
+      const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      activeTournament.value = await bridge.drawAdaptiveRoundUseCase.execute({
+        tournamentId: activeTournament.value.id,
+        participantIds: teamIds,
+        sessionDate: date
+      });
+    } catch (error) {
+      roundError.value = (error as Error).message;
+    } finally {
+      saving.value = false;
+    }
+  }
+
+  async function cancelAdaptiveMatch(matchId: string) {
+    if (!activeTournament.value || saving.value) return;
+    roundError.value = '';
+    saving.value = true;
+    try {
+      activeTournament.value = await bridge.drawAdaptiveRoundUseCase.cancelMatch(activeTournament.value.id, matchId);
+    } catch (error) {
+      roundError.value = (error as Error).message;
+    } finally {
+      saving.value = false;
+    }
+  }
+
   async function loadTournaments() {
     if (!bridge) return;
     loading.value = true;
@@ -108,6 +180,8 @@ export function useTournamentsView() {
   function startCreate() {
     form.value = { name: '', type: 'round-robin', teams: ['', ''] };
     createError.value = '';
+    selectedClassId.value = '';
+    classStudents.value = [];
     view.value = 'create';
   }
 
@@ -119,6 +193,8 @@ export function useTournamentsView() {
     activeTournament.value = tournament;
     detailTab.value = 'matches';
     view.value = 'detail';
+    roundError.value = '';
+    void loadTournamentParticipants();
   }
 
   async function backToList() {
@@ -138,7 +214,11 @@ export function useTournamentsView() {
   async function submitCreate() {
     createError.value = '';
     const filledTeams = form.value.teams.map(n => n.trim()).filter(n => n.length > 0);
-    if (filledTeams.length < 2) {
+    if (form.value.type === 'adaptive' && (!selectedClassId.value || classStudents.value.length < 2)) {
+      createError.value = t('TOURNAMENTS.adaptive_select_class');
+      return;
+    }
+    if (form.value.type !== 'adaptive' && filledTeams.length < 2) {
       createError.value = t('TOURNAMENTS.min_teams');
       return;
     }
@@ -146,14 +226,20 @@ export function useTournamentsView() {
 
     saving.value = true;
     try {
-      const teams = filledTeams.map(name => ({
+      const teams = form.value.type === 'adaptive'
+        ? classStudents.value.map(student => ({
+          id: crypto.randomUUID(),
+          name: `${student.firstName} ${student.lastName}`.trim(),
+          studentIds: [student.id]
+        }))
+        : filledTeams.map(name => ({
         id: crypto.randomUUID(),
         name,
         studentIds: [] as string[]
       }));
 
       const created = await bridge.createTournamentUseCase.execute({
-        classGroupId: 'default',
+        classGroupId: form.value.type === 'adaptive' ? selectedClassId.value : 'default',
         name: form.value.name.trim(),
         type: form.value.type,
         teams
@@ -254,6 +340,7 @@ export function useTournamentsView() {
 
   onMounted(() => {
     void loadTournaments();
+    void loadClasses();
     const handoff = sessionStorage.getItem('scoreboard_handoff_teams');
     if (handoff) {
       sessionStorage.removeItem('scoreboard_handoff_teams');
@@ -278,6 +365,14 @@ export function useTournamentsView() {
     tournaments,
     activeTournament,
     createError,
+    classes,
+    classStudents,
+    selectedClassId,
+    presentStudentIds,
+    roundError,
+    loadClassStudents,
+    drawRound,
+    cancelAdaptiveMatch,
     scoreError,
     form,
     scoreEntry,

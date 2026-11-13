@@ -239,3 +239,6 @@ export type {
 export { TimerToolPlugin } from './plugins/timer.plugin.js';
 
 export const SPORT_MODULE_VERSION = '0.1.0';
+
+export { DrawAdaptiveRoundUseCase } from './use-cases/draw-adaptive-round.use-case.js';
+export type { DrawAdaptiveRoundInput } from './use-cases/draw-adaptive-round.use-case.js';
