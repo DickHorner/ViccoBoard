@@ -180,6 +180,8 @@
                 type="button"
                 @click="openScoreEntry(match)"
               >{{ t('TOURNAMENTS.enter_result') }}</button>
+              <button v-if="activeTournament.type === 'adaptive' && match.status === 'scheduled'" class="btn-secondary btn-sm" type="button" :disabled="saving" @click="cancelAdaptiveMatch(match.id)">{{ t('TOURNAMENTS.adaptive_cancel_match') }}</button>
+              <span v-if="match.status === 'cancelled'">{{ t('TOURNAMENTS.adaptive_cancelled') }}</span>
             </li>
           </ul>
         </div>
