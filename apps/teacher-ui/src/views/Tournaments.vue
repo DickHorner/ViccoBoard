@@ -326,6 +326,7 @@ const {
   roundError,
   loadClassStudents,
   drawRound,
+  cancelAdaptiveMatch,
   scoreError,
   form,
   scoreEntry,
