@@ -104,8 +104,14 @@ const entries = [
   {
     to: '/tools/teams',
     eyebrow: 'Tool',
-    title: 'Teams & Turniere',
-    description: 'Gruppen fair einteilen und Turnierpläne im Unterricht nutzen.'
+    title: 'Teams bilden',
+    description: 'Schüler nach Zufall oder Kriterien in Mannschaften einteilen.'
+  },
+  {
+    to: '/tools/tournaments',
+    eyebrow: 'Tool',
+    title: 'Turnierplaner',
+    description: 'Turniere erstellen, Paarungen auslosen und Ergebnisse erfassen – von 1 gegen 1 bis 6 gegen 6.'
   },
   {
     to: '/tools/tactics',
