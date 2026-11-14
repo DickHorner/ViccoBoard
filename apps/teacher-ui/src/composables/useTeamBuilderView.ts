@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import { AttendanceStatus, type ClassGroup, type Student, type Sport } from '@viccoboard/core'
 import { TeamConstraintError, type TeamAlgorithm, type TeamBasis, type TeamSessionMetadata } from '@viccoboard/sport'
@@ -17,6 +18,7 @@ interface DisplayTeam {
 
 export function useTeamBuilderView() {
   const { t } = useI18n()
+  const router = useRouter()
 
   initializeSportBridge()
   initializeStudentsBridge()
@@ -41,6 +43,7 @@ export function useTeamBuilderView() {
   const neverTogetherRules = ref<string[][]>([])
   const alwaysTogetherRules = ref<string[][]>([])
   const teams = ref<DisplayTeam[]>([])
+  const missingTeamMembers = ref(false)
 
   const maxTeamCount = computed(() => Math.max(2, Math.min(students.value.length, 12)))
   const teamCountPresets = computed(() => {
@@ -63,6 +66,11 @@ export function useTeamBuilderView() {
   const canSave = computed(() =>
     Boolean(teams.value.length > 0 && sessionName.value.trim().length > 0 && selectedClassId.value)
   )
+  const canHandoffToTournament = computed(() => {
+    const studentIds = teams.value.flatMap(team => team.students.map(student => student.id))
+    return Boolean(selectedClassId.value && teams.value.length >= 2 && !missingTeamMembers.value &&
+      teams.value.every(team => team.students.length > 0) && new Set(studentIds).size === studentIds.length)
+  })
 
   async function loadClasses() {
     classes.value = await sportBridge.classGroupRepository.findAll()
@@ -72,6 +80,7 @@ export function useTeamBuilderView() {
     warning.value = ''
     constraintErrors.value = []
     teams.value = []
+    missingTeamMembers.value = false
     savedSessions.value = []
 
     if (!selectedClassId.value) {
@@ -172,6 +181,20 @@ export function useTeamBuilderView() {
     }
 
     saveSuccess.value = false
+    missingTeamMembers.value = false
+  }
+
+  function handoffToTournament() {
+    if (!canHandoffToTournament.value) return
+    sessionStorage.setItem('team_builder_handoff', JSON.stringify({
+      classGroupId: selectedClassId.value,
+      teams: teams.value.map(team => ({
+        id: team.id,
+        name: team.name,
+        studentIds: team.students.map(student => student.id)
+      }))
+    }))
+    void router.push({ name: 'tournaments' })
   }
 
   async function saveTeams() {
@@ -231,7 +254,8 @@ export function useTeamBuilderView() {
       roles: team.roles
     }))
 
-    if (missingIds.length > 0) warning.value = t('COMMON.error')
+    missingTeamMembers.value = missingIds.length > 0
+    if (missingTeamMembers.value) warning.value = t('TEAM.handoff_missing_members')
     saveSuccess.value = false
     sessionName.value = session.sessionMetadata.sessionName ?? ''
     constraintErrors.value = []
@@ -239,6 +263,7 @@ export function useTeamBuilderView() {
 
   function clearTeams() {
     teams.value = []
+    missingTeamMembers.value = false
     saveSuccess.value = false
     constraintErrors.value = []
   }
@@ -256,11 +281,13 @@ export function useTeamBuilderView() {
     basis,
     canGenerate,
     canSave,
+    canHandoffToTournament,
     classes,
     clearTeams,
     constraintErrors,
     formatDate,
     generateTeams,
+    handoffToTournament,
     loadSession,
     loadStudents,
     maxTeamCount,

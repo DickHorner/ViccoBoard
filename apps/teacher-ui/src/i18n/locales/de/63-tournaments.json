@@ -59,6 +59,7 @@
     "adaptive_cancel_match": "Spiel absagen",
     "adaptive_cancelled": "Abgesagt",
     "adaptive_team_size": "Mannschaftsgröße",
-    "adaptive_vs": "gegen"
+    "adaptive_vs": "gegen",
+    "imported_from_team_builder": "Feste Mannschaften aus der Teameinteilung übernommen. Die Zuordnung der Schüler bleibt erhalten. Möglich sind Jeder gegen Jeden und K.-o.-System."
   }
 }

@@ -1,5 +1,6 @@
 const mockFindTournaments = jest.fn().mockResolvedValue([]);
 const mockFindToolSessions = jest.fn().mockResolvedValue([]);
+const mockCreateTournament = jest.fn();
 
 jest.mock('vue', () => {
   const actual = jest.requireActual('vue');
@@ -67,7 +68,7 @@ jest.mock('../src/composables/useSportBridge', () => ({
     classGroupRepository: { findAll: jest.fn().mockResolvedValue([]) },
     drawAdaptiveRoundUseCase: { execute: jest.fn(), cancelMatch: jest.fn() },
     createTournamentUseCase: {
-      execute: jest.fn()
+      execute: mockCreateTournament
     },
     updateTournamentMatchUseCase: {
       execute: jest.fn()
@@ -86,6 +87,7 @@ describe('useTournamentsView', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
+    mockCreateTournament.mockReset();
   });
 
   it('opens the create flow from scoreboard handoff data and clears the session payload', async () => {
@@ -103,6 +105,82 @@ describe('useTournamentsView', () => {
       teamSize: 1
     });
     expect(sessionStorage.getItem('scoreboard_handoff_teams')).toBeNull();
+  });
+
+  it('preserves fixed teams, their students and the class when creating a round-robin tournament', async () => {
+    const handoff = {
+      classGroupId: 'class-1',
+      teams: [
+        { id: 'team-a', name: 'Red', studentIds: ['s1', 's2'] },
+        { id: 'team-b', name: 'Blue', studentIds: ['s3', 's4'] }
+      ]
+    };
+    sessionStorage.setItem('team_builder_handoff', JSON.stringify(handoff));
+    mockCreateTournament.mockResolvedValue({
+      id: 'created',
+      classGroupId: handoff.classGroupId,
+      name: 'Cup',
+      type: 'round-robin',
+      teams: handoff.teams,
+      matches: [],
+      status: 'planning'
+    });
+
+    const view = useTournamentsView();
+    expect(view.view.value).toBe('create');
+    expect(view.form.value.teams).toEqual(['Red', 'Blue']);
+    expect(view.importedTeamHandoff.value).toEqual(handoff);
+    expect(sessionStorage.getItem('team_builder_handoff')).toBeNull();
+
+    view.form.value.name = 'Cup';
+    await view.submitCreate();
+
+    expect(mockCreateTournament).toHaveBeenCalledWith(expect.objectContaining({
+      classGroupId: 'class-1',
+      name: 'Cup',
+      type: 'round-robin',
+      teams: handoff.teams
+    }));
+  });
+
+  it('keeps team memberships when switching imported fixed teams to knockout', async () => {
+    const handoff = {
+      classGroupId: 'class-2',
+      teams: [
+        { id: 'team-a', name: 'A', studentIds: ['s1'] },
+        { id: 'team-b', name: 'B', studentIds: ['s2'] }
+      ]
+    };
+    sessionStorage.setItem('team_builder_handoff', JSON.stringify(handoff));
+    mockCreateTournament.mockResolvedValue({
+      id: 'created', classGroupId: handoff.classGroupId, type: 'knockout',
+      teams: handoff.teams, matches: []
+    });
+
+    const view = useTournamentsView();
+    view.form.value.name = 'Cup';
+    view.form.value.type = 'knockout';
+    await view.submitCreate();
+
+    expect(mockCreateTournament).toHaveBeenCalledWith(expect.objectContaining({
+      classGroupId: 'class-2',
+      type: 'knockout',
+      teams: handoff.teams
+    }));
+  });
+
+  it('ignores a handoff that lists a student twice', () => {
+    sessionStorage.setItem('team_builder_handoff', JSON.stringify({
+      classGroupId: 'class-1',
+      teams: [
+        { id: 'a', name: 'A', studentIds: ['s1'] },
+        { id: 'b', name: 'B', studentIds: ['s1'] }
+      ]
+    }));
+    const view = useTournamentsView();
+    expect(view.view.value).toBe('list');
+    expect(view.importedTeamHandoff.value).toBeNull();
+    expect(sessionStorage.getItem('team_builder_handoff')).toBeNull();
   });
 
   it('imports a scoreboard session into match result entry', async () => {

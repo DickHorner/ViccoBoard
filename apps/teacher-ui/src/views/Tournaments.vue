@@ -58,7 +58,7 @@
           <select v-model="form.type" class="form-select">
             <option value="round-robin">{{ t('TOURNAMENTS.mode.round_robin') }}</option>
             <option value="knockout">{{ t('TOURNAMENTS.mode.knockout') }}</option>
-            <option value="adaptive">{{ t('TOURNAMENTS.mode.adaptive') }}</option>
+            <option v-if="!importedTeamHandoff" value="adaptive">{{ t('TOURNAMENTS.mode.adaptive') }}</option>
           </select>
         </div>
 
@@ -78,23 +78,25 @@
         </div>
         <div v-else class="form-group">
           <label>{{ t('TOURNAMENTS.teams_label') }}</label>
+          <p v-if="importedTeamHandoff">{{ t('TOURNAMENTS.imported_from_team_builder') }}</p>
           <ul class="team-list-editor">
             <li v-for="(_, idx) in form.teams" :key="idx" class="team-list-row">
               <input
                 v-model="form.teams[idx]"
+                :readonly="Boolean(importedTeamHandoff)"
                 class="form-input team-input"
                 type="text"
                 :placeholder="`${t('TOURNAMENT.team')} ${idx + 1}`"
               />
               <button
-                v-if="form.teams.length > 2"
+                v-if="!importedTeamHandoff && form.teams.length > 2"
                 class="btn-icon"
                 type="button"
                 @click="removeTeam(idx)"
               >✕</button>
             </li>
           </ul>
-          <button class="btn-secondary" type="button" @click="addTeam">
+          <button v-if="!importedTeamHandoff" class="btn-secondary" type="button" @click="addTeam">
             + {{ t('TOURNAMENTS.add_team') }}
           </button>
           <p v-if="createError" class="error-text">{{ createError }}</p>
@@ -330,6 +332,7 @@ const {
   classes,
   classStudents,
   selectedClassId,
+  importedTeamHandoff,
   presentStudentIds,
   roundError,
   loadClassStudents,
