@@ -53,6 +53,29 @@ describe('TeamBuilder tournament handoff', () => {
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'tournaments' });
   });
 
+  it('can transfer a complete saved team session', async () => {
+    mockFindStudents.mockResolvedValue([{ id: 's1' }, { id: 's2' }]);
+    const view = useTeamBuilderView();
+    view.selectedClassId.value = 'class-1';
+
+    await view.loadSession({
+      sessionMetadata: {
+        sessionName: 'Training',
+        teams: [
+          { id: 'red', name: 'Red', studentIds: ['s1'] },
+          { id: 'blue', name: 'Blue', studentIds: ['s2'] }
+        ]
+      }
+    } as any);
+
+    expect(view.canHandoffToTournament.value).toBe(true);
+    view.handoffToTournament();
+    expect(JSON.parse(sessionStorage.getItem('team_builder_handoff')!).teams).toEqual([
+      { id: 'red', name: 'Red', studentIds: ['s1'] },
+      { id: 'blue', name: 'Blue', studentIds: ['s2'] }
+    ]);
+  });
+
   it('does not transfer an incomplete saved team session', async () => {
     mockFindStudents.mockResolvedValue([{ id: 's1' }]);
     const view = useTeamBuilderView();
