@@ -59,6 +59,7 @@
     "adaptive_cancel_match": "Cancel match",
     "adaptive_cancelled": "Cancelled",
     "adaptive_team_size": "Team size",
-    "adaptive_vs": "versus"
+    "adaptive_vs": "versus",
+    "imported_from_team_builder": "Fixed teams imported from the team builder, including player assignments. Available formats: round robin and knockout."
   }
 }
