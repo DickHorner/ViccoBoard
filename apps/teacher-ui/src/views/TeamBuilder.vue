@@ -131,7 +131,7 @@
 
     <section v-if="teams.length > 0" class="card">
       <div class="card-header">
-        <h3>{{ t('TEAM.turniere') }}</h3>
+        <h3>{{ t('TEAM.teams-klasse') }}</h3>
       </div>
       <div class="teams-grid">
         <div v-for="team in teams" :key="team.id" class="team-card">
@@ -148,6 +148,7 @@
       <div class="save-section">
         <div class="form-actions">
           <button class="btn-primary" :disabled="!canSave" @click="saveTeams">{{ t('TEAM.speichern') }}</button>
+          <button class="btn-secondary" :disabled="!canHandoffToTournament" @click="handoffToTournament">{{ t('TEAM.handoff_to_tournament') }}</button>
         </div>
         <div v-if="saveSuccess" class="success-banner">{{ t('TEAM.session-gespeichert') }}</div>
       </div>
@@ -183,11 +184,13 @@ const {
   basis,
   canGenerate,
   canSave,
+  canHandoffToTournament,
   classes,
   clearTeams,
   constraintErrors,
   formatDate,
   generateTeams,
+  handoffToTournament,
   loadSession,
   loadStudents,
   maxTeamCount,
