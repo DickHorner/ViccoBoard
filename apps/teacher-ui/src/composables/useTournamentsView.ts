@@ -9,6 +9,32 @@ import { getStudentsBridge, initializeStudentsBridge } from './useStudentsBridge
 
 type View = 'list' | 'create' | 'detail';
 
+type TeamBuilderHandoff = {
+  classGroupId: string;
+  teams: Array<Pick<Sport.Team, 'id' | 'name' | 'studentIds'>>;
+};
+
+function isTeamBuilderHandoff(value: unknown): value is TeamBuilderHandoff {
+  if (!value || typeof value !== 'object') return false;
+  const data = value as Partial<TeamBuilderHandoff>;
+  if (typeof data.classGroupId !== 'string' || !data.classGroupId.trim() ||
+      !Array.isArray(data.teams) || data.teams.length < 2) return false;
+
+  const teamIds = new Set<string>();
+  const studentIds = new Set<string>();
+  for (const team of data.teams) {
+    if (!team || typeof team.id !== 'string' || !team.id.trim() ||
+        teamIds.has(team.id) || typeof team.name !== 'string' || !team.name.trim() ||
+        !Array.isArray(team.studentIds) || team.studentIds.length === 0) return false;
+    teamIds.add(team.id);
+    for (const studentId of team.studentIds) {
+      if (typeof studentId !== 'string' || !studentId.trim() || studentIds.has(studentId)) return false;
+      studentIds.add(studentId);
+    }
+  }
+  return true;
+}
+
 export function useTournamentsView() {
   const { t } = useI18n();
 
@@ -22,6 +48,7 @@ export function useTournamentsView() {
   const classes = ref<ClassGroup[]>([]);
   const classStudents = ref<Student[]>([]);
   const selectedClassId = ref('');
+  const importedTeamHandoff = ref<TeamBuilderHandoff | null>(null);
   const presentStudentIds = ref<string[]>([]);
   const roundError = ref('');
   const scoreError = ref('');
@@ -185,6 +212,7 @@ export function useTournamentsView() {
   }
 
   function startCreate() {
+    importedTeamHandoff.value = null;
     form.value = { name: '', type: 'round-robin', teams: ['', ''], teamSize: 1 };
     createError.value = '';
     selectedClassId.value = '';
@@ -193,6 +221,7 @@ export function useTournamentsView() {
   }
 
   function cancelCreate() {
+    importedTeamHandoff.value = null;
     view.value = 'list';
   }
 
@@ -233,20 +262,27 @@ export function useTournamentsView() {
 
     saving.value = true;
     try {
-      const teams = form.value.type === 'adaptive'
-        ? classStudents.value.map(student => ({
+      let teams: Sport.Team[];
+      if (form.value.type === 'adaptive') {
+        teams = classStudents.value.map(student => ({
           id: crypto.randomUUID(),
           name: `${student.firstName} ${student.lastName}`.trim(),
           studentIds: [student.id]
-        }))
-        : filledTeams.map(name => ({
-        id: crypto.randomUUID(),
-        name,
-        studentIds: [] as string[]
-      }));
+        }));
+      } else if (importedTeamHandoff.value) {
+        teams = importedTeamHandoff.value.teams;
+      } else {
+        teams = filledTeams.map(name => ({
+          id: crypto.randomUUID(),
+          name,
+          studentIds: []
+        }));
+      }
 
       const created = await bridge.createTournamentUseCase.execute({
-        classGroupId: form.value.type === 'adaptive' ? selectedClassId.value : 'default',
+        classGroupId: form.value.type === 'adaptive'
+          ? selectedClassId.value
+          : (importedTeamHandoff.value?.classGroupId ?? 'default'),
         name: form.value.name.trim(),
         type: form.value.type,
         teamSize: form.value.type === 'adaptive' ? form.value.teamSize : undefined,
@@ -349,6 +385,23 @@ export function useTournamentsView() {
   onMounted(() => {
     void loadTournaments();
     void loadClasses();
+    const teamHandoff = sessionStorage.getItem('team_builder_handoff');
+    if (teamHandoff) {
+      sessionStorage.removeItem('team_builder_handoff');
+      try {
+        const parsed: unknown = JSON.parse(teamHandoff);
+        if (isTeamBuilderHandoff(parsed)) {
+          importedTeamHandoff.value = parsed;
+          selectedClassId.value = parsed.classGroupId;
+          form.value = { name: '', type: 'round-robin', teams: parsed.teams.map(team => team.name), teamSize: 1 };
+          view.value = 'create';
+          sessionStorage.removeItem('scoreboard_handoff_teams');
+          return;
+        }
+      } catch {
+        // Ignore invalid handoff data.
+      }
+    }
     const handoff = sessionStorage.getItem('scoreboard_handoff_teams');
     if (handoff) {
       sessionStorage.removeItem('scoreboard_handoff_teams');
@@ -376,6 +429,7 @@ export function useTournamentsView() {
     classes,
     classStudents,
     selectedClassId,
+    importedTeamHandoff,
     presentStudentIds,
     roundError,
     loadClassStudents,
