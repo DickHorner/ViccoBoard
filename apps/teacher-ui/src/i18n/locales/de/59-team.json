@@ -49,6 +49,8 @@
     "constraint-fehler": "Regelkonflikt",
     "constraint-fehler-detail": "Die Ausschlussregeln können mit der gewählten Teamanzahl nicht erfüllt werden:",
     "set-name-vor-generierung": "Set-Name eingeben (optional)",
-    "anzahl-slider": "Teamanzahl"
+    "anzahl-slider": "Teamanzahl",
+    "handoff_to_tournament": "Im Turnierplaner verwenden",
+    "handoff_missing_members": "Einige Schüler dieser gespeicherten Teams fehlen in der Klasse. Bitte die Teams neu bilden."
   }
 }
