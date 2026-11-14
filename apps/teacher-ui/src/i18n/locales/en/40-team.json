@@ -49,6 +49,8 @@
     "constraint-fehler": "Rule conflict",
     "constraint-fehler-detail": "The exclusion rules cannot be satisfied with the selected team count:",
     "set-name-vor-generierung": "Enter set name (optional)",
-    "anzahl-slider": "Team count"
+    "anzahl-slider": "Team count",
+    "handoff_to_tournament": "Use in tournament planner",
+    "handoff_missing_members": "Some students from these saved teams are missing from the class. Please generate the teams again."
   }
 }
