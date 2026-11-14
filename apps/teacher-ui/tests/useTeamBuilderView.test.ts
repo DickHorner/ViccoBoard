@@ -9,6 +9,10 @@ jest.mock('vue-i18n', () => ({
   useI18n: () => ({ t: (key: string) => key })
 }));
 
+jest.mock('@viccoboard/sport', () => ({
+  TeamConstraintError: class TeamConstraintError extends Error {}
+}), { virtual: true });
+
 jest.mock('../src/composables/useSportBridge', () => ({
   initializeSportBridge: jest.fn(),
   getSportBridge: () => ({
