@@ -26,6 +26,14 @@ describe('StudentRepository class roster', () => {
       inactive: true
     });
 
+    const existing = await repository.findExactIdentityMatch({
+      firstName: 'Anna',
+      lastName: 'Muster',
+      dateOfBirth: '2010-10-01',
+      classGroupId: 'class-9a'
+    });
+    expect(existing?.id).toBe(student.id);
+
     await repository.update(student.id, { inactive: false });
     expect(await repository.findByClassGroup('class-9a')).toHaveLength(1);
   });
