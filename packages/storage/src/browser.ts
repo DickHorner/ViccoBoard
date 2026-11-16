@@ -36,3 +36,4 @@ export * from './migrations/indexeddb/027_subject_assignments.js';
 
 export * from './migrations/indexeddb/028_tournament_team_size.js';
 export * from './migrations/indexeddb/029_school_year_state.js';
+export * from './migrations/indexeddb/030_student_profile_and_roster.js';
