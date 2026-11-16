@@ -147,7 +147,8 @@ const service = new SchoolYearTransitionService(
   sport.classGroupRepository,
   students.studentRepository,
   exams.examRepository,
-  getStorageAdapter()
+  getStorageAdapter(),
+  students.copyClassGroupToSchoolYearUseCase
 )
 
 const loading = ref(true)
