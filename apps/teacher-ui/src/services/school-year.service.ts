@@ -28,7 +28,7 @@ export interface SchoolYearSwitchPreview {
   targetYear: string
   archivedClasses: number
   promotedClasses: number
-  copiedStudents: number
+  continuedStudents: number
   historicalExams: number
 }
 
@@ -109,7 +109,7 @@ export class SchoolYearTransitionService {
 
     let archivedClasses = 0
     let promotedClasses = 0
-    let copiedStudents = 0
+    let continuedStudents = 0
 
     for (const group of source) {
       const decision = decisions.get(group.id)
@@ -136,7 +136,7 @@ export class SchoolYearTransitionService {
       }
       existingNames.add(normalizedName)
       promotedClasses++
-      copiedStudents += await this.students.countByClassGroup(group.id)
+      continuedStudents += await this.students.countByClassGroup(group.id)
     }
 
     const classYears = new Map(allClasses.map(group => [group.id, group.schoolYear]))
@@ -149,7 +149,7 @@ export class SchoolYearTransitionService {
       targetYear: input.targetYear,
       archivedClasses,
       promotedClasses,
-      copiedStudents,
+      continuedStudents,
       historicalExams
     }
   }
@@ -168,7 +168,9 @@ export class SchoolYearTransitionService {
             targetGradeLevel: decision.targetGradeLevel
           })
         }
-        await this.classGroups.update(decision.classGroupId, { archived: true })
+        if (decision.action === 'archive') {
+          await this.classGroups.update(decision.classGroupId, { archived: true })
+        }
       }
 
       const existing = await this.adapter.getById('school_year_state', ACTIVE_YEAR_ID)
