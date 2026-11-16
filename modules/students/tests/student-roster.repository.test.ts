@@ -1,4 +1,4 @@
-import { InMemoryStorageAdapter } from '@viccoboard/storage/browser';
+import { InMemoryStorageAdapter } from '@viccoboard/storage';
 import { StudentRepository } from '../src/repositories/student.repository';
 
 describe('StudentRepository class roster', () => {
