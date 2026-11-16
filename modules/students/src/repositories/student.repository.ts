@@ -100,7 +100,7 @@ export class StudentRepository extends AdapterRepository<Student> {
     const normalizedFirstName = input.firstName.trim().toLowerCase();
     const normalizedLastName = input.lastName.trim().toLowerCase();
 
-    const students = await this.findByClassGroup(input.classGroupId);
+    const students = await this.findAllByClassGroup(input.classGroupId);
     return students.find((student) =>
       student.firstName.trim().toLowerCase() === normalizedFirstName &&
       student.lastName.trim().toLowerCase() === normalizedLastName &&
