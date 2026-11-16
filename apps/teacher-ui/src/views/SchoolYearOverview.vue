@@ -2,7 +2,7 @@
   <section class="school-year-page">
     <header>
       <h1>Schuljahre verwalten</h1>
-      <p>Klassen kontrolliert übernehmen oder archivieren. Prüfungen und Korrekturen bleiben beim alten Schuljahr.</p>
+      <p>Klassen kontrolliert fortführen oder archivieren. Prüfungen und Korrekturen bleiben erhalten.</p>
     </header>
 
     <p v-if="loading" class="notice">Schuljahre werden geladen …</p>
@@ -31,8 +31,8 @@
         <section class="card">
           <h2>Klassen für {{ targetYear }} vorbereiten</h2>
           <p>
-            Entscheide für jede Klasse, ob sie im alten Jahr archiviert oder mit neuer
-            Klassenstufe und einer Kopie der Schülerliste fortgeführt wird.
+            Entscheide für jede Klasse, ob sie archiviert oder mit derselben Klassen-ID und einer neuen
+            Klassenstufe fortgeführt wird.
           </p>
 
           <div v-for="group in sourceClasses" :key="group.id" class="class-row">
@@ -75,14 +75,15 @@
         <section v-if="preview" class="card review">
           <h2>Vorschau – noch nichts geändert</h2>
           <dl class="numbers">
-            <div><dt>Archivierte Klassen</dt><dd>{{ preview.archivedClasses + preview.promotedClasses }}</dd></div>
-            <div><dt>Neue Klassen</dt><dd>{{ preview.promotedClasses }}</dd></div>
-            <div><dt>Übernommene Schülerprofile</dt><dd>{{ preview.copiedStudents }}</dd></div>
+            <div><dt>Archivierte Klassen</dt><dd>{{ preview.archivedClasses }}</dd></div>
+            <div><dt>Fortgeführte Klassen</dt><dd>{{ preview.promotedClasses }}</dd></div>
+            <div><dt>Weitergeführte Schüler</dt><dd>{{ preview.continuedStudents }}</dd></div>
             <div><dt>Historische KBR-Prüfungen</dt><dd>{{ preview.historicalExams }}</dd></div>
           </dl>
           <p>
-            Schülerprofile werden für das neue Jahr kopiert. Alte Schüler-IDs, Noten, Stunden,
-            Abwesenheiten und Prüfungskorrekturen bleiben unverändert im alten Jahr.
+            Klassen und Schüler behalten ihre IDs. Beim Aufstieg werden Klassenstufe,
+            Klassenname und Schuljahr aktualisiert. Noten, Stunden, Abwesenheiten und
+            Prüfungskorrekturen bleiben erhalten; sie werden nicht kopiert.
             Prüfungsvorlagen, gespeicherte Aufgaben, Fördertipps und Bewertungstabellen
             bleiben bestehen.
           </p>
@@ -112,7 +113,7 @@
       </template>
 
       <p v-if="success" class="notice success" role="status">
-        Schuljahreswechsel nach {{ activeYear }} abgeschlossen. Die alten Klassen sind archiviert.
+        Schuljahreswechsel abgeschlossen. Fortgeführte Klassen behalten ihre IDs.
       </p>
     </template>
   </section>
