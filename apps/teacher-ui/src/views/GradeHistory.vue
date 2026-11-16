@@ -184,7 +184,7 @@ async function loadData() {
     }
     
     // Load students
-    students.value = await studentRepository.value?.findByClassGroup(
+    students.value = await studentRepository.value?.findAllByClassGroup(
       category.value.classGroupId
     ) ?? [];
     
