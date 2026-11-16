@@ -92,23 +92,13 @@ describe('SchoolYearTransitionService', () => {
         targetClassName?: string
         targetGradeLevel?: number
       }) => {
-        const original = (await classGroups.findById(input.sourceClassGroupId))!
-        const created = await classGroups.create({
-          name: input.targetClassName ?? original.name,
+        const updated = await classGroups.update(input.sourceClassGroupId, {
+          name: input.targetClassName,
           schoolYear: input.targetSchoolYear,
           gradeLevel: input.targetGradeLevel,
           archived: false
         })
-        const originals = await students.findByClassGroup(original.id)
-        for (const student of originals) {
-          await students.create({
-            firstName: student.firstName,
-            lastName: student.lastName,
-            dateOfBirth: student.dateOfBirth,
-            classGroupId: created.id
-          })
-        }
-        return { classGroup: created, copiedStudents: originals.length, skippedStudents: 0 }
+        return { classGroup: updated, copiedStudents: 0, skippedStudents: 0 }
       }
     } as CopyClassGroupToSchoolYearUseCase
 
@@ -133,14 +123,14 @@ describe('SchoolYearTransitionService', () => {
       targetYear: '2026/2027',
       archivedClasses: 0,
       promotedClasses: 1,
-      copiedStudents: 1,
+      continuedStudents: 1,
       historicalExams: 1
     })
     expect((await classGroups.findById(sourceId))?.archived).toBe(false)
     expect(await classGroups.findBySchoolYear('2026/2027')).toHaveLength(0)
   })
 
-  test('archives old class, copies pupils into a new class and preserves exam records', async () => {
+  test('promotes existing class and pupils without duplicating IDs or exams', async () => {
     const result = await service.execute({
       fromYear: '2025/2026',
       targetYear: '2026/2027',
@@ -148,16 +138,15 @@ describe('SchoolYearTransitionService', () => {
     })
 
     const newClasses = await classGroups.findBySchoolYear('2026/2027')
-    const oldPupils = await students.findByClassGroup(sourceId)
-    const newPupils = await students.findByClassGroup(newClasses[0].id)
+    const newPupils = await students.findByClassGroup(sourceId)
 
     expect(result.promotedClasses).toBe(1)
-    expect((await classGroups.findById(sourceId))?.archived).toBe(true)
+    expect((await classGroups.findById(sourceId))?.archived).toBe(false)
     expect(newClasses).toHaveLength(1)
-    expect(newClasses[0]).toMatchObject({ name: '10a', gradeLevel: 10, archived: false })
-    expect(oldPupils).toHaveLength(1)
+    expect(newClasses[0]).toMatchObject({ id: sourceId, name: '10a', gradeLevel: 10, archived: false })
     expect(newPupils).toHaveLength(1)
-    expect(newPupils[0].id).not.toBe(oldPupils[0].id)
+    expect(newPupils[0].id).toBe('student-2')
+    expect(pupils).toHaveLength(1)
     expect(exams[0].classGroupId).toBe(sourceId)
     expect(exams[1].kind).toBe('template')
     expect(await service.currentYear()).toBe('2026/2027')
