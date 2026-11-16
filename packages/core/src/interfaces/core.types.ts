@@ -71,7 +71,6 @@ export interface Student {
   photoUri?: string;
   contactInfo?: ContactInfo;
   classGroupId: string;
-  formerClassGroupIds?: string[];
   inactive?: boolean;
   legacyDateOfBirthMissing?: boolean;
   createdAt: Date;
