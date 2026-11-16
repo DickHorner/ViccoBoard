@@ -41,6 +41,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Einstellungen', parent: '/' }
   },
   {
+    path: '/settings/school-years',
+    name: 'school-years',
+    component: () => import('../views/SchoolYearOverview.vue'),
+    meta: { title: 'Schuljahre', parent: '/settings' }
+  },
+  {
     path: '/settings/backups',
     name: 'backup-restore',
     component: () => import('../views/BackupRestoreView.vue'),

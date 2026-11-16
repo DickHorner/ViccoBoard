@@ -19,7 +19,8 @@ import {
   ImportBatchItemRepository,
   StudentCalendarEntryRepository,
   StudentCsvImportUseCase,
-  IservAbsenceImportUseCase
+  IservAbsenceImportUseCase,
+  CopyClassGroupToSchoolYearUseCase
 } from '@viccoboard/students';
 import type { AddStudentInput } from '@viccoboard/students';
 import type {
@@ -43,6 +44,7 @@ interface StudentsBridge {
   studentCalendarEntryRepository: StudentCalendarEntryRepository;
   studentCsvImportUseCase: StudentCsvImportUseCase;
   iservAbsenceImportUseCase: IservAbsenceImportUseCase;
+  copyClassGroupToSchoolYearUseCase: CopyClassGroupToSchoolYearUseCase;
   addStatusUseCase: AddStatusUseCase;
   updateStatusUseCase: UpdateStatusUseCase;
   reorderStatusUseCase: ReorderStatusUseCase;
@@ -74,6 +76,10 @@ export function initializeStudentsBridge(): StudentsBridge {
     classGroupRepository,
     studentCalendarEntryRepository
   );
+  const copyClassGroupToSchoolYearUseCase = new CopyClassGroupToSchoolYearUseCase(
+    studentRepo,
+    classGroupRepository
+  );
   const addStatusUseCase = new AddStatusUseCase(statusCatalogRepo);
   const updateStatusUseCase = new UpdateStatusUseCase(statusCatalogRepo);
   const reorderStatusUseCase = new ReorderStatusUseCase(statusCatalogRepo);
@@ -88,6 +94,7 @@ export function initializeStudentsBridge(): StudentsBridge {
     studentCalendarEntryRepository,
     studentCsvImportUseCase,
     iservAbsenceImportUseCase,
+    copyClassGroupToSchoolYearUseCase,
     addStatusUseCase,
     updateStatusUseCase,
     reorderStatusUseCase
@@ -121,6 +128,7 @@ export function useStudents() {
     studentCalendarEntryRepository: computed(() => bridge.value?.studentCalendarEntryRepository),
     studentCsvImportUseCase: computed(() => bridge.value?.studentCsvImportUseCase),
     iservAbsenceImportUseCase: computed(() => bridge.value?.iservAbsenceImportUseCase),
+    copyClassGroupToSchoolYearUseCase: computed(() => bridge.value?.copyClassGroupToSchoolYearUseCase),
     addStatusUseCase: computed(() => bridge.value?.addStatusUseCase),
     updateStatusUseCase: computed(() => bridge.value?.updateStatusUseCase),
     reorderStatusUseCase: computed(() => bridge.value?.reorderStatusUseCase)

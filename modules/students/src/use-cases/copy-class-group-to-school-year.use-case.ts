@@ -3,13 +3,14 @@ import type { ClassGroupGateway } from './student-csv-import.use-case.js';
 import { StudentRepository } from '../repositories/student.repository.js';
 
 export interface CopyClassGroupGateway extends ClassGroupGateway {
-  getById(id: string): Promise<ClassGroup | null>;
+  findById(id: string): Promise<ClassGroup | null>;
 }
 
 export interface CopyClassGroupToSchoolYearInput {
   sourceClassGroupId: string;
   targetSchoolYear: string;
   targetClassName?: string;
+  targetGradeLevel?: number;
 }
 
 export interface CopyClassGroupToSchoolYearResult {
@@ -37,13 +38,20 @@ export class CopyClassGroupToSchoolYearUseCase {
       throw new Error('targetSchoolYear must use YYYY/YYYY format');
     }
 
-    const sourceClassGroup = await this.classGroupGateway.getById(sourceClassGroupId);
+    const sourceClassGroup = await this.classGroupGateway.findById(sourceClassGroupId);
     if (!sourceClassGroup) {
       throw new Error('Source class group not found');
     }
 
+    if (input.targetGradeLevel !== undefined &&
+        (!Number.isInteger(input.targetGradeLevel) || input.targetGradeLevel < 1 || input.targetGradeLevel > 13)) {
+      throw new Error('targetGradeLevel must be between 1 and 13');
+    }
+
     const className = targetClassName || sourceClassGroup.name;
-    const targetClassGroup = await this.createTargetClassGroup(sourceClassGroup, className, targetSchoolYear);
+    const targetClassGroup = await this.createTargetClassGroup(
+      sourceClassGroup, className, targetSchoolYear, input.targetGradeLevel
+    );
     const students = await this.studentRepository.findByClassGroup(sourceClassGroup.id);
 
     let copiedStudents = 0;
@@ -62,7 +70,8 @@ export class CopyClassGroupToSchoolYearUseCase {
   private async createTargetClassGroup(
     sourceClassGroup: ClassGroup,
     targetClassName: string,
-    targetSchoolYear: string
+    targetSchoolYear: string,
+    targetGradeLevel?: number
   ): Promise<ClassGroup> {
     const existingTargetClassGroup = (await this.classGroupGateway.findBySchoolYear(targetSchoolYear))
       .find((classGroup) => classGroup.name.trim().toLowerCase() === targetClassName.toLowerCase());
@@ -74,6 +83,7 @@ export class CopyClassGroupToSchoolYearUseCase {
     return this.classGroupGateway.create({
       name: targetClassName,
       schoolYear: targetSchoolYear,
+      gradeLevel: targetGradeLevel ?? sourceClassGroup.gradeLevel,
       color: sourceClassGroup.color,
       archived: false,
       state: sourceClassGroup.state,

@@ -53,7 +53,7 @@
       </section>
 
       <section class="exam-section" aria-labelledby="concrete-exams-heading">
-        <h2 id="concrete-exams-heading">Konkrete Prüfungen</h2>
+        <h2 id="concrete-exams-heading">Prüfungen · {{ activeYear }}</h2>
         <div v-if="concreteExams.length === 0" class="state-card compact">
           Noch keine konkreten Prüfungen.
         </div>
@@ -79,6 +79,34 @@
           </article>
         </div>
       </section>
+
+      <section v-if="archivedExams.length" class="exam-section">
+        <details class="archive-details">
+          <summary>Prüfungsarchiv ({{ archivedExams.length }})</summary>
+          <p>Abgeschlossene Schuljahre. Prüfungen, Ergebnisse und Korrekturen bleiben unverändert verfügbar.</p>
+          <div class="exam-grid">
+            <article v-for="exam in archivedExams" :key="exam.id" class="exam-card">
+              <div class="exam-header">
+                <h3>{{ exam.title }}</h3>
+                <span class="status">{{ examSchoolYear(exam, classYears) }}</span>
+              </div>
+              <p v-if="exam.description" class="exam-desc">{{ exam.description }}</p>
+              <div class="exam-meta">
+                <span>{{ exam.structure.tasks.length }} Aufgaben</span>
+                <span>{{ exam.structure.totalPoints }} Punkte</span>
+                <span>{{ formatStatus(exam.status) }}</span>
+              </div>
+              <div class="exam-actions">
+                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
+                <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
+                <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
+                <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+              </div>
+            </article>
+          </div>
+        </details>
+      </section>
     </div>
   </section>
 </template>
@@ -88,27 +116,33 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { parseExamDefinition } from '@viccoboard/exams'
-import type { Exams as ExamsTypes } from '@viccoboard/core'
+import type { Exams as ExamsTypes, ClassGroup } from '@viccoboard/core'
+import { getSportBridge } from '../composables/useSportBridge'
+import { getStorageAdapter } from '../services/storage.service'
+import { loadActiveSchoolYear } from '../services/school-year.service'
+import { examSchoolYear, isExamTemplate } from '../utils/exam-school-year'
 import { formatGermanDate } from '../utils/locale-format'
 
 const router = useRouter()
 const { examRepository } = useExamsBridge()
 const exams = ref<ExamsTypes.Exam[]>([])
+const classes = ref<ClassGroup[]>([])
+const activeYear = ref('')
 const loading = ref(true)
 const importing = ref(false)
 const importError = ref('')
 const examImportInput = ref<HTMLInputElement | null>(null)
 
-const isTemplateExam = (exam: ExamsTypes.Exam) => {
-  return exam.kind === 'template' || (
-    exam.candidates.length === 0 &&
-    !exam.date &&
-    !exam.classGroupId
-  )
-}
-
-const templateExams = computed(() => exams.value.filter(isTemplateExam))
-const concreteExams = computed(() => exams.value.filter((exam) => !isTemplateExam(exam)))
+const classYears = computed(() => new Map(classes.value.map(group => [group.id, group.schoolYear])))
+const templateExams = computed(() => exams.value.filter(isExamTemplate))
+const concreteExams = computed(() => exams.value.filter(exam =>
+  !isExamTemplate(exam) &&
+  (!examSchoolYear(exam, classYears.value) || examSchoolYear(exam, classYears.value) === activeYear.value)
+))
+const archivedExams = computed(() => exams.value.filter(exam => {
+  const year = examSchoolYear(exam, classYears.value)
+  return !isExamTemplate(exam) && year !== null && year !== activeYear.value
+}))
 
 const clonePrintPresetsForExam = (
   printPresets: ExamsTypes.Exam['printPresets'],
@@ -141,8 +175,15 @@ const clonePrintPresetsForExam = (
 
 const loadExams = async () => {
   loading.value = true
-  const result = await examRepository?.findAll() ?? []
+  const groupRepository = getSportBridge().classGroupRepository
+  const [result, groups, year] = await Promise.all([
+    examRepository?.findAll() ?? Promise.resolve([]),
+    groupRepository.findAll(),
+    loadActiveSchoolYear(getStorageAdapter(), groupRepository)
+  ])
   exams.value = result
+  classes.value = groups
+  activeYear.value = year
   loading.value = false
 }
 
@@ -179,7 +220,7 @@ const copyExam = async (exam: ExamsTypes.Exam) => {
   if (!examRepository) return
 
   const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...copyInput } = exam
-  const isTemplate = isTemplateExam(exam)
+  const isTemplate = isExamTemplate(exam)
   const copy = await examRepository.create({
     ...copyInput,
     title: isTemplate ? exam.title : `${exam.title} (Kopie)`,
@@ -285,6 +326,9 @@ onMounted(() => {
   color: #64748b;
 }
 
+.archive-details { padding: 1rem; border: 1px solid #dbe3ed; border-radius: 14px; }
+.archive-details summary { cursor: pointer; font-weight: 700; padding: .4rem 0; }
+.archive-details > p { color: #64748b; }
 .exam-sections,
 .exam-section {
   display: flex;

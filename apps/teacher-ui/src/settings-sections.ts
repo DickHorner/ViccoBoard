@@ -7,6 +7,12 @@ export interface SettingsCard {
 
 export const settingsCards: SettingsCard[] = [
   {
+    title: 'Schuljahre',
+    description: 'Aktives Schuljahr wechseln, Klassen archivieren oder samt Schülerliste in die nächste Stufe übernehmen.',
+    status: 'verfügbar',
+    to: '/settings/school-years'
+  },
+  {
     title: 'Sicherheit & App-Sperre',
     description: 'PIN, Passwort, Timeout und weitere Schutzmechanismen werden hier gebündelt.',
     status: 'in Aufbau',
