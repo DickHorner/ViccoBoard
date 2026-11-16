@@ -1,9 +1,9 @@
-import type { ClassGroup, Student } from '@viccoboard/core';
+import type { ClassGroup } from '@viccoboard/core';
 import type { ClassGroupGateway } from './student-csv-import.use-case.js';
-import { StudentRepository } from '../repositories/student.repository.js';
 
 export interface CopyClassGroupGateway extends ClassGroupGateway {
   findById(id: string): Promise<ClassGroup | null>;
+  update(id: string, updates: Partial<ClassGroup>): Promise<ClassGroup>;
 }
 
 export interface CopyClassGroupToSchoolYearInput {
@@ -20,10 +20,7 @@ export interface CopyClassGroupToSchoolYearResult {
 }
 
 export class CopyClassGroupToSchoolYearUseCase {
-  constructor(
-    private studentRepository: StudentRepository,
-    private classGroupGateway: CopyClassGroupGateway
-  ) {}
+  constructor(private classGroupGateway: CopyClassGroupGateway) {}
 
   async execute(input: CopyClassGroupToSchoolYearInput): Promise<CopyClassGroupToSchoolYearResult> {
     const sourceClassGroupId = input.sourceClassGroupId.trim();
@@ -49,70 +46,26 @@ export class CopyClassGroupToSchoolYearUseCase {
     }
 
     const className = targetClassName || sourceClassGroup.name;
-    const targetClassGroup = await this.createTargetClassGroup(
-      sourceClassGroup, className, targetSchoolYear, input.targetGradeLevel
-    );
-    const students = await this.studentRepository.findByClassGroup(sourceClassGroup.id);
+    const duplicate = (await this.classGroupGateway.findBySchoolYear(targetSchoolYear))
+      .find(group => group.id !== sourceClassGroupId &&
+        group.name.trim().toLowerCase() === className.toLowerCase());
 
-    let copiedStudents = 0;
-    for (const student of students) {
-      await this.copyStudent(student, targetClassGroup.id);
-      copiedStudents += 1;
-    }
-
-    return {
-      classGroup: targetClassGroup,
-      copiedStudents,
-      skippedStudents: 0
-    };
-  }
-
-  private async createTargetClassGroup(
-    sourceClassGroup: ClassGroup,
-    targetClassName: string,
-    targetSchoolYear: string,
-    targetGradeLevel?: number
-  ): Promise<ClassGroup> {
-    const existingTargetClassGroup = (await this.classGroupGateway.findBySchoolYear(targetSchoolYear))
-      .find((classGroup) => classGroup.name.trim().toLowerCase() === targetClassName.toLowerCase());
-
-    if (existingTargetClassGroup) {
+    if (duplicate) {
       throw new Error('Target class group already exists');
     }
 
-    return this.classGroupGateway.create({
-      name: targetClassName,
+    const classGroup = await this.classGroupGateway.update(sourceClassGroupId, {
+      name: className,
       schoolYear: targetSchoolYear,
-      gradeLevel: targetGradeLevel ?? sourceClassGroup.gradeLevel,
-      color: sourceClassGroup.color,
-      archived: false,
-      state: sourceClassGroup.state,
-      holidayCalendarRef: sourceClassGroup.holidayCalendarRef,
-      gradingScheme: sourceClassGroup.gradingScheme
+      gradeLevel: input.targetGradeLevel ?? sourceClassGroup.gradeLevel,
+      archived: false
     });
-  }
 
-  private async copyStudent(student: Student, targetClassGroupId: string): Promise<void> {
-    await this.studentRepository.create({
-      firstName: student.firstName,
-      lastName: student.lastName,
-      dateOfBirth: student.dateOfBirth,
-      gender: student.gender,
-      photoUri: student.photoUri,
-      contactInfo: student.contactInfo,
-      classGroupId: targetClassGroupId,
-      legacyDateOfBirthMissing: student.legacyDateOfBirthMissing
-    });
+    return { classGroup, copiedStudents: 0, skippedStudents: 0 };
   }
 
   private isValidSchoolYear(schoolYear: string): boolean {
     const match = /^(\d{4})\/(\d{4})$/.exec(schoolYear);
-    if (!match) {
-      return false;
-    }
-
-    const startYear = Number(match[1]);
-    const endYear = Number(match[2]);
-    return endYear === startYear + 1;
+    return Boolean(match && Number(match[2]) === Number(match[1]) + 1);
   }
 }
