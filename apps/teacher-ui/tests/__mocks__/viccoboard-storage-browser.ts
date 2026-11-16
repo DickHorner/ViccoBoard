@@ -24,6 +24,10 @@ export class InMemoryStorageAdapter implements StorageAdapter {
     this.tables.clear()
   }
 
+  async transaction<T>(callback: () => T | Promise<T>): Promise<T> {
+    return callback()
+  }
+
   async getAll<T = any>(tableName: string, criteria?: Record<string, any>): Promise<T[]> {
     const table = this.tables.get(tableName)
     if (!table) return []
