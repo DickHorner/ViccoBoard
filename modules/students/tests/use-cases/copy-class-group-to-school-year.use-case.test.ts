@@ -1,13 +1,11 @@
-import type { ClassGroup, Student } from '@viccoboard/core';
+import type { ClassGroup } from '@viccoboard/core';
 import {
   CopyClassGroupToSchoolYearUseCase,
   type CopyClassGroupGateway
 } from '../../src/use-cases/copy-class-group-to-school-year.use-case';
-import type { StudentRepository } from '../../src/repositories/student.repository';
 
 describe('CopyClassGroupToSchoolYearUseCase', () => {
   let groups: ClassGroup[];
-  let students: Student[];
   let useCase: CopyClassGroupToSchoolYearUseCase;
 
   beforeEach(() => {
@@ -17,15 +15,6 @@ describe('CopyClassGroupToSchoolYearUseCase', () => {
       schoolYear: '2025/2026',
       gradeLevel: 9,
       archived: false,
-      createdAt: new Date(),
-      lastModified: new Date()
-    }];
-    students = [{
-      id: 'pupil-1',
-      firstName: 'Anna',
-      lastName: 'Muster',
-      dateOfBirth: '2010-10-01',
-      classGroupId: 'class-9a',
       createdAt: new Date(),
       lastModified: new Date()
     }];
@@ -43,30 +32,22 @@ describe('CopyClassGroupToSchoolYearUseCase', () => {
         groups.push(group);
         return group;
       },
+      update: async (id, changes) => {
+        const group = groups.find(group => group.id === id);
+        if (!group) throw new Error('Class not found');
+        Object.assign(group, changes);
+        return group;
+      },
       delete: async id => {
         const oldLength = groups.length;
         groups = groups.filter(group => group.id !== id);
         return groups.length < oldLength;
       }
     };
-    const studentGateway = {
-      findByClassGroup: async (id: string) => students.filter(student => student.classGroupId === id),
-      create: async (input: Omit<Student, 'id' | 'createdAt' | 'lastModified'>) => {
-        const student: Student = {
-          ...input,
-          id: `pupil-${students.length + 1}`,
-          createdAt: new Date(),
-          lastModified: new Date()
-        };
-        students.push(student);
-        return student;
-      }
-    } as StudentRepository;
-
-    useCase = new CopyClassGroupToSchoolYearUseCase(studentGateway, classGateway);
+    useCase = new CopyClassGroupToSchoolYearUseCase(classGateway);
   });
 
-  test('copies a class, its grade level and pupils without touching the original', async () => {
+  test('promotes the same class ID without creating a class or pupils', async () => {
     const result = await useCase.execute({
       sourceClassGroupId: 'class-9a',
       targetSchoolYear: '2026/2027',
@@ -80,14 +61,13 @@ describe('CopyClassGroupToSchoolYearUseCase', () => {
       schoolYear: '2026/2027',
       archived: false
     });
-    expect(result.copiedStudents).toBe(1);
-    expect(students.filter(student => student.classGroupId === result.classGroup.id)).toHaveLength(1);
-    expect(students.filter(student => student.classGroupId === 'class-9a')).toHaveLength(1);
-    expect(students[0].id).not.toBe(students[1].id);
-    expect(groups[0].gradeLevel).toBe(9);
+    expect(result.classGroup.id).toBe('class-9a');
+    expect(result.copiedStudents).toBe(0);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].gradeLevel).toBe(10);
   });
 
-  test('rejects duplicate target classes without copying pupils', async () => {
+  test('rejects duplicate target class names', async () => {
     groups.push({ ...groups[0], id: 'already', name: '10a', schoolYear: '2026/2027' });
 
     await expect(useCase.execute({
@@ -97,7 +77,7 @@ describe('CopyClassGroupToSchoolYearUseCase', () => {
       targetGradeLevel: 10
     })).rejects.toThrow('already exists');
 
-    expect(students).toHaveLength(1);
+    expect(groups[0].schoolYear).toBe('2025/2026');
   });
 
   test('rejects invalid target school years and grade levels', async () => {

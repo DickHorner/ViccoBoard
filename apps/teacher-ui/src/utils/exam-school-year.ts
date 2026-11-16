@@ -6,17 +6,18 @@ export function isExamTemplate(exam: Exams.Exam): boolean {
   )
 }
 
+export function schoolYearForDate(date: Date): string | null {
+  if (!Number.isFinite(date.getTime())) return null
+  const year = date.getMonth() >= 7 ? date.getFullYear() : date.getFullYear() - 1
+  return `${year}/${year + 1}`
+}
+
 export function examSchoolYear(exam: Exams.Exam, classYears: Map<string, string>): string | null {
   if (isExamTemplate(exam)) return null
 
-  if (exam.classGroupId) {
-    const classYear = classYears.get(exam.classGroupId)
-    if (classYear) return classYear
-  }
+  const date = exam.date ?? exam.createdAt
+  const datedYear = date && schoolYearForDate(date)
+  if (datedYear) return datedYear
 
-  if (!exam.date || !Number.isFinite(exam.date.getTime())) return null
-  const year = exam.date.getMonth() >= 7
-    ? exam.date.getFullYear()
-    : exam.date.getFullYear() - 1
-  return `${year}/${year + 1}`
+  return exam.classGroupId ? classYears.get(exam.classGroupId) ?? null : null
 }

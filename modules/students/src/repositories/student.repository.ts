@@ -29,6 +29,7 @@ export class StudentRepository extends AdapterRepository<Student> {
         phone: row.phone || undefined
       },
       classGroupId: row.class_group_id,
+      inactive: row.inactive === 1 || row.inactive === true,
       legacyDateOfBirthMissing: row.legacy_dob_missing === 1 || row.legacy_dob_missing === true,
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
@@ -51,6 +52,7 @@ export class StudentRepository extends AdapterRepository<Student> {
     if (entity.contactInfo?.parentEmail !== undefined) row.parent_email = entity.contactInfo.parentEmail;
     if (entity.contactInfo?.phone !== undefined) row.phone = entity.contactInfo.phone;
     if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
+    if (entity.inactive !== undefined) row.inactive = entity.inactive ? 1 : 0;
     if (entity.legacyDateOfBirthMissing !== undefined) row.legacy_dob_missing = entity.legacyDateOfBirthMissing ? 1 : 0;
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
@@ -62,6 +64,10 @@ export class StudentRepository extends AdapterRepository<Student> {
    * Find all students in a specific class
    */
   async findByClassGroup(classGroupId: string): Promise<Student[]> {
+    return (await this.findAllByClassGroup(classGroupId)).filter(student => !student.inactive);
+  }
+
+  async findAllByClassGroup(classGroupId: string): Promise<Student[]> {
     return this.find({ class_group_id: classGroupId });
   }
 
@@ -94,7 +100,7 @@ export class StudentRepository extends AdapterRepository<Student> {
     const normalizedFirstName = input.firstName.trim().toLowerCase();
     const normalizedLastName = input.lastName.trim().toLowerCase();
 
-    const students = await this.findByClassGroup(input.classGroupId);
+    const students = await this.findAllByClassGroup(input.classGroupId);
     return students.find((student) =>
       student.firstName.trim().toLowerCase() === normalizedFirstName &&
       student.lastName.trim().toLowerCase() === normalizedLastName &&

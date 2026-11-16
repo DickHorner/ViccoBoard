@@ -6,6 +6,7 @@ import type { ClassGroup, Sport, Student } from '@viccoboard/core'
 import { getSportBridge, useSportBridge } from './useSportBridge'
 import { useStudents } from './useStudentsBridge'
 import { useToast } from './useToast'
+import { isPerformanceEntryInSchoolYear } from '../utils/performance-school-year'
 
 type NewCategoryForm = {
   name: string
@@ -100,7 +101,9 @@ export function useGradingOverviewView() {
       const entryPromises = students.value.map((student) =>
         SportBridge.value?.performanceEntryRepository.findByStudent(student.id) ?? Promise.resolve([])
       )
+      const year = classes.value.find(group => group.id === selectedClassId.value)?.schoolYear
       performanceEntries.value = (await Promise.all(entryPromises)).flat()
+        .filter(entry => year && isPerformanceEntryInSchoolYear(entry, year))
     } catch (error) {
       console.error('Failed to load grading data:', error)
     } finally {

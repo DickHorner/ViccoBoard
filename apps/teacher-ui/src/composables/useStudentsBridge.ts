@@ -76,10 +76,7 @@ export function initializeStudentsBridge(): StudentsBridge {
     classGroupRepository,
     studentCalendarEntryRepository
   );
-  const copyClassGroupToSchoolYearUseCase = new CopyClassGroupToSchoolYearUseCase(
-    studentRepo,
-    classGroupRepository
-  );
+  const copyClassGroupToSchoolYearUseCase = new CopyClassGroupToSchoolYearUseCase(classGroupRepository);
   const addStatusUseCase = new AddStatusUseCase(statusCatalogRepo);
   const updateStatusUseCase = new UpdateStatusUseCase(statusCatalogRepo);
   const reorderStatusUseCase = new ReorderStatusUseCase(statusCatalogRepo);

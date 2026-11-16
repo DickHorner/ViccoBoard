@@ -11,7 +11,11 @@ class InMemoryStudentRepository {
   constructor(private students: Student[] = []) {}
 
   async findByClassGroup(classGroupId: string): Promise<Student[]> {
-    return this.students.filter((student) => student.classGroupId === classGroupId);
+    return (await this.findAllByClassGroup(classGroupId)).filter(student => !student.inactive);
+  }
+
+  async findAllByClassGroup(classGroupId: string): Promise<Student[]> {
+    return this.students.filter(student => student.classGroupId === classGroupId);
   }
 
   async findExactIdentityMatch(input: {
@@ -357,6 +361,37 @@ describe('StudentCsvImportUseCase', () => {
     expect(importBatchRepository.getAll()).toHaveLength(1);
     expect(importBatchItemRepository.getAll().filter((item) => item.entityType === 'student' && item.action === 'created')).toHaveLength(2);
     expect(importBatchItemRepository.getAll().filter((item) => item.entityType === 'class_group' && item.action === 'created')).toHaveLength(1);
+  });
+
+  test('keeps a demo-created class containing inactive real pupils during cleanup', async () => {
+    const { useCase, studentRepository, classGroupGateway } = createUseCase();
+
+    await useCase.execute([{
+      fileName: 'demo.csv',
+      content: [
+        'Vorname,Nachname,Klasse,Teilklasse,Geburtsdatum,Geschlecht,E-Mail',
+        'Anna,Muster,7,a,14.03.2012,f,anna.muster@vvb-gym.de'
+      ].join('\n')
+    }], 'demo', 'Demo class');
+
+    const classId = classGroupGateway.getAll()[0].id;
+    const formerStudent = await studentRepository.create({
+      firstName: 'Lisa',
+      lastName: 'Ehemalig',
+      dateOfBirth: '12.04.2012',
+      classGroupId: classId,
+      inactive: true
+    });
+    expect(await studentRepository.findByClassGroup(classId)).toHaveLength(1);
+
+    const deletion = await useCase.deleteDemoData();
+
+    expect(deletion.deletedStudents).toBe(1);
+    expect(deletion.deletedClassGroups).toBe(0);
+    expect(classGroupGateway.getAll()).toHaveLength(1);
+    expect(await studentRepository.findAllByClassGroup(classId)).toMatchObject([
+      { id: formerStudent.id, inactive: true }
+    ]);
   });
 
   test('deletes only demo-imported students and removes empty demo class groups', async () => {

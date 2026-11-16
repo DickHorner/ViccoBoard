@@ -59,6 +59,10 @@
       </div>
 
       <div class="student-list-page__toolbar-side">
+        <label class="app-data-note">
+          <input v-model="showArchivedStudents" type="checkbox" />
+          Ehemalige und archivierte Schüler anzeigen
+        </label>
         <div v-if="selectedStudents.length > 0" class="app-actions-row">
           <Button
             :label="`${selectedStudents.length} verschieben`"
@@ -468,6 +472,7 @@ const {
   searchQuery,
   filterClass,
   filterGender,
+  showArchivedStudents,
   selectedStudents,
   showEditor,
   showImportDialog,

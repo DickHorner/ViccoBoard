@@ -232,7 +232,7 @@ export class StudentCsvImportUseCase {
 
     let deletedClassGroups = 0;
     for (const classGroupId of classGroupIds) {
-      const remainingStudents = await this.studentRepository.findByClassGroup(classGroupId);
+      const remainingStudents = await this.studentRepository.findAllByClassGroup(classGroupId);
       if (remainingStudents.length === 0) {
         const deleted = await this.classGroupGateway.delete(classGroupId);
         if (deleted) {

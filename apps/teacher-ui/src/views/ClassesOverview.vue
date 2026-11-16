@@ -17,6 +17,10 @@
         type="search"
         placeholder="Klasse oder Schuljahr suchen"
       />
+      <label class="archive-toggle">
+        <input v-model="showArchived" type="checkbox" />
+        Archivierte Klassen anzeigen
+      </label>
       <p class="filter-note">{{ visibleClasses.length }} Klassen sichtbar</p>
     </section>
 
@@ -82,12 +86,14 @@ const { repository: studentRepository } = useStudents()
 const loading = ref(true)
 const loadError = ref('')
 const searchQuery = ref('')
+const showArchived = ref(false)
 const classes = ref<ClassOverviewEntry[]>([])
 
 const visibleClasses = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
 
   return classes.value.filter((entry) => {
+    if (entry.classGroup.archived && !showArchived.value) return false
     if (!query) {
       return true
     }
@@ -214,7 +220,12 @@ onMounted(() => {
 
 .filter-card {
   padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
 }
+.archive-toggle { display: inline-flex; align-items: center; gap: .5rem; }
 
 .search-input {
   width: 100%;

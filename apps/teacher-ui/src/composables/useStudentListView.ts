@@ -59,6 +59,7 @@ export function useStudentListView() {
   const searchQuery = ref('');
   const filterClass = ref<string | null>(null);
   const filterGender = ref<'m' | 'f' | null>(null);
+  const showArchivedStudents = ref(false);
   const selectedStudents = ref<StudentRow[]>([]);
 
   const showEditor = ref(false);
@@ -87,7 +88,7 @@ export function useStudentListView() {
   const studentForm = ref<StudentFormState>(defaultStudentForm());
 
   const classOptions = computed(() =>
-    classes.value.map((classGroup) => ({
+    classes.value.filter(classGroup => !classGroup.archived || showArchivedStudents.value).map((classGroup) => ({
       label: classGroup.name,
       value: classGroup.id
     }))
@@ -105,6 +106,9 @@ export function useStudentListView() {
 
   const classNameById = computed(() =>
     new Map(classes.value.map((classGroup) => [classGroup.id, classGroup.name]))
+  );
+  const archivedClassIds = computed(() =>
+    new Set(classes.value.filter(group => group.archived).map(group => group.id))
   );
 
   const studentRows = computed<StudentRow[]>(() =>
@@ -131,8 +135,10 @@ export function useStudentListView() {
 
       const matchesClass = !filterClass.value || student.original.classGroupId === filterClass.value;
       const matchesGender = !filterGender.value || student.original.gender === filterGender.value;
+      const matchesArchived = showArchivedStudents.value ||
+        (!archivedClassIds.value.has(student.original.classGroupId) && !student.original.inactive);
 
-      return matchesQuery && matchesClass && matchesGender;
+      return matchesQuery && matchesClass && matchesGender && matchesArchived;
     });
   });
 
@@ -187,6 +193,7 @@ export function useStudentListView() {
     searchQuery.value = '';
     filterClass.value = null;
     filterGender.value = null;
+    showArchivedStudents.value = false;
   }
 
   function openCreateDialog() {
@@ -419,6 +426,7 @@ export function useStudentListView() {
     searchQuery,
     filterClass,
     filterGender,
+    showArchivedStudents,
     selectedStudents,
     showEditor,
     showImportDialog,
