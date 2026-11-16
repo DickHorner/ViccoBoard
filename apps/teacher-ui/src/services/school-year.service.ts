@@ -1,4 +1,4 @@
-import type { ClassGroup, Exams } from '@viccoboard/core'
+import type { ClassGroup } from '@viccoboard/core'
 import type { StorageAdapter } from '@viccoboard/storage/browser'
 import type { ClassGroupRepository } from '@viccoboard/sport'
 import {
