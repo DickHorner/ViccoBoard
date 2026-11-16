@@ -528,3 +528,8 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+
+.roster-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.roster-toggle { display: inline-flex; align-items: center; gap: .4rem; font-size: .875rem; }
+.student-profile-link { display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 0; color: inherit; text-decoration: none; }
+.student-card { gap: .75rem; flex-wrap: wrap; }
