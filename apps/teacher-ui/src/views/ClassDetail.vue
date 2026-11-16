@@ -63,33 +63,45 @@
       <section class="card">
         <div class="card-header">
           <h3>Schüler</h3>
-          <button class="btn-primary btn-small" @click="showAddStudentModal = true">
-            + Schüler hinzufügen
-          </button>
+          <div class="roster-actions">
+            <label class="roster-toggle">
+              <input v-model="showInactiveStudents" type="checkbox" />
+              Ausgeschiedene anzeigen
+            </label>
+            <button class="btn-primary btn-small" @click="showAddStudentModal = true">
+              + Schüler hinzufügen
+            </button>
+          </div>
         </div>
         <div class="card-content">
           <div v-if="loadingStudents" class="loading-state-small">
             <div class="spinner-small"></div>
             <p>Schüler werden geladen...</p>
           </div>
-          <div v-else-if="students.length === 0" class="empty-state">
+          <div v-else-if="visibleStudents.length === 0" class="empty-state">
             <p>Noch keine Schüler in dieser Klasse. Fügen Sie Ihren ersten Schüler hinzu.</p>
           </div>
           
           <div v-else class="student-list">
-            <RouterLink 
-              v-for="student in students" 
-              :key="student.id"
-              :to="`/students/${student.id}`"
-              class="student-card"
-            >
-              <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
-              <div class="student-info">
-                <h4>{{ student.firstName }} {{ student.lastName }}</h4>
-                <p v-if="student.dateOfBirth">Geb.: {{ formatGermanDateOfBirth(student.dateOfBirth) }}</p>
-              </div>
-              <div class="student-arrow">→</div>
-            </RouterLink>
+            <div v-for="student in visibleStudents" :key="student.id" class="student-card">
+              <RouterLink :to="`/students/${student.id}`" class="student-profile-link">
+                <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
+                <div class="student-info">
+                  <h4>{{ student.firstName }} {{ student.lastName }}</h4>
+                  <p v-if="student.dateOfBirth">Geb.: {{ formatGermanDateOfBirth(student.dateOfBirth) }}</p>
+                  <p v-if="student.inactive">Nicht mehr in der Klasse</p>
+                </div>
+                <div class="student-arrow">→</div>
+              </RouterLink>
+              <button
+                type="button"
+                class="btn-secondary btn-small"
+                :disabled="updatingRosterId === student.id"
+                @click="toggleStudentActive(student)"
+              >
+                {{ student.inactive ? 'Wieder aufnehmen' : 'Aus Klasse nehmen' }}
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -228,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge, initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
@@ -244,6 +256,11 @@ const classGroup = ref<ClassGroup | null>(null)
 const students = ref<Student[]>([])
 const loading = ref(false)
 const loadingStudents = ref(false)
+const showInactiveStudents = ref(false)
+const updatingRosterId = ref<string | null>(null)
+const visibleStudents = computed(() => showInactiveStudents.value
+  ? students.value
+  : students.value.filter(student => !student.inactive))
 const error = ref('')
 const showAddStudentModal = ref(false)
 const addingStudent = ref(false)
@@ -284,7 +301,7 @@ const loadData = async () => {
     }
     
     // Load students for this class
-    students.value = await studentsBridge.studentRepository.findByClassGroup(classId)
+    students.value = await studentsBridge.studentRepository.findAllByClassGroup(classId)
 
     // Load sport-specific data for summary cards
     const [lessons, gradeCategories, studentEntryArrays] = await Promise.all([
@@ -298,7 +315,7 @@ const loadData = async () => {
     const classAssessmentCount = studentEntryArrays.reduce((sum, entries) => sum + entries.length, 0)
 
     sportSummary.value = buildClassSportSummary(
-      students.value.length,
+      students.value.filter(student => !student.inactive).length,
       lessons.length,
       gradeCategories.length,
       classAssessmentCount
@@ -327,7 +344,7 @@ const handleAddStudent = async () => {
     })
     
     // Reload students
-    students.value = await studentsBridge.studentRepository.findByClassGroup(classId)
+    students.value = await studentsBridge.studentRepository.findAllByClassGroup(classId)
     
     // Reset form and close modal
     closeAddStudentModal()
@@ -340,6 +357,23 @@ const handleAddStudent = async () => {
     }
   } finally {
     addingStudent.value = false
+  }
+}
+
+const toggleStudentActive = async (student: Student) => {
+  if (!student.inactive && !window.confirm(
+    `${student.firstName} ${student.lastName} aus der aktiven Klassenliste nehmen? Die Leistungen bleiben erhalten.`
+  )) return
+
+  updatingRosterId.value = student.id
+  try {
+    await studentsBridge.studentRepository.update(student.id, { inactive: !student.inactive })
+    await loadData()
+  } catch (err) {
+    console.error('Failed to update roster:', err)
+    error.value = 'Die Schülerzuordnung konnte nicht aktualisiert werden.'
+  } finally {
+    updatingRosterId.value = null
   }
 }
 
