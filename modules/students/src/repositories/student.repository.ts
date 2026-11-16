@@ -4,7 +4,7 @@
  */
 
 import { AdapterRepository } from '@viccoboard/storage';
-import { Student } from '@viccoboard/core';
+import { Student, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 
 export class StudentRepository extends AdapterRepository<Student> {
@@ -29,6 +29,8 @@ export class StudentRepository extends AdapterRepository<Student> {
         phone: row.phone || undefined
       },
       classGroupId: row.class_group_id,
+      formerClassGroupIds: safeJsonParse(row.former_class_group_ids, [], 'Student.formerClassGroupIds'),
+      inactive: row.inactive === 1 || row.inactive === true,
       legacyDateOfBirthMissing: row.legacy_dob_missing === 1 || row.legacy_dob_missing === true,
       createdAt: new Date(row.created_at),
       lastModified: new Date(row.last_modified)
@@ -51,6 +53,8 @@ export class StudentRepository extends AdapterRepository<Student> {
     if (entity.contactInfo?.parentEmail !== undefined) row.parent_email = entity.contactInfo.parentEmail;
     if (entity.contactInfo?.phone !== undefined) row.phone = entity.contactInfo.phone;
     if (entity.classGroupId !== undefined) row.class_group_id = entity.classGroupId;
+    if (entity.formerClassGroupIds !== undefined) row.former_class_group_ids = safeJsonStringify(entity.formerClassGroupIds, 'Student.formerClassGroupIds');
+    if (entity.inactive !== undefined) row.inactive = entity.inactive ? 1 : 0;
     if (entity.legacyDateOfBirthMissing !== undefined) row.legacy_dob_missing = entity.legacyDateOfBirthMissing ? 1 : 0;
     if (entity.createdAt !== undefined) row.created_at = entity.createdAt.toISOString();
     if (entity.lastModified !== undefined) row.last_modified = entity.lastModified.toISOString();
@@ -62,7 +66,15 @@ export class StudentRepository extends AdapterRepository<Student> {
    * Find all students in a specific class
    */
   async findByClassGroup(classGroupId: string): Promise<Student[]> {
-    return this.find({ class_group_id: classGroupId });
+    return (await this.find({ class_group_id: classGroupId })).filter(student => !student.inactive);
+  }
+
+  async findRosterByClassGroup(classGroupId: string, includeFormer = false): Promise<Student[]> {
+    if (!includeFormer) return this.find({ class_group_id: classGroupId });
+    const students = await this.findAll();
+    return students.filter(student =>
+      student.classGroupId === classGroupId || student.formerClassGroupIds?.includes(classGroupId)
+    );
   }
 
   /**
