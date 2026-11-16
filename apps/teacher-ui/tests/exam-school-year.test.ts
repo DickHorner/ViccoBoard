@@ -18,14 +18,14 @@ describe('exam school-year classification', () => {
     expect(examSchoolYear(template, classYears)).toBeNull()
   })
 
-  test('uses the linked class year even when the exam has a different date', () => {
+  test('uses the exam date when the class advances to another year', () => {
     const exam = {
       kind: 'exam',
       classGroupId: 'class-old',
       date: new Date('2026-10-04'),
       candidates: [{ id: 'one' }]
     } as unknown as Exams.Exam
-    expect(examSchoolYear(exam, classYears)).toBe('2025/2026')
+    expect(examSchoolYear(exam, classYears)).toBe('2026/2027')
   })
 
   test('uses the exam date for unassigned concrete exams', () => {
