@@ -1,9 +1,9 @@
 import type { ClassGroup } from '@viccoboard/core'
 import type { StorageAdapter } from '@viccoboard/storage/browser'
 import type { ClassGroupRepository } from '@viccoboard/sport'
-import {
+import type {
   CopyClassGroupToSchoolYearUseCase,
-  type StudentRepository
+  StudentRepository
 } from '@viccoboard/students'
 import type { ExamRepository } from '@viccoboard/exams'
 import { examSchoolYear, isExamTemplate } from '../utils/exam-school-year'
@@ -70,16 +70,13 @@ export async function loadActiveSchoolYear(
 }
 
 export class SchoolYearTransitionService {
-  private copyClass: CopyClassGroupToSchoolYearUseCase
-
   constructor(
     private classGroups: ClassGroupRepository,
     private students: StudentRepository,
     private exams: ExamRepository,
-    private adapter: StorageAdapter
-  ) {
-    this.copyClass = new CopyClassGroupToSchoolYearUseCase(students, classGroups)
-  }
+    private adapter: StorageAdapter,
+    private copyClass: CopyClassGroupToSchoolYearUseCase
+  ) {}
 
   async currentYear(): Promise<string> {
     return loadActiveSchoolYear(this.adapter, this.classGroups)
