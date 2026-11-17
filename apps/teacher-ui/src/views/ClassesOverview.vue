@@ -80,6 +80,7 @@ import { useClassGroups, useLessons } from '../composables/useSportBridge'
 import { useStudents } from '../composables/useStudentsBridge'
 import type { ClassGroup } from '@viccoboard/core'
 import { prefetchClassStudents, scheduleViewPrefetch } from '../services/navigation-prefetch'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 interface ClassOverviewEntry {
   classGroup: ClassGroup
@@ -135,6 +136,7 @@ const loadData = async () => {
   if (loadError.value) return
 
   await nextTick()
+  recordRouteContentReady('classes')
   cancelViewPrefetch = scheduleViewPrefetch(() => import('./ClassDetail.vue'))
 
   void Promise.all(classes.value.map(async entry => {
