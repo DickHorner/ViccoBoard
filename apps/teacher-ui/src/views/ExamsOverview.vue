@@ -73,14 +73,11 @@
             <div class="exam-actions">
               <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
               <template v-else>
-                <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
-                <template v-else>
-                  <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
-                  <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
-                  <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
-                  <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
-                  <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
-                </template>
+                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
+                <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
+                <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
+                <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
               </template>
             </div>
           </article>
@@ -104,11 +101,14 @@
                 <span>{{ formatStatus(exam.status) }}</span>
               </div>
               <div class="exam-actions">
-                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
-                <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
-                <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
-                <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
-                <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+                <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
+                <template v-else>
+                  <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                  <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
+                  <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
+                  <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
+                  <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+                </template>
               </div>
             </article>
           </div>
