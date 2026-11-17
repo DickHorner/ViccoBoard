@@ -94,6 +94,7 @@ async function renderPreview(revision: number): Promise<void> {
   }
   try {
     const pdf = await previewCorrectionSheetDesignPdf(exam.value.id, preset.value)
+    if (!pdf) throw new Error('Die PDF-Vorschau ist noch nicht verfügbar.')
     if (revision !== previewRevision) return
     const url = URL.createObjectURL(new Blob([new Uint8Array(pdf.bytes)], { type: 'application/pdf' }))
     const oldUrl = previewUrl.value
@@ -102,6 +103,8 @@ async function renderPreview(revision: number): Promise<void> {
     previewError.value = ''
   } catch (error) {
     if (revision !== previewRevision) return
+    if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+    previewUrl.value = ''
     previewError.value = error instanceof Error ? error.message : 'Die PDF-Vorschau konnte nicht erstellt werden.'
   } finally {
     if (revision === previewRevision) previewPending.value = false
