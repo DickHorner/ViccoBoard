@@ -1,0 +1,5 @@
+/* OpenVolt uses Tailwind utilities, without Preflight resetting existing ViccoBoard styles. */
+@import "tailwindcss/theme.css";
+@import "tailwindcss/utilities.css";
+@import "tailwindcss-primeui";
+@source "./volt";

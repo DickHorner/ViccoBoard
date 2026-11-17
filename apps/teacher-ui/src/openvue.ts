@@ -1,5 +1,5 @@
-import { definePreset } from '@primeuix/themes'
-import Nora from '@primeuix/themes/nora'
+import { definePreset } from '@openvue/themes'
+import Nora from '@openvue/themes/nora'
 
 export const viccoThemePreset = definePreset(Nora, {
   semantic: {
@@ -12,8 +12,8 @@ export const viccoThemePreset = definePreset(Nora, {
   }
 })
 
-export const primeVueOptions = {
-  ripple: true,
+export const openVueOptions = {
+  ripple: false,
   inputVariant: 'filled' as const,
   theme: {
     preset: viccoThemePreset,

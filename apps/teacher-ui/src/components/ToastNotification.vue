@@ -10,8 +10,8 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
-import Toast from 'primevue/toast'
-import { useToast as usePrimeToast } from 'primevue/usetoast'
+import Toast from 'openvue/toast'
+import { useToast as usePrimeToast } from 'openvue/usetoast'
 import { useToast, type Toast as AppToast } from '../composables/useToast'
 
 const toastService = usePrimeToast()

@@ -45,7 +45,7 @@
           <Textarea id="calendar-notes" v-model="manualNotes" rows="3" autoResize />
         </div>
       </div>
-      <Button label="Eintrag speichern" icon="pi pi-save" :disabled="!canSaveManual" :loading="saving" @click="saveManualEntry" />
+      <VoltButton label="Eintrag speichern" icon="pi pi-save" :disabled="!canSaveManual" :loading="saving" @click="saveManualEntry" />
     </section>
 
     <section class="app-card student-calendar__section">
@@ -110,17 +110,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import Select from 'primevue/select';
-import Textarea from 'primevue/textarea';
+import Button from 'openvue/button';
+import InputText from 'openvue/inputtext';
+import Message from 'openvue/message';
+import Select from 'openvue/select';
+import Textarea from 'openvue/textarea';
 import type { ClassGroup, Student, StudentCalendarEntry } from '@viccoboard/core';
 import type { IservAbsenceImportPreview, IservArchiveTextFile } from '@viccoboard/students';
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge';
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import { readIservZipFile } from '../utils/iserv-zip';
+import VoltButton from '../volt/Button.vue';
 
 const router = useRouter();
 const toast = useToast();

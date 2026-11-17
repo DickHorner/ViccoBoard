@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import PrimeVue from 'primevue/config'
-import ToastService from 'primevue/toastservice'
+import OpenVue from 'openvue/config'
+import ToastService from 'openvue/toastservice'
 import App from './App.vue'
 import router from './router'
 import { createAppI18n } from './i18n'
@@ -10,8 +10,9 @@ import { initializeSportBridge } from './composables/useSportBridge'
 import { initializeStudentsBridge } from './composables/useStudentsBridge'
 import { initializeExamsBridge } from './composables/useExamsBridge'
 import { initializePlanningBridge } from './composables/usePlanningBridge'
-import { primeVueOptions } from './primevue'
-import 'primeicons/primeicons.css'
+import { openVueOptions } from './openvue'
+import '@openvue/openicons/primeicons.css'
+import './volt.css'
 import './style.css'
 
 const app = createApp(App)
@@ -35,7 +36,7 @@ const bootstrap = async () => {
 	}
 
 	app.use(pinia)
-	app.use(PrimeVue, primeVueOptions)
+	app.use(OpenVue, openVueOptions)
 	app.use(ToastService)
 	app.use(i18n)
 	app.use(router)

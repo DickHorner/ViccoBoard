@@ -6,7 +6,7 @@
         <h1>{{ t('SCHUELER.schueleruebersicht') }}</h1>
         <p class="student-list-page__intro">
           Stammdaten, Klassenbezug und Schnellaktionen an einem Ort. Die Datenlogik bleibt unverändert,
-          die Oberfläche ist jetzt die erste PrimeVue-Referenzansicht der App.
+          die Oberfläche verwendet die OpenVue-Komponentenbasis.
         </p>
       </div>
 
@@ -18,7 +18,7 @@
           outlined
           @click="showImportDialog = true"
         />
-        <Button
+        <VoltButton
           :label="t('SCHUELER.schueler-hinzu')"
           icon="pi pi-user-plus"
           @click="openCreateDialog"
@@ -492,17 +492,18 @@
 </template>
 
 <script setup lang="ts">
-import Button from 'primevue/button'
-import Column from 'primevue/column'
-import DataTable from 'primevue/datatable'
-import Dialog from 'primevue/dialog'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
-import InputText from 'primevue/inputtext'
-import Message from 'primevue/message'
-import ProgressSpinner from 'primevue/progressspinner'
-import Select from 'primevue/select'
+import Button from 'openvue/button'
+import Column from 'openvue/column'
+import DataTable from 'openvue/datatable'
+import Dialog from 'openvue/dialog'
+import IconField from 'openvue/iconfield'
+import InputIcon from 'openvue/inputicon'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import ProgressSpinner from 'openvue/progressspinner'
+import Select from 'openvue/select'
 import { useStudentListView } from '../composables/useStudentListView'
+import VoltButton from '../volt/Button.vue'
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 
 const {
