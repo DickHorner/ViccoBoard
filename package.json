@@ -38,7 +38,6 @@
   "author": "",
   "license": "GPL-3.0-only",
   "dependencies": {
-    "@types/bcryptjs": "^3.0.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^13.0.3",
     "sql.js": "^1.15.2",
