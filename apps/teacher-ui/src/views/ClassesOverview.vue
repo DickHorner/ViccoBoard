@@ -47,36 +47,44 @@
 
         <div class="class-metrics">
           <div>
-            <strong>{{ entry.studentCount }}</strong>
+            <strong>{{ entry.studentCount === null ? '…' : entry.studentCount ?? '–' }}</strong>
             <span>Schüler</span>
           </div>
           <div>
-            <strong>{{ entry.lessonCount }}</strong>
+            <strong>{{ entry.lessonCount === null ? '…' : entry.lessonCount ?? '–' }}</strong>
             <span>Stunden</span>
           </div>
         </div>
 
         <div class="class-actions">
-          <RouterLink :to="`/classes/${entry.classGroup.id}`" class="ghost-link">Details</RouterLink>
+          <RouterLink
+            :to="`/classes/${entry.classGroup.id}`"
+            class="ghost-link"
+            @pointerenter="prefetchClassStudents(entry.classGroup.id)"
+            @pointerdown="prefetchClassStudents(entry.classGroup.id)"
+            @focus="prefetchClassStudents(entry.classGroup.id)"
+          >Details</RouterLink>
           <RouterLink :to="`/lessons?classId=${entry.classGroup.id}`" class="ghost-link">Stunden</RouterLink>
           <RouterLink :to="`/attendance?classId=${entry.classGroup.id}`" class="ghost-link">Anwesenheit</RouterLink>
         </div>
       </article>
     </div>
+    <p v-if="metricsError" class="state-card error">{{ metricsError }}</p>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useClassGroups, useLessons } from '../composables/useSportBridge'
 import { useStudents } from '../composables/useStudentsBridge'
 import type { ClassGroup } from '@viccoboard/core'
+import { prefetchClassStudents, scheduleViewPrefetch } from '../services/navigation-prefetch'
 
 interface ClassOverviewEntry {
   classGroup: ClassGroup
-  studentCount: number
-  lessonCount: number
+  studentCount: number | null | undefined
+  lessonCount: number | null | undefined
 }
 
 const classGroups = useClassGroups()
@@ -85,6 +93,8 @@ const { repository: studentRepository } = useStudents()
 
 const loading = ref(true)
 const loadError = ref('')
+const metricsError = ref('')
+let cancelViewPrefetch: (() => void) | null = null
 const searchQuery = ref('')
 const showArchived = ref(false)
 const classes = ref<ClassOverviewEntry[]>([])
@@ -106,40 +116,42 @@ const visibleClasses = computed(() => {
 const loadData = async () => {
   loading.value = true
   loadError.value = ''
+  metricsError.value = ''
 
   try {
     const allClasses = await classGroups.findAll()
-
-    classes.value = await Promise.all(
-      allClasses.map(async (classGroup) => {
-        const [studentCount, lessonCount] = await Promise.all([
-          studentRepository.value
-            ? typeof (studentRepository.value as any).countByClassGroup === 'function'
-              ? (studentRepository.value as any).countByClassGroup(classGroup.id)
-              : typeof (studentRepository.value as any).count === 'function'
-                ? (studentRepository.value as any).count({ classGroupId: classGroup.id })
-                : 0
-            : 0,
-          typeof (lessonsRepository as any).countByClassGroup === 'function'
-            ? (lessonsRepository as any).countByClassGroup(classGroup.id)
-            : typeof (lessonsRepository as any).count === 'function'
-              ? (lessonsRepository as any).count({ classGroupId: classGroup.id })
-              : 0
-        ])
-
-        return {
-          classGroup,
-          studentCount,
-          lessonCount
-        }
-      })
-    )
+    classes.value = allClasses.map(classGroup => ({
+      classGroup,
+      studentCount: null,
+      lessonCount: null
+    }))
   } catch (error) {
     console.error('Failed to load class overview:', error)
     loadError.value = 'Die Klassenübersicht konnte nicht geladen werden.'
   } finally {
     loading.value = false
   }
+
+  if (loadError.value) return
+
+  await nextTick()
+  cancelViewPrefetch = scheduleViewPrefetch(() => import('./ClassDetail.vue'))
+
+  void Promise.all(classes.value.map(async entry => {
+    const classId = entry.classGroup.id
+    const [students, lessons] = await Promise.allSettled([
+      studentRepository.value?.countByClassGroup(classId) ?? Promise.resolve(0),
+      lessonsRepository.count({ class_group_id: classId })
+    ])
+
+    entry.studentCount = students.status === 'fulfilled' ? students.value : undefined
+    entry.lessonCount = lessons.status === 'fulfilled' ? lessons.value : undefined
+
+    if (students.status === 'rejected' || lessons.status === 'rejected') {
+      metricsError.value = 'Einige Klassenzahlen konnten nicht geladen werden.'
+      console.error('Failed to load class counts:', classId, students, lessons)
+    }
+  }))
 }
 
 const getClassColorStyle = (color?: string) => {
@@ -157,7 +169,11 @@ const getClassColorStyle = (color?: string) => {
 }
 
 onMounted(() => {
-  loadData()
+  void loadData()
+})
+
+onUnmounted(() => {
+  cancelViewPrefetch?.()
 })
 </script>
 
