@@ -63,6 +63,7 @@
             @pointerenter="prefetchClassStudents(entry.classGroup.id)"
             @pointerdown="prefetchClassStudents(entry.classGroup.id)"
             @focus="prefetchClassStudents(entry.classGroup.id)"
+            @click="rememberClassForNavigation(entry.classGroup)"
           >Details</RouterLink>
           <RouterLink :to="`/lessons?classId=${entry.classGroup.id}`" class="ghost-link">Stunden</RouterLink>
           <RouterLink :to="`/attendance?classId=${entry.classGroup.id}`" class="ghost-link">Anwesenheit</RouterLink>
@@ -79,7 +80,7 @@ import { RouterLink } from 'vue-router'
 import { useClassGroups, useLessons } from '../composables/useSportBridge'
 import { useStudents } from '../composables/useStudentsBridge'
 import type { ClassGroup } from '@viccoboard/core'
-import { prefetchClassStudents, scheduleViewPrefetch } from '../services/navigation-prefetch'
+import { prefetchClassStudents, rememberClassForNavigation, scheduleViewPrefetch } from '../services/navigation-prefetch'
 import { recordRouteContentReady } from '../utils/navigation-performance'
 
 interface ClassOverviewEntry {
