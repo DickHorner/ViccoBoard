@@ -78,6 +78,10 @@
             <div class="spinner-small"></div>
             <p>Schüler werden geladen...</p>
           </div>
+          <div v-else-if="studentsError" class="error-state">
+            <p>{{ studentsError }}</p>
+            <button class="btn-primary" @click="loadStudents">Erneut versuchen</button>
+          </div>
           <div v-else-if="visibleStudents.length === 0" class="empty-state">
             <p>Noch keine Schüler in dieser Klasse. Fügen Sie Ihren ersten Schüler hinzu.</p>
           </div>
@@ -109,7 +113,12 @@
       <section class="card">
         <h3>Sport-Kennzahlen</h3>
         <div class="card-content">
-          <div class="stats-grid">
+          <p v-if="loadingSummary" role="status">Sport-Kennzahlen werden geladen...</p>
+          <div v-else-if="summaryError" class="error-state">
+            <p>{{ summaryError }}</p>
+            <button class="btn-primary" @click="loadSportSummary">Erneut versuchen</button>
+          </div>
+          <div v-else class="stats-grid">
             <div class="stat-item">
               <div class="stat-value">{{ sportSummary.lessonCount }}</div>
               <div class="stat-label">Unterrichtsstunden</div>
@@ -240,7 +249,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge, initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
@@ -255,7 +264,10 @@ const classId = route.params.id as string
 const classGroup = ref<ClassGroup | null>(null)
 const students = ref<Student[]>([])
 const loading = ref(false)
-const loadingStudents = ref(false)
+const loadingStudents = ref(true)
+const loadingSummary = ref(true)
+const studentsError = ref('')
+const summaryError = ref('')
 const showInactiveStudents = ref(false)
 const updatingRosterId = ref<string | null>(null)
 const visibleStudents = computed(() => showInactiveStudents.value
@@ -290,42 +302,72 @@ const studentsBridge = getStudentsBridge()
 const loadData = async () => {
   loading.value = true
   error.value = ''
-  
+
   try {
-    // Load class details
     classGroup.value = await classGroups.findById(classId)
-    
     if (!classGroup.value) {
       error.value = 'Klasse nicht gefunden'
       return
     }
-    
-    // Load students for this class
-    students.value = await studentsBridge.studentRepository.findAllByClassGroup(classId)
 
-    // Load sport-specific data for summary cards
-    const [lessons, gradeCategories, studentEntryArrays] = await Promise.all([
-      sportBridge.lessonRepository.findByClassGroup(classId),
-      sportBridge.gradeCategoryRepository.findByClassGroup(classId),
-      Promise.all(
-        students.value.map((s) => sportBridge.performanceEntryRepository.findByStudent(s.id))
-      )
-    ])
-
-    const classAssessmentCount = studentEntryArrays.reduce((sum, entries) => sum + entries.length, 0)
-
-    sportSummary.value = buildClassSportSummary(
-      students.value.filter(student => !student.inactive).length,
-      lessons.length,
-      gradeCategories.length,
-      classAssessmentCount
-    )
     sportWorkAreas.value = buildSportWorkAreas(classId)
   } catch (err) {
     console.error('Failed to load class:', err)
     error.value = 'Fehler beim Laden der Klasse. Bitte versuchen Sie es erneut.'
   } finally {
     loading.value = false
+  }
+
+  if (classGroup.value) {
+    void loadStudents()
+  }
+}
+
+const loadStudents = async () => {
+  loadingStudents.value = true
+  studentsError.value = ''
+
+  try {
+    students.value = await studentsBridge.studentRepository.findAllByClassGroup(classId)
+  } catch (err) {
+    console.error('Failed to load class students:', err)
+    studentsError.value = 'Schüler konnten nicht geladen werden.'
+    loadingSummary.value = false
+    summaryError.value = 'Sport-Kennzahlen können ohne Schülerliste nicht geladen werden.'
+  } finally {
+    loadingStudents.value = false
+  }
+
+  if (!studentsError.value) {
+    await nextTick()
+    void loadSportSummary()
+  }
+}
+
+const loadSportSummary = async () => {
+  loadingSummary.value = true
+  summaryError.value = ''
+
+  try {
+    const [lessonCount, gradeCategoryCount, studentCounts] = await Promise.all([
+      sportBridge.lessonRepository.count({ class_group_id: classId }),
+      sportBridge.gradeCategoryRepository.count({ class_group_id: classId }),
+      Promise.all(students.value.map(student =>
+        sportBridge.performanceEntryRepository.count({ student_id: student.id })
+      ))
+    ])
+
+    sportSummary.value = buildClassSportSummary(
+      students.value.filter(student => !student.inactive).length,
+      lessonCount,
+      gradeCategoryCount,
+      studentCounts.reduce((sum, count) => sum + count, 0)
+    )
+  } catch (err) {
+    console.error('Failed to load class sport summary:', err)
+    summaryError.value = 'Sport-Kennzahlen konnten nicht geladen werden.'
+  } finally {
+    loadingSummary.value = false
   }
 }
 
@@ -345,7 +387,11 @@ const handleAddStudent = async () => {
     
     // Reload students
     students.value = await studentsBridge.studentRepository.findAllByClassGroup(classId)
-    
+    sportSummary.value = {
+      ...sportSummary.value,
+      studentCount: students.value.filter(student => !student.inactive).length
+    }
+
     // Reset form and close modal
     closeAddStudentModal()
   } catch (err) {
@@ -367,8 +413,12 @@ const toggleStudentActive = async (student: Student) => {
 
   updatingRosterId.value = student.id
   try {
-    await studentsBridge.studentRepository.update(student.id, { inactive: !student.inactive })
-    await loadData()
+    const updated = await studentsBridge.studentRepository.update(student.id, { inactive: !student.inactive })
+    students.value = students.value.map(entry => entry.id === updated.id ? updated : entry)
+    sportSummary.value = {
+      ...sportSummary.value,
+      studentCount: students.value.filter(entry => !entry.inactive).length
+    }
   } catch (err) {
     console.error('Failed to update roster:', err)
     error.value = 'Die Schülerzuordnung konnte nicht aktualisiert werden.'
