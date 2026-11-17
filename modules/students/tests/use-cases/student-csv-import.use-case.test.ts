@@ -248,6 +248,21 @@ describe('StudentCsvImportUseCase', () => {
       ]);
   });
 
+  test('normalizes repeated hyphens at name boundaries without changing the generated address', async () => {
+    const { useCase } = createUseCase();
+
+    const preview = await useCase.preview([{
+      fileName: 'punctuation.csv',
+      content: [
+        'Vorname,Nachname,Klasse',
+        `${'-'.repeat(5000)}Anna---Maria${'-'.repeat(5000)},---Müller--Schmidt---,7a`
+      ].join('\n')
+    }], 'live', 'Repeated separators', { generateSchoolEmails: true });
+
+    expect(preview.summary).toMatchObject({ imported: 1, errors: 0 });
+    expect(preview.candidates[0].email).toBe('anna-maria.mueller-schmidt@vvb-gym.de');
+  });
+
   test('recognizes m/w as a column heading and keeps explicitly supplied addresses', async () => {
     const { useCase } = createUseCase();
 
