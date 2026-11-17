@@ -13,6 +13,15 @@ describe('router fallback navigation', () => {
     expect(resolveBackFallbackPath(route)).toBe('/subjects/sport')
   })
 
+  it('resolves KBR workflow entry and its existing destinations', () => {
+    for (const workflow of ['correct', 'sheets', 'analysis']) {
+      expect(router.resolve(`/exams?workflow=${workflow}`).name).toBe('exams')
+    }
+    expect(router.resolve('/exams/demo/correct').name).toBe('exam-correct')
+    expect(router.resolve('/exams/demo/export').name).toBe('exam-export')
+    expect(router.resolve('/exams/demo/analysis').name).toBe('exam-analysis')
+  })
+
   it('resolves the new KBR export route back to the exams overview', () => {
     const route = router.resolve('/exams/demo/export')
 

@@ -2,12 +2,13 @@
   <section class="exams-overview">
     <header class="overview-header">
       <div>
-        <h1>Prüfungen</h1>
-        <p class="subtitle">Prüfungen für KBR erstellen und verwalten.</p>
+        <h1>{{ workflow?.title ?? 'Prüfungen' }}</h1>
+        <p class="subtitle">{{ workflow?.description ?? 'Prüfungen für KBR erstellen und verwalten.' }}</p>
       </div>
       <div class="header-actions">
+        <button v-if="workflow" class="ghost" type="button" @click="router.push('/subjects/kbr')">← KBR</button>
         <input ref="examImportInput" type="file" accept=".json,application/json" hidden @change="importExamFile" />
-        <button class="ghost" type="button" :disabled="importing" @click="examImportInput?.click()">
+        <button v-if="!workflow" class="ghost" type="button" :disabled="importing" @click="examImportInput?.click()">
           {{ importing ? 'Import läuft…' : 'Prüfung aus ChatGPT importieren' }}
         </button>
         <button class="primary" type="button" @click="createNew">Neue Prüfung</button>
@@ -25,7 +26,7 @@
     </div>
 
     <div v-else class="exam-sections">
-      <section class="exam-section" aria-labelledby="exam-templates-heading">
+      <section v-if="!workflow" class="exam-section" aria-labelledby="exam-templates-heading">
         <h2 id="exam-templates-heading">Vorlagen</h2>
         <div v-if="templateExams.length === 0" class="state-card compact">
           Noch keine Vorlagen.
@@ -53,7 +54,7 @@
       </section>
 
       <section class="exam-section" aria-labelledby="concrete-exams-heading">
-        <h2 id="concrete-exams-heading">Prüfungen · {{ activeYear }}</h2>
+        <h2 id="concrete-exams-heading">{{ workflow ? 'Prüfung auswählen' : `Prüfungen · ${activeYear}` }}</h2>
         <div v-if="concreteExams.length === 0" class="state-card compact">
           Noch keine konkreten Prüfungen.
         </div>
@@ -70,11 +71,14 @@
               <span class="meta-date">Aktualisiert {{ formatDate(exam.lastModified) }}</span>
             </div>
             <div class="exam-actions">
-              <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
-              <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
-              <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
-              <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
-              <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+              <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
+              <template v-else>
+                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
+                <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
+                <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
+                <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+              </template>
             </div>
           </article>
         </div>
@@ -97,11 +101,14 @@
                 <span>{{ formatStatus(exam.status) }}</span>
               </div>
               <div class="exam-actions">
-                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
-                <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
-                <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
-                <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
-                <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+                <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
+                <template v-else>
+                  <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                  <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
+                  <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
+                  <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
+                  <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+                </template>
               </div>
             </article>
           </div>
@@ -113,7 +120,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { parseExamDefinition } from '@viccoboard/exams'
 import type { Exams as ExamsTypes, ClassGroup } from '@viccoboard/core'
@@ -124,6 +131,38 @@ import { examSchoolYear, isExamTemplate } from '../utils/exam-school-year'
 import { formatGermanDate } from '../utils/locale-format'
 
 const router = useRouter()
+const route = useRoute()
+const workflow = computed(() => {
+  switch (route.query.workflow) {
+    case 'correct':
+      return {
+        title: 'Manuelle Korrektur',
+        description: 'Wähle die Prüfung, die Du korrigieren möchtest.',
+        action: 'Korrektur öffnen',
+        destination: 'correct'
+      }
+    case 'sheets':
+      return {
+        title: 'Rückmeldebögen',
+        description: 'Wähle die Prüfung, deren Druckbögen Du ansehen oder exportieren möchtest.',
+        action: 'Rückmeldebögen öffnen',
+        destination: 'export'
+      }
+    case 'analysis':
+      return {
+        title: 'Prüfungsanalyse',
+        description: 'Wähle die Prüfung, deren Ergebnisse Du auswerten möchtest.',
+        action: 'Analyse öffnen',
+        destination: 'analysis'
+      }
+    default:
+      return null
+  }
+})
+const openWorkflow = (examId: string) => {
+  if (!workflow.value) return
+  router.push(`/exams/${examId}/${workflow.value.destination}`)
+}
 const { examRepository } = useExamsBridge()
 const exams = ref<ExamsTypes.Exam[]>([])
 const classes = ref<ClassGroup[]>([])
