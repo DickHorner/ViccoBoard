@@ -263,6 +263,7 @@ import { buildClassSportSummary, buildSportWorkAreas } from '../utils/class-deta
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 import type { ClassGroup, Student } from '@viccoboard/core'
 import { loadClassStudents, prefetchStudentSport, scheduleViewPrefetch } from '../services/navigation-prefetch'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
 
@@ -348,6 +349,7 @@ const loadStudents = async () => {
 
   if (!studentsError.value) {
     await nextTick()
+    recordRouteContentReady('class-detail')
     cancelProfilePrefetch?.()
     cancelProfilePrefetch = scheduleViewPrefetch(() => import('./StudentProfile.vue'))
     void loadSportSummary()
