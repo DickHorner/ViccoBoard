@@ -1,3 +1,260 @@
+.correction-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  color: #0f172a;
+}
+
+.correction-header,
+.correction-header .header-actions,
+.candidate-header,
+.task-title,
+.nav-buttons,
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.correction-header {
+  margin-bottom: 1.5rem;
+}
+
+.correction-header h1,
+.candidate-header h2 {
+  margin: 0;
+}
+
+.correction-header .exam-meta,
+.max-points,
+.points-to-next {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.correction-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem;
+}
+
+.candidates-sidebar,
+.correction-panel {
+  min-width: 0;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 16px;
+}
+
+.sidebar-header h3 {
+  margin: 0 0 0.75rem;
+}
+
+.filter-input,
+.comment-input,
+.score-input {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.filter-input,
+.comment-input {
+  width: 100%;
+}
+
+.comment-input {
+  resize: vertical;
+}
+
+.candidates-list {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.candidate-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.candidate-btn.active {
+  background: #eff6ff;
+  border-color: #2563eb;
+  font-weight: 700;
+}
+
+.status-badge,
+.candidate-header .status {
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.correction-form,
+.scoring-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.scoring-section h3,
+.scoring-mode-section h3 {
+  margin: 0;
+}
+
+.task-scoring {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.task-title {
+  font-weight: 700;
+}
+
+.score-input-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.score-input {
+  width: 6.5rem;
+}
+
+.comment-box {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.total-score-section {
+  margin-top: 1rem;
+}
+
+.total-score-section .score-display {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.score-item {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #f1f5f9;
+}
+
+.score-item label {
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+.score-item .score-value,
+.score-item .grade-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.score-item.highlight {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.action-buttons,
+.nav-buttons {
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+.correction-container .btn-primary,
+.correction-container .btn-secondary,
+.correction-container .btn-success,
+.correction-container .btn-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.correction-container .btn-primary {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #fff;
+}
+
+.correction-container .btn-success {
+  background: #166534;
+  border-color: #166534;
+  color: #fff;
+}
+
+.correction-container button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.no-candidate {
+  padding: 2rem 1rem;
+  color: #64748b;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .correction-container {
+    padding: 0.75rem;
+  }
+
+  .correction-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .candidates-list {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+
+  .total-score-section .score-display {
+    grid-template-columns: 1fr;
+  }
+}
+
 .scoring-mode-section {
   margin-bottom: 2rem;
   padding: 1rem;
