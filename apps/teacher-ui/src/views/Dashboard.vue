@@ -9,7 +9,9 @@
     <div class="focus-grid">
       <section class="card focus-card focus-card-primary">
         <h3>Jetzt / Als Nächstes</h3>
-        <div v-if="currentOrNextLesson" class="focus-content">
+        <div v-if="loadingWorkspace" class="loading-state-small">Unterrichtsdaten werden geladen…</div>
+        <div v-else-if="workspaceError" class="error-state">{{ workspaceError }}</div>
+        <div v-else-if="currentOrNextLesson" class="focus-content">
           <p class="focus-meta">{{ currentOrNextMode }}</p>
           <h4>{{ getSubjectName(currentOrNextLesson.subjectId) }} · {{ getClassName(currentOrNextLesson.classGroupId) }}</h4>
           <p>{{ formatLessonDateTime(currentOrNextLesson.date) }}</p>
@@ -60,7 +62,9 @@
           <h3>Heute</h3>
           <RouterLink to="/schedule" class="btn-text btn-small">Zum Stundenplan</RouterLink>
         </div>
-        <div v-if="todayLessons.length === 0" class="empty-state">
+        <div v-if="loadingWorkspace" class="loading-state-small">Unterrichtsdaten werden geladen…</div>
+        <div v-else-if="workspaceError" class="error-state">{{ workspaceError }}</div>
+        <div v-else-if="todayLessons.length === 0" class="empty-state">
           <p>Heute sind noch keine Stunden eingetragen.</p>
         </div>
         <div v-else class="lesson-timeline">
@@ -196,11 +200,13 @@
         <h3>Letzte Aktivitäten</h3>
         <div class="card-content">
           <!-- Loading State -->
-          <div v-if="loading" class="loading-state-small">
+          <div v-if="loadingWorkspace" class="loading-state-small">
             <div class="spinner-small"></div>
             <p>Wird geladen...</p>
           </div>
           
+          <div v-else-if="workspaceError" class="error-state">{{ workspaceError }}</div>
+
           <!-- Empty State -->
           <div v-else-if="recentActivity.length === 0" class="empty-state">
             <p>Keine Aktivitäten zum Anzeigen.</p>
@@ -386,6 +392,8 @@ const {
   recentActivity,
   loading,
   loadError,
+  loadingWorkspace,
+  workspaceError,
   searchQuery,
   filterSchoolYear,
   showArchived,
