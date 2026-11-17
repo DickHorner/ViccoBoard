@@ -133,7 +133,7 @@
 
     <section v-else-if="error" class="app-card app-status-panel">
       <Message severity="error" :closable="false">{{ error }}</Message>
-      <Button label="Erneut versuchen" icon="pi pi-refresh" @click="loadData" />
+      <VoltButton label="Erneut versuchen" icon="pi pi-refresh" @click="loadData"  />
     </section>
 
     <section v-else class="student-list-page__content">
@@ -163,13 +163,12 @@
                 </p>
               </div>
 
-              <Button
+              <VoltSecondaryButton
                 label="Start"
                 icon="pi pi-home"
-                severity="secondary"
                 text
                 @click="router.push('/')"
-              />
+               />
             </div>
           </template>
 
@@ -177,14 +176,13 @@
             <div class="student-list-page__empty">
               <h3>Keine Schüler gefunden</h3>
               <p>{{ emptyStateMessage }}</p>
-              <Button
+              <VoltSecondaryButton
                 v-if="hasActiveFilters"
                 label="Filter zurücksetzen"
                 icon="pi pi-filter-slash"
-                severity="secondary"
                 text
                 @click="resetFilters"
-              />
+               />
             </div>
           </template>
 
@@ -229,30 +227,27 @@
           <Column header="Aktionen" :exportable="false" headerStyle="width: 10rem">
             <template #body="{ data }">
               <div class="student-list-page__row-actions">
-                <Button
+                <VoltSecondaryButton
                   icon="pi pi-pencil"
                   text
                   rounded
-                  severity="secondary"
                   aria-label="Schüler bearbeiten"
                   @click="editStudent(data.original)"
-                />
-                <Button
+                 />
+                <VoltSecondaryButton
                   icon="pi pi-user"
                   text
                   rounded
-                  severity="secondary"
                   aria-label="Profil öffnen"
                   @click="openStudentProfile(data.id)"
-                />
-                <Button
+                 />
+                <VoltDangerButton
                   icon="pi pi-trash"
                   text
                   rounded
-                  severity="danger"
                   aria-label="Schüler löschen"
                   @click="deleteStudent(data.original)"
-                />
+                 />
               </div>
             </template>
           </Column>
@@ -261,7 +256,7 @@
 
     </section>
 
-    <Dialog
+    <VoltDialog
       v-model:visible="showEditor"
       modal
       :draggable="false"
@@ -273,7 +268,7 @@
         <div class="student-list-page__dialog-grid">
           <div class="app-field">
             <label for="student-first-name">{{ t('SCHUELER.name') }} *</label>
-            <InputText
+            <VoltInputText
               id="student-first-name"
               v-model="studentForm.firstName"
               class="student-list-page__input"
@@ -282,7 +277,7 @@
 
           <div class="app-field">
             <label for="student-last-name">{{ t('SCHUELER.nachname') }} *</label>
-            <InputText
+            <VoltInputText
               id="student-last-name"
               v-model="studentForm.lastName"
               class="student-list-page__input"
@@ -291,7 +286,7 @@
 
           <div class="app-field">
             <label for="student-class">{{ t('SCHUELER.klasse') }} *</label>
-            <Select
+            <VoltSelect
               id="student-class"
               v-model="studentForm.classGroupId"
               class="student-list-page__input"
@@ -304,7 +299,7 @@
 
           <div class="app-field">
             <label for="student-gender">{{ t('SCHUELER.geschlecht') }}</label>
-            <Select
+            <VoltSelect
               id="student-gender"
               v-model="studentForm.gender"
               class="student-list-page__input"
@@ -318,7 +313,7 @@
 
           <div class="app-field">
             <label for="student-date-of-birth">Geburtsdatum *</label>
-            <InputText
+            <VoltInputText
               id="student-date-of-birth"
               v-model="studentForm.dateOfBirth"
               class="student-list-page__input"
@@ -329,7 +324,7 @@
 
           <div class="app-field">
             <label for="student-email">{{ t('SCHUELER.email') }}</label>
-            <InputText
+            <VoltInputText
               id="student-email"
               v-model="studentForm.email"
               class="student-list-page__input"
@@ -339,7 +334,7 @@
 
           <div class="app-field">
             <label for="student-parent-email">{{ t('SCHUELER.parent-email') }}</label>
-            <InputText
+            <VoltInputText
               id="student-parent-email"
               v-model="studentForm.parentEmail"
               class="student-list-page__input"
@@ -349,7 +344,7 @@
 
           <div class="app-field">
             <label for="student-phone">{{ t('SCHUELER.phone') }}</label>
-            <InputText
+            <VoltInputText
               id="student-phone"
               v-model="studentForm.phone"
               class="student-list-page__input"
@@ -359,23 +354,22 @@
         </div>
 
         <div class="student-list-page__dialog-actions">
-          <Button
+          <VoltSecondaryButton
             type="button"
             :label="t('COMMON.cancel') || 'Abbrechen'"
-            severity="secondary"
             text
             @click="closeEditor"
-          />
-          <Button
+           />
+          <VoltButton
             type="submit"
             :label="saving ? 'Wird gespeichert...' : t('SCHUELER.speichern')"
             :loading="saving"
-          />
+           />
         </div>
       </form>
-    </Dialog>
+    </VoltDialog>
 
-    <Dialog
+    <VoltDialog
       v-model:visible="showImportDialog"
       modal
       :draggable="false"
@@ -386,7 +380,7 @@
       <div class="app-form-grid">
         <div class="app-field">
           <label for="student-import-class-existing">Zielklasse auswählen</label>
-          <Select
+          <VoltSelect
             id="student-import-class-existing"
             v-model="importClassGroupId"
             class="student-list-page__input"
@@ -400,7 +394,7 @@
 
         <div class="app-field">
           <label for="student-import-class-new">Neue Zielklasse</label>
-          <InputText
+          <VoltInputText
             id="student-import-class-new"
             v-model="importClassName"
             class="student-list-page__input"
@@ -444,24 +438,22 @@
         </div>
 
         <div class="app-actions-row">
-          <Button
+          <VoltSecondaryButton
             type="button"
             label="RC-Demo-CSV-Paket laden"
             icon="pi pi-database"
-            severity="secondary"
             outlined
             :loading="importBusy"
             @click="previewDemoImport"
-          />
-          <Button
+           />
+          <VoltDangerButton
             type="button"
             label="Demo-Daten löschen"
             icon="pi pi-trash"
-            severity="danger"
             outlined
             :loading="importBusy"
             @click="deleteDemoData"
-          />
+           />
         </div>
 
         <div v-if="importPreview" class="app-card">
@@ -511,40 +503,38 @@
         </div>
 
         <div class="student-list-page__dialog-actions">
-          <Button
+          <VoltSecondaryButton
             type="button"
             :label="t('COMMON.cancel') || 'Abbrechen'"
-            severity="secondary"
             text
             @click="showImportDialog = false; resetImportState()"
-          />
-          <Button
+           />
+          <VoltButton
             type="button"
             label="Import ausführen"
             icon="pi pi-upload"
             :disabled="!importPreview || importBusy || importPreview.summary.imported === 0"
             :loading="importBusy"
             @click="executeImport"
-          />
+           />
         </div>
       </div>
-    </Dialog>
+    </VoltDialog>
   </section>
 </template>
 
 <script setup lang="ts">
-import Button from 'openvue/button'
 import Column from 'openvue/column'
 import DataTable from 'openvue/datatable'
-import Dialog from 'openvue/dialog'
-import IconField from 'openvue/iconfield'
-import InputIcon from 'openvue/inputicon'
-import InputText from 'openvue/inputtext'
 import Message from 'openvue/message'
 import ProgressSpinner from 'openvue/progressspinner'
-import Select from 'openvue/select'
 import { useStudentListView } from '../composables/useStudentListView'
 import VoltButton from '../volt/Button.vue'
+import VoltDangerButton from '../volt/DangerButton.vue'
+import VoltDialog from '../volt/Dialog.vue'
+import VoltInputText from '../volt/InputText.vue'
+import VoltSecondaryButton from '../volt/SecondaryButton.vue'
+import VoltSelect from '../volt/Select.vue'
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 
 const {
