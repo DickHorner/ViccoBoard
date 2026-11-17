@@ -140,11 +140,20 @@ export class IndexedDBAdapter implements StorageAdapter {
         : store.getAll()
     );
 
-    return filters.length === 0
+    const filtered = filters.length === 0
       ? results as T[]
       : (results as T[]).filter(item =>
           filters.every(([key, value]) => (item as Record<string, any>)[key] === value)
         );
+
+    // getAll() on an object store returns primary-key order; an index does not.
+    return indexedFilter
+      ? filtered.sort((a, b) => {
+          const left = (a as Record<string, any>).id;
+          const right = (b as Record<string, any>).id;
+          return indexedDB.cmp(left, right);
+        })
+      : filtered;
   }
 
   async getById<T = any>(tableName: string, id: string): Promise<T | null> {
