@@ -73,6 +73,7 @@ export function useStudentListView() {
   const importSourceType = ref<'demo' | 'live'>('live');
   const importClassGroupId = ref<string | null>(null);
   const importClassName = ref('');
+  const importGenerateSchoolEmails = ref(false);
 
   const defaultStudentForm = (): StudentFormState => ({
     firstName: '',
@@ -329,6 +330,7 @@ export function useStudentListView() {
     importSourceType.value = 'live';
     importClassGroupId.value = null;
     importClassName.value = '';
+    importGenerateSchoolEmails.value = false;
   }
 
   async function previewImport(files: StudentCsvFile[], sourceType: 'demo' | 'live', label: string) {
@@ -337,14 +339,21 @@ export function useStudentListView() {
       pendingImportFiles.value = files;
       importSourceType.value = sourceType;
       importLabel.value = label;
+      importPreview.value = null;
       importPreview.value = await studentsBridge.studentCsvImportUseCase.preview(files, sourceType, label, {
-        targetClassName: selectedImportClassName.value || undefined
+        targetClassName: selectedImportClassName.value || undefined,
+        generateSchoolEmails: importGenerateSchoolEmails.value
       });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Fehler bei der Importvorschau');
     } finally {
       importBusy.value = false;
     }
+  }
+
+  async function refreshImportPreview() {
+    if (!pendingImportFiles.value.length) return;
+    await previewImport(pendingImportFiles.value, importSourceType.value, importLabel.value);
   }
 
   async function handleCsvFileSelection(event: Event) {
@@ -379,7 +388,10 @@ export function useStudentListView() {
         pendingImportFiles.value,
         importSourceType.value,
         importLabel.value,
-        { targetClassName: selectedImportClassName.value || undefined }
+        {
+          targetClassName: selectedImportClassName.value || undefined,
+          generateSchoolEmails: importGenerateSchoolEmails.value
+        }
       );
       toast.success(
         `${result.summary.imported} importiert, ${result.summary.skipped} übersprungen, ${result.summary.conflicts} Konflikte`
@@ -443,6 +455,7 @@ export function useStudentListView() {
     importPreview,
     importClassGroupId,
     importClassName,
+    importGenerateSchoolEmails,
     loadData,
     resetFilters,
     openCreateDialog,
@@ -454,6 +467,7 @@ export function useStudentListView() {
     bulkDelete,
     bulkMoveToClass,
     handleCsvFileSelection,
+    refreshImportPreview,
     previewDemoImport,
     executeImport,
     deleteDemoData,
