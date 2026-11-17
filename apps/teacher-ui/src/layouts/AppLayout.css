@@ -31,7 +31,6 @@
   padding: 1.5rem 2rem;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   background: var(--surface-glass);
-  backdrop-filter: blur(18px);
   position: sticky;
   top: 0;
   z-index: 5;
@@ -267,17 +266,6 @@
   border: none;
   padding: 0;
   margin: 0;
-}
-
-.view-fade-enter-active,
-.view-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.view-fade-enter-from,
-.view-fade-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
 }
 
 @media (max-width: 900px) {
