@@ -124,7 +124,8 @@ async function savePreset(): Promise<void> {
   saveError.value = ''
   const savingRevision = previewRevision
   try {
-    await saveCorrectionSheetPreset({ ...preset.value, examId: exam.value.id })
+    const saved = await saveCorrectionSheetPreset({ ...preset.value, examId: exam.value.id })
+    if (!saved) throw new Error('Der Druckbogenspeicher ist nicht verfügbar.')
     if (savingRevision === previewRevision) {
       dirty.value = false
       saveMessage.value = 'Druckbogengestaltung gespeichert.'
