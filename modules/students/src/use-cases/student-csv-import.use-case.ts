@@ -430,7 +430,7 @@ export class StudentCsvImportUseCase {
         validationErrors.push(message);
       }
       if (rawGender && !gender) {
-        const message = 'Geschlecht muss m oder w sein';
+        const message = 'Geschlecht muss m, w oder f sein';
         issues.push({ rowNumber, field: 'geschlecht', message, severity: 'error' });
         validationErrors.push(message);
       }
