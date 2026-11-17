@@ -131,7 +131,14 @@
           <!-- Classes List -->
           <div v-else class="class-list">
             <div v-for="cls in filteredClasses" :key="cls.id" class="class-card-wrapper">
-              <RouterLink :to="`/classes/${cls.id}`" class="class-card">
+              <RouterLink
+                :to="`/classes/${cls.id}`"
+                class="class-card"
+                @pointerenter="prefetchClassStudents(cls.id)"
+                @pointerdown="prefetchClassStudents(cls.id)"
+                @focus="prefetchClassStudents(cls.id)"
+                @click="rememberClassForNavigation(cls)"
+              >
                 <div class="class-info">
                   <div class="class-title">
                     <span class="class-color" :style="getClassColorStyle(cls.color)"></span>
@@ -368,8 +375,10 @@
 </template>
 
 <script setup lang="ts">
+import { onUnmounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useDashboardView } from '../composables/useDashboardView'
+import { prefetchClassStudents, rememberClassForNavigation, scheduleViewPrefetch } from '../services/navigation-prefetch'
 
 const {
   t,
@@ -420,6 +429,17 @@ const {
   getActivityIcon,
   formatDate
 } = useDashboardView()
+
+let cancelViewPrefetch: (() => void) | null = null
+watch(loading, isLoading => {
+  if (!isLoading && !cancelViewPrefetch) {
+    cancelViewPrefetch = scheduleViewPrefetch(() => import('./ClassDetail.vue'))
+  }
+}, { immediate: true })
+
+onUnmounted(() => {
+  cancelViewPrefetch?.()
+})
 </script>
 
 <style src="../styles/modal.css"></style>
