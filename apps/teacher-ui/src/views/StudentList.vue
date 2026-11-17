@@ -381,7 +381,24 @@
           />
           <p class="app-field-hint">
             Die Kopfzeile darf in Zeile 2 stehen. Pflichtspalten: Vorname, Nachname; Klasse nur, wenn oben keine Zielklasse gewählt ist.
-            Optional: Geburtsdatum, Geschlecht, E-Mail. Komma, Semikolon und Tab werden erkannt.
+            Optional: Geburtsdatum, Geschlecht (m/w), E-Mail. Komma, Semikolon und Tab werden erkannt.
+          </p>
+        </div>
+
+        <div class="app-field">
+          <label class="app-data-note">
+            <input
+              v-model="importGenerateSchoolEmails"
+              type="checkbox"
+              :disabled="importBusy"
+              @change="refreshImportPreview"
+            />
+            Fehlende Schul-E-Mails aus Vor- und Nachnamen erzeugen
+          </label>
+          <p class="app-field-hint">
+            Muster: vorname.nachname@vvb-gym.de; Doppelvornamen mit Bindestrich.
+            Vorhandene Adressen bleiben erhalten. Bitte die Vorschau prüfen:
+            Eine erzeugte Adresse bestätigt nicht, dass das Postfach existiert.
           </p>
         </div>
 
@@ -426,6 +443,30 @@
               Zeile {{ issue.rowNumber }} · {{ issue.field }} · {{ issue.message }}
             </li>
           </ul>
+
+          <DataTable
+            :value="importPreview.candidates"
+            :rows="10"
+            paginator
+            stripedRows
+            scrollable
+            size="small"
+          >
+            <Column header="Schüler">
+              <template #body="{ data }">{{ data.firstName }} {{ data.lastName }}</template>
+            </Column>
+            <Column header="m/w">
+              <template #body="{ data }">{{ data.gender === 'f' ? 'w' : (data.gender ?? '–') }}</template>
+            </Column>
+            <Column field="email" header="E-Mail">
+              <template #body="{ data }">{{ data.email || '–' }}</template>
+            </Column>
+            <Column header="Status">
+              <template #body="{ data }">
+                {{ data.status === 'ready' ? 'Bereit' : data.status === 'skip_existing' ? 'Vorhanden' : data.status === 'conflict' ? 'Konflikt' : 'Ungültig' }}
+              </template>
+            </Column>
+          </DataTable>
         </div>
 
         <div class="student-list-page__dialog-actions">
@@ -489,6 +530,7 @@ const {
   importPreview,
   importClassGroupId,
   importClassName,
+  importGenerateSchoolEmails,
   loadData,
   resetFilters,
   openCreateDialog,
@@ -500,6 +542,7 @@ const {
   bulkDelete,
   bulkMoveToClass,
   handleCsvFileSelection,
+  refreshImportPreview,
   previewDemoImport,
   executeImport,
   deleteDemoData,

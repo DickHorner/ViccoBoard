@@ -21,6 +21,7 @@ export interface StudentCsvFile {
 
 export interface StudentCsvImportOptions {
   targetClassName?: string;
+  generateSchoolEmails?: boolean;
 }
 
 export interface StudentImportIssue {
@@ -74,7 +75,7 @@ const HEADER_ALIASES = {
   klasse: ['klasse', 'class', 'jahrgang', 'stufe'],
   teilklasse: ['teilklasse', 'classsuffix', 'subclass', 'zug', 'gruppe', 'teilklasse/zug'],
   geburtsdatum: ['geburtsdatum', 'dateofbirth', 'date_of_birth', 'dob', 'birthdate'],
-  geschlecht: ['geschlecht', 'gender', 'sex'],
+  geschlecht: ['geschlecht', 'geschl', 'geschl.', 'geschlecht (m/w)', 'geschlecht m/w', 'm/w', 'gender', 'sex'],
   'e-mail': ['e-mail', 'email', 'mail']
 };
 
@@ -260,6 +261,8 @@ export class StudentCsvImportUseCase {
     const existingClassGroups = await this.classGroupGateway.findBySchoolYear(schoolYear);
     const classGroupByName = new Map(existingClassGroups.map((group) => [group.name.toLowerCase(), group]));
     const seenKeys = new Map<string, number>();
+    const seenEmails = new Map<string, number>();
+    let existingEmails: Set<string> | null = null;
 
     for (const file of files) {
       const parsed = this.parseCsvFile(file, issues, options);
@@ -290,13 +293,20 @@ export class StudentCsvImportUseCase {
             })
           : null;
 
-        const emailMatches = row.email ? await this.studentRepository.findByEmail(row.email) : [];
+        const normalizedEmail = row.email?.toLowerCase();
+        if (normalizedEmail && !existingEmails) {
+          existingEmails = new Set((await this.studentRepository.findAll())
+            .map(student => student.contactInfo?.email?.trim().toLowerCase())
+            .filter((email): email is string => Boolean(email)));
+        }
+        const emailIsTaken = Boolean(normalizedEmail && existingEmails?.has(normalizedEmail));
+        const duplicateEmailRow = normalizedEmail ? seenEmails.get(normalizedEmail) : undefined;
 
         let status: StudentImportCandidate['status'] = 'ready';
         if (candidateIssues.length > 0) {
           status = 'invalid';
         } else if (existingStudent) {
-          const sameEmail = !row.email || (existingStudent.contactInfo?.email ?? '') === row.email;
+          const sameEmail = !row.email || existingStudent.contactInfo?.email?.trim().toLowerCase() === normalizedEmail;
           const sameGender = !row.gender || existingStudent.gender === row.gender;
           status = sameEmail && sameGender ? 'skip_existing' : 'conflict';
           if (status === 'conflict') {
@@ -309,9 +319,11 @@ export class StudentCsvImportUseCase {
             });
             candidateIssues.push(message);
           }
-        } else if (emailMatches.length > 0) {
+        } else if (emailIsTaken || duplicateEmailRow !== undefined) {
           status = 'conflict';
-          const message = 'E-Mail ist bereits bei einem anderen Schüler vergeben';
+          const message = duplicateEmailRow !== undefined
+            ? `E-Mail bereits in Zeile ${duplicateEmailRow} des Imports vergeben`
+            : 'E-Mail ist bereits bei einem anderen Schüler vergeben';
           issues.push({
             rowNumber: row.rowNumber,
             field: 'e-mail',
@@ -319,6 +331,10 @@ export class StudentCsvImportUseCase {
             severity: 'conflict'
           });
           candidateIssues.push(message);
+        }
+
+        if (normalizedEmail && status === 'ready') {
+          seenEmails.set(normalizedEmail, row.rowNumber);
         }
 
         candidates.push({
@@ -386,7 +402,9 @@ export class StudentCsvImportUseCase {
       const rawGender = this.getCell(cells, headerMatch.headers.geschlecht);
       const rawEmail = this.getCell(cells, headerMatch.headers['e-mail']);
       const gender = rawGender ? normalizeStudentGender(rawGender) : undefined;
-      const email = rawEmail || undefined;
+      const email = rawEmail || (options.generateSchoolEmails && firstName && lastName
+        ? this.buildSchoolEmail(firstName, lastName)
+        : undefined);
       const dateOfBirth = this.normalizeDateOfBirth(rawDateOfBirth);
       const className = options.targetClassName?.trim() || (subClass ? `${classLevel}${subClass}`.trim() : classLevel.trim());
       const validationErrors: string[] = [];
@@ -412,12 +430,17 @@ export class StudentCsvImportUseCase {
         validationErrors.push(message);
       }
       if (rawGender && !gender) {
-        const message = 'Geschlecht muss m oder f sein';
+        const message = 'Geschlecht muss m, w oder f sein';
         issues.push({ rowNumber, field: 'geschlecht', message, severity: 'error' });
         validationErrors.push(message);
       }
       if (email && !this.isValidEmail(email)) {
         const message = 'Ungültige E-Mail';
+        issues.push({ rowNumber, field: 'e-mail', message, severity: 'error' });
+        validationErrors.push(message);
+      }
+      if (!rawEmail && options.generateSchoolEmails && firstName && lastName && !email) {
+        const message = 'Schul-E-Mail konnte aus dem Namen nicht erzeugt werden';
         issues.push({ rowNumber, field: 'e-mail', message, severity: 'error' });
         validationErrors.push(message);
       }
@@ -463,7 +486,7 @@ export class StudentCsvImportUseCase {
   }
 
   private resolveHeaders(header: string[], hasTargetClassName: boolean): HeaderIndex | null {
-    const normalizedHeader = header.map((cell) => cell.trim().toLowerCase());
+    const normalizedHeader = header.map((cell) => cell.replace(/^\uFEFF/, '').trim().toLowerCase());
     const result: HeaderIndex = {};
 
     for (const [headerName, aliases] of Object.entries(HEADER_ALIASES)) {
@@ -584,6 +607,26 @@ export class StudentCsvImportUseCase {
       row.className.trim().toLowerCase(),
       row.dateOfBirth ?? ''
     ].join('|');
+  }
+
+  private buildSchoolEmail(firstName: string, lastName: string): string | undefined {
+    const normalizeNamePart = (value: string): string => value
+      .trim()
+      .toLocaleLowerCase('de-DE')
+      .replace(/ä/g, 'ae')
+      .replace(/ö/g, 'oe')
+      .replace(/ü/g, 'ue')
+      .replace(/ß/g, 'ss')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/['’]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-/, '')
+      .replace(/-$/, '');
+
+    const first = normalizeNamePart(firstName);
+    const last = normalizeNamePart(lastName);
+    return first && last ? `${first}.${last}@vvb-gym.de` : undefined;
   }
 
   private isValidEmail(email: string): boolean {
