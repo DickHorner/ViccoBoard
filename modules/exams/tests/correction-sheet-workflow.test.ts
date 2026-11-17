@@ -453,6 +453,8 @@ describe('KBR correction sheet workflow', () => {
     const pdf = await exportSheetsUseCase.previewDesignPdf(exam.id, preset);
     const document = await PDFDocument.load(pdf.bytes);
     expect(document.getPageCount()).toBeGreaterThan(0);
+    expect(document.getPage(0).getSize().width).toBeCloseTo(595.28, 0);
+    expect(document.getPage(0).getSize().height).toBeCloseTo(841.89, 0);
     expect(pdf.candidateCount).toBe(1);
     expect(await presetRepository.findByExamId(exam.id)).toBeNull();
   });
