@@ -443,10 +443,10 @@ describe('KBR correction sheet workflow', () => {
       candidateId: '',
       candidateName: '',
       maxPoints: 25,
-      grade: undefined,
       headerText: 'Prüfungsrückmeldung',
       showSignatureArea: true
     }));
+    expect(design.grade).toBeUndefined();
     expect(design.taskRows.map(task => task.label)).toEqual(['Inhaltsangabe', 'Sprachanalyse']);
     expect(design.taskRows[0].criteria).toHaveLength(2);
 
