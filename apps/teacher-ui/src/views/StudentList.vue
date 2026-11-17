@@ -381,7 +381,7 @@
           />
           <p class="app-field-hint">
             Die Kopfzeile darf in Zeile 2 stehen. Pflichtspalten: Vorname, Nachname; Klasse nur, wenn oben keine Zielklasse gewählt ist.
-            Optional: Geburtsdatum, Geschlecht, E-Mail. Komma, Semikolon und Tab werden erkannt.
+            Optional: Geburtsdatum, Geschlecht (m/w), E-Mail. Komma, Semikolon und Tab werden erkannt.
           </p>
         </div>
 
