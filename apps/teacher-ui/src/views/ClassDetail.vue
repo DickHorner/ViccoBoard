@@ -43,7 +43,7 @@
           </div>
           <div class="info-item">
             <label>Schüler:</label>
-            <span>{{ students.length }}</span>
+            <span>{{ loadingStudents ? '…' : studentsError ? '–' : students.length }}</span>
           </div>
           <div class="info-item">
             <label>Bewertungsschema:</label>
@@ -116,7 +116,7 @@
           <p v-if="loadingSummary" role="status">Sport-Kennzahlen werden geladen...</p>
           <div v-else-if="summaryError" class="error-state">
             <p>{{ summaryError }}</p>
-            <button class="btn-primary" @click="loadSportSummary">Erneut versuchen</button>
+            <button v-if="!studentsError" class="btn-primary" @click="loadSportSummary">Erneut versuchen</button>
           </div>
           <div v-else class="stats-grid">
             <div class="stat-item">
