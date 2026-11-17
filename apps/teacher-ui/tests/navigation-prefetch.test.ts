@@ -17,11 +17,16 @@ jest.mock('../src/composables/useSportBridge', () => ({
   })
 }))
 
+import type { ClassGroup, Student } from '@viccoboard/core'
 import {
   loadClassStudents,
   loadStudentSport,
   prefetchClassStudents,
-  prefetchStudentSport
+  prefetchStudentSport,
+  rememberClassForNavigation,
+  rememberStudentForNavigation,
+  takeClassForNavigation,
+  takeStudentForNavigation
 } from '../src/services/navigation-prefetch'
 
 describe('one-hop navigation prefetch', () => {
@@ -37,6 +42,29 @@ describe('one-hop navigation prefetch', () => {
   afterEach(() => {
     jest.runOnlyPendingTimers()
     jest.useRealTimers()
+  })
+
+  it('hands off one selected class without another database read', () => {
+    const classGroup = { id: 'class-9b', name: '9b' } as ClassGroup
+    rememberClassForNavigation(classGroup)
+
+    expect(takeClassForNavigation('class-9b')).toBe(classGroup)
+    expect(takeClassForNavigation('class-9b')).toBeNull()
+    expect(mockFindRoster).not.toHaveBeenCalled()
+  })
+
+  it('never hands off the identity of a different student or an expired one', () => {
+    const anna = { id: 'student-1', firstName: 'Anna' } as Student
+    rememberStudentForNavigation(anna)
+
+    expect(takeStudentForNavigation('student-2')).toBeNull()
+
+    rememberStudentForNavigation(anna)
+    jest.advanceTimersByTime(2000)
+    expect(takeStudentForNavigation('student-1')).toBeNull()
+
+    rememberStudentForNavigation(anna)
+    expect(takeStudentForNavigation('student-1')).toBe(anna)
   })
 
   it('reuses an in-flight class-roster query for the matching navigation', async () => {
