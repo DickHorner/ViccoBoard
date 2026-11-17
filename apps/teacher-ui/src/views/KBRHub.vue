@@ -3,10 +3,18 @@
     <header class="page-header">
       <div>
         <h1>KBR</h1>
-        <p class="subtitle">Arbeitsbereich für Prüfungen, Korrektur und Auswertung. Von hier aus sollen später alle KBR-Teilbereiche konsistent erreichbar sein.</p>
+        <p class="subtitle">Was möchtest Du tun? Wähle Deinen Arbeitsschritt – Prüfung erstellen, korrigieren, Rückmeldebogen oder Analyse.</p>
       </div>
       <span class="summary-pill">{{ examCount }} Prüfungen</span>
     </header>
+
+    <div class="hub-grid">
+      <RouterLink v-for="entry in entries" :key="entry.to" class="hub-card" :to="entry.to">
+        <p class="eyebrow">{{ entry.eyebrow }}</p>
+        <h2>{{ entry.title }}</h2>
+        <p>{{ entry.description }}</p>
+      </RouterLink>
+    </div>
 
     <section class="metrics-grid">
       <article class="metric-card">
@@ -22,32 +30,6 @@
         <span>Langzeitnotizen</span>
       </article>
     </section>
-
-    <div class="hub-grid">
-      <RouterLink class="hub-card" to="/exams">
-        <p class="eyebrow">Übersicht</p>
-        <h2>Prüfungen</h2>
-        <p>Bestehende Prüfungen ansehen, bearbeiten und in die Korrektur wechseln.</p>
-      </RouterLink>
-
-      <RouterLink class="hub-card" to="/exams/new">
-        <p class="eyebrow">Editor</p>
-        <h2>Neue Prüfung</h2>
-        <p>Direkter Einstieg in den KBR-Editor für einfache und komplexe Strukturen.</p>
-      </RouterLink>
-
-      <RouterLink class="hub-card" to="/support-tips">
-        <p class="eyebrow">Förderung</p>
-        <h2>Fördertipps</h2>
-        <p>Tipps verwalten, suchen und in Korrekturen wiederverwenden.</p>
-      </RouterLink>
-
-      <RouterLink class="hub-card" :to="analysisEntry.to">
-        <p class="eyebrow">Analyse</p>
-        <h2>{{ analysisEntry.title }}</h2>
-        <p>{{ analysisEntry.description }}</p>
-      </RouterLink>
-    </div>
 
     <section class="recent-panel">
       <div class="panel-header">
@@ -67,7 +49,7 @@
             <RouterLink :to="`/exams/${exam.id}`" class="ghost-link">Öffnen</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/correct`" class="ghost-link">Korrigieren</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/analysis`" class="ghost-link">Analyse</RouterLink>
-            <RouterLink :to="`/exams/${exam.id}/export`" class="ghost-link">Export</RouterLink>
+            <RouterLink :to="`/exams/${exam.id}/export`" class="ghost-link">Rückmeldebogen</RouterLink>
           </div>
         </article>
       </div>
@@ -81,6 +63,7 @@ import { RouterLink } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { formatGermanDate } from '../utils/locale-format'
+import { isExamTemplate } from '../utils/exam-school-year'
 
 const { examRepository } = useExamsBridge()
 const { supportTipRepository, studentLongTermNoteRepository } = useExamsBridge()
@@ -93,26 +76,48 @@ const longTermNoteCount = ref(0)
 const examCount = computed(() => exams.value.length)
 const recentExams = computed(() =>
   [...exams.value]
+    .filter(exam => !isExamTemplate(exam))
     .sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime())
     .slice(0, 5)
 )
-const analysisEntry = computed(() => {
-  const exam = recentExams.value[0]
-
-  if (!exam) {
-    return {
-      to: '/exams',
-      title: 'Analyse vorbereiten',
-      description: 'Sobald Prüfungen vorhanden sind, öffnet sich hier der direkte Weg in Statistik und Schwierigkeit.'
-    }
+const entries = [
+  {
+    to: '/exams/new',
+    eyebrow: 'Erstellen',
+    title: 'Neue Prüfung',
+    description: 'Aufgaben, Erwartungen, Notenschlüssel und Prüflinge anlegen.'
+  },
+  {
+    to: '/exams',
+    eyebrow: 'Verwalten',
+    title: 'Prüfungen',
+    description: 'Prüfungen und Vorlagen finden, bearbeiten und wiederverwenden.'
+  },
+  {
+    to: '/exams?workflow=correct',
+    eyebrow: 'Bewerten',
+    title: 'Manuelle Korrektur',
+    description: 'Prüfung auswählen und direkt nach Prüfling oder Aufgabe korrigieren.'
+  },
+  {
+    to: '/exams?workflow=sheets',
+    eyebrow: 'Rückmeldung',
+    title: 'Rückmeldebögen',
+    description: 'Prüfung auswählen, Druckbögen prüfen und exportieren.'
+  },
+  {
+    to: '/exams?workflow=analysis',
+    eyebrow: 'Auswerten',
+    title: 'Analyse',
+    description: 'Prüfung auswählen und Ergebnisse sowie Aufgabenschwierigkeiten auswerten.'
+  },
+  {
+    to: '/support-tips',
+    eyebrow: 'Förderung',
+    title: 'Fördertipps',
+    description: 'Förderhinweise verwalten und in Rückmeldungen wiederverwenden.'
   }
-
-  return {
-    to: `/exams/${exam.id}/analysis`,
-    title: 'Letzte Analyse',
-    description: `Direkt in die Analyse von ${exam.title} springen.`
-  }
-})
+]
 
 const loadData = async () => {
   loading.value = true
