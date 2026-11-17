@@ -100,6 +100,12 @@ const entries = [
     description: 'Prüfung auswählen und direkt nach Prüfling oder Aufgabe korrigieren.'
   },
   {
+    to: '/exams?workflow=design',
+    eyebrow: 'Gestaltung',
+    title: 'Druckbogeneditor',
+    description: 'Druckbogen gestalten und das fertige PDF sofort in der Vorschau sehen.'
+  },
+  {
     to: '/exams?workflow=sheets',
     eyebrow: 'Rückmeldung',
     title: 'Rückmeldebögen',
