@@ -1,88 +1,130 @@
 <template>
   <section class="student-list-page app-page">
     <header class="student-list-page__header">
-      <div>
-        <p class="student-list-page__eyebrow">Zentrale Schülerverwaltung</p>
-        <h1>{{ t('SCHUELER.schueleruebersicht') }}</h1>
-        <p class="student-list-page__intro">
-          Stammdaten, Klassenbezug und Schnellaktionen an einem Ort. Die Datenlogik bleibt unverändert,
-          die Oberfläche verwendet die OpenVue-Komponentenbasis.
-        </p>
+      <div class="student-list-page__hero-top">
+        <div class="student-list-page__hero-copy">
+          <p class="student-list-page__eyebrow">
+            <span class="student-list-page__status-dot" aria-hidden="true"></span>
+            SCHÜLERVERWALTUNG
+          </p>
+          <h1>{{ t('SCHUELER.schueleruebersicht') }}</h1>
+          <p class="student-list-page__intro">
+            Klassenübergreifend suchen, Stammdaten pflegen und Schülerprofile direkt öffnen.
+          </p>
+        </div>
+        <div class="student-list-page__hero-actions">
+          <VoltSecondaryButton
+            label="CSV importieren"
+            icon="pi pi-upload"
+            outlined
+            @click="showImportDialog = true"
+          />
+          <VoltButton
+            :label="t('SCHUELER.schueler-hinzu')"
+            icon="pi pi-user-plus"
+            @click="openCreateDialog"
+          />
+        </div>
       </div>
 
-      <div class="app-actions-row">
-        <Button
-          label="CSV-Datei importieren"
-          icon="pi pi-upload"
-          severity="secondary"
-          outlined
-          @click="showImportDialog = true"
-        />
-        <VoltButton
-          :label="t('SCHUELER.schueler-hinzu')"
-          icon="pi pi-user-plus"
-          @click="openCreateDialog"
-        />
+      <div class="student-list-page__hero-metrics" aria-label="Schülerstatistik">
+        <div class="student-list-page__metric">
+          <span>Aktuell sichtbar</span>
+          <strong>{{ loading ? '–' : filteredStudents.length }}</strong>
+        </div>
+        <div class="student-list-page__metric">
+          <span>Männlich</span>
+          <strong>{{ loading ? '–' : genderStats.male }}</strong>
+        </div>
+        <div class="student-list-page__metric">
+          <span>Weiblich</span>
+          <strong>{{ loading ? '–' : genderStats.female }}</strong>
+        </div>
       </div>
     </header>
 
-    <section class="student-list-page__toolbar app-card">
-      <div class="student-list-page__filters">
-        <IconField class="student-list-page__field">
-          <InputIcon class="pi pi-search" />
-          <InputText
-            v-model="searchQuery"
-            class="student-list-page__input"
-            :placeholder="t('SEARCH.placeholder') || 'Schüler suchen...'"
-          />
-        </IconField>
-
-        <Select
-          v-model="filterClass"
-          class="student-list-page__input"
-          :options="classOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Klasse filtern"
-          showClear
-        />
-
-        <Select
-          v-model="filterGender"
-          class="student-list-page__input"
-          :options="genderOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Geschlecht filtern"
-          showClear
+    <section class="student-list-page__toolbar app-card" aria-label="Schüler filtern">
+      <div class="student-list-page__toolbar-heading">
+        <div>
+          <h2>Suche & Filter</h2>
+          <p>Suche nach Namen oder grenze die Schülerliste gezielt ein.</p>
+        </div>
+        <VoltSecondaryButton
+          v-if="hasActiveFilters"
+          label="Zurücksetzen"
+          icon="pi pi-filter-slash"
+          text
+          @click="resetFilters"
         />
       </div>
 
-      <div class="student-list-page__toolbar-side">
-        <label class="app-data-note">
+      <div class="student-list-page__filters">
+        <div class="student-list-page__filter student-list-page__filter--search">
+          <label for="student-search">Schüler suchen</label>
+          <div class="student-list-page__search">
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <VoltInputText
+              id="student-search"
+              v-model="searchQuery"
+              class="student-list-page__input"
+              :placeholder="t('SEARCH.placeholder') || 'Name eingeben…'"
+            />
+          </div>
+        </div>
+        <div class="student-list-page__filter">
+          <label for="student-class-filter">Klasse</label>
+          <VoltSelect
+            id="student-class-filter"
+            v-model="filterClass"
+            class="student-list-page__input"
+            :options="classOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Alle Klassen"
+            showClear
+          />
+        </div>
+        <div class="student-list-page__filter">
+          <label for="student-gender-filter">Geschlecht</label>
+          <VoltSelect
+            id="student-gender-filter"
+            v-model="filterGender"
+            class="student-list-page__input"
+            :options="genderOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Alle"
+            showClear
+          />
+        </div>
+      </div>
+
+      <div class="student-list-page__toolbar-footer">
+        <label class="student-list-page__archived">
           <input v-model="showArchivedStudents" type="checkbox" />
           Ehemalige und archivierte Schüler anzeigen
         </label>
-        <div v-if="selectedStudents.length > 0" class="app-actions-row">
-          <Button
-            :label="`${selectedStudents.length} verschieben`"
-            icon="pi pi-arrow-right-arrow-left"
-            severity="secondary"
-            outlined
-            @click="bulkMoveToClass"
-          />
-          <Button
-            :label="`${selectedStudents.length} löschen`"
-            icon="pi pi-trash"
-            severity="danger"
-            outlined
-            @click="bulkDelete"
-          />
-        </div>
-
-        <span class="app-data-note">{{ filteredStudents.length }} Schüler sichtbar</span>
+        <span class="student-list-page__result-count">{{ filteredStudents.length }} Treffer</span>
       </div>
     </section>
+
+    <div v-if="selectedStudents.length > 0" class="student-list-page__selection-bar">
+      <span><strong>{{ selectedStudents.length }}</strong> Schüler ausgewählt</span>
+      <div class="student-list-page__selection-actions">
+        <VoltSecondaryButton
+          :label="`${selectedStudents.length} verschieben`"
+          icon="pi pi-arrow-right-arrow-left"
+          outlined
+          @click="bulkMoveToClass"
+        />
+        <VoltDangerButton
+          :label="`${selectedStudents.length} löschen`"
+          icon="pi pi-trash"
+          outlined
+          @click="bulkDelete"
+        />
+      </div>
+    </div>
 
     <section v-if="loading" class="app-card app-status-panel">
       <ProgressSpinner style="width: 2.5rem; height: 2.5rem" />
@@ -148,20 +190,33 @@
 
           <Column selectionMode="multiple" headerStyle="width: 3.25rem" />
 
-          <Column field="lastName" :header="t('SCHUELER.nachname')" sortable />
-
-          <Column field="firstName" :header="t('SCHUELER.name')" sortable>
+          <Column field="lastName" :header="t('SCHUELER.nachname')" sortable>
             <template #body="{ data }">
-              <div class="student-list-page__name-cell">
-                <span class="student-list-page__name">{{ data.firstName }}</span>
-                <small>{{ data.id }}</small>
+              <div class="student-list-page__identity">
+                <span class="student-list-page__avatar" aria-hidden="true">
+                  {{ data.firstName?.charAt(0) }}{{ data.lastName?.charAt(0) }}
+                </span>
+                <span class="student-list-page__name-cell">
+                  <strong class="student-list-page__name">{{ data.lastName }}</strong>
+                  <small :title="data.id">Schülerprofil</small>
+                </span>
               </div>
             </template>
           </Column>
 
-          <Column field="className" :header="t('SCHUELER.klasse')" sortable />
+          <Column field="firstName" :header="t('SCHUELER.name')" sortable />
 
-          <Column field="genderLabel" :header="t('SCHUELER.geschlecht')" sortable />
+          <Column field="className" :header="t('SCHUELER.klasse')" sortable>
+            <template #body="{ data }">
+              <span class="student-list-page__class-tag">{{ data.className || '–' }}</span>
+            </template>
+          </Column>
+
+          <Column field="genderLabel" :header="t('SCHUELER.geschlecht')" sortable>
+            <template #body="{ data }">
+              <span class="student-list-page__gender-tag">{{ data.genderLabel || '–' }}</span>
+            </template>
+          </Column>
 
           <Column field="dateOfBirth" header="Geburtsdatum" sortable>
             <template #body="{ data }">
@@ -204,20 +259,6 @@
         </DataTable>
       </div>
 
-      <section class="app-chip-row student-list-page__stats">
-        <div class="app-chip">
-          <span>Gesamt</span>
-          <strong>{{ filteredStudents.length }}</strong>
-        </div>
-        <div class="app-chip">
-          <span>Männlich</span>
-          <strong>{{ genderStats.male }}</strong>
-        </div>
-        <div class="app-chip">
-          <span>Weiblich</span>
-          <strong>{{ genderStats.female }}</strong>
-        </div>
-      </section>
     </section>
 
     <Dialog
