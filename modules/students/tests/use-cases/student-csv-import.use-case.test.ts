@@ -10,6 +10,10 @@ import {
 class InMemoryStudentRepository {
   constructor(private students: Student[] = []) {}
 
+  async findAll(): Promise<Student[]> {
+    return [...this.students];
+  }
+
   async findByClassGroup(classGroupId: string): Promise<Student[]> {
     return (await this.findAllByClassGroup(classGroupId)).filter(student => !student.inactive);
   }
@@ -210,6 +214,145 @@ describe('StudentCsvImportUseCase', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+  });
+
+  test('imports m/w from abbreviated gender headers and generates school emails when enabled', async () => {
+    const { useCase, studentRepository } = createUseCase();
+
+    const files = [{
+      fileName: 'klasse-9b.csv',
+      content: [
+        'Vorname;Nachname;Klasse;Geschl.',
+        'Paul;Müller;9b;m',
+        'Anna Maria;Weiß;9b;w'
+      ].join('\n')
+    }];
+
+    const options = { generateSchoolEmails: true };
+    const preview = await useCase.preview(files, 'live', 'Schulliste', options);
+
+    expect(preview.summary).toMatchObject({ imported: 2, conflicts: 0, errors: 0 });
+    expect(preview.candidates.map(candidate => candidate.gender)).toEqual(['m', 'f']);
+    expect(preview.candidates.map(candidate => candidate.email)).toEqual([
+      'paul.mueller@vvb-gym.de',
+      'anna-maria.weiss@vvb-gym.de'
+    ]);
+
+    const result = await useCase.execute(files, 'live', 'Schulliste', options);
+
+    expect(result.summary.imported).toBe(2);
+    expect(studentRepository.getAll().map(student => [student.gender, student.contactInfo?.email]))
+      .toEqual([
+        ['m', 'paul.mueller@vvb-gym.de'],
+        ['f', 'anna-maria.weiss@vvb-gym.de']
+      ]);
+  });
+
+  test('recognizes m/w as a column heading and keeps explicitly supplied addresses', async () => {
+    const { useCase } = createUseCase();
+
+    const preview = await useCase.preview([{
+      fileName: 'gender.csv',
+      content: [
+        'Vorname,Nachname,Klasse,m/w,E-Mail',
+        'Léa-Claire,Müller-Schmidt,7a,w,lea.custom@school.de',
+        'Karl-Heinz,Groß,7a,m,'
+      ].join('\n')
+    }], 'live', 'Special names', { generateSchoolEmails: true });
+
+    expect(preview.candidates.map(candidate => candidate.gender)).toEqual(['f', 'm']);
+    expect(preview.candidates.map(candidate => candidate.email)).toEqual([
+      'lea.custom@school.de',
+      'karl-heinz.gross@vvb-gym.de'
+    ]);
+    expect(preview.summary.conflicts).toBe(0);
+  });
+
+  test('does not invent addresses unless the option is enabled', async () => {
+    const { useCase } = createUseCase();
+    const files = [{
+      fileName: 'without-email.csv',
+      content: ['Vorname,Nachname,Klasse,Geschlecht', 'Lea,Muster,7a,w'].join('\n')
+    }];
+
+    const preview = await useCase.preview(files, 'live', 'Default import');
+
+    expect(preview.candidates[0].gender).toBe('f');
+    expect(preview.candidates[0].email).toBeUndefined();
+    expect(preview.summary.imported).toBe(1);
+  });
+
+  test('flags generated duplicate emails across different students before writing anything', async () => {
+    const { useCase, studentRepository } = createUseCase();
+    const files = [{
+      fileName: 'duplicates.csv',
+      content: [
+        'Vorname,Nachname,Klasse,Geburtsdatum,Geschlecht',
+        'Anna,Muster,7a,14.03.2012,w',
+        'Anna,Muster,7b,13.03.2012,w'
+      ].join('\n')
+    }];
+
+    const preview = await useCase.preview(files, 'live', 'Check duplicates', { generateSchoolEmails: true });
+
+    expect(preview.summary).toMatchObject({ imported: 1, conflicts: 1 });
+    expect(preview.candidates[1].status).toBe('conflict');
+    expect(preview.issues.some(issue => issue.field === 'e-mail' && issue.message.includes('Zeile 2'))).toBe(true);
+    expect(studentRepository.getAll()).toHaveLength(0);
+
+    await useCase.execute(files, 'live', 'Check duplicates', { generateSchoolEmails: true });
+    expect(studentRepository.getAll()).toHaveLength(1);
+  });
+
+  test('detects a generated email already used by a different existing student', async () => {
+    const { useCase } = createUseCase({
+      classGroups: [buildClassGroup('class-7a', '7a')],
+      students: [buildStudent()]
+    });
+
+    const preview = await useCase.preview([{
+      fileName: 'new-student.csv',
+      content: [
+        'Vorname,Nachname,Klasse,Geburtsdatum,Geschlecht',
+        'Anna,Muster,7a,01.01.2013,w'
+      ].join('\n')
+    }], 'live', 'Conflicting address', { generateSchoolEmails: true });
+
+    expect(preview.summary.conflicts).toBe(1);
+    expect(preview.candidates[0].email).toBe('anna.muster@vvb-gym.de');
+  });
+
+  test('skips the same student when w is normalized to an existing f and the generated email matches', async () => {
+    const { useCase, studentRepository } = createUseCase({
+      classGroups: [buildClassGroup('class-7a', '7a')],
+      students: [buildStudent()]
+    });
+
+    const files = [{
+      fileName: 'existing.csv',
+      content: [
+        'Vorname,Nachname,Klasse,Geburtsdatum,Geschlecht',
+        'Anna,Muster,7a,14.03.2012,w'
+      ].join('\n')
+    }];
+
+    const preview = await useCase.preview(files, 'live', 'Existing student', { generateSchoolEmails: true });
+    expect(preview.candidates[0].status).toBe('skip_existing');
+
+    await useCase.execute(files, 'live', 'Existing student', { generateSchoolEmails: true });
+    expect(studentRepository.getAll()).toHaveLength(1);
+  });
+
+  test('reports names that cannot be represented in the school address scheme', async () => {
+    const { useCase } = createUseCase();
+
+    const preview = await useCase.preview([{
+      fileName: 'other-scripts.csv',
+      content: ['Vorname,Nachname,Klasse', '李,王,7a'].join('\n')
+    }], 'live', 'Unsupported address', { generateSchoolEmails: true });
+
+    expect(preview.candidates[0].status).toBe('invalid');
+    expect(preview.issues.some(issue => issue.message.includes('Schul-E-Mail konnte'))).toBe(true);
   });
 
   test('builds a valid preview for m/f students and reuses class groups', async () => {
