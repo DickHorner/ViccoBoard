@@ -18,12 +18,12 @@
             icon="pi pi-upload"
             outlined
             @click="showImportDialog = true"
-          />
+        />
           <VoltButton
             :label="t('SCHUELER.schueler-hinzu')"
             icon="pi pi-user-plus"
             @click="openCreateDialog"
-          />
+        />
         </div>
       </div>
 
@@ -55,7 +55,7 @@
           icon="pi pi-filter-slash"
           text
           @click="resetFilters"
-        />
+      />
       </div>
 
       <div class="student-list-page__filters">
@@ -68,7 +68,7 @@
               v-model="searchQuery"
               class="student-list-page__input"
               :placeholder="t('SEARCH.placeholder') || 'Name eingeben…'"
-            />
+          />
           </div>
         </div>
         <div class="student-list-page__filter">
@@ -82,7 +82,7 @@
             optionValue="value"
             placeholder="Alle Klassen"
             showClear
-          />
+        />
         </div>
         <div class="student-list-page__filter">
           <label for="student-gender-filter">Geschlecht</label>
@@ -95,7 +95,7 @@
             optionValue="value"
             placeholder="Alle"
             showClear
-          />
+        />
         </div>
       </div>
 
@@ -116,13 +116,13 @@
           icon="pi pi-arrow-right-arrow-left"
           outlined
           @click="bulkMoveToClass"
-        />
+      />
         <VoltDangerButton
           :label="`${selectedStudents.length} löschen`"
           icon="pi pi-trash"
           outlined
           @click="bulkDelete"
-        />
+      />
       </div>
     </div>
 
@@ -133,7 +133,7 @@
 
     <section v-else-if="error" class="app-card app-status-panel">
       <Message severity="error" :closable="false">{{ error }}</Message>
-      <VoltButton label="Erneut versuchen" icon="pi pi-refresh" @click="loadData"  />
+      <VoltButton label="Erneut versuchen" icon="pi pi-refresh" @click="loadData" />
     </section>
 
     <section v-else class="student-list-page__content">
@@ -168,7 +168,7 @@
                 icon="pi pi-home"
                 text
                 @click="router.push('/')"
-               />
+             />
             </div>
           </template>
 
@@ -182,7 +182,7 @@
                 icon="pi pi-filter-slash"
                 text
                 @click="resetFilters"
-               />
+             />
             </div>
           </template>
 
@@ -235,27 +235,26 @@
                   rounded
                   aria-label="Schüler bearbeiten"
                   @click="editStudent(data.original)"
-                 />
+               />
                 <VoltSecondaryButton
                   icon="pi pi-user"
                   text
                   rounded
                   aria-label="Profil öffnen"
                   @click="openStudentProfile(data.id)"
-                 />
+               />
                 <VoltDangerButton
                   icon="pi pi-trash"
                   text
                   rounded
                   aria-label="Schüler löschen"
                   @click="deleteStudent(data.original)"
-                 />
+               />
               </div>
             </template>
           </Column>
         </DataTable>
       </div>
-
     </section>
 
     <VoltDialog
@@ -274,7 +273,7 @@
               id="student-first-name"
               v-model="studentForm.firstName"
               class="student-list-page__input"
-            />
+          />
           </div>
 
           <div class="app-field">
@@ -283,7 +282,7 @@
               id="student-last-name"
               v-model="studentForm.lastName"
               class="student-list-page__input"
-            />
+          />
           </div>
 
           <div class="app-field">
@@ -296,7 +295,7 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Klasse wählen"
-            />
+          />
           </div>
 
           <div class="app-field">
@@ -310,7 +309,7 @@
               optionValue="value"
               placeholder="Optional"
               showClear
-            />
+          />
           </div>
 
           <div class="app-field">
@@ -320,7 +319,7 @@
               v-model="studentForm.dateOfBirth"
               class="student-list-page__input"
               placeholder="TT.MM.JJJJ"
-            />
+          />
             <p class="app-field-hint">Vollständiges Datum im Format TT.MM.JJJJ</p>
           </div>
 
@@ -331,7 +330,7 @@
               v-model="studentForm.email"
               class="student-list-page__input"
               type="email"
-            />
+          />
           </div>
 
           <div class="app-field">
@@ -341,7 +340,7 @@
               v-model="studentForm.parentEmail"
               class="student-list-page__input"
               type="email"
-            />
+          />
           </div>
 
           <div class="app-field">
@@ -351,7 +350,7 @@
               v-model="studentForm.phone"
               class="student-list-page__input"
               type="tel"
-            />
+          />
           </div>
         </div>
 
@@ -361,12 +360,12 @@
             :label="t('COMMON.cancel') || 'Abbrechen'"
             text
             @click="closeEditor"
-           />
+         />
           <VoltButton
             type="submit"
             :label="saving ? 'Wird gespeichert...' : t('SCHUELER.speichern')"
             :loading="saving"
-           />
+         />
         </div>
       </form>
     </VoltDialog>
@@ -391,7 +390,7 @@
             optionValue="value"
             placeholder="Aus bestehender Klasse wählen"
             showClear
-          />
+        />
         </div>
 
         <div class="app-field">
@@ -402,7 +401,7 @@
             class="student-list-page__input"
             placeholder="z. B. 8b"
             :disabled="Boolean(importClassGroupId)"
-          />
+        />
           <p class="app-field-hint">
             Wenn eine Zielklasse gesetzt ist, muss die CSV keine Klasse-/Teilklasse-Spalte enthalten.
           </p>
@@ -415,7 +414,7 @@
             type="file"
             accept=".csv,text/csv"
             @change="handleCsvFileSelection"
-          />
+        />
           <p class="app-field-hint">
             Die Kopfzeile darf in Zeile 2 stehen. Pflichtspalten: Vorname, Nachname; Klasse nur, wenn oben keine Zielklasse gewählt ist.
             Optional: Geburtsdatum, Geschlecht (m/w), E-Mail. Komma, Semikolon und Tab werden erkannt.
@@ -429,7 +428,7 @@
               type="checkbox"
               :disabled="importBusy"
               @change="refreshImportPreview"
-            />
+          />
             Fehlende Schul-E-Mails aus Vor- und Nachnamen erzeugen
           </label>
           <p class="app-field-hint">
@@ -447,7 +446,7 @@
             outlined
             :loading="importBusy"
             @click="previewDemoImport"
-           />
+         />
           <VoltDangerButton
             type="button"
             label="Demo-Daten löschen"
@@ -455,7 +454,7 @@
             outlined
             :loading="importBusy"
             @click="deleteDemoData"
-           />
+         />
         </div>
 
         <div v-if="importPreview" class="app-card">
@@ -510,7 +509,7 @@
             :label="t('COMMON.cancel') || 'Abbrechen'"
             text
             @click="showImportDialog = false; resetImportState()"
-           />
+         />
           <VoltButton
             type="button"
             label="Import ausführen"
@@ -518,7 +517,7 @@
             :disabled="!importPreview || importBusy || importPreview.summary.imported === 0"
             :loading="importBusy"
             @click="executeImport"
-           />
+         />
         </div>
       </div>
     </VoltDialog>
