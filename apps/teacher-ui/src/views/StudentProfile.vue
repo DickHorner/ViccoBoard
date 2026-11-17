@@ -200,6 +200,7 @@ import { LongTermNoteManagementService } from '@viccoboard/exams'
 import type { StudentLongTermNote } from '@viccoboard/exams'
 import { readFileAsDataUrl, validateStudentPhotoFile } from '../utils/student-photo'
 import { loadStudentSport } from '../services/navigation-prefetch'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
 const studentId = route.params.id as string
@@ -280,6 +281,7 @@ async function loadData() {
 
   if (!student.value) return
 
+  recordRouteContentReady('student-profile')
   void loadClassName()
   void loadSportData().then(() => {
     kbrFrame = window.requestAnimationFrame(() => {
