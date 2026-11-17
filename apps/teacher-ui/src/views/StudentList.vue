@@ -18,7 +18,7 @@
           outlined
           @click="showImportDialog = true"
         />
-        <Button
+        <VoltButton
           :label="t('SCHUELER.schueler-hinzu')"
           icon="pi pi-user-plus"
           @click="openCreateDialog"
@@ -503,6 +503,7 @@ import Message from 'openvue/message'
 import ProgressSpinner from 'openvue/progressspinner'
 import Select from 'openvue/select'
 import { useStudentListView } from '../composables/useStudentListView'
+import VoltButton from '../volt/Button.vue'
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 
 const {
