@@ -199,7 +199,7 @@ import { useExamsBridge } from '../composables/useExamsBridge'
 import { LongTermNoteManagementService } from '@viccoboard/exams'
 import type { StudentLongTermNote } from '@viccoboard/exams'
 import { readFileAsDataUrl, validateStudentPhotoFile } from '../utils/student-photo'
-import { loadStudentSport } from '../services/navigation-prefetch'
+import { loadStudentSport, takeStudentForNavigation } from '../services/navigation-prefetch'
 import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
@@ -271,7 +271,7 @@ async function loadData() {
   error.value = null
 
   try {
-    student.value = await studentsBridge.studentRepository.findById(studentId) ?? null
+    student.value = takeStudentForNavigation(studentId) ?? await studentsBridge.studentRepository.findById(studentId) ?? null
   } catch (err) {
     console.error('Failed to load student profile:', err)
     error.value = 'Fehler beim Laden des Schülerprofils.'
