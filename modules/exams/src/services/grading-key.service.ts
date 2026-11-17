@@ -21,6 +21,7 @@ export class GradingKeyService {
     const percentage = gradingKey.totalPoints > 0
       ? (effectivePoints / gradingKey.totalPoints) * 100
       : 0;
+    const isPerfectScore = gradingKey.totalPoints > 0 && effectivePoints === gradingKey.totalPoints;
 
     if (!gradingKey.gradeBoundaries || gradingKey.gradeBoundaries.length === 0) {
       const fallbackGrade = Number.isFinite(percentage)
@@ -34,16 +35,16 @@ export class GradingKeyService {
       if (gradingKey.type === Exams.GradingKeyType.Percentage || isErrorPoints) {
         const minPct = b.minPercentage ?? (b.minPoints !== undefined && gradingKey.totalPoints > 0 ? (b.minPoints / gradingKey.totalPoints) * 100 : 0);
         const maxPct = b.maxPercentage ?? (b.maxPoints !== undefined && gradingKey.totalPoints > 0 ? (b.maxPoints / gradingKey.totalPoints) * 100 : 100);
-        // Use inclusive upper bound when no explicit maxPercentage is set (open-ended top grade)
+        // Explicit upper bounds are exclusive, except for the full-score cap at 100%.
         return b.maxPercentage !== undefined || b.maxPoints !== undefined
-          ? percentage >= minPct && percentage < maxPct
+          ? percentage >= minPct && (percentage < maxPct || (isPerfectScore && maxPct === 100))
           : percentage >= minPct && percentage <= maxPct;
       } else if (gradingKey.type === Exams.GradingKeyType.Points) {
         const minPts = b.minPoints ?? (b.minPercentage !== undefined ? (b.minPercentage / 100) * gradingKey.totalPoints : 0);
         const maxPts = b.maxPoints ?? (b.maxPercentage !== undefined ? (b.maxPercentage / 100) * gradingKey.totalPoints : gradingKey.totalPoints);
-        // Use inclusive upper bound when no explicit maxPoints is set (open-ended top grade)
+        // An explicit maximum equal to the total also includes a perfect score.
         return b.maxPoints !== undefined || b.maxPercentage !== undefined
-          ? effectivePoints >= minPts && effectivePoints < maxPts
+          ? effectivePoints >= minPts && (effectivePoints < maxPts || (isPerfectScore && maxPts === gradingKey.totalPoints))
           : effectivePoints >= minPts && effectivePoints <= maxPts;
       }
       return false;

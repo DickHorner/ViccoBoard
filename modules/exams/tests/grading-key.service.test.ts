@@ -53,6 +53,55 @@ describe('GradingKeyService', () => {
       expect(result.grade).toBe('1');
     });
 
+    it('grades 32 out of 32 as 1 with the generated Sek I percentage boundaries', () => {
+      const key: Exams.GradingKey = {
+        ...gradingKey,
+        totalPoints: 32,
+        gradeBoundaries: GradingKeyService.generatePercentageBoundaries(GERMAN_1_6_PRESET)
+      };
+
+      expect(GradingKeyService.calculateGrade(32, key)).toEqual({ grade: '1', percentage: 100 });
+      expect(GradingKeyService.calculateGrade(30, key).grade).toBe('2');
+    });
+
+    it('grades 32 out of 32 as 15 with the generated Oberstufe percentage boundaries', () => {
+      const key: Exams.GradingKey = {
+        ...gradingKey,
+        totalPoints: 32,
+        gradeBoundaries: GradingKeyService.generatePercentageBoundaries(GERMAN_0_15_PRESET)
+      };
+
+      expect(GradingKeyService.calculateGrade(32, key)).toEqual({ grade: '15', percentage: 100 });
+    });
+
+    it('includes the total at an explicit points-based upper boundary', () => {
+      const key: Exams.GradingKey = {
+        ...gradingKey,
+        type: Exams.GradingKeyType.Points,
+        totalPoints: 32,
+        gradeBoundaries: [
+          { grade: 1, minPoints: 31, maxPoints: 32, displayValue: '1' },
+          { grade: 6, minPoints: 0, maxPoints: 31, displayValue: '6' }
+        ]
+      };
+
+      expect(GradingKeyService.calculateGrade(32, key).grade).toBe('1');
+      expect(GradingKeyService.calculateGrade(30, key).grade).toBe('6');
+    });
+
+    it('preserves the inverted grading direction for actual error points', () => {
+      const key: Exams.GradingKey = {
+        ...gradingKey,
+        type: Exams.GradingKeyType.ErrorPoints,
+        errorPointsToGrade: true,
+        totalPoints: 32,
+        gradeBoundaries: GradingKeyService.generatePercentageBoundaries(GERMAN_1_6_PRESET)
+      };
+
+      expect(GradingKeyService.calculateGrade(0, key).grade).toBe('1');
+      expect(GradingKeyService.calculateGrade(32, key).grade).toBe('6');
+    });
+
     it('should handle boundary cases correctly', () => {
       // Exactly at 92 should be grade 1
       const at92 = GradingKeyService.calculateGrade(92, gradingKey);
