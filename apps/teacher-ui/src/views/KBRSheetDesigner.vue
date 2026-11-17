@@ -87,7 +87,11 @@ function schedulePreview(): void {
 }
 
 async function renderPreview(revision: number): Promise<void> {
-  if (!exam.value || !previewCorrectionSheetDesignPdf) return
+  if (!exam.value || !previewCorrectionSheetDesignPdf) {
+    previewPending.value = false
+    previewError.value = 'Die Vorschaufunktion ist nicht verfügbar.'
+    return
+  }
   try {
     const pdf = await previewCorrectionSheetDesignPdf(exam.value.id, preset.value)
     if (revision !== previewRevision) return
