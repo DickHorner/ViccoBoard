@@ -425,6 +425,46 @@ describe('KBR correction sheet workflow', () => {
     expect(secondDocument.getPageCount()).toBe(1);
   });
 
+  test('design preview renders the actual exam layout without corrections or candidates', async () => {
+    const exam = await createExam();
+    await examRepository.update(exam.id, { candidates: [] });
+
+    const preset = {
+      ...createDefaultCorrectionSheetPreset(exam.id),
+      layoutMode: 'detailed' as const,
+      headerText: 'Prüfungsrückmeldung',
+      showSignatureArea: true
+    };
+    const design = buildProjectionUseCase.buildDesignPreview(exam, preset);
+    expect(design).toEqual(expect.objectContaining({
+      examId: exam.id,
+      examTitle: exam.title,
+      isDesignPreview: true,
+      candidateId: '',
+      candidateName: '',
+      maxPoints: 25,
+      grade: undefined,
+      headerText: 'Prüfungsrückmeldung',
+      showSignatureArea: true
+    }));
+    expect(design.taskRows.map(task => task.label)).toEqual(['Inhaltsangabe', 'Sprachanalyse']);
+    expect(design.taskRows[0].criteria).toHaveLength(2);
+
+    const pdf = await exportSheetsUseCase.previewDesignPdf(exam.id, preset);
+    const document = await PDFDocument.load(pdf.bytes);
+    expect(document.getPageCount()).toBeGreaterThan(0);
+    expect(pdf.candidateCount).toBe(1);
+    expect(await presetRepository.findByExamId(exam.id)).toBeNull();
+  });
+
+  test('design preview never accepts the preset of another exam', async () => {
+    const exam = await createExam();
+    const preset = createDefaultCorrectionSheetPreset('different-exam');
+
+    await expect(exportSheetsUseCase.previewDesignPdf(exam.id, preset))
+      .rejects.toThrow(/anderen Prüfung/);
+  });
+
   test('single export is blocked when correction is in-progress', async () => {
     const exam = await createExam();
 
