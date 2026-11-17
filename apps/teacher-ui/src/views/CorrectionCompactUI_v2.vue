@@ -737,12 +737,21 @@ async function exportAllCandidates(): Promise<void> {
   }
 }
 
-function openPreviewForCurrentCandidate(): void {
+async function openPreviewForCurrentCandidate(): Promise<void> {
   if (!exam.value || !currentCandidate.value) {
     return;
   }
 
-  router.push({
+  if (hasChanges.value) {
+    try {
+      await saveCurrentCandidate(false);
+    } catch {
+      toast.error('Der aktuelle Korrekturstand konnte nicht gespeichert werden.');
+      return;
+    }
+  }
+
+  await router.push({
     path: `/exams/${exam.value.id}/export`,
     query: { candidateId: currentCandidate.value.id }
   });

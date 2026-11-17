@@ -92,6 +92,12 @@
                 <span>{{ projection.layoutMode === 'compact' ? 'Kompakt' : 'Standard' }}</span>
               </div>
             </div>
+            <img
+              v-if="projection.schoolLogo?.src"
+              class="preview-school-logo"
+              :src="projection.schoolLogo.src"
+              alt="Schullogo"
+            />
             <p v-if="projection.headerText" class="sheet-copy">{{ projection.headerText }}</p>
           </section>
 
@@ -141,6 +147,12 @@
           <section v-if="projection.footerText || projection.showSignatureArea" class="sheet-section footer-section">
             <p v-if="projection.footerText" class="sheet-copy">{{ projection.footerText }}</p>
             <div v-if="projection.showSignatureArea" class="signature-line">
+              <img
+                v-if="projection.teacherSignature?.src"
+                class="preview-signature"
+                :src="projection.teacherSignature.src"
+                alt="Unterschrift der Lehrkraft"
+              />
               <span>Unterschrift</span>
             </div>
           </section>
@@ -413,14 +425,6 @@ async function loadPreview(candidateId: string): Promise<void> {
   const correction = corrections.value.get(candidateId)
   if (!correction) {
     previewError.value = 'Für diesen Prüfling gibt es noch keine Korrektur.'
-    return
-  }
-
-  if (correction.status !== 'completed') {
-    previewError.value =
-      correction.status === 'in-progress'
-        ? 'Die Korrektur dieses Prüflings ist noch nicht abgeschlossen. Erst nach dem Abschluss kann ein Druckbogen exportiert werden.'
-        : 'Für diesen Prüfling wurde noch keine Korrektur begonnen.'
     return
   }
 
@@ -774,9 +778,24 @@ onMounted(() => {
   gap: 1rem;
 }
 
+.preview-school-logo {
+  display: block;
+  max-width: 140px;
+  max-height: 72px;
+  object-fit: contain;
+  margin: 0.75rem 0;
+}
+
+.preview-signature {
+  max-width: 180px;
+  max-height: 70px;
+  object-fit: contain;
+}
+
 .signature-line {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: flex-start;
   min-height: 3rem;
   border-bottom: 1px solid rgba(15, 23, 42, 0.3);
   width: min(280px, 100%);
