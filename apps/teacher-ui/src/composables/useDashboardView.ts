@@ -6,6 +6,7 @@ import type { AttendanceRecord, ClassGroup, Lesson, Subject } from '@viccoboard/
 import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading';
 import { useAttendance, useClassGroups, useLessons, useSubjects } from './useSportBridge';
 import { getDashboardLessonState } from '../utils/dashboard-workspace';
+import { recordRouteContentReady } from '../utils/navigation-performance';
 import {
   formatGermanDate,
   formatGermanDateTime,
@@ -135,6 +136,7 @@ export function useDashboardView() {
     }
 
     await nextTick();
+    recordRouteContentReady('dashboard');
 
     try {
       const [attendanceRecords, loadedSubjects, lessonCollections] = await Promise.all([
