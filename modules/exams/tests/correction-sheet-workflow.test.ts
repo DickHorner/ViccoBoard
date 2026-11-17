@@ -226,7 +226,9 @@ describe('KBR correction sheet workflow', () => {
       layoutMode: 'compact',
       headerText: 'Bitte lesen Sie die Rückmeldung aufmerksam.',
       footerText: 'Rückfragen im nächsten Unterricht.',
-      showSignatureArea: true
+      showSignatureArea: true,
+      teacherSignature: { src: 'data:image/png;base64,aW1hZ2U=', fileName: 'unterschrift.png' },
+      schoolLogo: { src: 'data:image/png;base64,bG9nbw==', fileName: 'logo.png' }
     });
 
     await recordCorrectionUseCase.execute({
@@ -270,7 +272,9 @@ describe('KBR correction sheet workflow', () => {
       layoutMode: 'compact',
       headerText: 'Bitte lesen Sie die Rückmeldung aufmerksam.',
       footerText: 'Rückfragen im nächsten Unterricht.',
-      showSignatureArea: true
+      showSignatureArea: true,
+      teacherSignature: { src: 'data:image/png;base64,aW1hZ2U=', fileName: 'unterschrift.png' },
+      schoolLogo: { src: 'data:image/png;base64,bG9nbw==', fileName: 'logo.png' }
     }));
     expect(projection.taskRows).toEqual([
       expect.objectContaining({
