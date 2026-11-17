@@ -262,9 +262,7 @@ export class StudentCsvImportUseCase {
     const classGroupByName = new Map(existingClassGroups.map((group) => [group.name.toLowerCase(), group]));
     const seenKeys = new Map<string, number>();
     const seenEmails = new Map<string, number>();
-    const existingEmails = new Set((await this.studentRepository.findAll())
-      .map(student => student.contactInfo?.email?.trim().toLowerCase())
-      .filter((email): email is string => Boolean(email)));
+    let existingEmails: Set<string> | null = null;
 
     for (const file of files) {
       const parsed = this.parseCsvFile(file, issues, options);
@@ -296,7 +294,12 @@ export class StudentCsvImportUseCase {
           : null;
 
         const normalizedEmail = row.email?.toLowerCase();
-        const emailIsTaken = normalizedEmail ? existingEmails.has(normalizedEmail) : false;
+        if (normalizedEmail && !existingEmails) {
+          existingEmails = new Set((await this.studentRepository.findAll())
+            .map(student => student.contactInfo?.email?.trim().toLowerCase())
+            .filter((email): email is string => Boolean(email)));
+        }
+        const emailIsTaken = Boolean(normalizedEmail && existingEmails?.has(normalizedEmail));
         const duplicateEmailRow = normalizedEmail ? seenEmails.get(normalizedEmail) : undefined;
 
         let status: StudentImportCandidate['status'] = 'ready';
