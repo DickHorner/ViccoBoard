@@ -94,6 +94,7 @@
                 @pointerenter="prefetchStudentSport(student.id)"
                 @pointerdown="prefetchStudentSport(student.id)"
                 @focus="prefetchStudentSport(student.id)"
+                @click="rememberStudentForNavigation(student)"
               >
                 <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
                 <div class="student-info">
@@ -262,7 +263,7 @@ import { getStudentsBridge, initializeStudentsBridge } from '../composables/useS
 import { buildClassSportSummary, buildSportWorkAreas } from '../utils/class-detail-summary'
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 import type { ClassGroup, Student } from '@viccoboard/core'
-import { loadClassStudents, prefetchStudentSport, scheduleViewPrefetch } from '../services/navigation-prefetch'
+import { loadClassStudents, prefetchStudentSport, rememberStudentForNavigation, scheduleViewPrefetch, takeClassForNavigation } from '../services/navigation-prefetch'
 import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
@@ -313,7 +314,7 @@ const loadData = async () => {
   error.value = ''
 
   try {
-    classGroup.value = await classGroups.findById(classId)
+    classGroup.value = takeClassForNavigation(classId) ?? await classGroups.findById(classId)
     if (!classGroup.value) {
       error.value = 'Klasse nicht gefunden'
       return
