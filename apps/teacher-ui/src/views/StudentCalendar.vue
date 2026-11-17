@@ -45,7 +45,7 @@
           <Textarea id="calendar-notes" v-model="manualNotes" rows="3" autoResize />
         </div>
       </div>
-      <Button label="Eintrag speichern" icon="pi pi-save" :disabled="!canSaveManual" :loading="saving" @click="saveManualEntry" />
+      <VoltButton label="Eintrag speichern" icon="pi pi-save" :disabled="!canSaveManual" :loading="saving" @click="saveManualEntry" />
     </section>
 
     <section class="app-card student-calendar__section">
@@ -121,6 +121,7 @@ import { getSportBridge, initializeSportBridge } from '../composables/useSportBr
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge';
 import { useToast } from '../composables/useToast';
 import { readIservZipFile } from '../utils/iserv-zip';
+import VoltButton from '../volt/Button.vue';
 
 const router = useRouter();
 const toast = useToast();
