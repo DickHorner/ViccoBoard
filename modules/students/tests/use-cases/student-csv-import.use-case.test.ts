@@ -268,6 +268,17 @@ describe('StudentCsvImportUseCase', () => {
     expect(preview.summary.conflicts).toBe(0);
   });
 
+  test('reads a UTF-8 BOM and a Geschlecht (m/w) column in a spreadsheet export', async () => {
+    const { useCase } = createUseCase();
+    const preview = await useCase.preview([{
+      fileName: 'excel-export.csv',
+      content: ['\uFEFFVorname;Nachname;Klasse;Geschlecht (m/w)', 'Maria;Sommer;7a;W'].join('\n')
+    }], 'live', 'BOM import');
+
+    expect(preview.summary).toMatchObject({ imported: 1, errors: 0 });
+    expect(preview.candidates[0].gender).toBe('f');
+  });
+
   test('does not invent addresses unless the option is enabled', async () => {
     const { useCase } = createUseCase();
     const files = [{
