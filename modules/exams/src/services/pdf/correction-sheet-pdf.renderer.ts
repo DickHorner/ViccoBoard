@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, type PDFImage, type PDFPage, type PDFFont } from 'pdf-lib';
+import { PDFDocument, PageSizes, StandardFonts, rgb, type PDFImage, type PDFPage, type PDFFont } from 'pdf-lib';
 import { Exams } from '@viccoboard/core';
 
 const PAGE_MARGIN = 40;
@@ -121,7 +121,7 @@ export class CorrectionSheetPdfRenderer {
     regularFont: PDFFont,
     boldFont: PDFFont
   ): Promise<void> {
-    let page = document.addPage();
+    let page = document.addPage(PageSizes.A4);
     let { width, height } = page.getSize();
     let cursorY = height - PAGE_MARGIN;
     const logoImage = await embedImage(document, projection.schoolLogo);
@@ -132,7 +132,7 @@ export class CorrectionSheetPdfRenderer {
         return;
       }
 
-      page = document.addPage();
+      page = document.addPage(PageSizes.A4);
       ({ width, height } = page.getSize());
       cursorY = height - PAGE_MARGIN;
     };
