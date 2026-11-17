@@ -303,7 +303,12 @@
       <ExamParts />
 
       <section class="section">
-        <CorrectionSheetPresetForm v-model="preset" />
+        <h2>Druckbogen gestalten</h2>
+        <p>Layout, Aufgabenübersicht, Schullogo und Unterschrift werden im eigenen Druckbogeneditor mit PDF-Vorschau bearbeitet.</p>
+        <button v-if="store.examId" type="button" class="btn-secondary" @click="openSheetDesigner">
+          Druckbogeneditor öffnen
+        </button>
+        <p v-else>Speichere zuerst die Prüfung. Anschließend kannst Du den Druckbogen unabhängig gestalten.</p>
       </section>
 
       <section class="section">
@@ -406,10 +411,6 @@
             <span class="label">Format</span>
             <span class="value">{{ selectedAssessmentFormatLabel }}</span>
           </div>
-          <div class="summary-item">
-            <span class="label">Bogenlayout</span>
-            <span class="value">{{ preset.layoutMode === 'compact' ? 'Kompakt' : 'Standard' }}</span>
-          </div>
         </div>
       </section>
     </div>
@@ -424,8 +425,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { Exams, type ClassGroup, type Student } from '@viccoboard/core';
 import {
   KBR_GRADING_PRESETS,
-  GradingKeyService,
-  createDefaultCorrectionSheetPreset
+  GradingKeyService
 } from '@viccoboard/exams';
 import { createUuid as uuidv4 } from '@/utils/uuid';
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge';
@@ -442,7 +442,6 @@ import {
   synchronizeCandidateGroups
 } from '../utils/exam-candidates';
 import { formatGermanDateOfBirth } from '../utils/locale-format';
-import CorrectionSheetPresetForm from '../components/CorrectionSheetPresetForm.vue';
 import TaskEditor from '../components/TaskEditor.vue';
 import ExamParts from '../components/ExamParts.vue';
 
@@ -457,8 +456,6 @@ const sportBridge = getSportBridge();
 const studentsBridge = getStudentsBridge();
 const {
   examRepository,
-  getCorrectionSheetPreset,
-  saveCorrectionSheetPreset,
   updateGradingKey,
   revertGradingKey
 } = useExamsBridge();
@@ -469,7 +466,6 @@ const selectedStudentIds = ref<string[]>([]);
 const candidates = ref<Exams.Candidate[]>([]);
 const gradingPresets = KBR_GRADING_PRESETS;
 const selectedGradingPresetId = ref('');
-const preset = ref<Exams.CorrectionSheetPreset>(createDefaultCorrectionSheetPreset('draft'));
 const examDateValue = ref('');
 const reusableTaskSubjectFilter = ref('');
 const reusableTaskGradeLevelFilter = ref('');
@@ -767,11 +763,6 @@ const saveExam = async () => {
     printPresets.value = savedExam.printPresets;
     selectedGradingPresetId.value = matchPresetByBoundaries(savedExam.gradingKey.gradeBoundaries);
 
-    await saveCorrectionSheetPreset?.({
-      ...preset.value,
-      examId: savedExam.id
-    });
-
     router.push('/exams');
   } catch (error) {
     console.error('Failed to save exam:', error);
@@ -780,6 +771,11 @@ const saveExam = async () => {
 
 const goBack = () => {
   router.push('/exams');
+};
+
+const openSheetDesigner = () => {
+  if (!store.examId) return;
+  router.push(`/exams/${store.examId}/sheet-design`);
 };
 
 const openExportPage = () => {
@@ -826,14 +822,12 @@ onMounted(async () => {
       selectedGradingPresetId.value = matchPresetByBoundaries(loaded.gradingKey.gradeBoundaries);
       examStatus.value = loaded.status;
       printPresets.value = loaded.printPresets;
-      preset.value = await getCorrectionSheetPreset?.(loaded.id) ?? createDefaultCorrectionSheetPreset(loaded.id);
       await loadStudentsForSelectedClass();
       isLoading.value = false;
       return;
     }
   }
 
-  preset.value = createDefaultCorrectionSheetPreset('draft');
   examDateValue.value = '';
   allowsComments.value = false;
   allowsSupportTips.value = false;
