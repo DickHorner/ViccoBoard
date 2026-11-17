@@ -1,0 +1,40 @@
+name: UI migration lockfile refresh (temporary)
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - apps/teacher-ui/package.json
+      - .github/workflows/refresh-ui-lock-temp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.head_ref == 'feat/openvue-openvolt-foundation-20261117' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout migration branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/openvue-openvolt-foundation-20261117
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Refresh npm lockfile only
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Commit reproducible lockfile on this branch only
+        run: |
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "build(ui): synchronize OpenVue and Tailwind npm lockfile"
+            git push origin HEAD:feat/openvue-openvolt-foundation-20261117
+          fi
