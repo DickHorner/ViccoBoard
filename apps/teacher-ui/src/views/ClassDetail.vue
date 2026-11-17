@@ -88,7 +88,14 @@
           
           <div v-else class="student-list">
             <div v-for="student in visibleStudents" :key="student.id" class="student-card">
-              <RouterLink :to="`/students/${student.id}`" class="student-profile-link">
+              <RouterLink
+                :to="`/students/${student.id}`"
+                class="student-profile-link"
+                @pointerenter="prefetchStudentSport(student.id)"
+                @pointerdown="prefetchStudentSport(student.id)"
+                @focus="prefetchStudentSport(student.id)"
+                @click="rememberStudentForNavigation(student)"
+              >
                 <div class="student-avatar">{{ getInitials(student.firstName, student.lastName) }}</div>
                 <div class="student-info">
                   <h4>{{ student.firstName }} {{ student.lastName }}</h4>
@@ -249,13 +256,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, onMounted } from 'vue'
+import { computed, nextTick, ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge, initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import { buildClassSportSummary, buildSportWorkAreas } from '../utils/class-detail-summary'
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 import type { ClassGroup, Student } from '@viccoboard/core'
+import { loadClassStudents, prefetchStudentSport, rememberStudentForNavigation, scheduleViewPrefetch, takeClassForNavigation } from '../services/navigation-prefetch'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
 
@@ -267,6 +276,7 @@ const loading = ref(false)
 const loadingStudents = ref(true)
 const loadingSummary = ref(true)
 const studentsError = ref('')
+let cancelProfilePrefetch: (() => void) | null = null
 const summaryError = ref('')
 const showInactiveStudents = ref(false)
 const updatingRosterId = ref<string | null>(null)
@@ -304,7 +314,7 @@ const loadData = async () => {
   error.value = ''
 
   try {
-    classGroup.value = await classGroups.findById(classId)
+    classGroup.value = takeClassForNavigation(classId) ?? await classGroups.findById(classId)
     if (!classGroup.value) {
       error.value = 'Klasse nicht gefunden'
       return
@@ -328,7 +338,7 @@ const loadStudents = async () => {
   studentsError.value = ''
 
   try {
-    students.value = await studentsBridge.studentRepository.findAllByClassGroup(classId)
+    students.value = await loadClassStudents(classId)
   } catch (err) {
     console.error('Failed to load class students:', err)
     studentsError.value = 'Schüler konnten nicht geladen werden.'
@@ -340,6 +350,9 @@ const loadStudents = async () => {
 
   if (!studentsError.value) {
     await nextTick()
+    recordRouteContentReady('class-detail')
+    cancelProfilePrefetch?.()
+    cancelProfilePrefetch = scheduleViewPrefetch(() => import('./StudentProfile.vue'))
     void loadSportSummary()
   }
 }
@@ -463,7 +476,11 @@ const getInitials = (firstName: string, lastName: string): string => {
 
 // Lifecycle
 onMounted(() => {
-  loadData()
+  void loadData()
+})
+
+onUnmounted(() => {
+  cancelProfilePrefetch?.()
 })
 </script>
 

@@ -61,7 +61,12 @@
       <!-- Sport summary cards -->
       <section class="card">
         <h3>Sport-Zusammenfassung</h3>
-        <div class="summary-grid">
+        <p v-if="loadingSport" role="status">Sportdaten werden geladen…</p>
+        <div v-else-if="sportError" class="error-state">
+          <p>{{ sportError }}</p>
+          <button class="btn-primary" @click="loadSportData">Erneut versuchen</button>
+        </div>
+        <div v-else class="summary-grid">
           <div class="summary-item">
             <span class="summary-label">Unterrichtsstunden</span>
             <span class="summary-value">{{ attendanceSummary.total }}</span>
@@ -98,7 +103,9 @@
       <!-- Attendance history -->
       <section class="card">
         <h3>Anwesenheitsverlauf</h3>
-        <div v-if="attendanceRecords.length === 0" class="empty-state">
+        <p v-if="loadingSport" role="status">Anwesenheitsdaten werden geladen…</p>
+        <p v-else-if="sportError" class="error-state">{{ sportError }}</p>
+        <div v-else-if="attendanceRecords.length === 0" class="empty-state">
           <p>Noch keine Anwesenheitseinträge vorhanden.</p>
         </div>
         <div v-else class="attendance-list">
@@ -119,7 +126,9 @@
       <!-- Performance history -->
       <section class="card">
         <h3>Leistungsverlauf</h3>
-        <div v-if="performanceEntries.length === 0" class="empty-state">
+        <p v-if="loadingSport" role="status">Leistungen werden geladen…</p>
+        <p v-else-if="sportError" class="error-state">{{ sportError }}</p>
+        <div v-else-if="performanceEntries.length === 0" class="empty-state">
           <p>Noch keine Leistungseinträge vorhanden.</p>
         </div>
         <div v-else class="performance-list">
@@ -141,6 +150,12 @@
 
       <section class="card kbr-overview">
         <h3>KBR: Schuljahresüberblick {{ schoolYear }}</h3>
+        <p v-if="loadingKbr" role="status">KBR-Daten werden geladen…</p>
+        <div v-else-if="kbrError" class="error-state">
+          <p>{{ kbrError }}</p>
+          <button class="btn-primary" @click="loadKbrData">Erneut versuchen</button>
+        </div>
+        <template v-else>
         <div class="note-editor">
           <label>Interne Notizen / Förderschwerpunkte</label>
           <textarea v-model="internalNotes" rows="4" placeholder="Entwicklung, Stärken und Förderschwerpunkte …"></textarea>
@@ -150,6 +165,7 @@
         <p v-if="competencySummary.length" class="record-notes">Kompetenzentwicklung: {{ competencySummary.join(' · ') }}</p>
         <div v-if="kbrRows.length === 0" class="empty-state"><p>Keine KBR-Prüfungen für diesen Prüfling im gewählten Schuljahr.</p></div>
         <div v-else class="kbr-list"><article v-for="row in kbrRows" :key="row.exam.id" class="kbr-row"><strong>{{ row.exam.title }}</strong><span>{{ formatDateDe(row.exam.date ?? row.exam.createdAt) }} · {{ row.correction.totalPoints }} Pkt. · Note {{ row.correction.totalGrade }}</span><p v-if="row.comments.length">{{ row.comments.join(' · ') }}</p><p v-if="row.tips.length">Fördertipps: {{ row.tips.join(', ') }}</p></article></div>
+        </template>
       </section>
 
     </div>
@@ -163,7 +179,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
@@ -183,6 +199,8 @@ import { useExamsBridge } from '../composables/useExamsBridge'
 import { LongTermNoteManagementService } from '@viccoboard/exams'
 import type { StudentLongTermNote } from '@viccoboard/exams'
 import { readFileAsDataUrl, validateStudentPhotoFile } from '../utils/student-photo'
+import { loadStudentSport, takeStudentForNavigation } from '../services/navigation-prefetch'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
 const studentId = route.params.id as string
@@ -201,6 +219,12 @@ const performanceEntries = ref<Sport.PerformanceEntry[]>([])
 const categories = ref<Sport.GradeCategory[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+const loadingSport = ref(true)
+const sportError = ref<string | null>(null)
+const loadingKbr = ref(true)
+const kbrError = ref<string | null>(null)
+let kbrFrame = 0
+let kbrTimer = 0
 const internalNotes = ref('')
 const noteStatus = ref('')
 const kbrRows = ref<Array<{ exam: any; correction: any; comments: string[]; tips: string[] }>>([])
@@ -245,25 +269,42 @@ onMounted(loadData)
 async function loadData() {
   loading.value = true
   error.value = null
+
   try {
-    student.value = await studentsBridge.studentRepository.findById(studentId) ?? null
-    if (!student.value) {
-      loading.value = false
-      return
-    }
+    student.value = takeStudentForNavigation(studentId) ?? await studentsBridge.studentRepository.findById(studentId) ?? null
+  } catch (err) {
+    console.error('Failed to load student profile:', err)
+    error.value = 'Fehler beim Laden des Schülerprofils.'
+  } finally {
+    loading.value = false
+  }
 
-    // Load class name
-    const classGroup = await sportBridge.classGroupRepository.findById(student.value.classGroupId)
+  if (!student.value) return
+
+  recordRouteContentReady('student-profile')
+  void loadClassName()
+  void loadSportData().then(() => {
+    kbrFrame = window.requestAnimationFrame(() => {
+      kbrTimer = window.setTimeout(() => { void loadKbrData() }, 0)
+    })
+  })
+}
+
+async function loadClassName() {
+  try {
+    const classGroup = await sportBridge.classGroupRepository.findById(student.value!.classGroupId)
     className.value = classGroup?.name ?? null
+  } catch (err) {
+    console.error('Failed to load student class name:', err)
+  }
+}
 
-    // Load attendance and performance data in parallel
-    const [attendance, performances, cats] = await Promise.all([
-      sportBridge.attendanceRepository.findByStudent(studentId),
-      sportBridge.performanceEntryRepository.findByStudent(studentId),
-      sportBridge.gradeCategoryRepository.findAll()
-    ])
+async function loadSportData() {
+  loadingSport.value = true
+  sportError.value = null
 
-    // Sort attendance records newest-first
+  try {
+    const { attendance, performances, categories: cats } = await loadStudentSport(studentId)
     attendanceRecords.value = [...attendance].sort(
       (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
     )
@@ -271,6 +312,19 @@ async function loadData() {
       (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
     )
     categories.value = cats
+  } catch (err) {
+    console.error('Failed to load student sport data:', err)
+    sportError.value = 'Sportdaten konnten nicht geladen werden.'
+  } finally {
+    loadingSport.value = false
+  }
+}
+
+async function loadKbrData() {
+  loadingKbr.value = true
+  kbrError.value = null
+
+  try {
     const [note, exams, tips] = await Promise.all([
       studentLongTermNoteRepository?.findByStudentAndYear(studentId, schoolYear.value) ?? null,
       examRepository?.findAll() ?? [],
@@ -290,12 +344,17 @@ async function loadData() {
     }))
     kbrRows.value = rows.filter(Boolean) as typeof kbrRows.value
   } catch (err) {
-    console.error('Failed to load student profile:', err)
-    error.value = 'Fehler beim Laden des Schülerprofils.'
+    console.error('Failed to load student KBR data:', err)
+    kbrError.value = 'KBR-Daten konnten nicht geladen werden.'
   } finally {
-    loading.value = false
+    loadingKbr.value = false
   }
 }
+
+onUnmounted(() => {
+  window.cancelAnimationFrame(kbrFrame)
+  window.clearTimeout(kbrTimer)
+})
 
 async function saveLongTermNote() {
   if (!student.value || !studentLongTermNoteRepository) return

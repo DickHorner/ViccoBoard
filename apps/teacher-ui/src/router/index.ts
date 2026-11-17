@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import type { RouteLocationNormalizedLoaded, RouteRecordRaw } from 'vue-router'
+import { recordRoutePaint, startRouteTiming } from '../utils/navigation-performance'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -377,10 +378,18 @@ const router = createRouter({
       return savedPosition
     }
     if (to.hash) {
-      return { el: to.hash, behavior: 'smooth' }
+      return { el: to.hash }
     }
-    return { top: 0, behavior: 'smooth' }
+    return { top: 0 }
   }
+})
+
+router.beforeEach(to => {
+  startRouteTiming(String(to.name ?? 'unknown'))
+})
+
+router.afterEach((to, _from, failure) => {
+  if (!failure) recordRoutePaint(String(to.name ?? 'unknown'))
 })
 
 const originalBack = router.back.bind(router)

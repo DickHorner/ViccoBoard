@@ -88,9 +88,7 @@
 
       <main id="main-content" class="app-content">
         <RouterView v-slot="{ Component }">
-          <Transition name="view-fade" mode="out-in">
-            <component :is="Component" :key="route.fullPath" />
-          </Transition>
+          <component :is="Component" :key="route.fullPath" />
         </RouterView>
       </main>
     </div>
