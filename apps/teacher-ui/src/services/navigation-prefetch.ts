@@ -1,4 +1,4 @@
-import type { AttendanceRecord, Student, Sport } from '@viccoboard/core'
+import type { AttendanceRecord, ClassGroup, Student, Sport } from '@viccoboard/core'
 import { getStudentsBridge } from '../composables/useStudentsBridge'
 import { getSportBridge } from '../composables/useSportBridge'
 
@@ -18,6 +18,43 @@ type StudentSportData = {
 
 let pendingRoster: Pending<Student[]> | null = null
 let pendingSport: Pending<StudentSportData> | null = null
+
+type Selection<T> = { id: string; createdAt: number; value: T }
+
+let selectedClass: Selection<ClassGroup> | null = null
+let selectedStudent: Selection<Student> | null = null
+
+export function rememberClassForNavigation(classGroup: ClassGroup): void {
+  const selection = { id: classGroup.id, createdAt: Date.now(), value: classGroup }
+  selectedClass = selection
+  window.setTimeout(() => {
+    if (selectedClass === selection) selectedClass = null
+  }, PREFETCH_AGE_MS)
+}
+
+export function takeClassForNavigation(classId: string): ClassGroup | null {
+  const selected = selectedClass
+  selectedClass = null
+  return selected?.id === classId && Date.now() - selected.createdAt < PREFETCH_AGE_MS
+    ? selected.value
+    : null
+}
+
+export function rememberStudentForNavigation(student: Student): void {
+  const selection = { id: student.id, createdAt: Date.now(), value: student }
+  selectedStudent = selection
+  window.setTimeout(() => {
+    if (selectedStudent === selection) selectedStudent = null
+  }, PREFETCH_AGE_MS)
+}
+
+export function takeStudentForNavigation(studentId: string): Student | null {
+  const selected = selectedStudent
+  selectedStudent = null
+  return selected?.id === studentId && Date.now() - selected.createdAt < PREFETCH_AGE_MS
+    ? selected.value
+    : null
+}
 
 export function prefetchClassStudents(classId: string): void {
   if (pendingRoster?.id === classId && Date.now() - pendingRoster.createdAt < PREFETCH_AGE_MS) {
