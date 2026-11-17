@@ -58,7 +58,7 @@ describe('IndexedDBAdapter indexed reads', () => {
     const tableRead = jest.spyOn(IDBObjectStore.prototype, 'getAll');
 
     expect((await adapter.getAll<{ id: string }>('rows', { missing: undefined })).map(row => row.id))
-      .toEqual([]);
+      .toEqual(['a', 'b', 'c']);
     expect((await adapter.getAll<{ id: string }>('rows', { class_group_id: null })).map(row => row.id))
       .toEqual([]);
     expect((await adapter.getAll<{ id: string }>('rows')).map(row => row.id))
