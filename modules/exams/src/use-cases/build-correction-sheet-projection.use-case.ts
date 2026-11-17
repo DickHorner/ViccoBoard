@@ -46,6 +46,36 @@ export class BuildCorrectionSheetProjectionUseCase {
     private readonly supportTipRepository?: SupportTipRepository
   ) {}
 
+  buildDesignPreview(
+    exam: Exams.Exam,
+    preset: Exams.CorrectionSheetPreset
+  ): Exams.CorrectionSheetProjection {
+    return {
+      ...preset,
+      isDesignPreview: true,
+      examId: exam.id,
+      examTitle: exam.title,
+      examDate: exam.date ?? exam.createdAt,
+      candidateId: '',
+      candidateName: '',
+      maxPoints: exam.gradingKey.totalPoints || exam.structure.totalPoints,
+      totalPoints: 0,
+      taskRows: getCorrectionRelevantTaskNodes(exam.structure.tasks).map(task => ({
+        taskId: task.id,
+        label: task.title,
+        maxPoints: task.points,
+        awardedPoints: 0,
+        partLabel: preset.showExamParts ? resolvePartLabel(exam, task.id) : undefined,
+        criteria: task.criteria.map(criterion => ({
+          criterionId: criterion.id,
+          text: criterion.text,
+          maxPoints: criterion.points,
+          formatting: criterion.formatting
+        }))
+      }))
+    };
+  }
+
   async execute(
     examId: string,
     candidateId: string,
