@@ -203,11 +203,11 @@ export class CorrectionSheetPdfRenderer {
       const summaryParts: string[] = [];
 
       if (projection.showOverallPoints) {
-        summaryParts.push(`Gesamtpunkte: ${projection.totalPoints} / ${projection.maxPoints}`);
+        summaryParts.push(`Gesamtpunkte: ${projection.isDesignPreview ? '--' : projection.totalPoints} / ${projection.maxPoints}`);
       }
 
-      if (projection.showGrade && projection.grade !== undefined) {
-        summaryParts.push(`Note: ${projection.grade}`);
+      if (projection.showGrade && (projection.grade !== undefined || projection.isDesignPreview)) {
+        summaryParts.push(`Note: ${projection.isDesignPreview ? '--' : projection.grade}`);
       }
 
       drawTextLine(summaryParts.join('    '), { size: NORMAL_FONT_SIZE, font: boldFont });
@@ -233,9 +233,11 @@ export class CorrectionSheetPdfRenderer {
       drawTextLine(`${labelPrefix}${row.label}`, { font: boldFont });
 
       if (projection.showTaskPoints && projection.layoutMode !== 'minimal') {
-        const percentage = row.maxPoints > 0 ? ` (${((row.awardedPoints / row.maxPoints) * 100).toFixed(0)} %)` : '';
+        const percentage = projection.isDesignPreview
+          ? ' (-- %)'
+          : row.maxPoints > 0 ? ` (${((row.awardedPoints / row.maxPoints) * 100).toFixed(0)} %)` : '';
         drawTextLine(
-          `${row.awardedPoints} / ${row.maxPoints} Punkte${projection.showTaskPercentages ? percentage : ''}`,
+          `${projection.isDesignPreview ? '--' : row.awardedPoints} / ${row.maxPoints} Punkte${projection.showTaskPercentages ? percentage : ''}`,
           { size: SMALL_FONT_SIZE, color: { r: 0.27, g: 0.32, b: 0.39 } }
         );
       }
