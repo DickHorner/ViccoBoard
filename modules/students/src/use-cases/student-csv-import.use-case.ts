@@ -621,7 +621,8 @@ export class StudentCsvImportUseCase {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/['’]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+      .replace(/^-/, '')
+      .replace(/-$/, '');
 
     const first = normalizeNamePart(firstName);
     const last = normalizeNamePart(lastName);
