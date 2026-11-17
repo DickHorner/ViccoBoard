@@ -1,4 +1,4 @@
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import type { AttendanceRecord, ClassGroup, Lesson, Subject } from '@viccoboard/core';
@@ -21,6 +21,8 @@ export function useDashboardView() {
   const lessons = ref<Lesson[]>([]);
   const loading = ref(true);
   const loadError = ref('');
+  const loadingWorkspace = ref(true);
+  const workspaceError = ref('');
   const searchQuery = ref('');
   const filterSchoolYear = ref('');
   const showArchived = ref(false);
@@ -111,11 +113,30 @@ export function useDashboardView() {
 
   const loadData = async () => {
     loading.value = true;
+    loadingWorkspace.value = true;
     loadError.value = '';
-    try {
-      const loadedClasses = await classGroups.findAll();
-      classes.value = loadedClasses;
+    workspaceError.value = '';
 
+    let loadedClasses: ClassGroup[] = [];
+    try {
+      loadedClasses = await classGroups.findAll();
+      classes.value = loadedClasses;
+    } catch (err) {
+      console.error('Failed to load class overview:', err);
+      loadError.value = 'Fehler beim Laden der Klassen. Bitte aktualisieren Sie die Seite.';
+    } finally {
+      loading.value = false;
+    }
+
+    if (loadError.value) {
+      loadingWorkspace.value = false;
+      workspaceError.value = 'Unterrichtsdaten konnten nicht geladen werden.';
+      return;
+    }
+
+    await nextTick();
+
+    try {
       const [attendanceRecords, loadedSubjects, lessonCollections] = await Promise.all([
         attendance.findAll({
           orderBy: 'timestamp',
@@ -137,10 +158,10 @@ export function useDashboardView() {
         return lessonDate >= startOfToday && lessonDate < startOfTomorrow;
       });
     } catch (err) {
-      console.error('Failed to load data:', err);
-      loadError.value = 'Fehler beim Laden der Übersichtsdaten. Bitte aktualisieren Sie die Seite.';
+      console.error('Failed to load dashboard workspace:', err);
+      workspaceError.value = 'Unterrichtsdaten konnten nicht geladen werden.';
     } finally {
-      loading.value = false;
+      loadingWorkspace.value = false;
     }
   };
 
@@ -334,6 +355,8 @@ export function useDashboardView() {
     lessons,
     loading,
     loadError,
+    loadingWorkspace,
+    workspaceError,
     searchQuery,
     filterSchoolYear,
     showArchived,
