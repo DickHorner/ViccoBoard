@@ -191,12 +191,14 @@
           <Column field="lastName" :header="t('SCHUELER.nachname')" sortable>
             <template #body="{ data }">
               <div class="student-list-page__identity">
-                <span class="student-list-page__avatar" aria-hidden="true">
+                <span class="student-list-page__avatar" :title="data.id" aria-hidden="true">
                   {{ data.firstName?.charAt(0) }}{{ data.lastName?.charAt(0) }}
                 </span>
                 <span class="student-list-page__name-cell">
                   <strong class="student-list-page__name">{{ data.lastName }}</strong>
-                  <small :title="data.id">Schülerprofil</small>
+                  <small v-if="data.original.contactInfo?.email" :title="data.original.contactInfo.email">
+                    {{ data.original.contactInfo.email }}
+                  </small>
                 </span>
               </div>
             </template>
