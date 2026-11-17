@@ -129,18 +129,22 @@ export class IndexedDBAdapter implements StorageAdapter {
 
   async getAll<T = any>(tableName: string, criteria?: Record<string, any>): Promise<T[]> {
     const { store } = this.getStore(tableName, 'readonly');
-    const results = await this.requestToPromise(store.getAll());
+    const filters = Object.entries(criteria ?? {});
+    const indexedFilter = filters.find(([field, value]) =>
+      store.indexNames.contains(field) &&
+      (typeof value === 'string' || (typeof value === 'number' && Number.isFinite(value)))
+    );
+    const results = await this.requestToPromise(
+      indexedFilter
+        ? store.index(indexedFilter[0]).getAll(indexedFilter[1])
+        : store.getAll()
+    );
 
-    let filtered = results as T[];
-    if (criteria && Object.keys(criteria).length > 0) {
-      filtered = filtered.filter(item => {
-        return Object.keys(criteria).every(key => {
-          return (item as any)[key] === criteria[key];
-        });
-      });
-    }
-
-    return filtered;
+    return filters.length === 0
+      ? results as T[]
+      : (results as T[]).filter(item =>
+          filters.every(([key, value]) => (item as Record<string, any>)[key] === value)
+        );
   }
 
   async getById<T = any>(tableName: string, id: string): Promise<T | null> {
@@ -185,13 +189,22 @@ export class IndexedDBAdapter implements StorageAdapter {
   }
 
   async count(tableName: string, criteria?: Record<string, any>): Promise<number> {
-    if (!criteria || Object.keys(criteria).length === 0) {
-      const { store } = this.getStore(tableName, 'readonly');
-      return await this.requestToPromise(store.count());
+    const filters = Object.entries(criteria ?? {});
+    const { store } = this.getStore(tableName, 'readonly');
+
+    if (filters.length === 0) {
+      return this.requestToPromise(store.count());
     }
 
-    const results = await this.getAll(tableName, criteria);
-    return results.length;
+    if (filters.length === 1) {
+      const [field, value] = filters[0];
+      if (store.indexNames.contains(field) &&
+        (typeof value === 'string' || (typeof value === 'number' && Number.isFinite(value)))) {
+        return this.requestToPromise(store.index(field).count(value));
+      }
+    }
+
+    return (await this.getAll(tableName, criteria)).length;
   }
 
   private getStore(tableName: string, mode: IDBTransactionMode): {
