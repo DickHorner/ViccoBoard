@@ -15,6 +15,22 @@ export class ExportCorrectionSheetsPdfUseCase {
     private readonly renderer: CorrectionSheetPdfRenderer = new CorrectionSheetPdfRenderer()
   ) {}
 
+  async previewDesignPdf(
+    examId: string,
+    preset: Exams.CorrectionSheetPreset
+  ): Promise<Exams.CorrectionSheetPdfDocument> {
+    const exam = await this.examRepository.findById(examId);
+    if (!exam) {
+      throw new Error(`Exam ${examId} not found`);
+    }
+    if (preset.examId !== examId) {
+      throw new Error('Druckbogenvorlage gehört zu einer anderen Prüfung.');
+    }
+
+    const projection = this.buildCorrectionSheetProjectionUseCase.buildDesignPreview(exam, preset);
+    return this.renderer.render([projection], `${exam.title}-druckbogen-vorschau`);
+  }
+
   async exportCurrentCandidatePdf(
     examId: string,
     candidateId: string

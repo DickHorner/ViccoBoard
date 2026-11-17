@@ -26,7 +26,7 @@
     </div>
 
     <div v-else class="exam-sections">
-      <section v-if="!workflow" class="exam-section" aria-labelledby="exam-templates-heading">
+      <section v-if="!workflow || workflow.destination === 'sheet-design'" class="exam-section" aria-labelledby="exam-templates-heading">
         <h2 id="exam-templates-heading">Vorlagen</h2>
         <div v-if="templateExams.length === 0" class="state-card compact">
           Noch keine Vorlagen.
@@ -45,9 +45,12 @@
               <span class="meta-date">Aktualisiert {{ formatDate(exam.lastModified) }}</span>
             </div>
             <div class="exam-actions">
-              <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
-              <button class="ghost" type="button" @click="copyExam(exam)">Aus Vorlage erstellen</button>
-              <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+              <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
+              <template v-else>
+                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                <button class="ghost" type="button" @click="copyExam(exam)">Aus Vorlage erstellen</button>
+                <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+              </template>
             </div>
           </article>
         </div>
@@ -140,6 +143,13 @@ const workflow = computed(() => {
         description: 'Wähle die Prüfung, die Du korrigieren möchtest.',
         action: 'Korrektur öffnen',
         destination: 'correct'
+      }
+    case 'design':
+      return {
+        title: 'Druckbogeneditor',
+        description: 'Wähle eine Prüfung oder Vorlage, deren Druckbogen Du gestalten möchtest.',
+        action: 'Druckbogen gestalten',
+        destination: 'sheet-design'
       }
     case 'sheets':
       return {
