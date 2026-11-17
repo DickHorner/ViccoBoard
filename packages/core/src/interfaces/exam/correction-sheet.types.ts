@@ -61,6 +61,7 @@ export interface ProjectionSupportTipRow {
 }
 
 export interface CorrectionSheetProjection {
+  isDesignPreview?: boolean;
   examId: string;
   examTitle: string;
   examDate?: Date;

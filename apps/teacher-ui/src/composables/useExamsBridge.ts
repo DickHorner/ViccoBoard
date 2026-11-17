@@ -38,6 +38,7 @@ import {
   type UpdateGradingKeyResult
 } from '@viccoboard/exams';
 import { getStorageAdapter } from '../services/storage.service';
+import type { Exams } from '@viccoboard/core';
 
 /**
  * Singleton exams bridge instance
@@ -83,6 +84,7 @@ interface ExamsBridge {
   getCorrectionSheetPreset(examId: string): Promise<any>;
   saveCorrectionSheetPreset(input: any): Promise<any>;
   buildCorrectionSheetPreview(examId: string, candidateId: string): Promise<any>;
+  previewCorrectionSheetDesignPdf(examId: string, preset: Exams.CorrectionSheetPreset): Promise<Exams.CorrectionSheetPdfDocument>;
   finalizeAllCorrections(examId: string): Promise<any>;
   exportCurrentCorrectionSheetPdf(examId: string, candidateId: string): Promise<any>;
   exportAllCorrectionSheetsPdf(examId: string): Promise<any>;
@@ -132,6 +134,7 @@ interface UseExamsBridgeResult {
   getCorrectionSheetPreset(examId: string): Promise<any> | undefined;
   saveCorrectionSheetPreset(input: any): Promise<any> | undefined;
   buildCorrectionSheetPreview(examId: string, candidateId: string): Promise<any> | undefined;
+  previewCorrectionSheetDesignPdf(examId: string, preset: Exams.CorrectionSheetPreset): Promise<Exams.CorrectionSheetPdfDocument> | undefined;
   finalizeAllCorrections(examId: string): Promise<any> | undefined;
   exportCurrentCorrectionSheetPdf(examId: string, candidateId: string): Promise<any> | undefined;
   exportAllCorrectionSheetsPdf(examId: string): Promise<any> | undefined;
@@ -239,6 +242,8 @@ export function initializeExamsBridge(): ExamsBridge {
       saveCorrectionSheetPresetUseCase.execute(input),
     buildCorrectionSheetPreview: (examId, candidateId) =>
       buildCorrectionSheetProjectionUseCase.execute(examId, candidateId, { allowIncomplete: true }),
+    previewCorrectionSheetDesignPdf: (examId, preset) =>
+      exportCorrectionSheetsPdfUseCase.previewDesignPdf(examId, preset),
     finalizeAllCorrections: (examId) =>
       finalizeAllCorrectionsUseCase.execute(examId),
     exportCurrentCorrectionSheetPdf: (examId, candidateId) =>
@@ -332,6 +337,8 @@ export function useExamsBridge(): UseExamsBridgeResult {
       bridge.value?.saveCorrectionSheetPreset(input),
     buildCorrectionSheetPreview: (examId: string, candidateId: string) =>
       bridge.value?.buildCorrectionSheetPreview(examId, candidateId),
+    previewCorrectionSheetDesignPdf: (examId: string, preset: Exams.CorrectionSheetPreset) =>
+      bridge.value?.previewCorrectionSheetDesignPdf(examId, preset),
     finalizeAllCorrections: (examId: string) =>
       bridge.value?.finalizeAllCorrections(examId),
     exportCurrentCorrectionSheetPdf: (examId: string, candidateId: string) =>

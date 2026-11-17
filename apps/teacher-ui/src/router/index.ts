@@ -138,6 +138,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'KBR Analyse', parent: '/exams' }
   },
   {
+    path: '/exams/:id/sheet-design',
+    name: 'exam-sheet-design',
+    component: () => import('../views/KBRSheetDesigner.vue'),
+    meta: { title: 'Druckbogeneditor', parent: '/exams' }
+  },
+  {
     path: '/exams/:id/export',
     name: 'exam-export',
     component: () => import('../views/KBRExportPage.vue'),

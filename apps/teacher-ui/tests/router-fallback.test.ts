@@ -13,6 +13,15 @@ describe('router fallback navigation', () => {
     expect(resolveBackFallbackPath(route)).toBe('/subjects/sport')
   })
 
+  it('resolves the independent KBR sheet designer without changing exam edit or export routes', () => {
+    expect(router.resolve('/exams?workflow=design').name).toBe('exams')
+    const designer = router.resolve('/exams/exam-1/sheet-design')
+    expect(designer.name).toBe('exam-sheet-design')
+    expect(resolveBackFallbackPath(designer)).toBe('/exams')
+    expect(router.resolve('/exams/exam-1').name).toBe('exam-edit')
+    expect(router.resolve('/exams/exam-1/export').name).toBe('exam-export')
+  })
+
   it('resolves KBR workflow entry and its existing destinations', () => {
     for (const workflow of ['correct', 'sheets', 'analysis']) {
       expect(router.resolve(`/exams?workflow=${workflow}`).name).toBe('exams')

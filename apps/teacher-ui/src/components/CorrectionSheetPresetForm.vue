@@ -174,7 +174,17 @@ async function uploadImage(
     return;
   }
 
-  updateField(key, await readImageFile(file));
+  const image = await readImageFile(file);
+  if (key === 'teacherSignature') {
+    emit('update:modelValue', {
+      ...props.modelValue,
+      teacherSignature: image,
+      showSignatureArea: true,
+      updatedAt: new Date()
+    });
+  } else {
+    updateField(key, image);
+  }
   input.value = '';
 }
 
@@ -187,7 +197,16 @@ function startDrawing(event: PointerEvent): void { const canvas = signatureCanva
 function draw(event: PointerEvent): void { if (!drawing || !signatureCanvas.value) return; const ctx = signatureCanvas.value.getContext('2d')!; const p = point(event); ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111'; ctx.lineTo(p.x, p.y); ctx.stroke(); }
 function stopDrawing(): void { drawing = false; }
 function clearDrawing(): void { const canvas = signatureCanvas.value; if (canvas) canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height); }
-function saveDrawing(): void { const canvas = signatureCanvas.value; if (canvas) updateField('teacherSignature', { src: canvas.toDataURL('image/png'), fileName: 'unterschrift-zeichnung.png' }); }
+function saveDrawing(): void {
+  const canvas = signatureCanvas.value;
+  if (!canvas) return;
+  emit('update:modelValue', {
+    ...props.modelValue,
+    teacherSignature: { src: canvas.toDataURL('image/png'), fileName: 'unterschrift-zeichnung.png' },
+    showSignatureArea: true,
+    updatedAt: new Date()
+  });
+}
 </script>
 
 <style scoped>
