@@ -5,11 +5,11 @@
         <h1>KBR</h1>
         <p class="subtitle">Was möchtest Du tun? Wähle Deinen Arbeitsschritt – Prüfung erstellen, korrigieren, Rückmeldebogen oder Analyse.</p>
       </div>
-      <span class="summary-pill">{{ examCount }} Prüfungen</span>
+      <Tag :value="loading ? '… Prüfungen' : `${examCount} Prüfungen`" severity="info" />
     </header>
 
     <div class="hub-grid">
-      <RouterLink v-for="entry in entries" :key="entry.to" class="hub-card" :to="entry.to">
+      <RouterLink v-for="entry in entries" :key="entry.to" class="hub-card app-card" :to="entry.to">
         <p class="eyebrow">{{ entry.eyebrow }}</p>
         <h2>{{ entry.title }}</h2>
         <p>{{ entry.description }}</p>
@@ -17,27 +17,33 @@
     </div>
 
     <section class="metrics-grid">
-      <article class="metric-card">
+      <article class="metric-card app-card">
         <strong>{{ examCount }}</strong>
         <span>Prüfungen</span>
       </article>
-      <article class="metric-card">
-        <strong>{{ supportTipCount }}</strong>
+      <article class="metric-card app-card">
+        <strong>{{ countsLoading ? '…' : supportTipCount }}</strong>
         <span>Fördertipps</span>
       </article>
-      <article class="metric-card">
-        <strong>{{ longTermNoteCount }}</strong>
+      <article class="metric-card app-card">
+        <strong>{{ countsLoading ? '…' : longTermNoteCount }}</strong>
         <span>Langzeitnotizen</span>
       </article>
     </section>
 
-    <section class="recent-panel">
+    <Message v-if="countsError" severity="warn" role="status">{{ countsError }}</Message>
+
+    <section class="recent-panel app-card">
       <div class="panel-header">
         <h2>Zuletzt bearbeitet</h2>
       </div>
 
-      <div v-if="loading" class="state-card">Prüfungen werden geladen...</div>
-      <div v-else-if="recentExams.length === 0" class="state-card">Noch keine Prüfungen vorhanden.</div>
+      <div v-if="loading" class="state-card app-card" role="status">Prüfungen werden geladen...</div>
+      <div v-else-if="loadError" class="state-card app-card">
+        <Message severity="error" role="alert">{{ loadError }}</Message>
+        <Button label="Erneut versuchen" @click="loadData" />
+      </div>
+      <div v-else-if="recentExams.length === 0" class="state-card app-card">Noch keine Prüfungen vorhanden.</div>
 
       <div v-else class="exam-list">
         <article v-for="exam in recentExams" :key="exam.id" class="exam-row">
@@ -60,6 +66,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import Button from 'openvue/button'
+import Message from 'openvue/message'
+import Tag from 'openvue/tag'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { formatGermanDate } from '../utils/locale-format'
@@ -69,6 +78,9 @@ const { examRepository } = useExamsBridge()
 const { supportTipRepository, studentLongTermNoteRepository } = useExamsBridge()
 
 const loading = ref(true)
+const loadError = ref('')
+const countsError = ref('')
+const countsLoading = ref(true)
 const exams = ref<ExamsTypes.Exam[]>([])
 const supportTipCount = ref(0)
 const longTermNoteCount = ref(0)
@@ -127,23 +139,40 @@ const entries = [
 
 const loadData = async () => {
   loading.value = true
-  const [loadedExams, supportTips, longTermNotes] = await Promise.all([
-    examRepository?.findAll() ?? [],
-    supportTipRepository?.findAll() ?? [],
-    studentLongTermNoteRepository?.findAll() ?? []
-  ])
+  loadError.value = ''
+  try {
+    exams.value = await (examRepository?.findAll() ?? Promise.resolve([]))
+  } catch (error) {
+    console.error('Failed to load KBR exams:', error)
+    loadError.value = 'Prüfungen konnten nicht geladen werden.'
+  } finally {
+    loading.value = false
+  }
+}
 
-  exams.value = loadedExams
-  supportTipCount.value = supportTips.length
-  longTermNoteCount.value = longTermNotes.length
-  loading.value = false
+const loadCounts = async () => {
+  countsLoading.value = true
+  try {
+    const [supportTips, longTermNotes] = await Promise.all([
+      supportTipRepository?.findAll() ?? Promise.resolve([]),
+      studentLongTermNoteRepository?.findAll() ?? Promise.resolve([])
+    ])
+    supportTipCount.value = supportTips.length
+    longTermNoteCount.value = longTermNotes.length
+  } catch (error) {
+    console.error('Failed to load KBR metrics:', error)
+    countsError.value = 'Einige Kennzahlen konnten nicht geladen werden.'
+  } finally {
+    countsLoading.value = false
+  }
 }
 
 const formatDate = (date: Date): string =>
   formatGermanDate(date)
 
 onMounted(() => {
-  loadData()
+  void loadData()
+  void loadCounts()
 })
 </script>
 
@@ -176,27 +205,13 @@ onMounted(() => {
   color: #64748b;
 }
 
-.summary-pill {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 1rem;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.08);
-  color: #0f172a;
-  font-weight: 700;
-}
-
 .metrics-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
 }
 
 .metric-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
@@ -214,21 +229,19 @@ onMounted(() => {
 .hub-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
-.hub-card,
-.recent-panel,
-.state-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
 }
 
 .hub-card {
   padding: 1.25rem;
   text-decoration: none;
-  color: #0f172a;
+  color: var(--color-ink);
+}
+
+.hub-card:focus-visible,
+.ghost-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 .eyebrow {
@@ -243,6 +256,11 @@ onMounted(() => {
 .recent-panel,
 .state-card {
   padding: 1.25rem;
+}
+
+.state-card :deep(.p-button) {
+  min-height: 44px;
+  margin-top: 0.75rem;
 }
 
 .exam-list {
