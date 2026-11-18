@@ -85,21 +85,14 @@
       <section class="card classes-card">
         <div class="card-header">
           <h3>{{ t('KLASSEN.title') }}</h3>
-          <button class="btn-primary btn-small" @click="showCreateModal = true">
-            + {{ t('KLASSEN.hinzu') }}
-          </button>
+          <Button icon="pi pi-plus" :label="t('KLASSEN.hinzu')" @click="showCreateModal = true" />
         </div>
         
         <!-- Search/Filter -->
         <div class="search-bar" v-if="classes.length > 0">
           <div class="search-controls">
-            <input v-model="searchQuery" type="text" :placeholder="t('SEARCH.placeholder')" class="search-input" />
-            <select v-model="filterSchoolYear" class="filter-select">
-              <option value="">{{ t('KLASSEN.schuljahr') }}: {{ t('COMMON.alle') || 'Alle' }}</option>
-              <option v-for="year in schoolYears" :key="year" :value="year">
-                {{ year }}
-              </option>
-            </select>
+            <InputText v-model="searchQuery" :placeholder="t('SEARCH.placeholder')" :aria-label="t('SEARCH.placeholder')" class="dashboard-search" />
+            <Select v-model="filterSchoolYear" :options="schoolYearOptions" optionLabel="label" optionValue="value" aria-label="Schuljahr filtern" class="dashboard-school-year" />
           </div>
           <label class="archive-toggle">
             <input type="checkbox" v-model="showArchived" />
@@ -117,9 +110,7 @@
           <!-- Error State -->
           <div v-else-if="loadError" class="error-state">
             <p>{{ loadError }}</p>
-            <button class="btn-primary btn-small" @click="loadData">
-              {{ t('COMMON.retry') || 'Erneut versuchen' }}
-            </button>
+            <Button :label="t('COMMON.retry') || 'Erneut versuchen'" @click="loadData" />
           </div>
 
           <!-- Empty State -->
@@ -153,25 +144,25 @@
                 <div class="class-arrow">→</div>
               </RouterLink>
               <div class="class-actions">
-                <button @click.stop="editClass(cls)" class="action-btn" :title="t('CLASSES.edit')" :aria-label="t('CLASSES.edit')">
-                  ✏️
-                </button>
-                <button
+                <Button icon="pi pi-pencil" severity="secondary" text rounded @click.stop="editClass(cls)" :title="t('CLASSES.edit')" :aria-label="t('CLASSES.edit')" />
+                <Button
+                  :icon="cls.archived ? 'pi pi-replay' : 'pi pi-box'"
+                  severity="secondary"
+                  text
+                  rounded
                   @click.stop="toggleArchiveClass(cls)"
-                  class="action-btn"
                   :title="cls.archived ? t('COMMON.unarchive') || 'Wiederherstellen' : t('COMMON.archive') || 'Archivieren'"
                   :aria-label="cls.archived ? t('COMMON.unarchive') || 'Wiederherstellen' : t('COMMON.archive') || 'Archivieren'"
-                >
-                  {{ cls.archived ? '📤' : '📥' }}
-                </button>
-                <button
+                />
+                <Button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  text
+                  rounded
                   @click.stop="confirmDeleteClass(cls)"
-                  class="action-btn action-btn-danger"
                   :title="`Klasse ${cls.name} löschen`"
                   :aria-label="`Klasse ${cls.name} löschen`"
-                >
-                  🗑️
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -230,158 +221,94 @@
       </section>
     </div>
     
-    <!-- Create Class Modal -->
-    <div v-if="showCreateModal" class="modal-overlay" @click="closeModal">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>{{ t('KLASSEN.hinzu') }}</h3>
-          <button class="modal-close" @click="closeModal">✕</button>
+
+    <!-- Create Class Dialog -->
+    <Dialog :visible="showCreateModal" @update:visible="visible => { if (!visible) closeModal() }" modal :header="t('KLASSEN.hinzu')" :style="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }">
+      <form @submit.prevent="handleCreateClass" class="modal-form">
+        <div class="form-group">
+          <label for="className">Klassenname *</label>
+          <InputText id="className" v-model="newClass.name" placeholder="z.B. Klasse 9a Sport" required fluid />
         </div>
-        
-        <form @submit.prevent="handleCreateClass" class="modal-form">
-          <div class="form-group">
-            <label for="className">Klassenname *</label>
-            <input id="className" v-model="newClass.name" type="text" placeholder="z.B. Klasse 9a Sport" required class="form-input" />
-          </div>
-          
-          <div class="form-group">
-            <label for="schoolYear">Schuljahr *</label>
-            <input id="schoolYear" v-model="newClass.schoolYear" type="text" placeholder="z.B. 2025/2026" pattern="\d{4}/\d{4}" required class="form-input" />
-            <small class="form-hint">Format: YYYY/YYYY</small>
-          </div>
-
-          <div class="form-group">
-            <label for="gradeLevel">Klassenstufe</label>
-            <input id="gradeLevel" v-model.number="newClass.gradeLevel" type="number" min="1" max="13" class="form-input" placeholder="z. B. 9" />
-          </div>
-
-          <div class="form-group">
-            <label for="gradingScheme">{{ t('KLASSEN.notenschema') }}</label>
-            <select id="gradingScheme" v-model="newClass.gradingScheme" class="form-input">
-              <option v-for="(label, key) in gradingSchemes" :key="key" :value="key">
-                {{ label }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="classColor">{{ t('KLASSEN.color') || 'Klassenfarbe' }}</label>
-            <select id="classColor" v-model="newClass.color" class="form-input">
-              <option value="">{{ t('COMMON.none') || 'Keine' }}</option>
-              <option v-for="color in classColorOptions" :key="color.value" :value="color.value">
-                {{ color.label }}
-              </option>
-            </select>
-          </div>
-          
-          <div v-if="error" class="error-message">
-            {{ error }}
-          </div>
-          
-          <div class="modal-actions">
-            <button type="button" @click="closeModal" class="btn-secondary">
-              {{ t('COMMON.cancel') || t('CANCEL') }}
-            </button>
-            <button type="submit" :disabled="creating" class="btn-primary">
-              {{ creating ? t('COMMON.loading') : t('KLASSEN.button-hinzufuegen') }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-    
-    <!-- Edit Class Modal -->
-    <div v-if="showEditModal" class="modal-overlay" @click="closeEditModal">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>Klasse bearbeiten</h3>
-          <button class="modal-close" @click="closeEditModal">✕</button>
+        <div class="form-group">
+          <label for="schoolYear">Schuljahr *</label>
+          <InputText id="schoolYear" v-model="newClass.schoolYear" placeholder="z.B. 2025/2026" pattern="\\d{4}/\\d{4}" required fluid />
+          <small class="form-hint">Format: YYYY/YYYY</small>
         </div>
-        
-        <form @submit.prevent="handleUpdateClass" class="modal-form">
-          <div class="form-group">
-            <label for="editClassName">Klassenname *</label>
-            <input id="editClassName" v-model="editClassData.name" type="text" required class="form-input" />
-          </div>
-          
-          <div class="form-group">
-            <label for="editSchoolYear">Schuljahr *</label>
-            <input id="editSchoolYear" v-model="editClassData.schoolYear" type="text" pattern="\d{4}/\d{4}" required class="form-input" />
-            <small class="form-hint">Format: YYYY/YYYY</small>
-          </div>
-
-          <div class="form-group">
-            <label for="editGradeLevel">Klassenstufe</label>
-            <input id="editGradeLevel" v-model.number="editClassData.gradeLevel" type="number" min="1" max="13" class="form-input" placeholder="z. B. 9" />
-          </div>
-
-          <div class="form-group">
-            <label for="editGradingScheme">Notenschema</label>
-            <select id="editGradingScheme" v-model="editClassData.gradingScheme" class="form-input">
-              <option v-for="(label, key) in gradingSchemes" :key="key" :value="key">
-                {{ label }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="editClassColor">Klassenfarbe</label>
-            <select id="editClassColor" v-model="editClassData.color" class="form-input">
-              <option value="">Keine</option>
-              <option v-for="color in classColorOptions" :key="color.value" :value="color.value">
-                {{ color.label }}
-              </option>
-            </select>
-          </div>
-          
-          <div v-if="editError" class="error-message">
-            {{ editError }}
-          </div>
-          
-          <div class="modal-actions">
-            <button type="button" @click="closeEditModal" class="btn-secondary">
-              Abbrechen
-            </button>
-            <button type="submit" :disabled="updating" class="btn-primary">
-              {{ updating ? 'Wird aktualisiert...' : 'Klasse aktualisieren' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-    
-    <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
-      <div class="modal modal-small" @click.stop>
-        <div class="modal-header">
-          <h3>Klasse löschen</h3>
-          <button class="modal-close" @click="closeDeleteModal">✕</button>
+        <div class="form-group">
+          <label for="gradeLevel">Klassenstufe</label>
+          <InputNumber inputId="gradeLevel" :modelValue="newClass.gradeLevel" @update:modelValue="value => newClass.gradeLevel = value ?? undefined" :min="1" :max="13" :useGrouping="false" placeholder="z. B. 9" fluid />
         </div>
-        
-        <div class="modal-content">
-          <p>Möchten Sie <strong>{{ classToDelete?.name }}</strong> wirklich löschen?</p>
-          <p class="warning-text">Diese Aktion kann nicht rückgängig gemacht werden.</p>
-          
-          <div v-if="deleteError" class="error-message">
-            {{ deleteError }}
-          </div>
-          
-          <div class="modal-actions">
-            <button type="button" @click="closeDeleteModal" class="btn-secondary">
-              Abbrechen
-            </button>
-            <button @click="handleDeleteClass" :disabled="deleting" class="btn-danger">
-              {{ deleting ? 'Wird gelöscht...' : 'Klasse löschen' }}
-            </button>
-          </div>
+        <div class="form-group">
+          <label for="gradingScheme">{{ t('KLASSEN.notenschema') }}</label>
+          <Select inputId="gradingScheme" v-model="newClass.gradingScheme" :options="gradingSchemeOptions" optionLabel="label" optionValue="value" fluid />
+        </div>
+        <div class="form-group">
+          <label for="classColor">{{ t('KLASSEN.color') || 'Klassenfarbe' }}</label>
+          <Select inputId="classColor" v-model="newClass.color" :options="colorSelectOptions" optionLabel="label" optionValue="value" fluid />
+        </div>
+        <Message v-if="error" severity="error" role="alert">{{ error }}</Message>
+        <div class="modal-actions">
+          <Button type="button" severity="secondary" label="Abbrechen" @click="closeModal" />
+          <Button type="submit" :label="creating ? t('COMMON.loading') : t('KLASSEN.button-hinzufuegen')" :loading="creating" :disabled="creating" />
+        </div>
+      </form>
+    </Dialog>
+
+    <!-- Edit Class Dialog -->
+    <Dialog :visible="showEditModal" @update:visible="visible => { if (!visible) closeEditModal() }" modal header="Klasse bearbeiten" :style="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }">
+      <form @submit.prevent="handleUpdateClass" class="modal-form">
+        <div class="form-group">
+          <label for="editClassName">Klassenname *</label>
+          <InputText id="editClassName" v-model="editClassData.name" required fluid />
+        </div>
+        <div class="form-group">
+          <label for="editSchoolYear">Schuljahr *</label>
+          <InputText id="editSchoolYear" v-model="editClassData.schoolYear" pattern="\\d{4}/\\d{4}" required fluid />
+          <small class="form-hint">Format: YYYY/YYYY</small>
+        </div>
+        <div class="form-group">
+          <label for="editGradeLevel">Klassenstufe</label>
+          <InputNumber inputId="editGradeLevel" :modelValue="editClassData.gradeLevel" @update:modelValue="value => editClassData.gradeLevel = value ?? undefined" :min="1" :max="13" :useGrouping="false" placeholder="z. B. 9" fluid />
+        </div>
+        <div class="form-group">
+          <label for="editGradingScheme">Notenschema</label>
+          <Select inputId="editGradingScheme" v-model="editClassData.gradingScheme" :options="gradingSchemeOptions" optionLabel="label" optionValue="value" fluid />
+        </div>
+        <div class="form-group">
+          <label for="editClassColor">Klassenfarbe</label>
+          <Select inputId="editClassColor" v-model="editClassData.color" :options="colorSelectOptions" optionLabel="label" optionValue="value" fluid />
+        </div>
+        <Message v-if="editError" severity="error" role="alert">{{ editError }}</Message>
+        <div class="modal-actions">
+          <Button type="button" severity="secondary" label="Abbrechen" @click="closeEditModal" />
+          <Button type="submit" :label="updating ? 'Wird aktualisiert...' : 'Klasse aktualisieren'" :loading="updating" :disabled="updating" />
+        </div>
+      </form>
+    </Dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <Dialog :visible="showDeleteModal" @update:visible="visible => { if (!visible) closeDeleteModal() }" modal header="Klasse löschen" :style="{ width: '28rem', maxWidth: 'calc(100vw - 2rem)' }">
+      <div class="modal-content">
+        <p>Möchten Sie <strong>{{ classToDelete?.name }}</strong> wirklich löschen?</p>
+        <p class="warning-text">Diese Aktion kann nicht rückgängig gemacht werden.</p>
+        <Message v-if="deleteError" severity="error" role="alert">{{ deleteError }}</Message>
+        <div class="modal-actions">
+          <Button type="button" severity="secondary" label="Abbrechen" @click="closeDeleteModal" />
+          <Button severity="danger" :label="deleting ? 'Wird gelöscht...' : 'Klasse löschen'" :loading="deleting" :disabled="deleting" @click="handleDeleteClass" />
         </div>
       </div>
-    </div>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, watch } from 'vue'
+import { computed, onUnmounted, watch } from 'vue'
+import Button from 'openvue/button'
+import Dialog from 'openvue/dialog'
+import InputNumber from 'openvue/inputnumber'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
 import { RouterLink } from 'vue-router'
 import { useDashboardView } from '../composables/useDashboardView'
 import { prefetchClassStudents, rememberClassForNavigation, scheduleViewPrefetch } from '../services/navigation-prefetch'
@@ -438,6 +365,13 @@ const {
   formatDate
 } = useDashboardView()
 
+const schoolYearOptions = computed(() => [
+  { label: `${t('KLASSEN.schuljahr')}: ${t('COMMON.alle') || 'Alle'}`, value: '' },
+  ...schoolYears.value.map(year => ({ label: year, value: year }))
+])
+const gradingSchemeOptions = Object.entries(gradingSchemes).map(([value, label]) => ({ value, label }))
+const colorSelectOptions = [{ value: '', label: 'Keine' }, ...classColorOptions]
+
 let cancelViewPrefetch: (() => void) | null = null
 watch(loading, isLoading => {
   if (!isLoading && !cancelViewPrefetch) {
@@ -449,7 +383,5 @@ onUnmounted(() => {
   cancelViewPrefetch?.()
 })
 </script>
-
-<style src="../styles/modal.css"></style>
 
 <style scoped src="./Dashboard.style2.css"></style>
