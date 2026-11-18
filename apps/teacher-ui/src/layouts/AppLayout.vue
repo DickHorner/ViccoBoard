@@ -65,7 +65,7 @@
                 :to="item.to"
                 class="nav-item"
                 :class="{ active: isNavItemActive(item.to) }"
-                :aria-current="isNavItemActive(item.to) ? 'page' : undefined"
+                :aria-current="isNavItemActive(item.to) ? (route.path === item.to || (route.path === '/dashboard' && item.to === '/') ? 'page' : 'location') : undefined"
                 :aria-label="isRailCollapsed ? item.label : undefined"
                 :title="isRailCollapsed ? `${item.label}: ${item.hint}` : undefined"
                 @click="handleNavClick"
@@ -176,9 +176,7 @@ const handleNavClick = () => {
 const isSectionExpanded = (sectionId: string) => {
   const section = navSections.find(entry => entry.id === sectionId)
   return sectionState.value[sectionId]
-    ?? section?.items.some(item => isNavItemActive(item.to))
-    ?? section?.defaultExpanded
-    ?? false
+    ?? Boolean(section?.defaultExpanded || section?.items.some(item => isNavItemActive(item.to)))
 }
 
 const toggleSection = (sectionId: string) => {
