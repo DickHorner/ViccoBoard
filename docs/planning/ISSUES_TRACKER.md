@@ -9,7 +9,7 @@
 
 **Priorität:** P1 | **Status:** [PR #462](https://github.com/DickHorner/ViccoBoard/pull/462) offen, nicht gemergt.
 
-**Produkt-Spezifikation:** [Plan.md §5](../../Plan.md#5-ui-informationsarchitektur--aufgaben-und-arbeitskontexte-ux-03). Hier keine zweite Navigations- oder UX-Regelquelle pflegen.
+**Produkt-Spezifikation:** [Plan.md §5](../../Plan.md). Hier keine zweite Navigations- oder UX-Regelquelle pflegen.
 
 **Erledigt im Entwurf:**
 - [x] 58 aktuelle Router-Einträge gegen vorhandene Legacy-Diagramme abgegrenzt.
