@@ -1,4 +1,5 @@
-import { primaryNavSections } from '../src/navigation'
+import { primaryNavSections, resolvePrimaryNavTarget } from '../src/navigation'
+import router from '../src/router'
 
 describe('primary navigation', () => {
   it('organizes the app into start, unterricht, and organisation', () => {
@@ -32,6 +33,42 @@ describe('primary navigation', () => {
       '/subjects/sport',
       '/subjects/kbr'
     ]))
+  })
+
+  it('provides a unique icon and destination for every workspace link', () => {
+    const items = primaryNavSections.flatMap(section => section.items)
+
+    expect(new Set(items.map(item => item.to)).size).toBe(items.length)
+    expect(items.every(item => item.icon.startsWith('pi pi-') && item.label.length > 0)).toBe(true)
+  })
+
+  it('selects the closest primary nav entry from declared router parents', () => {
+    const parentOf = (path: string) => router.resolve(path).meta.parent
+
+    expect(resolvePrimaryNavTarget('/dashboard', parentOf)).toBe('/')
+    expect(resolvePrimaryNavTarget('/subjects/sport/statistics', parentOf)).toBe('/subjects/sport')
+    expect(resolvePrimaryNavTarget('/grading/time/example', parentOf)).toBe('/subjects/sport')
+    expect(resolvePrimaryNavTarget('/tools/timer', parentOf)).toBe('/subjects/sport')
+    expect(resolvePrimaryNavTarget('/exams/example/correct', parentOf)).toBe('/subjects/kbr')
+    expect(resolvePrimaryNavTarget('/support-tips', parentOf)).toBe('/subjects/kbr')
+    expect(resolvePrimaryNavTarget('/students/example', parentOf)).toBe('/students')
+    expect(resolvePrimaryNavTarget('/classes/example', parentOf)).toBe('/classes')
+    expect(resolvePrimaryNavTarget('/lessons/example/workspace', parentOf)).toBe('/lessons')
+    expect(resolvePrimaryNavTarget('/settings/catalogs', parentOf)).toBe('/settings')
+    expect(resolvePrimaryNavTarget('/attendance', parentOf)).toBe('/attendance')
+  })
+
+  it('has an active navigation destination for every registered view', () => {
+    const parentOf = (path: string) => router.resolve(path).meta.parent
+    const unresolvedPaths = router.getRoutes()
+      .map(record => record.path.replace(/:[^/]+/g, 'sample'))
+      .filter(path => resolvePrimaryNavTarget(path, parentOf) === null)
+
+    expect(unresolvedPaths).toEqual([])
+  })
+
+  it('does not loop forever when unknown routes refer back to themselves', () => {
+    expect(resolvePrimaryNavTarget('/unknown', () => '/unknown')).toBeNull()
   })
 
   it('keeps sport tools out of the primary navigation', () => {

@@ -5,30 +5,33 @@
         <h1>Sport</h1>
         <p class="subtitle">Fachspezifischer Arbeitsbereich für Bewertung, Tests, Tools und Statistiken. Klassen, Stunden und Anwesenheit bleiben fachneutral organisiert.</p>
       </div>
-      <span class="summary-pill">{{ classCount }} aktive Klassen</span>
+      <Tag :value="loadingClasses ? '… aktive Klassen' : `${classCount} aktive Klassen`" severity="info" />
     </header>
 
+    <Message v-if="loadError" severity="warn" role="status">{{ loadError }}</Message>
+    <Message v-if="metricsError" severity="warn" role="status">{{ metricsError }}</Message>
+
     <section class="metrics-grid">
-      <article class="metric-card">
-        <strong>{{ gradeCategoryCount }}</strong>
+      <article class="metric-card app-card">
+        <strong>{{ countsLoading ? '…' : gradeCategoryCount }}</strong>
         <span>Bewertungskategorien</span>
       </article>
-      <article class="metric-card">
-        <strong>{{ tableCount }}</strong>
+      <article class="metric-card app-card">
+        <strong>{{ countsLoading ? '…' : tableCount }}</strong>
         <span>Tabellen</span>
       </article>
-      <article class="metric-card">
-        <strong>{{ toolSessionCount }}</strong>
+      <article class="metric-card app-card">
+        <strong>{{ countsLoading ? '…' : toolSessionCount }}</strong>
         <span>Tool-Sessions</span>
       </article>
-      <article class="metric-card">
-        <strong>{{ sportabzeichenStandardCount }}</strong>
+      <article class="metric-card app-card">
+        <strong>{{ countsLoading ? '…' : sportabzeichenStandardCount }}</strong>
         <span>Sportabzeichen-Standards</span>
       </article>
     </section>
 
     <div class="hub-grid">
-      <RouterLink v-for="entry in entries" :key="entry.to" :to="entry.to" class="hub-card">
+      <RouterLink v-for="entry in entries" :key="entry.to" :to="entry.to" class="hub-card app-card">
         <p class="eyebrow">{{ entry.eyebrow }}</p>
         <h2>{{ entry.title }}</h2>
         <p>{{ entry.description }}</p>
@@ -40,6 +43,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import Message from 'openvue/message'
+import Tag from 'openvue/tag'
 import { getSportBridge, useClassGroups } from '../composables/useSportBridge'
 import type { ClassGroup } from '@viccoboard/core'
 
@@ -47,6 +52,9 @@ const classGroups = useClassGroups()
 const SportBridge = getSportBridge()
 const classes = ref<ClassGroup[]>([])
 const loadError = ref<string | null>(null)
+const loadingClasses = ref(true)
+const metricsError = ref<string | null>(null)
+const countsLoading = ref(true)
 const gradeCategoryCount = ref(0)
 const tableCount = ref(0)
 const toolSessionCount = ref(0)
@@ -92,8 +100,14 @@ const entries = [
   {
     to: '/tools/timer',
     eyebrow: 'Tool',
-    title: 'Timer & Multistop',
-    description: 'Schneller Zugang zu Zeitmessung und Mehrfachstopps.'
+    title: 'Timer',
+    description: 'Zeitmessung für Unterricht und Tests.'
+  },
+  {
+    to: '/tools/multistop',
+    eyebrow: 'Tool',
+    title: 'Multistop',
+    description: 'Mehrfachstopps für parallele Zeitmessungen.'
   },
   {
     to: '/tools/scoreboard',
@@ -116,8 +130,14 @@ const entries = [
   {
     to: '/tools/tactics',
     eyebrow: 'Tool',
-    title: 'Taktik & Feedback',
-    description: 'Taktikboard und Feedbackmethoden für den laufenden Unterricht.'
+    title: 'Taktikboard',
+    description: 'Taktische Situationen für den Unterricht visualisieren.'
+  },
+  {
+    to: '/tools/feedback',
+    eyebrow: 'Tool',
+    title: 'Feedback',
+    description: 'Feedbackmethoden für den laufenden Unterricht.'
   },
   {
     to: '/tools/dice',
@@ -160,37 +180,47 @@ const entries = [
     eyebrow: 'Tool',
     title: 'Slow Motion Analyse',
     description: 'Clips framegenau analysieren, Biomechanik-Marker setzen und Winkel berechnen.'
-  },
-  {
-    to: '/subjects/sport/statistics',
-    eyebrow: 'Auswertung',
-    title: 'Statistiken',
-    description: 'Anwesenheitsquoten, Leistungsübersicht und Tool-Nutzung im Überblick.'
   }
 ]
 
 const classCount = computed(() => classes.value.filter((classGroup) => !classGroup.archived).length)
 
-onMounted(async () => {
+const loadClasses = async () => {
   try {
     classes.value = await classGroups.findAll()
     loadError.value = null
   } catch (error) {
-    loadError.value = error instanceof Error ? error.message : 'Fehler beim Laden der Klassen.'
-    classes.value = []
+    console.error('Failed to load sport classes:', error)
+    loadError.value = 'Klassen konnten nicht geladen werden.'
+  } finally {
+    loadingClasses.value = false
   }
+}
 
-  const [categories, tables, toolSessions, standards] = await Promise.all([
-    SportBridge.gradeCategoryRepository.findAll(),
-    SportBridge.tableDefinitionRepository.findAll(),
-    SportBridge.toolSessionRepository.findAll(),
-    SportBridge.sportabzeichenStandardRepository.findAll()
-  ])
+const loadCounts = async () => {
+  countsLoading.value = true
+  try {
+    const [categories, tables, toolSessions, standards] = await Promise.all([
+      SportBridge.gradeCategoryRepository.findAll(),
+      SportBridge.tableDefinitionRepository.findAll(),
+      SportBridge.toolSessionRepository.findAll(),
+      SportBridge.sportabzeichenStandardRepository.findAll()
+    ])
+    gradeCategoryCount.value = categories.length
+    tableCount.value = tables.length
+    toolSessionCount.value = toolSessions.length
+    sportabzeichenStandardCount.value = standards.length
+  } catch (error) {
+    console.error('Failed to load sport metrics:', error)
+    metricsError.value = 'Sport-Kennzahlen konnten nicht geladen werden.'
+  } finally {
+    countsLoading.value = false
+  }
+}
 
-  gradeCategoryCount.value = categories.length
-  tableCount.value = tables.length
-  toolSessionCount.value = toolSessions.length
-  sportabzeichenStandardCount.value = standards.length
+onMounted(() => {
+  void loadClasses()
+  void loadCounts()
 })
 </script>
 
@@ -219,27 +249,13 @@ onMounted(async () => {
   color: #64748b;
 }
 
-.summary-pill {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 1rem;
-  border-radius: 999px;
-  background: rgba(14, 116, 144, 0.12);
-  color: #155e75;
-  font-weight: 700;
-}
-
 .metrics-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
 }
 
 .metric-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
@@ -257,16 +273,18 @@ onMounted(async () => {
 .hub-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
 }
 
 .hub-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
   padding: 1.25rem;
   text-decoration: none;
-  color: #0f172a;
+  color: var(--color-ink);
+}
+
+.hub-card:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 .eyebrow {
@@ -274,7 +292,7 @@ onMounted(async () => {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.75rem;
-  color: #0f766e;
+  color: var(--accent-strong);
   font-weight: 700;
 }
 </style>
