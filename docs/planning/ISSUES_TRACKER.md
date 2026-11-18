@@ -5,6 +5,28 @@
 **Last status refresh:** March 12, 2026
 ---
 
+## UX-03 — Aufgabenwege und neue Informationsarchitektur (Entwurf)
+
+**Priorität:** P1 | **Status:** [PR #462](https://github.com/DickHorner/ViccoBoard/pull/462) offen, nicht gemergt.
+
+**Produkt-Spezifikation:** [Plan.md §5](../../Plan.md#5-ui-informationsarchitektur--aufgaben-und-arbeitskontexte-ux-03). Hier keine zweite Navigations- oder UX-Regelquelle pflegen.
+
+**Erledigt im Entwurf:**
+- [x] 58 aktuelle Router-Einträge gegen vorhandene Legacy-Diagramme abgegrenzt.
+- [x] 18 zentrale Aufgabenwege anhand echter Vue-Views/Links/Bridges beschrieben (T01–T18).
+- [x] Kontextmodell, Queraktionen, Kandidat für Hauptnavigation und KBR-Pilot skizziert.
+- [x] Sieben überprüfbare Szenarien S1–S7 samt Daten-/Sicherheits-Gegenproben spezifiziert.
+
+**Vor einer verbindlichen UX-Entscheidung offen:**
+- [ ] S1–S7 mit synthetischen Daten am Desktop und auf iPad Safari/Offline/Touch praktisch testen.
+- [ ] Ausgangswerte für Fehlwege, Kontextneuauswahl, Aufgabenabschluss und wahrgenommene Geschwindigkeit erheben.
+- [ ] Alternativen für den Primärzugang zur Sportbewertung und die globalen Schülerzugänge vergleichen.
+
+**Nächster begrenzter Implementierungs-Slice: UX-04 – KBR-Prüfungskontext.**
+Bestehende Prüfung einmal wählen; Bearbeiten, Korrigieren, Analyse, Druckbogen und Rückmeldung ohne erneute Prüfungsauswahl verbinden, weiterhin gültige Deep-Links und KBR-Contracts erhalten. Zuerst ein prüfbarer Pilot statt Komplettumbau.
+
+---
+
 ## Phase 2: Teacher UI Foundation (1-2 weeks)
 
 ### Issue P2-1: UI Framework Decision & Setup
