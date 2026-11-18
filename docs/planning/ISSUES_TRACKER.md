@@ -3,6 +3,8 @@
 **Baseline Commit:** d8875dd  
 
 **Last status refresh:** March 12, 2026
+
+**UX-03 ergänzt:** 18.11.2026; die älteren Issue-Einträge wurden dafür nicht pauschal erneut verifiziert.
 ---
 
 ## UX-03 — Aufgabenwege und neue Informationsarchitektur (Entwurf)
