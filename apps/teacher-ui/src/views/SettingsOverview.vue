@@ -11,7 +11,7 @@
       <article
         v-for="card in settingsCards"
         :key="card.title"
-        class="settings-card"
+        class="settings-card app-card"
         :class="{ 'settings-card--link': card.to }"
       >
         <template v-if="card.to">
@@ -28,14 +28,7 @@
         </template>
       </article>
 
-      <RouterLink
-        :to="{ name: 'catalog-management' }"
-        class="settings-card settings-card-link"
-      >
-        <p class="eyebrow">verfügbar</p>
-        <h2>Katalogverwaltung</h2>
-        <p>Status- und Kriterienkataloge für Anwesenheit, Mitarbeit und Verhalten konfigurieren, sortieren und aktivieren/deaktivieren.</p>
-      </RouterLink>
+
     </div>
   </section>
 </template>
@@ -65,13 +58,10 @@ import { settingsCards } from '../settings-sections'
 .settings-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
 }
 
 .settings-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
   padding: 1.25rem;
 }
 
@@ -84,28 +74,16 @@ import { settingsCards } from '../settings-sections'
   padding: 1.25rem;
   text-decoration: none;
   color: inherit;
-  border-radius: 18px;
-  transition: background 0.15s;
+  border-radius: inherit;
 }
 
 .card-link:hover {
-  background: #f0fdfa;
+  background: var(--surface-soft);
 }
 
-.settings-card-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  border-color: #0f766e;
-  transition: box-shadow 0.15s;
-}
-
-.settings-card-link:hover {
-  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.12);
-}
-
-.settings-card-link h2 {
-  color: #0f766e;
+.card-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 .eyebrow {
@@ -113,7 +91,7 @@ import { settingsCards } from '../settings-sections'
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.75rem;
-  color: #0f766e;
+  color: var(--accent-strong);
   font-weight: 700;
 }
 </style>
