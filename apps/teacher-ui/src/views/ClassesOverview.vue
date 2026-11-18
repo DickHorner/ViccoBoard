@@ -10,28 +10,32 @@
       </RouterLink>
     </header>
 
-    <section class="filter-card">
-      <input
+    <section class="filter-card app-card">
+      <InputText
         v-model="searchQuery"
-        class="search-input"
+        class="classes-search"
         type="search"
+        aria-label="Klasse oder Schuljahr suchen"
         placeholder="Klasse oder Schuljahr suchen"
       />
       <label class="archive-toggle">
         <input v-model="showArchived" type="checkbox" />
         Archivierte Klassen anzeigen
       </label>
-      <p class="filter-note">{{ visibleClasses.length }} Klassen sichtbar</p>
+      <p class="filter-note" aria-live="polite">{{ visibleClasses.length }} Klassen sichtbar</p>
     </section>
 
-    <div v-if="loading" class="state-card">Klassen werden geladen...</div>
-    <div v-else-if="loadError" class="state-card error">{{ loadError }}</div>
-    <div v-else-if="visibleClasses.length === 0" class="state-card">
+    <div v-if="loading" class="state-card app-card" role="status">Klassen werden geladen...</div>
+    <div v-else-if="loadError" class="state-card app-card">
+      <Message severity="error" role="alert">{{ loadError }}</Message>
+      <Button label="Erneut versuchen" @click="loadData" />
+    </div>
+    <div v-else-if="visibleClasses.length === 0" class="state-card app-card">
       Noch keine Klassen gefunden.
     </div>
 
     <div v-else class="class-grid">
-      <article v-for="entry in visibleClasses" :key="entry.classGroup.id" class="class-card">
+      <article v-for="entry in visibleClasses" :key="entry.classGroup.id" class="class-card app-card">
         <div class="class-card-header">
           <div class="class-title">
             <span class="class-color" :style="getClassColorStyle(entry.classGroup.color)"></span>
@@ -40,9 +44,7 @@
               <p>{{ entry.classGroup.schoolYear }}</p>
             </div>
           </div>
-          <span class="status-badge" :class="{ archived: entry.classGroup.archived }">
-            {{ entry.classGroup.archived ? 'Archiviert' : 'Aktiv' }}
-          </span>
+          <Tag :value="entry.classGroup.archived ? 'Archiviert' : 'Aktiv'" :severity="entry.classGroup.archived ? 'secondary' : 'success'" />
         </div>
 
         <div class="class-metrics">
@@ -70,13 +72,17 @@
         </div>
       </article>
     </div>
-    <p v-if="metricsError" class="state-card error">{{ metricsError }}</p>
+    <Message v-if="metricsError" severity="warn" role="status">{{ metricsError }}</Message>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import Tag from 'openvue/tag'
 import { useClassGroups, useLessons } from '../composables/useSportBridge'
 import { useStudents } from '../composables/useStudentsBridge'
 import type { ClassGroup } from '@viccoboard/core'
@@ -229,14 +235,6 @@ onUnmounted(() => {
   color: #0f172a;
 }
 
-.filter-card,
-.state-card,
-.class-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-}
-
 .filter-card {
   padding: 1rem;
   display: flex;
@@ -244,29 +242,27 @@ onUnmounted(() => {
   align-items: center;
   gap: 1rem;
 }
-.archive-toggle { display: inline-flex; align-items: center; gap: .5rem; }
+.archive-toggle { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; cursor: pointer; }
 
-.search-input {
-  width: 100%;
+.classes-search {
+  flex: 1 1 15rem;
+  min-width: 0;
   min-height: 44px;
-  border-radius: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  padding: 0.75rem 1rem;
-  font: inherit;
+}
+
+.state-card :deep(.p-button) {
+  min-height: 44px;
+  margin-top: 0.75rem;
 }
 
 .state-card {
   padding: 1.5rem;
 }
 
-.state-card.error {
-  color: #991b1b;
-}
-
 .class-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 .class-card {
@@ -296,20 +292,6 @@ onUnmounted(() => {
   height: 16px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-.status-badge {
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  background: rgba(22, 163, 74, 0.14);
-  color: #166534;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.status-badge.archived {
-  background: rgba(148, 163, 184, 0.18);
-  color: #475569;
 }
 
 .class-metrics div {
