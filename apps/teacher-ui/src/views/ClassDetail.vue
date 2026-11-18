@@ -28,7 +28,7 @@
     
     <!-- Class Details -->
     <div v-else-if="classGroup" class="class-info">
-      <section class="card">
+      <section class="card app-card">
         <h3>Klasseninformation</h3>
         <div class="info-grid">
           <div class="info-item">
@@ -58,7 +58,7 @@
         </div>
       </section>
       
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>Schüler</h3>
           <div class="roster-actions">
@@ -112,7 +112,7 @@
         </div>
       </section>
       
-      <section class="card">
+      <section class="card app-card">
         <h3>Sport-Kennzahlen</h3>
         <div class="card-content">
           <p v-if="loadingSummary" role="status">Sport-Kennzahlen werden geladen...</p>
@@ -141,7 +141,7 @@
         </div>
       </section>
 
-      <section class="card sport-workbench-card">
+      <section class="card app-card sport-workbench-card">
         <h3>Sport-Arbeitsbereiche</h3>
         <div class="card-content">
           <RouterLink
