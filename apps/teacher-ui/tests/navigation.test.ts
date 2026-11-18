@@ -58,6 +58,15 @@ describe('primary navigation', () => {
     expect(resolvePrimaryNavTarget('/attendance', parentOf)).toBe('/attendance')
   })
 
+  it('has an active navigation destination for every registered view', () => {
+    const parentOf = (path: string) => router.resolve(path).meta.parent
+    const unresolvedPaths = router.getRoutes()
+      .map(record => record.path.replace(/:[^/]+/g, 'sample'))
+      .filter(path => resolvePrimaryNavTarget(path, parentOf) === null)
+
+    expect(unresolvedPaths).toEqual([])
+  })
+
   it('does not loop forever when unknown routes refer back to themselves', () => {
     expect(resolvePrimaryNavTarget('/unknown', () => '/unknown')).toBeNull()
   })
