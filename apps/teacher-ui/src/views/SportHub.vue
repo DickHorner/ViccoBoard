@@ -5,7 +5,7 @@
         <h1>Sport</h1>
         <p class="subtitle">Fachspezifischer Arbeitsbereich für Bewertung, Tests, Tools und Statistiken. Klassen, Stunden und Anwesenheit bleiben fachneutral organisiert.</p>
       </div>
-      <Tag :value="`${classCount} aktive Klassen`" severity="info" />
+      <Tag :value="loadingClasses ? '… aktive Klassen' : `${classCount} aktive Klassen`" severity="info" />
     </header>
 
     <Message v-if="loadError" severity="warn" role="status">{{ loadError }}</Message>
@@ -52,6 +52,7 @@ const classGroups = useClassGroups()
 const SportBridge = getSportBridge()
 const classes = ref<ClassGroup[]>([])
 const loadError = ref<string | null>(null)
+const loadingClasses = ref(true)
 const metricsError = ref<string | null>(null)
 const countsLoading = ref(true)
 const gradeCategoryCount = ref(0)
@@ -191,6 +192,8 @@ const loadClasses = async () => {
   } catch (error) {
     console.error('Failed to load sport classes:', error)
     loadError.value = 'Klassen konnten nicht geladen werden.'
+  } finally {
+    loadingClasses.value = false
   }
 }
 
