@@ -1,7 +1,7 @@
 <template>
   <div class="class-detail-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button severity="secondary" text icon="pi pi-arrow-left" label="Zurück" @click="$router.back()" />
       <div class="header-content">
         <div>
           <div class="class-title">
@@ -10,9 +10,7 @@
           </div>
           <p class="page-description">Verwalten Sie Klasseninformationen, Schüler und Stunden.</p>
         </div>
-        <button v-if="classGroup" class="btn-primary" @click="showEditModal = true">
-          Klasse bearbeiten
-        </button>
+        <Button v-if="classGroup" label="Klasse bearbeiten" icon="pi pi-pencil" @click="openEditModal" />
       </div>
     </div>
     
@@ -25,7 +23,7 @@
     <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadData">Erneut versuchen</button>
+      <Button label="Erneut versuchen" @click="loadData" />
     </div>
     
     <!-- Class Details -->
@@ -68,9 +66,7 @@
               <input v-model="showInactiveStudents" type="checkbox" />
               Ausgeschiedene anzeigen
             </label>
-            <button class="btn-primary btn-small" @click="showAddStudentModal = true">
-              + Schüler hinzufügen
-            </button>
+            <Button label="Schüler hinzufügen" icon="pi pi-plus" @click="showAddStudentModal = true" />
           </div>
         </div>
         <div class="card-content">
@@ -80,7 +76,7 @@
           </div>
           <div v-else-if="studentsError" class="error-state">
             <p>{{ studentsError }}</p>
-            <button class="btn-primary" @click="loadStudents">Erneut versuchen</button>
+            <Button label="Erneut versuchen" @click="loadStudents" />
           </div>
           <div v-else-if="visibleStudents.length === 0" class="empty-state">
             <p>Noch keine Schüler in dieser Klasse. Fügen Sie Ihren ersten Schüler hinzu.</p>
@@ -104,14 +100,13 @@
                 </div>
                 <div class="student-arrow">→</div>
               </RouterLink>
-              <button
-                type="button"
-                class="btn-secondary btn-small"
+              <Button
+                severity="secondary"
+                :label="student.inactive ? 'Wieder aufnehmen' : 'Aus Klasse nehmen'"
+                :loading="updatingRosterId === student.id"
                 :disabled="updatingRosterId === student.id"
                 @click="toggleStudentActive(student)"
-              >
-                {{ student.inactive ? 'Wieder aufnehmen' : 'Aus Klasse nehmen' }}
-              </button>
+              />
             </div>
           </div>
         </div>
@@ -123,7 +118,7 @@
           <p v-if="loadingSummary" role="status">Sport-Kennzahlen werden geladen...</p>
           <div v-else-if="summaryError" class="error-state">
             <p>{{ summaryError }}</p>
-            <button v-if="!studentsError" class="btn-primary" @click="loadSportSummary">Erneut versuchen</button>
+            <Button v-if="!studentsError" label="Erneut versuchen" @click="loadSportSummary" />
           </div>
           <div v-else class="stats-grid">
             <div class="stat-item">
@@ -162,7 +157,7 @@
             </span>
             <span class="action-arrow">→</span>
           </RouterLink>
-          <button class="action-button" @click="showEditModal = true">
+          <button class="action-button" @click="openEditModal">
             <span class="action-icon">✏️</span>
             <span class="action-text">
               <span class="action-label">Klasse bearbeiten</span>
@@ -173,94 +168,85 @@
       </section>
     </div>
     
-    <!-- Add Student Modal -->
-    <div v-if="showAddStudentModal" class="modal-overlay" @click="closeAddStudentModal">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>Schüler zu {{ classGroup?.name }} hinzufügen</h3>
-          <button class="modal-close" @click="closeAddStudentModal" aria-label="Dialog schließen">✕</button>
+
+    <!-- Add Student Dialog -->
+    <Dialog :visible="showAddStudentModal" @update:visible="visible => { if (!visible) closeAddStudentModal() }" modal :header="`Schüler zu ${classGroup?.name ?? 'Klasse'} hinzufügen`" :style="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }">
+      <form @submit.prevent="handleAddStudent" class="modal-form">
+        <div class="form-group">
+          <label for="firstName">Vorname *</label>
+          <InputText id="firstName" v-model="newStudent.firstName" placeholder="z.B. Max" required fluid />
         </div>
-        
-        <form @submit.prevent="handleAddStudent" class="modal-form">
-          <div class="form-group">
-            <label for="firstName">Vorname</label>
-            <input
-              id="firstName"
-              v-model="newStudent.firstName"
-              type="text"
-              placeholder="z.B. Max"
-              required
-              class="form-input"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="lastName">Nachname</label>
-            <input
-              id="lastName"
-              v-model="newStudent.lastName"
-              type="text"
-              placeholder="z.B. Mustermann"
-              required
-              class="form-input"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="dateOfBirth">Geburtsdatum</label>
-            <input
-              id="dateOfBirth"
-              v-model="newStudent.dateOfBirth"
-              type="text"
-              placeholder="TT.MM.JJJJ"
-              class="form-input"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="gender">Geschlecht</label>
-            <select id="gender" v-model="newStudent.gender" class="form-input">
-              <option value="">Nicht angegeben</option>
-              <option value="m">Männlich</option>
-              <option value="f">Weiblich</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="email">E-Mail</label>
-            <input
-              id="email"
-              v-model="newStudent.email"
-              type="email"
-              placeholder="z.B. max@schule.de"
-              class="form-input"
-            />
-          </div>
-          
-          <div v-if="addStudentError" class="error-message">
-            {{ addStudentError }}
-          </div>
-          
-          <div class="modal-actions">
-            <button type="button" @click="closeAddStudentModal" class="btn-secondary">
-              Abbrechen
-            </button>
-            <button type="submit" :disabled="addingStudent" class="btn-primary">
-              {{ addingStudent ? 'Wird hinzugefügt...' : 'Schüler hinzufügen' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div class="form-group">
+          <label for="lastName">Nachname *</label>
+          <InputText id="lastName" v-model="newStudent.lastName" placeholder="z.B. Mustermann" required fluid />
+        </div>
+        <div class="form-group">
+          <label for="dateOfBirth">Geburtsdatum</label>
+          <InputText id="dateOfBirth" v-model="newStudent.dateOfBirth" placeholder="TT.MM.JJJJ" fluid />
+        </div>
+        <div class="form-group">
+          <label for="gender">Geschlecht</label>
+          <Select inputId="gender" v-model="newStudent.gender" :options="genderOptions" optionLabel="label" optionValue="value" fluid />
+        </div>
+        <div class="form-group">
+          <label for="email">E-Mail</label>
+          <InputText id="email" v-model="newStudent.email" type="email" placeholder="z.B. max@schule.de" fluid />
+        </div>
+        <Message v-if="addStudentError" severity="error" role="alert">{{ addStudentError }}</Message>
+        <div class="modal-actions">
+          <Button type="button" severity="secondary" label="Abbrechen" @click="closeAddStudentModal" />
+          <Button type="submit" :label="addingStudent ? 'Wird hinzugefügt...' : 'Schüler hinzufügen'" :loading="addingStudent" :disabled="addingStudent" />
+        </div>
+      </form>
+    </Dialog>
+
+    <!-- Edit Class Dialog -->
+    <Dialog :visible="showEditModal" @update:visible="visible => { if (!visible) closeEditModal() }" modal header="Klasse bearbeiten" :style="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }">
+      <form @submit.prevent="handleUpdateClass" class="modal-form">
+        <div class="form-group">
+          <label for="detailClassName">Klassenname *</label>
+          <InputText id="detailClassName" v-model="editClassData.name" required fluid />
+        </div>
+        <div class="form-group">
+          <label for="detailSchoolYear">Schuljahr *</label>
+          <InputText id="detailSchoolYear" v-model="editClassData.schoolYear" pattern="\\d{4}/\\d{4}" required fluid />
+          <small class="form-hint">Format: YYYY/YYYY</small>
+        </div>
+        <div class="form-group">
+          <label for="detailGradeLevel">Klassenstufe</label>
+          <InputNumber inputId="detailGradeLevel" :modelValue="editClassData.gradeLevel" @update:modelValue="value => editClassData.gradeLevel = value ?? undefined" :min="1" :max="13" :useGrouping="false" fluid />
+        </div>
+        <div class="form-group">
+          <label for="detailGradingScheme">Notenschema</label>
+          <Select inputId="detailGradingScheme" v-model="editClassData.gradingScheme" :options="gradingSchemeOptions" optionLabel="label" optionValue="value" fluid />
+        </div>
+        <div class="form-group">
+          <label for="detailClassColor">Klassenfarbe</label>
+          <Select inputId="detailClassColor" v-model="editClassData.color" :options="classColorOptions" optionLabel="label" optionValue="value" fluid />
+        </div>
+        <Message v-if="editError" severity="error" role="alert">{{ editError }}</Message>
+        <div class="modal-actions">
+          <Button type="button" severity="secondary" label="Abbrechen" @click="closeEditModal" />
+          <Button type="submit" :label="editingClass ? 'Wird gespeichert...' : 'Änderungen speichern'" :loading="editingClass" :disabled="editingClass" />
+        </div>
+      </form>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, ref, onMounted, onUnmounted } from 'vue'
+import Button from 'openvue/button'
+import Dialog from 'openvue/dialog'
+import InputNumber from 'openvue/inputnumber'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge, initializeSportBridge, useClassGroups } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import { buildClassSportSummary, buildSportWorkAreas } from '../utils/class-detail-summary'
+import { DEFAULT_GRADING_SCHEME, GRADING_SCHEMES } from '../constants/grading'
 import { formatGermanDateOfBirth } from '../utils/locale-format'
 import type { ClassGroup, Student } from '@viccoboard/core'
 import { loadClassStudents, prefetchStudentSport, rememberStudentForNavigation, scheduleViewPrefetch, takeClassForNavigation } from '../services/navigation-prefetch'
@@ -288,6 +274,25 @@ const showAddStudentModal = ref(false)
 const addingStudent = ref(false)
 const addStudentError = ref('')
 const showEditModal = ref(false)
+const editingClass = ref(false)
+const editError = ref('')
+const editClassData = ref({ name: '', schoolYear: '', gradeLevel: undefined as number | undefined, gradingScheme: DEFAULT_GRADING_SCHEME as string, color: '' })
+const gradingSchemeOptions = Object.entries(GRADING_SCHEMES).map(([value, label]) => ({ value, label }))
+const classColorOptions = [
+  { value: '', label: 'Keine' },
+  { value: 'white', label: 'Weiß' },
+  { value: 'green', label: 'Grün' },
+  { value: 'red', label: 'Rot' },
+  { value: 'blue', label: 'Blau' },
+  { value: 'orange', label: 'Orange' },
+  { value: 'yellow', label: 'Gelb' },
+  { value: 'grey', label: 'Grau' }
+]
+const genderOptions = [
+  { value: '', label: 'Nicht angegeben' },
+  { value: 'm', label: 'Männlich' },
+  { value: 'f', label: 'Weiblich' }
+]
 
 const sportSummary = ref(buildClassSportSummary(0, 0, 0, 0))
 const sportWorkAreas = ref(buildSportWorkAreas(''))
@@ -440,6 +445,47 @@ const toggleStudentActive = async (student: Student) => {
   }
 }
 
+const openEditModal = () => {
+  if (!classGroup.value) return
+  const group = classGroup.value
+  editClassData.value = {
+    name: group.name,
+    schoolYear: group.schoolYear,
+    gradeLevel: group.gradeLevel,
+    gradingScheme: group.gradingScheme || DEFAULT_GRADING_SCHEME,
+    color: group.color || ''
+  }
+  editError.value = ''
+  showEditModal.value = true
+}
+
+const closeEditModal = () => {
+  showEditModal.value = false
+  editError.value = ''
+}
+
+const handleUpdateClass = async () => {
+  if (!classGroup.value) return
+  editingClass.value = true
+  editError.value = ''
+  try {
+    await classGroups.update(classId, {
+      name: editClassData.value.name.trim(),
+      schoolYear: editClassData.value.schoolYear.trim(),
+      gradeLevel: editClassData.value.gradeLevel,
+      gradingScheme: editClassData.value.gradingScheme,
+      color: editClassData.value.color || undefined
+    })
+    classGroup.value = await classGroups.findById(classId)
+    closeEditModal()
+  } catch (err) {
+    console.error('Failed to update class:', err)
+    editError.value = err instanceof Error ? err.message : 'Klasse konnte nicht gespeichert werden.'
+  } finally {
+    editingClass.value = false
+  }
+}
+
 const closeAddStudentModal = () => {
   showAddStudentModal.value = false
   addStudentError.value = ''
@@ -483,7 +529,5 @@ onUnmounted(() => {
   cancelProfilePrefetch?.()
 })
 </script>
-
-<style src="../styles/modal.css"></style>
 
 <style scoped src="./ClassDetail.style2.css"></style>
