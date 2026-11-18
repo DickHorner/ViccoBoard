@@ -7,7 +7,7 @@
     </div>
 
     <div class="focus-grid">
-      <section class="card focus-card focus-card-primary">
+      <section class="card app-card focus-card focus-card-primary">
         <h3>Jetzt / Als Nächstes</h3>
         <div v-if="loadingWorkspace" class="loading-state-small">Unterrichtsdaten werden geladen…</div>
         <div v-else-if="workspaceError" class="error-state">{{ workspaceError }}</div>
@@ -37,7 +37,7 @@
         </div>
       </section>
 
-      <section class="card focus-card">
+      <section class="card app-card focus-card">
         <h3>Unterricht</h3>
         <div class="card-links">
           <RouterLink v-for="link in instructionLinks" :key="link.to" :to="link.to" class="dashboard-link">
@@ -47,7 +47,7 @@
         </div>
       </section>
 
-      <section class="card focus-card">
+      <section class="card app-card focus-card">
         <h3>Organisation</h3>
         <div class="card-links">
           <RouterLink v-for="link in organizationLinks" :key="link.to" :to="link.to" class="dashboard-link">
@@ -57,10 +57,10 @@
         </div>
       </section>
 
-      <section class="card focus-card focus-card-wide">
+      <section class="card app-card focus-card focus-card-wide">
         <div class="card-header">
           <h3>Heute</h3>
-          <RouterLink to="/schedule" class="btn-text btn-small">Zum Stundenplan</RouterLink>
+          <RouterLink to="/schedule" class="btn-text">Zum Stundenplan</RouterLink>
         </div>
         <div v-if="loadingWorkspace" class="loading-state-small">Unterrichtsdaten werden geladen…</div>
         <div v-else-if="workspaceError" class="error-state">{{ workspaceError }}</div>
@@ -82,7 +82,7 @@
     </div>
     
     <div class="dashboard-grid">
-      <section class="card classes-card">
+      <section class="card app-card classes-card">
         <div class="card-header">
           <h3>{{ t('KLASSEN.title') }}</h3>
           <Button icon="pi pi-plus" :label="t('KLASSEN.hinzu')" @click="showCreateModal = true" />
@@ -169,7 +169,7 @@
         </div>
       </section>
       
-      <section class="card">
+      <section class="card app-card">
         <h3>Schnellzugriffe</h3>
         <div class="card-content">
           <button class="action-button" @click="showCreateModal = true">
@@ -187,7 +187,7 @@
         </div>
       </section>
       
-      <section class="card">
+      <section class="card app-card">
         <h3>Letzte Aktivitäten</h3>
         <div class="card-content">
           <!-- Loading State -->
