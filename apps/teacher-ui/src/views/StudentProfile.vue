@@ -1,28 +1,28 @@
 <template>
   <div class="student-profile-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button severity="secondary" text icon="pi pi-arrow-left" label="Zurück" @click="$router.back()" />
       <h2>Schülerprofil</h2>
       <p class="page-description">Leistungsentwicklung, Anwesenheit und sportbezogene Zusammenfassung.</p>
     </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
-      <div class="spinner"></div>
+ 
       <p>Schülerprofil wird geladen…</p>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadData">Erneut versuchen</button>
+      <Button label="Erneut versuchen" @click="loadData" />
     </div>
 
     <!-- Content -->
     <div v-else-if="student" class="profile-layout">
 
       <!-- Identity card -->
-      <section class="card profile-card">
+      <section class="card app-card profile-card">
         <div class="student-header">
           <div class="student-avatar">
             <img
@@ -37,7 +37,7 @@
             <h3>{{ student.firstName }} {{ student.lastName }}</h3>
             <p v-if="student.dateOfBirth" class="meta">Geburtsdatum {{ formatGermanDateOfBirth(student.dateOfBirth) }}</p>
             <p v-if="student.contactInfo?.email" class="meta">{{ student.contactInfo.email }}</p>
-            <p v-if="className" class="meta class-badge">{{ className }}</p>
+            <Tag v-if="className" :value="className" severity="info" />
             <div class="photo-actions">
               <input
                 ref="photoInput"
@@ -46,12 +46,8 @@
                 class="photo-input"
                 @change="handlePhotoFileChange"
               >
-              <button class="btn-secondary" @click="triggerPhotoSelection" :disabled="photoSaving">
-                {{ student.photoUri ? 'Foto ändern' : 'Foto setzen' }}
-              </button>
-              <button v-if="student.photoUri" class="btn-secondary" @click="removePhoto" :disabled="photoSaving">
-                Foto entfernen
-              </button>
+              <Button severity="secondary" :label="student.photoUri ? 'Foto ändern' : 'Foto setzen'" :loading="photoSaving" :disabled="photoSaving" @click="triggerPhotoSelection" />
+              <Button v-if="student.photoUri" severity="secondary" label="Foto entfernen" :disabled="photoSaving" @click="removePhoto" />
             </div>
             <p v-if="photoError" class="photo-error">{{ photoError }}</p>
           </div>
@@ -59,12 +55,12 @@
       </section>
 
       <!-- Sport summary cards -->
-      <section class="card">
+      <section class="card app-card">
         <h3>Sport-Zusammenfassung</h3>
         <p v-if="loadingSport" role="status">Sportdaten werden geladen…</p>
         <div v-else-if="sportError" class="error-state">
           <p>{{ sportError }}</p>
-          <button class="btn-primary" @click="loadSportData">Erneut versuchen</button>
+          <Button label="Erneut versuchen" @click="loadSportData" />
         </div>
         <div v-else class="summary-grid">
           <div class="summary-item">
@@ -101,7 +97,7 @@
       </section>
 
       <!-- Attendance history -->
-      <section class="card">
+      <section class="card app-card">
         <h3>Anwesenheitsverlauf</h3>
         <p v-if="loadingSport" role="status">Anwesenheitsdaten werden geladen…</p>
         <p v-else-if="sportError" class="error-state">{{ sportError }}</p>
@@ -124,7 +120,7 @@
       </section>
 
       <!-- Performance history -->
-      <section class="card">
+      <section class="card app-card">
         <h3>Leistungsverlauf</h3>
         <p v-if="loadingSport" role="status">Leistungen werden geladen…</p>
         <p v-else-if="sportError" class="error-state">{{ sportError }}</p>
@@ -148,20 +144,21 @@
         </div>
       </section>
 
-      <section class="card kbr-overview">
+      <section class="card app-card kbr-overview">
         <h3>KBR: Schuljahresüberblick {{ schoolYear }}</h3>
         <p v-if="loadingKbr" role="status">KBR-Daten werden geladen…</p>
         <div v-else-if="kbrError" class="error-state">
           <p>{{ kbrError }}</p>
-          <button class="btn-primary" @click="loadKbrData">Erneut versuchen</button>
+          <Button label="Erneut versuchen" @click="loadKbrData" />
         </div>
         <template v-else>
         <div class="note-editor">
-          <label>Interne Notizen / Förderschwerpunkte</label>
-          <textarea v-model="internalNotes" rows="4" placeholder="Entwicklung, Stärken und Förderschwerpunkte …"></textarea>
-          <button class="btn-primary" @click="saveLongTermNote">Notizen speichern</button>
+          <label for="internalNotes">Interne Notizen / Förderschwerpunkte</label>
+          <Textarea id="internalNotes" v-model="internalNotes" rows="4" placeholder="Entwicklung, Stärken und Förderschwerpunkte …" fluid />
+          <Button label="Notizen speichern" :loading="savingNote" :disabled="savingNote" @click="saveLongTermNote" />
         </div>
-        <p v-if="noteStatus" class="record-notes">{{ noteStatus }}</p>
+        <Message v-if="noteStatus" severity="success" role="status">{{ noteStatus }}</Message>
+        <Message v-if="noteError" severity="error" role="alert">{{ noteError }}</Message>
         <p v-if="competencySummary.length" class="record-notes">Kompetenzentwicklung: {{ competencySummary.join(' · ') }}</p>
         <div v-if="kbrRows.length === 0" class="empty-state"><p>Keine KBR-Prüfungen für diesen Prüfling im gewählten Schuljahr.</p></div>
         <div v-else class="kbr-list"><article v-for="row in kbrRows" :key="row.exam.id" class="kbr-row"><strong>{{ row.exam.title }}</strong><span>{{ formatDateDe(row.exam.date ?? row.exam.createdAt) }} · {{ row.correction.totalPoints }} Pkt. · Note {{ row.correction.totalGrade }}</span><p v-if="row.comments.length">{{ row.comments.join(' · ') }}</p><p v-if="row.tips.length">Fördertipps: {{ row.tips.join(', ') }}</p></article></div>
@@ -173,7 +170,7 @@
     <!-- Not found -->
     <div v-else class="error-state">
       <p>Schüler nicht gefunden.</p>
-      <button class="btn-secondary" @click="$router.back()">Zurück</button>
+      <Button severity="secondary" label="Zurück" @click="$router.back()" />
     </div>
   </div>
 </template>
@@ -181,6 +178,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import Button from 'openvue/button'
+import Message from 'openvue/message'
+import Tag from 'openvue/tag'
+import Textarea from 'openvue/textarea'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import {
@@ -227,6 +228,8 @@ let kbrFrame = 0
 let kbrTimer = 0
 const internalNotes = ref('')
 const noteStatus = ref('')
+const noteError = ref('')
+const savingNote = ref(false)
 const kbrRows = ref<Array<{ exam: any; correction: any; comments: string[]; tips: string[] }>>([])
 const photoSaving = ref(false)
 const photoError = ref('')
@@ -357,14 +360,28 @@ onUnmounted(() => {
 })
 
 async function saveLongTermNote() {
-  if (!student.value || !studentLongTermNoteRepository) return
-  if (longTermNote) {
-    longTermNote = await studentLongTermNoteRepository.update(longTermNote.id, { internalNotes: internalNotes.value, lastReviewDate: new Date() })
-  } else {
-    const draft = LongTermNoteManagementService.createLongTermNote(studentId, student.value.classGroupId, schoolYear.value, { internalNotes: internalNotes.value })
-    longTermNote = await studentLongTermNoteRepository.create(draft)
+  if (!student.value || !studentLongTermNoteRepository) {
+    noteError.value = 'Notizen können derzeit nicht gespeichert werden.'
+    return
   }
-  noteStatus.value = 'Gespeichert.'
+
+  savingNote.value = true
+  noteStatus.value = ''
+  noteError.value = ''
+  try {
+    if (longTermNote) {
+      longTermNote = await studentLongTermNoteRepository.update(longTermNote.id, { internalNotes: internalNotes.value, lastReviewDate: new Date() })
+    } else {
+      const draft = LongTermNoteManagementService.createLongTermNote(studentId, student.value.classGroupId, schoolYear.value, { internalNotes: internalNotes.value })
+      longTermNote = await studentLongTermNoteRepository.create(draft)
+    }
+    noteStatus.value = 'Gespeichert.'
+  } catch (err) {
+    console.error('Failed to save student note:', err)
+    noteError.value = 'Notizen konnten nicht gespeichert werden.'
+  } finally {
+    savingNote.value = false
+  }
 }
 
 function triggerPhotoSelection(): void {
@@ -432,16 +449,6 @@ async function removePhoto(): Promise<void> {
   margin-bottom: 1.5rem;
 }
 
-.back-button {
-  background: none;
-  border: none;
-  color: #0066cc;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0;
-  margin-bottom: 0.5rem;
-}
-
 h2 {
   margin: 0.25rem 0;
 }
@@ -459,10 +466,7 @@ h2 {
 }
 
 .card {
-  background: white;
-  border-radius: 8px;
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .card h3 {
@@ -475,15 +479,20 @@ h2 {
 /* Profile card */
 .student-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
+}
+
+.student-info {
+  min-width: 0;
 }
 
 .student-avatar {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background-color: #0066cc;
+  background-color: var(--accent-strong);
   color: white;
   display: flex;
   align-items: center;
@@ -526,15 +535,6 @@ h2 {
   margin: 0.1rem 0;
   font-size: 0.875rem;
   color: #666;
-}
-
-.class-badge {
-  display: inline-block;
-  background: #e8f0fe;
-  color: #1a56db;
-  border-radius: 4px;
-  padding: 0.125rem 0.5rem;
-  font-size: 0.8125rem;
 }
 
 /* Summary grid */
@@ -631,46 +631,25 @@ h2 {
   color: #666;
 }
 
-.spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #0066cc;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.btn-primary {
-  padding: 0.625rem 1.25rem;
-  background-color: #0066cc;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
+.student-profile-view :deep(.p-button) {
   min-height: 44px;
 }
 
-.btn-primary:hover { background-color: #0052a3; }
-
-.btn-secondary {
-  padding: 0.625rem 1.25rem;
-  background-color: #f0f0f0;
-  color: #333;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  min-height: 44px;
+.note-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.btn-secondary:hover { background-color: #e0e0e0; }
+.note-editor label {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.note-editor :deep(.p-button) {
+  align-self: flex-start;
+}
 
 @media (max-width: 600px) {
   .summary-grid {
