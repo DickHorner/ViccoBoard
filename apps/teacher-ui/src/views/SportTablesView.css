@@ -17,7 +17,7 @@
 }
 
 .subtitle {
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -100,13 +100,13 @@
 }
 
 .hint {
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0;
   font-size: 0.9rem;
 }
 
 .hint code {
-  background: #f1f5f9;
+  background: var(--surface-soft);
   border-radius: 4px;
   padding: 0.1em 0.3em;
   font-family: monospace;
@@ -121,7 +121,7 @@
 .workflow-steps {
   margin: 0;
   padding-left: 1.25rem;
-  color: #475569;
+  color: var(--color-muted);
   font-size: 0.9rem;
 }
 
@@ -134,7 +134,7 @@
   padding: 0.65rem 0.75rem;
   border-radius: 8px;
   background: #f8fafc;
-  color: #475569;
+  color: var(--color-muted);
   font-size: 0.9rem;
 }
 
@@ -189,7 +189,7 @@
 
 .file-name {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--color-muted);
   align-self: flex-end;
   padding-bottom: 0.5rem;
 }
@@ -218,7 +218,7 @@
 .preview-label {
   margin: 0 0 0.4rem;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .preview-content {
@@ -227,7 +227,7 @@
   font-family: monospace;
   white-space: pre-wrap;
   word-break: break-all;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .import-button {
@@ -257,7 +257,7 @@
 /* Table list */
 .empty-msg,
 .error-msg {
-  color: #64748b;
+  color: var(--color-muted);
   font-size: 0.95rem;
 }
 
@@ -321,7 +321,7 @@
 
 .badge-inactive {
   background: rgba(100, 116, 139, 0.12);
-  color: #475569;
+  color: var(--color-muted);
 }
 
 .badge-source {
@@ -331,7 +331,7 @@
 
 .table-desc {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0;
 }
 
