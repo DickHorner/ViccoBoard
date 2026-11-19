@@ -8,12 +8,9 @@
     <div class="card app-card">
       <div class="form-group">
         <label>{{ t('KLASSEN.klasse') }}</label>
-        <select v-model="selectedClassId" class="form-input" @change="loadStudents">
-          <option value="">{{ t('SELECT.ok') }} {{ t('KLASSEN.klasse') }}</option>
-          <option v-for="cls in classes" :key="cls.id" :value="cls.id">
-            {{ cls.name }}
-          </option>
-        </select>
+        <Select :modelValue="selectedClassId" :options="classOptions"
+          optionLabel="label" optionValue="value" fluid
+          @update:modelValue="value => { selectedClassId = value; void loadStudents() }" />
       </div>
 
       <div v-if="selectedClassId" class="form-group">
@@ -49,12 +46,9 @@
         </div>
 
         <div v-if="!timer.studentId" class="student-select">
-          <select v-model="timer.studentId" class="form-input form-input-small" @change="assignStudent(index)">
-            <option value="">{{ t('MULTISTOP.select-student-hint') }}</option>
-            <option v-for="student in availableStudents" :key="student.id" :value="student.id">
-              {{ student.firstName }} {{ student.lastName }}
-            </option>
-          </select>
+          <Select :modelValue="timer.studentId" :options="studentOptions"
+            optionLabel="label" optionValue="value" class="form-input-small" fluid
+            @update:modelValue="value => { timer.studentId = value; void assignStudent(index) }" />
         </div>
         <div v-else class="student-name">
           {{ getStudentName(timer.studentId) }}
@@ -73,12 +67,10 @@
           >
             ▶️
           </Button>
-          <button v-if="timer.isRunning" class="btn-warning btn-small" @click="stopTimer(index)">
-            ⏹️ {{ t('COMMON.stop') || 'Stop' }}
-          </button>
-          <button v-if="timer.isStopped" class="btn-success btn-small" @click="saveTime(index)">
-            💾 {{ t('COMMON.save') }}
-          </button>
+          <Button v-if="timer.isRunning" severity="warn" :label="t('COMMON.stop') || 'Stop'"
+            icon="pi pi-stop" @click="stopTimer(index)" />
+          <Button v-if="timer.isStopped" severity="success" :label="t('COMMON.save')"
+            icon="pi pi-save" @click="saveTime(index)" />
           <Button severity="secondary" outlined v-if="timer.time > 0" @click="resetTimer(index)">
             🔄
           </Button>
@@ -95,15 +87,13 @@
         <Button :disabled="allRunning" @click="startAllTimers">
           ▶️ {{ t('COMMON.start-all') || 'Start All' }}
         </Button>
-        <button class="btn-warning" :disabled="noneRunning" @click="stopAllTimers">
-          ⏹️ {{ t('COMMON.stop-all') || 'Stop All' }}
-        </button>
+        <Button severity="warn" icon="pi pi-stop" :disabled="noneRunning"
+          :label="t('COMMON.stop-all') || 'Stop All'" @click="stopAllTimers" />
         <Button severity="secondary" outlined @click="resetAllTimers">
           🔄 {{ t('COMMON.reset-all') || 'Reset All' }}
         </Button>
-        <button class="btn-success" :disabled="!hasStoppedTimers" @click="saveAllTimes">
-          💾 {{ t('COMMON.save-all') || 'Alles speichern' }}
-        </button>
+        <Button severity="success" icon="pi pi-save" :disabled="!hasStoppedTimers"
+          :label="t('COMMON.save-all') || 'Alles speichern'" @click="saveAllTimes" />
       </div>
     </div>
 
@@ -172,6 +162,8 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import Select from 'openvue/select'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useMultistopView } from '../composables/useMultistopView'
@@ -213,6 +205,18 @@ const {
   toast,
   unassignStudent
 } = useMultistopView()
+
+const classOptions = computed(() => [
+  { label: `${t('SELECT.ok')} ${t('KLASSEN.klasse')}`, value: '' },
+  ...classes.value.map(group => ({ label: group.name, value: group.id }))
+])
+const studentOptions = computed(() => [
+  { label: t('MULTISTOP.select-student-hint'), value: '' },
+  ...availableStudents.value.map(student => ({
+    label: `${student.firstName} ${student.lastName}`,
+    value: student.id
+  }))
+])
 </script>
 
 <style scoped src="./Multistop.css"></style>
