@@ -75,9 +75,9 @@
   <!-- =========================================================
        MANAGE MODE — setup / save / load
        ========================================================= -->
-  <div v-else class="scoreboard-view">
+  <div v-else class="scoreboard-view sport-ui">
     <div class="page-header">
-      <Button text severity="secondary" icon="pi pi-arrow-left" type="button" @click="$router.back()">{{ '\u2190' }} {{ t('COMMON.back') }}</Button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" type="button" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <div>
         <h2>{{ t('SCORES.title') }}</h2>
         <p class="page-description">{{ t('SCORES.description') }}</p>
