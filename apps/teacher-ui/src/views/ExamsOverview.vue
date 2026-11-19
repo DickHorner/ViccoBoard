@@ -16,6 +16,7 @@
     </header>
 
     <p v-if="importError" class="state-card import-error" role="alert">{{ importError }}</p>
+    <Message v-if="deleteNotice" severity="success" role="status">{{ deleteNotice }}</Message>
     <Message v-if="contextError" severity="warn" role="status">{{ contextError }}</Message>
 
     <div v-if="loading" class="state-card" role="status">Prüfungen werden geladen…</div>
@@ -32,9 +33,9 @@
 
     <div v-else class="exam-sections">
       <section v-if="!workflow || workflow.destination === 'sheet-design'" class="exam-section" aria-labelledby="exam-templates-heading">
-        <h2 id="exam-templates-heading">Vorlagen</h2>
+        <h2 id="exam-templates-heading">Prüfungsvorlagen</h2>
         <div v-if="templateExams.length === 0" class="state-card compact">
-          Noch keine Vorlagen.
+          Noch keine Prüfungsvorlagen.
         </div>
         <div v-else class="exam-grid">
           <article v-for="exam in templateExams" :key="exam.id" class="exam-card">
@@ -55,6 +56,13 @@
                 <button class="ghost" type="button" @click="openExamWorkspace(exam.id)">Öffnen</button>
                 <button class="ghost" type="button" @click="copyExam(exam)">Aus Vorlage erstellen</button>
                 <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+                 <Button
+                   severity="danger"
+                   outlined
+                   label="Löschen"
+                   :aria-label="`${exam.title} löschen`"
+                   @click="examToDelete = exam"
+                 />
               </template>
             </div>
           </article>
@@ -86,6 +94,13 @@
                 <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
                 <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
                 <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+                 <Button
+                   severity="danger"
+                   outlined
+                   label="Löschen"
+                   :aria-label="`${exam.title} löschen`"
+                   @click="examToDelete = exam"
+                 />
               </template>
             </div>
           </article>
@@ -116,6 +131,13 @@
                   <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
                   <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
                   <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
+                 <Button
+                   severity="danger"
+                   outlined
+                   label="Löschen"
+                   :aria-label="`${exam.title} löschen`"
+                   @click="examToDelete = exam"
+                 />
                 </template>
               </div>
             </article>
@@ -123,6 +145,12 @@
         </details>
       </section>
     </div>
+
+    <DeleteExamDialog
+      :exam="examToDelete"
+      @close="examToDelete = null"
+      @deleted="handleDeletedExam"
+    />
   </section>
 </template>
 
@@ -140,6 +168,7 @@ import { formatGermanDate } from '../utils/locale-format'
 import { recordRouteContentReady } from '../utils/navigation-performance'
 import Button from 'openvue/button'
 import Message from 'openvue/message'
+import DeleteExamDialog from '../components/DeleteExamDialog.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -183,6 +212,8 @@ const openWorkflow = (examId: string) => {
 }
 const { examRepository } = useExamsBridge()
 const exams = ref<ExamsTypes.Exam[]>([])
+const examToDelete = ref<ExamsTypes.Exam | null>(null)
+const deleteNotice = ref('')
 const classes = ref<ClassGroup[]>([])
 const activeYear = ref('')
 const loading = ref(true)
@@ -296,6 +327,15 @@ const importExamFile = async (event: Event) => {
 
 const createNew = () => {
   router.push('/exams/new')
+}
+
+const handleDeletedExam = (id: string) => {
+  const deleted = exams.value.find(exam => exam.id === id)
+  exams.value = exams.value.filter(exam => exam.id !== id)
+  examToDelete.value = null
+  deleteNotice.value = deleted
+    ? `„${deleted.title}“ wurde gelöscht.`
+    : 'Der Datensatz wurde gelöscht.'
 }
 
 const openExamWorkspace = (id: string) => {
@@ -431,7 +471,7 @@ onMounted(() => {
 .exam-grid {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 .exam-card {

@@ -19,18 +19,27 @@
         <h2>Meine Vorlagen</h2>
         <p v-if="templates.length === 0" class="hint">Noch keine Vorlagen. Erstelle Deine erste Gestaltung.</p>
         <div v-else class="template-list">
-          <button
-            v-for="entry in templates"
-            :key="entry.id"
-            type="button"
-            class="template-choice"
-            :class="{ active: currentId === entry.id }"
-            :aria-current="currentId === entry.id ? 'true' : undefined"
-            @click="selectTemplate(entry)"
-          >
-            <strong>{{ entry.name }}</strong>
-            <span>{{ formatDate(entry.lastModified) }}</span>
-          </button>
+          <div v-for="entry in templates" :key="entry.id" class="template-list-row">
+            <button
+              type="button"
+              class="template-choice"
+              :class="{ active: currentId === entry.id }"
+              :aria-current="currentId === entry.id ? 'true' : undefined"
+              @click="selectTemplate(entry)"
+            >
+              <strong>{{ entry.name }}</strong>
+              <span>{{ formatDate(entry.lastModified) }}</span>
+            </button>
+            <Button
+              icon="pi pi-trash"
+              severity="danger"
+              text
+              rounded
+              :aria-label="`Druckbogenvorlage ${entry.name} löschen`"
+              :disabled="saving || deleting"
+              @click="deleteTemplate(entry)"
+            />
+          </div>
         </div>
       </aside>
 
@@ -214,16 +223,25 @@ async function saveCurrent(): Promise<void> {
 }
 
 async function deleteCurrent(): Promise<void> {
-  if (!currentId.value || deleting.value || saving.value) return
-  if (!window.confirm('Diese Druckbogenvorlage endgültig löschen?')) return
+  const selected = templates.value.find(entry => entry.id === currentId.value)
+  if (selected) await deleteTemplate(selected)
+}
+
+async function deleteTemplate(entry: CorrectionSheetTemplate): Promise<void> {
+  if (deleting.value || saving.value) return
+  if (entry.id === currentId.value && !canLeaveEditor()) return
+  if (!window.confirm(`Druckbogenvorlage „${entry.name}“ endgültig löschen? Verknüpfte Vorlagen können nicht gelöscht werden.`)) return
+
   deleting.value = true
   saveError.value = ''
   try {
     if (!correctionSheetTemplateRepository) throw new Error('Vorlagenspeicher nicht verfügbar.')
-    await correctionSheetTemplateRepository.delete(currentId.value)
+    await correctionSheetTemplateRepository.delete(entry.id)
     templates.value = await correctionSheetTemplateRepository.findAll()
-    const next = templates.value[0]
-    replaceEditor(next?.preset ?? createDefaultCorrectionSheetPreset(''), next?.id)
+    if (entry.id === currentId.value) {
+      const next = templates.value[0]
+      replaceEditor(next?.preset ?? createDefaultCorrectionSheetPreset(''), next?.id)
+    }
   } catch (error) {
     saveError.value = error instanceof Error ? error.message : 'Die Vorlage konnte nicht gelöscht werden.'
   } finally {
@@ -312,7 +330,21 @@ onBeforeUnmount(() => {
   margin-top: 0;
 }
 
+.template-list-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.template-list-row :deep(.p-button) {
+  min-width: 44px;
+  min-height: 44px;
+  align-self: center;
+}
+
 .template-choice {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;

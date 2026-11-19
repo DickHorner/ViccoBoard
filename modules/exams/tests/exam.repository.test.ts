@@ -134,6 +134,26 @@ describe('ExamRepository', () => {
     expect(byClass[0].candidateGroups[0]?.name).toBe('Gruppe Blau');
   });
 
+  test('persists explicitly classified exams without requiring a date or candidates', async () => {
+    const created = await repository.create({
+      title: 'Draft assessment',
+      assessmentFormat: 'klausur',
+      mode: Exams.ExamMode.Simple,
+      kind: 'exam',
+      structure,
+      gradingKey,
+      printPresets: [],
+      candidates: [],
+      candidateGroups: [],
+      status: 'draft'
+    });
+
+    const found = await repository.findById(created.id);
+    expect(found?.kind).toBe('exam');
+    expect(found?.candidates).toEqual([]);
+    expect(found?.date).toBeUndefined();
+  });
+
   test('persists template metadata without schema columns', async () => {
     const created = await repository.create({
       title: 'Essay template',

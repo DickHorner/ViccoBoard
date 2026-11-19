@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
 import { createUuid } from '../utils/uuid'
+import { isExamTemplate } from '../utils/exam-school-year'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { useToast } from '../composables/useToast'
 import { useRouter } from 'vue-router'
@@ -240,6 +241,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
   const classGroupId = ref('')
   const assessmentFormat = ref<ExamsTypes.ExamAssessmentFormat>('klausur')
   const mode = ref<'simple' | 'complex'>('complex')
+  const kind = ref<ExamsTypes.ExamKind>('exam')
   const tasks = ref<TaskDraft[]>([])
   const parts = ref<PartDraft[]>([])
   const candidateGroups = ref<CandidateGroupDraft[]>([])
@@ -427,7 +429,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
       classGroupId: classGroupId.value.trim() || undefined,
       assessmentFormat: assessmentFormat.value,
       mode: mode.value as ExamsTypes.ExamMode,
-      kind: 'template',
+      kind: kind.value,
       sourceTemplateId: sourceTemplateId.value,
       structure: {
         parts: parts.value.map((part, index) => ({
@@ -476,6 +478,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     isEditing.value = true
     createdAt.value = exam.createdAt
     sourceTemplateId.value = exam.sourceTemplateId
+    kind.value = isExamTemplate(exam) ? 'template' : 'exam'
     title.value = exam.title
     description.value = exam.description ?? ''
     classGroupId.value = exam.classGroupId ?? ''
@@ -576,6 +579,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     isEditing.value = false
     createdAt.value = null
     sourceTemplateId.value = undefined
+    kind.value = 'exam'
     title.value = ''
     description.value = ''
     classGroupId.value = ''
@@ -593,6 +597,7 @@ export const useExamBuilderStore = defineStore('examBuilder', () => {
     classGroupId,
     assessmentFormat,
     mode,
+    kind,
     tasks,
     parts,
     candidateGroups,
