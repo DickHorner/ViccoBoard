@@ -9,6 +9,7 @@
         </p>
       </div>
       <div class="header-actions">
+        <RouterLink v-if="exam" :to="`/exams/${exam.id}/workspace`" class="ghost-button">Zur Prüfung</RouterLink>
         <button class="ghost-button" type="button" @click="goToCorrection" :disabled="!exam">
           Zur Korrektur
         </button>
@@ -232,7 +233,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { downloadBytes, downloadText } from '../utils/download'
@@ -542,7 +543,10 @@ function goToCorrection(): void {
     return
   }
 
-  router.push(`/exams/${exam.value.id}/correct`)
+  router.push({
+    path: `/exams/${exam.value.id}/correct`,
+    query: selectedCandidateId.value ? { candidateId: selectedCandidateId.value } : {}
+  })
 }
 
 onMounted(() => {
@@ -609,6 +613,9 @@ onMounted(() => {
 }
 
 .ghost-button {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   background: #fff;
   color: #0f172a;
 }

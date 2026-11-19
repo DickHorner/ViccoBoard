@@ -1,5 +1,6 @@
 <template>
   <section class="analysis-page">
+    <RouterLink v-if="exam" :to="`/exams/${exam.id}/workspace`" class="back-link">← Zur Prüfung</RouterLink>
     <div v-if="loading" class="state-card">Analyse wird geladen...</div>
     <div v-else-if="loadError" class="state-card error">{{ loadError }}</div>
     <ExamAnalysis
@@ -14,7 +15,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import ExamAnalysis from './ExamAnalysis.vue'
 import type { Exams as ExamsTypes } from '@viccoboard/core'
@@ -69,6 +70,15 @@ onMounted(() => {
 .analysis-page {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent-strong);
 }
 
 .state-card {

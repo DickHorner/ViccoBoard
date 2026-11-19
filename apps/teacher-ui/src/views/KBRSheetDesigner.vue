@@ -6,7 +6,9 @@
         <p v-if="exam" class="subtitle">{{ exam.title }}</p>
       </div>
       <div class="header-actions">
-        <RouterLink to="/exams?workflow=design" class="secondary-button">Zur Prüfungsauswahl</RouterLink>
+        <RouterLink :to="exam ? `/exams/${exam.id}/workspace` : '/exams?workflow=design'" class="secondary-button">
+          {{ exam ? 'Zur Prüfung' : 'Zur Prüfungsauswahl' }}
+        </RouterLink>
         <button class="primary-button" type="button" :disabled="!exam || saving || !dirty" @click="savePreset">
           {{ saving ? 'Speichert…' : dirty ? preset.templateId ? 'Verknüpfung speichern' : 'Gestaltung speichern' : 'Alles gespeichert' }}
         </button>
