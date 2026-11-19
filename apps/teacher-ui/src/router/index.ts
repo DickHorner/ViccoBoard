@@ -204,6 +204,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Stundenarbeitsbereich', parent: '/lessons' }
   },
   {
+    path: '/subjects/sport/basketball',
+    name: 'sport-basketball-assessment',
+    component: () => import('../views/BasketballAssessmentPilot.vue'),
+    meta: { title: 'Basketball-Leistungsabnahme', parent: '/subjects/sport' }
+  },
+  {
     path: '/subjects/sport/exam',
     name: 'sport-exam',
     component: () => import('../views/SportExam.vue'),

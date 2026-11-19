@@ -8,7 +8,28 @@
   margin-bottom: 2rem;
 }
 
+.lesson-context {
+  margin: 0.75rem 0 0;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.field-hint {
+  margin: 0.35rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.class-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 0.5rem;
+  color: var(--accent-strong);
+}
+
 .back-button {
+  text-decoration: none;
   background: transparent;
   border: none;
   color: #667eea;

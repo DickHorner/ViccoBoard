@@ -6,7 +6,8 @@ export type SportExamStudentState =
   | 'ready'
   | 'absent'
   | 'passive'
-  | 'missing-kit';
+  | 'missing-kit'
+  | 'not-assessed';
 
 export interface SportExamStudentEntry {
   studentId: string;
@@ -24,6 +25,7 @@ export interface SportExamStudentEntry {
 }
 
 export interface SaveSportExamSessionInput {
+  sessionId?: string;
   classGroupId: string;
   lessonId?: string;
   categoryId: string;
@@ -94,14 +96,31 @@ export class SaveSportExamSessionUseCase {
           throw new Error(`Criterion scores missing for student: ${entry.studentId}`);
         }
 
-        if (entry.calculatedGrade === undefined) {
+        if (entry.calculatedGrade === undefined && assessmentType !== 'criteria') {
           throw new Error(`Calculated grade missing for student: ${entry.studentId}`);
         }
       }
     }
 
+    const previousSession = input.sessionId
+      ? await this.toolSessionRepository.findById(input.sessionId)
+      : null;
+    if (input.sessionId && !previousSession) {
+      throw new Error('Sport exam session not found');
+    }
+    if (previousSession) {
+      const metadata = previousSession.sessionMetadata as SportExamSessionMetadata;
+      if (previousSession.toolType !== 'sport-exam' ||
+          previousSession.classGroupId !== input.classGroupId ||
+          metadata.categoryId !== input.categoryId ||
+          metadata.examDate !== input.examDate ||
+          metadata.assessmentType !== assessmentType) {
+        throw new Error('Sport exam session does not match this assessment');
+      }
+    }
+
     const now = new Date();
-    const session = await this.toolSessionRepository.create({
+    const session = previousSession ?? await this.toolSessionRepository.create({
       toolType: 'sport-exam',
       classGroupId: input.classGroupId,
       lessonId: input.lessonId,
@@ -170,13 +189,26 @@ export class SaveSportExamSessionUseCase {
       })
     );
 
-    return this.toolSessionRepository.update(session.id, {
+    const updatedSession = await this.toolSessionRepository.update(session.id, {
       endedAt: new Date(),
       sessionMetadata: {
         ...(session.sessionMetadata as SportExamSessionMetadata),
+        announced: input.announced,
+        studentStates: input.entries.map((entry) => ({
+          studentId: entry.studentId,
+          state: entry.state,
+          attendanceSource: entry.attendanceSource,
+          requiresAttest: input.announced && entry.state === 'absent'
+        })),
         entryIds: savedEntries.map((entry) => entry.id),
         entryCount: savedEntries.length
       }
     });
+
+    if (previousSession) {
+      const priorIds = (previousSession.sessionMetadata as SportExamSessionMetadata).entryIds;
+      await Promise.all(priorIds.map((id) => this.performanceEntryRepository.delete(id)));
+    }
+    return updatedSession;
   }
 }
