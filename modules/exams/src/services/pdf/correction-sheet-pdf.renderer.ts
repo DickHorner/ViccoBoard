@@ -203,7 +203,7 @@ export class CorrectionSheetPdfRenderer {
       const summaryParts: string[] = [];
 
       if (projection.showOverallPoints) {
-        summaryParts.push(`Gesamtpunkte: ${projection.isDesignPreview ? '--' : projection.totalPoints} / ${projection.maxPoints}`);
+        summaryParts.push(`Gesamtpunkte: ${projection.isDesignPreview ? '--' : projection.totalPoints} / ${projection.isDesignPreview && !projection.examId ? '--' : projection.maxPoints}`);
       }
 
       if (projection.showGrade && (projection.grade !== undefined || projection.isDesignPreview)) {
