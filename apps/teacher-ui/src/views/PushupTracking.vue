@@ -172,10 +172,10 @@
     </div>
 
     <!-- Session saved notification -->
-    <div v-if="sessionSaved" class="success-banner card">
+    <div v-if="sessionSaved" class="success-banner card app-card">
       ✅ {{ t('DICE.save-success') }}
     </div>
-    <div v-if="saveError" class="warning-banner card">
+    <div v-if="saveError" class="warning-banner card app-card">
       ⚠️ {{ t('DICE.save-error') }}
     </div>
   </div>
