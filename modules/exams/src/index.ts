@@ -13,6 +13,8 @@ export {
   createDefaultCorrectionSheetPreset
 } from './repositories/correction-sheet-preset.repository.js';
 export { SupportTipRepository } from './repositories/support-tip.repository.js';
+export { CorrectionSheetTemplateRepository } from './repositories/correction-sheet-template.repository.js';
+export type { CorrectionSheetTemplate } from './repositories/correction-sheet-template.repository.js';
 export { ApplyPointAdjustmentsUseCase } from './use-cases/apply-point-adjustments.use-case.js';
 export type { ApplyPointAdjustmentsInput, PointAdjustment } from './use-cases/apply-point-adjustments.use-case.js';
 export { StudentLongTermNoteRepository } from './repositories/student-long-term-note.repository.js';
