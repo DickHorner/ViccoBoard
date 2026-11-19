@@ -19,6 +19,7 @@ import {
 } from '../src/repositories/correction-sheet-preset.repository';
 import { RecordCorrectionUseCase } from '../src/use-cases/record-correction.use-case-v2';
 import { GetCorrectionSheetPresetUseCase } from '../src/use-cases/get-correction-sheet-preset.use-case';
+import { CorrectionSheetTemplateRepository } from '../src/repositories/correction-sheet-template.repository';
 import { SaveCorrectionSheetPresetUseCase } from '../src/use-cases/save-correction-sheet-preset.use-case';
 import { BuildCorrectionSheetProjectionUseCase } from '../src/use-cases/build-correction-sheet-projection.use-case';
 import { ExportCorrectionSheetsPdfUseCase } from '../src/use-cases/export-correction-sheets-pdf.use-case';
@@ -52,7 +53,7 @@ describe('KBR correction sheet workflow', () => {
     examRepository = new ExamRepository(storage.getAdapter());
     correctionRepository = new CorrectionEntryRepository(storage.getAdapter());
     supportTipRepository = new SupportTipRepository(storage.getAdapter());
-    presetRepository = new CorrectionSheetPresetRepository(examRepository);
+    presetRepository = new CorrectionSheetPresetRepository(examRepository, new CorrectionSheetTemplateRepository(storage.getAdapter(), examRepository));
     recordCorrectionUseCase = new RecordCorrectionUseCase(correctionRepository, examRepository);
     getPresetUseCase = new GetCorrectionSheetPresetUseCase(presetRepository);
     savePresetUseCase = new SaveCorrectionSheetPresetUseCase(presetRepository);
