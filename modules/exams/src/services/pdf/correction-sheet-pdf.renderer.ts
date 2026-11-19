@@ -8,6 +8,11 @@ const SMALL_FONT_SIZE = 9;
 const TITLE_FONT_SIZE = 18;
 const LINE_HEIGHT = 14;
 
+function clampPercent(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+}
+
 function sanitizeFileNamePart(value: string): string {
   return value
     .toLowerCase()
@@ -104,8 +109,9 @@ export class CorrectionSheetPdfRenderer {
     const regularFont = await document.embedFont(StandardFonts.Helvetica);
     const boldFont = await document.embedFont(StandardFonts.HelveticaBold);
 
+    const renderedAt = new Date();
     for (const projection of projections) {
-      await this.renderProjection(document, projection, regularFont, boldFont);
+      await this.renderProjection(document, projection, regularFont, boldFont, renderedAt);
     }
 
     return {
@@ -119,7 +125,8 @@ export class CorrectionSheetPdfRenderer {
     document: PDFDocument,
     projection: Exams.CorrectionSheetProjection,
     regularFont: PDFFont,
-    boldFont: PDFFont
+    boldFont: PDFFont,
+    renderedAt: Date
   ): Promise<void> {
     let page = document.addPage(PageSizes.A4);
     let { width, height } = page.getSize();
@@ -301,25 +308,35 @@ export class CorrectionSheetPdfRenderer {
     }
 
     if (projection.showSignatureArea) {
-      ensureSpace(70);
-      drawTextLine('Unterschrift', { font: boldFont });
+      const gap = clampPercent(projection.signaturePositionY) * 0.9;
+      const x = PAGE_MARGIN + (width - PAGE_MARGIN * 2 - 180) *
+        clampPercent(projection.signaturePositionX) / 100;
+      ensureSpace(95 + gap);
+      cursorY -= gap;
+      drawTextLine('Unterschrift', { font: boldFont, x });
 
       if (signatureImage) {
         const scaled = signatureImage.scaleToFit(180, 42);
         page.drawImage(signatureImage, {
-          x: PAGE_MARGIN,
+          x,
           y: cursorY - scaled.height,
           width: scaled.width,
           height: scaled.height
         });
+        cursorY -= scaled.height + 8;
+      } else {
+        cursorY -= 22;
       }
 
-      page.drawLine({
-        start: { x: PAGE_MARGIN, y: cursorY - 8 },
-        end: { x: PAGE_MARGIN + 180, y: cursorY - 8 },
-        thickness: 0.8
-      });
-      cursorY -= 48;
+      if (projection.showSignatureDate !== false) {
+        const date = new Intl.DateTimeFormat('de-DE', {
+          day: 'numeric',
+          month: 'numeric',
+          year: 'numeric'
+        }).format(renderedAt);
+        drawTextLine(`Datum: ${date}`, { font: regularFont, size: SMALL_FONT_SIZE, x });
+      }
+      cursorY -= 8;
     }
 
     if (projection.footerText) {
