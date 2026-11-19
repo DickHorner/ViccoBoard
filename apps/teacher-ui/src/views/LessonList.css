@@ -331,48 +331,13 @@
 }
 
 .action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-strong);
+  background: var(--surface-soft);
 }
 
 .action-btn-attendance:hover {
   border-color: #4caf50;
   background: #e8f5e9;
-}
-
-.action-btn-edit:hover {
-  border-color: #2196f3;
-  background: #e3f2fd;
-}
-
-.action-btn-delete:hover {
-  border-color: #f44336;
-  background: #ffebee;
-}
-
-.btn-primary {
-  background: var(--accent-strong);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 44px;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--accent-strong);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.btn-primary:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .btn-secondary {
@@ -391,66 +356,6 @@
 .btn-secondary:hover {
   border-color: #ccc;
   background: #f8f9fa;
-}
-
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.modal {
-  background: white;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--color-ink);
-}
-
-.modal-close {
-  background: transparent;
-  border: none;
-  font-size: 2rem;
-  color: var(--color-subtle);
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-  background: var(--surface-soft);
-  color: var(--color-ink);
 }
 
 .modal-content {
