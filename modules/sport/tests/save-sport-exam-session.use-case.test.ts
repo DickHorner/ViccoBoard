@@ -335,6 +335,40 @@ describe('SaveSportExamSessionUseCase', () => {
     expect((await performanceRepository.findByCategory(categoryId))[0].measurements.criteria).toEqual({ accuracy: 2 });
   });
 
+  test('can save a random draw before any participant has been assessed', async () => {
+    const saved = await useCase.execute({
+      classGroupId, categoryId, examDate: '2026-11-12', assessmentType: 'criteria',
+      announced: false, drawHistory: [student1Id],
+      entries: [
+        { studentId: student1Id, state: 'not-assessed' },
+        { studentId: student2Id, state: 'not-assessed' }
+      ]
+    });
+    expect((saved.sessionMetadata as Record<string, any>).drawHistory).toEqual([student1Id]);
+    expect((saved.sessionMetadata as Record<string, any>).entryCount).toBe(0);
+  });
+
+  test('preserves unchanged older assessments without an assessedOn metadata field', async () => {
+    const saved = await useCase.execute({
+      classGroupId, categoryId, examDate: '2026-11-12', assessmentType: 'criteria',
+      announced: false,
+      entries: [{ studentId: student1Id, state: 'ready', criterionScores: { accuracy: 2 }, calculatedGrade: '2' }]
+    });
+    const initial = (await performanceRepository.findByCategory(categoryId))[0];
+    await performanceRepository.update(initial.id, {
+      metadata: { ...initial.metadata, assessedOn: undefined }
+    });
+    await useCase.execute({
+      sessionId: saved.id, classGroupId, categoryId, examDate: '2026-11-12',
+      assessmentType: 'criteria', announced: false,
+      entries: [{ studentId: student1Id, state: 'ready', criterionScores: { accuracy: 2 },
+        calculatedGrade: '2', assessedOn: '2026-11-12' }]
+    });
+    const updated = (await performanceRepository.findByCategory(categoryId))[0];
+    expect(updated.id).toBe(initial.id);
+    expect(updated.timestamp).toEqual(initial.timestamp);
+  });
+
   test('rejects duplicate students', async () => {
     await expect(useCase.execute({
       classGroupId,

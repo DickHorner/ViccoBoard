@@ -203,6 +203,7 @@ export class SaveSportExamSessionUseCase {
             };
       const calculatedGrade = missingKit ? 6 : entry.calculatedGrade;
       const assessedOn = entry.assessedOn ?? existing?.metadata?.assessedOn ?? input.examDate;
+      const comment = entry.comment ?? existing?.comment;
       const metadata = {
         testType: 'sport-exam',
         sessionId: session.id,
@@ -215,8 +216,9 @@ export class SaveSportExamSessionUseCase {
       if (existing &&
           JSON.stringify(existing.measurements) === JSON.stringify(measurements) &&
           existing.calculatedGrade === calculatedGrade &&
-          existing.metadata?.assessedOn === assessedOn &&
-          existing.comment === entry.comment) {
+          (existing.metadata?.assessedOn === assessedOn ||
+           (existing.metadata?.assessedOn === undefined && assessedOn === input.examDate)) &&
+          existing.comment === comment) {
         return existing;
       }
 
@@ -225,7 +227,7 @@ export class SaveSportExamSessionUseCase {
           measurements,
           calculatedGrade,
           timestamp: now,
-          comment: entry.comment,
+          comment,
           metadata
         });
       }
@@ -236,7 +238,7 @@ export class SaveSportExamSessionUseCase {
         measurements,
         calculatedGrade,
         timestamp: now,
-        comment: entry.comment,
+        comment,
         metadata
       });
     }));
