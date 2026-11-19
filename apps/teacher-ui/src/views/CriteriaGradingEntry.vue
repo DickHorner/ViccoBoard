@@ -1,7 +1,7 @@
 <template>
-  <div class="criteria-grading-view">
+  <div class="criteria-grading-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <h2>{{ category?.name || 'Kriterienbasierte Bewertung' }}</h2>
       <p class="page-description">
         Erfassen Sie Bewertungen basierend auf definierten Kriterien.
@@ -15,11 +15,11 @@
 
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="$router.go(0)">Erneut versuchen</button>
+      <Button @click="$router.go(0)">Erneut versuchen</Button>
     </div>
 
     <div v-else-if="category" class="grading-content">
-      <section class="card category-info-card">
+      <section class="card category-info-card app-card">
         <h3>Kategorieinformationen</h3>
         <div class="info-grid">
           <div class="info-item">
@@ -37,13 +37,13 @@
         </div>
 
         <div class="criteria-actions">
-          <button
+          <Button severity="secondary" outlined
             v-if="criteria.length < 50"
-            class="btn-secondary btn-small"
+           
             @click="showAddCriterionModal = true"
           >
             + Kriterium hinzufügen
-          </button>
+          </Button>
           <span v-if="criteria.length >= 50" class="info-note">
             Maximum 50 Kriterien erreicht
           </span>
@@ -64,9 +64,9 @@
                 {{ criterion.description }}
               </p>
             </div>
-            <button class="btn-danger-text btn-small" :disabled="saving" @click="removeCriterion(index)">
+            <Button severity="danger" text :disabled="saving" @click="removeCriterion(index)">
               Entfernen
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -75,16 +75,16 @@
         </div>
       </section>
 
-      <section v-if="criteria.length > 0 && students.length > 0" class="card">
+      <section v-if="criteria.length > 0 && students.length > 0" class="card app-card">
         <div class="card-header">
           <h3>Bewertungseingabe</h3>
           <div class="header-actions">
-            <button class="btn-secondary btn-small" @click="toggleBulkMode">
+            <Button severity="secondary" outlined @click="toggleBulkMode">
               {{ bulkMode ? 'Einzelmodus' : 'Bulk-Modus' }}
-            </button>
-            <button class="btn-primary btn-small" :disabled="saving || !hasUnsavedChanges" @click="saveAllGrades">
+            </Button>
+            <Button :disabled="saving || !hasUnsavedChanges" @click="saveAllGrades">
               {{ saving ? 'Speichern...' : 'Alle speichern' }}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -184,15 +184,15 @@
                     <span class="calculated-grade">{{ calculateGrade(student.id) }}</span>
                   </td>
                   <td class="actions-cell">
-                    <button
+                    <Button severity="secondary" outlined
                       v-if="selfAssessmentEnabled"
                       type="button"
-                      class="btn-secondary btn-small handoff-button"
+                      class="handoff-button"
                       :disabled="saving"
                       @click="prepareHandoff(student.id)"
                     >
                       iPad übergeben
-                    </button>
+                    </Button>
                     <button class="btn-text-small" title="Kommentar hinzufügen" @click="addComment(student.id)">
                       💬
                     </button>
@@ -204,7 +204,7 @@
         </div>
       </section>
 
-      <section v-if="students.length === 0" class="card">
+      <section v-if="students.length === 0" class="card app-card">
         <div class="empty-state">
           <p>Keine Schüler in dieser Klasse gefunden.</p>
         </div>
@@ -231,8 +231,8 @@
             <small>Nur eine Übergabesperre, kein sicherer Zugriffsschutz für die App oder gespeicherte Schülerdaten.</small>
           </div>
           <div class="modal-actions">
-            <button type="button" class="btn-secondary" @click="handoffCandidateId = null">Abbrechen</button>
-            <button type="button" class="btn-primary" @click="startHandoff">Schüleransicht starten</button>
+            <Button severity="secondary" outlined type="button" @click="handoffCandidateId = null">Abbrechen</Button>
+            <Button type="button" @click="startHandoff">Schüleransicht starten</Button>
           </div>
         </div>
       </div>
@@ -305,12 +305,12 @@
             </div>
 
             <div class="modal-actions">
-              <button type="button" class="btn-secondary" @click="showAddCriterionModal = false">
+              <Button severity="secondary" outlined type="button" @click="showAddCriterionModal = false">
                 Abbrechen
-              </button>
-              <button type="submit" class="btn-primary" :disabled="saving">
+              </Button>
+              <Button type="submit" :disabled="saving">
                 {{ saving ? 'Hinzufügen...' : 'Hinzufügen' }}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -336,12 +336,12 @@
             </div>
 
             <div class="modal-actions">
-              <button type="button" class="btn-secondary" @click="showCommentModal = false">
+              <Button severity="secondary" outlined type="button" @click="showCommentModal = false">
                 Abbrechen
-              </button>
-              <button type="submit" class="btn-primary" :disabled="saving">
+              </Button>
+              <Button type="submit" :disabled="saving">
                 {{ saving ? 'Speichern...' : 'Speichern' }}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -351,6 +351,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useCriteriaGradingEntryView } from '../composables/useCriteriaGradingEntryView'
 import CriteriaSelfAssessmentHandoff from '../components/CriteriaSelfAssessmentHandoff.vue'
 
