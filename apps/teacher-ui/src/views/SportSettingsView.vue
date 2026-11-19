@@ -220,7 +220,7 @@ onMounted(loadImportedConfigs)
 }
 
 .subtitle {
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -257,7 +257,7 @@ onMounted(loadImportedConfigs)
 }
 
 .config-card > p {
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0;
   font-size: 0.875rem;
 }
@@ -289,7 +289,7 @@ onMounted(loadImportedConfigs)
 .form-group label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--color-muted);
 }
 
 .form-input {
@@ -318,7 +318,7 @@ onMounted(loadImportedConfigs)
 
 .file-preview {
   font-size: 0.8rem;
-  color: #475569;
+  color: var(--color-muted);
 }
 
 .import-actions {
@@ -377,7 +377,7 @@ onMounted(loadImportedConfigs)
 .list-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--color-muted);
   margin: 0 0 0.5rem;
 }
 
@@ -403,11 +403,11 @@ onMounted(loadImportedConfigs)
 
 .config-name {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .config-meta {
-  color: #64748b;
+  color: var(--color-muted);
   font-size: 0.75rem;
 }
 
