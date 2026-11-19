@@ -126,7 +126,7 @@ export class CorrectionSheetTemplateRepository {
     const linked = exams.some(exam => exam.printPresets.some(preset =>
       preset.metadata?.correctionSheetTemplateId === id
     ));
-    if (linked) throw new Error('Diese Vorlage wird von Prüfungen verwendet und kann nicht gelöscht werden.');
+    if (linked) throw new Error('Diese Druckbogenvorlage wird von Prüfungen verwendet. Löse zuerst die Verknüpfungen in diesen Prüfungen, bevor Du sie löschst.');
     await this.adapter.delete('templates', id);
   }
 }
