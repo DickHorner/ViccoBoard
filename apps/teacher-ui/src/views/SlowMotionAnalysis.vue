@@ -6,10 +6,10 @@
     <div class="page-header">
       <h2>{{ t('SLOWMO.title') }}</h2>
       <div class="header-actions">
-        <Button severity="secondary" outlined v-if="activeTab !== 'sessions'" class="btn" @click="goToSessions">
+        <Button severity="secondary" outlined v-if="activeTab !== 'sessions'" @click="goToSessions">
           📋 {{ t('SLOWMO.sessions') }}
         </Button>
-        <Button v-if="activeTab === 'analyze' && videoLoaded" class="btn" @click="saveSession">
+        <Button v-if="activeTab === 'analyze' && videoLoaded" @click="saveSession">
           💾 {{ t('SLOWMO.save') }}
         </Button>
       </div>
@@ -20,7 +20,7 @@
     <!-- ------------------------------------------------------------------ -->
     <div v-if="activeTab === 'sessions'" class="sessions-panel">
       <div class="sessions-toolbar">
-        <Button class="btn" @click="startNewSession">
+        <Button @click="startNewSession">
           ➕ {{ t('SLOWMO.newSession') }}
         </Button>
       </div>
@@ -104,7 +104,7 @@
               @change="onFileSelected"
             />
           </label>
-          <Button severity="secondary" outlined class="btn" type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
+          <Button severity="secondary" outlined type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
             {{ cameraPreviewActive ? `🛑 ${t('SLOWMO.closeCamera')}` : `📷 ${t('SLOWMO.openCamera')}` }}
           </Button>
         </div>
@@ -126,7 +126,6 @@
         <div class="form-actions">
           <Button
             v-if="cameraPreviewActive && !recordingActive"
-            class="btn"
             type="button"
             @click="startRecording"
           >
@@ -134,7 +133,6 @@
           </Button>
           <Button severity="danger"
             v-if="recordingActive"
-            class="btn"
             type="button"
             @click="stopRecording"
           >
@@ -142,7 +140,6 @@
           </Button>
           <Button severity="secondary" outlined
             v-if="cameraPreviewActive && !recordingActive"
-            class="btn"
             type="button"
             @click="stopCapturePreview"
           >
@@ -152,8 +149,8 @@
       </div>
 
       <div class="form-actions">
-        <Button severity="secondary" outlined class="btn" @click="goToSessions">{{ t('SLOWMO.cancel') }}</Button>
-        <Button class="btn" :disabled="!sessionName.trim()" @click="startAnalysis">
+        <Button severity="secondary" outlined @click="goToSessions">{{ t('SLOWMO.cancel') }}</Button>
+        <Button :disabled="!sessionName.trim()" @click="startAnalysis">
           {{ t('SLOWMO.startAnalysis') }}
         </Button>
       </div>
@@ -202,7 +199,7 @@
               @change="onFileSelected"
             />
           </label>
-          <Button severity="secondary" outlined class="btn" type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
+          <Button severity="secondary" outlined type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
             {{ cameraPreviewActive ? `🛑 ${t('SLOWMO.closeCamera')}` : `📷 ${t('SLOWMO.openCamera')}` }}
           </Button>
         </div>
@@ -221,7 +218,6 @@
           <div class="form-actions">
             <Button
               v-if="cameraPreviewActive && !recordingActive"
-              class="btn"
               type="button"
               @click="startRecording"
             >
@@ -229,7 +225,6 @@
             </Button>
             <Button severity="danger"
               v-if="recordingActive"
-              class="btn"
               type="button"
               @click="stopRecording"
             >
@@ -237,7 +232,6 @@
             </Button>
             <Button severity="secondary" outlined
               v-if="cameraPreviewActive && !recordingActive"
-              class="btn"
               type="button"
               @click="stopCapturePreview"
             >
@@ -248,10 +242,10 @@
       </div>
 
       <div v-if="videoLoaded" class="video-source-actions card app-card">
-        <Button severity="secondary" outlined v-if="downloadableVideoBlob" class="btn" type="button" @click="downloadCurrentVideo">
+        <Button severity="secondary" outlined v-if="downloadableVideoBlob" type="button" @click="downloadCurrentVideo">
           💾 {{ t('SLOWMO.keepVideoLocal') }}
         </Button>
-        <Button severity="secondary" outlined class="btn" type="button" @click="deleteCurrentVideo">
+        <Button severity="secondary" outlined type="button" @click="deleteCurrentVideo">
           🗑 {{ t('SLOWMO.deleteVideo') }}
         </Button>
       </div>
@@ -345,13 +339,12 @@
         <div class="tracking-row">
           <Button severity="secondary" outlined
             v-if="pointTrackingStatus !== 'tracking'"
-            class="btn"
             :disabled="!canStartPointTracking"
             @click="startPointTracking"
           >
             🎯 {{ t('SLOWMO.startTracking') }}
           </Button>
-          <Button severity="secondary" outlined v-else class="btn" @click="stopPointTracking">
+          <Button severity="secondary" outlined v-else @click="stopPointTracking">
             ⏹ {{ t('SLOWMO.stopTracking') }}
           </Button>
           <span
@@ -367,11 +360,10 @@
 
         <!-- Keyframe management -->
         <div class="keyframe-row">
-          <Button severity="secondary" outlined class="btn" @click="addKeyframe">
+          <Button severity="secondary" outlined @click="addKeyframe">
             🔑 {{ t('SLOWMO.addKeyframe') }} @ {{ formatTime(currentTime) }}
           </Button>
           <Button severity="secondary" outlined
-            class="btn"
             @click="clearCurrentMarkers"
             :disabled="!currentExactKeyframe || currentExactKeyframe.markers.length === 0"
           >
@@ -431,7 +423,7 @@
 
       <!-- Save button at bottom -->
       <div v-if="videoLoaded" class="save-row">
-        <Button class="btn btn-full" @click="saveSession">
+        <Button class="btn-full" @click="saveSession">
           💾 {{ t('SLOWMO.save') }}
         </Button>
       </div>
