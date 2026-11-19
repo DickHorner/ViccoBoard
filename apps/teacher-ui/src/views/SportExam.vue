@@ -711,7 +711,7 @@ function localDateString(date: Date): string {
 .sport-exam-view { display: flex; flex-direction: column; gap: 1.25rem; }
 .page-header { display: flex; gap: 1rem; align-items: flex-start; }
 .page-header h1, .card h2 { margin: 0; }
-.page-header p, .card-header p { margin: 0.25rem 0 0; color: #64748b; }
+.page-header p, .card-header p { margin: 0.25rem 0 0; color: var(--color-muted); }
 .back-button { background: none; border: 0; cursor: pointer; min-height: 44px; }
 .card { background: white; border: 1px solid rgba(15,23,42,.08); border-radius: 16px; padding: 1rem; }
 .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; align-items: end; }
@@ -721,7 +721,7 @@ function localDateString(date: Date): string {
 .exam-meta { margin-top: 1rem; display: flex; gap: .5rem; flex-wrap: wrap; }
 .warning { color: #92400e; background: #fffbeb; padding: .75rem; border-radius: 8px; }
 .card-header { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
-.btn-primary { min-height: 44px; padding: .6rem 1rem; border: 0; border-radius: 8px; background: #0066cc; color: white; cursor: pointer; }
+.btn-primary { min-height: 44px; padding: .6rem 1rem; border: 0; border-radius: 8px; background: var(--accent-strong); color: white; cursor: pointer; }
 .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
 .table-wrapper { overflow-x: auto; margin-top: 1rem; }
 .exam-table { width: 100%; border-collapse: collapse; }
@@ -730,9 +730,9 @@ function localDateString(date: Date): string {
 .value-input { width: 100px; }
 .criterion-input { width: 72px; }
 .criterion-score-cell, .total-cell { text-align: center !important; }
-.criterion-range { color: #64748b; font-size: .75rem; font-weight: 400; }
-.btn-link { border: 0; background: none; color: #0066cc; cursor: pointer; padding: 0; }
-.unit { margin-left: .35rem; color: #64748b; }
+.criterion-range { color: var(--color-muted); font-size: .75rem; font-weight: 400; }
+.btn-link { border: 0; background: none; color: var(--accent-strong); cursor: pointer; padding: 0; }
+.unit { margin-left: .35rem; color: var(--color-muted); }
 .grade-cell { text-align: center !important; }
 .note-cell { min-width: 140px; }
 .exam-row--absent { opacity: .5; background: #f8fafc; }
@@ -740,7 +740,7 @@ function localDateString(date: Date): string {
 .exam-row--missing-kit { background: #fef2f2; }
 .attest-badge { display: inline-block; border-radius: 999px; padding: .2rem .55rem; background: #fee2e2; color: #991b1b; font-weight: 700; font-size: .8rem; }
 .success-card { padding: .8rem 1rem; border-radius: 10px; background: #ecfdf5; color: #166534; }
-.empty-state { text-align: center; color: #64748b; }
+.empty-state { text-align: center; color: var(--color-muted); }
 @media (max-width: 700px) {
   .card-header { align-items: stretch; flex-direction: column; }
   .exam-table th, .exam-table td { padding: .5rem; }
