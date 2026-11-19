@@ -41,7 +41,7 @@ export class PerformanceEntryRepository extends AdapterRepository<Sport.Performa
     if (entity.studentId !== undefined) row.student_id = entity.studentId;
     if (entity.categoryId !== undefined) row.category_id = entity.categoryId;
     if (entity.measurements !== undefined) row.measurements = safeJsonStringify(entity.measurements, 'PerformanceEntry.measurements');
-    if (entity.calculatedGrade !== undefined) row.calculated_grade = entity.calculatedGrade;
+    if ('calculatedGrade' in entity) row.calculated_grade = entity.calculatedGrade ?? null;
     if (entity.timestamp !== undefined) row.timestamp = entity.timestamp.toISOString();
     if (entity.deviceInfo !== undefined) row.device_info = entity.deviceInfo;
     if (entity.comment !== undefined) row.comment = entity.comment;
