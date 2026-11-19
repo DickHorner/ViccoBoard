@@ -10,7 +10,7 @@
           {{ exam ? 'Zur Prüfung' : 'Zur Prüfungsauswahl' }}
         </RouterLink>
         <button class="primary-button" type="button" :disabled="!exam || saving || !dirty" @click="savePreset">
-          {{ saving ? 'Speichert…' : dirty ? 'Gestaltung speichern' : 'Alles gespeichert' }}
+          {{ saving ? 'Speichert…' : dirty ? preset.templateId ? 'Verknüpfung speichern' : 'Gestaltung speichern' : 'Alles gespeichert' }}
         </button>
       </div>
     </header>
@@ -20,7 +20,37 @@
 
     <div v-else-if="exam" class="designer-layout">
       <div class="editor-panel">
-        <CorrectionSheetPresetForm v-model="preset" />
+        <section class="template-picker" aria-label="Druckbogenvorlage verwenden">
+          <h2>Vorlage verwenden</h2>
+          <p>Verknüpfe diese Prüfung mit einer Druckbogenvorlage. Künftige Änderungen an der Vorlage erscheinen automatisch beim erneuten PDF-Erzeugen.</p>
+          <div v-if="templateOptions.length" class="template-controls">
+            <Select
+              inputId="sheet-template-choice"
+              v-model="selectedTemplateId"
+              :options="templateOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Druckbogenvorlage wählen"
+              aria-label="Druckbogenvorlage wählen"
+              class="template-select"
+            />
+            <Button label="Vorlage verknüpfen" :disabled="!selectedTemplateId" @click="applyTemplate" />
+          </div>
+          <Message v-if="templateLoadError" severity="warn" role="status">{{ templateLoadError }}</Message>
+          <RouterLink to="/sheet-templates" class="secondary-button">Vorlagen verwalten</RouterLink>
+        </section>
+        <div v-if="preset.templateId" class="linked-template-panel">
+          <Message severity="info" role="status">
+            Diese Prüfung verwendet die gemeinsame Vorlage „{{ linkedTemplateName }}“. Auch bei älteren Prüfungen wird beim erneuten PDF-Erzeugen die aktuelle Vorlage verwendet.
+          </Message>
+          <div class="template-controls">
+            <RouterLink :to="{ path: '/sheet-templates', query: { templateId: preset.templateId } }" class="secondary-button">Gemeinsame Vorlage bearbeiten</RouterLink>
+            <Button label="Verknüpfung lösen und individuell gestalten" severity="secondary" outlined @click="detachTemplate" />
+          </div>
+        </div>
+        <fieldset class="preset-fields" :disabled="Boolean(preset.templateId)" aria-label="Druckbogengestaltung">
+          <CorrectionSheetPresetForm v-model="preset" />
+        </fieldset>
         <p v-if="dirty" class="notice">Die Gestaltung ist noch nicht gespeichert.</p>
         <p v-if="saveMessage" class="notice" role="status">{{ saveMessage }}</p>
         <p v-if="saveError" class="notice error" role="alert">{{ saveError }}</p>
@@ -51,10 +81,13 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, RouterLink, useRoute } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
-import { createDefaultCorrectionSheetPreset } from '@viccoboard/exams'
+import { createDefaultCorrectionSheetPreset, type CorrectionSheetTemplate } from '@viccoboard/exams'
+import Button from 'openvue/button'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import CorrectionSheetPresetForm from '../components/CorrectionSheetPresetForm.vue'
 
@@ -63,10 +96,16 @@ const {
   getExam,
   getCorrectionSheetPreset,
   saveCorrectionSheetPreset,
-  previewCorrectionSheetDesignPdf
+  previewCorrectionSheetDesignPdf,
+  correctionSheetTemplateRepository
 } = useExamsBridge()
 
 const exam = ref<Exams.Exam | null>(null)
+const templates = ref<CorrectionSheetTemplate[]>([])
+const selectedTemplateId = ref('')
+const templateLoadError = ref('')
+const templateOptions = computed(() => templates.value.map(entry => ({ label: entry.name, value: entry.id })))
+const linkedTemplateName = computed(() => templates.value.find(entry => entry.id === preset.value.templateId)?.name ?? preset.value.name)
 const preset = ref<Exams.CorrectionSheetPreset>(createDefaultCorrectionSheetPreset(''))
 const loading = ref(true)
 const loadError = ref('')
@@ -120,6 +159,37 @@ watch(preset, () => {
   schedulePreview()
 }, { flush: 'sync' })
 
+async function loadTemplates(): Promise<void> {
+  try {
+    if (!correctionSheetTemplateRepository) throw new Error('Vorlagenspeicher nicht verfügbar.')
+    templates.value = await correctionSheetTemplateRepository.findAll()
+  } catch (error) {
+    templateLoadError.value = error instanceof Error ? error.message : 'Vorlagen konnten nicht geladen werden.'
+  }
+}
+
+function applyTemplate(): void {
+  if (!exam.value) return
+  const template = templates.value.find(entry => entry.id === selectedTemplateId.value)
+  if (!template) return
+  if (dirty.value && !window.confirm('Die bisherigen ungespeicherten Änderungen durch die Vorlage ersetzen?')) return
+
+  preset.value = {
+    ...template.preset,
+    id: `correction-sheet-preset:${exam.value.id}`,
+    examId: exam.value.id,
+    templateId: template.id,
+    updatedAt: new Date()
+  }
+  selectedTemplateId.value = ''
+}
+
+function detachTemplate(): void {
+  if (!preset.value.templateId) return
+  if (!window.confirm('Die Verknüpfung lösen? Spätere Änderungen an der gemeinsamen Vorlage werden dann nicht mehr übernommen.')) return
+  preset.value = { ...preset.value, templateId: undefined, updatedAt: new Date() }
+}
+
 async function savePreset(): Promise<void> {
   if (!exam.value || !saveCorrectionSheetPreset || saving.value) return
   saving.value = true
@@ -140,6 +210,7 @@ async function savePreset(): Promise<void> {
 }
 
 onMounted(async () => {
+  void loadTemplates()
   try {
     const examId = String(route.params.id)
     const loadedExam = await getExam(examId)
@@ -197,6 +268,49 @@ onBeforeUnmount(() => {
 
 .header-actions {
   align-items: center;
+}
+
+.template-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.template-picker h2,
+.template-picker p {
+  margin: 0;
+}
+
+.linked-template-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.preset-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.template-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.template-select {
+  flex: 1 1 13rem;
+  min-width: 0;
+}
+
+.template-picker :deep(.p-button) {
+  min-height: 44px;
 }
 
 .primary-button,

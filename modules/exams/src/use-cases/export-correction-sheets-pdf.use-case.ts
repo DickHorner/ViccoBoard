@@ -31,6 +31,27 @@ export class ExportCorrectionSheetsPdfUseCase {
     return this.renderer.render([projection], `${exam.title}-druckbogen-vorschau`);
   }
 
+  async previewStandaloneDesignPdf(
+    preset: Exams.CorrectionSheetPreset
+  ): Promise<Exams.CorrectionSheetPdfDocument> {
+    if (preset.examId) {
+      throw new Error('Eine unabhängige Druckbogenvorlage darf keiner Prüfung zugeordnet sein.');
+    }
+
+    const projection: Exams.CorrectionSheetProjection = {
+      ...preset,
+      isDesignPreview: true,
+      examId: '',
+      examTitle: preset.name,
+      candidateId: '',
+      candidateName: '',
+      maxPoints: 0,
+      totalPoints: 0,
+      taskRows: []
+    };
+    return this.renderer.render([projection], `${preset.name}-druckbogen-vorschau`);
+  }
+
   async exportCurrentCandidatePdf(
     examId: string,
     candidateId: string

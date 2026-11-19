@@ -22,6 +22,17 @@ describe('router fallback navigation', () => {
     expect(router.resolve('/exams/exam-1/export').name).toBe('exam-export')
   })
 
+
+  it('opens the reusable sheet library without an exam id', () => {
+    const library = router.resolve('/sheet-templates')
+
+    expect(library.name).toBe('sheet-templates')
+    expect(library.params.id).toBeUndefined()
+    expect(resolveBackFallbackPath(library)).toBe('/subjects/kbr')
+    expect(router.resolve('/exams/exam-1/sheet-design').name).toBe('exam-sheet-design')
+    expect(router.resolve('/exams?workflow=design').name).toBe('exams')
+  })
+
   it('keeps the exam workspace distinct from legacy edit and deep links', () => {
     const workspace = router.resolve('/exams/exam-1/workspace')
     expect(workspace.name).toBe('exam-workspace')

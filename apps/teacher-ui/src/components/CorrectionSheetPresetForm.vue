@@ -2,16 +2,16 @@
   <section class="preset-section">
     <div class="section-header">
       <div>
-        <h2>Rückmeldebogen</h2>
+        <h2>Druckbogengestaltung</h2>
         <p class="section-copy">
-          Steuert die Darstellung des Korrektur- und Exportbogens, ohne die Prüfungslogik zu duplizieren.
+          Das wiederverwendbare Blanko-Layout für Rückmeldebögen. Prüfungsinhalte und Bewertungen werden erst beim PDF-Erzeugen eingesetzt.
         </p>
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
-        <label for="preset-name">Preset-Name</label>
+        <label for="preset-name">Vorlagenname</label>
         <input
           id="preset-name"
           :value="modelValue.name"
@@ -88,6 +88,55 @@
       </div>
     </div>
 
+    <div v-if="modelValue.showSignatureArea" class="signature-position-section">
+      <h3>Unterschrift und Datum</h3>
+      <label class="signature-date-toggle">
+        <input
+          type="checkbox"
+          :checked="modelValue.showSignatureDate !== false"
+          @change="updateField('showSignatureDate', ($event.target as HTMLInputElement).checked)"
+        />
+        Datum neben der Unterschrift beim PDF-Erzeugen einsetzen
+      </label>
+      <p class="section-copy">
+        Verschiebe die Unterschrift per Finger, Maus oder Pfeiltasten. Die horizontale Position und der zusätzliche Abstand zum vorherigen Inhalt werden auch im PDF übernommen.
+      </p>
+      <div ref="signaturePositionArea" class="signature-position-preview" aria-label="Positionierungsfeld für die Unterschrift">
+        <button
+          ref="signaturePositionMarker"
+          type="button"
+          class="signature-position-marker"
+          :style="{ left: `${signaturePositionX * 0.55}%`, top: `${signaturePositionY * 0.625}%` }"
+          aria-label="Unterschrift verschieben. Mit den Pfeiltasten bewegen, mit Umschalt schneller."
+          @pointerdown="startSignatureDrag"
+          @pointermove="moveSignatureDrag"
+          @pointerup="endSignatureDrag"
+          @pointercancel="endSignatureDrag"
+          @keydown="nudgeSignature"
+        >
+          <img v-if="modelValue.teacherSignature?.src" :src="modelValue.teacherSignature.src" alt="Unterschrift" />
+          <span v-else>Unterschrift</span>
+          <small v-if="modelValue.showSignatureDate !== false">Datum beim PDF-Erzeugen</small>
+        </button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="signature-position-x">Waagerechte Position (0–100)</label>
+          <input id="signature-position-x" type="number" min="0" max="100" step="1"
+            :value="signaturePositionX"
+            @change="updateSignaturePosition(Number(($event.target as HTMLInputElement).value), signaturePositionY)"
+          />
+        </div>
+        <div class="form-group">
+          <label for="signature-position-y">Zusätzlicher Abstand nach unten (0–100)</label>
+          <input id="signature-position-y" type="number" min="0" max="100" step="1"
+            :value="signaturePositionY"
+            @change="updateSignaturePosition(signaturePositionX, Number(($event.target as HTMLInputElement).value))"
+          />
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="preset-footer-text">Footer-Text</label>
       <textarea
@@ -101,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Exams } from '@viccoboard/core';
 
 const props = defineProps<{
@@ -112,7 +161,68 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: Exams.CorrectionSheetPreset): void;
 }>();
 const signatureCanvas = ref<HTMLCanvasElement | null>(null);
+const signaturePositionArea = ref<HTMLElement | null>(null);
+const signaturePositionMarker = ref<HTMLButtonElement | null>(null);
+const signaturePositionX = computed(() => clampPosition(props.modelValue.signaturePositionX));
+const signaturePositionY = computed(() => clampPosition(props.modelValue.signaturePositionY));
 let drawing = false;
+let signatureDrag: { pointerId: number; clientX: number; clientY: number; x: number; y: number } | null = null;
+
+function clampPosition(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function updateSignaturePosition(x: number, y: number): void {
+  emit('update:modelValue', {
+    ...props.modelValue,
+    signaturePositionX: clampPosition(x),
+    signaturePositionY: clampPosition(y),
+    updatedAt: new Date()
+  });
+}
+
+function startSignatureDrag(event: PointerEvent): void {
+  if (!signaturePositionArea.value || !signaturePositionMarker.value) return;
+  event.preventDefault();
+  signatureDrag = {
+    pointerId: event.pointerId,
+    clientX: event.clientX,
+    clientY: event.clientY,
+    x: signaturePositionX.value,
+    y: signaturePositionY.value
+  };
+  signaturePositionMarker.value.setPointerCapture(event.pointerId);
+}
+
+function moveSignatureDrag(event: PointerEvent): void {
+  if (!signatureDrag || event.pointerId !== signatureDrag.pointerId) return;
+  const area = signaturePositionArea.value;
+  const marker = signaturePositionMarker.value;
+  if (!area || !marker) return;
+  const travelX = Math.max(1, area.clientWidth - marker.offsetWidth);
+  const travelY = Math.max(1, area.clientHeight - marker.offsetHeight);
+  updateSignaturePosition(
+    signatureDrag.x + (event.clientX - signatureDrag.clientX) * 100 / travelX,
+    signatureDrag.y + (event.clientY - signatureDrag.clientY) * 100 / travelY
+  );
+}
+
+function endSignatureDrag(event: PointerEvent): void {
+  if (!signatureDrag || signatureDrag.pointerId !== event.pointerId) return;
+  const marker = signaturePositionMarker.value;
+  if (marker?.hasPointerCapture(event.pointerId)) marker.releasePointerCapture(event.pointerId);
+  signatureDrag = null;
+}
+
+function nudgeSignature(event: KeyboardEvent): void {
+  const step = event.shiftKey ? 10 : 2;
+  const deltaX = event.key === 'ArrowRight' ? step : event.key === 'ArrowLeft' ? -step : 0;
+  const deltaY = event.key === 'ArrowDown' ? step : event.key === 'ArrowUp' ? -step : 0;
+  if (!deltaX && !deltaY) return;
+  event.preventDefault();
+  updateSignaturePosition(signaturePositionX.value + deltaX, signaturePositionY.value + deltaY);
+}
 
 const toggles: Array<{ key: keyof Exams.CorrectionSheetPreset; label: string }> = [
   { key: 'showHeader', label: 'Kopfbereich anzeigen' },
@@ -228,7 +338,7 @@ function saveDrawing(): void {
 .form-row {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
 .form-group {
@@ -249,7 +359,7 @@ function saveDrawing(): void {
 .toggle-grid {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
 .toggle-card {
@@ -273,6 +383,7 @@ function saveDrawing(): void {
 }
 
 .small-button {
+  min-height: 44px;
   border: 1px solid rgba(15, 23, 42, 0.2);
   border-radius: 999px;
   background: transparent;
@@ -284,4 +395,71 @@ textarea {
   resize: vertical;
 }
 .signature-canvas { width: 100%; max-width: 360px; height: 100px; border: 1px dashed rgba(15, 23, 42, 0.28); background: #fff; touch-action: none; }
+
+.signature-position-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.signature-position-section h3 {
+  margin: 0;
+}
+
+.signature-date-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+}
+
+.signature-position-preview {
+  position: relative;
+  height: 160px;
+  border: 1px dashed var(--surface-border);
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.signature-position-marker {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 45%;
+  height: 60px;
+  min-height: 44px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--accent-strong);
+  border-radius: 0.5rem;
+  background: #f8fafc;
+  color: var(--color-ink);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.signature-position-marker:active {
+  cursor: grabbing;
+}
+
+.signature-position-marker:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.signature-position-marker img {
+  max-width: 100%;
+  max-height: 30px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.signature-position-marker small {
+  font-size: 0.65rem;
+  color: var(--color-muted);
+}
+
 </style>

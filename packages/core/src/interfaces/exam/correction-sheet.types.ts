@@ -8,6 +8,8 @@ export interface CorrectionSheetImage {
 export interface CorrectionSheetPreset {
   id: string;
   examId: string;
+  /** Live reference to a reusable layout template; unset for standalone or individual layouts. */
+  templateId?: string;
   name: string;
   layoutMode: CorrectionSheetLayoutMode;
   showHeader: boolean;
@@ -22,6 +24,11 @@ export interface CorrectionSheetPreset {
   showPointDeductions: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
+  showSignatureDate?: boolean;
+  /** Horizontal position within the printable width, 0 (left) to 100 (right). */
+  signaturePositionX?: number;
+  /** Extra spacing before the signature block, 0 to 100 percent of 90 PDF points. */
+  signaturePositionY?: number;
   headerText?: string;
   footerText?: string;
   schoolLogo?: CorrectionSheetImage;
@@ -88,6 +95,9 @@ export interface CorrectionSheetProjection {
   showPointDeductions: boolean;
   showExamParts: boolean;
   showSignatureArea: boolean;
+  showSignatureDate?: boolean;
+  signaturePositionX?: number;
+  signaturePositionY?: number;
   taskRows: CorrectionSheetTaskRow[];
   supportTips?: ProjectionSupportTipRow[];
 }

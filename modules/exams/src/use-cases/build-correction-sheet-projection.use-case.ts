@@ -187,6 +187,9 @@ export class BuildCorrectionSheetProjectionUseCase {
       showPointDeductions: preset.showPointDeductions,
       showExamParts: preset.showExamParts,
       showSignatureArea: preset.showSignatureArea,
+      showSignatureDate: preset.showSignatureDate,
+      signaturePositionX: preset.signaturePositionX,
+      signaturePositionY: preset.signaturePositionY,
       taskRows,
       supportTips: supportTipRows
     };
