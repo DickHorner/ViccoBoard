@@ -53,10 +53,10 @@
         <div class="panel-header">
           <h3>📷 {{ t('FINISH_CAMERA.camera') }}</h3>
           <div class="camera-actions">
-            <Button v-if="!cameraActive" class="btn" @click="startCamera">
+            <Button v-if="!cameraActive" @click="startCamera">
               {{ t('FINISH_CAMERA.start-camera') }}
             </Button>
-            <Button severity="danger" v-else class="btn" @click="stopCamera">
+            <Button severity="danger" v-else @click="stopCamera">
               {{ t('FINISH_CAMERA.stop-camera') }}
             </Button>
           </div>
@@ -97,13 +97,13 @@
           {{ formattedElapsed }}
         </div>
         <div class="stopwatch-controls">
-          <Button class="btn" :disabled="sessionActive || !finishLineSet" @click="startSession">
+          <Button :disabled="sessionActive || !finishLineSet" @click="startSession">
             ▶ {{ t('FINISH_CAMERA.start') }}
           </Button>
           <button class="btn btn-warning" :disabled="!sessionActive" @click="pauseSession">
             ⏸ {{ t('FINISH_CAMERA.pause') }}
           </button>
-          <Button severity="secondary" outlined class="btn" :disabled="sessionActive" @click="resetSession">
+          <Button severity="secondary" outlined :disabled="sessionActive" @click="resetSession">
             🔄 {{ t('FINISH_CAMERA.reset') }}
           </Button>
           <button class="btn btn-icon" :title="t('FINISH_CAMERA.manual-event')" :disabled="!sessionActive" @click="addManualEvent">
@@ -198,7 +198,6 @@
             </option>
           </select>
           <Button
-            class="btn"
             :disabled="!selectedCategoryId || !hasAssignedEvents || sending"
             @click="sendToMittelstrecke"
           >
