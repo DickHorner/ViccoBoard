@@ -6,7 +6,9 @@
         <p v-if="exam" class="subtitle">{{ exam.title }}</p>
       </div>
       <div class="header-actions">
-        <RouterLink to="/exams?workflow=design" class="secondary-button">Zur Prüfungsauswahl</RouterLink>
+        <RouterLink :to="exam ? `/exams/${exam.id}/workspace` : '/exams?workflow=design'" class="secondary-button">
+          {{ exam ? 'Zur Prüfung' : 'Zur Prüfungsauswahl' }}
+        </RouterLink>
         <button class="primary-button" type="button" :disabled="!exam || saving || !dirty" @click="savePreset">
           {{ saving ? 'Speichert…' : dirty ? 'Gestaltung speichern' : 'Alles gespeichert' }}
         </button>
@@ -50,7 +52,7 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { onBeforeRouteLeave, RouterLink, useRoute } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
 import { createDefaultCorrectionSheetPreset } from '@viccoboard/exams'
 import { useExamsBridge } from '../composables/useExamsBridge'
@@ -151,6 +153,11 @@ onMounted(async () => {
     loadError.value = error instanceof Error ? error.message : 'Druckbogen konnte nicht geladen werden.'
     loading.value = false
   }
+})
+
+onBeforeRouteLeave(() => {
+  if (!dirty.value) return true
+  return window.confirm('Die Druckbogengestaltung ist noch nicht gespeichert. Trotzdem verlassen?')
 })
 
 onBeforeUnmount(() => {

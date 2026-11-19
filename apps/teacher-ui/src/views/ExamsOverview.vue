@@ -16,8 +16,13 @@
     </header>
 
     <p v-if="importError" class="state-card import-error" role="alert">{{ importError }}</p>
+    <Message v-if="contextError" severity="warn" role="status">{{ contextError }}</Message>
 
-    <div v-if="loading" class="state-card">Prüfungen werden geladen…</div>
+    <div v-if="loading" class="state-card" role="status">Prüfungen werden geladen…</div>
+    <div v-else-if="loadError" class="state-card" role="alert">
+      <p>{{ loadError }}</p>
+      <Button label="Erneut versuchen" @click="loadExams" />
+    </div>
 
     <div v-else-if="exams.length === 0" class="state-card">
       <h2>Noch keine Prüfungen</h2>
@@ -47,7 +52,7 @@
             <div class="exam-actions">
               <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
               <template v-else>
-                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                <button class="ghost" type="button" @click="openExamWorkspace(exam.id)">Öffnen</button>
                 <button class="ghost" type="button" @click="copyExam(exam)">Aus Vorlage erstellen</button>
                 <button class="ghost" type="button" @click="openExport(exam.id)">Exportieren</button>
               </template>
@@ -57,7 +62,7 @@
       </section>
 
       <section class="exam-section" aria-labelledby="concrete-exams-heading">
-        <h2 id="concrete-exams-heading">{{ workflow ? 'Prüfung auswählen' : `Prüfungen · ${activeYear}` }}</h2>
+        <h2 id="concrete-exams-heading">{{ workflow ? 'Prüfung auswählen' : activeYear ? `Prüfungen · ${activeYear}` : 'Prüfungen' }}</h2>
         <div v-if="concreteExams.length === 0" class="state-card compact">
           Noch keine konkreten Prüfungen.
         </div>
@@ -76,7 +81,7 @@
             <div class="exam-actions">
               <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
               <template v-else>
-                <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                <button class="ghost" type="button" @click="openExamWorkspace(exam.id)">Öffnen</button>
                 <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
                 <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
                 <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
@@ -106,7 +111,7 @@
               <div class="exam-actions">
                 <button v-if="workflow" class="primary" type="button" @click="openWorkflow(exam.id)">{{ workflow.action }}</button>
                 <template v-else>
-                  <button class="ghost" type="button" @click="editExam(exam.id)">Öffnen</button>
+                  <button class="ghost" type="button" @click="openExamWorkspace(exam.id)">Öffnen</button>
                   <button class="ghost" type="button" @click="copyExam(exam)">Als Kopie verwenden</button>
                   <button class="ghost" type="button" @click="openCorrection(exam.id)">Korrigieren</button>
                   <button class="ghost" type="button" @click="openAnalysis(exam.id)">Analysieren</button>
@@ -122,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { parseExamDefinition } from '@viccoboard/exams'
@@ -132,6 +137,9 @@ import { getStorageAdapter } from '../services/storage.service'
 import { loadActiveSchoolYear } from '../services/school-year.service'
 import { examSchoolYear, isExamTemplate } from '../utils/exam-school-year'
 import { formatGermanDate } from '../utils/locale-format'
+import { recordRouteContentReady } from '../utils/navigation-performance'
+import Button from 'openvue/button'
+import Message from 'openvue/message'
 
 const router = useRouter()
 const route = useRoute()
@@ -178,6 +186,8 @@ const exams = ref<ExamsTypes.Exam[]>([])
 const classes = ref<ClassGroup[]>([])
 const activeYear = ref('')
 const loading = ref(true)
+const loadError = ref('')
+const contextError = ref('')
 const importing = ref(false)
 const importError = ref('')
 const examImportInput = ref<HTMLInputElement | null>(null)
@@ -186,9 +196,10 @@ const classYears = computed(() => new Map(classes.value.map(group => [group.id, 
 const templateExams = computed(() => exams.value.filter(isExamTemplate))
 const concreteExams = computed(() => exams.value.filter(exam =>
   !isExamTemplate(exam) &&
-  (!examSchoolYear(exam, classYears.value) || examSchoolYear(exam, classYears.value) === activeYear.value)
+  (!activeYear.value || !examSchoolYear(exam, classYears.value) || examSchoolYear(exam, classYears.value) === activeYear.value)
 ))
 const archivedExams = computed(() => exams.value.filter(exam => {
+  if (!activeYear.value) return false
   const year = examSchoolYear(exam, classYears.value)
   return !isExamTemplate(exam) && year !== null && year !== activeYear.value
 }))
@@ -224,16 +235,42 @@ const clonePrintPresetsForExam = (
 
 const loadExams = async () => {
   loading.value = true
-  const groupRepository = getSportBridge().classGroupRepository
-  const [result, groups, year] = await Promise.all([
-    examRepository?.findAll() ?? Promise.resolve([]),
-    groupRepository.findAll(),
-    loadActiveSchoolYear(getStorageAdapter(), groupRepository)
-  ])
-  exams.value = result
-  classes.value = groups
-  activeYear.value = year
-  loading.value = false
+  loadError.value = ''
+  try {
+    if (!examRepository) throw new Error('Prüfungsspeicher nicht verfügbar.')
+    exams.value = await examRepository.findAll()
+  } catch (error) {
+    console.error('Failed to load exams:', error)
+    loadError.value = 'Die Prüfungen konnten nicht geladen werden.'
+  } finally {
+    loading.value = false
+  }
+  if (!loadError.value) {
+    await nextTick()
+    recordRouteContentReady('exams')
+  }
+}
+
+const loadContext = async () => {
+  contextError.value = ''
+  try {
+    const groupRepository = getSportBridge().classGroupRepository
+    const [groups, year] = await Promise.allSettled([
+      groupRepository.findAll(),
+      loadActiveSchoolYear(getStorageAdapter(), groupRepository)
+    ])
+    if (groups.status === 'fulfilled') classes.value = groups.value
+    if (year.status === 'fulfilled') activeYear.value = year.value
+    if (groups.status === 'rejected' || year.status === 'rejected') {
+      console.error('Failed to load exam school year context:',
+        groups.status === 'rejected' ? groups.reason : null,
+        year.status === 'rejected' ? year.reason : null)
+      contextError.value = 'Schuljahres- oder Klassenzuordnung konnte nicht vollständig geladen werden.'
+    }
+  } catch (error) {
+    console.error('Failed to initialize exam context:', error)
+    contextError.value = 'Schuljahres- und Klassenzuordnung sind derzeit nicht verfügbar.'
+  }
 }
 
 const importExamFile = async (event: Event) => {
@@ -249,7 +286,7 @@ const importExamFile = async (event: Event) => {
     const exam = parseExamDefinition(JSON.parse(await file.text()))
     const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...payload } = exam
     const created = await examRepository.create(payload)
-    router.push(`/exams/${created.id}`)
+    router.push(`/exams/${created.id}/workspace`)
   } catch (error) {
     importError.value = error instanceof Error ? error.message : 'Prüfung konnte nicht importiert werden.'
   } finally {
@@ -261,8 +298,8 @@ const createNew = () => {
   router.push('/exams/new')
 }
 
-const editExam = (id: string) => {
-  router.push(`/exams/${id}`)
+const openExamWorkspace = (id: string) => {
+  router.push(`/exams/${id}/workspace`)
 }
 
 const copyExam = async (exam: ExamsTypes.Exam) => {
@@ -317,7 +354,8 @@ const formatStatus = (status: ExamsTypes.Exam['status']) => {
 const formatDate = (date: Date) => formatGermanDate(date)
 
 onMounted(() => {
-  loadExams()
+  void loadExams()
+  void loadContext()
 })
 </script>
 

@@ -120,6 +120,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Einfache Prüfung bearbeiten', parent: '/exams' }
   },
   {
+    path: '/exams/:id/workspace',
+    name: 'exam-workspace',
+    component: () => import('../views/ExamWorkspace.vue'),
+    meta: { title: 'Prüfungsarbeitsbereich', parent: '/exams' }
+  },
+  {
     path: '/exams/:id',
     name: 'exam-edit',
     component: () => import('../views/KBRExamBuilder.vue'),

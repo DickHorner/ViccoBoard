@@ -17,7 +17,7 @@
           {{ hasChanges ? 'Aktuellen Stand speichern' : 'Alles gespeichert' }}
         </button>
         <button @click="openExportPage" class="btn-secondary" :disabled="!exam">Export</button>
-        <button @click="goBack" class="btn-secondary">Zurück zu den Prüfungen</button>
+        <button @click="goBack" class="btn-secondary">Zur Prüfung</button>
       </div>
     </div>
 
@@ -302,7 +302,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router';
 import { Exams } from '@viccoboard/core';
 import {
   GradingKeyService,
@@ -453,7 +453,10 @@ async function loadExamData(): Promise<void> {
     supportTips.value = await supportTipRepository?.findAll() ?? [];
 
     if (loadedExam.candidates.length > 0) {
-      await selectCandidate(loadedExam.candidates[0]);
+      const candidateId = typeof route.query.candidateId === 'string' ? route.query.candidateId : '';
+      const candidate = loadedExam.candidates.find((entry: Exams.Candidate) => entry.id === candidateId)
+        ?? loadedExam.candidates[0];
+      await selectCandidate(candidate);
       return;
     }
 
@@ -737,36 +740,44 @@ async function exportAllCandidates(): Promise<void> {
   }
 }
 
+async function saveBeforeLeaving(): Promise<boolean> {
+  if (!hasChanges.value) return true;
+  if (!recordCorrectionUseCase || !currentCandidate.value) {
+    toast.error('Der aktuelle Korrekturstand konnte nicht gespeichert werden.');
+    return false;
+  }
+  try {
+    await saveCurrentCandidate(false);
+    return true;
+  } catch (error) {
+    console.error('Failed to save correction before navigation:', error);
+    toast.error('Der aktuelle Korrekturstand konnte nicht gespeichert werden.');
+    return false;
+  }
+}
+
 async function openPreviewForCurrentCandidate(): Promise<void> {
-  if (!exam.value || !currentCandidate.value) {
-    return;
-  }
-
-  if (hasChanges.value) {
-    try {
-      await saveCurrentCandidate(false);
-    } catch {
-      toast.error('Der aktuelle Korrekturstand konnte nicht gespeichert werden.');
-      return;
-    }
-  }
-
+  if (!exam.value || !currentCandidate.value || !(await saveBeforeLeaving())) return;
   await router.push({
     path: `/exams/${exam.value.id}/export`,
     query: { candidateId: currentCandidate.value.id }
   });
 }
 
-function openExportPage(): void {
-  if (!exam.value) {
-    return;
-  }
-  router.push(`/exams/${exam.value.id}/export`);
+async function openExportPage(): Promise<void> {
+  if (!exam.value || !(await saveBeforeLeaving())) return;
+  await router.push({
+    path: `/exams/${exam.value.id}/export`,
+    query: currentCandidate.value ? { candidateId: currentCandidate.value.id } : {}
+  });
 }
 
-function goBack(): void {
-  router.push('/exams');
+async function goBack(): Promise<void> {
+  if (!exam.value || !(await saveBeforeLeaving())) return;
+  await router.push(`/exams/${exam.value.id}/workspace`);
 }
+
+onBeforeRouteLeave(async () => saveBeforeLeaving());
 
 onMounted(() => {
   loadExamData();
