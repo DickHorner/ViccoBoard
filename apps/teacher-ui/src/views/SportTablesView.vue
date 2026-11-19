@@ -129,7 +129,7 @@
 <script setup lang="ts">
 import Button from 'openvue/button'
 import { ref, computed, onMounted } from 'vue'
-import Button from 'openvue/button'
+
 import InputText from 'openvue/inputtext'
 import Message from 'openvue/message'
 import Tag from 'openvue/tag'
