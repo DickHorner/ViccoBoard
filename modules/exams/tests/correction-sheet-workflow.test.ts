@@ -218,6 +218,56 @@ describe('KBR correction sheet workflow', () => {
     expect(reloaded?.comments[0]?.text).toBe('Saubere Überarbeitung mit nachvollziehbarer Argumentation.');
   });
 
+  test('re-renders a previously corrected exam with the current shared layout', async () => {
+    const exam = await createExam();
+    const library = new CorrectionSheetTemplateRepository(storage.getAdapter(), examRepository);
+    const template = await library.create({
+      ...createDefaultCorrectionSheetPreset(''),
+      name: 'Gemeinsamer Druckbogen',
+      headerText: 'Vorlagenfassung 1',
+      showSignatureArea: true,
+      showSignatureDate: true,
+      signaturePositionX: 0,
+      signaturePositionY: 0
+    });
+
+    await savePresetUseCase.execute({
+      ...template.preset,
+      examId: exam.id,
+      templateId: template.id
+    });
+    await recordCorrectionUseCase.execute({
+      examId: exam.id,
+      candidateId: 'cand-1',
+      taskScores: [
+        { taskId: 'task-1', points: 9, maxPoints: 10, timestamp: new Date() },
+        { taskId: 'task-2', points: 12, maxPoints: 15, timestamp: new Date() }
+      ],
+      comments: [],
+      finalizeCorrection: true
+    });
+
+    expect((await buildProjectionUseCase.execute(exam.id, 'cand-1')).headerText).toBe('Vorlagenfassung 1');
+
+    await library.update(template.id, {
+      ...template.preset,
+      headerText: 'Vorlagenfassung 2',
+      signaturePositionX: 100,
+      signaturePositionY: 100,
+      showSignatureDate: false
+    });
+
+    const current = await buildProjectionUseCase.execute(exam.id, 'cand-1');
+    expect(current).toEqual(expect.objectContaining({
+      headerText: 'Vorlagenfassung 2',
+      signaturePositionX: 100,
+      signaturePositionY: 100,
+      showSignatureDate: false
+    }));
+    const reRendered = await exportSheetsUseCase.exportCurrentCandidatePdf(exam.id, 'cand-1');
+    expect((await PDFDocument.load(reRendered.bytes)).getPageCount()).toBeGreaterThan(0);
+  });
+
   test('builds a printable projection from exam, correction and preset', async () => {
     const exam = await createExam();
 
