@@ -143,7 +143,7 @@ describe('CorrectionSheetPresetRepository', () => {
   });
   test('applies an independent layout to an exam without modifying the library template', async () => {
     const exam = await createExam();
-    const library = new CorrectionSheetTemplateRepository(storage.getAdapter());
+    const library = new CorrectionSheetTemplateRepository(storage.getAdapter(), examRepository);
     const template = await library.create({
       ...createDefaultCorrectionSheetPreset(''),
       name: 'Allgemeine Rückmeldung',
