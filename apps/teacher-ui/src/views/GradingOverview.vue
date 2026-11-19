@@ -2,11 +2,13 @@
   <div class="grading-overview-view sport-ui">
     <div class="page-header">
       <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
-      <h2>Bewertungsübersicht</h2>
-      <p class="page-description">Verwalten Sie Bewertungskategorien und erfassen Sie Noten.</p>
+      <h2>Bewerten & Prüfen</h2>
+      <p class="page-description">Prüfungen durchführen, Bewertungen erfassen und Bewertungskategorien verwalten.</p>
     </div>
 
     <div class="quick-links app-actions-row">
+      <Button label="Leistungsabnahmen" icon="pi pi-clipboard" severity="secondary" outlined @click="$router.push('/subjects/sport/assessments')" />
+      <Button label="Eigene Prüfung durchführen" icon="pi pi-pencil" severity="secondary" outlined @click="$router.push('/subjects/sport/exam')" />
       <Button label="Tabellenverwaltung" icon="pi pi-table" severity="secondary" outlined @click="$router.push('/grading/tables')" />
       <Button label="Kriterienkataloge" icon="pi pi-list" severity="secondary" outlined @click="$router.push('/settings/catalogs')" />
     </div>
