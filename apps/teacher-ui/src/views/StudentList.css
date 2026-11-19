@@ -504,3 +504,54 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Compact page header and token-bound surfaces, matching the shared OpenVue shell. */
+.student-list-page__header {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  overflow: visible;
+}
+
+.student-list-page__header::before,
+.student-list-page__header::after {
+  display: none;
+}
+
+.student-list-page__eyebrow,
+.student-list-page__intro,
+.student-list-page__metric span {
+  color: var(--color-muted);
+}
+
+.student-list-page__header h1 {
+  color: var(--color-ink);
+  font-size: 20px;
+  letter-spacing: -0.015em;
+}
+
+.student-list-page__status-dot {
+  background: var(--accent-strong);
+}
+
+.student-list-page__hero-metrics {
+  margin-top: 16px;
+  border-color: var(--surface-border);
+}
+
+.student-list-page__metric strong {
+  color: var(--color-ink);
+}
+
+.student-list-page__hero-actions :deep(button:first-child) {
+  background: transparent;
+  border-color: var(--surface-border);
+  color: var(--color-ink);
+}
+
+.student-list-page__hero-actions :deep(button:first-child:hover) {
+  background: var(--surface-muted);
+}
