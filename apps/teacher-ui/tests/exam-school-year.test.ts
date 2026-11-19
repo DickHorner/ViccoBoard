@@ -18,6 +18,29 @@ describe('exam school-year classification', () => {
     expect(examSchoolYear(template, classYears)).toBeNull()
   })
 
+  test('explicit exams remain exams without a date, class or candidates', () => {
+    const draft = {
+      kind: 'exam',
+      candidates: []
+    } as unknown as Exams.Exam
+    expect(isExamTemplate(draft)).toBe(false)
+  })
+
+  test('does not treat previously mislabelled exams with candidates as templates', () => {
+    const exam = {
+      kind: 'template',
+      candidates: [{ id: 'candidate-1' }],
+      date: new Date('2026-11-04')
+    } as unknown as Exams.Exam
+    expect(isExamTemplate(exam)).toBe(false)
+    expect(examSchoolYear(exam, classYears)).toBe('2026/2027')
+  })
+
+  test('retains the legacy fallback for records without a saved kind', () => {
+    const legacy = { candidates: [] } as unknown as Exams.Exam
+    expect(isExamTemplate(legacy)).toBe(true)
+  })
+
   test('uses the exam date when the class advances to another year', () => {
     const exam = {
       kind: 'exam',
