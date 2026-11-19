@@ -19,7 +19,7 @@
 .back-button {
   background: none;
   border: none;
-  color: #0f766e;
+  color: var(--accent-strong);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem;
@@ -71,7 +71,7 @@
 
 .badge {
   background: rgba(14, 116, 144, 0.12);
-  color: #155e75;
+  color: var(--color-ink);
   font-weight: 700;
   font-size: 0.85rem;
   padding: 0.25rem 0.75rem;
@@ -89,7 +89,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background: #f8fafc;
+  background: var(--surface-soft);
   border: 2px solid rgba(15, 23, 42, 0.08);
   border-radius: 14px;
   padding: 1.5rem 1rem;
@@ -100,7 +100,7 @@
 }
 
 .method-card:hover {
-  border-color: #0f766e;
+  border-color: var(--accent-strong);
 }
 
 .method-card p {
@@ -125,7 +125,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background: #f8fafc;
+  background: var(--surface-soft);
   border: 2px solid rgba(15, 23, 42, 0.08);
   border-radius: 14px;
   padding: 1.5rem 1rem;
@@ -141,8 +141,8 @@
 }
 
 .emoji-btn:hover {
-  border-color: #0f766e;
-  background: #ecfdf5;
+  border-color: var(--accent-strong);
+  background: var(--surface-soft);
 }
 
 .rating-section {
@@ -167,7 +167,7 @@
   height: 52px;
   border-radius: 50%;
   border: 2px solid rgba(15, 23, 42, 0.15);
-  background: #f8fafc;
+  background: var(--surface-soft);
   font-size: 1.25rem;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
@@ -175,9 +175,9 @@
 
 .rating-btn.selected,
 .rating-btn:hover {
-  background: #0f766e;
+  background: var(--accent-strong);
   color: white;
-  border-color: #0f766e;
+  border-color: var(--accent-strong);
 }
 
 .collect-actions {
@@ -188,7 +188,7 @@
 }
 
 .btn-primary {
-  background: #0f766e;
+  background: var(--accent-strong);
   color: white;
   border: none;
   border-radius: 8px;
@@ -205,8 +205,8 @@
 
 .btn-secondary {
   background: white;
-  color: #0f766e;
-  border: 2px solid #0f766e;
+  color: var(--accent-strong);
+  border: 2px solid var(--accent-strong);
   border-radius: 8px;
   padding: 0.75rem 1.25rem;
   font-size: 1rem;
@@ -217,7 +217,7 @@
 .btn-link {
   background: none;
   border: none;
-  color: #0f766e;
+  color: var(--accent-strong);
   cursor: pointer;
   font-size: 0.875rem;
   padding: 0.25rem 0.5rem;
@@ -239,7 +239,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: #f8fafc;
+  background: var(--surface-soft);
   border-radius: 10px;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -296,7 +296,7 @@
 .bar-fill.good { background: #22c55e; }
 .bar-fill.neutral { background: #f59e0b; }
 .bar-fill.bad { background: #ef4444; }
-.bar-fill.rating { background: #0f766e; }
+.bar-fill.rating { background: var(--accent-strong); }
 
 .bar-count {
   text-align: right;
@@ -313,7 +313,7 @@
 .analysis-avg {
   font-size: 2rem;
   font-weight: 700;
-  color: #0f766e;
+  color: var(--accent-strong);
   margin: 0 0 1rem;
 }
 
