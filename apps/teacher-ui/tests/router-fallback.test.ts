@@ -22,6 +22,23 @@ describe('router fallback navigation', () => {
     expect(router.resolve('/exams/exam-1/export').name).toBe('exam-export')
   })
 
+  it('keeps the exam workspace distinct from legacy edit and deep links', () => {
+    const workspace = router.resolve('/exams/exam-1/workspace')
+    expect(workspace.name).toBe('exam-workspace')
+    expect(workspace.params.id).toBe('exam-1')
+    expect(resolveBackFallbackPath(workspace)).toBe('/exams')
+
+    expect(router.resolve('/exams/exam-1').name).toBe('exam-edit')
+    expect(router.resolve('/exams/exam-1/correct').name).toBe('exam-correct')
+    expect(router.resolve('/exams/exam-1/analysis').name).toBe('exam-analysis')
+    expect(router.resolve('/exams/exam-1/sheet-design').name).toBe('exam-sheet-design')
+    expect(router.resolve('/exams/exam-1/export').name).toBe('exam-export')
+
+    const correction = router.resolve('/exams/exam-1/correct?candidateId=candidate-1')
+    expect(correction.params.id).toBe('exam-1')
+    expect(correction.query.candidateId).toBe('candidate-1')
+  })
+
   it('resolves KBR workflow entry and its existing destinations', () => {
     for (const workflow of ['correct', 'sheets', 'analysis']) {
       expect(router.resolve(`/exams?workflow=${workflow}`).name).toBe('exams')
