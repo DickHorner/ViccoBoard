@@ -195,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
@@ -207,6 +207,7 @@ import {
 } from '../utils/attendance-entry'
 import { buildAttendanceExportCsv, ATTENDANCE_EXPORT_COLUMNS } from '../utils/attendance-export'
 import { downloadText } from '../utils/download'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 import { AttendanceStatus } from '@viccoboard/core'
 import type { ClassGroup, Student, StatusOption, Subject } from '@viccoboard/core'
 
@@ -423,6 +424,10 @@ const onClassChange = async () => {
       catalogLoading.value = false
     }
   }
+  if (version === classLoadVersion && !saveError.value) {
+    await nextTick()
+    recordRouteContentReady('attendance')
+  }
 }
 
 const handleSaveAttendance = async () => {
@@ -539,6 +544,10 @@ onMounted(async () => {
   }
 
   await lookups
+  if (!selectedClassId.value && !saveError.value) {
+    await nextTick()
+    recordRouteContentReady('attendance')
+  }
 })
 </script>
 
