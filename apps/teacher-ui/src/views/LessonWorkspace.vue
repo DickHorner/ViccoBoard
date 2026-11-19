@@ -1,5 +1,5 @@
 <template>
-  <section class="lesson-workspace">
+  <section class="lesson-workspace sport-ui">
     <div
       v-if="loading"
       class="state-card"
@@ -35,7 +35,7 @@
       </section>
 
       <div class="workspace-grid">
-        <section class="panel">
+        <section class="panel app-card">
           <h2>Organisation</h2>
           <div class="link-grid">
             <RouterLink :to="`/lessons?classId=${classGroup.id}`" class="workspace-link">
@@ -53,7 +53,7 @@
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel app-card">
           <h2>Fachkontext</h2>
           <div class="link-grid">
             <RouterLink
@@ -68,7 +68,7 @@
           </div>
         </section>
 
-        <section class="panel">
+        <section class="panel app-card">
           <h2>Zufallsschüler</h2>
           <p class="section-hint">Wählt Schüler zufällig und merkt sich lokal, wer in dieser Runde bereits dran war.</p>
           <p v-if="loadingStudents" class="section-hint" role="status">Schüler werden geladen…</p>
@@ -102,7 +102,7 @@
           </div>
         </section>
 
-        <section class="panel full-width">
+        <section class="panel app-card full-width">
           <h2>Stundendetails</h2>
           <div class="details-grid">
             <div>
