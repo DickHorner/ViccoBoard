@@ -6,12 +6,13 @@
         <p>{{ store.mode === 'simple' ? 'Einfach: flache Aufgabenliste' : 'Komplex: verschachtelte Aufgaben (3 Ebenen)' }}</p>
       </div>
       <div class="actions">
-        <button v-if="store.examId" @click="openExportPage" class="btn-secondary">Export</button>
-        <button @click="goBack" class="btn-secondary">Abbrechen</button>
-        <button @click="saveExam" class="btn-primary" :disabled="!canSave">Prüfung speichern</button>
+        <Button v-if="store.examId" label="Export" severity="secondary" @click="openExportPage" />
+        <Button :label="isEditing ? 'Zur Prüfung' : 'Abbrechen'" severity="secondary" @click="goBack" />
+        <Button :label="savingExam ? 'Speichert…' : 'Prüfung speichern'" :loading="savingExam" :disabled="!canSave || savingExam" @click="saveExam" />
       </div>
     </div>
 
+    <Message v-if="saveError" severity="error" role="alert">{{ saveError }}</Message>
     <div v-if="!isLoading" class="builder-content">
       <section class="section">
         <h2>Prüfungsdetails</h2>
@@ -421,7 +422,9 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router';
+import Button from 'openvue/button';
+import Message from 'openvue/message';
 import { Exams, type ClassGroup, type Student } from '@viccoboard/core';
 import {
   KBR_GRADING_PRESETS,
@@ -481,6 +484,9 @@ const keyUpdateStatus = ref('');
 const examStatus = ref<Exams.Exam['status']>('draft');
 const printPresets = ref<Exams.Exam['printPresets']>([]);
 const isLoading = ref(true);
+const savingExam = ref(false);
+const saveError = ref('');
+let savedFormSnapshot: string | null = null;
 
 const assessmentFormats: Array<{ value: Exams.ExamAssessmentFormat; label: string }> = [
   { value: 'klausur', label: 'Klausur' },
@@ -684,6 +690,7 @@ const handleRevertGradingKey = async () => {
 };
 
 async function persistExam(): Promise<Exams.Exam> {
+  if (!examRepository) throw new Error('Prüfungsspeicher nicht verfügbar.');
   syncGroupAssignments();
 
   const builtExam = store.buildExam();
@@ -735,12 +742,12 @@ async function persistExam(): Promise<Exams.Exam> {
       }
     }
 
-    await examRepository?.update(nextExam.id, nextExam);
-    return (await examRepository?.findById(nextExam.id)) ?? nextExam;
+    await examRepository.update(nextExam.id, nextExam);
+    return (await examRepository.findById(nextExam.id)) ?? nextExam;
   }
 
   const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...createInput } = nextExam;
-  const created = await examRepository?.create(createInput);
+  const created = await examRepository.create(createInput);
   if (!created) {
     throw new Error('Prüfung konnte nicht erstellt werden');
   }
@@ -748,10 +755,10 @@ async function persistExam(): Promise<Exams.Exam> {
 }
 
 const saveExam = async () => {
-  if (!canSave.value) {
-    return;
-  }
+  if (!canSave.value || savingExam.value) return;
 
+  savingExam.value = true;
+  saveError.value = '';
   try {
     const savedExam = await persistExam();
     store.hydrateFromExam(savedExam);
@@ -762,15 +769,19 @@ const saveExam = async () => {
     examStatus.value = savedExam.status;
     printPresets.value = savedExam.printPresets;
     selectedGradingPresetId.value = matchPresetByBoundaries(savedExam.gradingKey.gradeBoundaries);
+    savedFormSnapshot = currentFormSnapshot();
 
-    router.push('/exams');
+    await router.push(`/exams/${savedExam.id}/workspace`);
   } catch (error) {
     console.error('Failed to save exam:', error);
+    saveError.value = error instanceof Error ? error.message : 'Die Prüfung konnte nicht gespeichert werden.';
+  } finally {
+    savingExam.value = false;
   }
 };
 
 const goBack = () => {
-  router.push('/exams');
+  router.push(isEditing.value ? `/exams/${route.params.id}/workspace` : '/exams');
 };
 
 const openSheetDesigner = () => {
@@ -784,6 +795,33 @@ const openExportPage = () => {
   }
   router.push(`/exams/${store.examId}/export`);
 };
+
+function currentFormSnapshot(): string {
+  return JSON.stringify({
+    title: store.title,
+    description: store.description,
+    classGroupId: store.classGroupId,
+    assessmentFormat: store.assessmentFormat,
+    mode: store.mode,
+    tasks: store.tasks,
+    parts: store.parts,
+    candidateGroups: store.candidateGroups,
+    candidates: candidates.value,
+    date: examDateValue.value,
+    allowsComments: allowsComments.value,
+    allowsSupportTips: allowsSupportTips.value,
+    gradingKeyType: gradingKeyType.value,
+    roundingRuleType: roundingRuleType.value,
+    gradeBoundaries: gradeBoundaries.value,
+    examStatus: examStatus.value,
+    printPresets: printPresets.value
+  });
+}
+
+onBeforeRouteLeave(() => {
+  if (isLoading.value || savedFormSnapshot === null || savedFormSnapshot === currentFormSnapshot()) return true;
+  return window.confirm('Es gibt nicht gespeicherte Änderungen. Diese Prüfung wirklich verlassen?');
+});
 
 watch(() => store.classGroupId, async () => {
   await loadStudentsForSelectedClass();
@@ -824,6 +862,7 @@ onMounted(async () => {
       printPresets.value = loaded.printPresets;
       await loadStudentsForSelectedClass();
       isLoading.value = false;
+      savedFormSnapshot = currentFormSnapshot();
       return;
     }
   }
@@ -840,6 +879,7 @@ onMounted(async () => {
   candidates.value = [];
   await loadStudentsForSelectedClass();
   isLoading.value = false;
+  savedFormSnapshot = currentFormSnapshot();
 });
 
 onUnmounted(() => {
