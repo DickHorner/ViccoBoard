@@ -410,7 +410,7 @@ const weekdayOptions = [
 
 // Computed
 const filteredLessons = computed(() => {
-  let filtered = lessons.value
+  let filtered = [...lessons.value]
 
   if (selectedClassId.value) {
     filtered = filtered.filter(l => l.classGroupId === selectedClassId.value)
