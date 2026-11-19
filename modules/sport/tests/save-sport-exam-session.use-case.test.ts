@@ -210,6 +210,59 @@ describe('SaveSportExamSessionUseCase', () => {
     expect(metadata.entryCount).toBe(0);
   });
 
+  test('reopens a session without duplicating grades', async () => {
+    const input = {
+      classGroupId, categoryId, assessmentType: 'criteria' as const,
+      examDate: '2026-11-12', announced: true,
+      entries: [{
+        studentId: student1Id, state: 'ready' as const,
+        criterionScores: { accuracy: 2 }, calculatedGrade: '2'
+      }]
+    };
+    const saved = await useCase.execute(input);
+    const revised = await useCase.execute({
+      ...input, sessionId: saved.id,
+      entries: [{
+        studentId: student1Id, state: 'ready',
+        criterionScores: { accuracy: 1 }, calculatedGrade: '3'
+      }]
+    });
+    expect(revised.id).toBe(saved.id);
+    const entries = await performanceRepository.findByCategory(categoryId);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].measurements.criteria).toEqual({ accuracy: 1 });
+    expect(entries[0].calculatedGrade).toBe('3');
+  });
+
+  test('stores observed criteria without inventing a grade', async () => {
+    const session = await useCase.execute({
+      classGroupId, categoryId, assessmentType: 'criteria',
+      examDate: '2026-11-12', announced: false,
+      entries: [
+        { studentId: student1Id, state: 'ready', criterionScores: { accuracy: 0 } },
+        { studentId: student2Id, state: 'not-assessed' }
+      ]
+    });
+    const entries = await performanceRepository.findByCategory(categoryId);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].calculatedGrade).toBeUndefined();
+    expect((session.sessionMetadata as Record<string, any>).studentStates).toEqual(
+      expect.arrayContaining([expect.objectContaining({ studentId: student2Id, state: 'not-assessed' })])
+    );
+  });
+
+  test('rejects reopening an unrelated session', async () => {
+    const first = await useCase.execute({
+      classGroupId, categoryId, examDate: '2026-11-12', announced: false,
+      entries: [{ studentId: student1Id, state: 'absent' }]
+    });
+    await expect(useCase.execute({
+      sessionId: first.id, classGroupId, categoryId: 'other',
+      examDate: '2026-11-12', announced: false,
+      entries: [{ studentId: student1Id, state: 'absent' }]
+    })).rejects.toThrow('does not match');
+  });
+
   test('rejects duplicate students', async () => {
     await expect(useCase.execute({
       classGroupId,
