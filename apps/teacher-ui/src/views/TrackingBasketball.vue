@@ -3,10 +3,10 @@
     <div class="page-header">
       <h2>🏀 {{ t('TRACKING.basketball.title') }}</h2>
       <div class="header-actions">
-        <Button v-if="!cameraActive" class="btn" @click="startCamera">
+        <Button v-if="!cameraActive" @click="startCamera">
           📷 {{ t('TRACKING.basketball.start-camera') }}
         </Button>
-        <Button severity="danger" v-else class="btn" @click="stopCamera">
+        <Button severity="danger" v-else @click="stopCamera">
           ⏹ {{ t('TRACKING.basketball.stop-camera') }}
         </Button>
       </div>
@@ -14,7 +14,7 @@
 
     <div v-if="cameraError" class="error-banner card app-card">
       ⚠️ {{ cameraError }}
-      <Button severity="secondary" outlined class="btn retry-btn" @click="retryCamera">
+      <Button severity="secondary" outlined class="retry-btn" @click="retryCamera">
         {{ t('TRACKING.basketball.retry') }}
       </Button>
     </div>
@@ -58,7 +58,7 @@
       <div class="zone-actions">
         <span v-if="targetZone" class="zone-badge">✅ {{ t('TRACKING.basketball.zone-defined') }}</span>
         <span v-else class="zone-badge zone-badge--empty">{{ t('TRACKING.basketball.define-zone') }}</span>
-        <Button severity="secondary" outlined v-if="targetZone" class="btn" @click="clearZone">
+        <Button severity="secondary" outlined v-if="targetZone" @click="clearZone">
           {{ t('TRACKING.basketball.clear-zone') }}
         </Button>
       </div>
@@ -80,17 +80,17 @@
       <div class="action-buttons">
         <Button
           v-if="!trackingActive"
-          class="btn btn-large"
+          class="btn-large"
           :disabled="!targetZone"
           :title="!targetZone ? t('TRACKING.basketball.no-zone-warning') : undefined"
           @click="startTracking"
         >
           ▶ {{ t('TRACKING.basketball.controls.start') }}
         </Button>
-        <Button severity="danger" v-else class="btn btn-large" @click="stopTracking">
+        <Button severity="danger" v-else class="btn-large" @click="stopTracking">
           ⏹ {{ t('TRACKING.basketball.controls.stop') }}
         </Button>
-        <Button severity="secondary" outlined class="btn btn-large" :disabled="trackingActive" @click="resetSession">
+        <Button severity="secondary" outlined class="btn-large" :disabled="trackingActive" @click="resetSession">
           ↺ {{ t('TRACKING.basketball.controls.reset') }}
         </Button>
       </div>
