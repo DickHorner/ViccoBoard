@@ -18,7 +18,15 @@
           <p v-if="exam.classGroupId" class="subtitle">{{ className || 'Klassenzuordnung wird geladen…' }}</p>
           <p v-else class="subtitle">Ohne Klassenzuordnung</p>
         </div>
-        <Tag :value="statusLabel" :severity="statusSeverity" />
+        <div class="workspace-header-actions">
+          <Tag :value="statusLabel" :severity="statusSeverity" />
+          <Button
+            severity="danger"
+            outlined
+            label="Prüfung löschen"
+            @click="examToDelete = exam"
+          />
+        </div>
       </header>
 
       <div class="context-grid">
@@ -71,12 +79,17 @@
         Diese Prüfung enthält noch keine Prüflinge. Du kannst Aufgaben und Druckbogen bereits bearbeiten.
       </Message>
     </template>
+    <DeleteExamDialog
+      :exam="examToDelete"
+      @close="examToDelete = null"
+      @deleted="handleDeletedExam"
+    />
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import Button from 'openvue/button'
 import Message from 'openvue/message'
 import Tag from 'openvue/tag'
@@ -84,10 +97,13 @@ import type { Exams } from '@viccoboard/core'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import { getSportBridge } from '../composables/useSportBridge'
 import { recordRouteContentReady } from '../utils/navigation-performance'
+import DeleteExamDialog from '../components/DeleteExamDialog.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { getExam } = useExamsBridge()
 const exam = ref<Exams.Exam | null>(null)
+const examToDelete = ref<Exams.Exam | null>(null)
 const className = ref('')
 const loading = ref(true)
 const loadError = ref('')
@@ -142,6 +158,12 @@ async function loadData(): Promise<void> {
   }
 }
 
+function handleDeletedExam(): void {
+  examToDelete.value = null
+  exam.value = null
+  void router.replace('/exams')
+}
+
 onMounted(() => { void loadData() })
 </script>
 
@@ -159,6 +181,17 @@ onMounted(() => { void loadData() })
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
+}
+
+.workspace-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.workspace-header-actions :deep(.p-button) {
+  min-height: 44px;
 }
 
 .workspace-header h1,
