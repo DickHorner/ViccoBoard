@@ -1,5 +1,5 @@
 <template>
-  <section class="subject-hub">
+  <section class="subject-hub sport-ui">
     <header class="page-header">
       <div>
         <h1>Sport</h1>
