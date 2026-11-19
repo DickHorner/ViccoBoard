@@ -37,43 +37,34 @@
     <!-- CREATE FORM -->
     <template v-else-if="view === 'create'">
       <div class="page-header">
-        <button class="btn-back" type="button" @click="cancelCreate">← {{ t('TOURNAMENTS.back') }}</button>
+        <Button type="button" severity="secondary" text icon="pi pi-arrow-left"
+          :label="t('TOURNAMENTS.back')" @click="cancelCreate" />
         <h2>{{ t('TOURNAMENTS.create') }}</h2>
       </div>
 
       <form class="create-form card app-card" @submit.prevent="submitCreate">
         <div class="form-group">
           <label>{{ t('TOURNAMENTS.name_label') }}</label>
-          <input
-            v-model="form.name"
-            class="form-input"
-            type="text"
-            :placeholder="t('TOURNAMENTS.name_placeholder')"
-            required
-          />
+          <InputText v-model="form.name" :placeholder="t('TOURNAMENTS.name_placeholder')"
+            required fluid />
         </div>
 
         <div class="form-group">
           <label>{{ t('TOURNAMENTS.format_label') }}</label>
-          <select v-model="form.type" class="form-select">
-            <option value="round-robin">{{ t('TOURNAMENTS.mode.round_robin') }}</option>
-            <option value="knockout">{{ t('TOURNAMENTS.mode.knockout') }}</option>
-            <option v-if="!importedTeamHandoff" value="adaptive">{{ t('TOURNAMENTS.mode.adaptive') }}</option>
-          </select>
+          <Select v-model="form.type" :options="tournamentTypeOptions"
+            optionLabel="label" optionValue="value" fluid />
         </div>
 
         <div v-if="form.type === 'adaptive'" class="form-group">
           <label for="tournament-team-size">{{ t('TOURNAMENTS.adaptive_team_size') }}</label>
-          <select id="tournament-team-size" v-model.number="form.teamSize" class="form-select">
-            <option v-for="size in 6" :key="size" :value="size">{{ size }} {{ t('TOURNAMENTS.adaptive_vs') }} {{ size }}</option>
-          </select>
+          <Select inputId="tournament-team-size" v-model="form.teamSize" :options="teamSizeOptions"
+            optionLabel="label" optionValue="value" fluid />
         </div>
         <div v-if="form.type === 'adaptive'" class="form-group">
           <label for="tournament-class">{{ t('TOURNAMENTS.adaptive_class') }}</label>
-          <select id="tournament-class" v-model="selectedClassId" class="form-select" @change="loadClassStudents">
-            <option value="">{{ t('TOURNAMENTS.adaptive_choose_class') }}</option>
-            <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
-          </select>
+          <Select inputId="tournament-class" :modelValue="selectedClassId" :options="classOptions"
+            optionLabel="label" optionValue="value" fluid
+            @update:modelValue="value => { selectedClassId = value; void loadClassStudents() }" />
           <p>{{ classStudents.length }} {{ t('TOURNAMENTS.adaptive_players') }}</p>
         </div>
         <div v-else class="form-group">
@@ -116,7 +107,8 @@
     <!-- TOURNAMENT DETAIL -->
     <template v-else-if="view === 'detail' && activeTournament">
       <div class="page-header">
-        <button class="btn-back" type="button" @click="backToList">← {{ t('TOURNAMENTS.back') }}</button>
+        <Button type="button" severity="secondary" text icon="pi pi-arrow-left"
+          :label="t('TOURNAMENTS.back')" @click="backToList" />
         <h2>{{ activeTournament.name }}</h2>
         <span :class="['status-badge', activeTournament.status]">
           {{ t(`TOURNAMENTS.status.${activeTournament.status}`) }}
@@ -319,6 +311,9 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Select from 'openvue/select'
+import { computed } from 'vue'
 import { useTournamentsView } from '../composables/useTournamentsView'
 
 const {
@@ -365,6 +360,22 @@ const {
   saveScore,
   deleteTournament,
 } = useTournamentsView()
+
+const tournamentTypeOptions = computed(() => [
+  { label: t('TOURNAMENTS.mode.round_robin'), value: 'round-robin' },
+  { label: t('TOURNAMENTS.mode.knockout'), value: 'knockout' },
+  ...(!importedTeamHandoff.value
+    ? [{ label: t('TOURNAMENTS.mode.adaptive'), value: 'adaptive' }]
+    : [])
+])
+const teamSizeOptions = computed(() => Array.from({ length: 6 }, (_, i) => ({
+  label: `${i + 1} ${t('TOURNAMENTS.adaptive_vs')} ${i + 1}`,
+  value: i + 1
+})))
+const classOptions = computed(() => [
+  { label: t('TOURNAMENTS.adaptive_choose_class'), value: '' },
+  ...classes.value.map(group => ({ label: group.name, value: group.id }))
+])
 </script>
 
 <style scoped src="./Tournaments.css"></style>
