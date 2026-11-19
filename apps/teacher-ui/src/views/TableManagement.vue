@@ -147,21 +147,21 @@
                   class="form-input"
                   placeholder="1"
                 />
-                <button type="button" class="btn-text btn-small" @click="removeQuickRow(index)">
+                <Button severity="secondary" text type="button" @click="removeQuickRow(index)">
                   Entfernen
-                </button>
+                </Button>
               </div>
-              <button type="button" class="btn-secondary btn-small" @click="addQuickRow">
+              <Button severity="secondary" outlined type="button" @click="addQuickRow">
                 + Grenzwert
-              </button>
+              </Button>
             </div>
           </template>
 
           <div v-if="modalError" class="error-banner" role="alert">{{ modalError }}</div>
 
           <div class="modal-footer">
-            <button type="button" class="btn-secondary" @click="closeModal">Abbrechen</button>
-            <button type="submit" class="btn-primary" :disabled="saving">{{ saving ? 'Speichern…' : 'Speichern' }}</button>
+            <Button severity="secondary" outlined type="button" @click="closeModal">Abbrechen</Button>
+            <Button type="submit" :disabled="saving">{{ saving ? 'Speichern…' : 'Speichern' }}</Button>
           </div>
         </form>
       </div>
@@ -178,10 +178,10 @@
           <p class="warning-text">Diese Aktion kann nicht rückgängig gemacht werden.</p>
         </div>
         <div class="modal-footer">
-          <button class="btn-secondary" @click="deleteTarget = null">Abbrechen</button>
-          <button class="btn-danger" :disabled="!!deleting" @click="executeDelete">
+          <Button severity="secondary" outlined @click="deleteTarget = null">Abbrechen</Button>
+          <Button severity="danger" :disabled="!!deleting" @click="executeDelete">
             {{ deleting ? 'Wird gelöscht…' : 'Löschen' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
