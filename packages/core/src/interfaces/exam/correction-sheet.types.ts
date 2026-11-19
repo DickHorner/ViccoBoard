@@ -8,6 +8,8 @@ export interface CorrectionSheetImage {
 export interface CorrectionSheetPreset {
   id: string;
   examId: string;
+  /** Live reference to a reusable layout template; unset for standalone or individual layouts. */
+  templateId?: string;
   name: string;
   layoutMode: CorrectionSheetLayoutMode;
   showHeader: boolean;
