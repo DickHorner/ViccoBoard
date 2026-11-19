@@ -64,7 +64,7 @@
           <h2>Layoutvorschau</h2>
           <a v-if="previewUrl" :href="previewUrl" target="_blank" rel="noopener" class="back-link">PDF öffnen</a>
         </div>
-        <p class="hint">Die Vorschau zeigt das Layout ohne Prüflinge oder Prüfungsaufgaben. Inhalt und Punktzahlen erscheinen erst in einer konkreten Prüfung.</p>
+        <p class="hint">Die Vorschau zeigt das Blanko-Layout ohne Prüflinge oder Prüfungsaufgaben. Prüfungen mit dieser Vorlage verwenden beim nächsten PDF-Erzeugen stets die aktuelle Version.</p>
         <Message v-if="previewError" severity="error" role="alert">{{ previewError }}</Message>
         <p v-if="previewPending" role="status">PDF-Vorschau wird erstellt…</p>
         <iframe v-if="previewUrl" :src="previewUrl" class="pdf-frame" title="Druckbogenvorlage als PDF"></iframe>
@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { onBeforeRouteLeave, RouterLink } from 'vue-router'
+import { onBeforeRouteLeave, RouterLink, useRoute } from 'vue-router'
 import Button from 'openvue/button'
 import Message from 'openvue/message'
 import type { Exams } from '@viccoboard/core'
@@ -89,6 +89,7 @@ import { formatGermanDate } from '../utils/locale-format'
 import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const { correctionSheetTemplateRepository, previewStandaloneSheetDesignPdf } = useExamsBridge()
+const route = useRoute()
 
 const templates = ref<CorrectionSheetTemplate[]>([])
 const currentId = ref('')
@@ -176,7 +177,8 @@ async function loadTemplates(): Promise<void> {
   try {
     if (!correctionSheetTemplateRepository) throw new Error('Vorlagenspeicher nicht verfügbar.')
     templates.value = await correctionSheetTemplateRepository.findAll()
-    const initial = templates.value[0]
+    const requestedId = typeof route.query.templateId === 'string' ? route.query.templateId : ''
+    const initial = templates.value.find(entry => entry.id === requestedId) ?? templates.value[0]
     replaceEditor(initial?.preset ?? createDefaultCorrectionSheetPreset(''), initial?.id)
     if (!initial) dirty.value = true
     loading.value = false
