@@ -135,6 +135,18 @@ export { DeleteTableDefinitionUseCase } from './use-cases/delete-table-definitio
 export { ImportTableDefinitionUseCase } from './use-cases/import-table-definition.use-case.js';
 export type { ImportTableDefinitionInput, ImportTableDefinitionResult } from './use-cases/import-table-definition.use-case.js';
 
+// Source-based sport assessment templates
+export {
+  BASKETBALL_ASSESSMENTS,
+  evaluateBasketballAssessment,
+  findBasketballAssessment
+} from './templates/basketball-assessments.template.js';
+export type {
+  BasketballAssessment,
+  BasketballCriterion,
+  BasketballAssessmentResult
+} from './templates/basketball-assessments.template.js';
+
 // Grading Engine
 export { CriteriaGradingEngine } from './grading/criteria-grading.engine.js';
 export type {
