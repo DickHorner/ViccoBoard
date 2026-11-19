@@ -1,7 +1,8 @@
 <template>
   <div class="lesson-list-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <RouterLink v-if="classGroup" :to="`/classes/${classGroup.id}`" class="back-button">← Zur Klasse</RouterLink>
+      <button v-else class="back-button" @click="$router.back()">← Zurück</button>
       <div class="header-content">
         <div>
           <h2>Stunden {{ classGroup ? `- ${classGroup.name}` : '' }}</h2>
