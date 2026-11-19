@@ -36,7 +36,7 @@ describe('CorrectionSheetPresetRepository', () => {
     await storage.migrate();
 
     examRepository = new ExamRepository(storage.getAdapter());
-    presetRepository = new CorrectionSheetPresetRepository(examRepository);
+    presetRepository = new CorrectionSheetPresetRepository(examRepository, new CorrectionSheetTemplateRepository(storage.getAdapter(), examRepository));
     getPresetUseCase = new GetCorrectionSheetPresetUseCase(presetRepository);
     savePresetUseCase = new SaveCorrectionSheetPresetUseCase(presetRepository);
   });
