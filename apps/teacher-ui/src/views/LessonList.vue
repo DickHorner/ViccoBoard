@@ -15,7 +15,7 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="loading-state" role="status">
       <div class="spinner"></div>
       <p>Stunden werden geladen...</p>
     </div>
@@ -160,6 +160,7 @@
                 :to="`/attendance?classId=${lesson.classGroupId}&lessonId=${lesson.id}`" 
                 class="action-btn action-btn-attendance"
                 title="Anwesenheit erfassen"
+                aria-label="Anwesenheit dieser Stunde öffnen"
               >
                 ✓
               </RouterLink>
@@ -446,7 +447,10 @@ const enrichWithParts = async (lessonList: Lesson[]) => {
   }
 }
 
+let classChangeVersion = 0
+
 const loadData = async () => {
+  ++classChangeVersion
   loading.value = true
   error.value = ''
 
@@ -488,18 +492,28 @@ const loadData = async () => {
 }
 
 const onClassChange = async () => {
+  const version = ++classChangeVersion
+  const classId = selectedClassId.value
   autoGenerateStatus.value = ''
   autoGenerateStatusType.value = ''
-  if (!selectedClassId.value) {
-    lessons.value = (await Promise.all(
-      classes.value.map(group => SportBridge.lessonRepository.findByClassGroup(group.id))
-    )).flat()
-    classGroup.value = null
-  } else {
-    lessons.value = await SportBridge.lessonRepository.findByClassGroup(selectedClassId.value)
-    classGroup.value = classes.value.find(group => group.id === selectedClassId.value) ?? null
+
+  try {
+    const loaded = classId
+      ? await SportBridge.lessonRepository.findByClassGroup(classId)
+      : (await Promise.all(
+          classes.value.map(group => SportBridge.lessonRepository.findByClassGroup(group.id))
+        )).flat()
+    if (version !== classChangeVersion) return
+
+    lessons.value = loaded
+    classGroup.value = classes.value.find(group => group.id === classId) ?? null
+    void enrichWithParts(lessons.value)
+  } catch (err) {
+    if (version === classChangeVersion) {
+      console.error('Failed to change lesson class:', err)
+      error.value = 'Stunden der gewählten Klasse konnten nicht geladen werden.'
+    }
   }
-  void enrichWithParts(lessons.value)
 }
 
 const handleAutoGenerateLessons = async () => {
