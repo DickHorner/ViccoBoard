@@ -1,5 +1,6 @@
 import { Exams } from '@viccoboard/core';
 import type { ExamRepository } from './exam.repository';
+import type { CorrectionSheetTemplateRepository } from './correction-sheet-template.repository';
 
 const CORRECTION_SHEET_PRESET_KIND = 'correction-sheet-preset';
 
@@ -60,7 +61,10 @@ export function createDefaultCorrectionSheetPreset(
 }
 
 export class CorrectionSheetPresetRepository {
-  constructor(private readonly examRepository: ExamRepository) {}
+  constructor(
+    private readonly examRepository: ExamRepository,
+    private readonly templateRepository: CorrectionSheetTemplateRepository
+  ) {}
 
   async findByExamId(examId: string): Promise<Exams.CorrectionSheetPreset | null> {
     const exam = await this.examRepository.findById(examId);
@@ -74,6 +78,19 @@ export class CorrectionSheetPresetRepository {
 
     if (!presetEntry) {
       return null;
+    }
+
+    const templateId = presetEntry.metadata?.correctionSheetTemplateId;
+    if (typeof templateId === 'string' && templateId) {
+      const template = await this.templateRepository.findById(templateId);
+      if (!template) throw new Error('Die verknüpfte Druckbogenvorlage wurde nicht gefunden.');
+      return {
+        ...template.preset,
+        id: presetEntry.id,
+        examId,
+        templateId,
+        updatedAt: template.lastModified
+      };
     }
 
     const metadata = presetEntry.metadata?.correctionSheetPreset;
@@ -100,11 +117,28 @@ export class CorrectionSheetPresetRepository {
       throw new Error(`Exam ${presetInput.examId} not found`);
     }
 
-    const preset: Exams.CorrectionSheetPreset = {
-      ...createDefaultCorrectionSheetPreset(presetInput.examId),
-      ...presetInput,
-      updatedAt: presetInput.updatedAt ?? new Date()
-    };
+    const templateId = presetInput.templateId;
+    const template = templateId
+      ? await this.templateRepository.findById(templateId)
+      : null;
+    if (templateId && !template) {
+      throw new Error('Die verknüpfte Druckbogenvorlage wurde nicht gefunden.');
+    }
+
+    const preset: Exams.CorrectionSheetPreset = template
+      ? {
+          ...template.preset,
+          id: `correction-sheet-preset:${exam.id}`,
+          examId: exam.id,
+          templateId,
+          updatedAt: template.lastModified
+        }
+      : {
+          ...createDefaultCorrectionSheetPreset(presetInput.examId),
+          ...presetInput,
+          templateId: undefined,
+          updatedAt: presetInput.updatedAt ?? new Date()
+        };
 
     const persistedPreset: Exams.PrintPreset = {
       id: preset.id,
@@ -123,13 +157,18 @@ export class CorrectionSheetPresetRepository {
         signatureType: preset.showSignatureArea ? 'empty' : 'empty'
       },
       isDefault: true,
-      metadata: {
-        kind: CORRECTION_SHEET_PRESET_KIND,
-        correctionSheetPreset: {
-          ...preset,
-          updatedAt: preset.updatedAt.toISOString()
-        }
-      }
+      metadata: templateId
+        ? {
+            kind: CORRECTION_SHEET_PRESET_KIND,
+            correctionSheetTemplateId: templateId
+          }
+        : {
+            kind: CORRECTION_SHEET_PRESET_KIND,
+            correctionSheetPreset: {
+              ...preset,
+              updatedAt: preset.updatedAt.toISOString()
+            }
+          }
     };
 
     const remainingPresets = exam.printPresets.filter((entry) => {
