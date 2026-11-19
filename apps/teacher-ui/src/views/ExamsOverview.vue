@@ -262,7 +262,9 @@ const loadContext = async () => {
   if (groups.status === 'fulfilled') classes.value = groups.value
   if (year.status === 'fulfilled') activeYear.value = year.value
   if (groups.status === 'rejected' || year.status === 'rejected') {
-    console.error('Failed to load exam school year context:', groups, year)
+    console.error('Failed to load exam school year context:',
+      groups.status === 'rejected' ? groups.reason : null,
+      year.status === 'rejected' ? year.reason : null)
     contextError.value = 'Schuljahres- oder Klassenzuordnung konnte nicht vollständig geladen werden.'
   }
 }
