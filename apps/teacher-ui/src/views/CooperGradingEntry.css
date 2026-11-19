@@ -137,7 +137,7 @@
 
 .session-item--active {
   border-color: var(--accent-strong);
-  background: #f0f2ff;
+  background: var(--accent-soft);
 }
 
 .session-info {
