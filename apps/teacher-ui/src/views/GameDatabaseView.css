@@ -24,7 +24,7 @@
 }
 
 .subtitle {
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0.25rem 0 0;
 }
 
@@ -72,7 +72,7 @@
 }
 
 .loading-hint {
-  color: #64748b;
+  color: var(--color-muted);
   font-style: italic;
 }
 
@@ -112,12 +112,12 @@
   background: white;
   cursor: pointer;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-ink);
   transition: background 0.15s, color 0.15s;
 }
 
 .chip:hover {
-  background: #f1f5f9;
+  background: var(--surface-soft);
 }
 
 .chip--active {
@@ -142,7 +142,7 @@
 
 .filter-label {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--color-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -167,7 +167,7 @@
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .empty-hint {
@@ -233,7 +233,7 @@
   color: #155e75;
 }
 
-.badge--unbekannt { background: #f1f5f9; color: #475569; }
+.badge--unbekannt { background: var(--surface-soft); color: var(--color-muted); }
 .badge--anfaenger { background: #dcfce7; color: #166534; }
 .badge--fortgeschrittene { background: #fef3c7; color: #92400e; }
 .badge--profis { background: #fee2e2; color: #991b1b; }
@@ -243,7 +243,7 @@
   border-radius: 9px;
   background: white;
   padding: 0.3rem 0.55rem;
-  color: #475569;
+  color: var(--color-muted);
   font: inherit;
   font-size: 0.78rem;
   cursor: pointer;
@@ -251,14 +251,14 @@
 }
 
 .edit-button:hover {
-  background: #f1f5f9;
+  background: var(--surface-soft);
 }
 
 .game-card__title {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .game-card__info-row {
@@ -269,15 +269,15 @@
 
 .info-chip {
   font-size: 0.8rem;
-  color: #475569;
-  background: #f1f5f9;
+  color: var(--color-muted);
+  background: var(--surface-soft);
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
 }
 
 .game-card__goal {
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--color-muted);
   margin: 0.25rem 0 0.5rem;
   line-height: 1.5;
 }
@@ -382,7 +382,7 @@
   min-height: 40px;
   border: 0;
   background: transparent;
-  color: #475569;
+  color: var(--color-muted);
   font-size: 1.5rem;
   cursor: pointer;
 }
@@ -425,7 +425,7 @@
   border-radius: 10px;
   padding: 0.7rem 0.8rem;
   background: white;
-  color: #0f172a;
+  color: var(--color-ink);
   font: inherit;
 }
 
