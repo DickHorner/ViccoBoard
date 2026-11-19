@@ -62,10 +62,10 @@ const sportabzeichenStandardCount = ref(0)
 
 const entries = [
   {
-    to: '/subjects/sport/basketball',
-    eyebrow: 'Leistungsabnahme · Pilot',
-    title: 'Basketball: Dribbeln & Passen',
-    description: 'LISUM Niveaustufe D: beobachtbare Kriterien, Bewertungsraster und wiederaufnehmbare Prüfung.'
+    to: '/subjects/sport/assessments',
+    eyebrow: 'Praxis',
+    title: 'Leistungsabnahmen',
+    description: 'Prüfung auswählen, Kriterien beobachten, Prüflinge zufällig ziehen und später fortsetzen.'
   },
   {
     to: '/subjects/sport/exam',
