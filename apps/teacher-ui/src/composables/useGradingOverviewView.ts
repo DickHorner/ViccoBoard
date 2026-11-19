@@ -7,6 +7,7 @@ import { getSportBridge, useSportBridge } from './useSportBridge'
 import { useStudents } from './useStudentsBridge'
 import { useToast } from './useToast'
 import { isPerformanceEntryInSchoolYear } from '../utils/performance-school-year'
+import { createParticipationCategoryConfiguration } from '../utils/participation-rubric'
 
 type NewCategoryForm = {
   name: string
@@ -40,15 +41,11 @@ function getDefaultConfiguration(type: NewCategoryForm['type']): Sport.GradeCate
     case 'bjs':
       return { type: 'bjs', disciplines: [], autoGrading: true }
     case 'verbal':
-      return { type: 'verbal', fields: PARTICIPATION_FIELDS, scales: [{ id: 'participation-0-3', name: 'Mitarbeit 0–3 Punkte', levels: [0, 1, 2, 3].map(value => ({ value, label: `${value} Punkte` })) }], exportFormat: 'structured' }
+      return createParticipationCategoryConfiguration()
     default:
       throw new Error('Unsupported category type')
   }
 }
-
-const PARTICIPATION_FIELDS: Sport.VerbalAssessmentField[] = [
-  { id: 'preparation', label: 'Vorbereitung', type: 'scale', required: true }, { id: 'discussion', label: 'Unterrichtsgespräche', type: 'scale', required: true }, { id: 'effort', label: 'Anstrengung', type: 'scale', required: true }, { id: 'independence', label: 'Selbstständigkeit', type: 'scale', required: true }, { id: 'interaction', label: 'Interaktion', type: 'scale', required: true }
-]
 
 export function useGradingOverviewView() {
   const router = useRouter()
