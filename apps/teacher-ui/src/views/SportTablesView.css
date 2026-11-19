@@ -21,28 +21,6 @@
   margin: 0.25rem 0 0;
 }
 
-.back-button {
-  background: none;
-  border: none;
-  color: #0f766e;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  min-height: 44px;
-  white-space: nowrap;
-}
-
-.summary-pill {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 1rem;
-  border-radius: 999px;
-  background: rgba(14, 116, 144, 0.12);
-  color: #155e75;
-  font-weight: 700;
-}
-
 .template-card {
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -54,22 +32,6 @@
 
 .template-card h2 {
   margin: 0.2rem 0;
-}
-
-.template-button {
-  min-height: 44px;
-  border: 1px solid #0e7490;
-  border-radius: 8px;
-  background: #0e7490;
-  color: white;
-  padding: 0.6rem 1rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.template-button:hover {
-  background: #155e75;
 }
 
 /* Import card */
@@ -152,20 +114,6 @@
   color: #334155;
 }
 
-.text-input {
-  border: 1px solid rgba(15, 23, 42, 0.2);
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
-  min-height: 44px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.text-input:disabled {
-  opacity: 0.6;
-}
-
 .file-row {
   align-items: flex-end;
 }
@@ -224,30 +172,6 @@
   color: var(--color-ink);
 }
 
-.import-button {
-  align-self: flex-start;
-  background: #0f766e;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  min-height: 44px;
-}
-
-.import-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.success-msg {
-  color: #15803d;
-  font-weight: 600;
-  margin: 0;
-}
-
 /* Table list */
 .empty-msg,
 .error-msg {
@@ -296,30 +220,6 @@
   font-size: 1rem;
 }
 
-.badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  border-radius: 999px;
-  padding: 0.15em 0.6em;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.badge-active {
-  background: rgba(16, 185, 129, 0.12);
-  color: #065f46;
-}
-
-.badge-inactive {
-  background: rgba(100, 116, 139, 0.12);
-  color: var(--color-muted);
-}
-
-.badge-source {
-  background: rgba(14, 116, 144, 0.1);
-  color: #0e7490;
-}
-
 .table-desc {
   font-size: 0.875rem;
   color: var(--color-muted);
@@ -339,26 +239,3 @@
   flex-shrink: 0;
 }
 
-.action-btn {
-  background: none;
-  border: 1px solid rgba(15, 23, 42, 0.2);
-  border-radius: 8px;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  min-height: 44px;
-  color: #334155;
-}
-
-.action-btn:hover {
-  background: rgba(15, 23, 42, 0.04);
-}
-
-.action-btn.danger {
-  border-color: #fca5a5;
-  color: #b91c1c;
-}
-
-.action-btn.danger:hover {
-  background: #fef2f2;
-}
