@@ -3,10 +3,10 @@
     <div class="page-header">
       <h2>{{ t('DELAY.title') }}</h2>
       <div class="header-actions">
-        <Button v-if="!cameraActive" class="btn" @click="startCamera">
+        <Button v-if="!cameraActive" @click="startCamera">
           📷 {{ t('DELAY.startCamera') }}
         </Button>
-        <Button severity="danger" v-else class="btn" @click="stopCamera">
+        <Button severity="danger" v-else @click="stopCamera">
           ⏹ {{ t('DELAY.stopCamera') }}
         </Button>
       </div>
