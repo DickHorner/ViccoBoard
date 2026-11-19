@@ -134,18 +134,107 @@ Jede „Feature-Familie“ wird über registrierbare Plugins abgebildet:
 
 ---
 
-## 5) UI-Informationsarchitektur (Navigation)
-- **Dashboard**: Klassen (Sport), Prüfungen (KBR), Schnellzugriff auf letzte Stunde / letzte Korrektur.
-- **Klasse**:
-  - Übersicht, Schülerliste, Stundenliste, Notenschema, Notenkategorien, Tabellen, WOW, Tools, Statistiken.
-- **Schülerprofil**:
-  - Sport: Entwicklung, Fehlzeiten, WOW-Übersicht.
-  - KBR: Prüfungen, Kommentare, Fördertipps, Langzeitnotizen.
-- **Prüfung**:
-  - Setup (Struktur), Korrektur (2 Modi), Auswertung, Export/Druck, Versand, Sharing.
-- **Einstellungen**:
-  - Security (PIN/Passwort/DB-Passwort), Backups, Sprache, Einrichtungshilfe, Shuttle-Run-Konfig.
+## 5) UI-Informationsarchitektur – Aufgaben und Arbeitskontexte (UX-03)
 
+> **Produktentwurf, noch keine implementierte Navigation.** Code-Bestandsaufnahme vom 18.11.2026 auf `main` @ `24f115505fd4f3b47432f5808c922e6bad54dc5a`. Implementierte Routen und Verträge bleiben allein im [Router](apps/teacher-ui/src/router/index.ts), in der [Navigation](apps/teacher-ui/src/navigation.ts) und den jeweiligen Domain-Modulen verbindlich. `HANDBOOK.md` regelt die Entwicklung, nicht die Produktgestaltung.
+>
+> Der aktuelle Router registriert 58 Routen. Die älteren Diagramme in `docs/ui/navigation.graph.json` / `navigation.mmd` / `routes.mmd` bilden nur einen älteren Ausschnitt ab (u. a. 28 Screens und absolute Windows-Dateipfade); sie sind **nicht** die Grundlage für die folgende Ist-Analyse. Die Anzahl der Parent-Routen ist **keine** Messung tatsächlicher Klickwege.
+
+### 5.1 UX-Ziel und nicht verhandelbare Grenzen
+
+- Ausgangspunkt ist die **Aufgabe der Lehrkraft**, nicht der Fachmodulname, die technische Route oder die bisherige Klickstrecke.
+- Häufige Ziele sollen möglichst direkt erreichbar sein; drei Navigationsebenen sind ein **Prüfanlass**, keine harte Grenze. Entscheidend sind Verständlichkeit, erfolgreich abgeschlossene Aufgaben, Kontextwechsel, Fehlwege und Wartezeiten. Sicherheitsbestätigungen und erforderliche Fachentscheidungen sind keine vermeidbaren Klicks.
+- Die zuletzt bewusst gewählte **Klasse, Stunde, Person, Prüfung und gegebenenfalls Bewertungskategorie** bleibt zwischen dazugehörigen Tätigkeiten erhalten, soweit die vorhandenen Contracts die Zuordnung erlauben. Auswahl bei fehlendem oder unpassendem Kontext bleibt erforderlich.
+- Die Hauptnavigation erschließt Arbeitsbereiche; **Queraktionen gehören an das jeweilige Objekt**: von der Stunde zur Anwesenheit, von der Klasse zur Schülerliste, von der Prüfung zur Korrektur, Auswertung und Rückmeldung.
+- Das System zeigt den nächsten **möglichen und fachlich zulässigen** Schritt an, ohne ungeprüfte Absichten zu erraten oder automatisch Daten zu verändern. Unsaved-Changes- und Fehlerfälle dürfen nicht übergangen werden.
+- Gemeinsame Bedienelemente verwenden bevorzugt das bereits konfigurierte **OpenVue im Styled Mode (Nora)**. Eigenes CSS bleibt auf notwendige Layout- und Fachinteraktionen begrenzt; ein Framework-Wechsel allein ist keine UX-Verbesserung.
+- Keine Funktion aus `6)` entfällt. Alle Daten- und Fachgrenzen bleiben bestehen: `Student` und `StudentRepository` zentral; Sport-/KBR-Referenzen nur über vorhandene IDs, Bridges und Use-Cases. **Prüflings-IDs sind nicht automatisch Schüler-IDs**; Zuordnungen nie erraten. Kein Cloud-, Server- oder Telemetriezwang.
+- iPadOS/Safari (auch Offline-HTML, Portrait/Landscape und ½/⅓ Split View), Desktop und Laptop sind gleichwertige Oberflächen. Touchziele ≥ 44 px, Tastatur/Fokus/Screenreader und transparente Lade-/Speicherzustände sind verbindlich. Für Geschwindigkeit: unmittelbare Interaktionsrückmeldung, kontextspezifisches Prefetching und gestufte Inhalte; tatsächliche Verbesserungen **messen**, nicht behaupten.
+
+### 5.2 Primärnavigation – zu prüfende Informationsarchitektur
+
+Die bestehende Icon-Sidebar bleibt zunächst bestehen. Folgende **Bezeichnungen und Gruppen sind Hypothesen zur Erprobung**, nicht bereits beschlossene Routen oder implementierte Menüpunkte:
+
+| Bereich | Hauptfrage | Direkte Objekte/Aktionen |
+|---|---|---|
+| **Heute** | Was steht als Nächstes an? | Nächste Stunde, Anwesenheit, zuletzt bearbeitete Klasse/Prüfung; kein reines Statistik-Dashboard. |
+| **Unterricht** | Welche Stunde oder Unterrichtssequenz? | Stundenplan, Stundenliste, Sequenzplanung, Stundenarbeitsbereich. |
+| **Klassen** | Mit welcher Lerngruppe arbeite ich? | Schüler, Stunden, Anwesenheit, Sport-Bewertung, Planung, Gruppen-/Klassenoptionen. |
+| **Schüler** | Was muss ich zu einer Person wissen oder pflegen? | Stammdaten, Anwesenheit, Leistung, Sport und KBR, Notizen, Import. |
+| **Prüfungen** | Mit welcher KBR-Prüfung arbeite ich? | Prüfung auswählen/erstellen; Struktur, Korrektur, Auswertung, Druckbogen und Rückmeldung **am selben Objekt**. |
+| **Werkzeuge** | Welches Unterrichtswerkzeug brauche ich jetzt? | Timer, Multistop, Teams, Scoreboard, Taktik, Feedback, Video und weitere vorhandene Sporttools – mit Kontext, wenn vorhanden. |
+| **Einstellungen** | Was muss ich systemweit konfigurieren? | Backup/Wiederherstellung, Schuljahreswechsel, Kataloge und Fachkonfiguration; möglichst abgesetzt vom Tagesgeschäft. |
+
+**Offen zu validieren:** Braucht Sport-Bewertung einen eigenen dauerhaften Hauptzugang oder ist sie aus Klasse/Unterricht zuverlässig leichter erreichbar? Soll die Schülerübersicht immer sichtbar sein oder über eine globale Suche ergänzt werden? Kein Umbau der Sidebar allein auf Basis dieses Entwurfs.
+
+### 5.3 Ist-Aufgabenkarte – aus aktuellen Vue-Ansichten und Routen abgeleitet
+
+Die nachfolgenden Wege sind **statisch belegte UI-Verbindungen bzw. Auswahlen**, keine beobachteten Nutzungsabläufe. Wo „erneut auswählen“ steht, ist die entsprechende Auswahlmaske im Code belegt; ob Nutzer:innen sie im konkreten Fall tatsächlich erneut bedienen müssen, wird separat getestet.
+
+| Aufgabe | Vorhandener Weg / belegte Reibung | Zielhypothese / nächste Queraktion |
+|---|---|---|
+| **T01** Anstehende Stunde öffnen | [Dashboard](apps/teacher-ui/src/views/Dashboard.vue) und [Stundenplan](apps/teacher-ui/src/views/ScheduleOverview.vue) verlinken bereits direkt zum [Stundenarbeitsbereich](apps/teacher-ui/src/views/LessonWorkspace.vue). | „Jetzt fortsetzen“ an prominenter Stelle; Stunde bleibt Kontext für weitere Aktionen. |
+| **T02** Anwesenheit erfassen | [LessonWorkspace](apps/teacher-ui/src/views/LessonWorkspace.vue) übergibt `classId` und `lessonId` an [AttendanceEntry](apps/teacher-ui/src/views/AttendanceEntry.vue); die Erfassung besitzt daneben eigene Klasse-/Fachauswahl. | Aus der Stunde direkt zum passenden Kurs und Termin; bei freiem Einstieg nur fehlende Angaben erfragen. |
+| **T03** Stunden anlegen/ändern | [ScheduleOverview](apps/teacher-ui/src/views/ScheduleOverview.vue) führt zur [LessonList](apps/teacher-ui/src/views/LessonList.vue) mit Erstellen/Bearbeiten; auch [PlanningOverview](apps/teacher-ui/src/views/PlanningOverview.vue) kann Stunden im Plan erzeugen. | Neue Stunde im gewählten Zeit-/Klassenkontext anlegen, anschließend direkt öffnen. |
+| **T04** Sequenz planen | [PlanningOverview](apps/teacher-ui/src/views/PlanningOverview.vue) startet mit eigener Klassen-/Fachauswahl und lädt Klassenplanung. | Von Klasse oder Stunde mit vorbereiteter Auswahl zur Sequenzplanung. |
+| **T05** Klasse anlegen/bearbeiten | [Dashboard](apps/teacher-ui/src/views/Dashboard.vue) stellt Erstellen bereit; [ClassesOverview](apps/teacher-ui/src/views/ClassesOverview.vue) verweist zum Anlegen auf die Startseite; [ClassDetail](apps/teacher-ui/src/views/ClassDetail.vue) kann bearbeiten. | Anlegen und Bearbeiten direkt in der Klassenübersicht und im Klassenkontext. |
+| **T06** Klassen-/Schülerdaten verwalten | [ClassDetail](apps/teacher-ui/src/views/ClassDetail.vue) verlinkt Schülerprofile und bietet Schüler hinzufügen; [StudentList](apps/teacher-ui/src/views/StudentList.vue) bietet globale Suche, Import und Sammelaktionen. | Von der Klasse zur gefilterten Schülerliste, von der Person mit erkennbarem Rückweg zur Klasse. |
+| **T07** Schülerentwicklung ansehen | [StudentProfile](apps/teacher-ui/src/views/StudentProfile.vue) aggregiert Sport, Anwesenheit, KBR und Notizen. | Kontextbezogene Aktionen direkt an den Abschnitten; keine unnötigen Zwischenhubs. |
+| **T08** Sport-Leistung bewerten | [ClassDetail](apps/teacher-ui/src/utils/class-detail-summary.ts) führt bei „Bewertung & Tests“ zur globalen [GradingOverview](apps/teacher-ui/src/views/GradingOverview.vue), die ihrerseits eine Klasse auswählen lässt; erst dann zur Bewertungskategorie. | Klasse aus dem Ursprung übernehmen; Kategorie und Bewertungsmaske ohne Rückweg über den Sport-Hub. |
+| **T09** Sportprüfung durchführen | [SportHub](apps/teacher-ui/src/views/SportHub.vue) führt zur [SportExam](apps/teacher-ui/src/views/SportExam.vue) mit Klasse, Kategorie, Datum, Erfassung und Speichern. | Aus Klasse/Stunde direkt in die passende Prüfung; fachlich erforderliche Auswahl erhalten. |
+| **T10** Sporttools starten/fortsetzen | [SportHub](apps/teacher-ui/src/views/SportHub.vue) bietet zahlreiche gleichrangige Tools; [LessonWorkspace](apps/teacher-ui/src/views/LessonWorkspace.vue) liefert bereits kontextbezogene Tool-Links und zuletzt verwendete Sessions. | Aus aktiver Stunde zuletzt genutztes oder passendes Tool direkt starten; globale Werkzeugübersicht bleibt als Ausweichweg. |
+| **T11** KBR-Prüfung erstellen | [KBRHub](apps/teacher-ui/src/views/KBRHub.vue) und [ExamsOverview](apps/teacher-ui/src/views/ExamsOverview.vue) öffnen den [KBRExamBuilder](apps/teacher-ui/src/views/KBRExamBuilder.vue); nach erfolgreichem Speichern navigiert er zu `/exams`. | Nach Speichern **bei der konkreten Prüfung bleiben** und „Korrigieren“, „Druckbogen“ oder „Zur Liste“ anbieten. |
+| **T12** KBR-Prüfung korrigieren | [KBRHub](apps/teacher-ui/src/views/KBRHub.vue) bietet `/exams?workflow=correct`; [ExamsOverview](apps/teacher-ui/src/views/ExamsOverview.vue) verlangt dann die konkrete Prüfung; [CorrectionCompactUI_v2](apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue) wählt Prüfling und Korrekturmodus. | Prüfung einmal wählen; von ihrem Arbeitskontext direkt in den letzten **belegten** Korrekturzustand. |
+| **T13** KBR-Druckbogen gestalten | [KBRHub](apps/teacher-ui/src/views/KBRHub.vue) führt über `?workflow=design` zur Prüfungsauswahl; [KBRSheetDesigner](apps/teacher-ui/src/views/KBRSheetDesigner.vue) bietet zurück zur **Prüfungsauswahl**. | Aus der konkreten Prüfung gestalten und zu **derselben Prüfung** zurückkehren, ohne andere Auswahl. |
+| **T14** KBR-Rückmeldung/Analyse | [ExamsOverview](apps/teacher-ui/src/views/ExamsOverview.vue) und [KBRHub](apps/teacher-ui/src/views/KBRHub.vue) öffnen Analyse/Export; aus der [Korrektur](apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue) kann die Vorschau mit `candidateId` geöffnet werden. | Struktur, Korrektur, Analyse und Rückmeldung als Aktionen desselben Prüfungskontexts; Prüfling nicht ungeprüft wechseln. |
+| **T15** Fördertipps pflegen | [CorrectionCompactUI_v2](apps/teacher-ui/src/views/CorrectionCompactUI_v2.vue) verlinkt [SupportTipLibrary](apps/teacher-ui/src/views/SupportTipLibrary.vue) bereits mit `returnTo`. | Vorhandenes Rückkehrmuster auf andere fachliche Querverbindungen übertragen; Eingaben vor Wechsel sichern. |
+| **T16** Schuljahr wechseln | [SettingsOverview](apps/teacher-ui/src/views/SettingsOverview.vue) führt zu [SchoolYearOverview](apps/teacher-ui/src/views/SchoolYearOverview.vue): Vorschau, Backup-Bestätigung und Schuljahr-Eingabe. | Wenige klare Schritte, **keine** Entfernung von Vorschau, Backup-Hinweis oder Bestätigung aus vermeintlicher Klickersparnis. |
+| **T17** Lokale Daten sichern | [SettingsOverview](apps/teacher-ui/src/views/SettingsOverview.vue) führt zu [BackupRestoreView](apps/teacher-ui/src/views/BackupRestoreView.vue) für verschlüsselten Export/Restore. | Von riskanten Vorgängen direkt zur Sicherung, aber Export und Wiederherstellung klar getrennt lassen. |
+| **T18** Bewertungs- und Normtabellen | [SportHub](apps/teacher-ui/src/views/SportHub.vue) verlinkt [SportTablesView](apps/teacher-ui/src/views/SportTablesView.vue); [GradingOverview](apps/teacher-ui/src/views/GradingOverview.vue) öffnet außerdem die separate [TableManagement](apps/teacher-ui/src/views/TableManagement.vue) – beide heißen sinngemäß Tabellenverwaltung. | Fachliche Unterschiede zuerst prüfen, dann verständliche Begriffe und gegebenenfalls direkte Kontextlinks; **keine** stillschweigende Zusammenlegung von Datenformaten. |
+
+Weitere registrierte Sport-Varianten (Kriterien, Zeiten, Cooper, Shuttle-Run, Mittelstrecke, BJS, Sportabzeichen, Messwerte, verbale Bewertung), Live-Tools (u. a. Kamera/Video, Team- und Turnierverwaltung), KBR-Editoren, Settings und Statistiken bleiben im Produktumfang. Ihre spezialisierten **fachlichen Ein- und Ausgaben** müssen beim Redesign gesondert geprüft werden; ihre heutigen Darstellungs- und Navigationsformen sind dagegen **nicht** schützenswert. Die [Router-Konfiguration](apps/teacher-ui/src/router/index.ts) ist das aktuelle vollständige Routenverzeichnis, keine zusätzliche manuelle Routenliste pflegen.
+
+### 5.4 Zielabläufe und Kontextmodell zur Erprobung
+
+**Arbeitskontexte, nicht neue persistente Datenmodelle:**
+
+- **Klasse:** gewählte Klassen-ID; direkte Aktionen Schüler, Stunden, Anwesenheit, Sportbewertung, Planung. Eine Verlinkung darf IDs nur übergeben, wenn das Ziel sie tatsächlich versteht und validiert.
+- **Stunde:** Stunden-ID, zugehörige Klassen-ID und Fach; „Anwesenheit“, „Unterrichtswerkzeug“, „Schüler ziehen“, „Stundendetails“. Fach-/Klassenwechsel ist sichtbar und überschreibt nicht unbeabsichtigt offene Eingaben.
+- **Schülerprofil:** zentrale Schüler-ID; Fachübersicht, Anwesenheit, Leistung, Notizen. KBR-Prüflinge nur bei tatsächlich bestehender und validierter Zuordnung querverlinken.
+- **KBR-Prüfung:** Prüfungs-ID und vorhandener Status; „Aufgaben“, „Korrigieren“, „Auswertung“, „Druckbogen“, „Rückmeldung“. Diese Stationen sind **frei anwählbare Aktionen**, kein erzwungener Wizard. Prüfling und Korrekturstatus bleiben eigene Validierungs- und Speicherkontexte.
+- **Werkzeug:** im freien Einstieg ohne Klasse startbar, soweit das konkrete Tool dies heute unterstützt; aus einer Stunde Kontext durchreichen, sofern der Tool-Contract es akzeptiert.
+
+**Pilot KBR-Prüfung (UX-04, vor Implementierung durch Aufgaben-Test prüfen):**
+
+1. Einstieg „Prüfungen“ → bestehende Prüfung auswählen oder neue erstellen (bestehende Prüfungs-IDs, Vorlagen und Kandidatenformate unverändert).
+2. Prüfung öffnet ihren **dauerhaft erkennbaren Arbeitskontext**: Titel, Zuordnung, Status und fachlich erlaubte Aktionen sichtbar. Es gibt **keinen** Zwang, für „Korrigieren“, „Analyse“ oder „Druckbogen“ erneut in die Gesamtliste zurückzukehren.
+3. Speichern der Prüfungsstruktur bleibt bei derselben Prüfung und bietet den nächsten möglichen Arbeitsschritt an; Fehler sind sichtbar. Unvollständige oder nicht gespeicherte Daten dürfen nicht still verworfen werden.
+4. Korrektur öffnet die vorhandene Korrekturfunktion; Prüflingswechsel, aufgabenweiser Modus, Punkte/Notenschlüssel, Kommentare und Fördertipps bleiben fachlich korrekt. Übergang zur Rückmeldung erhält Prüfung und gegebenenfalls Prüfling.
+5. Auswertung, Druckbogengestaltung und Export erhalten Rückwege zur **aktiven Prüfung** statt zur erneuten Auswahl. Alte URLs/Deep-Links einschließlich `?workflow=...` dürfen beim Übergang nicht unbeabsichtigt brechen.
+
+### 5.5 Bewertung des Entwurfs statt pauschaler Klickvorgaben
+
+| Szenario mit synthetischen Daten | Zu prüfende Folge | Kritische Gegenprobe |
+|---|---|---|
+| **S1** Heute → Anwesenheit der nächsten Stunde | Klasse und Termin korrekt vorgewählt, speichern, zurück zur Stunde | Ohne aktuelle Stunde ist eine freie Auswahl möglich. |
+| **S2** Klasse → Sportnote für ein Kind erfassen | Klasse bleibt erhalten; Kategorie wählen, erfassen, speichern | Falsche Klasse/Kategorie erzeugt keine unbemerkte Änderung. |
+| **S3** KBR-Prüfung erstellen → Korrektur beginnen | Speichern, gleiche Prüfung, Korrektur starten | Ungespeicherte Änderungen und fehlende Prüflinge werden klar behandelt. |
+| **S4** Korrektur → Druckbogenvorschau → dieselbe Prüfung | Prüfungs-/Prüflingskontext und Rückweg nachvollziehbar | Export nur mit zulässigem Korrektur-/Abschlussstand. |
+| **S5** Klasse → Schülerprofil → fachübergreifende Informationen | Wechsel ohne Startseitenumweg, eindeutige Identität | KBR-Kandidat wird nie aufgrund bloßer Namensgleichheit als Schüler verknüpft. |
+| **S6** Schuljahr umstellen → lokales Backup | Sicherung, Vorschau und explizite Bestätigung verständlich | Keine Umgehung des Schutzvorgangs zur Verringerung von Klicks. |
+| **S7** Timer/Tool aus aktiver Stunde, anschließend anderer Kontext | Tool schnell erreichbar, nur vorhandene Kontextparameter übernommen | Freier Start und Abbruch ohne Datenverlust bleiben möglich. |
+
+**Messung zuerst als Baseline, dann erneut mit Pilot:** erfolgreiche Aufgaben, notwendige Aktionen, Rückwege, verlorene/erneut gewählte Kontexte, Fehler, subjektive Orientierung und First-Paint-/Content-Ready-Werte (vorhanden: [navigation-performance.ts](apps/teacher-ui/src/utils/navigation-performance.ts)). Keine erfundenen Millisekunden- oder Klickbudgets. Zusätzlich Tastatur-/Touch-/Screenreader-Prüfung, echter Desktop- und iPad-Safari-Test einschließlich Offline-HTML und Split View. Keine realen Schülerdaten; keine verpflichtende externe Telemetrie.
+
+### 5.6 Reihenfolge der überprüfbaren UX-Arbeitspakete
+
+1. **UX-03 – Aufgabenkarte und IA-Hypothese:** Ist-Quellen, Zielkontexte und S1–S7 dokumentieren; **kein Produktcode**. Diesen Abschnitt nach fachlichem Review anpassen.
+2. **UX-04 – KBR-Prüfung als Pilot:** Aufgaben S3/S4 entlang vorhandener Exam-/Correction-Contracts neu gestalten; alte Deep-Links erhalten. Zunächst einen repräsentativen Flow, dann testen.
+3. **UX-05 – Klasse/Stunde/Anwesenheit:** S1/S2/S5; Klasse und Stunde nur über bestehende Bridges weiterreichen, keine Direktzugriffe aus Views.
+4. **UX-06 – Sportbewertung/Tools:** S2/S7; Eingabedichte, schnelle Bedienung und Live-Interaktion gesondert erproben. Fachlogik nicht neu erfinden.
+5. **UX-07 – restliche Ansichten und Operations:** ähnliche Komponenten systematisch vereinheitlichen, Sicherheit/Backup/Jahreswechsel und Offline-Prozesse prüfen, doppelte Navigation entfernen.
+
+**Abnahmeregel für jede spätere UI-Migration:** Aufgabe fachlich vollständig, reale Navigationswechsel nachweisbar, unmittelbares Feedback und Datenintegrität gesichert, Keyboard/Touch/Offline verifiziert oder explizit offen. Die erste Pilotlösung wird **nicht** ungeprüft auf alle Ansichten kopiert.
 ---
 
 ## 6) Vollständige Feature-Checkliste (Pflichtenheft)
