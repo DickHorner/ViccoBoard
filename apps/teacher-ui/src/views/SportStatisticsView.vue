@@ -249,14 +249,14 @@ function formatDate(date: Date): string {
 }
 
 .subtitle {
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0.25rem 0 0;
 }
 
 .loading-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .spinner {
@@ -282,7 +282,7 @@ function formatDate(date: Date): string {
 .stats-section h2 {
   margin: 0;
   font-size: 1.1rem;
-  color: #0f172a;
+  color: var(--color-ink);
   border-bottom: 2px solid rgba(14, 116, 144, 0.15);
   padding-bottom: 0.5rem;
 }
@@ -305,12 +305,12 @@ function formatDate(date: Date): string {
 
 .metric-card strong {
   font-size: 1.5rem;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .metric-card span {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .metric-card.accent-green strong { color: #15803d; }
@@ -357,7 +357,7 @@ function formatDate(date: Date): string {
 
 .stats-table th {
   font-weight: 600;
-  color: #475569;
+  color: var(--color-muted);
   background: rgba(15, 23, 42, 0.02);
   font-size: 0.8rem;
   text-transform: uppercase;
