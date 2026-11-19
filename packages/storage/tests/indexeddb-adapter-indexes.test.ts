@@ -74,7 +74,7 @@ describe('IndexedDBAdapter indexed reads', () => {
       await adapter.delete('related', 'related-1');
       await adapter.delete('rows', 'a');
       throw new Error('Simulated deletion failure');
-    })).rejects.toThrow('Simulated deletion failure');
+    })).rejects.toThrow('IndexedDB transaction aborted');
 
     expect(await adapter.getById('related', 'related-1')).toBeTruthy();
     expect(await adapter.getById('rows', 'a')).toBeTruthy();
