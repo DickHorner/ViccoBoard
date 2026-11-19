@@ -33,27 +33,21 @@
       <div class="form-row">
         <div class="form-group">
           <label for="dice-class">{{ t('DICE.class') }}</label>
-          <select id="dice-class" v-model="selectedClassId" class="form-input">
-            <option value="">—</option>
-            <option v-for="cls in classes" :key="cls.id" :value="cls.id">
-              {{ cls.name }} ({{ cls.schoolYear }})
-            </option>
-          </select>
+          <Select inputId="dice-class" v-model="selectedClassId" :options="classOptions"
+            optionLabel="label" optionValue="value" fluid />
         </div>
       </div>
 
-      <div v-if="rangeError" class="warning-banner">{{ rangeError }}</div>
+      <Message v-if="rangeError" severity="warn" role="alert">{{ rangeError }}</Message>
 
       <div class="roll-area">
-        <button class="btn-roll" @click="roll" :disabled="!canRoll">
-          {{ t('DICE.roll') }}
-        </button>
+        <Button class="btn-roll" :label="t('DICE.roll')" :disabled="!canRoll" @click="roll" />
         <div v-if="lastResult !== null" class="result-display" aria-live="polite">
           {{ lastResult }}
         </div>
       </div>
 
-      <div v-if="saveError" class="warning-banner">{{ t('DICE.save-error') }}</div>
+      <Message v-if="saveError" severity="error" role="alert">{{ t('DICE.save-error') }}</Message>
     </section>
 
     <section class="card app-card">
@@ -74,6 +68,8 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
@@ -88,6 +84,10 @@ const minValue = ref(1)
 const maxValue = ref(6)
 const selectedClassId = ref('')
 const classes = ref<ClassGroup[]>([])
+const classOptions = computed(() => [
+  { label: '—', value: '' },
+  ...classes.value.map(group => ({ label: `${group.name} (${group.schoolYear})`, value: group.id }))
+])
 const lastResult = ref<number | null>(null)
 const saveError = ref(false)
 

@@ -325,3 +325,79 @@ a {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/*
+ * Sport workspace: use the same app surface and Nora/OpenVue tokens in
+ * grading, statistics and teaching tools. Domain-specific display surfaces
+ * (stopwatches, scoreboards and camera overlays) keep their own styling.
+ */
+.sport-ui {
+  color: var(--color-ink);
+  min-width: 0;
+}
+
+.sport-ui .page-header h1,
+.sport-ui .page-header h2 {
+  color: var(--color-ink);
+}
+
+.sport-ui .page-description,
+.sport-ui .subtitle,
+.sport-ui .section-hint {
+  color: var(--color-muted);
+}
+
+.sport-ui :is(.card, .panel, .form-card, .settings-card):not(.app-card) {
+  background: var(--surface-glass);
+  border: 1px solid var(--surface-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.sport-ui :is(.btn-primary, .add-button, .save-button):not(.p-button) {
+  background: var(--accent-strong);
+  color: #fff;
+  border-color: var(--accent-strong);
+}
+
+.sport-ui :is(.btn-secondary, .ghost-button, .back-button):not(.p-button) {
+  color: var(--color-ink);
+  border-color: var(--surface-border);
+}
+
+.sport-ui :is(.form-group, .app-field, .filter-controls, .search-controls)
+  :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea):not(.p-inputtext) {
+  color: var(--color-ink);
+  background: var(--surface-glass);
+  border: 1px solid var(--surface-border-strong);
+  border-radius: 0.75rem;
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.sport-ui :is(.form-group, .app-field, .filter-controls, .search-controls)
+  :is(input, select, textarea):focus-visible,
+.sport-ui :is(.btn-primary, .btn-secondary, .ghost-button, .back-button):focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.sport-ui .page-header :is(button, a),
+.sport-ui :is(.card, .panel) :is(.btn-primary, .btn-secondary, .ghost-button, .back-button) {
+  min-height: 44px;
+}
+
+.sport-ui :is(.p-button, .p-inputtext, .p-select, .p-inputnumber-input) {
+  min-height: 44px;
+}
+
+@media (max-width: 640px) {
+  .sport-ui :is(.page-header, .card-header, .header-actions, .form-actions) {
+    flex-wrap: wrap;
+  }
+
+  .sport-ui :is(.card, .panel, .app-card) {
+    min-width: 0;
+  }
+}

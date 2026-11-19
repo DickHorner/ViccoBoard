@@ -1,5 +1,5 @@
 <template>
-  <section class="sport-statistics">
+  <section class="sport-statistics sport-ui">
     <header class="page-header">
       <button class="back-button" @click="$router.back()">← Zurück</button>
       <div>
@@ -25,7 +25,7 @@
 
     <div v-else class="stats-content">
       <!-- Attendance overview -->
-      <section class="stats-card">
+      <section class="stats-card app-card">
         <h2>Anwesenheit</h2>
         <div class="metrics-row">
           <article class="metric">
@@ -52,7 +52,7 @@
       </section>
 
       <!-- Performance overview -->
-      <section class="stats-card">
+      <section class="stats-card app-card">
         <h2>Leistungsübersicht</h2>
         <div v-if="gradeCategoryStats.length === 0" class="empty-state">
           <p>Noch keine Bewertungsdaten vorhanden.</p>
@@ -72,7 +72,7 @@
       </section>
 
       <!-- Tool usage overview -->
-      <section class="stats-card">
+      <section class="stats-card app-card">
         <h2>Tool-Nutzung</h2>
         <div v-if="toolUsageStats.length === 0" class="empty-state">
           <p>Noch keine Tool-Sessions aufgezeichnet.</p>

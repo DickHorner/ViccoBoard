@@ -1,10 +1,10 @@
 <template>
-  <div class="attendance-view">
+  <div class="attendance-view sport-ui">
     <div class="page-header">
       <RouterLink v-if="currentLessonId" :to="`/lessons/${currentLessonId}/workspace`" class="back-button">
         ← Zur Stunde
       </RouterLink>
-      <button v-else class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button v-else :label="t('COMMON.back')" icon="pi pi-arrow-left" severity="secondary" text @click="$router.back()" />
       <h2>{{ t('ANWESENHEIT.title') }}</h2>
       <p class="page-description">{{ t('ANWESENHEIT.status') }}</p>
       <p v-if="currentLessonId" class="lesson-context" role="status">
@@ -20,43 +20,24 @@
     </div>
     
     <div class="attendance-form">
-      <section class="card">
+      <section class="card app-card">
         <h3>{{ t('ANWESENHEIT.liste') }} {{ currentDate }}</h3>
         <p v-if="saveError" class="error-message" role="alert">{{ saveError }}</p>
         
         <div class="form-section">
           <label for="class-select" class="form-label">{{ t('KLASSEN.klasse') }}</label>
-          <select 
-            id="class-select" 
-            v-model="selectedClassId" 
-            class="form-select"
+          <Select inputId="class-select" :modelValue="selectedClassId"
+            :options="classOptions" optionLabel="label" optionValue="value" class="form-select"
             :disabled="Boolean(currentLessonId) || loading || saving"
-            @change="onClassChange"
-          >
-            <option value="">{{ t('KLASSEN.klasse') }}...</option>
-            <option 
-              v-for="cls in classes" 
-              :key="cls.id" 
-              :value="cls.id"
-            >
-              {{ cls.name }} ({{ cls.schoolYear }})
-            </option>
-          </select>
+            @update:modelValue="value => { selectedClassId = value; void onClassChange() }" />
           <p v-if="currentLessonId" class="field-hint">Diese Klasse gehört zur ausgewählten Stunde und kann hier nicht geändert werden.</p>
         </div>
 
         <div v-if="!currentLessonId" class="form-section">
           <label for="subject-select" class="form-label">Fach</label>
-          <select
-            id="subject-select"
-            v-model="selectedSubjectId"
-            class="form-select"
-          >
-            <option value="">Fach...</option>
-            <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
-              {{ subject.name }}
-            </option>
-          </select>
+          <Select inputId="subject-select" v-model="selectedSubjectId"
+            :options="subjectOptions" optionLabel="label" optionValue="value"
+            class="form-select" />
         </div>
 
         <div v-if="loading" class="loading-state" role="status">
@@ -86,13 +67,8 @@
           </div>
 
           <div class="bulk-actions">
-            <button 
-              class="btn-bulk" 
-              @click="markAllPresent"
-              :disabled="saving"
-            >
-              Alle {{ t('ANWESENHEIT.present') }}
-            </button>
+            <Button :label="`Alle ${t('ANWESENHEIT.present')}`" severity="secondary" outlined
+              :disabled="saving || loading" @click="markAllPresent" />
           </div>
           
           <div class="attendance-table-wrapper">
@@ -134,7 +110,7 @@
                     </div>
                   </td>
                   <td class="reason-cell">
-                    <input 
+                    <InputText
                       v-if="attendance[student.id] && statusesWithReason.includes(attendance[student.id].status)"
                       v-model="attendance[student.id].reason"
                       type="text"
@@ -160,27 +136,12 @@
           </div>
           
           <div class="form-actions">
-            <button 
-              class="btn-primary" 
-              @click="handleSaveAttendance"
-              :disabled="!hasAnyAttendance || saving || loading"
-            >
-              {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
-            </button>
-            <button 
-              class="btn-secondary" 
-              @click="clearAttendance"
-              :disabled="!hasAnyAttendance || saving"
-            >
-              {{ t('COMMON.delete') }}
-            </button>
-            <button
-              class="btn-secondary"
-              @click="exportAttendance"
-              :disabled="!hasAnyAttendance || saving"
-            >
-              Export CSV
-            </button>
+            <Button :label="t('COMMON.save')" icon="pi pi-save" :loading="saving"
+              :disabled="!hasAnyAttendance || saving || loading" @click="handleSaveAttendance" />
+            <Button :label="t('COMMON.delete')" severity="secondary" outlined
+              :disabled="!hasAnyAttendance || saving" @click="clearAttendance" />
+            <Button label="Export CSV" severity="secondary" outlined icon="pi pi-download"
+              :disabled="!hasAnyAttendance || saving" @click="exportAttendance" />
           </div>
 
           <p class="text-muted">Lokales Exportformat (CSV UTF-8): {{ attendanceExportFormat }}</p>
@@ -197,6 +158,9 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { onBeforeRouteLeave, RouterLink, useRoute } from 'vue-router'
+import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Select from 'openvue/select'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge } from '../composables/useStudentsBridge'
@@ -216,6 +180,14 @@ const { t } = useI18n()
 
 // State
 const classes = ref<ClassGroup[]>([])
+const classOptions = computed(() => [
+  { label: t('KLASSEN.klasse') + '...', value: '' },
+  ...classes.value.map(group => ({ label: `${group.name} (${group.schoolYear})`, value: group.id }))
+])
+const subjectOptions = computed(() => [
+  { label: 'Fach...', value: '' },
+  ...subjects.value.map(subject => ({ label: subject.name, value: subject.id }))
+])
 const subjects = ref<Subject[]>([])
 const students = ref<Student[]>([])
 const selectedClassId = ref<string>('')

@@ -86,7 +86,7 @@
 
 .status-pill--ready {
   background: rgba(14, 116, 144, 0.1);
-  color: #155e75;
+  color: var(--color-ink);
 }
 
 .status-pill--running {
@@ -179,19 +179,19 @@
 
 .sensitivity-level {
   font-weight: 700;
-  color: #0e7490;
+  color: var(--accent-strong);
 }
 
 .delay-slider {
   width: 100%;
-  accent-color: #0e7490;
+  accent-color: var(--accent-strong);
 }
 
 .slider-marks {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-subtle);
 }
 
 .action-buttons {
@@ -223,7 +223,7 @@
 }
 
 .btn-primary {
-  background: #0e7490;
+  background: var(--accent-strong);
   color: white;
 }
 

@@ -16,7 +16,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #0f766e;
+  color: var(--accent-strong);
   font-size: 0.9rem;
   padding: 0;
 }
@@ -165,9 +165,9 @@
 }
 
 .region-button--active {
-  border-color: #0f766e;
+  border-color: var(--accent-strong);
   background: rgba(15, 118, 110, 0.1);
-  color: #0f766e;
+  color: var(--accent-strong);
 }
 
 .region-hint {
@@ -272,7 +272,7 @@
 }
 
 .btn-primary {
-  background: #0f766e;
+  background: var(--accent-strong);
   color: white;
 }
 
@@ -283,7 +283,7 @@
 
 .btn-secondary {
   background: #e2e8f0;
-  color: #334155;
+  color: var(--color-ink);
 }
 
 .btn-secondary:disabled {

@@ -1,5 +1,5 @@
 <template>
-  <div class="verbal-grading-view">
+  <div class="verbal-grading-view sport-ui">
     <div class="page-header">
       <button class="back-button" @click="$router.back()">← Zurück</button>
       <h2>{{ category?.name || 'Verbalbeurteilung' }}</h2>
@@ -23,7 +23,7 @@
     <!-- Content -->
     <div v-else-if="category" class="grading-content">
       <!-- Category Info -->
-      <section class="card category-info-card">
+      <section class="card app-card category-info-card">
         <h3>Kategorieinformationen</h3>
         <div class="info-grid">
           <div class="info-item">
@@ -59,7 +59,7 @@
       <section
         v-for="student in students"
         :key="student.id"
-        :class="['card', 'student-card', { 'card-unsaved': hasUnsavedChangesForStudent(student.id), 'card-saved': isSaved(student.id) && !hasUnsavedChangesForStudent(student.id) }]"
+        :class="['card', 'app-card', 'student-card', { 'card-unsaved': hasUnsavedChangesForStudent(student.id), 'card-saved': isSaved(student.id) && !hasUnsavedChangesForStudent(student.id) }]"
       >
         <div class="student-header">
           <h4>{{ student.firstName }} {{ student.lastName }}</h4>

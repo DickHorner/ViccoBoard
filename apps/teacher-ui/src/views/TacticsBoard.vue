@@ -33,13 +33,9 @@
         <hr />
 
         <div class="field-group">
-          <label class="form-label">{{ t('TACTICS.background') }}</label>
-          <select v-model="background" class="form-select">
-            <option value="field">{{ t('TACTICS.backgroundField') }}</option>
-            <option value="court">{{ t('TACTICS.backgroundCourt') }}</option>
-            <option value="pitch">{{ t('TACTICS.backgroundPitch') }}</option>
-            <option value="custom">{{ t('TACTICS.backgroundCustom') }}</option>
-          </select>
+          <label class="form-label" for="tactics-background">{{ t('TACTICS.background') }}</label>
+          <Select inputId="tactics-background" v-model="background" :options="backgroundOptions"
+            optionLabel="label" optionValue="value" fluid />
         </div>
 
         <hr />
@@ -67,8 +63,8 @@
 
       <aside class="snapshot-panel card app-card">
         <h3>{{ t('TACTICS.newSnapshot') }}</h3>
-        <input v-model="snapshotTitle" class="form-input" :placeholder="t('TACTICS.snapshotTitlePlaceholder')" maxlength="80" />
-        <input v-model="snapshotSport" class="form-input" :placeholder="t('TACTICS.sport')" maxlength="40" />
+        <InputText v-model="snapshotTitle" :placeholder="t('TACTICS.snapshotTitlePlaceholder')" maxlength="80" fluid />
+        <InputText v-model="snapshotSport" :placeholder="t('TACTICS.sport')" maxlength="40" fluid />
         <Button class="btn" :disabled="saving" @click="saveSnapshot">
           {{ saving ? '…' : t('TACTICS.save') }}
         </Button>
@@ -97,6 +93,9 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Select from 'openvue/select'
+import { computed } from 'vue'
 import { useTacticsBoardView } from '../composables/useTacticsBoardView'
 
 const {
@@ -124,6 +123,13 @@ const {
   tools,
   t
 } = useTacticsBoardView()
+
+const backgroundOptions = computed(() => [
+  { label: t('TACTICS.backgroundField'), value: 'field' },
+  { label: t('TACTICS.backgroundCourt'), value: 'court' },
+  { label: t('TACTICS.backgroundPitch'), value: 'pitch' },
+  { label: t('TACTICS.backgroundCustom'), value: 'custom' }
+])
 
 void boardCanvas
 </script>
