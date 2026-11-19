@@ -9,6 +9,7 @@
 }
 
 .back-button {
+  text-decoration: none;
   background: transparent;
   border: none;
   color: #667eea;
