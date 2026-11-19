@@ -1,7 +1,7 @@
 <template>
-  <section class="statistics-view">
+  <section class="statistics-view sport-ui">
     <header class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <div>
         <h1>Statistiken</h1>
         <p class="subtitle">Überblick über Anwesenheit, Leistungen und Tool-Nutzung im Sportunterricht.</p>
@@ -27,23 +27,23 @@
           <p>Noch keine Anwesenheitsdaten vorhanden.</p>
         </div>
         <div v-else class="metrics-grid">
-          <article class="metric-card">
+          <article class="metric-card app-card">
             <strong>{{ attendanceOverview.global.total }}</strong>
             <span>Einträge gesamt</span>
           </article>
-          <article class="metric-card accent-green">
+          <article class="metric-card accent-green app-card">
             <strong>{{ attendanceOverview.global.present }}</strong>
             <span>Anwesend</span>
           </article>
-          <article class="metric-card accent-red">
+          <article class="metric-card accent-red app-card">
             <strong>{{ attendanceOverview.global.absent }}</strong>
             <span>Abwesend</span>
           </article>
-          <article class="metric-card accent-yellow">
+          <article class="metric-card accent-yellow app-card">
             <strong>{{ attendanceOverview.global.excused }}</strong>
             <span>Entschuldigt</span>
           </article>
-          <article class="metric-card">
+          <article class="metric-card app-card">
             <strong>{{ attendanceOverview.global.attendanceRate }}%</strong>
             <span>Anwesenheitsquote</span>
           </article>
@@ -58,11 +58,11 @@
         </div>
         <template v-else>
           <div class="metrics-grid">
-            <article class="metric-card">
+            <article class="metric-card app-card">
               <strong>{{ performanceOverview.totalEntries }}</strong>
               <span>Messungen gesamt</span>
             </article>
-            <article class="metric-card accent-green">
+            <article class="metric-card accent-green app-card">
               <strong>{{ performanceOverview.gradedEntries }}</strong>
               <span>Mit Note bewertet</span>
             </article>
@@ -142,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, onMounted } from 'vue'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { AttendanceOverview, PerformanceOverview, ToolUsageOverview } from '@viccoboard/sport'
