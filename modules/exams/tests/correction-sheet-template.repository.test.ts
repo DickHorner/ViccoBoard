@@ -1,4 +1,4 @@
-import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage/node';
+import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, ExamSchemaMigration } from '@viccoboard/storage/node';
 import { PDFDocument } from 'pdf-lib';
 import { ExamRepository } from '../src/repositories/exam.repository';
 import { CorrectionEntryRepository } from '../src/repositories/correction-entry.repository';
@@ -21,6 +21,8 @@ describe('CorrectionSheetTemplateRepository', () => {
     storage = new SQLiteStorage({ databasePath: ':memory:', memory: true });
     await storage.initialize('test-password');
     storage.registerMigration(new InitialSchemaMigration(storage));
+    storage.registerMigration(new GradingSchemaMigration(storage));
+    storage.registerMigration(new ExamSchemaMigration(storage));
     await storage.migrate();
     templates = new CorrectionSheetTemplateRepository(storage.getAdapter(), new ExamRepository(storage.getAdapter()));
   });
