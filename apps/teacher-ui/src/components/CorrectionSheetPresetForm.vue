@@ -273,6 +273,7 @@ function saveDrawing(): void {
 }
 
 .small-button {
+  min-height: 44px;
   border: 1px solid rgba(15, 23, 42, 0.2);
   border-radius: 999px;
   background: transparent;
