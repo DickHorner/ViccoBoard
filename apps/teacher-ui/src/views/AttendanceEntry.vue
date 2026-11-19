@@ -389,7 +389,11 @@ const onClassChange = async () => {
   attendance.value = {}
   statusCatalog.value = []
   saveError.value = ''
-  if (!classId) return
+  if (!classId) {
+    loading.value = false
+    catalogLoading.value = false
+    return
+  }
 
   loading.value = true
   catalogLoading.value = true
