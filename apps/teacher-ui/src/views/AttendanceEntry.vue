@@ -1,9 +1,22 @@
 <template>
   <div class="attendance-view">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <RouterLink v-if="currentLessonId" :to="`/lessons/${currentLessonId}/workspace`" class="back-button">
+        ← Zur Stunde
+      </RouterLink>
+      <button v-else class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
       <h2>{{ t('ANWESENHEIT.title') }}</h2>
       <p class="page-description">{{ t('ANWESENHEIT.status') }}</p>
+      <p v-if="currentLessonId" class="lesson-context" role="status">
+        {{ selectedClassName || 'Klasse wird geladen…' }} · {{ currentDate }}
+      </p>
+      <RouterLink
+        v-else-if="selectedClassId"
+        :to="`/classes/${selectedClassId}`"
+        class="class-link"
+      >
+        Zur Klasse
+      </RouterLink>
     </div>
     
     <div class="attendance-form">
@@ -16,6 +29,7 @@
             id="class-select" 
             v-model="selectedClassId" 
             class="form-select"
+            :disabled="Boolean(currentLessonId) || loading || saving"
             @change="onClassChange"
           >
             <option value="">{{ t('KLASSEN.klasse') }}...</option>
@@ -27,8 +41,9 @@
               {{ cls.name }} ({{ cls.schoolYear }})
             </option>
           </select>
+          <p v-if="currentLessonId" class="field-hint">Diese Klasse gehört zur ausgewählten Stunde und kann hier nicht geändert werden.</p>
         </div>
-        
+
         <div v-if="!currentLessonId" class="form-section">
           <label for="subject-select" class="form-label">Fach</label>
           <select
@@ -147,7 +162,7 @@
             <button 
               class="btn-primary" 
               @click="handleSaveAttendance"
-              :disabled="!hasAnyAttendance || saving"
+              :disabled="!hasAnyAttendance || saving || loading"
             >
               {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
             </button>
@@ -184,7 +199,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge } from '../composables/useStudentsBridge'
@@ -264,13 +279,17 @@ const studentsBridge = getStudentsBridge()
 
 // Computed
 const currentDate = computed(() => {
-  return new Date().toLocaleDateString('de-DE', { 
+  return (currentLessonDate.value ?? new Date()).toLocaleDateString('de-DE', { 
     weekday: 'long', 
     year: 'numeric', 
     month: 'long', 
     day: 'numeric' 
   })
 })
+
+const selectedClassName = computed(() =>
+  classes.value.find(group => group.id === selectedClassId.value)?.name ?? ''
+)
 
 const hasAnyAttendance = computed(() => {
   return Object.keys(attendance.value).length > 0
@@ -361,34 +380,45 @@ const clearAttendance = () => {
   saveError.value = ''
 }
 
+let classLoadVersion = 0
+
 const onClassChange = async () => {
-  if (!selectedClassId.value) {
-    students.value = []
-    attendance.value = {}
-    statusCatalog.value = []
-    return
-  }
-  
+  const version = ++classLoadVersion
+  const classId = selectedClassId.value
+  students.value = []
+  attendance.value = {}
+  statusCatalog.value = []
+  saveError.value = ''
+  if (!classId) return
+
   loading.value = true
   catalogLoading.value = true
   try {
-    // Load students and status catalog in parallel
-    const [studentsResult, catalog] = await Promise.all([
-      studentsBridge.studentRepository.findByClassGroup(selectedClassId.value),
-      studentsBridge.statusCatalogRepository.getOrCreateForClassGroup(
-        selectedClassId.value,
-        'attendance'
-      )
+    const [studentsResult, catalog, existingRecords] = await Promise.all([
+      studentsBridge.studentRepository.findByClassGroup(classId),
+      studentsBridge.statusCatalogRepository.getOrCreateForClassGroup(classId, 'attendance'),
+      currentLessonId.value
+        ? SportBridge.attendanceRepository.findByLesson(currentLessonId.value)
+        : Promise.resolve([])
     ])
-    
+    if (version !== classLoadVersion) return
+
     students.value = studentsResult
     statusCatalog.value = catalog.statuses
-    attendance.value = {}
+    attendance.value = Object.fromEntries(existingRecords.map(record => [
+      record.studentId,
+      { status: record.status, reason: record.reason, lateMinutes: record.lateMinutes }
+    ]))
   } catch (err) {
-    saveError.value = t('COMMON.error')
+    if (version === classLoadVersion) {
+      console.error('Failed to load attendance context:', err)
+      saveError.value = 'Anwesenheitsdaten konnten nicht geladen werden.'
+    }
   } finally {
-    loading.value = false
-    catalogLoading.value = false
+    if (version === classLoadVersion) {
+      loading.value = false
+      catalogLoading.value = false
+    }
   }
 }
 
@@ -404,6 +434,13 @@ const handleSaveAttendance = async () => {
 
     if (!currentLessonId.value && !selectedSubjectId.value) {
       throw new Error('Kein Fach ausgewählt')
+    }
+
+    if (currentLessonId.value) {
+      const lesson = await SportBridge.lessonRepository.findById(currentLessonId.value)
+      if (!lesson || lesson.classGroupId !== selectedClassId.value) {
+        throw new Error('Die Stunde gehört nicht zur ausgewählten Klasse.')
+      }
     }
 
     // Reuse existing lesson if editing, otherwise create a new one
@@ -454,47 +491,50 @@ const handleSaveAttendance = async () => {
   }
 }
 
-// Lifecycle
+// Lesson context is authoritative. Class/subject options load independently.
 onMounted(async () => {
+  const lookups = Promise.allSettled([
+    SportBridge.classGroupRepository.findAll(),
+    SportBridge.subjectRepository.findAll()
+  ]).then(([loadedClasses, loadedSubjects]) => {
+    if (loadedClasses.status === 'fulfilled') {
+      classes.value = loadedClasses.value
+    } else {
+      console.error('Failed to load class options:', loadedClasses.reason)
+      saveError.value = 'Klassen konnten nicht geladen werden.'
+    }
+    if (loadedSubjects.status === 'fulfilled') {
+      subjects.value = loadedSubjects.value.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
+    } else {
+      console.error('Failed to load subject options:', loadedSubjects.reason)
+      saveError.value = 'Fächer konnten nicht geladen werden.'
+    }
+  })
+
   try {
-    const [loadedClasses, loadedSubjects] = await Promise.all([
-      SportBridge.classGroupRepository.findAll(),
-      SportBridge.subjectRepository.findAll()
-    ])
-    classes.value = loadedClasses
-    subjects.value = loadedSubjects.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
-    
-    // Check if lessonId is passed via query params (edit mode)
-    const lessonIdFromQuery = route.query.lessonId as string
-    const classIdFromQuery = route.query.classId as string
-    
-    if (lessonIdFromQuery) {
-      const lesson = await SportBridge.lessonRepository.findById(lessonIdFromQuery)
-      if (lesson) {
-        currentLessonId.value = lesson.id
-        currentLessonDate.value = lesson.date
-        selectedClassId.value = lesson.classGroupId
-        selectedSubjectId.value = lesson.subjectId
-        await onClassChange()
-        // Load existing attendance records for this lesson
-        const records = await SportBridge.attendanceRepository.findByLesson(lesson.id)
-        for (const record of records) {
-          attendance.value[record.studentId] = {
-            status: record.status,
-            reason: record.reason,
-            lateMinutes: record.lateMinutes
-          }
-        }
-      } else {
-        saveError.value = t('COMMON.error')
-      }
-    } else if (classIdFromQuery) {
-      selectedClassId.value = classIdFromQuery
+    const lessonId = typeof route.query.lessonId === 'string' ? route.query.lessonId : ''
+    const classId = typeof route.query.classId === 'string' ? route.query.classId : ''
+
+    if (lessonId) {
+      const lesson = await SportBridge.lessonRepository.findById(lessonId)
+      if (!lesson) throw new Error('Die angeforderte Stunde wurde nicht gefunden.')
+      currentLessonId.value = lesson.id
+      currentLessonDate.value = lesson.date
+      selectedClassId.value = lesson.classGroupId
+      selectedSubjectId.value = lesson.subjectId
+      await onClassChange()
+    } else if (classId) {
+      const classGroup = await SportBridge.classGroupRepository.findById(classId)
+      if (!classGroup) throw new Error('Die angeforderte Klasse wurde nicht gefunden.')
+      selectedClassId.value = classGroup.id
       await onClassChange()
     }
   } catch (err) {
-    saveError.value = t('COMMON.error')
+    console.error('Failed to open attendance context:', err)
+    saveError.value = err instanceof Error ? err.message : t('COMMON.error')
   }
+
+  await lookups
 })
 </script>
 
