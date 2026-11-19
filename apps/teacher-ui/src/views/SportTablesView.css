@@ -44,9 +44,6 @@
 }
 
 .template-card {
-  background: #ecfeff;
-  border: 1px solid #a5f3fc;
-  border-radius: 18px;
   padding: 1.25rem 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -77,9 +74,6 @@
 
 /* Import card */
 .import-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
   padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -272,9 +266,6 @@
 }
 
 .table-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
   padding: 1rem 1.25rem;
   display: flex;
   justify-content: space-between;
