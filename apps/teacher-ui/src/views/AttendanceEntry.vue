@@ -196,7 +196,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { onBeforeRouteLeave, RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge } from '../composables/useStudentsBridge'
@@ -272,6 +272,15 @@ const exportAttendance = () => {
 }
 
 const attendance = ref<Record<string, AttendanceEntry>>({})
+let savedAttendanceSnapshot = '{}'
+let loadedClassId = ''
+
+const currentAttendanceSnapshot = () => JSON.stringify(attendance.value)
+const hasUnsavedAttendance = () => currentAttendanceSnapshot() !== savedAttendanceSnapshot
+
+onBeforeRouteLeave(() =>
+  !hasUnsavedAttendance() || window.confirm('Die Anwesenheit wurde verändert, aber noch nicht gespeichert. Trotzdem verlassen?')
+)
 
 // Bridge access
 const SportBridge = getSportBridge()
@@ -383,13 +392,21 @@ const clearAttendance = () => {
 let classLoadVersion = 0
 
 const onClassChange = async () => {
+  if (hasUnsavedAttendance() &&
+    !window.confirm('Die Anwesenheit wurde verändert, aber noch nicht gespeichert. Klasse trotzdem wechseln?')) {
+    selectedClassId.value = loadedClassId
+    return
+  }
+
   const version = ++classLoadVersion
   const classId = selectedClassId.value
   students.value = []
   attendance.value = {}
+  savedAttendanceSnapshot = '{}'
   statusCatalog.value = []
   saveError.value = ''
   if (!classId) {
+    loadedClassId = ''
     loading.value = false
     catalogLoading.value = false
     return
@@ -413,6 +430,8 @@ const onClassChange = async () => {
       record.studentId,
       { status: record.status, reason: record.reason, lateMinutes: record.lateMinutes }
     ]))
+    loadedClassId = classId
+    savedAttendanceSnapshot = currentAttendanceSnapshot()
   } catch (err) {
     if (version === classLoadVersion) {
       console.error('Failed to load attendance context:', err)
@@ -477,16 +496,19 @@ const handleSaveAttendance = async () => {
     await SportBridge.recordAttendanceUseCase.executeBatch(records)
     
     const savedCount = records.length
-    saveSuccess.value = `${t('COMMON.success')} (${savedCount})`
-    
-    // Reset attendance after brief display in create mode only.
+    const successMessage = `${t('COMMON.success')} (${savedCount})`
+    const savedSnapshot = currentAttendanceSnapshot()
+    savedAttendanceSnapshot = savedSnapshot
+    saveSuccess.value = successMessage
+
     setTimeout(() => {
-      if (saveSuccess.value.includes(savedCount.toString())) {
-        if (shouldClearAttendanceAfterSave(wasEditingExistingLesson)) {
-          attendance.value = {}
-        }
-        saveSuccess.value = ''
+      if (saveSuccess.value !== successMessage) return
+      if (shouldClearAttendanceAfterSave(wasEditingExistingLesson) &&
+        currentAttendanceSnapshot() === savedSnapshot) {
+        attendance.value = {}
+        savedAttendanceSnapshot = '{}'
       }
+      saveSuccess.value = ''
     }, 2000)
   } catch (err) {
     if (err instanceof Error) {
