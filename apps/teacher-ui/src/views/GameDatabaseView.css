@@ -35,7 +35,7 @@
   padding: 0 1rem;
   border-radius: 999px;
   background: rgba(14, 116, 144, 0.12);
-  color: #155e75;
+  color: var(--color-ink);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -46,7 +46,7 @@
   padding: 0.65rem 1rem;
   border: 0;
   border-radius: 12px;
-  background: #0e7490;
+  background: var(--accent-strong);
   color: white;
   font: inherit;
   font-weight: 700;
@@ -55,7 +55,7 @@
 
 .add-button:hover,
 .save-button:hover:not(:disabled) {
-  background: #155e75;
+  background: var(--color-ink);
 }
 
 .save-button:disabled {
@@ -93,7 +93,7 @@
 }
 
 .search-input:focus {
-  outline: 2px solid #0e7490;
+  outline: 2px solid var(--accent-strong);
   outline-offset: 1px;
 }
 
@@ -121,9 +121,9 @@
 }
 
 .chip--active {
-  background: #0e7490;
+  background: var(--accent-strong);
   color: white;
-  border-color: #0e7490;
+  border-color: var(--accent-strong);
 }
 
 /* Filter bar */
@@ -159,7 +159,7 @@
 }
 
 .filter-select:focus {
-  outline: 2px solid #0e7490;
+  outline: 2px solid var(--accent-strong);
   outline-offset: 1px;
 }
 
@@ -230,7 +230,7 @@
 
 .badge--tag {
   background: rgba(14, 116, 144, 0.1);
-  color: #155e75;
+  color: var(--color-ink);
 }
 
 .badge--unbekannt { background: var(--surface-soft); color: var(--color-muted); }
@@ -303,19 +303,19 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #0f766e;
+  color: var(--accent-strong);
 }
 
 .detail-text {
   margin: 0;
   font-size: 0.875rem;
-  color: #1e293b;
+  color: var(--color-ink);
   line-height: 1.5;
 }
 
 .video-link {
   align-self: flex-start;
-  color: #0e7490;
+  color: var(--accent-strong);
   font-weight: 700;
   text-decoration: none;
 }
@@ -332,7 +332,7 @@
   border: none;
   cursor: pointer;
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-subtle);
   padding: 0.25rem;
   min-height: 32px;
   min-width: 32px;
@@ -413,7 +413,7 @@
 .form-group label {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--color-ink);
 }
 
 .form-group input,
@@ -436,7 +436,7 @@
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  outline: 2px solid #0e7490;
+  outline: 2px solid var(--accent-strong);
   outline-offset: 1px;
 }
 
@@ -452,7 +452,7 @@
   border: 1px solid rgba(15, 23, 42, 0.16);
   border-radius: 12px;
   background: white;
-  color: #334155;
+  color: var(--color-ink);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
