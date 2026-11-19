@@ -170,7 +170,7 @@ export function initializeExamsBridge(): ExamsBridge {
   const supportTipRepo = new SupportTipRepository(adapter);
   const studentLongTermNoteRepo = new StudentLongTermNoteRepository(adapter);
   const correctionSheetPresetRepo = new CorrectionSheetPresetRepository(examRepo);
-  const correctionSheetTemplateRepo = new CorrectionSheetTemplateRepository(adapter);
+  const correctionSheetTemplateRepo = new CorrectionSheetTemplateRepository(adapter, examRepo);
 
   // Initialize use cases with repositories
   const recordCorrectionUseCase = new RecordCorrectionUseCase(correctionEntryRepo, examRepo);
