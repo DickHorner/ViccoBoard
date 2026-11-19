@@ -175,16 +175,6 @@ export function useDashboardView() {
     newClass.value = { name: '', schoolYear: '', gradeLevel: undefined, gradingScheme: DEFAULT_GRADING_SCHEME, color: '' };
   };
 
-  const getActivityIcon = (status: string): string => {
-    const icons: Record<string, string> = {
-      present: '✓',
-      absent: '✗',
-      excused: '📋',
-      late: '⏰'
-    };
-    return icons[status] || '•';
-  };
-
   const formatDate = (date: Date): string => {
     const now = new Date();
     const recordDate = new Date(date);
