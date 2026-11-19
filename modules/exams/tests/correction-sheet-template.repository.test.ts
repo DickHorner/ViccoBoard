@@ -99,7 +99,7 @@ describe('CorrectionSheetTemplateRepository', () => {
 
   it('renders a standalone PDF preview without creating an exam', async () => {
     const examRepository = new ExamRepository(storage.getAdapter());
-    const presetRepository = new CorrectionSheetPresetRepository(examRepository);
+    const presetRepository = new CorrectionSheetPresetRepository(examRepository, new CorrectionSheetTemplateRepository(storage.getAdapter(), examRepository));
     const getPreset = new GetCorrectionSheetPresetUseCase(presetRepository);
     const corrections = new CorrectionEntryRepository(storage.getAdapter());
     const builder = new BuildCorrectionSheetProjectionUseCase(examRepository, corrections, getPreset);
