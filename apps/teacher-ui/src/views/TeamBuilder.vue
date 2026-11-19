@@ -9,21 +9,18 @@
     <section class="card app-card">
       <div class="form-row">
         <div class="form-group">
-          <label>{{ t('KLASSEN.klasse') }}</label>
-          <select v-model="selectedClassId" class="form-input" @change="loadStudents">
-            <option value="">{{ t('KLASSEN.klasse') }}...</option>
-            <option v-for="cls in classes" :key="cls.id" :value="cls.id">
-              {{ cls.name }} ({{ cls.schoolYear }})
-            </option>
-          </select>
+          <label for="team-class">{{ t('KLASSEN.klasse') }}</label>
+          <Select inputId="team-class" :modelValue="selectedClassId" :options="classOptions"
+            optionLabel="label" optionValue="value" fluid
+            @update:modelValue="value => { selectedClassId = value; void loadStudents() }" />
         </div>
         <div class="form-group">
-          <label>{{ t('TEAM.session-name') }}</label>
-          <input v-model="sessionName" type="text" class="form-input" :placeholder="t('TEAM.set-name-vor-generierung')" />
+          <label for="team-session-name">{{ t('TEAM.session-name') }}</label>
+          <InputText id="team-session-name" v-model="sessionName" :placeholder="t('TEAM.set-name-vor-generierung')" fluid />
         </div>
         <div class="form-group">
-          <label>{{ t('TEAM.bezeichnung') }}</label>
-          <input v-model="teamLabel" type="text" class="form-input" />
+          <label for="team-label">{{ t('TEAM.bezeichnung') }}</label>
+          <InputText id="team-label" v-model="teamLabel" fluid />
         </div>
       </div>
 
@@ -50,20 +47,14 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>{{ t('TEAM.algorithm') }}</label>
-          <select v-model="algorithm" class="form-input">
-            <option value="random">{{ t('TEAM.algorithm-random') }}</option>
-            <option value="gender-balanced">{{ t('TEAM.algorithm-gender-balanced') }}</option>
-            <option value="homogeneous">{{ t('TEAM.algorithm-homogeneous') }}</option>
-            <option value="heterogeneous">{{ t('TEAM.algorithm-heterogeneous') }}</option>
-          </select>
+          <label for="team-algorithm">{{ t('TEAM.algorithm') }}</label>
+          <Select inputId="team-algorithm" v-model="algorithm" :options="algorithmOptions"
+            optionLabel="label" optionValue="value" fluid />
         </div>
         <div v-if="showBasisSelector" class="form-group">
-          <label>{{ t('TEAM.basis') }}</label>
-          <select v-model="basis" class="form-input">
-            <option value="performance">{{ t('TEAM.basis-performance') }}</option>
-            <option value="performanceRating">{{ t('TEAM.basis-performance-rating') }}</option>
-          </select>
+          <label for="team-basis">{{ t('TEAM.basis') }}</label>
+          <Select inputId="team-basis" v-model="basis" :options="basisOptions"
+            optionLabel="label" optionValue="value" fluid />
         </div>
       </div>
 
@@ -73,7 +64,7 @@
           <p class="hint-text">{{ t('TEAM.rollen-hint') }}</p>
           <div class="form-row">
             <div class="form-group">
-              <input v-model="rolesInput" type="text" class="form-input" :placeholder="t('TEAM.rollen-hint')" />
+              <InputText v-model="rolesInput" :placeholder="t('TEAM.rollen-hint')" fluid />
             </div>
           </div>
         </div>
@@ -176,6 +167,9 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Select from 'openvue/select'
+import { computed } from 'vue'
 import { useTeamBuilderView } from '../composables/useTeamBuilderView'
 
 const {
@@ -213,6 +207,21 @@ const {
   useLatestAttendance,
   warning
 } = useTeamBuilderView()
+
+const classOptions = computed(() => [
+  { label: t('KLASSEN.klasse') + '...', value: '' },
+  ...classes.value.map(group => ({ label: `${group.name} (${group.schoolYear})`, value: group.id }))
+])
+const algorithmOptions = computed(() => [
+  { label: t('TEAM.algorithm-random'), value: 'random' },
+  { label: t('TEAM.algorithm-gender-balanced'), value: 'gender-balanced' },
+  { label: t('TEAM.algorithm-homogeneous'), value: 'homogeneous' },
+  { label: t('TEAM.algorithm-heterogeneous'), value: 'heterogeneous' }
+])
+const basisOptions = computed(() => [
+  { label: t('TEAM.basis-performance'), value: 'performance' },
+  { label: t('TEAM.basis-performance-rating'), value: 'performanceRating' }
+])
 </script>
 
 <style scoped src="./TeamBuilder.css"></style>
