@@ -96,6 +96,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'KBR-Prüfungen', parent: '/subjects/kbr' }
   },
   {
+    path: '/sheet-templates',
+    name: 'sheet-templates',
+    component: () => import('../views/KBRSheetTemplateLibrary.vue'),
+    meta: { title: 'Druckbogenvorlagen', parent: '/subjects/kbr' }
+  },
+  {
     path: '/support-tips',
     name: 'support-tips',
     component: () => import('../views/SupportTipLibrary.vue'),
