@@ -159,6 +159,11 @@ a {
   font-size: 1rem;
 }
 
+/* Shared touch targets for the Sport workflow's styled OpenVue controls. */
+.sport-ui :is(.p-button, .p-inputtext, .p-select, .p-textarea) {
+  min-height: 44px;
+}
+
 .app-data-note {
   color: var(--color-subtle);
   font-size: 0.88rem;
