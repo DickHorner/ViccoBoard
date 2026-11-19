@@ -7,7 +7,7 @@
           <h2>Stunden {{ classGroup ? `- ${classGroup.name}` : '' }}</h2>
           <p class="page-description">Verwalten Sie Unterrichtsstunden und Anwesenheit</p>
         </div>
-        <button class="btn-primary" @click="showCreateLessonModal = true">
+        <button class="btn-primary" @click="openCreateLesson">
           + Neue Stunde
         </button>
       </div>
@@ -331,12 +331,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Lesson, ClassGroup, Subject } from '@viccoboard/core'
 import { buildAutoLessonDates, getDateKey } from '../utils/lesson-auto-generation'
 
 const route = useRoute()
+const router = useRouter()
 const SportBridge = getSportBridge()
 
 // State
@@ -348,7 +349,9 @@ const loading = ref(false)
 const saving = ref(false)
 const error = ref('')
 const saveError = ref('')
-const selectedClassId = ref<string>('')
+const selectedClassId = ref<string>(
+  typeof route.query.classId === 'string' ? route.query.classId : ''
+)
 const selectedSubjectId = ref<string>('')
 const dateFrom = ref<string>('')
 const dateTo = ref<string>('')
@@ -432,7 +435,12 @@ const filteredLessons = computed(() => {
 // Methods
 const enrichWithParts = async (lessonList: Lesson[]) => {
   for (const lesson of lessonList) {
-    lesson.lessonParts = await SportBridge.lessonPartRepository.findByLesson(lesson.id)
+    if (lessons.value !== lessonList) return
+    try {
+      lesson.lessonParts = await SportBridge.lessonPartRepository.findByLesson(lesson.id)
+    } catch (err) {
+      console.error('Failed to load lesson parts:', lesson.id, err)
+    }
   }
 }
 
@@ -441,53 +449,51 @@ const loadData = async () => {
   error.value = ''
 
   try {
-    const [loadedClasses, loadedSubjects] = await Promise.all([
+    const classIdFromRoute = typeof route.query.classId === 'string' ? route.query.classId : ''
+    const classLessons = classIdFromRoute
+      ? SportBridge.lessonRepository.findByClassGroup(classIdFromRoute)
+      : Promise.resolve(null)
+    const [loadedClasses, loadedSubjects, selectedLessons] = await Promise.all([
       SportBridge.classGroupRepository.findAll(),
-      SportBridge.subjectRepository.findAll()
+      SportBridge.subjectRepository.findAll(),
+      classLessons
     ])
     classes.value = loadedClasses
     subjects.value = loadedSubjects.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
 
-    // If classId is in route, load that class specifically
-    const classIdFromRoute = route.query.classId as string
     if (classIdFromRoute) {
-      selectedClassId.value = classIdFromRoute
-      classGroup.value = await SportBridge.classGroupRepository.findById(classIdFromRoute)
-      lessons.value = await SportBridge.lessonRepository.findByClassGroup(classIdFromRoute)
+      const selectedClass = loadedClasses.find(group => group.id === classIdFromRoute)
+      if (!selectedClass) throw new Error('Die angeforderte Klasse wurde nicht gefunden.')
+      selectedClassId.value = selectedClass.id
+      classGroup.value = selectedClass
+      lessons.value = selectedLessons ?? []
     } else {
-      // Load all lessons for all classes
-      const allLessons: Lesson[] = []
-      for (const cls of classes.value) {
-        const classLessons = await SportBridge.lessonRepository.findByClassGroup(cls.id)
-        allLessons.push(...classLessons)
-      }
-      lessons.value = allLessons
+      lessons.value = (await Promise.all(
+        loadedClasses.map(group => SportBridge.lessonRepository.findByClassGroup(group.id))
+      )).flat()
     }
-
-    await enrichWithParts(lessons.value)
   } catch (err) {
     console.error('Failed to load lessons:', err)
-    error.value = 'Fehler beim Laden der Stunden'
+    error.value = err instanceof Error ? err.message : 'Fehler beim Laden der Stunden'
   } finally {
     loading.value = false
   }
+  if (!error.value) void enrichWithParts(lessons.value)
 }
 
 const onClassChange = async () => {
   autoGenerateStatus.value = ''
   autoGenerateStatusType.value = ''
   if (!selectedClassId.value) {
-    lessons.value = []
-    const allLessons: Lesson[] = []
-    for (const cls of classes.value) {
-      const classLessons = await SportBridge.lessonRepository.findByClassGroup(cls.id)
-      allLessons.push(...classLessons)
-    }
-    lessons.value = allLessons
+    lessons.value = (await Promise.all(
+      classes.value.map(group => SportBridge.lessonRepository.findByClassGroup(group.id))
+    )).flat()
+    classGroup.value = null
   } else {
     lessons.value = await SportBridge.lessonRepository.findByClassGroup(selectedClassId.value)
+    classGroup.value = classes.value.find(group => group.id === selectedClassId.value) ?? null
   }
-  await enrichWithParts(lessons.value)
+  void enrichWithParts(lessons.value)
 }
 
 const handleAutoGenerateLessons = async () => {
@@ -559,6 +565,11 @@ const onDateFilterChange = () => {
   // Filtering happens automatically via computed property
 }
 
+const openCreateLesson = () => {
+  lessonForm.value = getInitialLessonForm()
+  showCreateLessonModal.value = true
+}
+
 const handleEditLesson = async (lesson: Lesson) => {
   const parts = await SportBridge.lessonPartRepository.findByLesson(lesson.id)
   lessonForm.value = {
@@ -610,6 +621,7 @@ const handleSaveLesson = async () => {
         type: part.type.trim() || undefined
       }))
 
+    let createdLessonId: string | null = null
     if (showEditLessonModal.value && lessonForm.value.id) {
       // Update existing lesson via validated use-case
       await SportBridge.updateLessonUseCase.execute({
@@ -636,10 +648,15 @@ const handleSaveLesson = async () => {
         shortcuts
       })
       await SportBridge.lessonPartRepository.replacePartsForLesson(created.id, partsInput)
+      createdLessonId = created.id
     }
 
     closeModals()
-    await loadData()
+    if (createdLessonId) {
+      await router.push(`/lessons/${createdLessonId}/workspace`)
+    } else {
+      await loadData()
+    }
   } catch (err) {
     console.error('Failed to save lesson:', err)
     if (err instanceof Error) {
