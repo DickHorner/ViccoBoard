@@ -137,15 +137,15 @@ export type { ImportTableDefinitionInput, ImportTableDefinitionResult } from './
 
 // Source-based sport assessment templates
 export {
-  BASKETBALL_ASSESSMENTS,
-  evaluateBasketballAssessment,
-  findBasketballAssessment
-} from './templates/basketball-assessments.template.js';
+  SPORT_ASSESSMENTS,
+  evaluateSportAssessment,
+  findSportAssessment
+} from './templates/sport-assessments.template.js';
 export type {
-  BasketballAssessment,
-  BasketballCriterion,
-  BasketballAssessmentResult
-} from './templates/basketball-assessments.template.js';
+  SportAssessment,
+  SportAssessmentCriterion,
+  SportAssessmentResult
+} from './templates/sport-assessments.template.js';
 
 // Grading Engine
 export { CriteriaGradingEngine } from './grading/criteria-grading.engine.js';

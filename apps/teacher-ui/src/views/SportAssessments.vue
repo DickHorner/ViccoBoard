@@ -1,16 +1,16 @@
 <template>
-  <section class="basketball-assessment app-page">
+  <section class="sport-assessments app-page">
     <header class="page-header">
       <div>
         <RouterLink to="/subjects/sport" class="back-link">← Sport</RouterLink>
-        <h1>Basketball · Leistungsabnahme</h1>
-        <p>Einheitliche Erfassung für Passen und Dribbeln, Niveaustufe D.</p>
+        <h1>Leistungsabnahmen</h1>
+        <p>Sportprüfungen direkt durchführen – mit Kriterienhilfe, Ergebniserfassung und Fortsetzung an Folgetagen.</p>
       </div>
     </header>
 
     <section class="app-card configuration" aria-label="Prüfung auswählen">
       <label>Klasse
-        <select v-model="classGroupId" :disabled="loading || saving" @change="changeClass">
+        <select v-model="classGroupId" :disabled="loading || saving || dirty" @change="changeClass">
           <option value="">Klasse auswählen</option>
           <option v-for="group in classes" :key="group.id" :value="group.id">
             {{ group.name }}{{ group.gradeLevel ? ` · Jahrgang ${group.gradeLevel}` : '' }}
@@ -18,26 +18,31 @@
         </select>
       </label>
       <label>Prüfung
-        <select v-model="assessmentId" :disabled="loading || saving" @change="changeAssessment">
+        <select v-model="assessmentId" :disabled="loading || saving || dirty" @change="changeAssessment">
           <option v-for="item in assessments" :key="item.id" :value="item.id">
             {{ item.title }}
           </option>
         </select>
       </label>
-      <label>Datum
-        <input v-model="examDate" type="date" :disabled="loading || saving" @change="changeDate" />
+      <label>Startdatum
+        <input v-model="examDate" type="date" :disabled="loading || saving || dirty || !!sessionId" @change="changeDate" />
       </label>
-      <label v-if="sessions.length">Gespeicherte Durchführung
-        <select v-model="sessionId" :disabled="loading || saving" @change="restoreSession">
+      <label>Erfassung am
+        <input v-model="assessmentDay" type="date" :disabled="loading || saving" required />
+      </label>
+      <label v-if="sessions.length">Durchführung fortsetzen
+        <select v-model="sessionId" :disabled="loading || saving || dirty" @change="restoreSession">
           <option value="">Neue Durchführung</option>
           <option v-for="session in sessions" :key="session.id" :value="session.id">
-            {{ formatSessionTime(session.startedAt) }}
+            Beginn {{ formatStartDate(session) }} · {{ formatSessionTime(session.startedAt) }}
           </option>
         </select>
       </label>
     </section>
 
     <p v-if="error" class="notice error" role="alert">{{ error }}</p>
+    <p v-if="dirty" class="notice" role="status">Ungespeicherte Änderungen – bitte vor einem Prüfungswechsel speichern.</p>
+    <p v-if="sessionId" class="notice">Fortsetzung der Prüfung vom {{ formatDate(examDate) }}. Neue Bewertungen werden dem jeweils ausgewählten Erfassungstag zugeordnet.</p>
     <p v-if="loading" role="status">Prüfungsdaten werden geladen…</p>
 
     <template v-if="!loading && classGroupId && students.length">
@@ -56,21 +61,22 @@
         <div class="capture-heading">
           <div>
             <h2>Beobachten und bewerten</h2>
-            <p>{{ completedCount }} von {{ students.length }} Personen vollständig bewertet</p>
+            <p>{{ completedCount }} von {{ students.length }} Personen vollständig bewertet · {{ eligibleIds.length }} offen</p>
           </div>
           <Button
             :label="saving ? 'Speichert…' : 'Prüfung speichern'"
             :loading="saving"
-            :disabled="saving || !hasInput"
+            :disabled="saving || !dirty || !assessmentDay"
             @click="save"
           />
         </div>
 
         <div class="student-navigation">
-          <label for="basketball-student">Aktuelle Person</label>
+          <label for="assessment-student">Aktuelle Person</label>
           <div class="student-navigation-controls">
+            <Button label="Zufällig ziehen" icon="pi pi-shuffle" outlined :disabled="saving || eligibleIds.length === 0" @click="drawStudent" />
             <Button label="Zurück" severity="secondary" outlined :disabled="studentIndex === 0" @click="studentIndex--" />
-            <select id="basketball-student" v-model.number="studentIndex" aria-label="Schüler auswählen">
+            <select id="assessment-student" v-model.number="studentIndex" aria-label="Schüler auswählen">
               <option v-for="(student, index) in students" :key="student.id" :value="index">
                 {{ student.firstName }} {{ student.lastName }}
               </option>
@@ -101,12 +107,13 @@
                 <button
                   v-for="value in criterion.choices"
                   :key="value"
+                  :disabled="saving"
                   type="button"
                   :class="['score-button', { selected: currentScores[criterion.id] === value }]"
                   :aria-pressed="currentScores[criterion.id] === value"
                   @click="setScore(criterion.id, value)"
                 >{{ value }}</button>
-                <button type="button" class="score-button clear" :disabled="currentScores[criterion.id] === undefined" @click="clearScore(criterion.id)">
+                <button type="button" class="score-button clear" :disabled="saving || currentScores[criterion.id] === undefined" @click="clearScore(criterion.id)">
                   Löschen
                 </button>
               </div>
@@ -115,15 +122,18 @@
           <p v-else class="notice">Für diesen Teilnahmestatus werden keine Punkte erfasst.</p>
 
           <div class="result" aria-live="polite">
-            <span v-if="assessment.type === 'points'">Punkte:
-              <strong>{{ currentResult?.totalPoints ?? '–' }} / 16</strong>
+            <span v-if="assessment.type === 'points'">{{ assessment.scoreLabel ?? 'Punkte' }}:
+              <strong>{{ currentResult?.totalPoints ?? '–' }} / {{ currentResult?.maxPoints ?? maximumPoints }}</strong>
             </span>
             <span>Note:
               <strong>{{ currentResult?.grade ?? '–' }}</strong>
             </span>
           </div>
           <p v-if="assessment.type === 'points' && currentResult && !currentResult.grade" class="notice">
-            Für weniger als 3 Punkte ist in Tabelle 62 keine Note angegeben. Der Punktestand bleibt speicherbar.
+            {{ assessment.noGradeReason }} Die Leistung ist dennoch speicherbar.
+          </p>
+          <p v-if="currentStudent && assessedDates[currentStudent.id]" class="source">
+            Zuletzt bewertet am {{ formatDate(assessedDates[currentStudent.id]) }}
           </p>
           <p v-if="assessment.type === 'holistic'" class="source">
             Die qualitative Note wird direkt anhand der vollständigen Bewegungsbeschreibung ausgewählt.
@@ -137,24 +147,37 @@
       <template v-if="help === 'task'">
         <p>{{ assessment.task }}</p>
         <ul><li v-for="instruction in assessment.instructions" :key="instruction">{{ instruction }}</li></ul>
-        <svg class="court-diagram" viewBox="0 0 400 155" role="img" :aria-label="assessment.type === 'points' ? 'Zwei parallele Laufwege mit diagonalen Pässen' : 'Laufweg mit Dribbling bis zur Wendemarke und zurück'">
+        <svg v-if="assessment.diagram" class="court-diagram" viewBox="0 0 400 155" role="img" :aria-label="`Schematischer Aufbau: ${assessment.title}`">
           <rect x="14" y="16" width="372" height="120" rx="5" fill="none" stroke="currentColor" stroke-width="2" />
-          <line x1="55" y1="25" x2="55" y2="126" stroke="currentColor" stroke-dasharray="5 4" />
-          <line x1="345" y1="25" x2="345" y2="126" stroke="currentColor" stroke-dasharray="5 4" />
-          <template v-if="assessment.type === 'points'">
+          <template v-if="assessment.diagram === 'passing'">
             <path d="M65 57 H333 M333 98 H65" stroke="#2563eb" stroke-width="3" fill="none" />
             <path d="M80 98 L130 57 L185 98 L240 57 L295 98 L328 57" stroke="#c2410c" stroke-width="2" stroke-dasharray="6 4" fill="none" />
-            <text x="70" y="44" font-size="12" fill="currentColor">Laufweg A</text>
-            <text x="70" y="117" font-size="12" fill="currentColor">Laufweg B</text>
+            <text x="65" y="44" font-size="12" fill="currentColor">Laufweg A</text>
+            <text x="65" y="118" font-size="12" fill="currentColor">Laufweg B</text>
           </template>
-          <template v-else>
+          <template v-else-if="assessment.diagram === 'dribbling'">
             <path d="M65 59 H330 Q365 76 330 96 H65" stroke="#2563eb" stroke-width="3" fill="none" />
             <circle cx="330" cy="77" r="9" stroke="#c2410c" fill="none" stroke-width="3" />
-            <text x="285" y="44" font-size="12" fill="currentColor">Wendemarke</text>
+            <text x="265" y="44" font-size="12" fill="currentColor">Wendemarke</text>
             <text x="65" y="116" font-size="12" fill="currentColor">Start / Ziel</text>
           </template>
+          <template v-else-if="assessment.diagram === 'shooting'">
+            <circle cx="196" cy="54" r="13" stroke="#c2410c" stroke-width="3" fill="none" />
+            <text x="218" y="57" font-size="12" fill="currentColor">Korb</text>
+            <circle v-for="(point, index) in [[144,84],[176,101],[204,108],[230,101],[260,84]]" :key="index" :cx="point[0]" :cy="point[1]" r="11" fill="none" stroke="#2563eb" stroke-width="2" />
+            <text v-for="(point, index) in [[144,84],[176,101],[204,108],[230,101],[260,84]]" :key="`point-${index}`" :x="point[0] - 4" :y="point[1] + 4" font-size="12" fill="currentColor">{{ 'ABCDE'[index] }}</text>
+          </template>
+          <template v-else-if="assessment.diagram === 'serving'">
+            <line x1="200" y1="16" x2="200" y2="136" stroke="#c2410c" stroke-width="4" />
+            <line x1="290" y1="16" x2="290" y2="136" stroke="#94a3b8" stroke-dasharray="6 4" />
+            <path d="M72 76 Q158 12 285 70" stroke="#2563eb" stroke-width="3" stroke-dasharray="6 5" fill="none" />
+            <circle cx="72" cy="76" r="8" fill="#2563eb" />
+            <text x="25" y="59" font-size="12" fill="currentColor">Aufschlag</text>
+            <text x="210" y="32" font-size="12" fill="currentColor">Zielfeld</text>
+            <text x="170" y="151" font-size="12" fill="currentColor">Netz</text>
+          </template>
         </svg>
-        <p class="source">Eigene schematische Skizze, nicht maßstabsgetreu. Grundlage: LISUM, S. {{ assessment.sourcePages }}.</p>
+        <p v-if="assessment.diagram" class="source">Eigene schematische Skizze, nicht maßstabsgetreu. Grundlage: LISUM, S. {{ assessment.sourcePages }}.</p>
       </template>
       <template v-else-if="activeCriterion">
         <p>{{ activeCriterion.description }}</p>
@@ -173,30 +196,32 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { onBeforeRouteLeave, RouterLink } from 'vue-router'
 import Button from 'openvue/button'
 import Dialog from 'openvue/dialog'
 import { Sport, type ClassGroup, type Student } from '@viccoboard/core'
 import {
-  BASKETBALL_ASSESSMENTS,
-  evaluateBasketballAssessment,
-  findBasketballAssessment,
-  type BasketballAssessmentResult,
+  SPORT_ASSESSMENTS,
+  evaluateSportAssessment,
+  findSportAssessment,
+  type SportAssessmentResult,
   type SportExamSessionMetadata,
   type SportExamStudentState
 } from '@viccoboard/sport'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
+import { selectRandomStudentId } from '../utils/random-student'
 
 initializeSportBridge()
 initializeStudentsBridge()
 const sport = getSportBridge()
 const studentBridge = getStudentsBridge()
-const assessments = BASKETBALL_ASSESSMENTS
+const assessments = SPORT_ASSESSMENTS
 const classes = ref<ClassGroup[]>([])
 const classGroupId = ref('')
-const assessmentId = ref<(typeof assessments)[number]['id']>('passing-d')
+const assessmentId = ref('passing-d')
 const examDate = ref(localDateString(new Date()))
+const assessmentDay = ref(localDateString(new Date()))
 const students = ref<Student[]>([])
 const categoryId = ref('')
 const sessions = ref<Sport.ToolSession[]>([])
@@ -204,8 +229,11 @@ const sessionId = ref('')
 const studentIndex = ref(0)
 const scores = ref<Record<string, Record<string, number>>>({})
 const states = ref<Record<string, SportExamStudentState>>({})
+const assessedDates = ref<Record<string, string>>({})
+const drawHistory = ref<string[]>([])
 const loading = ref(false)
 const saving = ref(false)
+const dirty = ref(false)
 const error = ref('')
 const saveMessage = ref('')
 const help = ref<string | null>(null)
@@ -216,25 +244,36 @@ const currentScores = computed<Record<string, number>>(() => currentStudent.valu
 const currentState = computed<SportExamStudentState>(() =>
   currentStudent.value ? states.value[currentStudent.value.id] ?? 'not-assessed' : 'not-assessed'
 )
-const currentResult = computed<BasketballAssessmentResult | null>(() =>
+const currentResult = computed<SportAssessmentResult | null>(() =>
   currentState.value === 'ready' || currentState.value === 'not-assessed'
-    ? evaluateBasketballAssessment(assessment.value, currentScores.value)
+    ? evaluateSportAssessment(assessment.value, currentScores.value)
     : null
+)
+const maximumPoints = computed(() =>
+  assessment.value.criteria.reduce((total, criterion) => total + criterion.choices[criterion.choices.length - 1], 0)
 )
 const completedCount = computed(() => students.value.filter((student) =>
   states.value[student.id] === 'ready' &&
-  evaluateBasketballAssessment(assessment.value, scores.value[student.id] ?? {}) !== null
+  evaluateSportAssessment(assessment.value, scores.value[student.id] ?? {}) !== null
 ).length)
-const hasInput = computed(() => students.value.some((student) =>
-  Object.keys(scores.value[student.id] ?? {}).length > 0 ||
-  (states.value[student.id] !== undefined && states.value[student.id] !== 'not-assessed')
-))
+const eligibleIds = computed(() => students.value
+  .filter((student) => {
+    const state = states.value[student.id] ?? 'not-assessed'
+    return (state === 'not-assessed' || state === 'ready') &&
+      evaluateSportAssessment(assessment.value, scores.value[student.id] ?? {}) === null
+  })
+  .map((student) => student.id)
+)
 const activeCriterion = computed(() => assessment.value.criteria.find((criterion) => criterion.id === help.value))
 const helpTitle = computed(() => help.value === 'task' ? 'Aufgabe und Aufbau' : activeCriterion.value?.name ?? 'Beobachtungshilfe')
 const helpVisible = computed({
   get: () => help.value !== null,
   set: (visible: boolean) => { if (!visible) help.value = null }
 })
+
+onBeforeRouteLeave(() =>
+  !dirty.value || window.confirm('Die Bewertung enthält ungespeicherte Eingaben. Wirklich verlassen?')
+)
 
 onMounted(async () => {
   loading.value = true
@@ -247,15 +286,22 @@ onMounted(async () => {
   }
 })
 
+function clearDraft(): void {
+  scores.value = {}
+  states.value = {}
+  assessedDates.value = {}
+  drawHistory.value = []
+  dirty.value = false
+  saveMessage.value = ''
+  studentIndex.value = 0
+}
+
 async function changeClass(): Promise<void> {
   students.value = []
-  studentIndex.value = 0
   categoryId.value = ''
   sessions.value = []
   sessionId.value = ''
-  scores.value = {}
-  states.value = {}
-  saveMessage.value = ''
+  clearDraft()
   if (!classGroupId.value) return
   loading.value = true
   error.value = ''
@@ -272,10 +318,8 @@ async function changeClass(): Promise<void> {
 async function changeAssessment(): Promise<void> {
   loading.value = true
   error.value = ''
-  saveMessage.value = ''
   sessionId.value = ''
-  scores.value = {}
-  states.value = {}
+  clearDraft()
   try {
     if (classGroupId.value) await loadAssessment()
   } catch (cause) {
@@ -285,26 +329,15 @@ async function changeAssessment(): Promise<void> {
   }
 }
 
-async function changeDate(): Promise<void> {
+function changeDate(): void {
   sessionId.value = ''
-  scores.value = {}
-  states.value = {}
-  saveMessage.value = ''
-  loading.value = true
-  error.value = ''
-  try {
-    await loadSessions()
-  } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'Durchführungen konnten nicht geladen werden.'
-  } finally {
-    loading.value = false
-  }
+  clearDraft()
 }
 
 async function loadAssessment(): Promise<void> {
   const existing = (await sport.gradeCategoryRepository.findByClassGroup(classGroupId.value))
     .filter((category) => category.description === assessment.value.sourceId)
-  if (existing.length > 1 || (existing.length && !findBasketballAssessment(existing[0]))) {
+  if (existing.length > 1 || (existing.length && !findSportAssessment(existing[0]))) {
     throw new Error('Die zugehörige Prüfungsvorlage wurde verändert oder mehrfach angelegt. Bitte zuerst die Kategorie prüfen.')
   }
   const category = existing[0] ?? await sport.createGradeCategoryUseCase.execute({
@@ -338,16 +371,17 @@ async function loadSessions(): Promise<void> {
     .filter((session) => {
       if (session.toolType !== 'sport-exam') return false
       const metadata = session.sessionMetadata as SportExamSessionMetadata
-      return metadata.categoryId === categoryId.value && metadata.examDate === examDate.value
+      return metadata.categoryId === categoryId.value && metadata.assessmentType === 'criteria'
     })
     .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
 }
 
 async function restoreSession(): Promise<void> {
-  scores.value = {}
-  states.value = {}
-  saveMessage.value = ''
-  if (!sessionId.value) return
+  if (!sessionId.value) {
+    clearDraft()
+    examDate.value = localDateString(new Date())
+    return
+  }
   loading.value = true
   error.value = ''
   try {
@@ -355,8 +389,11 @@ async function restoreSession(): Promise<void> {
     if (!session) throw new Error('Durchführung wurde nicht gefunden.')
     const metadata = session.sessionMetadata as SportExamSessionMetadata
     const studentIds = new Set(students.value.map((student) => student.id))
+    const restoredStates: Record<string, SportExamStudentState> = {}
+    const restoredScores: Record<string, Record<string, number>> = {}
+    const restoredDates: Record<string, string> = {}
     for (const item of metadata.studentStates) {
-      if (studentIds.has(item.studentId)) states.value[item.studentId] = item.state
+      if (studentIds.has(item.studentId)) restoredStates[item.studentId] = item.state
     }
     const entries = await Promise.all(metadata.entryIds.map((id) => sport.performanceEntryRepository.findById(id)))
     if (entries.some((entry) => !entry)) throw new Error('Gespeicherte Leistungsdaten sind unvollständig.')
@@ -364,7 +401,7 @@ async function restoreSession(): Promise<void> {
       if (!entry || !studentIds.has(entry.studentId)) continue
       const savedScores = entry.measurements.criteria
       if (savedScores && typeof savedScores === 'object' && !Array.isArray(savedScores)) {
-        scores.value[entry.studentId] = Object.fromEntries(
+        restoredScores[entry.studentId] = Object.fromEntries(
           assessment.value.criteria
             .filter((criterion) =>
               typeof savedScores[criterion.id] === 'number' &&
@@ -373,7 +410,16 @@ async function restoreSession(): Promise<void> {
             .map((criterion) => [criterion.id, savedScores[criterion.id]])
         )
       }
+      restoredDates[entry.studentId] = entry.metadata?.assessedOn ?? metadata.examDate
     }
+    examDate.value = metadata.examDate
+    scores.value = restoredScores
+    states.value = restoredStates
+    assessedDates.value = restoredDates
+    drawHistory.value = (metadata.drawHistory ?? []).filter((id) => studentIds.has(id))
+    dirty.value = false
+    saveMessage.value = ''
+    studentIndex.value = 0
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Durchführung konnte nicht wiederhergestellt werden.'
   } finally {
@@ -382,31 +428,57 @@ async function restoreSession(): Promise<void> {
 }
 
 function setState(state: SportExamStudentState): void {
-  if (!currentStudent.value || saving.value) return
+  if (!currentStudent.value || saving.value || currentState.value === state) return
   states.value = { ...states.value, [currentStudent.value.id]: state }
+  if (state === 'not-assessed') {
+    const studentId = currentStudent.value.id
+    scores.value = { ...scores.value, [studentId]: {} }
+    const updatedDates = { ...assessedDates.value }
+    delete updatedDates[studentId]
+    assessedDates.value = updatedDates
+  }
+  dirty.value = true
   saveMessage.value = ''
 }
 
 function setScore(criterionId: string, value: number): void {
-  if (!currentStudent.value || saving.value) return
+  if (!currentStudent.value || saving.value || currentScores.value[criterionId] === value) return
   const studentId = currentStudent.value.id
   scores.value = { ...scores.value, [studentId]: { ...currentScores.value, [criterionId]: value } }
   states.value = { ...states.value, [studentId]: 'ready' }
+  assessedDates.value = { ...assessedDates.value, [studentId]: assessmentDay.value }
+  dirty.value = true
   saveMessage.value = ''
 }
 
 function clearScore(criterionId: string): void {
   if (!currentStudent.value || saving.value) return
   const studentId = currentStudent.value.id
+  if (currentScores.value[criterionId] === undefined) return
   const updated = { ...currentScores.value }
   delete updated[criterionId]
   scores.value = { ...scores.value, [studentId]: updated }
   states.value = { ...states.value, [studentId]: Object.keys(updated).length ? 'ready' : 'not-assessed' }
+  assessedDates.value = { ...assessedDates.value, [studentId]: assessmentDay.value }
+  dirty.value = true
+  saveMessage.value = ''
+}
+
+function drawStudent(): void {
+  if (!eligibleIds.value.length || saving.value) return
+  const selected = selectRandomStudentId(eligibleIds.value, drawHistory.value)
+  if (!selected) return
+  const index = students.value.findIndex((student) => student.id === selected.selectedStudentId)
+  if (index < 0) return
+  studentIndex.value = index
+  drawHistory.value = selected.updatedHistory
+  dirty.value = true
   saveMessage.value = ''
 }
 
 async function save(): Promise<void> {
-  if (!categoryId.value || !classGroupId.value || !hasInput.value) return
+  if (!categoryId.value || !classGroupId.value || !dirty.value ||
+      !assessmentDay.value) return
   saving.value = true
   error.value = ''
   saveMessage.value = ''
@@ -415,7 +487,7 @@ async function save(): Promise<void> {
       const studentScores = scores.value[student.id] ?? {}
       const state = states.value[student.id] ?? 'not-assessed'
       const result = state === 'ready'
-        ? evaluateBasketballAssessment(assessment.value, studentScores)
+        ? evaluateSportAssessment(assessment.value, studentScores)
         : null
       return {
         studentId: student.id,
@@ -424,7 +496,8 @@ async function save(): Promise<void> {
         criteriaTotalPoints: result?.totalPoints,
         criteriaMaxPoints: result?.maxPoints,
         criteriaPercentage: result?.percentage,
-        calculatedGrade: result?.grade
+        calculatedGrade: result?.grade,
+        assessedOn: assessedDates.value[student.id]
       }
     })
     const session = await sport.saveSportExamSessionUseCase.execute({
@@ -434,18 +507,30 @@ async function save(): Promise<void> {
       assessmentType: 'criteria',
       examDate: examDate.value,
       announced: false,
-      sport: 'Basketball',
+      sport: assessment.value.sport,
       discipline: assessment.value.title,
+      drawHistory: drawHistory.value,
       entries
     })
     sessionId.value = session.id
+    dirty.value = false
+    saveMessage.value = 'Zwischenstand gespeichert. Diese Durchführung kann auch an einem späteren Tag fortgesetzt werden.'
     await loadSessions()
-    saveMessage.value = 'Durchführung gespeichert. Sie kann über die Auswahl erneut geöffnet werden.'
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Prüfung konnte nicht gespeichert werden.'
   } finally {
     saving.value = false
   }
+}
+
+function formatDate(date: string): string {
+  const [year, month, day] = date.split('-').map(Number)
+  return `${day}.${month}.${year}`
+}
+
+function formatStartDate(session: Sport.ToolSession): string {
+  const metadata = session.sessionMetadata as SportExamSessionMetadata
+  return formatDate(metadata.examDate)
 }
 
 function formatSessionTime(date: Date): string {
@@ -458,7 +543,7 @@ function localDateString(date: Date): string {
 </script>
 
 <style scoped>
-.basketball-assessment { display: flex; flex-direction: column; gap: 1rem; }
+.sport-assessments { display: flex; flex-direction: column; gap: 1rem; }
 .page-header h1, h2 { margin: .3rem 0; }
 .page-header p, .task p, .capture-heading p { color: var(--p-text-muted-color, #64748b); margin: .25rem 0; }
 .back-link { text-decoration: none; }
