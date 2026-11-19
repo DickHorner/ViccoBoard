@@ -1,15 +1,15 @@
 <template>
-  <div class="finish-camera-view">
+  <div class="finish-camera-view sport-ui">
     <div class="page-header">
       <h2>{{ t('FINISH_CAMERA.title') }}</h2>
       <p class="page-description">{{ t('FINISH_CAMERA.description') }}</p>
     </div>
 
-    <div v-if="cameraError" class="error-banner card">
+    <div v-if="cameraError" class="error-banner card app-card">
       ⚠️ {{ cameraError }}
     </div>
 
-    <div class="card setup-card">
+    <div class="card setup-card app-card">
       <div class="form-row">
         <div class="form-group">
           <label>{{ t('KLASSEN.klasse') }}</label>
@@ -49,16 +49,16 @@
     </div>
 
     <div class="camera-section">
-      <div class="card camera-panel">
+      <div class="card camera-panel app-card">
         <div class="panel-header">
           <h3>📷 {{ t('FINISH_CAMERA.camera') }}</h3>
           <div class="camera-actions">
-            <button v-if="!cameraActive" class="btn btn-primary" @click="startCamera">
+            <Button v-if="!cameraActive" class="btn" @click="startCamera">
               {{ t('FINISH_CAMERA.start-camera') }}
-            </button>
-            <button v-else class="btn btn-danger" @click="stopCamera">
+            </Button>
+            <Button severity="danger" v-else class="btn" @click="stopCamera">
               {{ t('FINISH_CAMERA.stop-camera') }}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -91,21 +91,21 @@
         </div>
       </div>
 
-      <div class="card stopwatch-panel">
+      <div class="card stopwatch-panel app-card">
         <h3>⏱ {{ t('FINISH_CAMERA.stopwatch') }}</h3>
         <div class="stopwatch-display" :class="{ running: sessionActive }">
           {{ formattedElapsed }}
         </div>
         <div class="stopwatch-controls">
-          <button class="btn btn-primary" :disabled="sessionActive || !finishLineSet" @click="startSession">
+          <Button class="btn" :disabled="sessionActive || !finishLineSet" @click="startSession">
             ▶ {{ t('FINISH_CAMERA.start') }}
-          </button>
+          </Button>
           <button class="btn btn-warning" :disabled="!sessionActive" @click="pauseSession">
             ⏸ {{ t('FINISH_CAMERA.pause') }}
           </button>
-          <button class="btn btn-secondary" :disabled="sessionActive" @click="resetSession">
+          <Button severity="secondary" outlined class="btn" :disabled="sessionActive" @click="resetSession">
             🔄 {{ t('FINISH_CAMERA.reset') }}
-          </button>
+          </Button>
           <button class="btn btn-icon" :title="t('FINISH_CAMERA.manual-event')" :disabled="!sessionActive" @click="addManualEvent">
             ➕
           </button>
@@ -119,13 +119,13 @@
       </div>
     </div>
 
-    <div v-if="events.length > 0" class="card events-card">
+    <div v-if="events.length > 0" class="card events-card app-card">
       <div class="card-header">
         <h3>🏁 {{ t('FINISH_CAMERA.events-title') }}</h3>
         <div class="header-actions">
-          <button class="btn-secondary btn-small" @click="clearAllEvents">
+          <Button severity="secondary" outlined @click="clearAllEvents">
             🗑 {{ t('FINISH_CAMERA.clear-events') }}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -170,18 +170,18 @@
             </select>
           </div>
 
-          <button class="btn-icon btn-danger btn-small" :title="t('COMMON.delete')" @click="deleteEvent(event.id)">
+          <Button severity="danger" class="btn-icon" :title="t('COMMON.delete')" @click="deleteEvent(event.id)">
             🗑
-          </button>
+          </Button>
         </div>
       </div>
     </div>
 
-    <div v-else-if="sessionActive || totalElapsedMs > 0" class="card empty-state">
+    <div v-else-if="sessionActive || totalElapsedMs > 0" class="card empty-state app-card">
       {{ t('FINISH_CAMERA.no-events-yet') }}
     </div>
 
-    <div v-if="events.length > 0 && selectedClassId" class="card save-card">
+    <div v-if="events.length > 0 && selectedClassId" class="card save-card app-card">
       <div class="card-header">
         <h3>💾 {{ t('FINISH_CAMERA.save-section') }}</h3>
       </div>
@@ -197,13 +197,13 @@
               {{ cat.name }}
             </option>
           </select>
-          <button
-            class="btn btn-primary"
+          <Button
+            class="btn"
             :disabled="!selectedCategoryId || !hasAssignedEvents || sending"
             @click="sendToMittelstrecke"
           >
             {{ sending ? '…' : '→' }} {{ t('FINISH_CAMERA.send-to-mittelstrecke') }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -215,6 +215,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useI18n } from 'vue-i18n'
 
 import { useFinishCameraView } from '../composables/useFinishCameraView'
