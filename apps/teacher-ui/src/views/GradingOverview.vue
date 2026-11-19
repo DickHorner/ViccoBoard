@@ -1,7 +1,7 @@
 <template>
-  <div class="grading-overview-view">
+  <div class="grading-overview-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <h2>Bewertungsübersicht</h2>
       <p class="page-description">Verwalten Sie Bewertungskategorien und erfassen Sie Noten.</p>
     </div>
@@ -16,7 +16,7 @@
     </div>
 
     <div class="grading-content">
-      <section class="card">
+      <section class="card app-card">
         <h3>Klasse auswählen</h3>
         <div class="form-section">
           <select v-model="selectedClassId" class="form-select" @change="onClassChange">
@@ -38,12 +38,12 @@
       </div>
 
       <div v-else-if="selectedClassId">
-        <section class="card">
+        <section class="card app-card">
           <div class="card-header">
             <h3>Bewertungskategorien</h3>
-            <button class="btn-primary btn-small" @click="showCreateCategoryModal = true">
+            <Button @click="showCreateCategoryModal = true">
               + Neue Kategorie
-            </button>
+            </Button>
           </div>
 
           <div class="card-content">
@@ -63,29 +63,29 @@
                 </div>
 
                 <div class="category-actions">
-                  <button class="btn-secondary btn-small" @click="openGradingEntry(category)">
+                  <Button severity="secondary" outlined @click="openGradingEntry(category)">
                     Noten erfassen
-                  </button>
-                  <button class="btn-text btn-small" @click="viewHistory(category)">
+                  </Button>
+                  <Button severity="secondary" text @click="viewHistory(category)">
                     Historie
-                  </button>
-                  <button class="btn-text btn-small" @click="openEditCategoryModal(category)">
+                  </Button>
+                  <Button severity="secondary" text @click="openEditCategoryModal(category)">
                     ✏️
-                  </button>
-                  <button
-                    class="btn-danger-text btn-small"
+                  </Button>
+                  <Button severity="danger" text
+                   
                     :disabled="deletingCategoryId === category.id"
                     @click="confirmDeleteCategory(category)"
                   >
                     {{ deletingCategoryId === category.id ? '…' : '🗑' }}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section v-if="categories.length > 0 && students.length > 0" class="card">
+        <section v-if="categories.length > 0 && students.length > 0" class="card app-card">
           <h3>Bewertungsfortschritt</h3>
           <div class="card-content">
             <div class="progress-table-wrapper">
@@ -175,12 +175,12 @@
             </div>
 
             <div class="modal-actions">
-              <button type="button" class="btn-secondary" @click="showCreateCategoryModal = false">
+              <Button severity="secondary" outlined type="button" @click="showCreateCategoryModal = false">
                 Abbrechen
-              </button>
-              <button type="submit" class="btn-primary" :disabled="saving">
+              </Button>
+              <Button type="submit" :disabled="saving">
                 {{ saving ? 'Wird erstellt...' : 'Erstellen' }}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -222,10 +222,10 @@
             />
           </div>
           <div class="modal-actions">
-            <button type="button" class="btn-secondary" @click="closeEditModal">Abbrechen</button>
-            <button type="submit" class="btn-primary" :disabled="saving">
+            <Button severity="secondary" outlined type="button" @click="closeEditModal">Abbrechen</Button>
+            <Button type="submit" :disabled="saving">
               {{ saving ? 'Wird gespeichert…' : 'Speichern' }}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -247,7 +247,7 @@
         </p>
       </div>
       <div class="modal-actions">
-        <button class="btn-secondary" @click="deleteCategoryTarget = null">Abbrechen</button>
+        <Button severity="secondary" outlined @click="deleteCategoryTarget = null">Abbrechen</Button>
         <button class="btn-danger-solid" :disabled="!!deletingCategoryId" @click="executeDeleteCategory">
           {{ deletingCategoryId ? 'Wird gelöscht…' : 'Löschen' }}
         </button>
@@ -257,6 +257,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useGradingOverviewView } from '../composables/useGradingOverviewView'
 
 const {
