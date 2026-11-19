@@ -16,14 +16,13 @@
     </header>
 
     <p v-if="importError" class="state-card import-error" role="alert">{{ importError }}</p>
+    <Message v-if="contextError" severity="warn" role="status">{{ contextError }}</Message>
 
     <div v-if="loading" class="state-card" role="status">Prüfungen werden geladen…</div>
     <div v-else-if="loadError" class="state-card" role="alert">
       <p>{{ loadError }}</p>
       <Button label="Erneut versuchen" @click="loadExams" />
     </div>
-
-    <Message v-if="contextError" severity="warn" role="status">{{ contextError }}</Message>
 
     <div v-else-if="exams.length === 0" class="state-card">
       <h2>Noch keine Prüfungen</h2>
