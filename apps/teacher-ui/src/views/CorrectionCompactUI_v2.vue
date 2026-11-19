@@ -453,7 +453,10 @@ async function loadExamData(): Promise<void> {
     supportTips.value = await supportTipRepository?.findAll() ?? [];
 
     if (loadedExam.candidates.length > 0) {
-      await selectCandidate(loadedExam.candidates[0]);
+      const candidateId = typeof route.query.candidateId === 'string' ? route.query.candidateId : '';
+      const candidate = loadedExam.candidates.find((entry: Exams.Candidate) => entry.id === candidateId)
+        ?? loadedExam.candidates[0];
+      await selectCandidate(candidate);
       return;
     }
 
