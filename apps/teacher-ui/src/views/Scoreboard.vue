@@ -92,42 +92,22 @@
       <div class="setup-grid">
         <div class="form-group">
           <label for="scoreboard-class">{{ t('SCORES.classGroup') }}</label>
-          <select id="scoreboard-class" v-model="selectedClassId" class="form-input">
-            <option value="">{{ t('SCORES.noClassBinding') }}</option>
-            <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
-              {{ classGroup.name }} ({{ classGroup.schoolYear }})
-            </option>
-          </select>
+          <Select inputId="scoreboard-class" v-model="selectedClassId" :options="classOptions"
+            optionLabel="label" optionValue="value" fluid />
         </div>
 
         <div class="form-group">
           <label for="team-session">{{ t('SCORES.importTeams') }}</label>
-          <select
-            id="team-session"
-            v-model="selectedTeamSessionId"
-            class="form-input"
-            :disabled="availableTeamSessions.length === 0"
-          >
-            <option value="">{{ availableTeamSessions.length === 0 ? t('SCORES.noTeamSessions') : t('SCORES.importTeamsPlaceholder') }}</option>
-            <option v-for="session in availableTeamSessions" :key="session.id" :value="session.id">
-              {{ teamSessionLabel(session) }}
-            </option>
-          </select>
+          <Select inputId="team-session" v-model="selectedTeamSessionId" :options="teamSessionOptions"
+            optionLabel="label" optionValue="value" fluid
+            :disabled="availableTeamSessions.length === 0" />
         </div>
 
         <div class="form-group">
           <label for="timer-session">{{ t('SCORES.timerLink') }}</label>
-          <select
-            id="timer-session"
-            v-model="linkedTimerSessionId"
-            class="form-input"
-            :disabled="availableTimerSessions.length === 0"
-          >
-            <option value="">{{ availableTimerSessions.length === 0 ? t('SCORES.noTimerSessions') : t('SCORES.timerLinkPlaceholder') }}</option>
-            <option v-for="session in availableTimerSessions" :key="session.id" :value="session.id">
-              {{ timerSessionLabel(session) }}
-            </option>
-          </select>
+          <Select inputId="timer-session" v-model="linkedTimerSessionId" :options="timerSessionOptions"
+            optionLabel="label" optionValue="value" fluid
+            :disabled="availableTimerSessions.length === 0" />
         </div>
       </div>
     </section>
@@ -296,6 +276,8 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import Select from 'openvue/select'
+import { computed } from 'vue'
 import { useScoreboardView } from '../composables/useScoreboardView';
 
 const {
@@ -338,6 +320,21 @@ const {
   formatDateTime,
   formatDuration,
 } = useScoreboardView();
+
+const classOptions = computed(() => [
+  { label: t('SCORES.noClassBinding'), value: '' },
+  ...classes.value.map(group => ({ label: `${group.name} (${group.schoolYear})`, value: group.id }))
+])
+const teamSessionOptions = computed(() => [
+  { label: availableTeamSessions.value.length === 0
+      ? t('SCORES.noTeamSessions') : t('SCORES.importTeamsPlaceholder'), value: '' },
+  ...availableTeamSessions.value.map(session => ({ label: teamSessionLabel(session), value: session.id }))
+])
+const timerSessionOptions = computed(() => [
+  { label: availableTimerSessions.value.length === 0
+      ? t('SCORES.noTimerSessions') : t('SCORES.timerLinkPlaceholder'), value: '' },
+  ...availableTimerSessions.value.map(session => ({ label: timerSessionLabel(session), value: session.id }))
+])
 </script>
 
 <style scoped src="./Scoreboard.css"></style>
