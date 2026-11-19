@@ -1,5 +1,5 @@
 <template>
-  <section class="basketball-assessment app-page">
+  <section class="basketball-assessment app-page sport-ui">
     <header class="page-header">
       <div>
         <RouterLink to="/subjects/sport" class="back-link">← Sport</RouterLink>
