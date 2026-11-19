@@ -1,19 +1,19 @@
 <template>
-  <div class="shuttle-view">
+  <div class="shuttle-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('SHUTTLE.bewerte-shuttle') }} {{ currentDate }}</h2>
       <p class="page-description">{{ t('SHUTTLE.tabelle') }}</p>
     </div>
 
-    <section v-if="loading" class="card">
+    <section v-if="loading" class="card app-card">
       <div class="loading-state">
         <div class="spinner"></div>
         <p>{{ t('COMMON.loading') }}</p>
       </div>
     </section>
 
-    <section v-else-if="category" class="card">
+    <section v-else-if="category" class="card app-card">
       <div class="config-row">
         <div class="form-group">
           <label>{{ t('SHUTTLE.tabelle') }}</label>
@@ -59,21 +59,21 @@
           </div>
         </div>
         <div class="timer-controls">
-          <button class="btn-primary" :disabled="isRunning || !selectedConfig" @click="startTest">
+          <Button :disabled="isRunning || !selectedConfig" @click="startTest">
             {{ t('SHUTTLE.start') }}
-          </button>
-          <button class="btn-secondary" :disabled="!isRunning" @click="pauseTest">
+          </Button>
+          <Button severity="secondary" outlined :disabled="!isRunning" @click="pauseTest">
             {{ t('SHUTTLE.pause') }}
-          </button>
-          <button class="btn-secondary" :disabled="!isPaused" @click="resumeTest">
+          </Button>
+          <Button severity="secondary" outlined :disabled="!isPaused" @click="resumeTest">
             {{ t('SHUTTLE.resume') }}
-          </button>
-          <button class="btn-secondary" :disabled="!isRunning && !isPaused" @click="finishTest">
+          </Button>
+          <Button severity="secondary" outlined :disabled="!isRunning && !isPaused" @click="finishTest">
             {{ t('SHUTTLE.finish') }}
-          </button>
-          <button class="btn-secondary" :disabled="isRunning" @click="resetTimerState">
+          </Button>
+          <Button severity="secondary" outlined :disabled="isRunning" @click="resetTimerState">
             {{ t('SHUTTLE.reset') }}
-          </button>
+          </Button>
         </div>
         <label class="sound-toggle">
           <input v-model="soundEnabled" type="checkbox" />
@@ -127,16 +127,16 @@
               </td>
               <td class="grade-cell">{{ results[student.id].grade ?? '—' }}</td>
               <td class="action-cell">
-                <button
-                  class="btn-secondary btn-stop"
+                <Button severity="secondary" outlined
+                  class="btn-stop"
                   :disabled="!isRunning || !currentSegment"
                   @click="stopStudent(student.id)"
                 >
                   {{ t('SHUTTLE.stop') }}
-                </button>
-                <button class="btn-secondary btn-clear" :disabled="isRunning" @click="clearStudent(student.id)">
+                </Button>
+                <Button severity="secondary" outlined class="btn-clear" :disabled="isRunning" @click="clearStudent(student.id)">
                   {{ t('SHUTTLE.clear') }}
-                </button>
+                </Button>
               </td>
             </tr>
           </tbody>
@@ -144,26 +144,26 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn-secondary" :disabled="saving" @click="resetAll">
+        <Button severity="secondary" outlined :disabled="saving" @click="resetAll">
           {{ t('SHUTTLE.noten-neu') }}
-        </button>
-        <button class="btn-secondary" :disabled="isRunning" @click="saveSessionState">
+        </Button>
+        <Button severity="secondary" outlined :disabled="isRunning" @click="saveSessionState">
           {{ t('SHUTTLE.session-save') }}
-        </button>
-        <button class="btn-primary" :disabled="saving || !selectedTableId || !selectedConfigId" @click="saveAll">
+        </Button>
+        <Button :disabled="saving || !selectedTableId || !selectedConfigId" @click="saveAll">
           {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
-        </button>
+        </Button>
       </div>
 
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
     </section>
 
-    <section v-else class="card">
+    <section v-else class="card app-card">
       <p class="empty-state">{{ t('COMMON.error') }}</p>
     </section>
 
-    <section v-if="historyGroups.length > 0" class="card history-card">
+    <section v-if="historyGroups.length > 0" class="card history-card app-card">
       <h3 class="history-title">{{ t('SHUTTLE.history-title') }}</h3>
       <div v-for="group in historyGroups" :key="group.date" class="history-group">
         <p class="history-date">{{ group.date }}</p>
@@ -191,6 +191,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useI18n } from 'vue-i18n'
 
 import { useShuttleGradingEntryView } from '../composables/useShuttleGradingEntryView'
