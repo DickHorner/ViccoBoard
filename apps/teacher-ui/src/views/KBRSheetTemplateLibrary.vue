@@ -178,6 +178,7 @@ async function loadTemplates(): Promise<void> {
     templates.value = await correctionSheetTemplateRepository.findAll()
     const initial = templates.value[0]
     replaceEditor(initial?.preset ?? createDefaultCorrectionSheetPreset(''), initial?.id)
+    if (!initial) dirty.value = true
     loading.value = false
     await nextTick()
     recordRouteContentReady('sheet-templates')
