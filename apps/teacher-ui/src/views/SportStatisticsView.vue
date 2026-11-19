@@ -105,7 +105,7 @@
         </div>
         <template v-else>
           <div class="metrics-grid">
-            <article class="metric-card">
+            <article class="metric-card app-card">
               <strong>{{ toolUsageOverview.totalSessions }}</strong>
               <span>Sessions gesamt</span>
             </article>
