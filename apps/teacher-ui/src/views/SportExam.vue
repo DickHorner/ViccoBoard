@@ -10,30 +10,28 @@
 
     <section class="card setup-card app-card">
       <div class="setup-grid">
-        <label>
-          <span>Datum</span>
-          <input v-model="examDate" type="date" class="form-input" @change="loadRoster" />
-        </label>
+        <div class="app-field">
+          <label for="sport-exam-date">Datum</label>
+          <InputText id="sport-exam-date" v-model="examDate" type="date" fluid @change="loadRoster" />
+        </div>
 
-        <label>
-          <span>Klasse</span>
-          <select v-model="selectedClassId" class="form-input" @change="loadClassContext">
-            <option value="">Klasse auswählen...</option>
-            <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
-              {{ classGroup.name }}{{ classGroup.gradeLevel ? ` · Jg. ${classGroup.gradeLevel}` : '' }}
-            </option>
-          </select>
-        </label>
+        <div class="app-field">
+          <label for="sport-exam-class">Klasse</label>
+          <Select inputId="sport-exam-class" :modelValue="selectedClassId"
+            :options="classOptions" optionLabel="label" optionValue="value"
+            placeholder="Klasse auswählen" fluid
+            @update:modelValue="value => { selectedClassId = value; void loadClassContext() }"
+          />
+        </div>
 
-        <label>
-          <span>Disziplin</span>
-          <select v-model="selectedCategoryId" class="form-input" @change="loadCategory">
-            <option value="">Disziplin auswählen...</option>
-            <option v-for="candidate in categories" :key="candidate.id" :value="candidate.id">
-              {{ categoryLabel(candidate) }}
-            </option>
-          </select>
-        </label>
+        <div class="app-field">
+          <label for="sport-exam-category">Disziplin</label>
+          <Select inputId="sport-exam-category" :modelValue="selectedCategoryId"
+            :options="categoryOptions" optionLabel="label" optionValue="value"
+            placeholder="Disziplin auswählen" fluid
+            @update:modelValue="value => { selectedCategoryId = value; void loadCategory() }"
+          />
+        </div>
 
         <label class="announced-toggle">
           <input v-model="announced" type="checkbox" />
@@ -45,9 +43,7 @@
         <strong>{{ categoryLabel(selectedCategory) }}</strong>
         <template v-if="isCriteriaAssessment">
           <span>· {{ criteriaConfig?.criteria.length ?? 0 }} Beobachtungskriterien</span>
-          <button class="btn-link" type="button" @click="router.push(`/grading/criteria/${selectedCategory.id}`)">
-            Kriterien bearbeiten
-          </button>
+          <Button severity="secondary" text label="Kriterien bearbeiten" @click="router.push(`/grading/criteria/${selectedCategory.id}`)" />
         </template>
         <template v-else>
           <span v-if="selectedConfig?.measurementLabel">{{ selectedConfig.measurementLabel }}</span>
@@ -187,6 +183,8 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Select from 'openvue/select'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -214,7 +212,18 @@ const sportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 const classes = ref<ClassGroup[]>([])
+const classOptions = computed(() => [
+  { label: 'Klasse auswählen', value: '' },
+  ...classes.value.map(group => ({
+    label: group.name + (group.gradeLevel ? ` · Jg. ${group.gradeLevel}` : ''),
+    value: group.id
+  }))
+])
 const categories = ref<Sport.GradeCategory[]>([])
+const categoryOptions = computed(() => [
+  { label: 'Disziplin auswählen', value: '' },
+  ...categories.value.map(category => ({ label: categoryLabel(category), value: category.id }))
+])
 const students = ref<Student[]>([])
 const selectedClassId = ref('')
 const selectedCategoryId = ref('')
