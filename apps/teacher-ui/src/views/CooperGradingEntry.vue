@@ -1,19 +1,19 @@
 <template>
-  <div class="cooper-view">
+  <div class="cooper-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('COOPER.bewerte-cooper') }} {{ currentDate }}</h2>
       <p class="page-description">{{ t('COOPER.tabelle') }}</p>
     </div>
 
-    <section class="card" v-if="loading">
+    <section class="card app-card" v-if="loading">
       <div class="loading-state">
         <div class="spinner"></div>
         <p>{{ t('COMMON.loading') }}</p>
       </div>
     </section>
 
-    <section v-else-if="category" class="card">
+    <section v-else-if="category" class="card app-card">
       <div class="config-row">
         <div class="form-group">
           <label>{{ t('COOPER.Sportart') }}</label>
@@ -90,12 +90,12 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn-secondary" @click="resetAll" :disabled="saving">
+        <Button severity="secondary" outlined @click="resetAll" :disabled="saving">
           {{ t('COOPER.noten-neu') }}
-        </button>
-        <button class="btn-primary" @click="saveAll" :disabled="saving || !selectedConfigId">
+        </Button>
+        <Button @click="saveAll" :disabled="saving || !selectedConfigId">
           {{ saving ? t('COMMON.loading') : t('COMMON.save') }}
-        </button>
+        </Button>
       </div>
 
       <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -103,7 +103,7 @@
     </section>
 
     <!-- Session History -->
-    <section v-if="category && pastSessions.length > 0" class="card history-card">
+    <section v-if="category && pastSessions.length > 0" class="card history-card app-card">
       <h3>{{ t('COOPER.session-history') }}</h3>
       <div class="session-list">
         <div
@@ -119,29 +119,30 @@
               {{ t('COOPER.session-count', { count: sessionEntryCount(session) }) }}
             </span>
           </div>
-          <button
-            class="btn-secondary btn-small"
+          <Button severity="secondary" outlined
+           
             @click="loadSession(session)"
             :disabled="saving"
           >
             {{ t('COOPER.session-load') }}
-          </button>
+          </Button>
         </div>
       </div>
     </section>
 
-    <section v-else-if="category" class="card history-card">
+    <section v-else-if="category" class="card history-card app-card">
       <h3>{{ t('COOPER.session-history') }}</h3>
       <p class="empty-state">{{ t('COOPER.no-sessions') }}</p>
     </section>
 
-    <section v-else class="card">
+    <section v-else class="card app-card">
       <p class="empty-state">{{ t('COMMON.error') }}</p>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
