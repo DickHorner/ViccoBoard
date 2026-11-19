@@ -8,7 +8,7 @@
       <div class="header-actions">
         <RouterLink to="/exams?workflow=design" class="secondary-button">Zur Prüfungsauswahl</RouterLink>
         <button class="primary-button" type="button" :disabled="!exam || saving || !dirty" @click="savePreset">
-          {{ saving ? 'Speichert…' : dirty ? 'Gestaltung speichern' : 'Alles gespeichert' }}
+          {{ saving ? 'Speichert…' : dirty ? preset.templateId ? 'Verknüpfung speichern' : 'Gestaltung speichern' : 'Alles gespeichert' }}
         </button>
       </div>
     </header>
@@ -20,7 +20,7 @@
       <div class="editor-panel">
         <section class="template-picker" aria-label="Druckbogenvorlage verwenden">
           <h2>Vorlage verwenden</h2>
-          <p>Übernehme ein gespeichertes Layout in diese Prüfung. Änderungen werden erst mit „Gestaltung speichern“ übernommen.</p>
+          <p>Verknüpfe diese Prüfung mit einer Druckbogenvorlage. Künftige Änderungen an der Vorlage erscheinen automatisch beim erneuten PDF-Erzeugen.</p>
           <div v-if="templateOptions.length" class="template-controls">
             <Select
               inputId="sheet-template-choice"
@@ -32,12 +32,23 @@
               aria-label="Druckbogenvorlage wählen"
               class="template-select"
             />
-            <Button label="Vorlage übernehmen" :disabled="!selectedTemplateId" @click="applyTemplate" />
+            <Button label="Vorlage verknüpfen" :disabled="!selectedTemplateId" @click="applyTemplate" />
           </div>
           <Message v-if="templateLoadError" severity="warn" role="status">{{ templateLoadError }}</Message>
           <RouterLink to="/sheet-templates" class="secondary-button">Vorlagen verwalten</RouterLink>
         </section>
-        <CorrectionSheetPresetForm v-model="preset" />
+        <div v-if="preset.templateId" class="linked-template-panel">
+          <Message severity="info" role="status">
+            Diese Prüfung verwendet die gemeinsame Vorlage „{{ linkedTemplateName }}“. Auch bei älteren Prüfungen wird beim erneuten PDF-Erzeugen die aktuelle Vorlage verwendet.
+          </Message>
+          <div class="template-controls">
+            <RouterLink :to="{ path: '/sheet-templates', query: { templateId: preset.templateId } }" class="secondary-button">Gemeinsame Vorlage bearbeiten</RouterLink>
+            <Button label="Verknüpfung lösen und individuell gestalten" severity="secondary" outlined @click="detachTemplate" />
+          </div>
+        </div>
+        <fieldset class="preset-fields" :disabled="Boolean(preset.templateId)" aria-label="Druckbogengestaltung">
+          <CorrectionSheetPresetForm v-model="preset" />
+        </fieldset>
         <p v-if="dirty" class="notice">Die Gestaltung ist noch nicht gespeichert.</p>
         <p v-if="saveMessage" class="notice" role="status">{{ saveMessage }}</p>
         <p v-if="saveError" class="notice error" role="alert">{{ saveError }}</p>
@@ -92,6 +103,7 @@ const templates = ref<CorrectionSheetTemplate[]>([])
 const selectedTemplateId = ref('')
 const templateLoadError = ref('')
 const templateOptions = computed(() => templates.value.map(entry => ({ label: entry.name, value: entry.id })))
+const linkedTemplateName = computed(() => templates.value.find(entry => entry.id === preset.value.templateId)?.name ?? preset.value.name)
 const preset = ref<Exams.CorrectionSheetPreset>(createDefaultCorrectionSheetPreset(''))
 const loading = ref(true)
 const loadError = ref('')
@@ -164,9 +176,16 @@ function applyTemplate(): void {
     ...template.preset,
     id: `correction-sheet-preset:${exam.value.id}`,
     examId: exam.value.id,
+    templateId: template.id,
     updatedAt: new Date()
   }
   selectedTemplateId.value = ''
+}
+
+function detachTemplate(): void {
+  if (!preset.value.templateId) return
+  if (!window.confirm('Die Verknüpfung lösen? Spätere Änderungen an der gemeinsamen Vorlage werden dann nicht mehr übernommen.')) return
+  preset.value = { ...preset.value, templateId: undefined, updatedAt: new Date() }
 }
 
 async function savePreset(): Promise<void> {
@@ -261,6 +280,20 @@ onBeforeUnmount(() => {
 .template-picker h2,
 .template-picker p {
   margin: 0;
+}
+
+.linked-template-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.preset-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .template-controls {
