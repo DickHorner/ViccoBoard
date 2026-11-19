@@ -8,6 +8,18 @@
     <section class="section exam-details">
       <h2>Prüfungsdetails</h2>
       <div class="form-group">
+        <label for="simple-exam-template">
+          <input
+            id="simple-exam-template"
+            type="checkbox"
+            :checked="examKind === 'template'"
+            @change="examKind = ($event.target as HTMLInputElement).checked ? 'template' : 'exam'"
+          />
+          Als Prüfungsvorlage speichern
+        </label>
+        <p v-if="examKind === 'template'">Vorlagen enthalten keine Prüflinge. Entferne vorhandene Prüflinge, bevor Du die Vorlage speicherst.</p>
+      </div>
+      <div class="form-group">
         <label for="exam-title" class="label-required">Prüfungstitel</label>
         <input
           id="exam-title"
@@ -281,9 +293,9 @@
         @click="saveExam"
         class="btn btn-primary btn-lg"
         :disabled="!canSave"
-        title="Prüfung speichern"
+        :title="examKind === 'template' ? 'Prüfungsvorlage speichern' : 'Prüfung speichern'"
       >
-        {{ isSaving ? 'Wird gespeichert...' : 'Prüfung speichern' }}
+        {{ isSaving ? 'Wird gespeichert...' : examKind === 'template' ? 'Vorlage speichern' : 'Prüfung speichern' }}
       </button>
       <button @click="cancelEdit" class="btn btn-secondary btn-lg">
         Abbrechen
@@ -312,6 +324,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { createUuid as uuidv4 } from '@/utils/uuid';
 import type { Exams } from '@viccoboard/core';
 import { createDefaultCorrectionSheetPreset } from '@viccoboard/exams';
+import { isExamTemplate } from '../utils/exam-school-year';
 import { useExamsBridge } from '../composables/useExamsBridge';
 import CorrectionSheetPresetForm from './CorrectionSheetPresetForm.vue';
 
@@ -363,6 +376,7 @@ const errors = reactive<{
 }>({});
 
 const isSaving = ref(false);
+const examKind = ref<Exams.ExamKind>('exam');
 const successMessage = ref('');
 const errorMessage = ref('');
 const isEditing = computed(() => !!route.params.id);
@@ -443,6 +457,7 @@ onMounted(async () => {
       const examId = route.params.id as string;
       const exam = await examRepository.findById(examId);
       if (exam && exam.mode === 'simple') {
+        examKind.value = isExamTemplate(exam) ? 'template' : 'exam';
         formData.title = exam.title;
         formData.description = exam.description || '';
         formData.date = exam.date ? new Date(exam.date).toISOString().slice(0, 10) : '';
@@ -576,6 +591,10 @@ const saveExam = async () => {
     errorMessage.value = 'Bitte beheben Sie die oben markierten Fehler, bevor Sie speichern.';
     return;
   }
+  if (examKind.value === 'template' && formData.candidates.length > 0) {
+    errorMessage.value = 'Eine Prüfungsvorlage darf keine Prüflinge enthalten. Entferne zuerst die Prüflinge.';
+    return;
+  }
 
   isSaving.value = true;
   try {
@@ -612,7 +631,7 @@ const saveExam = async () => {
       date: formData.date ? new Date(`${formData.date}T00:00:00`) : undefined,
       assessmentFormat: 'klausur',
       mode: 'simple' as Exams.ExamMode,
-      kind: 'template',
+      kind: examKind.value,
       structure: {
         parts: [],
         tasks,

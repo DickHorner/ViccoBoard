@@ -1,9 +1,9 @@
 import type { Exams } from '@viccoboard/core'
 
 export function isExamTemplate(exam: Exams.Exam): boolean {
-  return exam.kind === 'template' || (
-    exam.candidates.length === 0 && !exam.date && !exam.classGroupId
-  )
+  if (exam.candidates.length > 0) return false
+  if (exam.kind) return exam.kind === 'template'
+  return !exam.date && !exam.classGroupId
 }
 
 export function schoolYearForDate(date: Date): string | null {

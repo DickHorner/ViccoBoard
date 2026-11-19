@@ -136,6 +136,33 @@ describe('P5-3: examBuilderStore', () => {
     mockExamRepository.create.mockReset()
   })
 
+  describe('exam and template classification', () => {
+    it('creates a regular exam by default, including empty drafts', () => {
+      const store = useExamBuilderStore()
+      expect(store.kind).toBe('exam')
+      expect(store.buildExam().kind).toBe('exam')
+    })
+
+    it('creates an explicit template and resets the choice for the next exam', () => {
+      const store = useExamBuilderStore()
+      store.kind = 'template'
+      expect(store.buildExam().kind).toBe('template')
+      store.reset()
+      expect(store.kind).toBe('exam')
+      expect(store.buildExam().kind).toBe('exam')
+    })
+
+    it('preserves genuine templates when loading an existing exam', () => {
+      const store = useExamBuilderStore()
+      store.hydrateFromExam({ ...createReusableExam(), kind: 'template' })
+      expect(store.kind).toBe('template')
+      expect(store.buildExam().kind).toBe('template')
+      store.hydrateFromExam({ ...createReusableExam(), kind: 'exam' })
+      expect(store.kind).toBe('exam')
+      expect(store.buildExam().kind).toBe('exam')
+    })
+  })
+
   describe('3-level hierarchy', () => {
     it('adds a root-level task', () => {
       const store = useExamBuilderStore()
