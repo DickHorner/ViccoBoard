@@ -1,6 +1,34 @@
 import router, { getSafeBackNavigationTarget, resolveBackFallbackPath } from '../src/router'
 
 describe('router fallback navigation', () => {
+  it('preserves class and lesson context across Unterricht navigation', () => {
+    const group = router.resolve('/classes/class-7')
+    expect(group.name).toBe('class-detail')
+
+    const lessons = router.resolve({ path: '/lessons', query: { classId: 'class-7' } })
+    expect(lessons.name).toBe('lessons')
+    expect(lessons.query.classId).toBe('class-7')
+
+    const workspace = router.resolve('/lessons/lesson-12/workspace')
+    expect(workspace.name).toBe('lesson-workspace')
+    expect(workspace.params.id).toBe('lesson-12')
+
+    const attendance = router.resolve({
+      path: '/attendance',
+      query: { classId: 'class-7', lessonId: 'lesson-12' }
+    })
+    expect(attendance.name).toBe('attendance')
+    expect(attendance.query).toEqual({ classId: 'class-7', lessonId: 'lesson-12' })
+    expect(resolveBackFallbackPath(attendance)).toBe('/lessons')
+  })
+
+  it('keeps attendance accessible without an existing lesson', () => {
+    const attendance = router.resolve({ path: '/attendance', query: { classId: 'class-7' } })
+    expect(attendance.name).toBe('attendance')
+    expect(attendance.query).toEqual({ classId: 'class-7' })
+    expect(router.resolve('/attendance').name).toBe('attendance')
+  })
+
   it('resolves grading detail routes back to the grading overview', () => {
     const route = router.resolve('/grading/tables')
 
