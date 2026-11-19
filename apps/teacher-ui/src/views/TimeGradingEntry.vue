@@ -1,7 +1,7 @@
 <template>
-  <div class="time-grading-view">
+  <div class="time-grading-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <h2>{{ category?.name || 'Zeitbasierte Bewertung' }}</h2>
       <p class="page-description">
         Erfassen Sie Zeiten und lassen Sie die Noten automatisch berechnen.
@@ -17,13 +17,13 @@
     <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadData">Erneut versuchen</button>
+      <Button @click="loadData">Erneut versuchen</Button>
     </div>
 
     <!-- Content -->
     <div v-else-if="category" class="grading-content">
       <!-- Category Info -->
-      <section class="card">
+      <section class="card app-card">
         <h3>Kategorieinformationen</h3>
         <div class="info-grid">
           <div class="info-item">
@@ -46,17 +46,17 @@
       </section>
 
       <!-- Time Entry Table -->
-      <section class="card" v-if="students.length > 0">
+      <section class="card app-card" v-if="students.length > 0">
         <div class="card-header">
           <h3>Zeiteingabe</h3>
           <div class="header-actions">
-            <button 
-              class="btn-primary btn-small"
+            <Button 
+             
               @click="saveAllTimes"
               :disabled="saving || !hasUnsavedChanges"
             >
               {{ saving ? 'Speichern...' : 'Alle speichern' }}
-            </button>
+            </Button>
           </div>
         </div>
         
@@ -125,7 +125,7 @@
       </section>
 
       <!-- No Students -->
-      <section class="card" v-if="students.length === 0">
+      <section class="card app-card" v-if="students.length === 0">
         <div class="empty-state">
           <p>Keine Schüler in dieser Klasse gefunden.</p>
         </div>
@@ -152,12 +152,12 @@
             </div>
             
             <div class="modal-actions">
-              <button type="button" class="btn-secondary" @click="showCommentModal = false">
+              <Button severity="secondary" outlined type="button" @click="showCommentModal = false">
                 Abbrechen
-              </button>
-              <button type="submit" class="btn-primary" :disabled="saving">
+              </Button>
+              <Button type="submit" :disabled="saving">
                 {{ saving ? 'Speichern...' : 'Speichern' }}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -167,6 +167,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSportBridge } from '../composables/useSportBridge';
