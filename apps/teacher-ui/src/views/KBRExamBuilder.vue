@@ -2,13 +2,13 @@
   <div class="exam-builder-page">
     <div class="builder-header">
       <div>
-        <h1>{{ isEditing ? 'Prüfung bearbeiten' : 'Prüfung erstellen' }}</h1>
+        <h1>{{ store.kind === 'template' ? 'Prüfungsvorlage' : isEditing ? 'Prüfung bearbeiten' : 'Prüfung erstellen' }}</h1>
         <p>{{ store.mode === 'simple' ? 'Einfach: flache Aufgabenliste' : 'Komplex: verschachtelte Aufgaben (3 Ebenen)' }}</p>
       </div>
       <div class="actions">
         <Button v-if="store.examId" label="Export" severity="secondary" @click="openExportPage" />
         <Button :label="isEditing ? 'Zur Prüfung' : 'Abbrechen'" severity="secondary" @click="goBack" />
-        <Button :label="savingExam ? 'Speichert…' : 'Prüfung speichern'" :loading="savingExam" :disabled="!canSave || savingExam" @click="saveExam" />
+        <Button :label="savingExam ? 'Speichert…' : store.kind === 'template' ? 'Vorlage speichern' : 'Prüfung speichern'" :loading="savingExam" :disabled="!canSave || savingExam" @click="saveExam" />
       </div>
     </div>
 
@@ -16,6 +16,16 @@
     <div v-if="!isLoading" class="builder-content">
       <section class="section">
         <h2>Prüfungsdetails</h2>
+        <div class="form-group checkbox">
+          <input
+            id="kbr-exam-template"
+            type="checkbox"
+            :checked="store.kind === 'template'"
+            @change="store.kind = ($event.target as HTMLInputElement).checked ? 'template' : 'exam'"
+          />
+          <label for="kbr-exam-template">Als Prüfungsvorlage speichern</label>
+        </div>
+        <p v-if="store.kind === 'template'">Vorlagen enthalten keine Prüflinge. Entferne vorhandene Prüflinge, bevor Du die Vorlage speicherst.</p>
         <div class="form-group">
           <label>Prüfungstitel</label>
           <input v-model="store.title" type="text" placeholder="Prüfungstitel" />
@@ -757,8 +767,13 @@ async function persistExam(): Promise<Exams.Exam> {
 const saveExam = async () => {
   if (!canSave.value || savingExam.value) return;
 
-  savingExam.value = true;
   saveError.value = '';
+  if (store.kind === 'template' && candidates.value.length > 0) {
+    saveError.value = 'Eine Prüfungsvorlage darf keine Prüflinge enthalten. Entferne zuerst die Prüflinge.';
+    return;
+  }
+
+  savingExam.value = true;
   try {
     const savedExam = await persistExam();
     store.hydrateFromExam(savedExam);
@@ -803,6 +818,7 @@ function currentFormSnapshot(): string {
     classGroupId: store.classGroupId,
     assessmentFormat: store.assessmentFormat,
     mode: store.mode,
+    kind: store.kind,
     tasks: store.tasks,
     parts: store.parts,
     candidateGroups: store.candidateGroups,
