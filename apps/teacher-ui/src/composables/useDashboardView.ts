@@ -226,7 +226,6 @@ export function useDashboardView() {
     formatLessonDateTime,
     handleCreateClass,
     closeModal,
-    getActivityIcon,
     formatDate
   };
 }
