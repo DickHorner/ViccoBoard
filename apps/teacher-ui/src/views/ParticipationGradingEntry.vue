@@ -238,12 +238,11 @@ onMounted(async () => {
 })
 
 function isParticipationCategory(candidate: Sport.GradeCategory): boolean {
-  if (candidate.type !== Sport.GradeCategoryType.Verbal || candidate.configuration.type !== 'verbal') {
+  const config = candidate.configuration
+  if (candidate.type !== Sport.GradeCategoryType.Verbal || config.type !== 'verbal') {
     return false
   }
-  return criteria.every(criterion => candidate.configuration.type === 'verbal' &&
-    candidate.configuration.fields.some(field => field.id === criterion.id)
-  )
+  return criteria.every(criterion => config.fields.some(field => field.id === criterion.id))
 }
 
 async function selectClass(): Promise<void> {
@@ -451,7 +450,8 @@ async function save(id: string): Promise<boolean> {
 
 async function saveAll(): Promise<void> {
   for (const id of [...unsaved.value]) {
-    if (!await save(id)) break
+    const saved = await save(id)
+    if (!saved) break
   }
 }
 </script>
@@ -475,7 +475,7 @@ async function saveAll(): Promise<void> {
 .assessment-grid { display: grid; grid-template-columns: minmax(170px, 1fr) 95px 105px; gap: .5rem; align-items: center; }
 .assessment-grid label { display: grid; gap: .15rem; }
 .assessment-grid small { color: var(--color-muted); }
-.assessment-grid select, textarea { min-height: 44px; width: 100%; border: 1px solid var(--surface-border); border-radius: 6px; padding: .35rem; background: var(--p-content-background); color: inherit; box-sizing: border-box; font: inherit; }
+.assessment-grid select, textarea { min-height: 44px; width: 100%; border: 1px solid var(--surface-border); border-radius: 6px; padding: .35rem; background: var(--p-content-background, var(--surface-soft)); color: inherit; box-sizing: border-box; font: inherit; }
 .bonus { display: flex; align-items: center; gap: .5rem; min-height: 44px; }
 .bonus input { width: 18px; height: 18px; }
 .error-message { color: var(--p-red-700, #991b1b); }
