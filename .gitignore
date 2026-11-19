@@ -10,6 +10,10 @@ yarn-error.log*
 .env.local
 .env.*.local
 
+# Local Glide editor state (generated only during visual editing)
+**/glide-components.json
+**/glide-positions.json
+
 # Build outputs
 dist/
 build/
