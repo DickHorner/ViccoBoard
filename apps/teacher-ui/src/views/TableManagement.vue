@@ -33,7 +33,7 @@
       </div>
 
       <div v-else class="table-list">
-        <div v-for="table in tables" :key="table.id" :class="['table-card', { expanded: previewId === table.id }]">
+        <div v-for="table in tables" :key="table.id" :class="['table-card', 'app-card', { expanded: previewId === table.id }]">
           <div class="table-card-header">
             <div class="table-info">
               <h3 class="table-name">{{ table.name }}</h3>
