@@ -1,13 +1,13 @@
 <template>
-  <div class="feedback-view">
+  <div class="feedback-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <h2>Feedback</h2>
     </div>
 
     <!-- Step 1: History / start new session -->
     <div v-if="view === 'list'" class="content">
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>Neue Feedback-Runde starten</h3>
         </div>
@@ -34,7 +34,7 @@
         </div>
       </section>
 
-      <section v-if="sessions.length > 0" class="card">
+      <section v-if="sessions.length > 0" class="card app-card">
         <h3>Vergangene Feedback-Runden</h3>
         <ul class="session-list">
           <li v-for="s in sessions" :key="s.id" class="session-item">
@@ -56,7 +56,7 @@
 
     <!-- Step 2: Collect responses -->
     <div v-else-if="view === 'collect'" class="content">
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>{{ methodLabel(activeMethod) }} – Antwort {{ responseIndex + 1 }}</h3>
           <span class="badge">{{ responses.length }} erfasst</span>
@@ -81,22 +81,22 @@
               @click="currentRating = n"
             >{{ n }}</button>
           </div>
-          <button class="btn-primary" :disabled="!currentRating" @click="recordRating">
+          <Button :disabled="!currentRating" @click="recordRating">
             Bestätigen
-          </button>
+          </Button>
         </div>
 
         <div class="collect-actions">
-          <button class="btn-secondary" @click="finishSession">
+          <Button severity="secondary" outlined @click="finishSession">
             Abschliessen ({{ responses.length }} Antworten)
-          </button>
+          </Button>
         </div>
       </section>
     </div>
 
     <!-- Step 3: Analysis view -->
     <div v-else-if="view === 'analysis' && analysisSession" class="content">
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>Auswertung – {{ methodLabel(analysisSession.method.type) }}</h3>
           <span class="session-meta">{{ formatDate(analysisSession.createdAt) }}</span>
@@ -142,7 +142,7 @@
         </div>
 
         <div class="collect-actions">
-          <button class="btn-secondary" @click="view = 'list'">Zurück zur Übersicht</button>
+          <Button severity="secondary" outlined @click="view = 'list'">Zurück zur Übersicht</Button>
         </div>
       </section>
     </div>
@@ -150,6 +150,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, onMounted } from 'vue'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { ClassGroup, Sport } from '@viccoboard/core'
