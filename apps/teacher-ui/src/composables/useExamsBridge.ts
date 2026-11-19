@@ -39,6 +39,7 @@ import {
   type UpdateGradingKeyResult
 } from '@viccoboard/exams';
 import { getStorageAdapter } from '../services/storage.service';
+import { deleteExamAndRelatedRecords } from '../services/delete-exam.service';
 import type { Exams } from '@viccoboard/core';
 
 /**
@@ -81,6 +82,7 @@ interface ExamsBridge {
   longTermNoteManagementService: typeof LongTermNoteManagementService;
   listExams(): Promise<any[]>;
   getExam(examId: string): Promise<any | null>;
+  deleteExam(examId: string): Promise<void>;
   findCorrectionsByExam(examId: string): Promise<any[]>;
   findCorrectionByExamAndCandidate(examId: string, candidateId: string): Promise<any | null>;
   getCorrectionSheetPreset(examId: string): Promise<any>;
@@ -133,6 +135,7 @@ interface UseExamsBridgeResult {
   readonly longTermNoteManagementService: ExamsBridge['longTermNoteManagementService'] | undefined;
   listExams(): Promise<any[]>;
   getExam(examId: string): Promise<any | null>;
+  deleteExam(examId: string): Promise<void>;
   findCorrectionsByExam(examId: string): Promise<any[]>;
   findCorrectionByExamAndCandidate(examId: string, candidateId: string): Promise<any | null>;
   getCorrectionSheetPreset(examId: string): Promise<any> | undefined;
@@ -240,6 +243,7 @@ export function initializeExamsBridge(): ExamsBridge {
     longTermNoteManagementService: LongTermNoteManagementService,
     listExams: () => examRepo.findAll(),
     getExam: (examId) => examRepo.findById(examId),
+    deleteExam: (examId) => deleteExamAndRelatedRecords(adapter, examRepo, examId),
     findCorrectionsByExam: (examId) => correctionEntryRepo.findByExam(examId),
     findCorrectionByExamAndCandidate: (examId, candidateId) =>
       correctionEntryRepo.findByExamAndCandidate(examId, candidateId),
@@ -337,6 +341,7 @@ export function useExamsBridge(): UseExamsBridgeResult {
     get longTermNoteManagementService() { return bridge.value?.longTermNoteManagementService; },
     listExams: () => bridge.value?.listExams() ?? Promise.resolve([]),
     getExam: (examId: string) => bridge.value?.getExam(examId) ?? Promise.resolve(null),
+    deleteExam: (examId: string) => bridge.value?.deleteExam(examId) ?? Promise.reject(new Error('Bridge not initialized')),
     findCorrectionsByExam: (examId: string) =>
       bridge.value?.findCorrectionsByExam(examId) ?? Promise.resolve([]),
     findCorrectionByExamAndCandidate: (examId: string, candidateId: string) =>
