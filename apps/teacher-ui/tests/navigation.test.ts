@@ -49,6 +49,7 @@ describe('primary navigation', () => {
     expect(resolvePrimaryNavTarget('/subjects/sport/statistics', parentOf)).toBe('/subjects/sport')
     expect(resolvePrimaryNavTarget('/grading/time/example', parentOf)).toBe('/subjects/sport')
     expect(resolvePrimaryNavTarget('/tools/timer', parentOf)).toBe('/subjects/sport')
+    expect(resolvePrimaryNavTarget('/sheet-templates', parentOf)).toBe('/subjects/kbr')
     expect(resolvePrimaryNavTarget('/exams/example/correct', parentOf)).toBe('/subjects/kbr')
     expect(resolvePrimaryNavTarget('/support-tips', parentOf)).toBe('/subjects/kbr')
     expect(resolvePrimaryNavTarget('/students/example', parentOf)).toBe('/students')
