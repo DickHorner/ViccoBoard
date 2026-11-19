@@ -1,85 +1,125 @@
 <template>
-  <section class="classes-overview">
-    <header class="page-header">
-      <div>
-        <h1>Klassen</h1>
-        <p class="subtitle">Fächerübergreifende Klassenverwaltung mit Direktzugriff auf Stunden, Schüler und Anwesenheit.</p>
-      </div>
-      <RouterLink class="primary-link" to="/">
-        Neue Klasse auf der Startseite
-      </RouterLink>
+  <section class="app-form-grid">
+    <header class="app-actions-row">
+      <h1>Klassen</h1>
+      <Button
+        as="router-link"
+        to="/?createClass=1"
+        label="Neue Klasse"
+        icon="pi pi-plus"
+        size="small"
+      />
     </header>
 
-    <section class="filter-card app-card">
-      <InputText
-        v-model="searchQuery"
-        class="classes-search"
-        type="search"
-        aria-label="Klasse oder Schuljahr suchen"
-        placeholder="Klasse oder Schuljahr suchen"
-      />
-      <label class="archive-toggle">
-        <input v-model="showArchived" type="checkbox" />
-        Archivierte Klassen anzeigen
-      </label>
-      <p class="filter-note" aria-live="polite">{{ visibleClasses.length }} Klassen sichtbar</p>
-    </section>
-
-    <div v-if="loading" class="state-card app-card" role="status">Klassen werden geladen...</div>
-    <div v-else-if="loadError" class="state-card app-card">
-      <Message severity="error" role="alert">{{ loadError }}</Message>
-      <Button label="Erneut versuchen" @click="loadData" />
-    </div>
-    <div v-else-if="visibleClasses.length === 0" class="state-card app-card">
-      Noch keine Klassen gefunden.
-    </div>
-
-    <div v-else class="class-grid">
-      <article v-for="entry in visibleClasses" :key="entry.classGroup.id" class="class-card app-card">
-        <div class="class-card-header">
-          <div class="class-title">
-            <span class="class-color" :style="getClassColorStyle(entry.classGroup.color)"></span>
-            <div>
-              <h2>{{ entry.classGroup.name }}</h2>
-              <p>{{ entry.classGroup.schoolYear }}</p>
-            </div>
-          </div>
-          <Tag :value="entry.classGroup.archived ? 'Archiviert' : 'Aktiv'" :severity="entry.classGroup.archived ? 'secondary' : 'success'" />
+    <Panel header="Klassenverwaltung">
+      <div class="app-form-grid">
+        <div class="app-actions-row">
+          <InputText
+            v-model="searchQuery"
+            type="search"
+            aria-label="Klasse oder Schuljahr suchen"
+            placeholder="Klasse oder Schuljahr suchen"
+          />
+          <label class="app-actions-row" for="archived-classes">
+            <Checkbox v-model="showArchived" inputId="archived-classes" binary />
+            Archivierte anzeigen
+          </label>
+          <span class="app-data-note">{{ visibleClasses.length }} Klassen sichtbar</span>
         </div>
 
-        <div class="class-metrics">
-          <div>
-            <strong>{{ entry.studentCount === null ? '…' : entry.studentCount ?? '–' }}</strong>
-            <span>Schüler</span>
-          </div>
-          <div>
-            <strong>{{ entry.lessonCount === null ? '…' : entry.lessonCount ?? '–' }}</strong>
-            <span>Stunden</span>
-          </div>
-        </div>
+        <Message v-if="loadError" severity="error" role="alert">{{ loadError }}</Message>
+        <Button v-if="loadError" label="Erneut versuchen" size="small" severity="secondary" outlined @click="loadData" />
+        <Message v-if="metricsError" severity="warn" role="status">{{ metricsError }}</Message>
+        <Message v-if="classActionError && !deleteDialogOpen" severity="error" role="alert">{{ classActionError }}</Message>
 
-        <div class="class-actions">
-          <RouterLink
-            :to="`/classes/${entry.classGroup.id}`"
-            class="ghost-link"
-            @pointerenter="prefetchClassStudents(entry.classGroup.id)"
-            @pointerdown="prefetchClassStudents(entry.classGroup.id)"
-            @focus="prefetchClassStudents(entry.classGroup.id)"
-            @click="rememberClassForNavigation(entry.classGroup)"
-          >Details</RouterLink>
-          <RouterLink :to="`/lessons?classId=${entry.classGroup.id}`" class="ghost-link">Stunden</RouterLink>
-          <RouterLink :to="`/attendance?classId=${entry.classGroup.id}`" class="ghost-link">Anwesenheit</RouterLink>
-        </div>
-      </article>
-    </div>
-    <Message v-if="metricsError" severity="warn" role="status">{{ metricsError }}</Message>
+        <DataTable
+          v-if="!loadError"
+          :value="visibleClasses"
+          :loading="loading"
+          size="small"
+          paginator
+          :rows="10"
+          stripedRows
+        >
+          <template #empty>Keine Klassen gefunden.</template>
+          <Column field="classGroup.name" header="Klasse" sortable>
+            <template #body="{ data }">
+              <Button
+                as="router-link"
+                :to="`/classes/${data.classGroup.id}`"
+                :label="data.classGroup.name"
+                severity="secondary"
+                text
+                size="small"
+                @pointerenter="prefetchClassStudents(data.classGroup.id)"
+                @pointerdown="prefetchClassStudents(data.classGroup.id)"
+                @focus="prefetchClassStudents(data.classGroup.id)"
+                @click="rememberClassForNavigation(data.classGroup)"
+              />
+            </template>
+          </Column>
+          <Column field="classGroup.schoolYear" header="Schuljahr" sortable />
+          <Column field="studentCount" header="Schüler" sortable>
+            <template #body="{ data }">{{ data.studentCount === null ? '…' : data.studentCount ?? '–' }}</template>
+          </Column>
+          <Column field="lessonCount" header="Stunden" sortable>
+            <template #body="{ data }">{{ data.lessonCount === null ? '…' : data.lessonCount ?? '–' }}</template>
+          </Column>
+          <Column header="Status">
+            <template #body="{ data }">
+              <Tag :value="data.classGroup.archived ? 'Archiviert' : 'Aktiv'" :severity="data.classGroup.archived ? 'secondary' : 'success'" />
+            </template>
+          </Column>
+          <Column header="Aktionen">
+            <template #body="{ data }">
+              <div class="app-actions-row">
+                <Button as="router-link" :to="`/lessons?classId=${data.classGroup.id}`" icon="pi pi-calendar" severity="secondary" text size="small" aria-label="Stunden öffnen" title="Stunden öffnen" />
+                <Button as="router-link" :to="`/attendance?classId=${data.classGroup.id}`" icon="pi pi-check-square" severity="secondary" text size="small" aria-label="Anwesenheit öffnen" title="Anwesenheit öffnen" />
+                <Button
+                  :icon="data.classGroup.archived ? 'pi pi-replay' : 'pi pi-box'"
+                  severity="secondary"
+                  text
+                  size="small"
+                  :disabled="busyClassId !== null"
+                  :aria-label="data.classGroup.archived ? 'Klasse wiederherstellen' : 'Klasse archivieren'"
+                  :title="data.classGroup.archived ? 'Klasse wiederherstellen' : 'Klasse archivieren'"
+                  @click="toggleArchiveClass(data.classGroup)"
+                />
+                <Button
+                  icon="pi pi-trash"
+                  severity="danger"
+                  text
+                  size="small"
+                  :disabled="busyClassId !== null"
+                  :aria-label="`Klasse ${data.classGroup.name} löschen`"
+                  @click="confirmDeleteClass(data.classGroup)"
+                />
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+    </Panel>
+
+    <Dialog v-model:visible="deleteDialogOpen" modal header="Klasse löschen" :style="{ width: '28rem', maxWidth: 'calc(100vw - 2rem)' }">
+      <p>Klasse <strong>{{ classToDelete?.name }}</strong> wirklich löschen? Das kann nicht rückgängig gemacht werden.</p>
+      <Message v-if="classActionError" severity="error" role="alert">{{ classActionError }}</Message>
+      <template #footer>
+        <Button label="Abbrechen" severity="secondary" size="small" :disabled="busyClassId !== null" @click="deleteDialogOpen = false" />
+        <Button label="Löschen" severity="danger" size="small" :loading="busyClassId !== null" :disabled="busyClassId !== null" @click="deleteClass" />
+      </template>
+    </Dialog>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
 import Button from 'openvue/button'
+import Checkbox from 'openvue/checkbox'
+import Column from 'openvue/column'
+import DataTable from 'openvue/datatable'
+import Dialog from 'openvue/dialog'
+import Panel from 'openvue/panel'
 import InputText from 'openvue/inputtext'
 import Message from 'openvue/message'
 import Tag from 'openvue/tag'
@@ -106,6 +146,10 @@ let cancelViewPrefetch: (() => void) | null = null
 const searchQuery = ref('')
 const showArchived = ref(false)
 const classes = ref<ClassOverviewEntry[]>([])
+const busyClassId = ref<string | null>(null)
+const classActionError = ref('')
+const classToDelete = ref<ClassGroup | null>(null)
+const deleteDialogOpen = ref(false)
 
 const visibleClasses = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
@@ -163,18 +207,43 @@ const loadData = async () => {
   }))
 }
 
-const getClassColorStyle = (color?: string) => {
-  const colorMap: Record<string, string> = {
-    white: '#f8f9fa',
-    green: '#7ed957',
-    red: '#ff6b6b',
-    blue: '#4dabf7',
-    orange: '#ffa94d',
-    yellow: '#ffd43b',
-    grey: '#adb5bd'
+const toggleArchiveClass = async (classGroup: ClassGroup) => {
+  if (busyClassId.value) return
+  busyClassId.value = classGroup.id
+  classActionError.value = ''
+  try {
+    await classGroups.update(classGroup.id, { archived: !classGroup.archived })
+    await loadData()
+  } catch (error) {
+    console.error('Failed to toggle class archive:', error)
+    classActionError.value = 'Der Klassenstatus konnte nicht geändert werden.'
+  } finally {
+    busyClassId.value = null
   }
+}
 
-  return { backgroundColor: color ? colorMap[color] || '#e0e0e0' : '#e0e0e0' }
+const confirmDeleteClass = (classGroup: ClassGroup) => {
+  classToDelete.value = classGroup
+  deleteDialogOpen.value = true
+  classActionError.value = ''
+}
+
+const deleteClass = async () => {
+  const selected = classToDelete.value
+  if (!selected || busyClassId.value) return
+  busyClassId.value = selected.id
+  classActionError.value = ''
+  try {
+    await classGroups.delete(selected.id)
+    deleteDialogOpen.value = false
+    classToDelete.value = null
+    await loadData()
+  } catch (error) {
+    console.error('Failed to delete class:', error)
+    classActionError.value = 'Die Klasse konnte nicht gelöscht werden.'
+  } finally {
+    busyClassId.value = null
+  }
 }
 
 onMounted(() => {
@@ -185,134 +254,3 @@ onUnmounted(() => {
   cancelViewPrefetch?.()
 })
 </script>
-
-<style scoped>
-.classes-overview {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.page-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.page-header h1 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.subtitle,
-.class-title p,
-.filter-note {
-  margin: 4px 0 0;
-  color: var(--color-muted);
-  font-size: 13px;
-}
-
-.primary-link,
-.ghost-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 10px;
-  border: 1px solid var(--surface-border);
-  border-radius: 4px;
-  color: var(--color-ink);
-  background: var(--surface-glass);
-  font-size: 13px;
-  text-decoration: none;
-}
-
-.primary-link:hover,
-.ghost-link:hover {
-  background: var(--surface-muted);
-}
-
-.filter-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 12px 16px;
-}
-
-.archive-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.classes-search {
-  flex: 1 1 200px;
-  min-width: 0;
-}
-
-.state-card {
-  padding: 16px;
-}
-
-.class-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
-}
-
-.class-card {
-  display: grid;
-  gap: 12px;
-  padding: 14px 16px;
-}
-
-.class-card-header,
-.class-metrics,
-.class-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.class-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.class-title h2 {
-  margin: 0;
-  font-size: 14px;
-}
-
-.class-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid var(--surface-border);
-}
-
-.class-metrics {
-  justify-content: flex-start;
-  gap: 24px;
-}
-
-.class-metrics div {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  color: var(--color-muted);
-  font-size: 12px;
-}
-
-.class-metrics strong {
-  color: var(--color-ink);
-  font-size: 15px;
-  font-variant-numeric: tabular-nums;
-}
-</style>
