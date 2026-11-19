@@ -18,13 +18,7 @@
         <div class="import-form">
           <div class="form-group">
             <label for="config-name">Name</label>
-            <input
-              id="config-name"
-              v-model="importName"
-              type="text"
-              class="form-input"
-              placeholder="z.B. Standard 20m"
-            />
+            <InputText id="config-name" v-model="importName" placeholder="z. B. Standard 20 m" fluid />
           </div>
 
           <div class="form-group">
@@ -69,8 +63,8 @@
             </Button>
           </div>
 
-          <div v-if="importError" class="error-message">{{ importError }}</div>
-          <div v-if="importSuccess" class="success-message">{{ importSuccess }}</div>
+          <Message v-if="importError" severity="error" role="alert">{{ importError }}</Message>
+          <Message v-if="importSuccess" severity="success" role="status">{{ importSuccess }}</Message>
         </div>
 
         <!-- Existing imported configs -->
@@ -116,6 +110,8 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -196,7 +192,7 @@ async function loadImportedConfigs() {
 }
 
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString(locale.value, { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return new Date(date).toLocaleDateString(locale.value, { day: 'numeric', month: 'numeric', year: 'numeric' })
 }
 
 onMounted(loadImportedConfigs)
@@ -224,27 +220,13 @@ onMounted(loadImportedConfigs)
   margin: 0.25rem 0 0;
 }
 
-.back-button {
-  background: none;
-  border: none;
-  color: #0f766e;
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  min-height: 44px;
-  white-space: nowrap;
-}
-
 .settings-sections {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 .config-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -267,7 +249,7 @@ onMounted(loadImportedConfigs)
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.75rem;
-  color: #0f766e;
+  color: var(--accent-strong);
   font-weight: 700;
 }
 
@@ -275,7 +257,7 @@ onMounted(loadImportedConfigs)
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  background: #f8fafc;
+  background: var(--surface-soft);
   border-radius: 12px;
   padding: 1rem;
 }
@@ -290,13 +272,6 @@ onMounted(loadImportedConfigs)
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-muted);
-}
-
-.form-input {
-  padding: 0.6rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  font-size: 0.875rem;
 }
 
 .file-input {
@@ -336,39 +311,6 @@ onMounted(loadImportedConfigs)
   cursor: pointer;
 }
 
-.btn-primary {
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  border: none;
-  background: #0f766e;
-  color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  min-height: 40px;
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.error-message {
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  background: #ffebee;
-  color: #c62828;
-  font-size: 0.8rem;
-}
-
-.success-message {
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  background: #e8f5e9;
-  color: #2e7d32;
-  font-size: 0.8rem;
-}
-
 .imported-list {
   border-top: 1px solid #e2e8f0;
   padding-top: 0.75rem;
@@ -395,8 +337,8 @@ onMounted(loadImportedConfigs)
   justify-content: space-between;
   align-items: baseline;
   font-size: 0.875rem;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-glass);
+  border: 1px solid var(--surface-border);
   border-radius: 6px;
   padding: 0.4rem 0.6rem;
 }
