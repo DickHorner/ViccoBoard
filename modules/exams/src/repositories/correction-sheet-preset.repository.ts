@@ -54,6 +54,9 @@ export function createDefaultCorrectionSheetPreset(
     showPointDeductions: false,
     showExamParts: true,
     showSignatureArea: false,
+    showSignatureDate: true,
+    signaturePositionX: 0,
+    signaturePositionY: 0,
     headerText: '',
     footerText: '',
     updatedAt: timestamp
