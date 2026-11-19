@@ -11,7 +11,7 @@
 .back-button {
   background: none;
   border: none;
-  color: #0066cc;
+  color: var(--accent-strong);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -46,7 +46,7 @@
 .form-input {
   padding: 0.75rem;
   border-radius: 6px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
 }
 
 .warning-banner {
@@ -82,7 +82,7 @@
   min-width: 80px;
   padding: 0.5rem;
   border-radius: 6px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
 }
 
 .grade-cell {
@@ -106,14 +106,14 @@
 }
 
 .btn-primary {
-  background: #667eea;
+  background: var(--accent-strong);
   color: white;
 }
 
 .btn-secondary {
   background: white;
-  border: 2px solid #ddd;
-  color: #333;
+  border: 2px solid var(--surface-border);
+  color: var(--color-ink);
 }
 
 .btn-small {
@@ -135,11 +135,11 @@
   padding: 0.75rem 1rem;
   border: 1px solid #eee;
   border-radius: 6px;
-  background: #fafafa;
+  background: var(--surface-soft);
 }
 
 .session-item--active {
-  border-color: #667eea;
+  border-color: var(--accent-strong);
   background: #f0f2ff;
 }
 
@@ -156,7 +156,7 @@
 
 .session-meta {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .loading-state {
@@ -168,8 +168,8 @@
 .spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
+  border: 3px solid var(--surface-soft);
+  border-top: 3px solid var(--accent-strong);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -196,7 +196,7 @@
 }
 
 .empty-state {
-  color: #666;
+  color: var(--color-muted);
   font-style: italic;
 }
 
