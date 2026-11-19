@@ -11,13 +11,13 @@
 .page-header h2 {
   margin: 0.5rem 0;
   font-size: 1.75rem;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .back-button {
   background: none;
   border: none;
-  color: #0066cc;
+  color: var(--accent-strong);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -35,8 +35,8 @@
 }
 
 .spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #0066cc;
+  border: 3px solid var(--surface-soft);
+  border-top: 3px solid var(--accent-strong);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -65,7 +65,7 @@
 .card h3 {
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .card-header {
@@ -82,7 +82,7 @@
 .form-select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 4px;
   font-size: 1rem;
   background-color: white;
@@ -91,7 +91,7 @@
 }
 
 .btn-primary {
-  background-color: #0066cc;
+  background-color: var(--accent-strong);
   color: white;
   border: none;
   border-radius: 4px;
@@ -103,11 +103,11 @@
 }
 
 .btn-primary:hover {
-  background-color: #0052a3;
+  background-color: var(--accent-strong);
 }
 
 .btn-primary:disabled {
-  background-color: #ccc;
+  background-color: var(--surface-border);
   cursor: not-allowed;
 }
 
@@ -131,13 +131,13 @@
 .grading-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .grading-table th {
-  background-color: #f5f5f5;
+  background-color: var(--surface-soft);
   font-weight: 600;
-  color: #333;
+  color: var(--color-ink);
   position: sticky;
   top: 0;
 }
@@ -154,7 +154,7 @@
 .time-input {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 4px;
   font-size: 0.875rem;
   font-family: 'Courier New', monospace;
@@ -164,7 +164,7 @@
 
 .time-input:focus {
   outline: none;
-  border-color: #0066cc;
+  border-color: var(--accent-strong);
   box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
 }
 
@@ -197,7 +197,7 @@
 }
 
 .grade-missing {
-  color: #999;
+  color: var(--color-subtle);
 }
 
 @media (max-width: 768px) {
