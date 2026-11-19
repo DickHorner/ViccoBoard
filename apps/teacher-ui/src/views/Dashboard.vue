@@ -190,7 +190,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Button from 'openvue/button'
 import Checkbox from 'openvue/checkbox'
