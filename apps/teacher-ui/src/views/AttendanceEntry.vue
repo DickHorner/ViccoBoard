@@ -22,6 +22,7 @@
     <div class="attendance-form">
       <section class="card">
         <h3>{{ t('ANWESENHEIT.liste') }} {{ currentDate }}</h3>
+        <p v-if="saveError" class="error-message" role="alert">{{ saveError }}</p>
         
         <div class="form-section">
           <label for="class-select" class="form-label">{{ t('KLASSEN.klasse') }}</label>
@@ -183,10 +184,6 @@
           </div>
 
           <p class="text-muted">Lokales Exportformat (CSV UTF-8): {{ attendanceExportFormat }}</p>
-          
-          <div v-if="saveError" class="error-message">
-            {{ saveError }}
-          </div>
           
           <div v-if="saveSuccess" class="success-message">
             {{ saveSuccess }}
