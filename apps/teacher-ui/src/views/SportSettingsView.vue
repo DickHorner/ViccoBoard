@@ -1,7 +1,7 @@
 <template>
-  <section class="sport-settings">
+  <section class="sport-settings sport-ui">
     <header class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <div>
         <h1>Sport-Konfiguration</h1>
         <p class="subtitle">Shuttle-Run-Setup, Status-Katalog, Tabellen und fachspezifische Einstellungen.</p>
@@ -10,7 +10,7 @@
 
     <div class="settings-sections">
       <!-- Shuttle-Run config import -->
-      <section class="config-card">
+      <section class="config-card app-card">
         <p class="eyebrow">Test-Konfiguration</p>
         <h2>{{ t('SETTINGS.shuttle-konfiguration') }}</h2>
         <p>{{ t('SETTINGS.shuttle-import') }}</p>
@@ -60,13 +60,13 @@
               <input type="checkbox" v-model="importAudio" />
               Audio-Signale aktivieren
             </label>
-            <button
-              class="btn-primary"
+            <Button
+             
               :disabled="!importFileContent || importing"
               @click="runImport"
             >
               {{ importing ? 'Importiere…' : 'Konfiguration importieren' }}
-            </button>
+            </Button>
           </div>
 
           <div v-if="importError" class="error-message">{{ importError }}</div>
@@ -88,7 +88,7 @@
       </section>
 
       <!-- Status catalog -->
-      <section class="config-card">
+      <section class="config-card app-card">
         <p class="eyebrow">Anwesenheit</p>
         <h2>Status-Katalog</h2>
         <p>Anwesenheitsstatus anpassen: Kürzel, Bezeichnung, Farbe und Reihenfolge.</p>
@@ -96,7 +96,7 @@
       </section>
 
       <!-- Table management -->
-      <section class="config-card">
+      <section class="config-card app-card">
         <p class="eyebrow">Bewertungstabellen</p>
         <h2>Tabellen &amp; Normen</h2>
         <p>Leistungstabellen für Cooper-Test, Shuttle-Run und weitere Disziplinen verwalten.</p>
@@ -104,7 +104,7 @@
       </section>
 
       <!-- Grade categories -->
-      <section class="config-card">
+      <section class="config-card app-card">
         <p class="eyebrow">Bewertung</p>
         <h2>Bewertungskategorien</h2>
         <p>Kriterienkataloge, Zeitgrenzen und Gewichtungen für alle Bewertungsformen einsehen.</p>
@@ -115,6 +115,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
