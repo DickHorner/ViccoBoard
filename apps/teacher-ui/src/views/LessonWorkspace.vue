@@ -71,8 +71,9 @@
         <section class="panel">
           <h2>Zufallsschüler</h2>
           <p class="section-hint">Wählt Schüler zufällig und merkt sich lokal, wer in dieser Runde bereits dran war.</p>
+          <p v-if="loadingStudents" class="section-hint" role="status">Schüler werden geladen…</p>
           <div class="random-actions">
-            <button class="primary-link random-button" @click="selectRandomStudent" :disabled="classStudents.length === 0">
+            <button class="primary-link random-button" @click="selectRandomStudent" :disabled="loadingStudents || classStudents.length === 0">
               Schüler ziehen
             </button>
             <button class="ghost-button" @click="resetRandomHistory" :disabled="randomHistory.length === 0">
@@ -135,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import { resolveLessonWorkspaceSubject, buildSportToolEntries, formatToolLabel, SPORT_TOOL_ROUTES } from '../utils/lesson-workspace'
@@ -143,6 +144,7 @@ import { getStudentsBridge, initializeStudentsBridge } from '../composables/useS
 import { selectRandomStudentId } from '../utils/random-student'
 import type { ClassGroup, Lesson, Sport, Student, Subject } from '@viccoboard/core'
 import { formatGermanDateTime } from '../utils/locale-format'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
 const SportBridge = getSportBridge()
@@ -156,6 +158,7 @@ const classGroup = ref<ClassGroup | null>(null)
 const subject = ref<Subject | null>(null)
 const recentSessions = ref<Array<{ id: string; toolLabel: string; startedAt: Date; resumeLink: string }>>([])
 const classStudents = ref<Student[]>([])
+const loadingStudents = ref(true)
 const randomHistory = ref<string[]>([])
 const selectedRandomStudent = ref<Student | null>(null)
 const randomSelectionError = ref('')
@@ -228,25 +231,46 @@ const loadData = async () => {
     subject.value = loadedSubject
     randomHistory.value = loadedLesson.randomStudentHistory ?? []
     selectedRandomStudent.value = null
-    classStudents.value = await studentsBridge.studentRepository.findByClassGroup(loadedClassGroup.id)
-
-    const allSessions = await SportBridge.toolSessionRepository.findByClassGroup(loadedClassGroup.id)
-    const ctx = { lessonId: loadedLesson.id, classGroupId: loadedClassGroup.id }
-    recentSessions.value = allSessions
-      .filter((session) => session.lessonId === loadedLesson.id)
-      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
-      .slice(0, MAX_RECENT_SESSIONS)
-      .map((s) => ({
-        id: s.id,
-        toolLabel: formatToolLabel(s.toolType),
-        startedAt: s.startedAt,
-        resumeLink: buildResumeLink(s, ctx),
-      }))
+    loading.value = false
+    await nextTick()
+    recordRouteContentReady('lesson-workspace')
+    void loadSecondaryData(loadedLesson, loadedClassGroup)
   } catch (error) {
     console.error('Failed to load lesson workspace:', error)
     loadError.value = 'Der Stundenarbeitsbereich konnte nicht geladen werden.'
   } finally {
     loading.value = false
+  }
+}
+
+const loadSecondaryData = async (loadedLesson: Lesson, loadedClassGroup: ClassGroup) => {
+  const [studentsResult, sessionsResult] = await Promise.allSettled([
+    studentsBridge.studentRepository.findByClassGroup(loadedClassGroup.id),
+    SportBridge.toolSessionRepository.findByClassGroup(loadedClassGroup.id)
+  ])
+
+  if (studentsResult.status === 'fulfilled') {
+    classStudents.value = studentsResult.value
+  } else {
+    console.error('Failed to load class students:', studentsResult.reason)
+    randomSelectionError.value = 'Schüler konnten nicht geladen werden.'
+  }
+  loadingStudents.value = false
+
+  if (sessionsResult.status === 'fulfilled') {
+    const ctx = { lessonId: loadedLesson.id, classGroupId: loadedClassGroup.id }
+    recentSessions.value = sessionsResult.value
+      .filter((session) => session.lessonId === loadedLesson.id)
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+      .slice(0, MAX_RECENT_SESSIONS)
+      .map((session) => ({
+        id: session.id,
+        toolLabel: formatToolLabel(session.toolType),
+        startedAt: session.startedAt,
+        resumeLink: buildResumeLink(session, ctx)
+      }))
+  } else {
+    console.error('Failed to load recent tool sessions:', sessionsResult.reason)
   }
 }
 
