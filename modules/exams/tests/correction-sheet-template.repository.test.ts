@@ -22,7 +22,7 @@ describe('CorrectionSheetTemplateRepository', () => {
     await storage.initialize('test-password');
     storage.registerMigration(new InitialSchemaMigration(storage));
     await storage.migrate();
-    templates = new CorrectionSheetTemplateRepository(storage.getAdapter());
+    templates = new CorrectionSheetTemplateRepository(storage.getAdapter(), new ExamRepository(storage.getAdapter()));
   });
 
   afterEach(async () => {
@@ -39,7 +39,7 @@ describe('CorrectionSheetTemplateRepository', () => {
     expect(saved.preset.examId).toBe('');
     expect(saved.preset.headerText).toBe('Rückmeldung zum Lernstand');
 
-    const reopened = new CorrectionSheetTemplateRepository(storage.getAdapter());
+    const reopened = new CorrectionSheetTemplateRepository(storage.getAdapter(), new ExamRepository(storage.getAdapter()));
     expect(await reopened.findAll()).toEqual([
       expect.objectContaining({ id: saved.id, name: 'Klausur Rückmeldung' })
     ]);
