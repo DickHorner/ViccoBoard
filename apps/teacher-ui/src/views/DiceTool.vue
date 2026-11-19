@@ -202,7 +202,7 @@ onMounted(async () => {
 
 .form-group label {
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--color-muted);
   font-weight: 500;
 }
 
@@ -241,7 +241,7 @@ onMounted(async () => {
 .result-display {
   font-size: 4rem;
   font-weight: 900;
-  color: #0f172a;
+  color: var(--color-ink);
   min-width: 5rem;
   text-align: center;
   line-height: 1;
@@ -257,7 +257,7 @@ onMounted(async () => {
 }
 
 .empty-hint {
-  color: #64748b;
+  color: var(--color-muted);
   font-style: italic;
 }
 
@@ -288,7 +288,7 @@ onMounted(async () => {
 }
 
 .roll-meta {
-  color: #475569;
+  color: var(--color-muted);
   font-size: 0.875rem;
 }
 
