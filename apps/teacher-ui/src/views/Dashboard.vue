@@ -1,13 +1,23 @@
 <template>
   <div class="dashboard-view">
     <div class="page-header">
-      <p class="dashboard-eyebrow">Startseite</p>
-      <h2>Start</h2>
-      <p class="page-description">Schneller Einstieg in die aktuelle Arbeit: Stunde, Unterricht und Organisation.</p>
+      <div>
+        <h2>Dashboard</h2>
+        <p class="page-description">Stunden, Klassen und aktuelle Aktivitäten.</p>
+      </div>
+      <details class="dashboard-config">
+        <summary><i class="pi pi-cog" aria-hidden="true"></i> Anpassen</summary>
+        <div class="dashboard-config-options">
+          <label v-for="panel in dashboardPanels" :key="panel.id">
+            <input v-model="visiblePanels" type="checkbox" :value="panel.id" />
+            {{ panel.label }}
+          </label>
+        </div>
+      </details>
     </div>
 
     <div class="focus-grid">
-      <section class="card app-card focus-card focus-card-primary">
+      <section v-if="panelIsVisible('next')" class="card app-card focus-card focus-card-primary">
         <h3>Jetzt / Als Nächstes</h3>
         <div v-if="loadingWorkspace" class="loading-state-small">Unterrichtsdaten werden geladen…</div>
         <div v-else-if="workspaceError" class="error-state">{{ workspaceError }}</div>
@@ -37,7 +47,7 @@
         </div>
       </section>
 
-      <section class="card app-card focus-card">
+      <section v-if="panelIsVisible('teaching')" class="card app-card focus-card">
         <h3>Unterricht</h3>
         <div class="card-links">
           <RouterLink v-for="link in instructionLinks" :key="link.to" :to="link.to" class="dashboard-link">
@@ -47,7 +57,7 @@
         </div>
       </section>
 
-      <section class="card app-card focus-card">
+      <section v-if="panelIsVisible('organization')" class="card app-card focus-card">
         <h3>Organisation</h3>
         <div class="card-links">
           <RouterLink v-for="link in organizationLinks" :key="link.to" :to="link.to" class="dashboard-link">
@@ -57,7 +67,7 @@
         </div>
       </section>
 
-      <section class="card app-card focus-card focus-card-wide">
+      <section v-if="panelIsVisible('today')" class="card app-card focus-card focus-card-wide">
         <div class="card-header">
           <h3>Heute</h3>
           <RouterLink to="/schedule" class="btn-text">Zum Stundenplan</RouterLink>
@@ -82,7 +92,7 @@
     </div>
     
     <div class="dashboard-grid">
-      <section class="card app-card classes-card">
+      <section v-if="panelIsVisible('classes')" class="card app-card classes-card">
         <div class="card-header">
           <h3>{{ t('KLASSEN.title') }}</h3>
           <Button icon="pi pi-plus" :label="t('KLASSEN.hinzu')" @click="showCreateModal = true" />
@@ -169,25 +179,22 @@
         </div>
       </section>
       
-      <section class="card app-card">
+      <section v-if="panelIsVisible('shortcuts')" class="card app-card">
         <h3>Schnellzugriffe</h3>
         <div class="card-content">
           <button class="action-button" @click="showCreateModal = true">
-            <span class="action-icon">📚</span>
-            <span>Neue Klasse erstellen</span>
+            <i class="pi pi-plus" aria-hidden="true"></i> Neue Klasse
           </button>
           <RouterLink to="/students" class="action-button">
-            <span class="action-icon">👥</span>
-            <span>Alle Schüler anzeigen</span>
+            <i class="pi pi-users" aria-hidden="true"></i> Schüler
           </RouterLink>
           <RouterLink to="/attendance" class="action-button">
-            <span class="action-icon">✓</span>
-            <span>Anwesenheit erfassen</span>
+            <i class="pi pi-check-square" aria-hidden="true"></i> Anwesenheit
           </RouterLink>
         </div>
       </section>
       
-      <section class="card app-card">
+      <section v-if="panelIsVisible('activity')" class="card app-card">
         <h3>Letzte Aktivitäten</h3>
         <div class="card-content">
           <!-- Loading State -->
@@ -302,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import Button from 'openvue/button'
 import Dialog from 'openvue/dialog'
 import InputNumber from 'openvue/inputnumber'
@@ -364,6 +371,44 @@ const {
   getActivityIcon,
   formatDate
 } = useDashboardView()
+
+const dashboardPanels = [
+  { id: 'next', label: 'Jetzt / Als Nächstes' },
+  { id: 'teaching', label: 'Unterricht' },
+  { id: 'organization', label: 'Organisation' },
+  { id: 'today', label: 'Heute' },
+  { id: 'classes', label: 'Klassen' },
+  { id: 'shortcuts', label: 'Schnellzugriffe' },
+  { id: 'activity', label: 'Letzte Aktivitäten' }
+] as const
+
+type DashboardPanelId = (typeof dashboardPanels)[number]['id']
+const preferenceKey = 'viccoboard-dashboard-panels'
+
+const readVisiblePanels = (): DashboardPanelId[] => {
+  try {
+    const saved = window.localStorage.getItem(preferenceKey)
+    if (!saved) return dashboardPanels.map(panel => panel.id)
+    const parsed: unknown = JSON.parse(saved)
+    if (Array.isArray(parsed) && parsed.every(id => dashboardPanels.some(panel => panel.id === id))) {
+      return parsed as DashboardPanelId[]
+    }
+  } catch (error) {
+    console.warn('Dashboard-Einstellung kann nicht gelesen werden:', error)
+  }
+  return dashboardPanels.map(panel => panel.id)
+}
+
+const visiblePanels = ref<DashboardPanelId[]>(readVisiblePanels())
+const panelIsVisible = (id: DashboardPanelId) => visiblePanels.value.includes(id)
+
+watch(visiblePanels, selected => {
+  try {
+    window.localStorage.setItem(preferenceKey, JSON.stringify(selected))
+  } catch (error) {
+    console.warn('Dashboard-Einstellung kann nicht gespeichert werden:', error)
+  }
+})
 
 const schoolYearOptions = computed(() => [
   { label: `${t('KLASSEN.schuljahr')}: ${t('COMMON.alle') || 'Alle'}`, value: '' },

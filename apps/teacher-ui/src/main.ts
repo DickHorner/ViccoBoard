@@ -11,9 +11,12 @@ import { initializeStudentsBridge } from './composables/useStudentsBridge'
 import { initializeExamsBridge } from './composables/useExamsBridge'
 import { initializePlanningBridge } from './composables/usePlanningBridge'
 import { openVueOptions } from './openvue'
+import { initializeColorScheme } from './composables/useColorScheme'
 import '@openvue/openicons/primeicons.css'
 import './volt.css'
 import './style.css'
+
+initializeColorScheme()
 
 const app = createApp(App)
 const pinia = createPinia()

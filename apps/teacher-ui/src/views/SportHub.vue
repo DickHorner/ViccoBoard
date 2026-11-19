@@ -32,9 +32,10 @@
 
     <div class="hub-grid">
       <RouterLink v-for="entry in entries" :key="entry.to" :to="entry.to" class="hub-card app-card">
-        <p class="eyebrow">{{ entry.eyebrow }}</p>
-        <h2>{{ entry.title }}</h2>
-        <p>{{ entry.description }}</p>
+        <span class="hub-link-category">{{ entry.eyebrow }}</span>
+        <strong>{{ entry.title }}</strong>
+        <span class="hub-link-description">{{ entry.description }}</span>
+        <i class="pi pi-angle-right" aria-hidden="true"></i>
       </RouterLink>
     </div>
   </section>
@@ -234,71 +235,117 @@ onMounted(() => {
 .subject-hub {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
 }
 
-.page-header {
+.page-header,
+.panel-header {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
   align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .page-header h1,
-.hub-card h2 {
+.panel-header h2 {
   margin: 0;
+  font-size: 20px;
+  font-weight: 650;
 }
 
-.subtitle,
-.hub-card p {
+.subtitle {
+  margin: 4px 0 0;
   color: var(--color-muted);
+  font-size: 13.5px;
 }
 
 .metrics-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: 12px;
 }
 
 .metric-card {
-  padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 5px;
+  padding: 14px 16px;
 }
 
 .metric-card strong {
-  font-size: 1.5rem;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
 }
 
 .metric-card span {
+  order: -1;
   color: var(--color-muted);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .hub-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 0 24px;
+  padding: 4px 16px;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  background: var(--surface-glass);
 }
 
 .hub-card {
-  padding: 1.25rem;
-  text-decoration: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: center;
+  gap: 3px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--surface-border);
+  background: transparent;
   color: var(--color-ink);
+  text-decoration: none;
+  box-shadow: none;
+  border-radius: 0;
 }
 
-.hub-card:focus-visible {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 2px;
-}
-
-.eyebrow {
-  margin: 0 0 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
+.hub-card:hover {
   color: var(--accent-strong);
-  font-weight: 700;
 }
+
+.hub-card:focus-visible,
+.ghost-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: -2px;
+}
+
+.hub-link-category {
+  grid-column: 1 / -1;
+  color: var(--color-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hub-card strong {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.hub-link-description {
+  grid-column: 1;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.hub-card .pi {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  align-self: center;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
 </style>
