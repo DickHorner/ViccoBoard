@@ -7,9 +7,7 @@
       </div>
       <div class="page-header__actions">
         <span class="summary-pill">{{ t('UEBUNGEN.spiele-anzahl', { count: filteredEntries.length }) }}</span>
-        <button class="add-button" type="button" @click="openAddModal">
-          + {{ t('UEBUNGEN.uebung-hinzu') }}
-        </button>
+        <Button :label="t('UEBUNGEN.uebung-hinzu')" icon="pi pi-plus" @click="openAddModal" />
       </div>
     </header>
 
@@ -23,7 +21,7 @@
 
     <!-- Search -->
     <div class="search-row">
-      <input
+      <InputText
         v-model="searchQuery"
         type="search"
         class="search-input"
@@ -58,32 +56,17 @@
     <div class="filter-bar">
       <div class="filter-group">
         <label class="filter-label" for="phase-select">{{ t('UEBUNGEN.phase') }}</label>
-        <select id="phase-select" v-model="selectedPhase" class="filter-select">
-          <option value="">{{ t('UEBUNGEN.alle') }}</option>
-          <option value="erwaermung">{{ t('UEBUNGEN.phase-erwaermung') }}</option>
-          <option value="hauptteil">{{ t('UEBUNGEN.phase-hauptteil') }}</option>
-          <option value="schluss">{{ t('UEBUNGEN.phase-schluss') }}</option>
-        </select>
+        <Select inputId="phase-select" v-model="selectedPhase" :options="phaseFilterOptions" optionLabel="label" optionValue="value" class="filter-select" />
       </div>
 
       <div class="filter-group">
         <label class="filter-label" for="difficulty-select">{{ t('UEBUNGEN.schwierigkeit') }}</label>
-        <select id="difficulty-select" v-model="selectedDifficulty" class="filter-select">
-          <option value="">{{ t('UEBUNGEN.alle') }}</option>
-          <option value="unbekannt">{{ t('UEBUNGEN.schwierigkeit-unbekannt') }}</option>
-          <option value="anfaenger">{{ t('UEBUNGEN.schwierigkeit-anfaenger') }}</option>
-          <option value="fortgeschrittene">{{ t('UEBUNGEN.schwierigkeit-fortgeschrittene') }}</option>
-          <option value="profis">{{ t('UEBUNGEN.schwierigkeit-profis') }}</option>
-        </select>
+        <Select inputId="difficulty-select" v-model="selectedDifficulty" :options="difficultyFilterOptions" optionLabel="label" optionValue="value" class="filter-select" />
       </div>
 
       <div class="filter-group">
         <label class="filter-label" for="sort-select">{{ t('UEBUNGEN.sortieren-nach') }}</label>
-        <select id="sort-select" v-model="sortBy" class="filter-select">
-          <option value="name">{{ t('UEBUNGEN.sortierung-name') }}</option>
-          <option value="duration">{{ t('UEBUNGEN.sortierung-dauer') }}</option>
-          <option value="difficulty">{{ t('UEBUNGEN.sortierung-schwierigkeit') }}</option>
-        </select>
+        <Select inputId="sort-select" v-model="sortBy" :options="sortOptions" optionLabel="label" optionValue="value" class="filter-select" />
       </div>
     </div>
 
@@ -174,30 +157,21 @@
     </div>
 
     <!-- Add / Edit Modal -->
-    <div
-      v-if="showModal"
-      class="modal-overlay"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="editingEntry ? t('UEBUNGEN.formular-bearbeiten') : t('UEBUNGEN.formular-neu')"
-      @click.self="closeModal"
-    >
-      <div class="modal">
-        <div class="modal-header">
-          <h2>{{ editingEntry ? t('UEBUNGEN.formular-bearbeiten') : t('UEBUNGEN.formular-neu') }}</h2>
-          <button class="close-button" type="button" :aria-label="t('UEBUNGEN.abbrechen')" @click="closeModal">×</button>
-        </div>
+    <Dialog :visible="showModal" modal :closable="!saving"
+      :header="editingEntry ? t('UEBUNGEN.formular-bearbeiten') : t('UEBUNGEN.formular-neu')"
+      :style="{ width: '48rem', maxWidth: 'calc(100vw - 2rem)' }"
+      @update:visible="visible => { if (!visible && !saving) closeModal() }">
 
         <form class="modal-content" @submit.prevent="saveModal">
           <div class="form-grid">
             <div class="form-group form-group--wide">
               <label for="game-name">{{ t('UEBUNGEN.name') }} *</label>
-              <input id="game-name" v-model="form.name" type="text" maxlength="120" required />
+              <InputText id="game-name" v-model="form.name" maxlength="120" required fluid />
             </div>
 
             <div class="form-group form-group--wide">
               <label for="game-tags">{{ t('UEBUNGEN.schlagworte') }}</label>
-              <input
+              <InputText
                 id="game-tags"
                 v-model="form.tagsText"
                 type="text"
@@ -207,21 +181,12 @@
 
             <div class="form-group">
               <label for="game-phase">{{ t('UEBUNGEN.phase') }}</label>
-              <select id="game-phase" v-model="form.phase">
-                <option value="erwaermung">{{ t('UEBUNGEN.phase-erwaermung') }}</option>
-                <option value="hauptteil">{{ t('UEBUNGEN.phase-hauptteil') }}</option>
-                <option value="schluss">{{ t('UEBUNGEN.phase-schluss') }}</option>
-              </select>
+              <Select inputId="game-phase" v-model="form.phase" :options="phaseOptions" optionLabel="label" optionValue="value" fluid />
             </div>
 
             <div class="form-group">
               <label for="game-difficulty">{{ t('UEBUNGEN.schwierigkeit') }}</label>
-              <select id="game-difficulty" v-model="form.difficulty">
-                <option value="unbekannt">{{ t('UEBUNGEN.schwierigkeit-unbekannt') }}</option>
-                <option value="anfaenger">{{ t('UEBUNGEN.schwierigkeit-anfaenger') }}</option>
-                <option value="fortgeschrittene">{{ t('UEBUNGEN.schwierigkeit-fortgeschrittene') }}</option>
-                <option value="profis">{{ t('UEBUNGEN.schwierigkeit-profis') }}</option>
-              </select>
+              <Select inputId="game-difficulty" v-model="form.difficulty" :options="difficultyOptions" optionLabel="label" optionValue="value" fluid />
             </div>
 
             <div class="form-group">
@@ -231,37 +196,37 @@
 
             <div class="form-group">
               <label for="game-age-group">{{ t('UEBUNGEN.altersgruppe') }}</label>
-              <input id="game-age-group" v-model="form.ageGroup" type="text" maxlength="160" />
+              <InputText id="game-age-group" v-model="form.ageGroup" maxlength="160" fluid />
             </div>
 
             <div class="form-group">
               <label for="game-material">{{ t('UEBUNGEN.material') }}</label>
-              <input id="game-material" v-model="form.material" type="text" maxlength="240" />
+              <InputText id="game-material" v-model="form.material" maxlength="240" fluid />
             </div>
 
             <div class="form-group form-group--wide">
               <label for="game-goal">{{ t('UEBUNGEN.ziele') }}</label>
-              <textarea id="game-goal" v-model="form.goal" rows="2"></textarea>
+              <Textarea id="game-goal" v-model="form.goal" rows="2" fluid />
             </div>
 
             <div class="form-group form-group--wide">
               <label for="game-description">{{ t('UEBUNGEN.detail-beschreibung') }}</label>
-              <textarea id="game-description" v-model="form.description" rows="5"></textarea>
+              <Textarea id="game-description" v-model="form.description" rows="5" fluid />
             </div>
 
             <div class="form-group form-group--wide">
               <label for="game-variation">{{ t('UEBUNGEN.detail-variation') }}</label>
-              <textarea id="game-variation" v-model="form.variation" rows="3"></textarea>
+              <Textarea id="game-variation" v-model="form.variation" rows="3" fluid />
             </div>
 
             <div class="form-group form-group--wide">
               <label for="game-notes">{{ t('UEBUNGEN.detail-hinweise') }}</label>
-              <textarea id="game-notes" v-model="form.notes" rows="3"></textarea>
+              <Textarea id="game-notes" v-model="form.notes" rows="3" fluid />
             </div>
 
             <div class="form-group form-group--wide">
               <label for="game-video-url">{{ t('UEBUNGEN.video-url') }}</label>
-              <input
+              <InputText
                 id="game-video-url"
                 v-model="form.videoUrl"
                 type="url"
@@ -276,30 +241,24 @@
           </div>
 
           <div class="modal-footer">
-            <button
-              v-if="editingEntry?.isCustom"
-              class="cancel-button"
-              type="button"
-              :disabled="saving"
-              @click="deleteEditingEntry"
-            >
-              {{ t('UEBUNGEN.loeschen') }}
-            </button>
-            <button class="cancel-button" type="button" :disabled="saving" @click="closeModal">
-              {{ t('UEBUNGEN.abbrechen') }}
-            </button>
-            <button class="save-button" type="submit" :disabled="saving">
-              {{ saving ? t('UEBUNGEN.speichern-laeuft') : t('UEBUNGEN.speichern') }}
-            </button>
+            <Button v-if="editingEntry?.isCustom" severity="danger" outlined
+              type="button" :disabled="saving" :label="t('UEBUNGEN.loeschen')" @click="deleteEditingEntry" />
+            <Button severity="secondary" type="button" :disabled="saving" :label="t('UEBUNGEN.abbrechen')" @click="closeModal" />
+            <Button type="submit" :loading="saving" :disabled="saving"
+              :label="saving ? t('UEBUNGEN.speichern-laeuft') : t('UEBUNGEN.speichern')" />
           </div>
         </form>
-      </div>
-    </div>
+    </Dialog>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import Button from 'openvue/button'
+import Dialog from 'openvue/dialog'
+import InputText from 'openvue/inputtext'
+import Select from 'openvue/select'
+import Textarea from 'openvue/textarea'
 import { useI18n } from 'vue-i18n'
 import type { Sport } from '@viccoboard/core'
 import { getSportBridge } from '../composables/useSportBridge'
@@ -323,6 +282,30 @@ const selectedTag = ref<string | null>(null)
 const selectedPhase = ref<Sport.GamePhase | ''>('')
 const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
+const phaseOptions = computed(() => [
+  { label: t('UEBUNGEN.phase-erwaermung'), value: 'erwaermung' },
+  { label: t('UEBUNGEN.phase-hauptteil'), value: 'hauptteil' },
+  { label: t('UEBUNGEN.phase-schluss'), value: 'schluss' }
+])
+const phaseFilterOptions = computed(() => [
+  { label: t('UEBUNGEN.alle'), value: '' },
+  ...phaseOptions.value
+])
+const difficultyOptions = computed(() => [
+  { label: t('UEBUNGEN.schwierigkeit-unbekannt'), value: 'unbekannt' },
+  { label: t('UEBUNGEN.schwierigkeit-anfaenger'), value: 'anfaenger' },
+  { label: t('UEBUNGEN.schwierigkeit-fortgeschrittene'), value: 'fortgeschrittene' },
+  { label: t('UEBUNGEN.schwierigkeit-profis'), value: 'profis' }
+])
+const difficultyFilterOptions = computed(() => [
+  { label: t('UEBUNGEN.alle'), value: '' },
+  ...difficultyOptions.value
+])
+const sortOptions = computed(() => [
+  { label: t('UEBUNGEN.sortierung-name'), value: 'name' },
+  { label: t('UEBUNGEN.sortierung-dauer'), value: 'duration' },
+  { label: t('UEBUNGEN.sortierung-schwierigkeit'), value: 'difficulty' }
+])
 
 interface GameForm {
   name: string
