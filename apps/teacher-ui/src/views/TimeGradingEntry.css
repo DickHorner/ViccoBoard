@@ -12,18 +12,18 @@
 .page-header h2 {
   margin: 0.5rem 0;
   font-size: 1.75rem;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .page-description {
-  color: #666;
+  color: var(--color-muted);
   margin: 0.5rem 0;
 }
 
 .back-button {
   background: none;
   border: none;
-  color: #0066cc;
+  color: var(--accent-strong);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -46,7 +46,7 @@
 .card h3 {
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .card-header {
@@ -74,20 +74,20 @@
 
 .info-item label {
   font-weight: 600;
-  color: #666;
+  color: var(--color-muted);
   font-size: 0.875rem;
   margin-bottom: 0.25rem;
 }
 
 .info-item span {
-  color: #333;
+  color: var(--color-ink);
 }
 
 .info-note {
   display: block;
   padding: 0.75rem;
   background-color: #e6f7ff;
-  border-left: 3px solid #0066cc;
+  border-left: 3px solid var(--accent-strong);
   margin-bottom: 1rem;
   font-size: 0.875rem;
 }
@@ -107,13 +107,13 @@
 .time-table td {
   padding: 0.75rem 0.5rem;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .time-table th {
-  background-color: #f5f5f5;
+  background-color: var(--surface-soft);
   font-weight: 600;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .student-name {
@@ -127,7 +127,7 @@
 .time-input {
   width: 120px;
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 4px;
   text-align: center;
   font-size: 0.875rem;
@@ -136,7 +136,7 @@
 
 .time-input:focus {
   outline: none;
-  border-color: #0066cc;
+  border-color: var(--accent-strong);
   box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
 }
 
@@ -155,7 +155,7 @@
 }
 
 .grade-missing {
-  color: #999;
+  color: var(--color-subtle);
 }
 
 .highlight-row {
@@ -181,12 +181,12 @@
 .error-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #0066cc;
+  border: 3px solid var(--surface-soft);
+  border-top: 3px solid var(--accent-strong);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -209,22 +209,22 @@
 }
 
 .btn-primary {
-  background-color: #0066cc;
+  background-color: var(--accent-strong);
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #0052a3;
+  background-color: var(--accent-strong);
 }
 
 .btn-primary:disabled {
-  background-color: #ccc;
+  background-color: var(--surface-border);
   cursor: not-allowed;
 }
 
 .btn-secondary {
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: var(--surface-soft);
+  color: var(--color-ink);
 }
 
 .btn-small {
@@ -263,7 +263,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .modal-header h3 {
@@ -276,7 +276,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #666;
+  color: var(--color-muted);
   padding: 0;
   width: 32px;
   height: 32px;
@@ -294,13 +294,13 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .form-group textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 4px;
   font-size: 1rem;
   font-family: inherit;
