@@ -107,7 +107,7 @@
 }
 
 .method-card p {
-  color: #64748b;
+  color: var(--color-muted);
   font-size: 0.875rem;
   text-align: center;
   margin: 0;
@@ -140,7 +140,7 @@
 
 .emoji-btn span {
   font-size: 0.875rem;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .emoji-btn:hover {
@@ -251,7 +251,7 @@
 .session-meta {
   margin-left: 0.75rem;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .session-stats {
@@ -259,13 +259,13 @@
   align-items: center;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 /* Analysis */
@@ -284,7 +284,7 @@
 }
 
 .bar-track {
-  background: #f1f5f9;
+  background: var(--surface-soft);
   border-radius: 999px;
   height: 20px;
   overflow: hidden;
@@ -309,7 +309,7 @@
 
 .analysis-summary {
   margin-top: 0.5rem;
-  color: #64748b;
+  color: var(--color-muted);
   font-size: 0.875rem;
 }
 
