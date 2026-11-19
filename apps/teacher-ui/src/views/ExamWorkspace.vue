@@ -97,7 +97,7 @@ const statusLabel = computed(() => {
   if (exam.value?.status === 'in-progress') return 'In Bearbeitung'
   return 'Entwurf'
 })
-const statusSeverity = computed(() => {
+const statusSeverity = computed<'secondary' | 'info' | 'success'>(() => {
   if (exam.value?.status === 'completed') return 'success'
   if (exam.value?.status === 'in-progress') return 'info'
   return 'secondary'
