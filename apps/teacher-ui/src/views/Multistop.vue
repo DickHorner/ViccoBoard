@@ -1,11 +1,11 @@
 <template>
-  <div class="multistop-view">
+  <div class="multistop-view sport-ui">
     <div class="page-header">
       <h2>{{ t('MULTISTOP.bewerte') }}</h2>
       <p class="page-description">{{ t('MULTISTOP.capture-time') }}</p>
     </div>
 
-    <div class="card">
+    <div class="card app-card">
       <div class="form-group">
         <label>{{ t('KLASSEN.klasse') }}</label>
         <select v-model="selectedClassId" class="form-input" @change="loadStudents">
@@ -65,23 +65,23 @@
         </div>
 
         <div class="stopwatch-controls">
-          <button
+          <Button
             v-if="!timer.isRunning && !timer.isStopped"
-            class="btn-primary btn-small"
+           
             :disabled="!timer.studentId"
             @click="startTimer(index)"
           >
             ▶️
-          </button>
+          </Button>
           <button v-if="timer.isRunning" class="btn-warning btn-small" @click="stopTimer(index)">
             ⏹️ {{ t('COMMON.stop') || 'Stop' }}
           </button>
           <button v-if="timer.isStopped" class="btn-success btn-small" @click="saveTime(index)">
             💾 {{ t('COMMON.save') }}
           </button>
-          <button v-if="timer.time > 0" class="btn-secondary btn-small" @click="resetTimer(index)">
+          <Button severity="secondary" outlined v-if="timer.time > 0" @click="resetTimer(index)">
             🔄
-          </button>
+          </Button>
         </div>
 
         <div v-if="timer.laps.length > 0" class="lap-times-mini">
@@ -90,30 +90,30 @@
       </div>
     </div>
 
-    <div v-if="selectedClassId && numberOfStopwatches > 0" class="card">
+    <div v-if="selectedClassId && numberOfStopwatches > 0" class="card app-card">
       <div class="global-controls">
-        <button class="btn-primary" :disabled="allRunning" @click="startAllTimers">
+        <Button :disabled="allRunning" @click="startAllTimers">
           ▶️ {{ t('COMMON.start-all') || 'Start All' }}
-        </button>
+        </Button>
         <button class="btn-warning" :disabled="noneRunning" @click="stopAllTimers">
           ⏹️ {{ t('COMMON.stop-all') || 'Stop All' }}
         </button>
-        <button class="btn-secondary" @click="resetAllTimers">
+        <Button severity="secondary" outlined @click="resetAllTimers">
           🔄 {{ t('COMMON.reset-all') || 'Reset All' }}
-        </button>
+        </Button>
         <button class="btn-success" :disabled="!hasStoppedTimers" @click="saveAllTimes">
           💾 {{ t('COMMON.save-all') || 'Alles speichern' }}
         </button>
       </div>
     </div>
 
-    <div v-if="capturedTimes.length > 0" class="card">
+    <div v-if="capturedTimes.length > 0" class="card app-card">
       <div class="card-header">
         <h3>{{ t('MULTISTOP.captured-times') }}</h3>
         <div class="header-actions">
-          <button class="btn-secondary btn-small" @click="exportTimes">
+          <Button severity="secondary" outlined @click="exportTimes">
             📊 {{ t('COMMON.export') || 'Exportieren' }}
-          </button>
+          </Button>
         </div>
       </div>
       <div class="captured-times-list">
@@ -124,9 +124,9 @@
           </div>
           <div class="record-meta">
             <small>{{ formatGermanTime(new Date(record.timestamp)) }}</small>
-            <button class="btn-icon btn-danger btn-small" @click="deleteRecord(index)">
+            <Button severity="danger" class="btn-icon" @click="deleteRecord(index)">
               🗑️
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -140,14 +140,14 @@
               {{ cat.name }}
             </option>
           </select>
-          <button class="btn-primary" :disabled="!selectedCategoryId || sending" @click="sendToMittelstrecke">
+          <Button :disabled="!selectedCategoryId || sending" @click="sendToMittelstrecke">
             {{ sending ? '…' : '→' }} {{ t('MITTELSTRECKE.bewerte') || 'Zur Bewertung' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
 
-    <div v-if="selectedClassId" class="card">
+    <div v-if="selectedClassId" class="card app-card">
       <div class="card-header">
         <h3>{{ t('MULTISTOP.session-history') }}</h3>
       </div>
@@ -171,6 +171,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useI18n } from 'vue-i18n'
 
 import { useMultistopView } from '../composables/useMultistopView'
