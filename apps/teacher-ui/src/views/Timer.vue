@@ -1,5 +1,5 @@
 <template>
-  <div class="timer-view">
+  <div class="timer-view sport-ui">
     <!-- ─── Page header ───────────────────────────────────────────── -->
     <div class="page-header">
       <h2>{{ t('TIMER.set') }}</h2>
@@ -37,7 +37,7 @@
     </div>
 
     <!-- ─── Mode tabs ─────────────────────────────────────────────── -->
-    <div class="card">
+    <div class="card app-card">
       <div class="timer-modes">
         <button
           class="mode-btn"
@@ -64,7 +64,7 @@
     </div>
 
     <!-- ─── Countdown Timer ───────────────────────────────────────── -->
-    <div v-if="mode === 'countdown'" class="card timer-card">
+    <div v-if="mode === 'countdown'" class="card timer-card app-card">
       <div class="timer-setup" v-if="!isRunning && !isPaused">
         <div class="time-input-group">
           <div class="time-input">
@@ -89,9 +89,9 @@
             />
           </div>
         </div>
-        <button class="btn-primary btn-large" @click="startCountdown">
+        <Button class="btn-large" @click="startCountdown">
           ▶️ {{ t('COMMON.start') || 'Start' }}
-        </button>
+        </Button>
       </div>
 
       <div class="timer-display" v-else>
@@ -117,15 +117,15 @@
         </div>
 
         <div class="timer-controls">
-          <button class="btn-secondary btn-touch" @click="pauseTimer" v-if="isRunning && !isPaused">
+          <Button severity="secondary" outlined class="btn-touch" @click="pauseTimer" v-if="isRunning && !isPaused">
             ⏸️ {{ t('COMMON.pause') || 'Pause' }}
-          </button>
-          <button class="btn-primary btn-touch" @click="resumeTimer" v-if="isPaused">
+          </Button>
+          <Button class="btn-touch" @click="resumeTimer" v-if="isPaused">
             ▶️ {{ t('COMMON.resume') || 'Resume' }}
-          </button>
-          <button class="btn-danger btn-touch" @click="resetTimer">
+          </Button>
+          <Button severity="danger" class="btn-touch" @click="resetTimer">
             🔄 {{ t('COMMON.reset') || 'Reset' }}
-          </button>
+          </Button>
         </div>
         <div v-if="timeRemaining === 0" class="timer-finished">
           <h3>{{ t('TIMER.finished') }}</h3>
@@ -134,27 +134,27 @@
     </div>
 
     <!-- ─── Stopwatch ─────────────────────────────────────────────── -->
-    <div v-if="mode === 'stopwatch'" class="card timer-card">
+    <div v-if="mode === 'stopwatch'" class="card timer-card app-card">
       <div class="timer-display">
         <div class="time-display">
           {{ formatTime(elapsedTime) }}
         </div>
         <div class="timer-controls">
-          <button class="btn-primary btn-touch btn-large" @click="startStopwatch" v-if="!isRunning">
+          <Button class="btn-touch btn-large" @click="startStopwatch" v-if="!isRunning">
             ▶️ {{ t('COMMON.start') || 'Start' }}
-          </button>
-          <button class="btn-secondary btn-touch" @click="pauseTimer" v-if="isRunning && !isPaused">
+          </Button>
+          <Button severity="secondary" outlined class="btn-touch" @click="pauseTimer" v-if="isRunning && !isPaused">
             ⏸️ {{ t('COMMON.pause') || 'Pause' }}
-          </button>
-          <button class="btn-primary btn-touch" @click="resumeTimer" v-if="isPaused">
+          </Button>
+          <Button class="btn-touch" @click="resumeTimer" v-if="isPaused">
             ▶️ {{ t('COMMON.resume') || 'Resume' }}
-          </button>
+          </Button>
           <button class="btn-warning btn-touch" @click="recordLap" v-if="isRunning || isPaused">
             ⏱️ Lap
           </button>
-          <button class="btn-danger btn-touch" @click="resetTimer">
+          <Button severity="danger" class="btn-touch" @click="resetTimer">
             🔄 {{ t('COMMON.reset') || 'Reset' }}
-          </button>
+          </Button>
         </div>
 
         <!-- Lap Times -->
@@ -171,7 +171,7 @@
     </div>
 
     <!-- ─── Interval Timer ────────────────────────────────────────── -->
-    <div v-if="mode === 'interval'" class="card timer-card">
+    <div v-if="mode === 'interval'" class="card timer-card app-card">
       <!-- Setup screen -->
       <div class="timer-setup" v-if="!isRunning && !isPaused">
         <!-- Preset chips -->
@@ -222,9 +222,9 @@
             />
           </div>
         </div>
-        <button class="btn-primary btn-large" @click="startInterval">
+        <Button class="btn-large" @click="startInterval">
           ▶️ {{ t('COMMON.start') || 'Start' }}
-        </button>
+        </Button>
       </div>
 
       <!-- Running screen -->
@@ -266,21 +266,21 @@
         </div>
 
         <div class="timer-controls">
-          <button class="btn-secondary btn-touch" @click="pauseTimer" v-if="isRunning && !isPaused">
+          <Button severity="secondary" outlined class="btn-touch" @click="pauseTimer" v-if="isRunning && !isPaused">
             ⏸️ {{ t('COMMON.pause') || 'Pause' }}
-          </button>
-          <button class="btn-primary btn-touch" @click="resumeTimer" v-if="isPaused">
+          </Button>
+          <Button class="btn-touch" @click="resumeTimer" v-if="isPaused">
             ▶️ {{ t('COMMON.resume') || 'Resume' }}
-          </button>
-          <button class="btn-danger btn-touch" @click="resetTimer">
+          </Button>
+          <Button severity="danger" class="btn-touch" @click="resetTimer">
             🔄 {{ t('COMMON.reset') || 'Reset' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
 
     <!-- ─── Sound Settings ────────────────────────────────────────── -->
-    <div class="card">
+    <div class="card app-card">
       <div class="card-header">
         <h3>{{ t('TIMER.sound-settings') }}</h3>
       </div>
@@ -293,14 +293,14 @@
     </div>
 
     <!-- ─── Save Result ────────────────────────────────────────────── -->
-    <div class="card">
-      <button
-        class="btn-primary btn-large"
+    <div class="card app-card">
+      <Button
+        class="btn-large"
         @click="saveTimerResult"
         :disabled="saving || (!isRunning && elapsedTime === 0 && timeRemaining === 0)"
       >
         {{ saving ? t('COMMON.syncing') : '💾 ' + t('COMMON.save') }}
-      </button>
+      </Button>
     </div>
   </div>
 
@@ -402,6 +402,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useTimerView } from '../composables/useTimerView'
 
 const {
