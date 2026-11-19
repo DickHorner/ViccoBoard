@@ -252,7 +252,7 @@ onMounted(() => {
 
 .subtitle,
 .hub-card p {
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .metrics-grid {
@@ -273,7 +273,7 @@ onMounted(() => {
 }
 
 .metric-card span {
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .hub-grid {
