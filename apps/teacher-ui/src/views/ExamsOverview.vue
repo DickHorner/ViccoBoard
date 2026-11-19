@@ -254,18 +254,23 @@ const loadExams = async () => {
 
 const loadContext = async () => {
   contextError.value = ''
-  const groupRepository = getSportBridge().classGroupRepository
-  const [groups, year] = await Promise.allSettled([
-    groupRepository.findAll(),
-    loadActiveSchoolYear(getStorageAdapter(), groupRepository)
-  ])
-  if (groups.status === 'fulfilled') classes.value = groups.value
-  if (year.status === 'fulfilled') activeYear.value = year.value
-  if (groups.status === 'rejected' || year.status === 'rejected') {
-    console.error('Failed to load exam school year context:',
-      groups.status === 'rejected' ? groups.reason : null,
-      year.status === 'rejected' ? year.reason : null)
-    contextError.value = 'Schuljahres- oder Klassenzuordnung konnte nicht vollständig geladen werden.'
+  try {
+    const groupRepository = getSportBridge().classGroupRepository
+    const [groups, year] = await Promise.allSettled([
+      groupRepository.findAll(),
+      loadActiveSchoolYear(getStorageAdapter(), groupRepository)
+    ])
+    if (groups.status === 'fulfilled') classes.value = groups.value
+    if (year.status === 'fulfilled') activeYear.value = year.value
+    if (groups.status === 'rejected' || year.status === 'rejected') {
+      console.error('Failed to load exam school year context:',
+        groups.status === 'rejected' ? groups.reason : null,
+        year.status === 'rejected' ? year.reason : null)
+      contextError.value = 'Schuljahres- oder Klassenzuordnung konnte nicht vollständig geladen werden.'
+    }
+  } catch (error) {
+    console.error('Failed to initialize exam context:', error)
+    contextError.value = 'Schuljahres- und Klassenzuordnung sind derzeit nicht verfügbar.'
   }
 }
 
@@ -282,7 +287,7 @@ const importExamFile = async (event: Event) => {
     const exam = parseExamDefinition(JSON.parse(await file.text()))
     const { id: _id, createdAt: _createdAt, lastModified: _lastModified, ...payload } = exam
     const created = await examRepository.create(payload)
-    router.push(`/exams/${created.id}`)
+    router.push(`/exams/${created.id}/workspace`)
   } catch (error) {
     importError.value = error instanceof Error ? error.message : 'Prüfung konnte nicht importiert werden.'
   } finally {
