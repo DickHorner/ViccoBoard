@@ -19,12 +19,16 @@
       <section class="card app-card">
         <h3>Klasse auswählen</h3>
         <div class="form-section">
-          <select v-model="selectedClassId" class="form-select" @change="onClassChange">
-            <option value="">Klasse auswählen...</option>
-            <option v-for="cls in classes" :key="cls.id" :value="cls.id">
-              {{ cls.name }} ({{ cls.schoolYear }})
-            </option>
-          </select>
+          <label for="grading-class">Klasse</label>
+          <Select
+            inputId="grading-class"
+            v-model="selectedClassId"
+            :options="classOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Klasse auswählen"
+            fluid
+          />
         </div>
       </section>
 
@@ -116,148 +120,120 @@
       </div>
     </div>
 
-    <div v-if="showCreateCategoryModal" class="modal-overlay" @click="showCreateCategoryModal = false">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>Neue Bewertungskategorie</h3>
-          <button class="close-btn" @click="showCreateCategoryModal = false">×</button>
+    <Dialog
+      :visible="showCreateCategoryModal"
+      modal
+      header="Neue Bewertungskategorie"
+      :closable="!saving"
+      :style="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }"
+      @update:visible="visible => { if (!visible && !saving) showCreateCategoryModal = false }"
+    >
+      <form class="grading-dialog-form" @submit.prevent="createCategory">
+        <div class="app-field">
+          <label for="category-name">Name *</label>
+          <InputText id="category-name" v-model="newCategory.name" required fluid placeholder="z. B. Ausdauer, Technik, Teamfähigkeit" />
         </div>
-        <div class="modal-content">
-          <form @submit.prevent="createCategory">
-            <div class="form-group">
-              <label for="category-name">Name*</label>
-              <input
-                id="category-name"
-                v-model="newCategory.name"
-                type="text"
-                required
-                placeholder="z.B. Ausdauer, Technik, Teamfähigkeit"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="category-description">Beschreibung</label>
-              <textarea
-                id="category-description"
-                v-model="newCategory.description"
-                rows="3"
-                placeholder="Optionale Beschreibung..."
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="category-type">Typ*</label>
-              <select id="category-type" v-model="newCategory.type" required>
-                <option value="">Typ auswählen...</option>
-                <option value="criteria">Kriterienbasiert</option>
-                <option value="time">Zeitbasiert</option>
-                <option value="performance">Messwert nach Tabelle</option>
-                <option value="cooper">Cooper-Test</option>
-                <option value="shuttle">Shuttle-Run</option>
-                <option value="mittelstrecke">Mittelstrecke</option>
-                <option value="Sportabzeichen">Sportabzeichen</option>
-                <option value="bjs">Bundesjugendspiele</option>
-                <option value="verbal">Verbal</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="category-weight">Gewicht (%)*</label>
-              <input
-                id="category-weight"
-                v-model.number="newCategory.weight"
-                type="number"
-                min="0"
-                max="100"
-                required
-                placeholder="0-100"
-              />
-            </div>
-
-            <div class="modal-actions">
-              <Button severity="secondary" outlined type="button" @click="showCreateCategoryModal = false">
-                Abbrechen
-              </Button>
-              <Button type="submit" :disabled="saving">
-                {{ saving ? 'Wird erstellt...' : 'Erstellen' }}
-              </Button>
-            </div>
-          </form>
+        <div class="app-field">
+          <label for="category-description">Beschreibung</label>
+          <Textarea id="category-description" v-model="newCategory.description" rows="3" autoResize fluid placeholder="Optionale Beschreibung" />
         </div>
-      </div>
-    </div>
-  </div>
+        <div class="app-field">
+          <label for="category-type">Typ *</label>
+          <Select
+            inputId="category-type"
+            v-model="newCategory.type"
+            :options="categoryTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Typ auswählen"
+            required
+            fluid
+          />
+        </div>
+        <div class="app-field">
+          <label for="category-weight">Gewicht (%) *</label>
+          <InputNumber
+            inputId="category-weight"
+            :modelValue="newCategory.weight"
+            @update:modelValue="value => newCategory.weight = value ?? 0"
+            :min="0"
+            :max="100"
+            :useGrouping="false"
+            fluid
+          />
+        </div>
+        <div class="app-actions-row grading-dialog-actions">
+          <Button label="Abbrechen" severity="secondary" :disabled="saving" @click="showCreateCategoryModal = false" />
+          <Button type="submit" :label="saving ? 'Wird erstellt…' : 'Erstellen'" :loading="saving" :disabled="saving || !newCategory.name.trim() || !newCategory.type" />
+        </div>
+      </form>
+    </Dialog>
 
-  <div v-if="showEditCategoryModal" class="modal-overlay" @click.self="closeEditModal">
-    <div class="modal" @click.stop>
-      <div class="modal-header">
-        <h3>Kategorie bearbeiten</h3>
-        <button class="close-btn" @click="closeEditModal">×</button>
-      </div>
-      <div class="modal-content">
-        <form @submit.prevent="saveEditCategory">
-          <div class="form-group">
-            <label for="edit-category-name">Name*</label>
-            <input id="edit-category-name" v-model="editCategoryForm.name" type="text" required placeholder="Kategoriename" />
-          </div>
-          <div class="form-group">
-            <label for="edit-category-description">Beschreibung</label>
-            <textarea
-              id="edit-category-description"
-              v-model="editCategoryForm.description"
-              rows="3"
-              placeholder="Optionale Beschreibung…"
-            ></textarea>
-          </div>
-          <div class="form-group">
-            <label for="edit-category-weight">Gewicht (%)*</label>
-            <input
-              id="edit-category-weight"
-              v-model.number="editCategoryForm.weight"
-              type="number"
-              min="0"
-              max="100"
-              required
-              placeholder="0-100"
-            />
-          </div>
-          <div class="modal-actions">
-            <Button severity="secondary" outlined type="button" @click="closeEditModal">Abbrechen</Button>
-            <Button type="submit" :disabled="saving">
-              {{ saving ? 'Wird gespeichert…' : 'Speichern' }}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+    <Dialog
+      :visible="showEditCategoryModal"
+      modal
+      header="Kategorie bearbeiten"
+      :closable="!saving"
+      :style="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }"
+      @update:visible="visible => { if (!visible && !saving) closeEditModal() }"
+    >
+      <form class="grading-dialog-form" @submit.prevent="saveEditCategory">
+        <div class="app-field">
+          <label for="edit-category-name">Name *</label>
+          <InputText id="edit-category-name" v-model="editCategoryForm.name" required fluid placeholder="Kategoriename" />
+        </div>
+        <div class="app-field">
+          <label for="edit-category-description">Beschreibung</label>
+          <Textarea id="edit-category-description" v-model="editCategoryForm.description" rows="3" autoResize fluid placeholder="Optionale Beschreibung" />
+        </div>
+        <div class="app-field">
+          <label for="edit-category-weight">Gewicht (%) *</label>
+          <InputNumber
+            inputId="edit-category-weight"
+            :modelValue="editCategoryForm.weight"
+            @update:modelValue="value => editCategoryForm.weight = value ?? 0"
+            :min="0"
+            :max="100"
+            :useGrouping="false"
+            fluid
+          />
+        </div>
+        <div class="app-actions-row grading-dialog-actions">
+          <Button label="Abbrechen" severity="secondary" :disabled="saving" @click="closeEditModal" />
+          <Button type="submit" :label="saving ? 'Wird gespeichert…' : 'Speichern'" :loading="saving" :disabled="saving || !editCategoryForm.name.trim()" />
+        </div>
+      </form>
+    </Dialog>
 
-  <div v-if="deleteCategoryTarget" class="modal-overlay" @click.self="deleteCategoryTarget = null">
-    <div class="modal" @click.stop>
-      <div class="modal-header">
-        <h3>Kategorie löschen?</h3>
-        <button class="close-btn" @click="deleteCategoryTarget = null">×</button>
+    <Dialog
+      :visible="Boolean(deleteCategoryTarget)"
+      modal
+      header="Kategorie löschen?"
+      :closable="!deletingCategoryId"
+      :style="{ width: '30rem', maxWidth: 'calc(100vw - 2rem)' }"
+      @update:visible="visible => { if (!visible && !deletingCategoryId) deleteCategoryTarget = null }"
+    >
+      <p>Möchtest Du die Kategorie <strong>{{ deleteCategoryTarget?.name }}</strong> wirklich löschen?</p>
+      <Message severity="warn" role="alert">
+        Zugehörige Leistungseinträge bleiben erhalten, sind aber ohne Kategorie nicht mehr auswertbar.
+      </Message>
+      <div class="app-actions-row grading-dialog-actions">
+        <Button label="Abbrechen" severity="secondary" :disabled="Boolean(deletingCategoryId)" @click="deleteCategoryTarget = null" />
+        <Button label="Löschen" severity="danger" :loading="Boolean(deletingCategoryId)" :disabled="Boolean(deletingCategoryId)" @click="executeDeleteCategory" />
       </div>
-      <div class="modal-content">
-        <p>
-          Möchten Sie die Kategorie <strong>{{ deleteCategoryTarget.name }}</strong> wirklich löschen?
-        </p>
-        <p style="color:#c00; font-size:0.875rem;">
-          Alle zugehörigen Leistungseinträge bleiben erhalten, sind aber ohne Kategorie nicht mehr auswertbar.
-        </p>
-      </div>
-      <div class="modal-actions">
-        <Button severity="secondary" outlined @click="deleteCategoryTarget = null">Abbrechen</Button>
-        <button class="btn-danger-solid" :disabled="!!deletingCategoryId" @click="executeDeleteCategory">
-          {{ deletingCategoryId ? 'Wird gelöscht…' : 'Löschen' }}
-        </button>
-      </div>
-    </div>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed, watch } from 'vue'
 import Button from 'openvue/button'
+import Dialog from 'openvue/dialog'
+import InputNumber from 'openvue/inputnumber'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
+import Textarea from 'openvue/textarea'
 import { useGradingOverviewView } from '../composables/useGradingOverviewView'
 
 const {
@@ -286,6 +262,35 @@ const {
   students,
   viewHistory
 } = useGradingOverviewView()
+
+const classOptions = computed(() => classes.value.map(cls => ({
+  value: cls.id,
+  label: `${cls.name} (${cls.schoolYear})`
+})))
+const categoryTypeOptions = [
+  { label: 'Kriterienbasiert', value: 'criteria' },
+  { label: 'Zeitbasiert', value: 'time' },
+  { label: 'Messwert nach Tabelle', value: 'performance' },
+  { label: 'Cooper-Test', value: 'cooper' },
+  { label: 'Shuttle-Run', value: 'shuttle' },
+  { label: 'Mittelstrecke', value: 'mittelstrecke' },
+  { label: 'Sportabzeichen', value: 'Sportabzeichen' },
+  { label: 'Bundesjugendspiele', value: 'bjs' },
+  { label: 'Verbal', value: 'verbal' }
+]
+
+watch(selectedClassId, () => { void onClassChange() })
 </script>
 
 <style scoped src="./GradingOverview.css"></style>
+<style scoped>
+.grading-dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.grading-dialog-actions {
+  justify-content: flex-end;
+}
+</style>
