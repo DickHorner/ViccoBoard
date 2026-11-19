@@ -181,11 +181,11 @@
       </template>
     </div>
 
-    <div v-if="sessionSaved" class="success-banner card">
+    <div v-if="sessionSaved" class="success-banner card app-card">
       ✅ {{ t('TRACKING.jump-rope.session-saved') }}
     </div>
 
-    <div v-if="saveError" class="warning-banner card">
+    <div v-if="saveError" class="warning-banner card app-card">
       ⚠️ {{ t('TRACKING.jump-rope.session-save-error') }}
     </div>
   </div>
