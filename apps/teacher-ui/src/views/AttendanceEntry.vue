@@ -1,5 +1,5 @@
 <template>
-  <div class="attendance-view">
+  <div class="attendance-view sport-ui">
     <div class="page-header">
       <RouterLink v-if="currentLessonId" :to="`/lessons/${currentLessonId}/workspace`" class="back-button">
         ← Zur Stunde
@@ -20,7 +20,7 @@
     </div>
     
     <div class="attendance-form">
-      <section class="card">
+      <section class="card app-card">
         <h3>{{ t('ANWESENHEIT.liste') }} {{ currentDate }}</h3>
         <p v-if="saveError" class="error-message" role="alert">{{ saveError }}</p>
         
