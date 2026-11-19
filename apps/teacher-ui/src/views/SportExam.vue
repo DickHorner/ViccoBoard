@@ -59,15 +59,15 @@
       <p v-if="contextWarning" class="warning">{{ contextWarning }}</p>
     </section>
 
-    <section v-if="students.length > 0 && selectedCategory" class="card">
+    <section v-if="students.length > 0 && selectedCategory" class="card app-card">
       <div class="card-header">
         <div>
           <h2>Leistungserfassung</h2>
           <p>{{ students.length }} Schüler · Abwesenheiten für {{ formatDate(examDate) }} abgeglichen</p>
         </div>
-        <button class="btn-primary" :disabled="saving || !canSave" @click="saveExam">
+        <Button :disabled="saving || !canSave" @click="saveExam">
           {{ saving ? 'Speichern...' : 'Prüfung speichern' }}
-        </button>
+        </Button>
       </div>
 
       <div class="table-wrapper">
@@ -175,7 +175,7 @@
       </div>
     </section>
 
-    <section v-else-if="selectedClassId && selectedCategoryId" class="card empty-state">
+    <section v-else-if="selectedClassId && selectedCategoryId" class="card empty-state app-card">
       Keine Schüler gefunden.
     </section>
 
