@@ -41,7 +41,7 @@
         <h2>{{ t('TOURNAMENTS.create') }}</h2>
       </div>
 
-      <form class="create-form card" @submit.prevent="submitCreate">
+      <form class="create-form card app-card" @submit.prevent="submitCreate">
         <div class="form-group">
           <label>{{ t('TOURNAMENTS.name_label') }}</label>
           <input
@@ -96,19 +96,19 @@
               >✕</button>
             </li>
           </ul>
-          <button v-if="!importedTeamHandoff" class="btn-secondary" type="button" @click="addTeam">
+          <Button severity="secondary" outlined v-if="!importedTeamHandoff" type="button" @click="addTeam">
             + {{ t('TOURNAMENTS.add_team') }}
-          </button>
+          </Button>
           <p v-if="createError" class="error-text">{{ createError }}</p>
         </div>
 
         <div class="form-actions">
-          <button class="btn-secondary" type="button" @click="cancelCreate">
+          <Button severity="secondary" outlined type="button" @click="cancelCreate">
             {{ t('TOURNAMENTS.cancel') }}
-          </button>
-          <button class="btn-primary" type="submit" :disabled="saving">
+          </Button>
+          <Button type="submit" :disabled="saving">
             {{ t('TOURNAMENTS.create') }}
-          </button>
+          </Button>
         </div>
       </form>
     </template>
@@ -121,9 +121,9 @@
         <span :class="['status-badge', activeTournament.status]">
           {{ t(`TOURNAMENTS.status.${activeTournament.status}`) }}
         </span>
-        <button class="btn-danger" type="button" @click="deleteTournament">
+        <Button severity="danger" type="button" @click="deleteTournament">
           {{ t('TOURNAMENTS.delete') }}
-        </button>
+        </Button>
       </div>
 
       <!-- Tab bar -->
@@ -147,7 +147,7 @@
         >{{ t('TOURNAMENTS.bracket') }}</button>
       </div>
 
-      <section v-if="activeTournament.type === 'adaptive'" class="card adaptive-round-panel">
+      <section v-if="activeTournament.type === 'adaptive'" class="card adaptive-round-panel app-card">
         <h3>{{ t('TOURNAMENTS.adaptive_today') }}</h3>
         <p>{{ t('TOURNAMENTS.adaptive_attendance_hint') }}</p>
         <div class="adaptive-players">
@@ -156,9 +156,9 @@
             {{ team.name }}
           </label>
         </div>
-        <button class="btn-primary" type="button" :disabled="saving || presentStudentIds.length < 2 * (activeTournament.teamSize ?? 1)" @click="drawRound">
+        <Button type="button" :disabled="saving || presentStudentIds.length < 2 * (activeTournament.teamSize ?? 1)" @click="drawRound">
           {{ t('TOURNAMENTS.adaptive_draw') }}
-        </button>
+        </Button>
         <p v-if="roundError" class="error-text">{{ roundError }}</p>
       </section>
 
@@ -182,13 +182,13 @@
               <template v-if="match.status === 'completed' && match.team2Id">
                 <span class="score-display">{{ match.score1 }} : {{ match.score2 }}</span>
               </template>
-              <button
+              <Button severity="secondary" outlined
                 v-if="match.team1Id && match.team2Id && match.status !== 'completed' && match.status !== 'cancelled'"
-                class="btn-secondary btn-sm"
+                class="btn-sm"
                 type="button"
                 @click="openScoreEntry(match)"
-              >{{ t('TOURNAMENTS.enter_result') }}</button>
-              <button v-if="activeTournament.type === 'adaptive' && match.status === 'scheduled'" class="btn-secondary btn-sm" type="button" :disabled="saving" @click="cancelAdaptiveMatch(match.id)">{{ t('TOURNAMENTS.adaptive_cancel_match') }}</button>
+              >{{ t('TOURNAMENTS.enter_result') }}</Button>
+              <Button severity="secondary" outlined v-if="activeTournament.type === 'adaptive' && match.status === 'scheduled'" class="btn-sm" type="button" :disabled="saving" @click="cancelAdaptiveMatch(match.id)">{{ t('TOURNAMENTS.adaptive_cancel_match') }}</Button>
               <span v-if="match.status === 'cancelled'">{{ t('TOURNAMENTS.adaptive_cancelled') }}</span>
             </li>
           </ul>
@@ -247,12 +247,12 @@
               <template v-if="match.status === 'completed'">
                 <span class="score-display">{{ match.score1 }} : {{ match.score2 }}</span>
               </template>
-              <button
+              <Button severity="secondary" outlined
                 v-if="match.team1Id && match.team2Id && match.status !== 'completed'"
-                class="btn-secondary btn-sm"
+                class="btn-sm"
                 type="button"
                 @click="openScoreEntry(match)"
-              >{{ t('TOURNAMENTS.enter_result') }}</button>
+              >{{ t('TOURNAMENTS.enter_result') }}</Button>
             </li>
           </ul>
         </div>
@@ -305,12 +305,12 @@
         </div>
         <p v-if="scoreError" class="error-text">{{ scoreError }}</p>
         <div class="modal-actions">
-          <button class="btn-secondary" type="button" @click="closeScoreEntry">
+          <Button severity="secondary" outlined type="button" @click="closeScoreEntry">
             {{ t('TOURNAMENTS.cancel') }}
-          </button>
-          <button class="btn-primary" type="button" :disabled="saving" @click="saveScore">
+          </Button>
+          <Button type="button" :disabled="saving" @click="saveScore">
             {{ t('TOURNAMENTS.save_result') }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
