@@ -52,7 +52,7 @@
             <p>{{ formatDate(exam.lastModified) }}</p>
           </div>
           <div class="row-actions">
-            <RouterLink :to="`/exams/${exam.id}`" class="ghost-link">Öffnen</RouterLink>
+            <RouterLink :to="`/exams/${exam.id}/workspace`" class="ghost-link">Öffnen</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/correct`" class="ghost-link">Korrigieren</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/analysis`" class="ghost-link">Analyse</RouterLink>
             <RouterLink :to="`/exams/${exam.id}/export`" class="ghost-link">Rückmeldebogen</RouterLink>
