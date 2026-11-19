@@ -1,12 +1,12 @@
 <template>
-  <div class="pushup-view">
+  <div class="pushup-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('TRACKING.pushups.title') }}</h2>
     </div>
 
     <!-- Configuration card (hidden while tracking) -->
-    <section v-if="!isTracking && !sessionSaved" class="card config-card">
+    <section v-if="!isTracking && !sessionSaved" class="card config-card app-card">
       <h3>{{ t('TRACKING.pushups.fps-label').replace(':', '') }} &amp; {{ t('TRACKING.pushups.persons-label').replace(':', '') }}</h3>
       <div class="form-row">
         <div class="form-group">
@@ -38,20 +38,20 @@
     </section>
 
     <!-- Camera error -->
-    <div v-if="cameraError" class="error-banner card">
+    <div v-if="cameraError" class="error-banner card app-card">
       <strong>{{ t('TRACKING.pushups.error-title') }}:</strong> {{ cameraError }}
       <button class="btn-retry" @click="initCamera">{{ t('TRACKING.pushups.retry') }}</button>
     </div>
 
     <!-- Camera idle hint -->
-    <div v-if="!cameraActive && !cameraError" class="idle-hint card">
+    <div v-if="!cameraActive && !cameraError" class="idle-hint card app-card">
       <p>{{ t('TRACKING.pushups.status.ready') }}</p>
     </div>
 
     <!-- Main tracking area -->
     <div v-show="cameraActive" class="tracking-layout">
       <!-- Video + person zones overlay -->
-      <div ref="videoWrapper" class="video-wrapper card">
+      <div ref="videoWrapper" class="video-wrapper card app-card">
         <video
           ref="videoEl"
           class="camera-feed"
@@ -94,12 +94,12 @@
         ></div>
       </div>
 
-      <div v-if="cameraActive && !isTracking" class="region-controls card">
+      <div v-if="cameraActive && !isTracking" class="region-controls card app-card">
         <div class="region-controls__header">
           <strong>{{ t('TRACKING.pushups.regions.title') }}</strong>
-          <button class="btn-secondary region-reset" type="button" @click="resetPersonRegions">
+          <Button severity="secondary" outlined class="region-reset" type="button" @click="resetPersonRegions">
             {{ t('TRACKING.pushups.regions.reset') }}
-          </button>
+          </Button>
         </div>
         <div class="region-controls__buttons">
           <button
@@ -117,7 +117,7 @@
       </div>
 
       <!-- Live stats bar -->
-      <div class="stats-bar card">
+      <div class="stats-bar card app-card">
         <div class="stat-item">
           <span class="stat-label">{{ t('TRACKING.pushups.stats.total-reps') }}</span>
           <span class="stat-value">{{ totalReps }}</span>
@@ -138,36 +138,36 @@
     </div>
 
     <!-- Controls -->
-    <div class="controls-card card">
-      <button
+    <div class="controls-card card app-card">
+      <Button
         v-if="!cameraActive"
-        class="btn-primary"
+       
         @click="initCamera"
       >
         📷 {{ t('TRACKING.pushups.controls.start') }}
-      </button>
+      </Button>
       <template v-else>
-        <button
+        <Button
           v-if="!isTracking"
-          class="btn-primary"
+         
           @click="startTracking"
         >
           ▶ {{ t('TRACKING.pushups.controls.start') }}
-        </button>
-        <button
+        </Button>
+        <Button severity="danger"
           v-else
-          class="btn-danger"
+         
           @click="stopTracking"
         >
           ⏹ {{ t('TRACKING.pushups.controls.stop') }}
-        </button>
-        <button
-          class="btn-secondary"
+        </Button>
+        <Button severity="secondary" outlined
+         
           :disabled="isTracking"
           @click="resetAll"
         >
           🔄 {{ t('TRACKING.pushups.controls.reset') }}
-        </button>
+        </Button>
       </template>
     </div>
 
@@ -182,6 +182,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
