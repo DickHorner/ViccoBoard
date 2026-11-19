@@ -332,7 +332,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Lesson, ClassGroup, Subject } from '@viccoboard/core'
 import { buildAutoLessonDates, getDateKey } from '../utils/lesson-auto-generation'
