@@ -1,7 +1,7 @@
 <template>
-  <div class="table-management-view">
+  <div class="table-management-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <h2>Tabellenverwaltung</h2>
       <p class="page-description">Verwalten Sie Bewertungstabellen für den Sportunterricht.</p>
     </div>
@@ -9,8 +9,8 @@
     <div v-if="loadError" class="error-banner" role="alert">{{ loadError }}</div>
 
     <div class="toolbar">
-      <button class="btn-primary" @click="openCreateModal">+ Neue Tabelle</button>
-      <button class="btn-secondary" @click="triggerImport">↑ CSV importieren</button>
+      <Button @click="openCreateModal">+ Neue Tabelle</Button>
+      <Button severity="secondary" outlined @click="triggerImport">↑ CSV importieren</Button>
       <input
         ref="fileInputRef"
         type="file"
@@ -46,13 +46,13 @@
               <p v-if="table.description" class="table-description">{{ table.description }}</p>
             </div>
             <div class="table-actions">
-              <button class="btn-secondary btn-small" :aria-expanded="previewId === table.id" @click="togglePreview(table.id)">
+              <Button severity="secondary" outlined :aria-expanded="previewId === table.id" @click="togglePreview(table.id)">
                 {{ previewId === table.id ? 'Vorschau schließen' : 'Vorschau' }}
-              </button>
-              <button class="btn-text btn-small" @click="openEditModal(table)">✏️ Bearbeiten</button>
-              <button class="btn-danger btn-small" :disabled="deleting === table.id" @click="confirmDelete(table)">
+              </Button>
+              <Button severity="secondary" text @click="openEditModal(table)">✏️ Bearbeiten</Button>
+              <Button severity="danger" :disabled="deleting === table.id" @click="confirmDelete(table)">
                 {{ deleting === table.id ? '…' : '🗑 Löschen' }}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -189,6 +189,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useTableManagementView } from '../composables/useTableManagementView'
 
 const {
