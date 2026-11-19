@@ -460,7 +460,7 @@ function localDateString(date: Date): string {
 <style scoped>
 .basketball-assessment { display: flex; flex-direction: column; gap: 1rem; }
 .page-header h1, h2 { margin: .3rem 0; }
-.page-header p, .task p, .capture-heading p { color: var(--p-text-muted-color, #64748b); margin: .25rem 0; }
+.page-header p, .task p, .capture-heading p { color: var(--p-text-muted-color, var(--color-muted)); margin: .25rem 0; }
 .back-link { text-decoration: none; }
 .app-card { padding: 1rem; border: 1px solid var(--p-content-border-color, #d1d5db); border-radius: 14px; }
 .configuration { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 1rem; }
@@ -468,7 +468,7 @@ function localDateString(date: Date): string {
 .configuration input, .configuration select, .student-navigation select, .state-field select { min-height: 44px; border: 1px solid var(--p-content-border-color, #94a3b8); border-radius: 8px; padding: .5rem; background: var(--p-content-background, white); color: inherit; width: 100%; }
 .task-heading, .capture-heading, .criterion-heading, .result { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .capture { display: grid; gap: 1rem; }
-.source { font-size: .84rem; color: var(--p-text-muted-color, #64748b); }
+.source { font-size: .84rem; color: var(--p-text-muted-color, var(--color-muted)); }
 .student-navigation { display: grid; gap: .5rem; }
 .student-navigation-controls { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 .student-navigation-controls select { flex: 1; min-width: 140px; }
@@ -482,7 +482,7 @@ function localDateString(date: Date): string {
 .score-button:disabled { opacity: .5; }
 .result { padding: .9rem 0; border-top: 1px solid var(--p-content-border-color, #e2e8f0); }
 .result strong { font-size: 1.3rem; margin-left: .5rem; }
-.notice { margin: 0; padding: .8rem; border-radius: 8px; background: var(--p-content-hover-background, #f1f5f9); }
+.notice { margin: 0; padding: .8rem; border-radius: 8px; background: var(--p-content-hover-background, var(--surface-soft)); }
 .error { color: #991b1b; }
 .success { color: #166534; }
 .court-diagram { display: block; width: 100%; height: auto; max-height: 180px; margin: 1rem 0; }
