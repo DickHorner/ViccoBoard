@@ -1,12 +1,12 @@
 <template>
-  <div class="tournaments-view">
+  <div class="tournaments-view sport-ui">
     <!-- LIST VIEW -->
     <template v-if="view === 'list'">
       <div class="page-header">
         <h2>{{ t('TOURNAMENTS.title') }}</h2>
-        <button class="btn-primary" type="button" @click="startCreate">
+        <Button type="button" @click="startCreate">
           + {{ t('TOURNAMENTS.new') }}
-        </button>
+        </Button>
       </div>
 
       <div v-if="loading" class="loading">…</div>
@@ -17,7 +17,7 @@
         <li
           v-for="tournament in tournaments"
           :key="tournament.id"
-          class="tournament-card"
+          class="tournament-card app-card"
           @click="openTournament(tournament)"
         >
           <div class="tournament-card-header">
@@ -318,6 +318,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useTournamentsView } from '../composables/useTournamentsView'
 
 const {
