@@ -1,14 +1,14 @@
 <template>
-  <section class="sport-exam-view">
+  <section class="sport-exam-view sport-ui">
     <header class="page-header">
-      <button class="back-button" @click="router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="router.back()">Zurück</Button>
       <div>
         <h1>Sportprüfung</h1>
         <p>Prüfung anlegen, Anwesenheit abgleichen und Messwerte direkt in Noten umrechnen.</p>
       </div>
     </header>
 
-    <section class="card setup-card">
+    <section class="card setup-card app-card">
       <div class="setup-grid">
         <label>
           <span>Datum</span>
@@ -186,6 +186,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
