@@ -1,47 +1,44 @@
 <template>
   <section class="sport-ui app-form-grid">
     <header class="app-actions-row">
-      <h1>Sport</h1>
-      <Tag :value="loadingClasses ? '… aktive Klassen' : `${classCount} aktive Klassen`" severity="info" />
+      <h1 class="app-section-title">Sport</h1>
+      <span class="app-data-note">{{ loadingClasses ? '…' : classCount }} aktive Klassen</span>
     </header>
 
     <Message v-if="loadError" severity="warn" role="status">{{ loadError }}</Message>
     <Message v-if="metricsError" severity="warn" role="status">{{ metricsError }}</Message>
 
-    <div class="app-actions-row" aria-label="Sport-Kennzahlen">
-      <Tag :value="`${countsLoading ? '…' : gradeCategoryCount} Bewertungskategorien`" severity="secondary" />
-      <Tag :value="`${countsLoading ? '…' : tableCount} Tabellen`" severity="secondary" />
-      <Tag :value="`${countsLoading ? '…' : toolSessionCount} Tool-Sessions`" severity="secondary" />
-      <Tag :value="`${countsLoading ? '…' : sportabzeichenStandardCount} Sportabzeichen-Standards`" severity="secondary" />
-    </div>
+    <p class="app-data-note" aria-label="Sport-Kennzahlen">
+      {{ countsLoading ? '…' : gradeCategoryCount }} Bewertungskategorien ·
+      {{ countsLoading ? '…' : tableCount }} Tabellen ·
+      {{ countsLoading ? '…' : toolSessionCount }} Tool-Sessions ·
+      {{ countsLoading ? '…' : sportabzeichenStandardCount }} Sportabzeichen-Standards
+    </p>
 
-    <Panel v-for="group in groupedEntries" :key="group.title" :header="group.title">
-      <div class="app-actions-row">
-        <Button
-          v-for="entry in group.items"
-          :key="entry.to"
-          as="router-link"
-          :to="entry.to"
-          :label="entry.title"
-          severity="secondary"
-          outlined
-          size="small"
-        />
-      </div>
-    </Panel>
+    <nav class="app-actions-row" aria-label="Sportfunktionen">
+      <Button
+        v-for="entry in entries"
+        :key="entry.to"
+        :label="entry.title"
+        severity="secondary"
+        outlined
+        size="small"
+        @click="router.push(entry.to)"
+      />
+    </nav>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import Button from 'openvue/button'
-import Panel from 'openvue/panel'
+import { useRouter } from 'vue-router'
 import Message from 'openvue/message'
-import Tag from 'openvue/tag'
 import { getSportBridge, useClassGroups } from '../composables/useSportBridge'
 import type { ClassGroup } from '@viccoboard/core'
 
 const classGroups = useClassGroups()
+const router = useRouter()
 const SportBridge = getSportBridge()
 const classes = ref<ClassGroup[]>([])
 const loadError = ref<string | null>(null)
@@ -56,134 +53,89 @@ const sportabzeichenStandardCount = ref(0)
 const entries = [
   {
     to: '/subjects/sport/assessments',
-    eyebrow: 'Praxis',
-    title: 'Leistungsabnahmen',
-
+    title: 'Leistungsabnahmen'
   },
   {
     to: '/subjects/sport/exam',
-    eyebrow: 'Prüfung',
-    title: 'Sportprüfung',
-
+    title: 'Sportprüfung'
   },
   {
     to: '/grading',
-    eyebrow: 'Bewertung',
-    title: 'Bewertung & Tests',
-
+    title: 'Bewertung & Tests'
   },
   {
     to: '/subjects/sport/tables',
-    eyebrow: 'Tabellen',
-    title: 'Tabellenverwaltung',
-
+    title: 'Tabellenverwaltung'
   },
   {
     to: '/subjects/sport/games',
-    eyebrow: 'Datenbank',
-    title: 'Spieldatenbank',
-
+    title: 'Spieldatenbank'
   },
   {
     to: '/student-calendar',
-    eyebrow: 'Schüler',
-    title: 'Abwesenheiten & Verletzungen',
-
+    title: 'Abwesenheiten & Verletzungen'
   },
   {
     to: '/subjects/sport/statistics',
-    eyebrow: 'Statistiken',
-    title: 'Statistiken',
-
+    title: 'Statistiken'
   },
   {
     to: '/tools/timer',
-    eyebrow: 'Tool',
-    title: 'Timer',
-
+    title: 'Timer'
   },
   {
     to: '/tools/multistop',
-    eyebrow: 'Tool',
-    title: 'Multistop',
-
+    title: 'Multistop'
   },
   {
     to: '/tools/scoreboard',
-    eyebrow: 'Tool',
-    title: 'Scoreboard',
-
+    title: 'Scoreboard'
   },
   {
     to: '/tools/teams',
-    eyebrow: 'Tool',
-    title: 'Teams bilden',
-
+    title: 'Teams bilden'
   },
   {
     to: '/tools/tournaments',
-    eyebrow: 'Tool',
-    title: 'Turnierplaner',
-
+    title: 'Turnierplaner'
   },
   {
     to: '/tools/tactics',
-    eyebrow: 'Tool',
-    title: 'Taktikboard',
-
+    title: 'Taktikboard'
   },
   {
     to: '/tools/feedback',
-    eyebrow: 'Tool',
-    title: 'Feedback',
-
+    title: 'Feedback'
   },
   {
     to: '/tools/dice',
-    eyebrow: 'Tool',
-    title: 'Würfeln',
-
+    title: 'Würfeln'
   },
   {
     to: '/tools/video-delay',
-    eyebrow: 'Tool',
-    title: 'Video Delay',
-
+    title: 'Video Delay'
   },
   {
     to: '/tools/finish-camera',
-    eyebrow: 'Tool',
-    title: 'Zielkamera',
-
+    title: 'Zielkamera'
   },
   {
     to: '/tools/pushup-tracking',
-    eyebrow: 'Tool',
-    title: 'Liegestütze Tracking',
-
+    title: 'Liegestütze Tracking'
   },
   {
     to: '/tools/tracking-basketball',
-    eyebrow: 'Tool',
-    title: 'Basketball Trefferquote',
-
+    title: 'Basketball Trefferquote'
   },
   {
     to: '/tools/jump-rope-tracking',
-    eyebrow: 'Tool',
-    title: 'Seilspringen Tracking',
-
+    title: 'Seilspringen Tracking'
   },
   {
     to: '/tools/slow-motion',
-    eyebrow: 'Tool',
-    title: 'Slow Motion Analyse',
-
+    title: 'Slow Motion Analyse'
   }
 ]
-
-const groupedEntries = [...new Set(entries.map(entry => entry.eyebrow))]
-  .map(title => ({ title, items: entries.filter(entry => entry.eyebrow === title) }))
 
 const classCount = computed(() => classes.value.filter((classGroup) => !classGroup.archived).length)
 
