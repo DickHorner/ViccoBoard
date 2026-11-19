@@ -26,9 +26,6 @@
 /* Cards                                                               */
 /* ------------------------------------------------------------------ */
 .card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
   padding: 1rem 1.25rem;
 }
 
