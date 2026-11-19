@@ -7,7 +7,7 @@
       </div>
       <div class="header-actions">
         <RouterLink to="/subjects/kbr" class="back-link">← KBR</RouterLink>
-        <Button label="Neue Vorlage" icon="pi pi-plus" @click="startNew" />
+        <Button label="Neue Vorlage" icon="pi pi-plus" :disabled="loading || saving || deleting" @click="startNew" />
       </div>
     </header>
 
@@ -119,8 +119,10 @@ function schedulePreview(): void {
 
 async function renderPreview(revision: number): Promise<void> {
   if (!previewStandaloneSheetDesignPdf) {
-    previewError.value = 'Die PDF-Vorschau ist nicht verfügbar.'
-    previewPending.value = false
+    if (revision === previewRevision) {
+      previewError.value = 'Die PDF-Vorschau ist nicht verfügbar.'
+      previewPending.value = false
+    }
     return
   }
   try {
@@ -176,6 +178,7 @@ async function loadTemplates(): Promise<void> {
     templates.value = await correctionSheetTemplateRepository.findAll()
     const initial = templates.value[0]
     replaceEditor(initial?.preset ?? createDefaultCorrectionSheetPreset(''), initial?.id)
+    loading.value = false
     await nextTick()
     recordRouteContentReady('sheet-templates')
   } catch (error) {
