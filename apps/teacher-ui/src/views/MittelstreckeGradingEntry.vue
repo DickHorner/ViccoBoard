@@ -1,7 +1,7 @@
 <template>
-  <div class="mittelstrecke-grading-view">
+  <div class="mittelstrecke-grading-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('MITTELSTRECKE.bewerte') }} {{ categoryName }}</h2>
     </div>
 
@@ -12,7 +12,7 @@
 
     <div v-else class="grading-content">
       <!-- Table Selection -->
-      <section class="card">
+      <section class="card app-card">
         <h3>{{ t('MITTELSTRECKE.tabelle') }}</h3>
         <select v-model="selectedTableId" class="form-select">
           <option value="">{{ t('TABLES.select-table') }}...</option>
@@ -23,17 +23,17 @@
       </section>
 
       <!-- Grading Table -->
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>{{ t('MITTELSTRECKE.alle-schueler') }}</h3>
-          <button 
+          <Button 
             v-if="hasChanges" 
-            class="btn-primary btn-small" 
+            
             @click="saveAll"
             :disabled="saving"
           >
             {{ saving ? t('COMMON.syncing') : t('COMMON.save') }}
-          </button>
+          </Button>
         </div>
 
         <div class="grading-table-wrapper">
@@ -79,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
