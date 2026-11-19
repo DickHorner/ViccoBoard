@@ -6,13 +6,9 @@
       <p class="page-description">Verwalten Sie Bewertungskategorien und erfassen Sie Noten.</p>
     </div>
 
-    <div class="quick-links">
-      <button class="quick-link-btn" @click="$router.push('/grading/tables')">
-        📊 Tabellenverwaltung
-      </button>
-      <button class="quick-link-btn" @click="$router.push('/settings/catalogs')">
-        📋 Kriterienkataloge
-      </button>
+    <div class="quick-links app-actions-row">
+      <Button label="Tabellenverwaltung" icon="pi pi-table" severity="secondary" outlined @click="$router.push('/grading/tables')" />
+      <Button label="Kriterienkataloge" icon="pi pi-list" severity="secondary" outlined @click="$router.push('/settings/catalogs')" />
     </div>
 
     <div class="grading-content">
