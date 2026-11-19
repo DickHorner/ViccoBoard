@@ -12,6 +12,7 @@ describe('IndexedDBAdapter indexed reads', () => {
         const store = request.result.createObjectStore('rows', { keyPath: 'id' });
         store.createIndex('class_group_id', 'class_group_id');
         store.createIndex('status', 'status');
+        request.result.createObjectStore('related', { keyPath: 'id' });
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
@@ -64,6 +65,19 @@ describe('IndexedDBAdapter indexed reads', () => {
     expect((await adapter.getAll<{ id: string }>('rows')).map(row => row.id))
       .toEqual(['a', 'b', 'c']);
     expect(tableRead).toHaveBeenCalledTimes(3);
+  });
+
+  it('rolls back deletions across stores when an async transaction fails', async () => {
+    await adapter.insert('related', { id: 'related-1' });
+
+    await expect(adapter.transaction(async () => {
+      await adapter.delete('related', 'related-1');
+      await adapter.delete('rows', 'a');
+      throw new Error('Simulated deletion failure');
+    })).rejects.toThrow('IndexedDB transaction aborted');
+
+    expect(await adapter.getById('related', 'related-1')).toBeTruthy();
+    expect(await adapter.getById('rows', 'a')).toBeTruthy();
   });
 
   it('counts indexed matches without fetching rows', async () => {
