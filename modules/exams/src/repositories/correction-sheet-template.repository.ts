@@ -1,6 +1,7 @@
 import { Exams, safeJsonParse, safeJsonStringify } from '@viccoboard/core';
 import type { StorageAdapter } from '@viccoboard/storage';
 import { createDefaultCorrectionSheetPreset } from './correction-sheet-preset.repository';
+import type { ExamRepository } from './exam.repository';
 
 const TEMPLATE_TYPE = 'correction-sheet';
 
@@ -17,7 +18,10 @@ export interface CorrectionSheetTemplate {
  * They do not belong to an exam and never contain an exam or candidate identity.
  */
 export class CorrectionSheetTemplateRepository {
-  constructor(private readonly adapter: StorageAdapter) {}
+  constructor(
+    private readonly adapter: StorageAdapter,
+    private readonly examRepository: ExamRepository
+  ) {}
 
   private mapToEntity(row: Record<string, any>): CorrectionSheetTemplate {
     const stored = safeJsonParse(
@@ -37,6 +41,7 @@ export class CorrectionSheetTemplateRepository {
         ...stored,
         id: `correction-sheet-preset:template:${row.id}`,
         examId: '',
+        templateId: undefined,
         name: row.name,
         updatedAt: new Date(row.last_modified)
       },
@@ -58,6 +63,7 @@ export class CorrectionSheetTemplateRepository {
       ...input,
       id: `correction-sheet-preset:template:${id}`,
       examId: '',
+      templateId: undefined,
       name,
       updatedAt: now
     };
@@ -116,6 +122,11 @@ export class CorrectionSheetTemplateRepository {
     if (!(await this.findById(id))) {
       throw new Error('Die Druckbogenvorlage wurde nicht gefunden.');
     }
+    const exams = await this.examRepository.findAll();
+    const linked = exams.some(exam => exam.printPresets.some(preset =>
+      preset.metadata?.correctionSheetTemplateId === id
+    ));
+    if (linked) throw new Error('Diese Vorlage wird von Prüfungen verwendet und kann nicht gelöscht werden.');
     await this.adapter.delete('templates', id);
   }
 }
