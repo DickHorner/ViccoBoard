@@ -1,7 +1,7 @@
 <template>
-  <div class="Sportabzeichen-view">
+  <div class="Sportabzeichen-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('SportABZEICHEN.title') }}</h2>
       <p class="info-text">{{ t('SportABZEICHEN.explainer') }}</p>
     </div>
@@ -13,7 +13,7 @@
 
     <div v-else class="content">
       <!-- Discipline Category Tabs -->
-      <section class="card">
+      <section class="card app-card">
         <div class="discipline-tabs">
           <button 
             v-for="cat in disciplineCategories" 
@@ -28,17 +28,17 @@
       </section>
 
       <!-- Student Grading Table -->
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>{{ t(`SportABZEICHEN.${selectedCategory}`) }}</h3>
-          <button 
+          <Button 
             v-if="hasChanges" 
-            class="btn-primary btn-small"
+           
             @click="saveAll"
             :disabled="saving"
           >
             {{ saving ? t('COMMON.syncing') : t('COMMON.save') }}
-          </button>
+          </Button>
         </div>
 
         <div class="table-wrapper">
@@ -119,7 +119,7 @@
       </section>
 
       <!-- Overall Results Summary -->
-      <section class="card">
+      <section class="card app-card">
         <h3>{{ t('SportABZEICHEN.gesamtergebnis') }}</h3>
         <div class="summary-grid">
           <div 
@@ -141,21 +141,22 @@
       </section>
 
       <!-- PDF Export -->
-      <section class="card">
+      <section class="card app-card">
         <h3>PDF-Export</h3>
-        <button 
-          class="btn-primary"
+        <Button 
+         
           @click="exportPdf"
           :disabled="exporting"
         >
           {{ exporting ? 'Erstelle PDF...' : 'Übersicht als PDF exportieren' }}
-        </button>
+        </Button>
       </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
