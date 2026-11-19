@@ -14,6 +14,7 @@ import {
 } from '../src/repositories/correction-sheet-preset.repository';
 import { GetCorrectionSheetPresetUseCase } from '../src/use-cases/get-correction-sheet-preset.use-case';
 import { SaveCorrectionSheetPresetUseCase } from '../src/use-cases/save-correction-sheet-preset.use-case';
+import { CorrectionSheetTemplateRepository } from '../src/repositories/correction-sheet-template.repository';
 
 describe('CorrectionSheetPresetRepository', () => {
   let storage: SQLiteStorage;
@@ -140,4 +141,31 @@ describe('CorrectionSheetPresetRepository', () => {
       footerText: 'Unterschrift der Lehrkraft folgt im Unterricht.'
     }));
   });
+  test('applies an independent layout to an exam without modifying the library template', async () => {
+    const exam = await createExam();
+    const library = new CorrectionSheetTemplateRepository(storage.getAdapter());
+    const template = await library.create({
+      ...createDefaultCorrectionSheetPreset(''),
+      name: 'Allgemeine Rückmeldung',
+      headerText: 'Hinweise zur Bearbeitung',
+      showTaskComments: false
+    });
+
+    await savePresetUseCase.execute({
+      ...template.preset,
+      id: `correction-sheet-preset:${exam.id}`,
+      examId: exam.id
+    });
+
+    const linked = await presetRepository.findByExamId(exam.id);
+    const unchanged = await library.findById(template.id);
+    expect(linked).toEqual(expect.objectContaining({
+      examId: exam.id,
+      headerText: 'Hinweise zur Bearbeitung',
+      showTaskComments: false
+    }));
+    expect(unchanged?.preset.examId).toBe('');
+    expect(unchanged?.id).toBe(template.id);
+  });
+
 });
