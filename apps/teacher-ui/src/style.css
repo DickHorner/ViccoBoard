@@ -3,28 +3,35 @@
   font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #14213d;
-  background-color: #f3f4f6;
+  color: var(--p-text-color, #14213d);
+  background-color: var(--p-surface-50, #f8fafc);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --page-background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
-  --surface-glass: rgba(255, 255, 255, 0.92);
-  --surface-soft: #f5f7fb;
-  --surface-muted: #eef2f6;
-  --surface-border: rgba(15, 23, 42, 0.1);
-  --surface-border-strong: rgba(15, 23, 42, 0.16);
-  --color-ink: #14213d;
-  --color-muted: #52607a;
-  --color-subtle: #6b7280;
-  --accent-strong: #1d4ed8;
-  --accent-soft: rgba(29, 78, 216, 0.12);
+  --page-background: var(--p-surface-50, #f8fafc);
+  --surface-glass: var(--p-content-background, #fff);
+  --surface-soft: var(--p-surface-50, #f8fafc);
+  --surface-muted: var(--p-content-hover-background, #f1f5f9);
+  --surface-border: var(--p-content-border-color, #dfe3e8);
+  --surface-border-strong: var(--p-surface-300, #cbd5e1);
+  --color-ink: var(--p-text-color, #14213d);
+  --color-muted: var(--p-text-muted-color, #64748b);
+  --color-subtle: var(--p-text-muted-color, #64748b);
+  --accent-strong: var(--p-primary-color, #1d4ed8);
+  --accent-soft: color-mix(in srgb, var(--p-primary-color, #1d4ed8) 12%, transparent);
   --danger-soft: rgba(220, 38, 38, 0.12);
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-sm: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --shadow-xs: none;
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
   --layout-max-width: 1440px;
+}
+
+:root.app-dark {
+  color-scheme: dark;
+  --page-background: var(--p-surface-950);
+  --surface-soft: var(--p-surface-900);
+  --surface-border-strong: var(--p-surface-700);
 }
 
 *,
@@ -69,13 +76,13 @@ a {
 .app-page {
   width: min(100%, var(--layout-max-width));
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .app-card {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--surface-glass);
   border: 1px solid var(--surface-border);
-  border-radius: 1.25rem;
+  border-radius: 6px;
   box-shadow: var(--shadow-xs);
 }
 
@@ -157,11 +164,6 @@ a {
 
 .app-chip strong {
   font-size: 1rem;
-}
-
-/* Shared touch targets for the Sport workflow's styled OpenVue controls. */
-.sport-ui :is(.p-button, .p-inputtext, .p-select, .p-textarea) {
-  min-height: 44px;
 }
 
 .app-data-note {
@@ -351,7 +353,7 @@ a {
 .sport-ui :is(.card, .panel, .form-card, .settings-card):not(.app-card) {
   background: var(--surface-glass);
   border: 1px solid var(--surface-border);
-  border-radius: 1.25rem;
+  border-radius: 6px;
   box-shadow: var(--shadow-xs);
 }
 

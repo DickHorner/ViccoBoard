@@ -7,9 +7,9 @@
         id="sidebar-toggle"
         class="menu-button"
         severity="secondary"
-        outlined
+        text
+        rounded
         :icon="isCompact ? 'pi pi-bars' : isRailCollapsed ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"
-        :label="isCompact ? 'Menü' : isRailCollapsed ? 'Ausklappen' : 'Einklappen'"
         :aria-label="isCompact ? (isSidebarOpen ? 'Menü schließen' : 'Menü öffnen') : isRailCollapsed ? 'Navigation ausklappen' : 'Navigation einklappen'"
         :aria-expanded="isCompact ? isSidebarOpen : !isRailCollapsed"
         aria-controls="primary-navigation"
@@ -26,7 +26,14 @@
 
       <div class="header-meta">
         <div class="page-title">{{ pageTitle }}</div>
-        <div class="status-pill">Offline bereit</div>
+        <Button
+          severity="secondary"
+          text
+          rounded
+          :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
+          :aria-label="isDark ? 'Hellen Modus aktivieren' : 'Dunklen Modus aktivieren'"
+          @click="toggleColorScheme"
+        />
       </div>
     </header>
 
@@ -67,7 +74,7 @@
                 :class="{ active: isNavItemActive(item.to) }"
                 :aria-current="isNavItemActive(item.to) ? (route.path === item.to || (route.path === '/dashboard' && item.to === '/') ? 'page' : 'location') : undefined"
                 :aria-label="isRailCollapsed ? item.label : undefined"
-                :title="isRailCollapsed ? `${item.label}: ${item.hint}` : undefined"
+                :title="isRailCollapsed ? `${item.label}: ${item.hint}` : item.hint"
                 @click="handleNavClick"
               >
                 <i :class="['nav-icon', item.icon]" aria-hidden="true"></i>
@@ -78,12 +85,6 @@
           </section>
         </nav>
 
-        <div class="sidebar-footer">
-          <div class="sidebar-card">
-            <p class="sidebar-card-title">Arbeitsprinzip</p>
-            <p class="sidebar-card-body">Organisation bleibt fachneutral. Fachtools öffnen wir erst im passenden Arbeitsbereich.</p>
-          </div>
-        </div>
       </aside>
 
       <button
@@ -108,10 +109,12 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import Button from 'openvue/button'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { primaryNavSections, resolvePrimaryNavTarget } from '../navigation'
+import { useColorScheme } from '../composables/useColorScheme'
 
 const route = useRoute()
 const router = useRouter()
 
+const { isDark, toggleColorScheme } = useColorScheme()
 const navSections = primaryNavSections
 const sectionState = ref<Record<string, boolean>>({})
 
@@ -131,7 +134,7 @@ const pageTitle = computed(() => {
   return 'Start'
 })
 
-const compactWidth = 900
+const compactWidth = 1025
 
 const getInitialLayout = () => {
   if (typeof window !== 'undefined') {
