@@ -277,7 +277,10 @@ async function loadClassContext(): Promise<void> {
   if (!selectedClassId.value) return
 
   categories.value = (await sportBridge.gradeCategoryRepository.findByClassGroup(selectedClassId.value))
-    .filter((category) => category.type === 'performance' || category.type === 'criteria')
+    .filter((category) =>
+      (category.type === 'performance' || category.type === 'criteria') &&
+      !category.description?.startsWith('lisum-basketball-')
+    )
 
   await loadRoster()
 }

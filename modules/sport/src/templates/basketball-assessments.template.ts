@@ -101,6 +101,8 @@ export function findBasketballAssessment(category: Sport.GradeCategory): Basketb
     category.configuration.criteria.length === assessment.criteria.length &&
     category.configuration.criteria.every((criterion, index) =>
       criterion.id === assessment.criteria[index].id &&
+      criterion.name === assessment.criteria[index].name &&
+      criterion.description === assessment.criteria[index].description &&
       criterion.minValue === assessment.criteria[index].choices[0] &&
       criterion.maxValue === assessment.criteria[index].choices[assessment.criteria[index].choices.length - 1] &&
       criterion.weight === 1

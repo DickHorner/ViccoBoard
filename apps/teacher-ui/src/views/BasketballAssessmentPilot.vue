@@ -212,7 +212,7 @@ const help = ref<string | null>(null)
 
 const assessment = computed(() => assessments.find((item) => item.id === assessmentId.value) ?? assessments[0])
 const currentStudent = computed(() => students.value[studentIndex.value])
-const currentScores = computed(() => currentStudent.value ? scores.value[currentStudent.value.id] ?? {} : {})
+const currentScores = computed<Record<string, number>>(() => currentStudent.value ? scores.value[currentStudent.value.id] ?? {} : {})
 const currentState = computed<SportExamStudentState>(() =>
   currentStudent.value ? states.value[currentStudent.value.id] ?? 'not-assessed' : 'not-assessed'
 )
@@ -382,13 +382,13 @@ async function restoreSession(): Promise<void> {
 }
 
 function setState(state: SportExamStudentState): void {
-  if (!currentStudent.value) return
+  if (!currentStudent.value || saving.value) return
   states.value = { ...states.value, [currentStudent.value.id]: state }
   saveMessage.value = ''
 }
 
 function setScore(criterionId: string, value: number): void {
-  if (!currentStudent.value) return
+  if (!currentStudent.value || saving.value) return
   const studentId = currentStudent.value.id
   scores.value = { ...scores.value, [studentId]: { ...currentScores.value, [criterionId]: value } }
   states.value = { ...states.value, [studentId]: 'ready' }
@@ -396,7 +396,7 @@ function setScore(criterionId: string, value: number): void {
 }
 
 function clearScore(criterionId: string): void {
-  if (!currentStudent.value) return
+  if (!currentStudent.value || saving.value) return
   const studentId = currentStudent.value.id
   const updated = { ...currentScores.value }
   delete updated[criterionId]
