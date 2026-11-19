@@ -18,6 +18,25 @@
 
     <div v-else-if="exam" class="designer-layout">
       <div class="editor-panel">
+        <section class="template-picker" aria-label="Druckbogenvorlage verwenden">
+          <h2>Vorlage verwenden</h2>
+          <p>Übernehme ein gespeichertes Layout in diese Prüfung. Änderungen werden erst mit „Gestaltung speichern“ übernommen.</p>
+          <div v-if="templateOptions.length" class="template-controls">
+            <Select
+              inputId="sheet-template-choice"
+              v-model="selectedTemplateId"
+              :options="templateOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Druckbogenvorlage wählen"
+              aria-label="Druckbogenvorlage wählen"
+              class="template-select"
+            />
+            <Button label="Vorlage übernehmen" :disabled="!selectedTemplateId" @click="applyTemplate" />
+          </div>
+          <Message v-if="templateLoadError" severity="warn" role="status">{{ templateLoadError }}</Message>
+          <RouterLink to="/sheet-templates" class="secondary-button">Vorlagen verwalten</RouterLink>
+        </section>
         <CorrectionSheetPresetForm v-model="preset" />
         <p v-if="dirty" class="notice">Die Gestaltung ist noch nicht gespeichert.</p>
         <p v-if="saveMessage" class="notice" role="status">{{ saveMessage }}</p>
@@ -49,10 +68,13 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeRouteLeave, RouterLink, useRoute } from 'vue-router'
 import type { Exams } from '@viccoboard/core'
-import { createDefaultCorrectionSheetPreset } from '@viccoboard/exams'
+import { createDefaultCorrectionSheetPreset, type CorrectionSheetTemplate } from '@viccoboard/exams'
+import Button from 'openvue/button'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
 import { useExamsBridge } from '../composables/useExamsBridge'
 import CorrectionSheetPresetForm from '../components/CorrectionSheetPresetForm.vue'
 
@@ -61,10 +83,15 @@ const {
   getExam,
   getCorrectionSheetPreset,
   saveCorrectionSheetPreset,
-  previewCorrectionSheetDesignPdf
+  previewCorrectionSheetDesignPdf,
+  correctionSheetTemplateRepository
 } = useExamsBridge()
 
 const exam = ref<Exams.Exam | null>(null)
+const templates = ref<CorrectionSheetTemplate[]>([])
+const selectedTemplateId = ref('')
+const templateLoadError = ref('')
+const templateOptions = computed(() => templates.value.map(entry => ({ label: entry.name, value: entry.id })))
 const preset = ref<Exams.CorrectionSheetPreset>(createDefaultCorrectionSheetPreset(''))
 const loading = ref(true)
 const loadError = ref('')
@@ -118,6 +145,30 @@ watch(preset, () => {
   schedulePreview()
 }, { flush: 'sync' })
 
+async function loadTemplates(): Promise<void> {
+  try {
+    if (!correctionSheetTemplateRepository) throw new Error('Vorlagenspeicher nicht verfügbar.')
+    templates.value = await correctionSheetTemplateRepository.findAll()
+  } catch (error) {
+    templateLoadError.value = error instanceof Error ? error.message : 'Vorlagen konnten nicht geladen werden.'
+  }
+}
+
+function applyTemplate(): void {
+  if (!exam.value) return
+  const template = templates.value.find(entry => entry.id === selectedTemplateId.value)
+  if (!template) return
+  if (dirty.value && !window.confirm('Die bisherigen ungespeicherten Änderungen durch die Vorlage ersetzen?')) return
+
+  preset.value = {
+    ...template.preset,
+    id: `correction-sheet-preset:${exam.value.id}`,
+    examId: exam.value.id,
+    updatedAt: new Date()
+  }
+  selectedTemplateId.value = ''
+}
+
 async function savePreset(): Promise<void> {
   if (!exam.value || !saveCorrectionSheetPreset || saving.value) return
   saving.value = true
@@ -138,6 +189,7 @@ async function savePreset(): Promise<void> {
 }
 
 onMounted(async () => {
+  void loadTemplates()
   try {
     const examId = String(route.params.id)
     const loadedExam = await getExam(examId)
@@ -151,6 +203,11 @@ onMounted(async () => {
     loadError.value = error instanceof Error ? error.message : 'Druckbogen konnte nicht geladen werden.'
     loading.value = false
   }
+})
+
+onBeforeRouteLeave(() => {
+  if (!dirty.value) return true
+  return window.confirm('Die Druckbogengestaltung ist noch nicht gespeichert. Trotzdem verlassen?')
 })
 
 onBeforeUnmount(() => {
@@ -190,6 +247,35 @@ onBeforeUnmount(() => {
 
 .header-actions {
   align-items: center;
+}
+
+.template-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.template-picker h2,
+.template-picker p {
+  margin: 0;
+}
+
+.template-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.template-select {
+  flex: 1 1 13rem;
+  min-width: 0;
+}
+
+.template-picker :deep(.p-button) {
+  min-height: 44px;
 }
 
 .primary-button,
