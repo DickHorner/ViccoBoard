@@ -58,13 +58,13 @@
           </select>
         </div>
 
-        <div class="card-content" v-if="!selectedClassId">
-          <p class="empty-state">{{ t('KLASSEN.klasse') }}...</p>
-        </div>
-
-        <div v-else-if="loading" class="loading-state">
+        <div v-if="loading" class="loading-state" role="status">
           <div class="spinner"></div>
           <p>{{ t('COMMON.loading') }}</p>
+        </div>
+
+        <div v-else-if="!selectedClassId" class="card-content">
+          <p class="empty-state">{{ t('KLASSEN.klasse') }}...</p>
         </div>
         
         <div v-else-if="selectedClassId && students.length === 0" class="empty-state">
@@ -224,7 +224,9 @@ const selectedClassId = ref<string>('')
 const selectedSubjectId = ref<string>('')
 const currentLessonId = ref<string | null>(null)
 const currentLessonDate = ref<Date | null>(null)
-const loading = ref(false)
+const loading = ref(
+  typeof route.query.lessonId === 'string' || typeof route.query.classId === 'string'
+)
 const saving = ref(false)
 const saveError = ref('')
 const saveSuccess = ref('')
@@ -505,13 +507,13 @@ onMounted(async () => {
       classes.value = loadedClasses.value
     } else {
       console.error('Failed to load class options:', loadedClasses.reason)
-      saveError.value = 'Klassen konnten nicht geladen werden.'
+      if (!saveError.value) saveError.value = 'Klassen konnten nicht geladen werden.'
     }
     if (loadedSubjects.status === 'fulfilled') {
       subjects.value = loadedSubjects.value.sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
     } else {
       console.error('Failed to load subject options:', loadedSubjects.reason)
-      saveError.value = 'Fächer konnten nicht geladen werden.'
+      if (!saveError.value) saveError.value = 'Fächer konnten nicht geladen werden.'
     }
   })
 
@@ -536,6 +538,7 @@ onMounted(async () => {
   } catch (err) {
     console.error('Failed to open attendance context:', err)
     saveError.value = err instanceof Error ? err.message : t('COMMON.error')
+    loading.value = false
   }
 
   await lookups
