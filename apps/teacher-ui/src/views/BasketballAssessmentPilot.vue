@@ -178,10 +178,10 @@ import Button from 'openvue/button'
 import Dialog from 'openvue/dialog'
 import { Sport, type ClassGroup, type Student } from '@viccoboard/core'
 import {
-  BASKETBALL_ASSESSMENTS,
-  evaluateBasketballAssessment,
-  findBasketballAssessment,
-  type BasketballAssessmentResult,
+  SPORT_ASSESSMENTS,
+  evaluateSportAssessment,
+  findSportAssessment,
+  type SportAssessmentResult,
   type SportExamSessionMetadata,
   type SportExamStudentState
 } from '@viccoboard/sport'
@@ -192,7 +192,7 @@ initializeSportBridge()
 initializeStudentsBridge()
 const sport = getSportBridge()
 const studentBridge = getStudentsBridge()
-const assessments = BASKETBALL_ASSESSMENTS
+const assessments = SPORT_ASSESSMENTS
 const classes = ref<ClassGroup[]>([])
 const classGroupId = ref('')
 const assessmentId = ref<(typeof assessments)[number]['id']>('passing-d')
@@ -216,14 +216,14 @@ const currentScores = computed<Record<string, number>>(() => currentStudent.valu
 const currentState = computed<SportExamStudentState>(() =>
   currentStudent.value ? states.value[currentStudent.value.id] ?? 'not-assessed' : 'not-assessed'
 )
-const currentResult = computed<BasketballAssessmentResult | null>(() =>
+const currentResult = computed<SportAssessmentResult | null>(() =>
   currentState.value === 'ready' || currentState.value === 'not-assessed'
-    ? evaluateBasketballAssessment(assessment.value, currentScores.value)
+    ? evaluateSportAssessment(assessment.value, currentScores.value)
     : null
 )
 const completedCount = computed(() => students.value.filter((student) =>
   states.value[student.id] === 'ready' &&
-  evaluateBasketballAssessment(assessment.value, scores.value[student.id] ?? {}) !== null
+  evaluateSportAssessment(assessment.value, scores.value[student.id] ?? {}) !== null
 ).length)
 const hasInput = computed(() => students.value.some((student) =>
   Object.keys(scores.value[student.id] ?? {}).length > 0 ||
@@ -304,7 +304,7 @@ async function changeDate(): Promise<void> {
 async function loadAssessment(): Promise<void> {
   const existing = (await sport.gradeCategoryRepository.findByClassGroup(classGroupId.value))
     .filter((category) => category.description === assessment.value.sourceId)
-  if (existing.length > 1 || (existing.length && !findBasketballAssessment(existing[0]))) {
+  if (existing.length > 1 || (existing.length && !findSportAssessment(existing[0]))) {
     throw new Error('Die zugehörige Prüfungsvorlage wurde verändert oder mehrfach angelegt. Bitte zuerst die Kategorie prüfen.')
   }
   const category = existing[0] ?? await sport.createGradeCategoryUseCase.execute({
@@ -415,7 +415,7 @@ async function save(): Promise<void> {
       const studentScores = scores.value[student.id] ?? {}
       const state = states.value[student.id] ?? 'not-assessed'
       const result = state === 'ready'
-        ? evaluateBasketballAssessment(assessment.value, studentScores)
+        ? evaluateSportAssessment(assessment.value, studentScores)
         : null
       return {
         studentId: student.id,
