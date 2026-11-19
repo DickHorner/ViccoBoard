@@ -1,7 +1,7 @@
 <template>
-  <div class="bjs-view">
+  <div class="bjs-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('BUNDESJUGENDSPIELE.info-titel') }}</h2>
       <p class="info-text">{{ t('BUNDESJUGENDSPIELE.info1') }}</p>
       <p class="info-text">{{ t('BUNDESJUGENDSPIELE.info2') }}</p>
@@ -17,7 +17,7 @@
 
     <div v-else class="content">
       <!-- Discipline Inputs-->
-      <section class="card">
+      <section class="card app-card">
         <h3>{{ t('BUNDESJUGENDSPIELE.disziplinen-einzeln') }}</h3>
         
         <div class="table-wrapper">
@@ -97,7 +97,7 @@
       </section>
 
       <!-- Summary -->
-      <section class="card">
+      <section class="card app-card">
         <h3>Übersicht</h3>
         <div class="summary-stats">
           <div class="stat-item">
@@ -116,22 +116,22 @@
       </section>
 
       <!-- Actions -->
-      <section class="card">
+      <section class="card app-card">
         <div class="action-buttons">
-          <button 
-            class="btn-primary"
+          <Button 
+           
             @click="saveAll"
             :disabled="saving"
           >
             {{ saving ? t('COMMON.syncing') : t('COMMON.save') }}
-          </button>
-          <button
-            class="btn-primary"
+          </Button>
+          <Button
+           
             @click="exportPdf"
             :disabled="exporting"
           >
             {{ exporting ? t('BUNDESJUGENDSPIELE.pdf-erstelle') : t('BUNDESJUGENDSPIELE.pdf-export') }}
-          </button>
+          </Button>
         </div>
       </section>
     </div>
@@ -139,6 +139,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';

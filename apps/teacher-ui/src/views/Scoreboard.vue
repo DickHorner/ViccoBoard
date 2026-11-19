@@ -75,20 +75,20 @@
   <!-- =========================================================
        MANAGE MODE — setup / save / load
        ========================================================= -->
-  <div v-else class="scoreboard-view">
+  <div v-else class="scoreboard-view sport-ui">
     <div class="page-header">
-      <button class="back-button" type="button" @click="$router.back()">{{ '\u2190' }} {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" type="button" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <div>
         <h2>{{ t('SCORES.title') }}</h2>
         <p class="page-description">{{ t('SCORES.description') }}</p>
       </div>
-      <button class="btn-primary" type="button" @click="viewMode = 'presenter'">
+      <Button type="button" @click="viewMode = 'presenter'">
         {{ t('SCORES.presenterMode') }}
-      </button>
+      </Button>
     </div>
 
     <!-- Setup card -->
-    <section class="card">
+    <section class="card app-card">
       <div class="setup-grid">
         <div class="form-group">
           <label for="scoreboard-class">{{ t('SCORES.classGroup') }}</label>
@@ -133,7 +133,7 @@
     </section>
 
     <!-- Layout + Teams card -->
-    <section class="card">
+    <section class="card app-card">
       <div class="section-header">
         <h3>{{ t('SCORES.layoutToggle') }}</h3>
         <div class="layout-toggle-group">
@@ -182,8 +182,8 @@
             <button class="score-btn" type="button" @click="adjustScore(team.id, 1)">+1</button>
           </div>
           <div class="score-actions">
-            <button class="btn-secondary" type="button" @click="adjustScore(team.id, 2)">+2</button>
-            <button class="btn-secondary" type="button" @click="adjustScore(team.id, 3)">+3</button>
+            <Button severity="secondary" outlined type="button" @click="adjustScore(team.id, 2)">+2</Button>
+            <Button severity="secondary" outlined type="button" @click="adjustScore(team.id, 3)">+3</Button>
           </div>
         </article>
       </div>
@@ -192,9 +192,9 @@
       <div class="inline-timer-bar">
         <span class="timer-label">{{ t('SCORES.inlineTimer') }}:</span>
         <span class="timer-value" :class="{ 'timer-value--running': timerRunning }">{{ formatDuration(timerElapsedMs) }}</span>
-        <button v-if="!timerRunning" class="btn-secondary btn-small" type="button" @click="startTimer">{{ t('SCORES.timerStart') }}</button>
-        <button v-else class="btn-secondary btn-small" type="button" @click="pauseTimer">{{ t('SCORES.timerPause') }}</button>
-        <button class="btn-secondary btn-small" type="button" @click="resetTimer">{{ t('SCORES.timerReset') }}</button>
+        <Button severity="secondary" outlined v-if="!timerRunning" type="button" @click="startTimer">{{ t('SCORES.timerStart') }}</Button>
+        <Button severity="secondary" outlined v-else type="button" @click="pauseTimer">{{ t('SCORES.timerPause') }}</Button>
+        <Button severity="secondary" outlined type="button" @click="resetTimer">{{ t('SCORES.timerReset') }}</Button>
       </div>
 
       <div v-if="linkedTimerSummary" class="info-banner">
@@ -224,25 +224,25 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn-secondary" type="button" @click="resetBoard">{{ t('SCORES.reset') }}</button>
+        <Button severity="secondary" outlined type="button" @click="resetBoard">{{ t('SCORES.reset') }}</Button>
       </div>
     </section>
 
     <!-- Tournament handoff -->
-    <section class="card">
+    <section class="card app-card">
       <div class="section-header">
         <h3>{{ t('SCORES.sendToTournament') }}</h3>
       </div>
       <p class="info-text">{{ t('SCORES.tournamentHandoffHint') }}</p>
       <div class="form-actions">
-        <button class="btn-secondary" type="button" @click="handoffToTournament">
+        <Button severity="secondary" outlined type="button" @click="handoffToTournament">
           {{ t('SCORES.sendToTournament') }}
-        </button>
+        </Button>
       </div>
     </section>
 
     <!-- Live mode section -->
-    <section class="card">
+    <section class="card app-card">
       <div class="section-header">
         <h3>{{ t('SCORES.liveMode') }}</h3>
         <span class="session-badge">{{ t('SCORES.liveModeOff') }}</span>
@@ -251,7 +251,7 @@
     </section>
 
     <!-- Save session -->
-    <section class="card">
+    <section class="card app-card">
       <div class="section-header">
         <h3>{{ t('SCORES.saveSession') }}</h3>
         <span v-if="currentSessionId" class="session-badge">{{ t('SCORES.existingSession') }}</span>
@@ -268,15 +268,15 @@
         />
       </div>
       <div class="form-actions">
-        <button class="btn-primary" type="button" :disabled="!canSave || saving" @click="saveSession">
+        <Button type="button" :disabled="!canSave || saving" @click="saveSession">
           {{ saving ? '...' : t('SCORES.save') }}
-        </button>
+        </Button>
       </div>
       <p v-if="message" class="info-text">{{ message }}</p>
     </section>
 
     <!-- Saved sessions -->
-    <section class="card">
+    <section class="card app-card">
       <h3>{{ t('SCORES.savedSessions') }}</h3>
       <p v-if="savedSessions.length === 0" class="empty-hint">{{ t('SCORES.noSessions') }}</p>
       <ul v-else class="sessions-list">
@@ -285,9 +285,9 @@
             <strong>{{ scoreboardSessionName(session) }}</strong>
             <span class="session-meta">{{ scoreboardSessionSummary(session) }}</span>
           </div>
-          <button class="btn-secondary btn-small" type="button" @click="loadSession(session)">
+          <Button severity="secondary" outlined type="button" @click="loadSession(session)">
             {{ t('SCORES.loadSession') }}
-          </button>
+          </Button>
         </li>
       </ul>
     </section>
@@ -295,6 +295,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useScoreboardView } from '../composables/useScoreboardView';
 
 const {

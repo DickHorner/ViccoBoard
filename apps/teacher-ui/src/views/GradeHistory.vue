@@ -1,7 +1,7 @@
 <template>
-  <div class="grade-history-view">
+  <div class="grade-history-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <h2>Bewertungshistorie</h2>
       <p class="page-description">
         {{ category ? `Historie für: ${category.name}` : 'Zeigen Sie die Historie der Bewertungen an.' }}
@@ -17,13 +17,13 @@
     <!-- Error State -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadData">Erneut versuchen</button>
+      <Button @click="loadData">Erneut versuchen</Button>
     </div>
 
     <!-- Content -->
     <div v-else-if="category" class="history-content">
       <!-- Filters -->
-      <section class="card filters-card">
+      <section class="card filters-card app-card">
         <h3>Filter</h3>
         <div class="filter-grid">
           <div class="filter-item">
@@ -59,17 +59,17 @@
       </section>
 
       <!-- History Table -->
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>Bewertungseinträge</h3>
           <div class="header-actions">
-            <button 
-              class="btn-secondary btn-small"
+            <Button severity="secondary" outlined 
+             
               @click="exportHistory"
               :disabled="filteredEntries.length === 0"
             >
               📥 Exportieren
-            </button>
+            </Button>
           </div>
         </div>
         
@@ -117,7 +117,7 @@
       </section>
 
       <!-- Statistics (if student selected) -->
-      <section class="card" v-if="selectedStudentId && studentStatistics">
+      <section class="card app-card" v-if="selectedStudentId && studentStatistics">
         <h3>Statistiken für {{ getStudentName(selectedStudentId) }}</h3>
         <div class="stats-grid">
           <div class="stat-item">
@@ -143,6 +143,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSportBridge } from '../composables/useSportBridge';

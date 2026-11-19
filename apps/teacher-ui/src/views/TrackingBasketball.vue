@@ -1,29 +1,29 @@
 <template>
-  <div class="tracking-basketball-view">
+  <div class="tracking-basketball-view sport-ui">
     <div class="page-header">
       <h2>🏀 {{ t('TRACKING.basketball.title') }}</h2>
       <div class="header-actions">
-        <button v-if="!cameraActive" class="btn btn-primary" @click="startCamera">
+        <Button v-if="!cameraActive" @click="startCamera">
           📷 {{ t('TRACKING.basketball.start-camera') }}
-        </button>
-        <button v-else class="btn btn-danger" @click="stopCamera">
+        </Button>
+        <Button severity="danger" v-else @click="stopCamera">
           ⏹ {{ t('TRACKING.basketball.stop-camera') }}
-        </button>
+        </Button>
       </div>
     </div>
 
-    <div v-if="cameraError" class="error-banner card">
+    <div v-if="cameraError" class="error-banner card app-card">
       ⚠️ {{ cameraError }}
-      <button class="btn btn-secondary retry-btn" @click="retryCamera">
+      <Button severity="secondary" outlined class="retry-btn" @click="retryCamera">
         {{ t('TRACKING.basketball.retry') }}
-      </button>
+      </Button>
     </div>
 
-    <div v-if="!cameraActive && !cameraError" class="idle-hint card">
+    <div v-if="!cameraActive && !cameraError" class="idle-hint card app-card">
       <p>{{ t('TRACKING.basketball.zone-hint') }}</p>
     </div>
 
-    <div v-if="cameraActive" class="stats-bar card">
+    <div v-if="cameraActive" class="stats-bar card app-card">
       <div class="stat-item">
         <span class="stat-value">{{ shotCount }}</span>
         <span class="stat-label">{{ t('TRACKING.basketball.stats.shots') }}</span>
@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <div v-show="cameraActive" class="video-wrapper card">
+    <div v-show="cameraActive" class="video-wrapper card app-card">
       <div class="canvas-container">
         <video ref="liveVideo" class="live-video-hidden" autoplay muted playsinline />
         <canvas
@@ -58,13 +58,13 @@
       <div class="zone-actions">
         <span v-if="targetZone" class="zone-badge">✅ {{ t('TRACKING.basketball.zone-defined') }}</span>
         <span v-else class="zone-badge zone-badge--empty">{{ t('TRACKING.basketball.define-zone') }}</span>
-        <button v-if="targetZone" class="btn btn-secondary" @click="clearZone">
+        <Button severity="secondary" outlined v-if="targetZone" @click="clearZone">
           {{ t('TRACKING.basketball.clear-zone') }}
-        </button>
+        </Button>
       </div>
     </div>
 
-    <div v-if="cameraActive" class="controls-panel card">
+    <div v-if="cameraActive" class="controls-panel card app-card">
       <div class="control-group">
         <label class="control-label">
           {{ t('TRACKING.basketball.sensitivity-label') }}
@@ -78,21 +78,21 @@
       </div>
 
       <div class="action-buttons">
-        <button
+        <Button
           v-if="!trackingActive"
-          class="btn btn-primary btn-large"
+          class="btn-large"
           :disabled="!targetZone"
           :title="!targetZone ? t('TRACKING.basketball.no-zone-warning') : undefined"
           @click="startTracking"
         >
           ▶ {{ t('TRACKING.basketball.controls.start') }}
-        </button>
-        <button v-else class="btn btn-danger btn-large" @click="stopTracking">
+        </Button>
+        <Button severity="danger" v-else class="btn-large" @click="stopTracking">
           ⏹ {{ t('TRACKING.basketball.controls.stop') }}
-        </button>
-        <button class="btn btn-secondary btn-large" :disabled="trackingActive" @click="resetSession">
+        </Button>
+        <Button severity="secondary" outlined class="btn-large" :disabled="trackingActive" @click="resetSession">
           ↺ {{ t('TRACKING.basketball.controls.reset') }}
-        </button>
+        </Button>
       </div>
 
       <p v-if="sessionSaved" class="session-saved-notice">
@@ -103,6 +103,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useI18n } from 'vue-i18n'
 
 import { useTrackingBasketballView } from '../composables/useTrackingBasketballView'

@@ -1,7 +1,7 @@
 <template>
-  <div class="time-grading-view">
+  <div class="time-grading-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="router.back()">Zurück</Button>
       <h2>{{ category?.name || 'Messwertbewertung' }}</h2>
       <p class="page-description">
         Messwerte erfassen und über eine Bewertungstabelle automatisch in Noten umrechnen.
@@ -15,16 +15,16 @@
 
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="loadData">Erneut versuchen</button>
+      <Button @click="loadData">Erneut versuchen</Button>
     </div>
 
     <div v-else-if="category" class="grading-content">
-      <section class="card">
+      <section class="card app-card">
         <div class="card-header">
           <h3>Bewertung konfigurieren</h3>
-          <button class="btn-secondary btn-small" @click="router.push('/grading/tables')">
+          <Button severity="secondary" outlined @click="router.push('/grading/tables')">
             Tabellen verwalten
-          </button>
+          </Button>
         </div>
 
         <div class="info-grid">
@@ -101,21 +101,21 @@
           werden beim Schülerabgleich berücksichtigt.
         </p>
 
-        <button class="btn-primary btn-small" :disabled="savingConfig" @click="saveConfiguration">
+        <Button :disabled="savingConfig" @click="saveConfiguration">
           {{ savingConfig ? 'Speichern...' : 'Konfiguration speichern' }}
-        </button>
+        </Button>
       </section>
 
-      <section v-if="students.length > 0" class="card">
+      <section v-if="students.length > 0" class="card app-card">
         <div class="card-header">
           <h3>Leistungen</h3>
-          <button
-            class="btn-primary btn-small"
+          <Button
+           
             :disabled="saving || dirtyStudents.size === 0 || !selectedTableId"
             @click="saveAll"
           >
             {{ saving ? 'Speichern...' : 'Alle Änderungen speichern' }}
-          </button>
+          </Button>
         </div>
 
         <p class="info-note">
@@ -182,7 +182,7 @@
         </div>
       </section>
 
-      <section v-else class="card">
+      <section v-else class="card app-card">
         <div class="empty-state">
           <p>Keine Schüler in dieser Klasse gefunden.</p>
         </div>
@@ -192,6 +192,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 

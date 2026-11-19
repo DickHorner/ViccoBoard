@@ -1,5 +1,5 @@
 <template>
-  <section class="subject-hub">
+  <section class="subject-hub sport-ui">
     <header class="page-header">
       <div>
         <h1>Sport</h1>
@@ -252,7 +252,7 @@ onMounted(() => {
 
 .subtitle,
 .hub-card p {
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .metrics-grid {
@@ -273,7 +273,7 @@ onMounted(() => {
 }
 
 .metric-card span {
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .hub-grid {

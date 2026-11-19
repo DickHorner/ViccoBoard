@@ -1,15 +1,15 @@
 <template>
-  <section class="sport-tables">
+  <section class="sport-tables sport-ui">
     <header class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <div>
         <h1>Tabellenverwaltung</h1>
         <p class="subtitle">Leistungstabellen importieren, aktivieren und verwalten.</p>
       </div>
-      <span class="summary-pill">{{ tables.length }} Tabellen</span>
+      <Tag :value="tables.length + ' Tabellen'" severity="info" />
     </header>
 
-    <section class="template-card" aria-label="CSV-Vorlage herunterladen">
+    <section class="template-card app-card" aria-label="CSV-Vorlage herunterladen">
       <div>
         <p class="eyebrow">Vorlage</p>
         <h2>Cooper-Normen als CSV</h2>
@@ -17,13 +17,11 @@
           Vorlage herunterladen, in Excel oder einer Tabellen-App anpassen und wieder als CSV importieren.
         </p>
       </div>
-      <button class="template-button" type="button" @click="downloadCooperTemplate">
-        CSV-Vorlage herunterladen
-      </button>
+      <Button label="CSV-Vorlage herunterladen" icon="pi pi-download" severity="secondary" outlined @click="downloadCooperTemplate" />
     </section>
 
     <!-- Import section -->
-    <section class="import-card" aria-label="Tabelle importieren">
+    <section class="import-card app-card" aria-label="Tabelle importieren">
       <p class="eyebrow">Import</p>
       <h2>Tabelle importieren</h2>
       <div class="import-guidance">
@@ -44,23 +42,11 @@
       <div class="form-row">
         <label class="field">
           <span class="label-text">Name *</span>
-          <input
-            v-model="importName"
-            type="text"
-            placeholder="z. B. Cooper-Normen Sek 1"
-            class="text-input"
-            :disabled="importing"
-          />
+          <InputText v-model="importName" placeholder="z. B. Cooper-Normen Sek 1" :disabled="importing" fluid />
         </label>
         <label class="field">
           <span class="label-text">Beschreibung</span>
-          <input
-            v-model="importDescription"
-            type="text"
-            placeholder="Optional"
-            class="text-input"
-            :disabled="importing"
-          />
+          <InputText v-model="importDescription" placeholder="Optional" :disabled="importing" fluid />
         </label>
       </div>
 
@@ -90,17 +76,11 @@
         <pre class="preview-content">{{ csvPreviewLines.join('\n') }}</pre>
       </div>
 
-      <button
-        class="import-button"
-        :disabled="!canImport || importing"
-        @click="doImport"
-      >
-        {{ importing ? 'Wird importiert …' : 'Importieren' }}
-      </button>
+      <Button :label="importing ? 'Wird importiert …' : 'Importieren'" icon="pi pi-upload" :loading="importing" :disabled="!canImport || importing" @click="doImport" />
 
-      <p v-if="importSuccess" class="success-msg" role="status">
+      <Message v-if="importSuccess" severity="success" role="status">
         Tabelle „{{ lastImportedName }}" erfolgreich importiert.
-      </p>
+      </Message>
     </section>
 
     <!-- Table list -->
@@ -115,16 +95,14 @@
         <article
           v-for="table in tables"
           :key="table.id"
-          class="table-card"
+          class="table-card app-card"
           :class="{ inactive: table.active === false }"
         >
           <div class="table-info">
             <div class="table-header-row">
               <strong class="table-name">{{ table.name }}</strong>
-              <span class="badge" :class="table.active !== false ? 'badge-active' : 'badge-inactive'">
-                {{ table.active !== false ? 'Aktiv' : 'Inaktiv' }}
-              </span>
-              <span class="badge badge-source">{{ sourceLabelMap[table.source] ?? table.source }}</span>
+              <Tag :value="table.active !== false ? 'Aktiv' : 'Inaktiv'" :severity="table.active !== false ? 'success' : 'secondary'" />
+              <Tag :value="sourceLabelMap[table.source] ?? table.source" severity="secondary" />
             </div>
             <p v-if="table.description" class="table-desc">{{ table.description }}</p>
             <p class="table-meta">
@@ -135,20 +113,12 @@
           </div>
 
           <div class="table-actions">
-            <button
-              class="action-btn"
-              :aria-label="table.active !== false ? 'Deaktivieren' : 'Aktivieren'"
-              @click="toggleActive(table)"
-            >
-              {{ table.active !== false ? 'Deaktivieren' : 'Aktivieren' }}
-            </button>
-            <button
-              class="action-btn danger"
-              aria-label="Tabelle löschen"
-              @click="deleteTable(table.id)"
-            >
-              Löschen
-            </button>
+            <Button
+              :label="table.active !== false ? 'Deaktivieren' : 'Aktivieren'"
+              severity="secondary" outlined @click="toggleActive(table)"
+            />
+            <Button label="Löschen" :aria-label="`Tabelle ${table.name} löschen`"
+              severity="danger" text @click="deleteTable(table.id)" />
           </div>
         </article>
       </div>
@@ -157,7 +127,12 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, computed, onMounted } from 'vue'
+
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import Tag from 'openvue/tag'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Sport } from '@viccoboard/core'
 import {

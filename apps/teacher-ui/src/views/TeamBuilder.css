@@ -11,7 +11,7 @@
 .back-button {
   background: none;
   border: none;
-  color: #0066cc;
+  color: var(--accent-strong);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -19,10 +19,7 @@
 }
 
 .card {
-  background: white;
-  border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 1.5rem;
 }
 
@@ -50,7 +47,7 @@
 .form-input {
   padding: 0.75rem;
   border-radius: 6px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
 }
 
 .checkbox-row {
@@ -67,7 +64,7 @@
 
 .team-count-slider {
   width: 100%;
-  accent-color: #667eea;
+  accent-color: var(--accent-strong);
   height: 6px;
   cursor: pointer;
 }
@@ -82,7 +79,7 @@
 .preset-btn {
   padding: 0.3rem 0.75rem;
   border-radius: 6px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--surface-border);
   background: white;
   cursor: pointer;
   font-size: 0.875rem;
@@ -91,8 +88,8 @@
 }
 
 .preset-btn.active {
-  background: #667eea;
-  border-color: #667eea;
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
   color: white;
 }
 
@@ -130,7 +127,7 @@ details[open] .expandable-title::before {
 
 .hint-text {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-muted);
   margin: 0 0 0.5rem;
 }
 
@@ -166,11 +163,11 @@ details[open] .expandable-title::before {
 
 .btn-icon {
   background: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 4px;
   cursor: pointer;
   padding: 0.4rem 0.6rem;
-  color: #666;
+  color: var(--color-muted);
   min-height: 36px;
   line-height: 1;
 }
@@ -199,7 +196,7 @@ details[open] .expandable-title::before {
 }
 
 .btn-primary {
-  background: #667eea;
+  background: var(--accent-strong);
   color: white;
 }
 
@@ -210,8 +207,8 @@ details[open] .expandable-title::before {
 
 .btn-secondary {
   background: white;
-  border: 2px solid #ddd;
-  color: #333;
+  border: 2px solid var(--surface-border);
+  color: var(--color-ink);
 }
 
 .btn-secondary:disabled {
@@ -288,7 +285,7 @@ details[open] .expandable-title::before {
 
 .role-badge {
   font-size: 0.75rem;
-  background: #667eea;
+  background: var(--accent-strong);
   color: white;
   border-radius: 10px;
   padding: 0.15rem 0.5rem;
@@ -331,11 +328,11 @@ details[open] .expandable-title::before {
 
 .session-meta {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .empty-hint {
-  color: #888;
+  color: var(--color-subtle);
   padding: 1rem 0;
 }
 

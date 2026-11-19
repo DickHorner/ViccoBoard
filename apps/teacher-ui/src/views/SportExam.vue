@@ -1,39 +1,37 @@
 <template>
-  <section class="sport-exam-view">
+  <section class="sport-exam-view sport-ui">
     <header class="page-header">
-      <button class="back-button" @click="router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="router.back()">Zurück</Button>
       <div>
         <h1>Sportprüfung</h1>
         <p>Prüfung anlegen, Anwesenheit abgleichen und Messwerte direkt in Noten umrechnen.</p>
       </div>
     </header>
 
-    <section class="card setup-card">
+    <section class="card setup-card app-card">
       <div class="setup-grid">
-        <label>
-          <span>Datum</span>
-          <input v-model="examDate" type="date" class="form-input" @change="loadRoster" />
-        </label>
+        <div class="app-field">
+          <label for="sport-exam-date">Datum</label>
+          <InputText id="sport-exam-date" v-model="examDate" type="date" fluid @change="loadRoster" />
+        </div>
 
-        <label>
-          <span>Klasse</span>
-          <select v-model="selectedClassId" class="form-input" @change="loadClassContext">
-            <option value="">Klasse auswählen...</option>
-            <option v-for="classGroup in classes" :key="classGroup.id" :value="classGroup.id">
-              {{ classGroup.name }}{{ classGroup.gradeLevel ? ` · Jg. ${classGroup.gradeLevel}` : '' }}
-            </option>
-          </select>
-        </label>
+        <div class="app-field">
+          <label for="sport-exam-class">Klasse</label>
+          <Select inputId="sport-exam-class" :modelValue="selectedClassId"
+            :options="classOptions" optionLabel="label" optionValue="value"
+            placeholder="Klasse auswählen" fluid
+            @update:modelValue="value => { selectedClassId = value; void loadClassContext() }"
+          />
+        </div>
 
-        <label>
-          <span>Disziplin</span>
-          <select v-model="selectedCategoryId" class="form-input" @change="loadCategory">
-            <option value="">Disziplin auswählen...</option>
-            <option v-for="candidate in categories" :key="candidate.id" :value="candidate.id">
-              {{ categoryLabel(candidate) }}
-            </option>
-          </select>
-        </label>
+        <div class="app-field">
+          <label for="sport-exam-category">Disziplin</label>
+          <Select inputId="sport-exam-category" :modelValue="selectedCategoryId"
+            :options="categoryOptions" optionLabel="label" optionValue="value"
+            placeholder="Disziplin auswählen" fluid
+            @update:modelValue="value => { selectedCategoryId = value; void loadCategory() }"
+          />
+        </div>
 
         <label class="announced-toggle">
           <input v-model="announced" type="checkbox" />
@@ -45,9 +43,7 @@
         <strong>{{ categoryLabel(selectedCategory) }}</strong>
         <template v-if="isCriteriaAssessment">
           <span>· {{ criteriaConfig?.criteria.length ?? 0 }} Beobachtungskriterien</span>
-          <button class="btn-link" type="button" @click="router.push(`/grading/criteria/${selectedCategory.id}`)">
-            Kriterien bearbeiten
-          </button>
+          <Button severity="secondary" text label="Kriterien bearbeiten" @click="router.push(`/grading/criteria/${selectedCategory.id}`)" />
         </template>
         <template v-else>
           <span v-if="selectedConfig?.measurementLabel">{{ selectedConfig.measurementLabel }}</span>
@@ -59,15 +55,15 @@
       <p v-if="contextWarning" class="warning">{{ contextWarning }}</p>
     </section>
 
-    <section v-if="students.length > 0 && selectedCategory" class="card">
+    <section v-if="students.length > 0 && selectedCategory" class="card app-card">
       <div class="card-header">
         <div>
           <h2>Leistungserfassung</h2>
           <p>{{ students.length }} Schüler · Abwesenheiten für {{ formatDate(examDate) }} abgeglichen</p>
         </div>
-        <button class="btn-primary" :disabled="saving || !canSave" @click="saveExam">
+        <Button :disabled="saving || !canSave" @click="saveExam">
           {{ saving ? 'Speichern...' : 'Prüfung speichern' }}
-        </button>
+        </Button>
       </div>
 
       <div class="table-wrapper">
@@ -175,7 +171,7 @@
       </div>
     </section>
 
-    <section v-else-if="selectedClassId && selectedCategoryId" class="card empty-state">
+    <section v-else-if="selectedClassId && selectedCategoryId" class="card empty-state app-card">
       Keine Schüler gefunden.
     </section>
 
@@ -186,6 +182,9 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Select from 'openvue/select'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -213,7 +212,18 @@ const sportBridge = getSportBridge()
 const studentsBridge = getStudentsBridge()
 
 const classes = ref<ClassGroup[]>([])
+const classOptions = computed(() => [
+  { label: 'Klasse auswählen', value: '' },
+  ...classes.value.map(group => ({
+    label: group.name + (group.gradeLevel ? ` · Jg. ${group.gradeLevel}` : ''),
+    value: group.id
+  }))
+])
 const categories = ref<Sport.GradeCategory[]>([])
+const categoryOptions = computed(() => [
+  { label: 'Disziplin auswählen', value: '' },
+  ...categories.value.map(category => ({ label: categoryLabel(category), value: category.id }))
+])
 const students = ref<Student[]>([])
 const selectedClassId = ref('')
 const selectedCategoryId = ref('')
@@ -710,7 +720,7 @@ function localDateString(date: Date): string {
 .sport-exam-view { display: flex; flex-direction: column; gap: 1.25rem; }
 .page-header { display: flex; gap: 1rem; align-items: flex-start; }
 .page-header h1, .card h2 { margin: 0; }
-.page-header p, .card-header p { margin: 0.25rem 0 0; color: #64748b; }
+.page-header p, .card-header p { margin: 0.25rem 0 0; color: var(--color-muted); }
 .back-button { background: none; border: 0; cursor: pointer; min-height: 44px; }
 .card { background: white; border: 1px solid rgba(15,23,42,.08); border-radius: 16px; padding: 1rem; }
 .setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; align-items: end; }
@@ -720,7 +730,7 @@ function localDateString(date: Date): string {
 .exam-meta { margin-top: 1rem; display: flex; gap: .5rem; flex-wrap: wrap; }
 .warning { color: #92400e; background: #fffbeb; padding: .75rem; border-radius: 8px; }
 .card-header { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
-.btn-primary { min-height: 44px; padding: .6rem 1rem; border: 0; border-radius: 8px; background: #0066cc; color: white; cursor: pointer; }
+.btn-primary { min-height: 44px; padding: .6rem 1rem; border: 0; border-radius: 8px; background: var(--accent-strong); color: white; cursor: pointer; }
 .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
 .table-wrapper { overflow-x: auto; margin-top: 1rem; }
 .exam-table { width: 100%; border-collapse: collapse; }
@@ -729,9 +739,9 @@ function localDateString(date: Date): string {
 .value-input { width: 100px; }
 .criterion-input { width: 72px; }
 .criterion-score-cell, .total-cell { text-align: center !important; }
-.criterion-range { color: #64748b; font-size: .75rem; font-weight: 400; }
-.btn-link { border: 0; background: none; color: #0066cc; cursor: pointer; padding: 0; }
-.unit { margin-left: .35rem; color: #64748b; }
+.criterion-range { color: var(--color-muted); font-size: .75rem; font-weight: 400; }
+.btn-link { border: 0; background: none; color: var(--accent-strong); cursor: pointer; padding: 0; }
+.unit { margin-left: .35rem; color: var(--color-muted); }
 .grade-cell { text-align: center !important; }
 .note-cell { min-width: 140px; }
 .exam-row--absent { opacity: .5; background: #f8fafc; }
@@ -739,7 +749,7 @@ function localDateString(date: Date): string {
 .exam-row--missing-kit { background: #fef2f2; }
 .attest-badge { display: inline-block; border-radius: 999px; padding: .2rem .55rem; background: #fee2e2; color: #991b1b; font-weight: 700; font-size: .8rem; }
 .success-card { padding: .8rem 1rem; border-radius: 10px; background: #ecfdf5; color: #166534; }
-.empty-state { text-align: center; color: #64748b; }
+.empty-state { text-align: center; color: var(--color-muted); }
 @media (max-width: 700px) {
   .card-header { align-items: stretch; flex-direction: column; }
   .exam-table th, .exam-table td { padding: .5rem; }

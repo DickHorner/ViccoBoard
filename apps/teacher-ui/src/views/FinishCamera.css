@@ -9,7 +9,7 @@
 }
 
 .page-description {
-  color: var(--color-text-muted, #666);
+  color: var(--color-text-muted, var(--color-muted));
   margin: 0;
   font-size: 0.9rem;
 }
@@ -96,7 +96,7 @@
 .idle-hint {
   padding: 2rem 1rem;
   text-align: center;
-  color: var(--color-text-muted, #888);
+  color: var(--color-text-muted, var(--color-subtle));
 }
 
 .finish-line-info {
@@ -107,7 +107,7 @@
   gap: 0.5rem;
 }
 
-.muted { color: var(--color-text-muted, #999); }
+.muted { color: var(--color-text-muted, var(--color-subtle)); }
 
 .stopwatch-panel {
   width: 200px;
@@ -126,7 +126,7 @@
   font-family: monospace;
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  background: var(--color-surface-2, #f5f5f5);
+  background: var(--color-surface-2, var(--surface-soft));
   min-width: 9ch;
   text-align: center;
   transition: background 0.2s;
@@ -184,7 +184,7 @@
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
-  background: var(--color-surface-2, #f5f5f5);
+  background: var(--color-surface-2, var(--surface-soft));
   border-left: 3px solid transparent;
 }
 
@@ -197,7 +197,7 @@
   font-size: 0.9rem;
   width: 1.5rem;
   text-align: center;
-  color: var(--color-text-muted, #666);
+  color: var(--color-text-muted, var(--color-muted));
 }
 
 .event-thumbnail {
@@ -269,7 +269,7 @@
 
 .empty-state {
   text-align: center;
-  color: var(--color-text-muted, #888);
+  color: var(--color-text-muted, var(--color-subtle));
   padding: 2rem;
 }
 

@@ -1,11 +1,11 @@
 <template>
-  <div class="tactics-view">
+  <div class="tactics-view sport-ui">
     <div class="page-header">
       <h2>{{ t('TACTICS.title') }}</h2>
     </div>
 
     <div class="board-layout">
-      <aside class="toolbar card">
+      <aside class="toolbar card app-card">
         <h3>{{ t('TACTICS.tools') }}</h3>
 
         <div class="tool-group">
@@ -44,12 +44,12 @@
 
         <hr />
 
-        <button class="btn btn-secondary clear-btn" @click="clearBoard">
+        <Button severity="secondary" outlined class="btn clear-btn" @click="clearBoard">
           {{ t('TACTICS.clearBoard') }}
-        </button>
+        </Button>
       </aside>
 
-      <div class="canvas-wrapper card">
+      <div class="canvas-wrapper card app-card">
         <canvas
           ref="boardCanvas"
           class="board-canvas"
@@ -65,13 +65,13 @@
         ></canvas>
       </div>
 
-      <aside class="snapshot-panel card">
+      <aside class="snapshot-panel card app-card">
         <h3>{{ t('TACTICS.newSnapshot') }}</h3>
         <input v-model="snapshotTitle" class="form-input" :placeholder="t('TACTICS.snapshotTitlePlaceholder')" maxlength="80" />
         <input v-model="snapshotSport" class="form-input" :placeholder="t('TACTICS.sport')" maxlength="40" />
-        <button class="btn btn-primary" :disabled="saving" @click="saveSnapshot">
+        <Button class="btn" :disabled="saving" @click="saveSnapshot">
           {{ saving ? '…' : t('TACTICS.save') }}
-        </button>
+        </Button>
         <p v-if="saveMessage" class="save-message">{{ saveMessage }}</p>
 
         <hr />
@@ -85,8 +85,8 @@
               <span class="snap-meta">{{ formatDate(snap.createdAt) }}</span>
             </div>
             <div class="snap-actions">
-              <button class="btn btn-sm btn-secondary" @click="reopenSnapshot(snap)">{{ t('TACTICS.reopen') }}</button>
-              <button class="btn btn-sm btn-danger" @click="deleteSnapshot(snap.id)">{{ t('TACTICS.delete') }}</button>
+              <Button severity="secondary" outlined class="btn btn-sm" @click="reopenSnapshot(snap)">{{ t('TACTICS.reopen') }}</Button>
+              <Button severity="danger" class="btn btn-sm" @click="deleteSnapshot(snap.id)">{{ t('TACTICS.delete') }}</Button>
             </div>
           </li>
         </ul>
@@ -96,6 +96,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useTacticsBoardView } from '../composables/useTacticsBoardView'
 
 const {

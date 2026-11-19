@@ -1,11 +1,11 @@
 <template>
-  <div class="dice-view">
+  <div class="dice-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('DICE.title') }}</h2>
     </div>
 
-    <section class="card">
+    <section class="card app-card">
       <h3>{{ t('DICE.range') }}</h3>
       <div class="form-row">
         <div class="form-group">
@@ -56,7 +56,7 @@
       <div v-if="saveError" class="warning-banner">{{ t('DICE.save-error') }}</div>
     </section>
 
-    <section class="card">
+    <section class="card app-card">
       <h3>{{ t('DICE.log') }}</h3>
       <div v-if="rollLog.length === 0" class="empty-hint">
         {{ t('DICE.no-log') }}
@@ -73,6 +73,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getSportBridge } from '../composables/useSportBridge'
@@ -201,7 +202,7 @@ onMounted(async () => {
 
 .form-group label {
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--color-muted);
   font-weight: 500;
 }
 
@@ -240,7 +241,7 @@ onMounted(async () => {
 .result-display {
   font-size: 4rem;
   font-weight: 900;
-  color: #0f172a;
+  color: var(--color-ink);
   min-width: 5rem;
   text-align: center;
   line-height: 1;
@@ -256,7 +257,7 @@ onMounted(async () => {
 }
 
 .empty-hint {
-  color: #64748b;
+  color: var(--color-muted);
   font-style: italic;
 }
 
@@ -287,7 +288,7 @@ onMounted(async () => {
 }
 
 .roll-meta {
-  color: #475569;
+  color: var(--color-muted);
   font-size: 0.875rem;
 }
 

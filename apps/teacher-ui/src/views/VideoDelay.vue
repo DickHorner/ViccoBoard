@@ -1,27 +1,27 @@
 <template>
-  <div class="video-delay-view">
+  <div class="video-delay-view sport-ui">
     <div class="page-header">
       <h2>{{ t('DELAY.title') }}</h2>
       <div class="header-actions">
-        <button v-if="!cameraActive" class="btn btn-primary" @click="startCamera">
+        <Button v-if="!cameraActive" @click="startCamera">
           📷 {{ t('DELAY.startCamera') }}
-        </button>
-        <button v-else class="btn btn-danger" @click="stopCamera">
+        </Button>
+        <Button severity="danger" v-else @click="stopCamera">
           ⏹ {{ t('DELAY.stopCamera') }}
-        </button>
+        </Button>
       </div>
     </div>
 
-    <div v-if="cameraError" class="error-banner card">
+    <div v-if="cameraError" class="error-banner card app-card">
       ⚠️ {{ cameraError }}
     </div>
 
-    <div v-if="!cameraActive && !cameraError" class="idle-hint card">
+    <div v-if="!cameraActive && !cameraError" class="idle-hint card app-card">
       <p>{{ t('DELAY.hint') }}</p>
     </div>
 
     <div v-show="cameraActive" class="video-layout">
-      <div class="video-panel card">
+      <div class="video-panel card app-card">
         <h3 class="panel-title">
           🎞 {{ t('DELAY.delayedView') }}
           <span class="delay-badge">{{ delaySeconds }}s</span>
@@ -45,7 +45,7 @@
         </div>
       </div>
 
-      <div class="video-panel card">
+      <div class="video-panel card app-card">
         <h3 class="panel-title">🔴 {{ t('DELAY.liveView') }}</h3>
         <div class="canvas-container">
           <video ref="liveVideo" class="live-video" autoplay muted playsinline />
@@ -53,7 +53,7 @@
       </div>
     </div>
 
-    <div class="controls-panel card">
+    <div class="controls-panel card app-card">
       <div class="control-group">
         <label class="control-label">
           {{ t('DELAY.delay') }}: <strong>{{ delaySeconds }} {{ t('DELAY.seconds') }}</strong>
@@ -132,6 +132,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useI18n } from 'vue-i18n'
 
 import { useVideoDelayView } from '../composables/useVideoDelayView'

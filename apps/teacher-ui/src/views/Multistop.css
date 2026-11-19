@@ -12,7 +12,7 @@
 }
 
 .stopwatch-card {
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--surface-border);
   border-radius: 12px;
   padding: 1rem;
   background: white;
@@ -44,7 +44,7 @@
 
 .stopwatch-number {
   font-weight: bold;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .student-select select {
@@ -54,10 +54,10 @@
 
 .student-name {
   font-weight: 600;
-  color: #333;
+  color: var(--color-ink);
   text-align: center;
   padding: 0.25rem;
-  background: #f5f5f5;
+  background: var(--surface-soft);
   border-radius: 4px;
 }
 
@@ -67,9 +67,9 @@
   font-family: 'Courier New', monospace;
   text-align: center;
   padding: 0.75rem;
-  background: #fafafa;
+  background: var(--surface-soft);
   border-radius: 8px;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .running .time-display {
@@ -97,7 +97,7 @@
 
 .lap-times-mini {
   text-align: center;
-  color: #666;
+  color: var(--color-muted);
   font-size: 0.75rem;
 }
 
@@ -122,9 +122,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--surface-border);
   border-radius: 8px;
-  background: #fafafa;
+  background: var(--surface-soft);
 }
 
 .record-info {
@@ -154,13 +154,13 @@
 .handoff-section {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--surface-border);
 }
 
 .handoff-section h4 {
   margin: 0 0 0.75rem;
   font-size: 1rem;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .handoff-row {
@@ -196,12 +196,12 @@
 }
 
 .session-count {
-  color: #888;
+  color: var(--color-subtle);
   font-size: 0.8rem;
 }
 
 .empty-state {
-  color: #888;
+  color: var(--color-subtle);
   font-size: 0.9rem;
   padding: 0.5rem 0;
 }

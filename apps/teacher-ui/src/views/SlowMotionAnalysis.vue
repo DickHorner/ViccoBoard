@@ -1,17 +1,17 @@
 <template>
-  <div class="slow-motion-view">
+  <div class="slow-motion-view sport-ui">
     <!-- ------------------------------------------------------------------ -->
     <!-- Header                                                               -->
     <!-- ------------------------------------------------------------------ -->
     <div class="page-header">
       <h2>{{ t('SLOWMO.title') }}</h2>
       <div class="header-actions">
-        <button v-if="activeTab !== 'sessions'" class="btn btn-secondary" @click="goToSessions">
+        <Button severity="secondary" outlined v-if="activeTab !== 'sessions'" @click="goToSessions">
           📋 {{ t('SLOWMO.sessions') }}
-        </button>
-        <button v-if="activeTab === 'analyze' && videoLoaded" class="btn btn-primary" @click="saveSession">
+        </Button>
+        <Button v-if="activeTab === 'analyze' && videoLoaded" @click="saveSession">
           💾 {{ t('SLOWMO.save') }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -20,12 +20,12 @@
     <!-- ------------------------------------------------------------------ -->
     <div v-if="activeTab === 'sessions'" class="sessions-panel">
       <div class="sessions-toolbar">
-        <button class="btn btn-primary" @click="startNewSession">
+        <Button @click="startNewSession">
           ➕ {{ t('SLOWMO.newSession') }}
-        </button>
+        </Button>
       </div>
 
-      <div v-if="sessions.length === 0" class="empty-hint card">
+      <div v-if="sessions.length === 0" class="empty-hint card app-card">
         <p>{{ t('SLOWMO.noSessions') }}</p>
       </div>
 
@@ -33,7 +33,7 @@
         <li
           v-for="s in sessions"
           :key="s.id"
-          class="session-card card"
+          class="session-card card app-card"
           @click="loadExistingSession(s)"
         >
           <div class="session-info">
@@ -58,7 +58,7 @@
     <!-- ------------------------------------------------------------------ -->
     <!-- Tab: Session setup (new session form)                                -->
     <!-- ------------------------------------------------------------------ -->
-    <div v-if="activeTab === 'setup'" class="setup-panel card">
+    <div v-if="activeTab === 'setup'" class="setup-panel card app-card">
       <h3>{{ t('SLOWMO.newSession') }}</h3>
 
       <div class="form-group">
@@ -104,14 +104,14 @@
               @change="onFileSelected"
             />
           </label>
-          <button class="btn btn-secondary" type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
+          <Button severity="secondary" outlined type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
             {{ cameraPreviewActive ? `🛑 ${t('SLOWMO.closeCamera')}` : `📷 ${t('SLOWMO.openCamera')}` }}
-          </button>
+          </Button>
         </div>
         <p class="field-hint">{{ t('SLOWMO.fileHint') }}</p>
       </div>
 
-      <div v-if="cameraPreviewActive || downloadableVideoBlob || captureError" class="capture-panel card">
+      <div v-if="cameraPreviewActive || downloadableVideoBlob || captureError" class="capture-panel card app-card">
         <div class="capture-header">
           <strong>{{ t('SLOWMO.recordVideo') }}</strong>
           <span v-if="recordingActive" class="recording-badge">
@@ -124,38 +124,35 @@
           <video ref="captureVideoEl" class="capture-video" autoplay muted playsinline />
         </div>
         <div class="form-actions">
-          <button
+          <Button
             v-if="cameraPreviewActive && !recordingActive"
-            class="btn btn-primary"
             type="button"
             @click="startRecording"
           >
             ⏺ {{ t('SLOWMO.startRecording') }}
-          </button>
-          <button
+          </Button>
+          <Button severity="danger"
             v-if="recordingActive"
-            class="btn btn-danger"
             type="button"
             @click="stopRecording"
           >
             ⏹ {{ t('SLOWMO.stopRecording') }}
-          </button>
-          <button
+          </Button>
+          <Button severity="secondary" outlined
             v-if="cameraPreviewActive && !recordingActive"
-            class="btn btn-secondary"
             type="button"
             @click="stopCapturePreview"
           >
             {{ t('SLOWMO.closeCamera') }}
-          </button>
+          </Button>
         </div>
       </div>
 
       <div class="form-actions">
-        <button class="btn btn-secondary" @click="goToSessions">{{ t('SLOWMO.cancel') }}</button>
-        <button class="btn btn-primary" :disabled="!sessionName.trim()" @click="startAnalysis">
+        <Button severity="secondary" outlined @click="goToSessions">{{ t('SLOWMO.cancel') }}</Button>
+        <Button :disabled="!sessionName.trim()" @click="startAnalysis">
           {{ t('SLOWMO.startAnalysis') }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -164,7 +161,7 @@
     <!-- ------------------------------------------------------------------ -->
     <div v-if="activeTab === 'analyze'" class="analyze-panel">
       <!-- Mode toggle -->
-      <div class="mode-tabs card">
+      <div class="mode-tabs card app-card">
         <button
           class="mode-tab"
           :class="{ active: analysisMode === 'playback' }"
@@ -182,14 +179,14 @@
       </div>
 
       <!-- Session meta bar -->
-      <div class="session-meta-bar card">
+      <div class="session-meta-bar card app-card">
         <span>📝 <strong>{{ sessionName }}</strong></span>
         <span v-if="studentLabel">🧑 {{ studentLabel }}</span>
         <span v-if="exerciseName">🏃 {{ exerciseName }}</span>
       </div>
 
       <!-- No video hint -->
-      <div v-if="!videoLoaded" class="idle-hint card">
+      <div v-if="!videoLoaded" class="idle-hint card app-card">
         <p>{{ t('SLOWMO.noVideoHint') }}</p>
         <div class="source-actions source-actions--centered">
           <label class="file-pick-btn btn btn-primary">
@@ -202,11 +199,11 @@
               @change="onFileSelected"
             />
           </label>
-          <button class="btn btn-secondary" type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
+          <Button severity="secondary" outlined type="button" @click="cameraPreviewActive ? stopCapturePreview() : startCapturePreview()">
             {{ cameraPreviewActive ? `🛑 ${t('SLOWMO.closeCamera')}` : `📷 ${t('SLOWMO.openCamera')}` }}
-          </button>
+          </Button>
         </div>
-        <div v-if="cameraPreviewActive || downloadableVideoBlob || captureError" class="capture-panel card">
+        <div v-if="cameraPreviewActive || downloadableVideoBlob || captureError" class="capture-panel card app-card">
           <div class="capture-header">
             <strong>{{ t('SLOWMO.recordVideo') }}</strong>
             <span v-if="recordingActive" class="recording-badge">
@@ -219,41 +216,38 @@
             <video ref="captureVideoEl" class="capture-video" autoplay muted playsinline />
           </div>
           <div class="form-actions">
-            <button
+            <Button
               v-if="cameraPreviewActive && !recordingActive"
-              class="btn btn-primary"
               type="button"
               @click="startRecording"
             >
               ⏺ {{ t('SLOWMO.startRecording') }}
-            </button>
-            <button
+            </Button>
+            <Button severity="danger"
               v-if="recordingActive"
-              class="btn btn-danger"
               type="button"
               @click="stopRecording"
             >
               ⏹ {{ t('SLOWMO.stopRecording') }}
-            </button>
-            <button
+            </Button>
+            <Button severity="secondary" outlined
               v-if="cameraPreviewActive && !recordingActive"
-              class="btn btn-secondary"
               type="button"
               @click="stopCapturePreview"
             >
               {{ t('SLOWMO.closeCamera') }}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
-      <div v-if="videoLoaded" class="video-source-actions card">
-        <button v-if="downloadableVideoBlob" class="btn btn-secondary" type="button" @click="downloadCurrentVideo">
+      <div v-if="videoLoaded" class="video-source-actions card app-card">
+        <Button severity="secondary" outlined v-if="downloadableVideoBlob" type="button" @click="downloadCurrentVideo">
           💾 {{ t('SLOWMO.keepVideoLocal') }}
-        </button>
-        <button class="btn btn-secondary" type="button" @click="deleteCurrentVideo">
+        </Button>
+        <Button severity="secondary" outlined type="button" @click="deleteCurrentVideo">
           🗑 {{ t('SLOWMO.deleteVideo') }}
-        </button>
+        </Button>
       </div>
 
       <!-- Video + canvas area -->
@@ -281,7 +275,7 @@
       </div>
 
       <!-- ---- PLAYBACK controls ---- -->
-      <div v-if="videoLoaded" class="controls-panel card">
+      <div v-if="videoLoaded" class="controls-panel card app-card">
         <!-- Scrubber -->
         <div class="scrubber-row">
           <span class="time-label">{{ formatTime(currentTime) }}</span>
@@ -322,7 +316,7 @@
       </div>
 
       <!-- ---- BIOMECHANICS panel ---- -->
-      <div v-if="videoLoaded && analysisMode === 'biomechanics'" class="biomechanics-panel card">
+      <div v-if="videoLoaded && analysisMode === 'biomechanics'" class="biomechanics-panel card app-card">
         <!-- Body-point selector -->
         <div class="bp-selector">
           <label class="control-label">{{ t('SLOWMO.bodyPoint') }}</label>
@@ -343,17 +337,16 @@
         </div>
 
         <div class="tracking-row">
-          <button
+          <Button severity="secondary" outlined
             v-if="pointTrackingStatus !== 'tracking'"
-            class="btn btn-secondary"
             :disabled="!canStartPointTracking"
             @click="startPointTracking"
           >
             🎯 {{ t('SLOWMO.startTracking') }}
-          </button>
-          <button v-else class="btn btn-secondary" @click="stopPointTracking">
+          </Button>
+          <Button severity="secondary" outlined v-else @click="stopPointTracking">
             ⏹ {{ t('SLOWMO.stopTracking') }}
-          </button>
+          </Button>
           <span
             class="tracking-status"
             :class="{ 'tracking-status--lost': pointTrackingStatus === 'lost' }"
@@ -367,16 +360,15 @@
 
         <!-- Keyframe management -->
         <div class="keyframe-row">
-          <button class="btn btn-secondary" @click="addKeyframe">
+          <Button severity="secondary" outlined @click="addKeyframe">
             🔑 {{ t('SLOWMO.addKeyframe') }} @ {{ formatTime(currentTime) }}
-          </button>
-          <button
-            class="btn btn-secondary"
+          </Button>
+          <Button severity="secondary" outlined
             @click="clearCurrentMarkers"
             :disabled="!currentExactKeyframe || currentExactKeyframe.markers.length === 0"
           >
             🗑 {{ t('SLOWMO.clearMarkers') }}
-          </button>
+          </Button>
         </div>
 
         <!-- Keyframes list -->
@@ -417,9 +409,9 @@
           >
             📏 {{ drawingRefLine ? t('SLOWMO.cancelRefLine') : t('SLOWMO.addRefLine') }}
           </button>
-          <button v-if="referenceLines.length > 0" class="btn btn-secondary" @click="clearRefLines">
+          <Button severity="secondary" outlined v-if="referenceLines.length > 0" class="btn" @click="clearRefLines">
             🗑 {{ t('SLOWMO.clearRefLines') }}
-          </button>
+          </Button>
         </div>
 
         <!-- Notes -->
@@ -431,9 +423,9 @@
 
       <!-- Save button at bottom -->
       <div v-if="videoLoaded" class="save-row">
-        <button class="btn btn-primary btn-full" @click="saveSession">
+        <Button class="btn-full" @click="saveSession">
           💾 {{ t('SLOWMO.save') }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -443,6 +435,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'

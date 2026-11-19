@@ -1,7 +1,7 @@
 <template>
-  <section class="statistics-view">
+  <section class="statistics-view sport-ui">
     <header class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <div>
         <h1>Statistiken</h1>
         <p class="subtitle">Überblick über Anwesenheit, Leistungen und Tool-Nutzung im Sportunterricht.</p>
@@ -27,23 +27,23 @@
           <p>Noch keine Anwesenheitsdaten vorhanden.</p>
         </div>
         <div v-else class="metrics-grid">
-          <article class="metric-card">
+          <article class="metric-card app-card">
             <strong>{{ attendanceOverview.global.total }}</strong>
             <span>Einträge gesamt</span>
           </article>
-          <article class="metric-card accent-green">
+          <article class="metric-card accent-green app-card">
             <strong>{{ attendanceOverview.global.present }}</strong>
             <span>Anwesend</span>
           </article>
-          <article class="metric-card accent-red">
+          <article class="metric-card accent-red app-card">
             <strong>{{ attendanceOverview.global.absent }}</strong>
             <span>Abwesend</span>
           </article>
-          <article class="metric-card accent-yellow">
+          <article class="metric-card accent-yellow app-card">
             <strong>{{ attendanceOverview.global.excused }}</strong>
             <span>Entschuldigt</span>
           </article>
-          <article class="metric-card">
+          <article class="metric-card app-card">
             <strong>{{ attendanceOverview.global.attendanceRate }}%</strong>
             <span>Anwesenheitsquote</span>
           </article>
@@ -58,11 +58,11 @@
         </div>
         <template v-else>
           <div class="metrics-grid">
-            <article class="metric-card">
+            <article class="metric-card app-card">
               <strong>{{ performanceOverview.totalEntries }}</strong>
               <span>Messungen gesamt</span>
             </article>
-            <article class="metric-card accent-green">
+            <article class="metric-card accent-green app-card">
               <strong>{{ performanceOverview.gradedEntries }}</strong>
               <span>Mit Note bewertet</span>
             </article>
@@ -105,7 +105,7 @@
         </div>
         <template v-else>
           <div class="metrics-grid">
-            <article class="metric-card">
+            <article class="metric-card app-card">
               <strong>{{ toolUsageOverview.totalSessions }}</strong>
               <span>Sessions gesamt</span>
             </article>
@@ -142,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, onMounted } from 'vue'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { AttendanceOverview, PerformanceOverview, ToolUsageOverview } from '@viccoboard/sport'
@@ -248,14 +249,14 @@ function formatDate(date: Date): string {
 }
 
 .subtitle {
-  color: #64748b;
+  color: var(--color-muted);
   margin: 0.25rem 0 0;
 }
 
 .loading-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .spinner {
@@ -281,7 +282,7 @@ function formatDate(date: Date): string {
 .stats-section h2 {
   margin: 0;
   font-size: 1.1rem;
-  color: #0f172a;
+  color: var(--color-ink);
   border-bottom: 2px solid rgba(14, 116, 144, 0.15);
   padding-bottom: 0.5rem;
 }
@@ -304,12 +305,12 @@ function formatDate(date: Date): string {
 
 .metric-card strong {
   font-size: 1.5rem;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .metric-card span {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .metric-card.accent-green strong { color: #15803d; }
@@ -356,7 +357,7 @@ function formatDate(date: Date): string {
 
 .stats-table th {
   font-weight: 600;
-  color: #475569;
+  color: var(--color-muted);
   background: rgba(15, 23, 42, 0.02);
   font-size: 0.8rem;
   text-transform: uppercase;

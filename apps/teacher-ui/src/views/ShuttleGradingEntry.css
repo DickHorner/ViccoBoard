@@ -14,7 +14,7 @@
 .back-button {
   background: none;
   border: none;
-  color: #0066cc;
+  color: var(--accent-strong);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -22,10 +22,7 @@
 }
 
 .card {
-  background: white;
-  border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .config-row {
@@ -44,7 +41,7 @@
 .form-input {
   padding: 0.75rem;
   border-radius: 6px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
 }
 
 /* Session banner */
@@ -124,7 +121,7 @@
 
 .status-label {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .status-value {
@@ -170,7 +167,7 @@
   min-width: 90px;
   padding: 0.5rem;
   border-radius: 6px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
 }
 
 .grade-cell {
@@ -205,14 +202,14 @@
 }
 
 .btn-primary {
-  background: #667eea;
+  background: var(--accent-strong);
   color: white;
 }
 
 .btn-secondary {
   background: white;
-  border: 2px solid #ddd;
-  color: #333;
+  border: 2px solid var(--surface-border);
+  color: var(--color-ink);
 }
 
 .loading-state {
@@ -224,8 +221,8 @@
 .spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
+  border: 3px solid var(--surface-soft);
+  border-top: 3px solid var(--accent-strong);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -259,7 +256,7 @@
 .history-title {
   margin: 0 0 1rem;
   font-size: 1rem;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .history-group {
@@ -283,13 +280,13 @@
   text-align: left;
   padding: 0.4rem 0.6rem;
   border-bottom: 2px solid #e2e8f0;
-  color: #475569;
+  color: var(--color-muted);
   font-weight: 600;
 }
 
 .history-table td {
   padding: 0.4rem 0.6rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--surface-soft);
 }
 
 @media (max-width: 768px) {

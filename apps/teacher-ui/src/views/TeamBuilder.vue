@@ -1,12 +1,12 @@
 <template>
-  <div class="team-view">
+  <div class="team-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('TEAM.team-erstellen') }}</h2>
       <p class="page-description">{{ t('TEAM.teams-klasse') }}</p>
     </div>
 
-    <section class="card">
+    <section class="card app-card">
       <div class="form-row">
         <div class="form-group">
           <label>{{ t('KLASSEN.klasse') }}</label>
@@ -95,7 +95,7 @@
               </div>
               <button class="btn-icon" :title="t('TEAM.regel-entfernen')" @click="removeConstraint('never', idx)">✕</button>
             </div>
-            <button class="btn-secondary btn-small" @click="addConstraint('never')">+ {{ t('TEAM.regel-hinzufuegen') }}</button>
+            <Button severity="secondary" outlined @click="addConstraint('never')">+ {{ t('TEAM.regel-hinzufuegen') }}</Button>
           </div>
 
           <div class="constraint-section" style="margin-top: 1rem;">
@@ -109,7 +109,7 @@
               </div>
               <button class="btn-icon" :title="t('TEAM.regel-entfernen')" @click="removeConstraint('always', idx)">✕</button>
             </div>
-            <button class="btn-secondary btn-small" @click="addConstraint('always')">+ {{ t('TEAM.regel-hinzufuegen') }}</button>
+            <Button severity="secondary" outlined @click="addConstraint('always')">+ {{ t('TEAM.regel-hinzufuegen') }}</Button>
           </div>
         </div>
       </details>
@@ -124,12 +124,12 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn-primary" :disabled="!canGenerate" @click="generateTeams">{{ t('TEAM.erstellen') }}</button>
-        <button class="btn-secondary" :disabled="teams.length === 0" @click="clearTeams">{{ t('TEAM.loeschen') }}</button>
+        <Button :disabled="!canGenerate" @click="generateTeams">{{ t('TEAM.erstellen') }}</Button>
+        <Button severity="secondary" outlined :disabled="teams.length === 0" @click="clearTeams">{{ t('TEAM.loeschen') }}</Button>
       </div>
     </section>
 
-    <section v-if="teams.length > 0" class="card">
+    <section v-if="teams.length > 0" class="card app-card">
       <div class="card-header">
         <h3>{{ t('TEAM.teams-klasse') }}</h3>
       </div>
@@ -147,14 +147,14 @@
 
       <div class="save-section">
         <div class="form-actions">
-          <button class="btn-primary" :disabled="!canSave" @click="saveTeams">{{ t('TEAM.speichern') }}</button>
-          <button class="btn-secondary" :disabled="!canHandoffToTournament" @click="handoffToTournament">{{ t('TEAM.handoff_to_tournament') }}</button>
+          <Button :disabled="!canSave" @click="saveTeams">{{ t('TEAM.speichern') }}</Button>
+          <Button severity="secondary" outlined :disabled="!canHandoffToTournament" @click="handoffToTournament">{{ t('TEAM.handoff_to_tournament') }}</Button>
         </div>
         <div v-if="saveSuccess" class="success-banner">{{ t('TEAM.session-gespeichert') }}</div>
       </div>
     </section>
 
-    <section v-if="selectedClassId" class="card">
+    <section v-if="selectedClassId" class="card app-card">
       <div class="card-header">
         <h3>{{ t('TEAM.gespeicherte-sessions') }}</h3>
       </div>
@@ -167,7 +167,7 @@
               {{ formatDate(session.createdAt) }} · {{ session.sessionMetadata.teams?.length }} {{ t('TEAM.anzahl') }}
             </span>
           </div>
-          <button class="btn-secondary btn-small" @click="loadSession(session)">{{ t('TEAM.sitzung-laden') }}</button>
+          <Button severity="secondary" outlined @click="loadSession(session)">{{ t('TEAM.sitzung-laden') }}</Button>
         </div>
       </div>
     </section>
@@ -175,6 +175,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useTeamBuilderView } from '../composables/useTeamBuilderView'
 
 const {

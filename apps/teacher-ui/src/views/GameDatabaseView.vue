@@ -1,5 +1,5 @@
 <template>
-  <section class="game-database">
+  <section class="game-database sport-ui">
     <header class="page-header">
       <div>
         <h1>{{ t('UEBUNGEN.spieldatenbank') }}</h1>

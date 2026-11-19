@@ -11,18 +11,18 @@
 .page-header h2 {
   margin: 0.5rem 0;
   font-size: 1.75rem;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .page-description {
-  color: #666;
+  color: var(--color-muted);
   margin: 0.25rem 0 0;
 }
 
 .back-button {
   background: none;
   border: none;
-  color: #0066cc;
+  color: var(--accent-strong);
   font-size: 1rem;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -46,12 +46,12 @@
 .loading-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #0066cc;
+  border: 3px solid var(--surface-soft);
+  border-top: 3px solid var(--accent-strong);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -67,12 +67,12 @@
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .empty-hint {
   font-size: 0.875rem;
-  color: #999;
+  color: var(--color-subtle);
 }
 
 .table-list {
@@ -82,11 +82,7 @@
 }
 
 .table-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   overflow: hidden;
-  border: 1px solid #e0e0e0;
 }
 
 .table-card-header {
@@ -120,8 +116,8 @@
   padding: 0.15rem 0.5rem;
   border-radius: 99px;
   font-weight: 600;
-  background: #e0e0e0;
-  color: #333;
+  background: var(--surface-border);
+  color: var(--color-ink);
 }
 
 .meta-badge.simple { background: #dbeafe; color: #1e40af; }
@@ -130,12 +126,12 @@
 
 .meta-text {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 .table-description {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--color-subtle);
   margin: 0.3rem 0 0;
 }
 
@@ -148,12 +144,12 @@
 
 .table-preview {
   padding: 1rem 1.25rem;
-  border-top: 1px solid #e0e0e0;
-  background: #f9f9f9;
+  border-top: 1px solid var(--surface-border);
+  background: var(--surface-soft);
 }
 
 .preview-empty {
-  color: #999;
+  color: var(--color-subtle);
   font-size: 0.875rem;
   text-align: center;
   padding: 1rem;
@@ -172,17 +168,17 @@
 .preview-table th,
 .preview-table td {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--surface-border);
   text-align: left;
 }
 
 .preview-table th {
-  background: #f0f0f0;
+  background: var(--surface-soft);
   font-weight: 600;
 }
 
 .preview-truncate {
-  color: #999;
+  color: var(--color-subtle);
   font-size: 0.8rem;
   text-align: center;
   margin-top: 0.5rem;
@@ -200,19 +196,19 @@
   white-space: nowrap;
 }
 
-.btn-primary { background: #0066cc; color: white; }
-.btn-primary:hover { background: #0052a3; }
-.btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+.btn-primary { background: var(--accent-strong); color: white; }
+.btn-primary:hover { background: var(--accent-strong); }
+.btn-primary:disabled { background: var(--surface-border); cursor: not-allowed; }
 
-.btn-secondary { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
-.btn-secondary:hover { background: #e0e0e0; }
+.btn-secondary { background: var(--surface-soft); color: var(--color-ink); border: 1px solid var(--surface-border); }
+.btn-secondary:hover { background: var(--surface-border); }
 
-.btn-text { background: transparent; color: #0066cc; border: 1px solid #0066cc; }
+.btn-text { background: transparent; color: var(--accent-strong); border: 1px solid var(--accent-strong); }
 .btn-text:hover { background: #f0f7ff; }
 
 .btn-danger { background: #dc3545; color: white; }
 .btn-danger:hover { background: #b02a37; }
-.btn-danger:disabled { background: #ccc; cursor: not-allowed; }
+.btn-danger:disabled { background: var(--surface-border); cursor: not-allowed; }
 
 .btn-small {
   padding: 0.4rem 0.75rem;
@@ -252,7 +248,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--surface-border);
 }
 
 .modal-header h3 { margin: 0; }
@@ -262,7 +258,7 @@
   border: none;
   font-size: 1.4rem;
   cursor: pointer;
-  color: #666;
+  color: var(--color-muted);
   padding: 0 0.25rem;
 }
 
@@ -282,12 +278,12 @@
 .form-group label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-ink);
 }
 
 .form-input, .form-select {
   padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 8px;
   font-size: 0.9rem;
   font-family: inherit;
@@ -296,7 +292,7 @@
 
 .form-hint {
   margin: 0.25rem 0 0;
-  color: #666;
+  color: var(--color-muted);
   font-size: 0.8rem;
 }
 
@@ -316,7 +312,7 @@
 .quick-row label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-ink);
 }
 
 .modal-footer {
@@ -324,7 +320,7 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--surface-border);
 }
 
 .warning-text {

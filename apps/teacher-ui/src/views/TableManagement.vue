@@ -1,7 +1,7 @@
 <template>
-  <div class="table-management-view">
+  <div class="table-management-view sport-ui">
     <div class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <h2>Tabellenverwaltung</h2>
       <p class="page-description">Verwalten Sie Bewertungstabellen für den Sportunterricht.</p>
     </div>
@@ -9,8 +9,8 @@
     <div v-if="loadError" class="error-banner" role="alert">{{ loadError }}</div>
 
     <div class="toolbar">
-      <button class="btn-primary" @click="openCreateModal">+ Neue Tabelle</button>
-      <button class="btn-secondary" @click="triggerImport">↑ CSV importieren</button>
+      <Button @click="openCreateModal">+ Neue Tabelle</Button>
+      <Button severity="secondary" outlined @click="triggerImport">↑ CSV importieren</Button>
       <input
         ref="fileInputRef"
         type="file"
@@ -33,7 +33,7 @@
       </div>
 
       <div v-else class="table-list">
-        <div v-for="table in tables" :key="table.id" :class="['table-card', { expanded: previewId === table.id }]">
+        <div v-for="table in tables" :key="table.id" :class="['table-card', 'app-card', { expanded: previewId === table.id }]">
           <div class="table-card-header">
             <div class="table-info">
               <h3 class="table-name">{{ table.name }}</h3>
@@ -46,13 +46,13 @@
               <p v-if="table.description" class="table-description">{{ table.description }}</p>
             </div>
             <div class="table-actions">
-              <button class="btn-secondary btn-small" :aria-expanded="previewId === table.id" @click="togglePreview(table.id)">
+              <Button severity="secondary" outlined :aria-expanded="previewId === table.id" @click="togglePreview(table.id)">
                 {{ previewId === table.id ? 'Vorschau schließen' : 'Vorschau' }}
-              </button>
-              <button class="btn-text btn-small" @click="openEditModal(table)">✏️ Bearbeiten</button>
-              <button class="btn-danger btn-small" :disabled="deleting === table.id" @click="confirmDelete(table)">
+              </Button>
+              <Button severity="secondary" text @click="openEditModal(table)">✏️ Bearbeiten</Button>
+              <Button severity="danger" :disabled="deleting === table.id" @click="confirmDelete(table)">
                 {{ deleting === table.id ? '…' : '🗑 Löschen' }}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -147,21 +147,21 @@
                   class="form-input"
                   placeholder="1"
                 />
-                <button type="button" class="btn-text btn-small" @click="removeQuickRow(index)">
+                <Button severity="secondary" text type="button" @click="removeQuickRow(index)">
                   Entfernen
-                </button>
+                </Button>
               </div>
-              <button type="button" class="btn-secondary btn-small" @click="addQuickRow">
+              <Button severity="secondary" outlined type="button" @click="addQuickRow">
                 + Grenzwert
-              </button>
+              </Button>
             </div>
           </template>
 
           <div v-if="modalError" class="error-banner" role="alert">{{ modalError }}</div>
 
           <div class="modal-footer">
-            <button type="button" class="btn-secondary" @click="closeModal">Abbrechen</button>
-            <button type="submit" class="btn-primary" :disabled="saving">{{ saving ? 'Speichern…' : 'Speichern' }}</button>
+            <Button severity="secondary" outlined type="button" @click="closeModal">Abbrechen</Button>
+            <Button type="submit" :disabled="saving">{{ saving ? 'Speichern…' : 'Speichern' }}</Button>
           </div>
         </form>
       </div>
@@ -178,10 +178,10 @@
           <p class="warning-text">Diese Aktion kann nicht rückgängig gemacht werden.</p>
         </div>
         <div class="modal-footer">
-          <button class="btn-secondary" @click="deleteTarget = null">Abbrechen</button>
-          <button class="btn-danger" :disabled="!!deleting" @click="executeDelete">
+          <Button severity="secondary" outlined @click="deleteTarget = null">Abbrechen</Button>
+          <Button severity="danger" :disabled="!!deleting" @click="executeDelete">
             {{ deleting ? 'Wird gelöscht…' : 'Löschen' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -189,6 +189,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { useTableManagementView } from '../composables/useTableManagementView'
 
 const {
