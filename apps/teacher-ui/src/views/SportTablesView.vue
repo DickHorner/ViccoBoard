@@ -1,7 +1,7 @@
 <template>
-  <section class="sport-tables">
+  <section class="sport-tables sport-ui">
     <header class="page-header">
-      <button class="back-button" @click="$router.back()">← Zurück</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" @click="$router.back()">Zurück</Button>
       <div>
         <h1>Tabellenverwaltung</h1>
         <p class="subtitle">Leistungstabellen importieren, aktivieren und verwalten.</p>
@@ -9,7 +9,7 @@
       <span class="summary-pill">{{ tables.length }} Tabellen</span>
     </header>
 
-    <section class="template-card" aria-label="CSV-Vorlage herunterladen">
+    <section class="template-card app-card" aria-label="CSV-Vorlage herunterladen">
       <div>
         <p class="eyebrow">Vorlage</p>
         <h2>Cooper-Normen als CSV</h2>
@@ -23,7 +23,7 @@
     </section>
 
     <!-- Import section -->
-    <section class="import-card" aria-label="Tabelle importieren">
+    <section class="import-card app-card" aria-label="Tabelle importieren">
       <p class="eyebrow">Import</p>
       <h2>Tabelle importieren</h2>
       <div class="import-guidance">
@@ -115,7 +115,7 @@
         <article
           v-for="table in tables"
           :key="table.id"
-          class="table-card"
+          class="table-card app-card"
           :class="{ inactive: table.active === false }"
         >
           <div class="table-info">
@@ -157,6 +157,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { ref, computed, onMounted } from 'vue'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Sport } from '@viccoboard/core'
