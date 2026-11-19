@@ -16,15 +16,16 @@
       >
         <template v-if="card.to">
           <RouterLink :to="card.to" class="card-link">
-            <p class="eyebrow">{{ card.status }}</p>
-            <h2>{{ card.title }}</h2>
-            <p>{{ card.description }}</p>
+            <span class="settings-status">{{ card.status }}</span>
+            <strong>{{ card.title }}</strong>
+            <span class="settings-description">{{ card.description }}</span>
+            <i class="pi pi-angle-right" aria-hidden="true"></i>
           </RouterLink>
         </template>
         <template v-else>
-          <p class="eyebrow">{{ card.status }}</p>
-          <h2>{{ card.title }}</h2>
-          <p>{{ card.description }}</p>
+          <span class="settings-status">{{ card.status }}</span>
+          <strong>{{ card.title }}</strong>
+          <span class="settings-description">{{ card.description }}</span>
         </template>
       </article>
 
@@ -42,56 +43,87 @@ import { settingsCards } from '../settings-sections'
 .settings-overview {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 16px;
 }
 
-.page-header h1,
-.settings-card h2 {
+.page-header h1 {
   margin: 0;
+  font-size: 20px;
 }
 
-.subtitle,
-.settings-card p {
-  color: #64748b;
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 13.5px;
 }
 
 .settings-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 0 24px;
+  padding: 4px 16px;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  background: var(--surface-glass);
 }
 
-.settings-card {
-  padding: 1.25rem;
+.settings-card,
+.card-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 12px;
+  align-content: center;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid var(--surface-border);
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
 }
 
-.settings-card--link {
+.settings-card--link,
+.settings-card--link .card-link {
   padding: 0;
 }
 
-.card-link {
-  display: block;
-  padding: 1.25rem;
+.settings-card--link .card-link {
+  padding: 12px 0;
   text-decoration: none;
   color: inherit;
-  border-radius: inherit;
 }
 
-.card-link:hover {
-  background: var(--surface-soft);
+.settings-card--link .card-link:hover {
+  color: var(--accent-strong);
 }
 
 .card-link:focus-visible {
   outline: 2px solid var(--accent-strong);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
-.eyebrow {
-  margin: 0 0 0.5rem;
+.settings-status {
+  grid-column: 1 / -1;
+  color: var(--color-muted);
+  font-size: 10.5px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
-  color: var(--accent-strong);
-  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.settings-card strong {
+  font-size: 13.5px;
+}
+
+.settings-description {
+  grid-column: 1;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.card-link .pi {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  align-self: center;
+  color: var(--color-muted);
+  font-size: 12px;
 }
 </style>
