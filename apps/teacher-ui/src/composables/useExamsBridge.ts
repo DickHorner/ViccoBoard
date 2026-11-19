@@ -13,6 +13,7 @@ import {
   CriterionRepository,
   CorrectionEntryRepository,
   CorrectionSheetPresetRepository,
+  CorrectionSheetTemplateRepository,
   SupportTipRepository,
   StudentLongTermNoteRepository,
   GradingKeyService,
@@ -54,6 +55,7 @@ interface ExamsBridge {
   supportTipRepository: SupportTipRepository;
   studentLongTermNoteRepository: StudentLongTermNoteRepository;
   correctionSheetPresetRepository: CorrectionSheetPresetRepository;
+  correctionSheetTemplateRepository: CorrectionSheetTemplateRepository;
 
   // Use Cases
   createExamPayload: typeof createExamPayload;
@@ -85,6 +87,7 @@ interface ExamsBridge {
   saveCorrectionSheetPreset(input: any): Promise<any>;
   buildCorrectionSheetPreview(examId: string, candidateId: string): Promise<any>;
   previewCorrectionSheetDesignPdf(examId: string, preset: Exams.CorrectionSheetPreset): Promise<Exams.CorrectionSheetPdfDocument>;
+  previewStandaloneSheetDesignPdf(preset: Exams.CorrectionSheetPreset): Promise<Exams.CorrectionSheetPdfDocument>;
   finalizeAllCorrections(examId: string): Promise<any>;
   exportCurrentCorrectionSheetPdf(examId: string, candidateId: string): Promise<any>;
   exportAllCorrectionSheetsPdf(examId: string): Promise<any>;
@@ -108,6 +111,7 @@ interface UseExamsBridgeResult {
   readonly supportTipRepository: ExamsBridge['supportTipRepository'] | undefined;
   readonly studentLongTermNoteRepository: ExamsBridge['studentLongTermNoteRepository'] | undefined;
   readonly correctionSheetPresetRepository: ExamsBridge['correctionSheetPresetRepository'] | undefined;
+  readonly correctionSheetTemplateRepository: ExamsBridge['correctionSheetTemplateRepository'] | undefined;
   readonly createExamPayload: ExamsBridge['createExamPayload'] | undefined;
   readonly recordCorrectionUseCase: ExamsBridge['recordCorrectionUseCase'] | undefined;
   readonly calculateGradeUseCase: ExamsBridge['calculateGradeUseCase'] | undefined;
@@ -135,6 +139,7 @@ interface UseExamsBridgeResult {
   saveCorrectionSheetPreset(input: any): Promise<any> | undefined;
   buildCorrectionSheetPreview(examId: string, candidateId: string): Promise<any> | undefined;
   previewCorrectionSheetDesignPdf(examId: string, preset: Exams.CorrectionSheetPreset): Promise<Exams.CorrectionSheetPdfDocument> | undefined;
+  previewStandaloneSheetDesignPdf(preset: Exams.CorrectionSheetPreset): Promise<Exams.CorrectionSheetPdfDocument> | undefined;
   finalizeAllCorrections(examId: string): Promise<any> | undefined;
   exportCurrentCorrectionSheetPdf(examId: string, candidateId: string): Promise<any> | undefined;
   exportAllCorrectionSheetsPdf(examId: string): Promise<any> | undefined;
@@ -165,6 +170,7 @@ export function initializeExamsBridge(): ExamsBridge {
   const supportTipRepo = new SupportTipRepository(adapter);
   const studentLongTermNoteRepo = new StudentLongTermNoteRepository(adapter);
   const correctionSheetPresetRepo = new CorrectionSheetPresetRepository(examRepo);
+  const correctionSheetTemplateRepo = new CorrectionSheetTemplateRepository(adapter);
 
   // Initialize use cases with repositories
   const recordCorrectionUseCase = new RecordCorrectionUseCase(correctionEntryRepo, examRepo);
@@ -208,6 +214,7 @@ export function initializeExamsBridge(): ExamsBridge {
     supportTipRepository: supportTipRepo,
     studentLongTermNoteRepository: studentLongTermNoteRepo,
     correctionSheetPresetRepository: correctionSheetPresetRepo,
+    correctionSheetTemplateRepository: correctionSheetTemplateRepo,
 
     // Use Cases
     createExamPayload,
@@ -244,6 +251,8 @@ export function initializeExamsBridge(): ExamsBridge {
       buildCorrectionSheetProjectionUseCase.execute(examId, candidateId, { allowIncomplete: true }),
     previewCorrectionSheetDesignPdf: (examId, preset) =>
       exportCorrectionSheetsPdfUseCase.previewDesignPdf(examId, preset),
+    previewStandaloneSheetDesignPdf: (preset) =>
+      exportCorrectionSheetsPdfUseCase.previewStandaloneDesignPdf(preset),
     finalizeAllCorrections: (examId) =>
       finalizeAllCorrectionsUseCase.execute(examId),
     exportCurrentCorrectionSheetPdf: (examId, candidateId) =>
@@ -306,6 +315,7 @@ export function useExamsBridge(): UseExamsBridgeResult {
     get supportTipRepository() { return bridge.value?.supportTipRepository; },
     get studentLongTermNoteRepository() { return bridge.value?.studentLongTermNoteRepository; },
     get correctionSheetPresetRepository() { return bridge.value?.correctionSheetPresetRepository; },
+    get correctionSheetTemplateRepository() { return bridge.value?.correctionSheetTemplateRepository; },
     get createExamPayload() { return bridge.value?.createExamPayload; },
     get recordCorrectionUseCase() { return bridge.value?.recordCorrectionUseCase; },
     get calculateGradeUseCase() { return bridge.value?.calculateGradeUseCase; },
@@ -339,6 +349,8 @@ export function useExamsBridge(): UseExamsBridgeResult {
       bridge.value?.buildCorrectionSheetPreview(examId, candidateId),
     previewCorrectionSheetDesignPdf: (examId: string, preset: Exams.CorrectionSheetPreset) =>
       bridge.value?.previewCorrectionSheetDesignPdf(examId, preset),
+    previewStandaloneSheetDesignPdf: (preset: Exams.CorrectionSheetPreset) =>
+      bridge.value?.previewStandaloneSheetDesignPdf(preset),
     finalizeAllCorrections: (examId: string) =>
       bridge.value?.finalizeAllCorrections(examId),
     exportCurrentCorrectionSheetPdf: (examId: string, candidateId: string) =>
