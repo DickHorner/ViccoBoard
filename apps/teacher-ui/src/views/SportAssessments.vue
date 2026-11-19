@@ -27,7 +27,7 @@
       <label>Startdatum
         <input v-model="examDate" type="date" :disabled="loading || saving || dirty || !!sessionId" @change="changeDate" />
       </label>
-      <label>Heute erfassen am
+      <label>Erfassung am
         <input v-model="assessmentDay" type="date" :disabled="loading || saving" required />
       </label>
       <label v-if="sessions.length">Durchführung fortsetzen
@@ -66,7 +66,7 @@
           <Button
             :label="saving ? 'Speichert…' : 'Prüfung speichern'"
             :loading="saving"
-            :disabled="saving || !dirty || (!hasInput && !sessionId) || !assessmentDay"
+            :disabled="saving || !dirty || !assessmentDay"
             @click="save"
           />
         </div>
@@ -264,10 +264,6 @@ const eligibleIds = computed(() => students.value
   })
   .map((student) => student.id)
 )
-const hasInput = computed(() => students.value.some((student) =>
-  Object.keys(scores.value[student.id] ?? {}).length > 0 ||
-  (states.value[student.id] !== undefined && states.value[student.id] !== 'not-assessed')
-))
 const activeCriterion = computed(() => assessment.value.criteria.find((criterion) => criterion.id === help.value))
 const helpTitle = computed(() => help.value === 'task' ? 'Aufgabe und Aufbau' : activeCriterion.value?.name ?? 'Beobachtungshilfe')
 const helpVisible = computed({
@@ -420,7 +416,7 @@ async function restoreSession(): Promise<void> {
     scores.value = restoredScores
     states.value = restoredStates
     assessedDates.value = restoredDates
-    drawHistory.value = metadata.drawHistory ?? []
+    drawHistory.value = (metadata.drawHistory ?? []).filter((id) => studentIds.has(id))
     dirty.value = false
     saveMessage.value = ''
     studentIndex.value = 0
@@ -434,6 +430,13 @@ async function restoreSession(): Promise<void> {
 function setState(state: SportExamStudentState): void {
   if (!currentStudent.value || saving.value || currentState.value === state) return
   states.value = { ...states.value, [currentStudent.value.id]: state }
+  if (state === 'not-assessed') {
+    const studentId = currentStudent.value.id
+    scores.value = { ...scores.value, [studentId]: {} }
+    const updatedDates = { ...assessedDates.value }
+    delete updatedDates[studentId]
+    assessedDates.value = updatedDates
+  }
   dirty.value = true
   saveMessage.value = ''
 }
@@ -475,7 +478,7 @@ function drawStudent(): void {
 
 async function save(): Promise<void> {
   if (!categoryId.value || !classGroupId.value || !dirty.value ||
-      (!hasInput.value && !sessionId.value) || !assessmentDay.value) return
+      !assessmentDay.value) return
   saving.value = true
   error.value = ''
   saveMessage.value = ''

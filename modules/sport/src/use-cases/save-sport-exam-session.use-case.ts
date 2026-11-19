@@ -132,6 +132,9 @@ export class SaveSportExamSessionUseCase {
     }
 
     const previousMetadata = previousSession?.sessionMetadata as SportExamSessionMetadata | undefined;
+    if (previousMetadata && previousMetadata.studentStates.some((item) => !studentIds.has(item.studentId))) {
+      throw new Error('Cannot resume: original student roster is incomplete');
+    }
     const previousEntries = new Map<string, Sport.PerformanceEntry>();
     if (previousMetadata) {
       const existing = await Promise.all(

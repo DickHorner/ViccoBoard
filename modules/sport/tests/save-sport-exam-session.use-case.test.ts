@@ -318,6 +318,23 @@ describe('SaveSportExamSessionUseCase', () => {
     })).rejects.toThrow('does not match');
   });
 
+  test('refuses to overwrite an existing session when its original student roster is incomplete', async () => {
+    const original = await useCase.execute({
+      classGroupId, categoryId, examDate: '2026-11-12', announced: false,
+      assessmentType: 'criteria',
+      entries: [
+        { studentId: student1Id, state: 'ready', criterionScores: { accuracy: 2 }, calculatedGrade: '3' },
+        { studentId: student2Id, state: 'not-assessed' }
+      ]
+    });
+    await expect(useCase.execute({
+      sessionId: original.id, classGroupId, categoryId, examDate: '2026-11-12',
+      announced: false, assessmentType: 'criteria',
+      entries: [{ studentId: student1Id, state: 'ready', criterionScores: { accuracy: 1 }, calculatedGrade: '4' }]
+    })).rejects.toThrow('original student roster is incomplete');
+    expect((await performanceRepository.findByCategory(categoryId))[0].measurements.criteria).toEqual({ accuracy: 2 });
+  });
+
   test('rejects duplicate students', async () => {
     await expect(useCase.execute({
       classGroupId,
