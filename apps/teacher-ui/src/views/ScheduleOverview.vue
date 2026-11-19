@@ -238,7 +238,7 @@ const scheduleDays = computed<ScheduleDay[]>(() => {
 
     return {
       key,
-      label: date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+      label: date.toLocaleDateString('de-DE', { day: 'numeric', month: 'numeric' }),
       weekday: date.toLocaleDateString('de-DE', { weekday: 'long' }),
       isToday: index === 0,
       lessons: [...dayLessons].sort(compareLessonsByStartTime),
@@ -285,13 +285,15 @@ const loadData = async () => {
     )
 
     lessons.value = allLessons.flat()
-    await nextTick()
-    recordRouteContentReady('schedule')
   } catch (error) {
     console.error('Failed to load schedule overview:', error)
     loadError.value = 'Die Stundenplanansicht konnte nicht geladen werden.'
   } finally {
     loading.value = false
+  }
+  if (!loadError.value) {
+    await nextTick()
+    recordRouteContentReady('schedule')
   }
 }
 
