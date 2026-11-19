@@ -168,4 +168,64 @@ describe('CorrectionSheetPresetRepository', () => {
     expect(unchanged?.id).toBe(template.id);
   });
 
+  test('reuses the latest master layout for old exams without rewriting the exams', async () => {
+    const firstExam = await createExam();
+    const secondExam = await createExam();
+    const library = new CorrectionSheetTemplateRepository(storage.getAdapter(), examRepository);
+    const master = await library.create({
+      ...createDefaultCorrectionSheetPreset(''),
+      name: 'Gemeinsame Gestaltung',
+      headerText: 'Fassung 1',
+      showSignatureArea: true,
+      showSignatureDate: true,
+      signaturePositionX: 10,
+      signaturePositionY: 20
+    });
+
+    for (const exam of [firstExam, secondExam]) {
+      await savePresetUseCase.execute({
+        ...master.preset,
+        examId: exam.id,
+        templateId: master.id
+      });
+    }
+
+    const savedFirst = await examRepository.findById(firstExam.id);
+    expect(savedFirst?.printPresets[0].metadata).toEqual({
+      kind: 'correction-sheet-preset',
+      correctionSheetTemplateId: master.id
+    });
+
+    await library.update(master.id, {
+      ...master.preset,
+      headerText: 'Fassung 2',
+      showSignatureDate: false,
+      signaturePositionX: 75,
+      signaturePositionY: 60
+    });
+
+    for (const exam of [firstExam, secondExam]) {
+      expect(await getPresetUseCase.execute(exam.id)).toEqual(expect.objectContaining({
+        examId: exam.id,
+        templateId: master.id,
+        headerText: 'Fassung 2',
+        showSignatureDate: false,
+        signaturePositionX: 75,
+        signaturePositionY: 60
+      }));
+    }
+    expect((await examRepository.findById(firstExam.id))?.printPresets).toEqual(savedFirst?.printPresets);
+    await expect(library.delete(master.id)).rejects.toThrow('verwendet');
+
+    const detached = await getPresetUseCase.execute(firstExam.id);
+    await savePresetUseCase.execute({ ...detached, templateId: undefined });
+    expect((await getPresetUseCase.execute(firstExam.id)).templateId).toBeUndefined();
+    await expect(library.delete(master.id)).rejects.toThrow('verwendet');
+
+    const secondDetached = await getPresetUseCase.execute(secondExam.id);
+    await savePresetUseCase.execute({ ...secondDetached, templateId: undefined });
+    await library.delete(master.id);
+    expect((await getPresetUseCase.execute(firstExam.id)).headerText).toBe('Fassung 2');
+  });
+
 });
