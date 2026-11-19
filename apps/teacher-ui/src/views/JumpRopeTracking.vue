@@ -1,11 +1,11 @@
 <template>
-  <div class="jump-rope-view">
+  <div class="jump-rope-view sport-ui">
     <div class="page-header">
-      <button class="back-button" type="button" @click="$router.back()">← {{ t('COMMON.back') }}</button>
+      <Button text severity="secondary" icon="pi pi-arrow-left" type="button" @click="$router.back()">{{ t('COMMON.back') }}</Button>
       <h2>{{ t('TRACKING.jump-rope.title') }}</h2>
     </div>
 
-    <section v-if="!isTracking && !sessionSaved" class="card config-card">
+    <section v-if="!isTracking && !sessionSaved" class="card config-card app-card">
       <h3>
         {{ t('TRACKING.jump-rope.fps-label').replace(':', '') }}
         &amp;
@@ -43,19 +43,19 @@
       </div>
     </section>
 
-    <div v-if="cameraError" class="error-banner card">
+    <div v-if="cameraError" class="error-banner card app-card">
       <strong>{{ t('TRACKING.jump-rope.error-title') }}:</strong> {{ cameraError }}
       <button class="btn-retry" type="button" @click="initCamera">
         {{ t('TRACKING.jump-rope.retry') }}
       </button>
     </div>
 
-    <div v-if="!cameraActive && !cameraError" class="idle-hint card">
+    <div v-if="!cameraActive && !cameraError" class="idle-hint card app-card">
       <p>{{ t('TRACKING.jump-rope.status.ready') }}</p>
     </div>
 
     <div v-show="cameraActive" class="tracking-layout">
-      <div ref="videoWrapper" class="video-wrapper card">
+      <div ref="videoWrapper" class="video-wrapper card app-card">
         <video
           ref="videoEl"
           class="camera-feed"
@@ -97,12 +97,12 @@
         ></div>
       </div>
 
-      <div v-if="cameraActive && !isTracking" class="region-controls card">
+      <div v-if="cameraActive && !isTracking" class="region-controls card app-card">
         <div class="region-controls__header">
           <strong>{{ t('TRACKING.jump-rope.regions.title') }}</strong>
-          <button class="btn-secondary region-reset" type="button" @click="resetPersonRegions">
+          <Button severity="secondary" outlined class="region-reset" type="button" @click="resetPersonRegions">
             {{ t('TRACKING.jump-rope.regions.reset') }}
-          </button>
+          </Button>
         </div>
 
         <div class="region-controls__buttons">
@@ -121,7 +121,7 @@
         <p class="region-hint">{{ t('TRACKING.jump-rope.regions.hint') }}</p>
       </div>
 
-      <div class="stats-bar card">
+      <div class="stats-bar card app-card">
         <div class="stat-item">
           <span class="stat-label">{{ t('TRACKING.jump-rope.stats.total-reps') }}</span>
           <span class="stat-value">{{ totalReps }}</span>
@@ -141,43 +141,43 @@
       </div>
     </div>
 
-    <div class="controls-card card">
-      <button
+    <div class="controls-card card app-card">
+      <Button
         v-if="!cameraActive"
-        class="btn-primary"
+       
         type="button"
         @click="initCamera"
       >
         📷 {{ t('TRACKING.jump-rope.controls.start-camera') }}
-      </button>
+      </Button>
 
       <template v-else>
-        <button
+        <Button
           v-if="!isTracking"
-          class="btn-primary"
+         
           type="button"
           @click="startTracking"
         >
           ▶ {{ t('TRACKING.jump-rope.controls.start') }}
-        </button>
+        </Button>
 
-        <button
+        <Button severity="danger"
           v-else
-          class="btn-danger"
+         
           type="button"
           @click="stopTracking"
         >
           ⏹ {{ t('TRACKING.jump-rope.controls.stop') }}
-        </button>
+        </Button>
 
-        <button
-          class="btn-secondary"
+        <Button severity="secondary" outlined
+         
           type="button"
           :disabled="isTracking"
           @click="resetAll"
         >
           🔄 {{ t('TRACKING.jump-rope.controls.reset') }}
-        </button>
+        </Button>
       </template>
     </div>
 
@@ -192,6 +192,7 @@
 </template>
 
 <script setup lang="ts">
+import Button from 'openvue/button'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
