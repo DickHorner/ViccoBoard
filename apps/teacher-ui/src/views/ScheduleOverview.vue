@@ -1,140 +1,171 @@
 <template>
   <section class="schedule-overview">
-    <header class="page-header">
+    <header class="schedule-header">
       <div>
+        <p class="schedule-eyebrow">Unterricht</p>
         <h1>Stundenplan</h1>
-        <p class="subtitle">Wochennahe Übersicht der vorhandenen Unterrichtsstunden.</p>
+        <p class="app-section-copy">Wochennahe Übersicht der vorhandenen Unterrichtsstunden.</p>
       </div>
-      <div class="actions">
-        <button class="ghost-link" type="button" @click="showSubjectForm = !showSubjectForm">
-          + Fach
-        </button>
-        <RouterLink class="primary-link" to="/lessons">
-          Stunden verwalten
-        </RouterLink>
+      <div class="app-actions-row schedule-header-actions">
+        <Button label="Fach anlegen" icon="pi pi-plus" severity="secondary" outlined @click="showSubjectForm = true" />
+        <Button label="Stunden verwalten" icon="pi pi-calendar" @click="router.push('/lessons')" />
       </div>
     </header>
 
-    <div v-if="loading" class="state-card">Stunden werden geladen...</div>
-    <div v-else-if="loadError" class="state-card error">{{ loadError }}</div>
-    <div v-else class="schedule-grid">
-      <section v-if="showSubjectForm" class="panel full-width subject-panel">
-        <div>
-          <h2>Fach anlegen</h2>
-          <p class="panel-subtitle">Fächer gelten klassenübergreifend und werden anschließend einer Stunde oder Sequenz zugeordnet.</p>
-        </div>
-        <form class="subject-form" @submit.prevent="handleCreateSubject">
-          <input v-model="newSubjectName" type="text" placeholder="Fachname" required />
-          <select v-model="newSubjectProfile">
-            <option value="generic">Allgemein</option>
-            <option value="sport">Sport-Arbeitsbereich</option>
-            <option value="kbr">KBR-Arbeitsbereich</option>
-          </select>
-          <button class="primary-link" type="submit" :disabled="creatingSubject">
-            {{ creatingSubject ? 'Wird angelegt...' : 'Anlegen' }}
-          </button>
-        </form>
-        <p v-if="subjectError" class="error-text">{{ subjectError }}</p>
-        <div v-if="subjects.length > 0" class="subject-list">
-          <span v-for="subject in subjects" :key="subject.id">{{ subject.name }}</span>
-        </div>
-      </section>
-
-      <section class="panel hero-panel">
-        <h2>Jetzt / Als Nächstes</h2>
-        <div v-if="currentOrNextLesson" class="lesson-focus">
-          <p class="eyebrow">{{ currentOrNextMode }}</p>
-          <h3>{{ getLessonTitle(currentOrNextLesson) }}</h3>
-          <p>{{ getSubjectName(currentOrNextLesson.subjectId) }} · {{ getClassName(currentOrNextLesson.classGroupId) }}</p>
-          <p>{{ formatLessonDateTime(currentOrNextLesson) }}</p>
-          <div class="actions">
-            <RouterLink :to="getLessonWorkspaceUrl(currentOrNextLesson)" class="ghost-link">
-              Arbeitsbereich öffnen
-            </RouterLink>
-            <RouterLink :to="getAttendanceUrl(currentOrNextLesson)" class="primary-link">
-              Anwesenheit
-            </RouterLink>
+    <div v-if="loading" class="app-card app-status-panel" role="status">Stunden werden geladen…</div>
+    <div v-else-if="loadError" class="app-card app-status-panel">
+      <Message severity="error" role="alert">{{ loadError }}</Message>
+      <Button label="Erneut versuchen" icon="pi pi-refresh" @click="loadData" />
+    </div>
+    <template v-else>
+      <div class="schedule-focus-grid">
+        <section class="app-card schedule-panel">
+          <h2 class="app-section-title">Jetzt / Als Nächstes</h2>
+          <div v-if="currentOrNextLesson" class="schedule-focus">
+            <Tag :value="currentOrNextMode" severity="info" />
+            <h3>{{ getLessonTitle(currentOrNextLesson) }}</h3>
+            <p>{{ getSubjectName(currentOrNextLesson.subjectId) }} · {{ getClassName(currentOrNextLesson.classGroupId) }}</p>
+            <p class="app-section-copy">{{ formatLessonDateTime(currentOrNextLesson) }}</p>
+            <div class="app-actions-row">
+              <Button label="Arbeitsbereich öffnen" icon="pi pi-arrow-right" severity="secondary" outlined @click="router.push(getLessonWorkspaceUrl(currentOrNextLesson))" />
+              <Button label="Anwesenheit" icon="pi pi-check-square" @click="router.push(getAttendanceUrl(currentOrNextLesson))" />
+            </div>
           </div>
-        </div>
-        <p v-else class="empty-text">Heute sind noch keine Stunden eingetragen.</p>
-      </section>
+          <p v-else class="app-section-copy">Heute sind noch keine Stunden eingetragen.</p>
+        </section>
 
-      <section class="panel">
-        <h2>Danach</h2>
-        <div v-if="upcomingLesson" class="mini-lesson">
-          <strong>{{ getLessonTitle(upcomingLesson) }}</strong>
-          <span>{{ getSubjectName(upcomingLesson.subjectId) }} · {{ getClassName(upcomingLesson.classGroupId) }}</span>
-          <span>{{ formatLessonDateTime(upcomingLesson) }}</span>
-        </div>
-        <p v-else class="empty-text">Keine weitere Stunde für heute gefunden.</p>
-      </section>
+        <section class="app-card schedule-panel">
+          <h2 class="app-section-title">Danach</h2>
+          <div v-if="upcomingLesson" class="schedule-upcoming">
+            <strong>{{ getLessonTitle(upcomingLesson) }}</strong>
+            <p>{{ getSubjectName(upcomingLesson.subjectId) }} · {{ getClassName(upcomingLesson.classGroupId) }}</p>
+            <p class="app-section-copy">{{ formatLessonDateTime(upcomingLesson) }}</p>
+            <RouterLink :to="getLessonWorkspaceUrl(upcomingLesson)" class="schedule-text-link">Stunde öffnen</RouterLink>
+          </div>
+          <p v-else class="app-section-copy">Keine weitere Stunde für heute gefunden.</p>
+        </section>
+      </div>
 
-      <section class="panel full-width">
-        <div class="panel-header">
+      <section class="app-card schedule-panel">
+        <div class="schedule-heading">
           <div>
-            <h2>Nächste 7 Tage</h2>
-            <p class="panel-subtitle">Gruppiert nach Kalendertag, sortiert nach Startzeit.</p>
+            <h2 class="app-section-title">Nächste 7 Tage</h2>
+            <p class="app-section-copy">Gruppiert nach Kalendertag, sortiert nach Startzeit.</p>
           </div>
-          <span>{{ scheduledLessonCount }} Einträge</span>
+          <Tag :value="scheduledLessonCount + ' Einträge'" severity="secondary" />
         </div>
 
-        <div class="week-list">
+        <div class="schedule-days">
           <section
             v-for="day in scheduleDays"
             :key="day.key"
-            class="day-card"
-            :class="{ 'is-today': day.isToday }"
+            class="schedule-day"
+            :class="{ 'schedule-day-today': day.isToday }"
           >
-            <header class="day-header">
+            <header class="schedule-day-header">
               <div>
-                <strong>{{ day.weekday }}</strong>
-                <span>{{ day.label }}</span>
-                <div v-if="day.markers.length > 0" class="calendar-markers">
-                  <span
-                    v-for="marker in day.markers"
-                    :key="`${day.key}-${marker.type}-${marker.label}`"
-                    class="calendar-marker"
-                    :class="`is-${marker.type}`"
-                  >
-                    {{ marker.label }}
-                  </span>
-                </div>
+                <h3>{{ day.weekday }} · {{ day.label }}</h3>
+                <Tag v-if="day.isToday" value="Heute" severity="info" />
               </div>
-              <span>{{ day.lessons.length }} Stunden</span>
+              <Tag :value="day.lessons.length + ' Stunden'" severity="secondary" />
             </header>
 
-            <div v-if="day.lessons.length === 0" class="empty-text compact">
-              Keine Stunden eingetragen.
+            <div v-if="day.markers.length" class="schedule-markers">
+              <Tag
+                v-for="marker in day.markers"
+                :key="day.key + '-' + marker.type + '-' + marker.label"
+                :value="marker.label"
+                :severity="marker.type === 'holiday' ? 'danger' : 'info'"
+              />
             </div>
 
-            <div v-else class="day-lessons">
+            <p v-if="day.lessons.length === 0" class="app-section-copy">Keine Stunden eingetragen.</p>
+            <div v-else class="schedule-lessons">
               <RouterLink
                 v-for="lesson in day.lessons"
                 :key="lesson.id"
                 :to="getLessonWorkspaceUrl(lesson)"
-                class="lesson-row"
+                class="schedule-lesson-link"
               >
                 <time>{{ formatLessonTime(lesson) }}</time>
                 <div>
                   <strong>{{ getLessonTitle(lesson) }}</strong>
                   <p>{{ getSubjectName(lesson.subjectId) }} · {{ getClassName(lesson.classGroupId) }}{{ getLessonMeta(lesson) }}</p>
-                  <p v-if="getLessonHourSlotLabel(lesson)" class="lesson-slot">
-                    {{ getLessonHourSlotLabel(lesson) }}
-                  </p>
+                  <small v-if="getLessonHourSlotLabel(lesson)">{{ getLessonHourSlotLabel(lesson) }}</small>
                 </div>
-                <span>öffnen</span>
+                <i class="pi pi-chevron-right" aria-hidden="true"></i>
               </RouterLink>
             </div>
           </section>
         </div>
       </section>
-    </div>
+    </template>
+
+    <Dialog
+      :visible="showSubjectForm"
+      modal
+      header="Fach anlegen"
+      :closable="!creatingSubject"
+      :style="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }"
+      @update:visible="visible => { if (!visible && !creatingSubject) closeSubjectForm() }"
+    >
+      <form class="schedule-subject-form" @submit.prevent="handleCreateSubject">
+        <p class="app-section-copy">
+          Fächer gelten klassenübergreifend und können anschließend Stunden oder Sequenzen zugeordnet werden.
+        </p>
+        <div class="app-field">
+          <label for="schedule-subject-name">Fachname *</label>
+          <InputText
+            id="schedule-subject-name"
+            v-model="newSubjectName"
+            placeholder="Fachname"
+            autocomplete="off"
+            required
+            fluid
+          />
+        </div>
+        <div class="app-field">
+          <label for="schedule-subject-profile">Arbeitsbereich</label>
+          <Select
+            inputId="schedule-subject-profile"
+            v-model="newSubjectProfile"
+            :options="subjectProfileOptions"
+            optionLabel="label"
+            optionValue="value"
+            fluid
+          />
+        </div>
+        <div v-if="subjects.length" class="schedule-subject-list">
+          <span class="app-data-note">Bestehende Fächer</span>
+          <div class="app-chip-row">
+            <Tag v-for="subject in subjects" :key="subject.id" :value="subject.name" severity="secondary" />
+          </div>
+        </div>
+        <Message v-if="subjectError" severity="error" role="alert">{{ subjectError }}</Message>
+        <div class="app-actions-row schedule-dialog-actions">
+          <Button type="button" label="Abbrechen" severity="secondary" :disabled="creatingSubject" @click="closeSubjectForm" />
+          <Button
+            type="submit"
+            label="Fach anlegen"
+            icon="pi pi-plus"
+            :loading="creatingSubject"
+            :disabled="creatingSubject || !newSubjectName.trim()"
+          />
+        </div>
+      </form>
+    </Dialog>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, nextTick, onMounted, ref } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import Button from 'openvue/button'
+import Dialog from 'openvue/dialog'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
+import Tag from 'openvue/tag'
 import { useClassGroups, useLessons, useSubjects } from '../composables/useSportBridge'
 import { getDashboardLessonState } from '../utils/dashboard-workspace'
 import type { ClassGroup, Lesson, Subject, SubjectWorkspaceProfile } from '@viccoboard/core'
@@ -144,6 +175,7 @@ import {
   type ResolvedScheduleCalendarMarker
 } from '../utils/schedule-calendar-markers'
 import { getScheduleHourSlot } from './schedule-hour-grid'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 interface ScheduleDay {
   key: string
@@ -154,6 +186,7 @@ interface ScheduleDay {
   markers: ResolvedScheduleCalendarMarker[]
 }
 
+const router = useRouter()
 const classGroups = useClassGroups()
 const subjectsRepository = useSubjects()
 const lessonsRepository = useLessons()
@@ -168,6 +201,11 @@ const newSubjectName = ref('')
 const newSubjectProfile = ref<SubjectWorkspaceProfile>('generic')
 const creatingSubject = ref(false)
 const subjectError = ref('')
+const subjectProfileOptions: Array<{ label: string; value: SubjectWorkspaceProfile }> = [
+  { label: 'Allgemein', value: 'generic' },
+  { label: 'Sport-Arbeitsbereich', value: 'sport' },
+  { label: 'KBR-Arbeitsbereich', value: 'kbr' }
+]
 const now = ref(Date.now())
 
 const classesById = computed(() => new Map(classes.value.map((classGroup) => [classGroup.id, classGroup])))
@@ -200,7 +238,7 @@ const scheduleDays = computed<ScheduleDay[]>(() => {
 
     return {
       key,
-      label: date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+      label: date.toLocaleDateString('de-DE', { day: 'numeric', month: 'numeric' }),
       weekday: date.toLocaleDateString('de-DE', { weekday: 'long' }),
       isToday: index === 0,
       lessons: [...dayLessons].sort(compareLessonsByStartTime),
@@ -253,6 +291,10 @@ const loadData = async () => {
   } finally {
     loading.value = false
   }
+  if (!loadError.value) {
+    await nextTick()
+    recordRouteContentReady('schedule')
+  }
 }
 
 const getClassName = (classGroupId: string): string =>
@@ -281,19 +323,29 @@ const getLessonWorkspaceUrl = (lesson: Lesson): string =>
 const getAttendanceUrl = (lesson: Lesson): string =>
   '/attendance?classId=' + lesson.classGroupId + '&lessonId=' + lesson.id
 
+const closeSubjectForm = () => {
+  showSubjectForm.value = false
+  newSubjectName.value = ''
+  newSubjectProfile.value = 'generic'
+  subjectError.value = ''
+}
+
 const handleCreateSubject = async () => {
   subjectError.value = ''
+  if (!newSubjectName.value.trim()) {
+    subjectError.value = 'Bitte einen Fachnamen eingeben.'
+    return
+  }
   creatingSubject.value = true
 
   try {
     await subjectsRepository.create({
-      name: newSubjectName.value,
+      name: newSubjectName.value.trim(),
       workspaceProfile: newSubjectProfile.value
     })
     subjects.value = (await subjectsRepository.findAll())
       .sort((left, right) => left.name.localeCompare(right.name, 'de-DE'))
-    newSubjectName.value = ''
-    newSubjectProfile.value = 'generic'
+    closeSubjectForm()
   } catch (error) {
     subjectError.value = error instanceof Error ? error.message : 'Fach konnte nicht angelegt werden.'
   } finally {
@@ -381,219 +433,176 @@ onMounted(() => {
   gap: 1.5rem;
 }
 
-.page-header,
-.panel-header,
-.actions,
-.day-header,
-.lesson-row {
+.schedule-header,
+.schedule-heading,
+.schedule-day-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
-.page-header,
-.panel-header,
-.actions {
-  flex-wrap: wrap;
-}
-
-.day-header,
-.lesson-row {
-  align-items: center;
-}
-
-.page-header h1,
-.panel h2,
-.panel h3,
-.day-header strong,
-.lesson-row p {
+.schedule-header h1,
+.schedule-day-header h3,
+.schedule-focus h3,
+.schedule-upcoming p,
+.schedule-focus p,
+.schedule-upcoming strong {
   margin: 0;
 }
 
-.subtitle,
-.panel-subtitle,
-.empty-text,
-.mini-lesson span,
-.day-header span,
-.lesson-row p,
-.lesson-slot {
-  color: #64748b;
+.schedule-eyebrow {
+  margin: 0 0 0.25rem;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
-.panel-subtitle {
-  margin: 0.25rem 0 0;
-}
-
-.primary-link,
-.ghost-link,
-.lesson-row {
-  min-height: 44px;
-  border-radius: 16px;
-  text-decoration: none;
-}
-
-.primary-link,
-.ghost-link {
-  display: inline-flex;
+.schedule-header-actions {
   align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1rem;
-  font-weight: 600;
 }
 
-.primary-link {
-  background: #0f172a;
-  color: white;
+.schedule-header :deep(.p-button),
+.schedule-panel :deep(.p-button),
+.schedule-subject-form :deep(.p-button) {
+  min-height: 44px;
 }
 
-.ghost-link {
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  color: #0f172a;
+.schedule-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1rem;
 }
 
-.state-card,
-.panel,
-.day-card {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
+.schedule-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
   padding: 1.25rem;
 }
 
-.state-card.error,
-.error-text {
-  color: #991b1b;
-}
-
-.subject-form,
-.subject-list {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.subject-form input,
-.subject-form select {
-  min-height: 44px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  border-radius: 12px;
-  padding: 0.65rem 0.8rem;
-  font: inherit;
-}
-
-.subject-list span {
-  border-radius: 999px;
-  background: #f1f5f9;
-  padding: 0.35rem 0.7rem;
-}
-
-.schedule-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.hero-panel {
-  min-height: 220px;
-}
-
-.full-width {
-  grid-column: 1 / -1;
-}
-
-.eyebrow {
-  margin: 0 0 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
-  color: #0f766e;
-  font-weight: 700;
-}
-
-.lesson-focus,
-.week-list,
-.day-lessons,
-.mini-lesson,
-.calendar-markers {
+.schedule-focus,
+.schedule-upcoming,
+.schedule-subject-form {
   display: flex;
   flex-direction: column;
-}
-
-.lesson-focus {
   gap: 0.75rem;
 }
 
-.week-list,
-.day-lessons,
-.mini-lesson {
+.schedule-focus .p-tag {
+  align-self: flex-start;
+}
+
+.schedule-focus h3 {
+  font-size: 1.25rem;
+  color: var(--color-ink);
+}
+
+.schedule-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1rem;
+}
+
+.schedule-day {
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.9rem;
 }
 
-.calendar-markers {
-  align-items: flex-start;
-  gap: 0.25rem;
-  margin-top: 0.5rem;
+.schedule-day-today {
+  border-color: var(--accent-strong);
 }
 
-.calendar-marker {
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.2rem 0.6rem;
+.schedule-day-header h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
 }
 
-.calendar-marker.is-holiday {
-  background: rgba(220, 38, 38, 0.1);
-  color: #991b1b;
+.schedule-markers,
+.schedule-lessons,
+.schedule-subject-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.calendar-marker.is-school-break {
-  background: rgba(14, 165, 233, 0.12);
-  color: #075985;
-}
-
-.day-card.is-today {
-  border-color: rgba(15, 118, 110, 0.36);
-}
-
-.lesson-row {
+.schedule-lesson-link {
+  display: flex;
   align-items: center;
-  padding: 0.875rem 1rem;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  color: #0f172a;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  color: var(--color-ink);
+  text-decoration: none;
 }
 
-.lesson-row time {
-  min-width: 3.25rem;
+.schedule-lesson-link:hover {
+  border-color: var(--accent-strong);
+  background: var(--surface-soft);
+}
+
+.schedule-lesson-link:focus-visible,
+.schedule-text-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.schedule-lesson-link time {
+  min-width: 3rem;
   font-weight: 700;
-  color: #0f766e;
+  color: var(--accent-strong);
 }
 
-.lesson-row div {
+.schedule-lesson-link div {
   flex: 1;
+  min-width: 0;
 }
 
-.lesson-slot {
-  font-size: 0.85rem;
-  margin-top: 0.25rem;
+.schedule-lesson-link p,
+.schedule-lesson-link small {
+  margin: 0.2rem 0 0;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
 }
 
-.empty-text.compact {
-  margin: 0;
+.schedule-lesson-link .pi {
+  color: var(--color-muted);
 }
 
-@media (max-width: 820px) {
-  .schedule-grid {
-    grid-template-columns: 1fr;
+.schedule-text-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 44px;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.schedule-subject-form :deep(.p-inputtext),
+.schedule-subject-form :deep(.p-select) {
+  min-height: 44px;
+}
+
+.schedule-dialog-actions {
+  justify-content: flex-end;
+}
+
+@media (max-width: 580px) {
+  .schedule-header-actions {
+    width: 100%;
   }
 
-  .lesson-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .lesson-row time {
-    min-width: auto;
+  .schedule-header-actions :deep(.p-button) {
+    flex: 1 1 100%;
   }
 }
 </style>
