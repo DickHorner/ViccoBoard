@@ -2,9 +2,9 @@
   <section class="preset-section">
     <div class="section-header">
       <div>
-        <h2>Rückmeldebogen</h2>
+        <h2>Druckbogengestaltung</h2>
         <p class="section-copy">
-          Steuert die Darstellung des Korrektur- und Exportbogens, ohne die Prüfungslogik zu duplizieren.
+          Das wiederverwendbare Blanko-Layout für Rückmeldebögen. Prüfungsinhalte und Bewertungen werden erst beim PDF-Erzeugen eingesetzt.
         </p>
       </div>
     </div>
