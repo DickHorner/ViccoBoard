@@ -768,8 +768,11 @@ const saveExam = async () => {
   if (!canSave.value || savingExam.value) return;
 
   saveError.value = '';
-  if (store.kind === 'template' && candidates.value.length > 0) {
-    saveError.value = 'Eine Prüfungsvorlage darf keine Prüflinge enthalten. Entferne zuerst die Prüflinge.';
+  if (store.kind === 'template' && (
+    candidates.value.length > 0 ||
+    store.candidateGroups.some(group => group.memberCandidateIds.length > 0)
+  )) {
+    saveError.value = 'Eine Prüfungsvorlage darf keine Prüflinge oder Gruppenzuordnungen enthalten. Entferne zuerst die Zuordnungen.';
     return;
   }
 
