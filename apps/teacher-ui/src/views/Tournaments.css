@@ -17,13 +17,13 @@
 .page-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #333;
+  color: var(--color-ink);
   flex: 1;
 }
 
 /* Buttons */
 .btn-primary {
-  background: #4a6fa5;
+  background: var(--accent-strong);
   color: white;
   border: none;
   border-radius: 6px;
@@ -41,8 +41,8 @@
 
 .btn-secondary {
   background: white;
-  color: #4a6fa5;
-  border: 1px solid #4a6fa5;
+  color: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
   border-radius: 6px;
   padding: 0.45rem 0.9rem;
   cursor: pointer;
@@ -60,7 +60,7 @@
 .btn-back {
   background: none;
   border: none;
-  color: #4a6fa5;
+  color: var(--accent-strong);
   cursor: pointer;
   font-size: 0.95rem;
   padding: 0.25rem 0;
@@ -83,7 +83,7 @@
 .btn-icon {
   background: none;
   border: none;
-  color: #888;
+  color: var(--color-subtle);
   cursor: pointer;
   font-size: 1rem;
   padding: 0.2rem 0.4rem;
@@ -148,13 +148,13 @@
   display: flex;
   gap: 1rem;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-muted);
 }
 
 /* Empty state */
 .empty-state {
   text-align: center;
-  color: #888;
+  color: var(--color-subtle);
   padding: 3rem 1rem;
   font-size: 1rem;
 }
@@ -194,7 +194,7 @@
 .form-select {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 6px;
   font-size: 0.95rem;
   box-sizing: border-box;
@@ -203,7 +203,7 @@
 .form-input:focus,
 .form-select:focus {
   outline: none;
-  border-color: #4a6fa5;
+  border-color: var(--accent-strong);
 }
 
 .team-list-editor {
@@ -243,7 +243,7 @@
 .tab-bar {
   display: flex;
   gap: 0;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid var(--surface-border);
   margin-bottom: 1.25rem;
 }
 
@@ -253,14 +253,14 @@
   padding: 0.5rem 1.1rem;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--color-muted);
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
   transition: color 0.15s, border-color 0.15s;
 }
 .tab-btn.active {
-  color: #4a6fa5;
-  border-bottom-color: #4a6fa5;
+  color: var(--accent-strong);
+  border-bottom-color: var(--accent-strong);
   font-weight: 600;
 }
 
@@ -306,14 +306,14 @@
 
 .team-name {
   font-size: 0.95rem;
-  color: #333;
+  color: var(--color-ink);
   min-width: 80px;
 }
 
 .score-display {
   font-weight: 700;
   font-size: 1rem;
-  color: #333;
+  color: var(--color-ink);
   margin-left: auto;
   background: #f3f6fb;
   border-radius: 4px;
@@ -347,7 +347,7 @@
 
 .points-cell {
   font-weight: 700;
-  color: #4a6fa5;
+  color: var(--accent-strong);
 }
 
 /* Bracket */
@@ -386,7 +386,7 @@
 .modal-card h3 {
   margin: 0 0 1.2rem 0;
   font-size: 1.1rem;
-  color: #333;
+  color: var(--color-ink);
 }
 
 .score-entry-row {
@@ -400,7 +400,7 @@
   width: 64px;
   text-align: center;
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--surface-border);
   border-radius: 6px;
   font-size: 1.3rem;
   font-weight: 700;
@@ -408,7 +408,7 @@
 
 .score-input:focus {
   outline: none;
-  border-color: #4a6fa5;
+  border-color: var(--accent-strong);
 }
 
 .modal-actions {
