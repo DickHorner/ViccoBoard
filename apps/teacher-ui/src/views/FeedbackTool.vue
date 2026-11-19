@@ -13,12 +13,8 @@
         </div>
         <div v-if="classes.length > 0" class="class-select-row">
           <label for="feedback-class">Klasse:</label>
-          <select id="feedback-class" v-model="selectedClassId">
-            <option value="">Keine Klasse gewählt</option>
-            <option v-for="cls in classes" :key="cls.id" :value="cls.id">
-              {{ cls.name }}
-            </option>
-          </select>
+          <Select inputId="feedback-class" v-model="selectedClassId" :options="classOptions"
+            optionLabel="label" optionValue="value" />
         </div>
         <div class="method-grid">
           <button class="method-card" @click="startMethod('emoji')">
@@ -44,7 +40,7 @@
             </div>
             <div class="session-stats">
               <span>{{ s.responses.length }} Antworten</span>
-              <button class="btn-link" @click="openAnalysis(s)">Auswertung</button>
+              <Button label="Auswertung" severity="secondary" text @click="openAnalysis(s)" />
             </div>
           </li>
         </ul>
@@ -151,6 +147,8 @@
 
 <script setup lang="ts">
 import Button from 'openvue/button'
+import Select from 'openvue/select'
+import { computed } from 'vue'
 import { ref, onMounted } from 'vue'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { ClassGroup, Sport } from '@viccoboard/core'
@@ -171,6 +169,10 @@ const bridge = getSportBridge()
 const view = ref<FeedbackView>('list')
 const sessions = ref<Sport.FeedbackSession[]>([])
 const classes = ref<ClassGroup[]>([])
+const classOptions = computed(() => [
+  { label: 'Keine Klasse gewählt', value: '' },
+  ...classes.value.map(group => ({ label: group.name, value: group.id }))
+])
 const selectedClassId = ref('')
 const loading = ref(false)
 
