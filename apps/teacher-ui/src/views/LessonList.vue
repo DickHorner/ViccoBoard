@@ -331,11 +331,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { getSportBridge } from '../composables/useSportBridge'
 import type { Lesson, ClassGroup, Subject } from '@viccoboard/core'
 import { buildAutoLessonDates, getDateKey } from '../utils/lesson-auto-generation'
+import { recordRouteContentReady } from '../utils/navigation-performance'
 
 const route = useRoute()
 const router = useRouter()
@@ -479,7 +480,11 @@ const loadData = async () => {
   } finally {
     loading.value = false
   }
-  if (!error.value) void enrichWithParts(lessons.value)
+  if (!error.value) {
+    await nextTick()
+    recordRouteContentReady('lessons')
+    void enrichWithParts(lessons.value)
+  }
 }
 
 const onClassChange = async () => {
