@@ -28,6 +28,16 @@
     
     <!-- Class Details -->
     <div v-else-if="classGroup" class="class-info">
+      <nav class="class-context-actions" aria-label="Mit dieser Klasse arbeiten">
+        <RouterLink :to="{ path: '/lessons', query: { classId: classGroup.id } }" class="class-context-link">
+          <i class="pi pi-calendar" aria-hidden="true"></i>
+          Stunden dieser Klasse
+        </RouterLink>
+        <RouterLink :to="{ path: '/attendance', query: { classId: classGroup.id } }" class="class-context-link">
+          <i class="pi pi-check-square" aria-hidden="true"></i>
+          Anwesenheit erfassen
+        </RouterLink>
+      </nav>
       <section class="card app-card">
         <h3>Klasseninformation</h3>
         <div class="info-grid">
