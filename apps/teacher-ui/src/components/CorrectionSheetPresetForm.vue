@@ -11,7 +11,7 @@
 
     <div class="form-row">
       <div class="form-group">
-        <label for="preset-name">Preset-Name</label>
+        <label for="preset-name">Vorlagenname</label>
         <input
           id="preset-name"
           :value="modelValue.name"
