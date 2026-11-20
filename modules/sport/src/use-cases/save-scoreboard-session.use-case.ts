@@ -73,7 +73,7 @@ export interface ScoreboardSessionMetadata {
   /** Inline timer state persisted with the session. */
   inlineTimer?: InlineTimerState;
   roundSettings?: ScoreboardRoundSettings;
-
+}
 
 export class SaveScoreboardSessionUseCase {
   constructor(private toolSessionRepository: ToolSessionRepository) {}
