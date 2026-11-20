@@ -81,6 +81,38 @@ describe('SaveScoreboardSessionUseCase', () => {
     expect(session.sessionMetadata.history[0].timestamp).toEqual(expect.any(String));
   });
 
+  it('persists optional numbered rounds without a class binding', async () => {
+    const session = await useCase.execute({
+      sessionName: 'Basketball rounds',
+      teams: [{ id: 'team-a', name: 'A' }, { id: 'team-b', name: 'B' }],
+      scores: { 'team-a': 2, 'team-b': 3 },
+      history: [],
+      roundSettings: {
+        sport: 'basketball',
+        customPoints: 1,
+        timerMode: 'countdown',
+        roundDurationMs: 180000,
+        numberPickerEnabled: true,
+        teamSize: 12,
+        playersPerRound: 5,
+        exclusionMode: 'unused',
+        selectionMethod: 'random',
+        activeNumbers: [1, 2, 3, 4, 5],
+        roundActive: false,
+        pendingNumbers: [6, 7, 8, 9, 10],
+        roundHistory: [[1, 2, 3, 4, 5]]
+      }
+    });
+
+    expect(session.classGroupId).toBeUndefined();
+    expect(session.sessionMetadata.roundSettings).toMatchObject({
+      teamSize: 12,
+      playersPerRound: 5,
+      activeNumbers: [1, 2, 3, 4, 5],
+      pendingNumbers: [6, 7, 8, 9, 10]
+    });
+  });
+
   it('preserves existing history timestamps on update', async () => {
     const created = await useCase.execute({
       sessionName: 'Matchday',

@@ -4,6 +4,7 @@
  */
 
 import { Sport } from '@viccoboard/core';
+import type { RoundExclusionMode } from '../services/round-number-picker.service.js';
 import type { ToolSessionRepository } from '../repositories/tool-session.repository.js';
 
 export interface ScoreboardTeamInput {
@@ -28,6 +29,22 @@ export interface InlineTimerState {
   running: boolean;
 }
 
+export interface ScoreboardRoundSettings {
+  sport: 'basketball' | 'standard' | 'custom';
+  customPoints: number;
+  timerMode: 'stopwatch' | 'countdown';
+  roundDurationMs: number;
+  numberPickerEnabled: boolean;
+  teamSize: number;
+  playersPerRound: number;
+  exclusionMode: RoundExclusionMode;
+  selectionMethod: 'random' | 'manual';
+  activeNumbers: number[];
+  roundActive: boolean;
+  pendingNumbers: number[];
+  roundHistory: number[][];
+}
+
 export interface SaveScoreboardSessionInput {
   sessionId?: string;
   classGroupId?: string;
@@ -42,6 +59,7 @@ export interface SaveScoreboardSessionInput {
   layout?: 2 | 4;
   /** Inline timer state persisted with the session. */
   inlineTimer?: InlineTimerState;
+  roundSettings?: ScoreboardRoundSettings;
 }
 
 export interface ScoreboardSessionMetadata {
@@ -55,6 +73,7 @@ export interface ScoreboardSessionMetadata {
   layout?: 2 | 4;
   /** Inline timer state persisted with the session. */
   inlineTimer?: InlineTimerState;
+  roundSettings?: ScoreboardRoundSettings;
 }
 
 export class SaveScoreboardSessionUseCase {
@@ -80,7 +99,8 @@ export class SaveScoreboardSessionUseCase {
       linkedTeamSessionId: input.linkedTeamSessionId,
       linkedTimerSessionId: input.linkedTimerSessionId,
       layout: input.layout,
-      inlineTimer: input.inlineTimer
+      inlineTimer: input.inlineTimer,
+      roundSettings: input.roundSettings
     };
 
     if (input.sessionId) {

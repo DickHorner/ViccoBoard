@@ -32,6 +32,7 @@ import {
   ParticipationRubricTemplateRepository,
   PerformanceTableGradingService,
   RecordAttendanceUseCase,
+  RoundNumberPickerService,
   RecordCooperTestResultUseCase,
   RecordDiceRollUseCase,
   RecordFeedbackSessionUseCase,
@@ -146,6 +147,7 @@ interface SportBridge {
   bjsGradingService: BJSGradingService;
   sportStatisticsService: SportStatisticsService;
   teamBuilderService: TeamBuilderService;
+  roundNumberPickerService: RoundNumberPickerService;
   tournamentService: TournamentService;
 }
 
@@ -248,6 +250,7 @@ export function initializeSportBridge(): SportBridge {
   const bjsGradingService = new BJSGradingService();
   const sportStatisticsService = new SportStatisticsService();
   const teamBuilderService = new TeamBuilderService();
+  const roundNumberPickerService = new RoundNumberPickerService();
 
   sportBridgeInstance = {
     classGroupRepository,
@@ -312,6 +315,7 @@ export function initializeSportBridge(): SportBridge {
     bjsGradingService,
     sportStatisticsService,
     teamBuilderService,
+    roundNumberPickerService,
     tournamentService
   };
 
