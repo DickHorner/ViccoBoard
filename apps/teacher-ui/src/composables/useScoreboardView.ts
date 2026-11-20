@@ -76,7 +76,7 @@ export function useScoreboardView() {
   const roundMessage = ref('');
   const nextRoundNumber = computed(() => roundHistory.value.length + 1);
   const usedNumbers = computed(() => roundHistory.value.flat());
-  const previousNumbers = computed(() => roundHistory.value.at(-1) ?? []);
+  const previousNumbers = computed(() => roundHistory.value[roundHistory.value.length - 1] ?? []);
   const pickerInput = computed(() => ({
     teamSize: teamSize.value,
     playersPerRound: playersPerRound.value,
