@@ -10,13 +10,20 @@
       </button>
 
       <div class="ph-timer" :class="{ 'ph-timer--running': timerRunning }">
-        <span class="ph-timer-display">{{ formatDuration(timerElapsedMs) }}</span>
+        <span class="ph-timer-display">{{ formatDuration(displayedTimerMs) }}</span>
         <button
-          v-if="!timerRunning"
+          v-if="!timerRunning && (!numberPickerEnabled || roundActive)"
           class="ph-btn ph-btn--sm"
           type="button"
           @click="startTimer"
         >{{ t('SCORES.timerStart') }}</button>
+        <button
+          v-if="numberPickerEnabled && !roundActive"
+          class="ph-btn ph-btn--sm"
+          type="button"
+          :disabled="pendingNumbers.length !== playersPerRound"
+          @click="startRound"
+        >{{ t('SCORES.startRound') }}</button>
         <button
           v-else
           class="ph-btn ph-btn--sm"
@@ -42,6 +49,14 @@
       </div>
     </div>
 
+    <div v-if="numberPickerEnabled" class="presenter-round-strip">
+      <span>{{ t('SCORES.round') }} {{ roundHistory.length }}:</span>
+      <strong>{{ activeNumbers.join(' · ') || '—' }}</strong>
+      <span v-if="pendingNumbers.length">{{ t('SCORES.nextRound') }} {{ nextRoundNumber }}: {{ pendingNumbers.join(' · ') }}</span>
+      <button v-if="!roundActive && selectionMethod === 'random'" class="ph-btn ph-btn--sm" type="button" @click="prepareNextRound">{{ t('SCORES.draw') }}</button>
+      <span v-if="roundMessage" role="status">{{ roundMessage }}</span>
+    </div>
+
     <!-- Presenter board -->
     <div :class="['presenter-board', `presenter-board--${layout}`]">
       <article
@@ -52,21 +67,10 @@
       >
         <div class="presenter-team-name">{{ team.name || `Team ${team.slot}` }}</div>
         <div class="presenter-score-row">
-          <button
-            class="presenter-score-btn"
-            type="button"
-            @click="adjustScore(team.id, -1)"
-          >&#x2212;1</button>
+          <button class="presenter-score-btn" type="button" @click="adjustScore(team.id, -1)">−1</button>
           <div class="presenter-score-value">{{ scores[team.id] ?? 0 }}</div>
-          <button
-            class="presenter-score-btn presenter-score-btn--plus"
-            type="button"
-            @click="adjustScore(team.id, 1)"
-          >+1</button>
-        </div>
-        <div class="presenter-extra-btns">
-          <button class="presenter-extra-btn" type="button" @click="adjustScore(team.id, 2)">+2</button>
-          <button class="presenter-extra-btn" type="button" @click="adjustScore(team.id, 3)">+3</button>
+          <button v-for="points in pointOptions" :key="points" class="presenter-score-btn presenter-score-btn--plus"
+            type="button" @click="adjustScore(team.id, points)">+{{ points }}</button>
         </div>
       </article>
     </div>
@@ -90,6 +94,18 @@
     <!-- Setup card -->
     <section class="card app-card">
       <div class="setup-grid">
+        <div class="form-group">
+          <label for="scoreboard-sport">{{ t('SCORES.sport') }}</label>
+          <select id="scoreboard-sport" v-model="sport" class="form-input">
+            <option value="basketball">{{ t('SCORES.basketball') }}</option>
+            <option value="standard">{{ t('SCORES.standardPoints') }}</option>
+            <option value="custom">{{ t('SCORES.customPoints') }}</option>
+          </select>
+        </div>
+        <div v-if="sport === 'custom'" class="form-group">
+          <label for="scoreboard-points">{{ t('SCORES.pointsPerAction') }}</label>
+          <input id="scoreboard-points" v-model.number="customPoints" type="number" min="1" max="20" step="1" class="form-input" />
+        </div>
         <div class="form-group">
           <label for="scoreboard-class">{{ t('SCORES.classGroup') }}</label>
           <Select inputId="scoreboard-class" v-model="selectedClassId" :options="classOptions"
@@ -157,13 +173,14 @@
             </div>
           </div>
           <div class="team-score">
-            <button class="score-btn" type="button" @click="adjustScore(team.id, -1)">&#x2212;1</button>
+            <button class="score-btn" type="button" @click="adjustScore(team.id, -1)">−1</button>
             <div class="score-value">{{ scores[team.id] ?? 0 }}</div>
-            <button class="score-btn" type="button" @click="adjustScore(team.id, 1)">+1</button>
+            <button v-if="pointOptions.length === 1" class="score-btn" type="button"
+              @click="adjustScore(team.id, pointOptions[0])">+{{ pointOptions[0] }}</button>
           </div>
-          <div class="score-actions">
-            <Button severity="secondary" outlined type="button" @click="adjustScore(team.id, 2)">+2</Button>
-            <Button severity="secondary" outlined type="button" @click="adjustScore(team.id, 3)">+3</Button>
+          <div v-if="pointOptions.length > 1" class="score-actions">
+            <Button v-for="points in pointOptions" :key="points" severity="secondary" outlined
+              type="button" @click="adjustScore(team.id, points)">+{{ points }}</Button>
           </div>
         </article>
       </div>
@@ -171,14 +188,36 @@
       <!-- Inline timer -->
       <div class="inline-timer-bar">
         <span class="timer-label">{{ t('SCORES.inlineTimer') }}:</span>
-        <span class="timer-value" :class="{ 'timer-value--running': timerRunning }">{{ formatDuration(timerElapsedMs) }}</span>
-        <Button severity="secondary" outlined v-if="!timerRunning" type="button" @click="startTimer">{{ t('SCORES.timerStart') }}</Button>
+        <span class="timer-value" :class="{ 'timer-value--running': timerRunning }">{{ formatDuration(displayedTimerMs) }}</span>
+        <Button severity="secondary" outlined v-if="!timerRunning && (!numberPickerEnabled || roundActive)" type="button" @click="startTimer">{{ t('SCORES.timerStart') }}</Button>
         <Button severity="secondary" outlined v-else type="button" @click="pauseTimer">{{ t('SCORES.timerPause') }}</Button>
         <Button severity="secondary" outlined type="button" @click="resetTimer">{{ t('SCORES.timerReset') }}</Button>
+        <div class="timer-settings">
+          <label for="scoreboard-timer-mode">{{ t('SCORES.timerMode') }}</label>
+          <select id="scoreboard-timer-mode" v-model="timerMode" class="form-input" :disabled="roundActive || timerRunning">
+            <option value="stopwatch">{{ t('SCORES.stopwatch') }}</option>
+            <option value="countdown">{{ t('SCORES.countdown') }}</option>
+          </select>
+          <template v-if="timerMode === 'countdown'">
+            <label for="scoreboard-minutes">{{ t('SCORES.minutes') }}</label>
+            <input id="scoreboard-minutes" v-model.number="roundMinutes" :disabled="roundActive || timerRunning"
+              type="number" min="0" max="99" step="1" class="form-input timer-input" />
+            <label for="scoreboard-seconds">{{ t('SCORES.seconds') }}</label>
+            <input id="scoreboard-seconds" v-model.number="roundSeconds" :disabled="roundActive || timerRunning"
+              type="number" min="0" max="59" step="1" class="form-input timer-input" />
+            <span v-if="!timerConfigurationValid" class="info-text" role="alert">{{ t('SCORES.invalidTimer') }}</span>
+          </template>
+        </div>
       </div>
 
       <div v-if="linkedTimerSummary" class="info-banner">
         {{ linkedTimerSummary }}
+      </div>
+
+      <div class="form-actions">
+        <Button severity="secondary" outlined type="button" :disabled="history.length === 0" @click="undoLastScore">
+          {{ t('SCORES.undoScore') }}
+        </Button>
       </div>
 
       <!-- Event log -->
@@ -206,6 +245,78 @@
       <div class="form-actions">
         <Button severity="secondary" outlined type="button" @click="resetBoard">{{ t('SCORES.reset') }}</Button>
       </div>
+    </section>
+
+    <section class="card app-card">
+      <div class="section-header">
+        <h3>{{ t('SCORES.numberPicker') }}</h3>
+        <label class="scoreboard-toggle">
+          <input v-model="numberPickerEnabled" type="checkbox" />
+          {{ t('SCORES.enableNumberPicker') }}
+        </label>
+      </div>
+      <template v-if="numberPickerEnabled">
+        <p class="info-text">{{ t('SCORES.sharedNumberHint') }}</p>
+        <div class="setup-grid">
+          <div class="form-group">
+            <label for="number-team-size">{{ t('SCORES.teamSize') }}</label>
+            <input id="number-team-size" v-model.number="teamSize" type="number" min="1" max="99" step="1"
+              class="form-input" :disabled="roundActive" />
+          </div>
+          <div class="form-group">
+            <label for="number-per-round">{{ t('SCORES.playersPerRound') }}</label>
+            <input id="number-per-round" v-model.number="playersPerRound" type="number" min="1" :max="teamSize" step="1"
+              class="form-input" :disabled="roundActive" />
+          </div>
+          <div class="form-group">
+            <label for="number-exclusion">{{ t('SCORES.exclusionMode') }}</label>
+            <select id="number-exclusion" v-model="exclusionMode" class="form-input" :disabled="roundActive">
+              <option value="unused">{{ t('SCORES.unused') }}</option>
+              <option value="previous">{{ t('SCORES.previous') }}</option>
+              <option value="any">{{ t('SCORES.any') }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="number-method">{{ t('SCORES.selectionMethod') }}</label>
+            <select id="number-method" v-model="selectionMethod" class="form-input" :disabled="roundActive">
+              <option value="random">{{ t('SCORES.random') }}</option>
+              <option value="manual">{{ t('SCORES.manual') }}</option>
+            </select>
+          </div>
+        </div>
+        <p v-if="layout !== 2 || timerMode !== 'countdown'" class="info-text" role="alert">{{ t('SCORES.twoTeamCountdownRequired') }}</p>
+        <div class="round-details">
+          <div>
+            <strong>{{ t('SCORES.round') }} {{ roundHistory.length }}</strong>
+            <div class="number-chips">
+              <span v-for="number in activeNumbers" :key="number" class="number-chip">{{ number }}</span>
+              <span v-if="activeNumbers.length === 0">—</span>
+            </div>
+          </div>
+          <div>
+            <strong>{{ t('SCORES.nextRound') }} {{ nextRoundNumber }}</strong>
+            <div class="number-chips">
+              <span v-for="number in pendingNumbers" :key="number" class="number-chip">{{ number }}</span>
+              <span v-if="pendingNumbers.length === 0">—</span>
+            </div>
+          </div>
+        </div>
+        <div v-if="selectionMethod === 'manual' && !roundActive" class="number-grid">
+          <button v-for="number in selectableNumbers" :key="number" type="button"
+            class="number-choice" :class="{ active: pendingNumbers.includes(number) }"
+            :aria-pressed="pendingNumbers.includes(number)"
+            @click="toggleManualNumber(number)">{{ number }}</button>
+        </div>
+        <div class="form-actions">
+          <Button severity="secondary" outlined type="button" :disabled="roundActive || !roundConfigurationValid"
+            @click="prepareNextRound">{{ selectionMethod === 'random' ? t('SCORES.draw') : t('SCORES.clearSelection') }}</Button>
+          <Button type="button" :disabled="roundActive || !roundConfigurationValid || !timerConfigurationValid ||
+            timerMode !== 'countdown' || pendingNumbers.length !== playersPerRound"
+            @click="startRound">{{ t('SCORES.startRound') }}</Button>
+          <Button severity="secondary" outlined type="button" :disabled="roundActive" @click="resetRoundCycle">{{ t('SCORES.newCycle') }}</Button>
+        </div>
+        <p v-if="roundMessage" class="info-text" role="status">{{ roundMessage }}</p>
+      </template>
     </section>
 
     <!-- Tournament handoff -->
@@ -300,7 +411,28 @@ const {
   saving,
   message,
   timerElapsedMs,
+  displayedTimerMs,
   timerRunning,
+  timerMode,
+  roundMinutes,
+  roundSeconds,
+  timerConfigurationValid,
+  sport,
+  customPoints,
+  pointOptions,
+  numberPickerEnabled,
+  teamSize,
+  playersPerRound,
+  exclusionMode,
+  selectionMethod,
+  selectableNumbers,
+  activeNumbers,
+  pendingNumbers,
+  roundHistory,
+  roundActive,
+  roundMessage,
+  nextRoundNumber,
+  roundConfigurationValid,
   canSave,
   linkedTimerSummary,
   setLayout,
@@ -308,6 +440,11 @@ const {
   pauseTimer,
   resetTimer,
   adjustScore,
+  undoLastScore,
+  prepareNextRound,
+  toggleManualNumber,
+  startRound,
+  resetRoundCycle,
   resetBoard,
   saveSession,
   loadSession,
