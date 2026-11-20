@@ -270,7 +270,7 @@ export function useScoreboardView() {
 
   const canSave = computed(() => {
     const hasAnyTeamName = allTeams.value.slice(0, layout.value).some(team => team.name.trim());
-    return Boolean(sessionName.value.trim() && (hasAnyTeamName || history.value.length > 0));
+    return Boolean(sessionName.value.trim() && (hasAnyTeamName || history.value.length > 0 || roundHistory.value.length > 0));
   });
 
   const linkedTimerSummary = computed(() => {
