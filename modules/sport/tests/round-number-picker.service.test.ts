@@ -12,7 +12,7 @@ const base = {
 
 describe('RoundNumberPickerService', () => {
   it('draws distinct numbers in the configured range', () => {
-    expect(picker.draw(base, () => 0)).toEqual([1, 2, 3, 4, 5]);
+    expect(picker.draw(base, () => 0.99999)).toEqual([1, 2, 3, 4, 5]);
   });
 
   it('excludes everyone previously selected in unused mode', () => {
@@ -20,7 +20,7 @@ describe('RoundNumberPickerService', () => {
       ...base,
       usedNumbers: [1, 2, 3, 4, 5],
       previousNumbers: [1, 2, 3, 4, 5]
-    }, () => 0);
+    }, () => 0.99999);
     expect(numbers).toEqual([6, 7, 8, 9, 10]);
   });
 
@@ -37,7 +37,7 @@ describe('RoundNumberPickerService', () => {
       exclusionMode: 'previous',
       usedNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       previousNumbers: [6, 7, 8, 9, 10]
-    }, () => 0);
+    }, () => 0.99999);
     expect(numbers).toEqual([1, 2, 3, 4, 5]);
   });
 
