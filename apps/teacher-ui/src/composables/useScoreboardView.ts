@@ -253,7 +253,9 @@ export function useScoreboardView() {
       const now = Date.now();
       const delta = now - (timerLastTick ?? now);
       timerLastTick = now;
-      timerElapsedMs.value += delta;
+      timerElapsedMs.value += timerMode.value === 'countdown'
+        ? Math.min(delta, timerRemainingMs.value)
+        : delta;
       if (timerMode.value === 'countdown') {
         timerRemainingMs.value = Math.max(0, timerRemainingMs.value - delta);
         if (timerRemainingMs.value === 0) {
@@ -389,6 +391,7 @@ export function useScoreboardView() {
           exclusionMode: exclusionMode.value,
           selectionMethod: selectionMethod.value,
           activeNumbers: activeNumbers.value,
+          roundActive: roundActive.value,
           pendingNumbers: pendingNumbers.value,
           roundHistory: roundHistory.value,
         },
@@ -457,6 +460,7 @@ export function useScoreboardView() {
     selectionMethod.value = settings?.selectionMethod ?? 'random';
     roundHistory.value = settings?.roundHistory?.map(numbers => [...numbers]) ?? [];
     activeNumbers.value = [...(settings?.activeNumbers ?? [])];
+    roundActive.value = settings?.roundActive === true;
     pendingNumbers.value = [...(settings?.pendingNumbers ?? [])];
     resetTimer();
     if (metadata.inlineTimer && Number.isFinite(metadata.inlineTimer.elapsedMs)) {
