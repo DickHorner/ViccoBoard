@@ -159,6 +159,8 @@ export type {
 } from './grading/criteria-grading.engine.js';
 
 // Services
+export { RoundNumberPickerService } from './services/round-number-picker.service.js';
+export type { RoundExclusionMode, RoundNumberPickerInput } from './services/round-number-picker.service.js';
 export { TeamBuilderService, TeamConstraintError } from './services/team-builder.service.js';
 export type { TeamBuildInput, TeamStudent, TeamAlgorithm, TeamBasis, TeamConstraints, TeamConstraintConflict, BuiltTeam } from './services/team-builder.service.js';
 export { TournamentService } from './services/tournament.service.js';
