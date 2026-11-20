@@ -35,6 +35,14 @@
         </button>
       </div>
 
+      <div class="presenter-audio-controls">
+        <button class="ph-btn ph-btn--sm" type="button" :aria-pressed="soundEnabled"
+          @click="soundEnabled = !soundEnabled">{{ soundEnabled ? t('SCORES.soundOn') : t('SCORES.soundOff') }}</button>
+        <button class="ph-btn ph-btn--sm" type="button" :disabled="!soundEnabled" @click="testSignal">
+          {{ t('SCORES.signalNow') }}
+        </button>
+      </div>
+
       <div class="ph-layout-toggle">
         <button
           :class="['ph-btn ph-btn--sm', { active: layout === 2 }]"
@@ -72,6 +80,16 @@
           <button v-for="points in pointOptions" :key="points" class="presenter-score-btn presenter-score-btn--plus"
             type="button" @click="adjustScore(team.id, points)">+{{ points }}</button>
         </div>
+        <div v-if="showFoulCounter" class="presenter-fouls">
+          <span>{{ foulLabel }}</span>
+          <div class="presenter-foul-controls">
+            <button class="ph-btn ph-btn--sm" type="button" :aria-label="t('SCORES.foulMinus')"
+              @click="adjustFouls(team.id, -1)">−</button>
+            <strong>{{ foulCounts[team.id] ?? 0 }}</strong>
+            <button class="ph-btn ph-btn--sm" type="button" :aria-label="t('SCORES.foulPlus')"
+              @click="adjustFouls(team.id, 1)">+</button>
+          </div>
+        </div>
       </article>
     </div>
   </div>
@@ -98,6 +116,9 @@
           <label for="scoreboard-sport">{{ t('SCORES.sport') }}</label>
           <select id="scoreboard-sport" v-model="sport" class="form-input">
             <option value="basketball">{{ t('SCORES.basketball') }}</option>
+            <option value="football">{{ t('SCORES.football') }}</option>
+            <option value="handball">{{ t('SCORES.handball') }}</option>
+            <option value="volleyball">{{ t('SCORES.volleyball') }}</option>
             <option value="standard">{{ t('SCORES.standardPoints') }}</option>
             <option value="custom">{{ t('SCORES.customPoints') }}</option>
           </select>
@@ -182,6 +203,16 @@
             <Button v-for="points in pointOptions" :key="points" severity="secondary" outlined
               type="button" @click="adjustScore(team.id, points)">+{{ points }}</Button>
           </div>
+          <div v-if="showFoulCounter" class="team-fouls">
+            <span class="timer-label">{{ foulLabel }}</span>
+            <div class="team-foul-controls">
+              <Button severity="secondary" outlined type="button" :aria-label="t('SCORES.foulMinus')"
+                @click="adjustFouls(team.id, -1)">−1</Button>
+              <strong class="foul-value">{{ foulCounts[team.id] ?? 0 }}</strong>
+              <Button severity="secondary" outlined type="button" :aria-label="t('SCORES.foulPlus')"
+                @click="adjustFouls(team.id, 1)">+1</Button>
+            </div>
+          </div>
         </article>
       </div>
 
@@ -208,6 +239,16 @@
             <span v-if="!timerConfigurationValid" class="info-text" role="alert">{{ t('SCORES.invalidTimer') }}</span>
           </template>
         </div>
+        <div class="sound-controls">
+          <label class="scoreboard-toggle">
+            <input v-model="soundEnabled" type="checkbox" />
+            {{ t('SCORES.soundEnabled') }}
+          </label>
+          <Button severity="secondary" outlined type="button" :disabled="!soundEnabled" @click="testSignal">
+            {{ t('SCORES.testSound') }}
+          </Button>
+          <span v-if="soundMessage" class="info-text" role="status">{{ soundMessage }}</span>
+        </div>
       </div>
 
       <div v-if="linkedTimerSummary" class="info-banner">
@@ -217,6 +258,10 @@
       <div class="form-actions">
         <Button severity="secondary" outlined type="button" :disabled="history.length === 0" @click="undoLastScore">
           {{ t('SCORES.undoScore') }}
+        </Button>
+        <Button v-if="showFoulCounter" severity="secondary" outlined type="button"
+          :disabled="!activeTeams.some(team => (foulCounts[team.id] ?? 0) > 0)" @click="resetFouls">
+          {{ t('SCORES.resetFouls') }}
         </Button>
       </div>
 
@@ -419,6 +464,11 @@ const {
   sport,
   customPoints,
   pointOptions,
+  foulCounts,
+  foulLabel,
+  showFoulCounter,
+  soundEnabled,
+  soundMessage,
   numberPickerEnabled,
   teamSize,
   playersPerRound,
@@ -439,7 +489,10 @@ const {
   pauseTimer,
   resetTimer,
   adjustScore,
+  adjustFouls,
+  resetFouls,
   undoLastScore,
+  testSignal,
   prepareNextRound,
   toggleManualNumber,
   startRound,
