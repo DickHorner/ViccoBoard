@@ -129,6 +129,7 @@
     "technicalNoPenaltyDefined": "Keine konkrete Freiwurfstrafe für technische Fouls im Regelblatt angegeben.",
     "playerExcluded": "Spieler*in #{number}: 5 Fouls – Ausschluss",
     "legacyFouls": "Alter Foulstand ohne Viertelzuordnung",
-    "invalidBasketballFoul": "Ungültiger Foul-Eintrag."
+    "invalidBasketballFoul": "Ungültiger Foul-Eintrag.",
+    "invalidSoundFile": "Bitte eine Audiodatei mit 1 bis 256 KiB auswählen."
   }
 }
