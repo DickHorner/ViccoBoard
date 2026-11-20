@@ -115,16 +115,18 @@
           <strong>Selbst</strong>
           <strong>Lehrkraft</strong>
           <template v-for="criterion in criteria" :key="criterion.id">
-            <label :for="`${student.id}-${criterion.id}-teacher`">
-              <strong>{{ criterion.label }}</strong>
-              <small>{{ criterion.description }}</small>
+            <div class="criterion-details">
+              <label :for="`${student.id}-${criterion.id}-teacher`">
+                <strong>{{ criterion.label }}</strong>
+                <small>{{ criterion.description }}</small>
+              </label>
               <details class="criterion-levels">
                 <summary>Bewertungsstufen 0–3</summary>
                 <span v-for="(description, points) in criterion.levels" :key="points">
                   <strong>{{ points }} Punkte:</strong> {{ description }}
                 </span>
               </details>
-            </label>
+            </div>
             <select
               :aria-label="`Selbsteinschätzung: ${criterion.label}, ${student.firstName} ${student.lastName}`"
               :value="score(student.id, 'selfAssessment', criterion.id)"
@@ -491,7 +493,7 @@ async function saveAll(): Promise<void> {
 .student-card { padding: 1rem; display: grid; gap: 1rem; }
 .student-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
 .assessment-grid { display: grid; grid-template-columns: minmax(170px, 1fr) 95px 105px; gap: .5rem; align-items: center; }
-.assessment-grid label { display: grid; gap: .15rem; }
+.criterion-details, .criterion-details label { display: grid; gap: .15rem; }
 .assessment-grid small { color: var(--color-muted); }
 .criterion-levels summary { cursor: pointer; min-height: 36px; }
 .criterion-levels span { display: block; margin: .4rem 0; line-height: 1.4; }
