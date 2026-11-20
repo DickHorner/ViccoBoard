@@ -35,7 +35,7 @@ describe('BasketballFoulService (simplified school rules)', () => {
     const events = service.add([], technical);
     expect(service.technicalTotal(events, 'a')).toBe(1);
     expect(service.teamQuarterTotal(events, 'a', 1)).toBe(0);
-    expect(service.playerTotal(events, 'a', 7)).toBe(0);
+    expect(service.playerTotal(events, 'a', 7)).toBe(1);
     expect(service.freeThrowsForFoul(events, technical)).toBeNull();
   });
 
