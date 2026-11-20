@@ -29,6 +29,7 @@ import {
   LessonPartRepository,
   LessonRepository,
   PerformanceEntryRepository,
+  ParticipationRubricTemplateRepository,
   PerformanceTableGradingService,
   RecordAttendanceUseCase,
   RecordCooperTestResultUseCase,
@@ -89,6 +90,7 @@ interface SportBridge {
   lessonPartRepository: LessonPartRepository;
   gradeCategoryRepository: GradeCategoryRepository;
   performanceEntryRepository: PerformanceEntryRepository;
+  participationRubricTemplateRepository: ParticipationRubricTemplateRepository;
   attendanceRepository: AttendanceRepository;
   toolSessionRepository: ToolSessionRepository;
   feedbackSessionRepository: FeedbackSessionRepository;
@@ -160,6 +162,7 @@ export function initializeSportBridge(): SportBridge {
   const lessonPartRepository = new LessonPartRepository(adapter);
   const gradeCategoryRepository = new GradeCategoryRepository(adapter);
   const performanceEntryRepository = new PerformanceEntryRepository(adapter);
+  const participationRubricTemplateRepository = new ParticipationRubricTemplateRepository(adapter);
   const attendanceRepository = new AttendanceRepository(adapter);
   const tableDefinitionRepository = new TableDefinitionRepository(adapter);
   const cooperTestConfigRepository = new CooperTestConfigRepository(adapter);
@@ -253,6 +256,7 @@ export function initializeSportBridge(): SportBridge {
     lessonPartRepository,
     gradeCategoryRepository,
     performanceEntryRepository,
+    participationRubricTemplateRepository,
     attendanceRepository,
     toolSessionRepository,
     feedbackSessionRepository,

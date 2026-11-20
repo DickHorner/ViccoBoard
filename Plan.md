@@ -15,6 +15,7 @@ in einem konsistenten System vereint.
 5. **Online/Integrationen nur optional:** iServ/Notion/Sync sind **Feature-Flags** und standardmäßig **aus**. Die App muss ohne diese Integrationen vollständig nutzbar sein.
 6. **Sicherheitsmodell:** App-Sperre (PIN/Passwort), Lock-Policy/Timeout, sichere Schlüsselableitung, saubere Backups/Restore (kein Datenverlust durch Updates).
 7. **Konfigurierbarkeit statt Hartkodierung:** Kriterien und Statusoptionen müssen in den relevanten Bereichen (z. B. Anwesenheit) als benutzerdefinierbare Kataloge pflegbar sein (hinzufügen/umbenennen/deaktivieren/sortieren), ohne Codeänderung.
+8. **Vorlagen vor Lerngruppen:** Jede Prüfung und jedes Bewertungsraster muss zunächst unabhängig von Klassen, Kursen und Schülern angelegt und dauerhaft lokal als Vorlage gespeichert werden können. Erst die Verwendung verbindet eine Vorlage mit einer Lerngruppe. Einzelne Durchführungen und Bewertungen sind datiert und überschreiben vorherige Erfassungen nicht. Bestehende Vorlagen werden bei erneuter Verwendung nicht dupliziert; Änderungen dürfen historische Ergebnisse nicht still umdeuten.
 
 ### 1.1 Zielplattform: iPad (10. Gen) / iPadOS Safari (WebKit)
 Diese App wird **primär** für iPadOS (Safari/WebKit) gebaut. Das beeinflusst insbesondere lokale Persistenz, Datei-Flows und Bedienung.

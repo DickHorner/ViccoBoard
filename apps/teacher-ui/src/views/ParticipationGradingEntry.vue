@@ -10,6 +10,24 @@
     </header>
 
     <section v-if="directEntry" class="app-card selection">
+      <h2>Meine Bewertungsraster-Vorlagen</h2>
+      <p class="app-data-note">Vorlagen werden unabhängig von Klassen gespeichert und können beliebig oft verwendet werden.</p>
+      <div class="app-field">
+        <label for="participation-import">Vorlage aus lokaler JSON-Datei importieren</label>
+        <input id="participation-import" type="file" accept=".json,application/json"
+          :disabled="loading || saving || unsaved.size > 0" @change="importRubric" />
+      </div>
+      <div class="app-field">
+        <label for="participation-template">Gespeicherte Vorlage</label>
+        <Select inputId="participation-template" v-model="selectedTemplateId"
+          :options="templateOptions" optionLabel="label" optionValue="value"
+          placeholder="Vorlage auswählen" :disabled="loading || saving" fluid />
+      </div>
+      <Button label="Standardraster als Vorlage speichern" severity="secondary" outlined
+        :disabled="loading || saving || hasDefaultTemplate" @click="saveDefaultTemplate" />
+      <Button label="Ausgewählte Vorlage löschen" severity="danger" text
+        :disabled="loading || saving || !selectedTemplateId || unsaved.size > 0" @click="deleteTemplate" />
+      <p v-if="templateStatus" class="app-data-note" role="status">{{ templateStatus }}</p>
       <div class="app-field">
         <label for="participation-class">Klasse</label>
         <Select
@@ -40,35 +58,19 @@
         />
       </div>
 
-      <div v-if="selectedClassId" class="app-field">
-        <label for="participation-import">Eigenes Bewertungsraster (JSON) lokal importieren</label>
-        <input id="participation-import" type="file" accept=".json,application/json"
-          :disabled="loading || saving || unsaved.size > 0" @change="importRubric" />
-      </div>
-
-      <div v-if="selectedClassId && !loading && participationCategories.length === 0" class="create-category">
-        <p>Für diese Klasse gibt es noch kein Mitarbeitsraster. Du kannst hier eines anlegen.</p>
+      <div v-if="selectedClassId && selectedTemplateId" class="create-category">
         <div class="app-field">
-          <label for="participation-weight">Gewichtung für die Gesamtnote (%)</label>
-          <InputNumber
-            inputId="participation-weight"
-            v-model="newCategoryWeight"
-            :min="0"
-            :max="100"
-            :useGrouping="false"
-            :disabled="saving"
-            fluid
-          />
+          <label for="participation-weight">Gewichtung in dieser Klasse (%)</label>
+          <InputNumber inputId="participation-weight" v-model="newCategoryWeight"
+            :min="0" :max="100" :useGrouping="false" :disabled="saving" fluid />
         </div>
-        <Button
-          label="Mitarbeitsraster anlegen"
-          icon="pi pi-plus"
-          :disabled="saving || newCategoryWeight === null || newCategoryWeight < 0 || newCategoryWeight > 100"
-          :loading="saving"
-          @click="createCategory"
-        />
-        <p class="app-data-note">Die Gewichtung lässt sich unter „Bewerten & Prüfen“ später ändern.</p>
+        <Button label="Vorlage für diese Klasse verwenden" icon="pi pi-check"
+          :disabled="loading || saving || unsaved.size > 0 || newCategoryWeight === null || newCategoryWeight < 0 || newCategoryWeight > 100"
+          :loading="saving" @click="useTemplate" />
       </div>
+      <p v-if="selectedClassId && !loading && participationCategories.length === 0" class="app-data-note">
+        Für diese Klasse ist noch kein Mitarbeitsraster eingerichtet. Wähle oben eine gespeicherte Vorlage.
+      </p>
 
       <p v-if="unsaved.size > 0" class="app-data-note" role="status">
         Bitte ungespeicherte Änderungen zuerst sichern, bevor Du die Klasse oder das Raster wechselst.
@@ -92,6 +94,22 @@
             :loading="saving"
             @click="saveAll"
           />
+        </div>
+        <div class="app-field">
+          <label for="participation-assessment-day">Bewertungstag</label>
+          <input id="participation-assessment-day" type="date" :value="assessmentDay"
+            :disabled="loading || saving" @change="changeAssessmentDay" />
+          <p class="app-data-note">Jeder Bewertungstag wird getrennt gespeichert.</p>
+          <div v-if="savedDays.length" class="app-field">
+            <label for="participation-saved-day">Bereits erfassten Tag öffnen</label>
+            <Select inputId="participation-saved-day"
+              :modelValue="savedDays.includes(assessmentDay) ? assessmentDay : ''"
+              :options="savedDayOptions" optionLabel="label" optionValue="value"
+              placeholder="Bewertungstag auswählen"
+              :disabled="loading || saving"
+              fluid @update:modelValue="day => selectAssessmentDay(day)" />
+          </div>
+          <p v-else class="app-data-note">Noch keine Mitarbeitseinträge in dieser Klasse gespeichert.</p>
         </div>
         <p>Selbsteinschätzungen unterstützen das Gespräch; eine Note entsteht nur bei vollständiger Lehrkraftbewertung oder dokumentierter Leistungsverweigerung.</p>
         <details>
@@ -189,6 +207,7 @@ import Button from 'openvue/button'
 import InputNumber from 'openvue/inputnumber'
 import Select from 'openvue/select'
 import { Sport, type ClassGroup, type Student } from '@viccoboard/core'
+import type { ParticipationRubricTemplate } from '@viccoboard/sport'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import {
@@ -205,6 +224,8 @@ import {
   type ParticipationCriterionId
 } from '../utils/participation-rubric'
 import { isPerformanceEntryInSchoolYear } from '../utils/performance-school-year'
+import { participationEntryDay } from '../utils/participation-entry-day'
+import { schoolYearForDate } from '../utils/exam-school-year'
 
 initializeSportBridge()
 initializeStudentsBridge()
@@ -227,6 +248,16 @@ const categoryOptions = computed(() => participationCategories.value.map(item =>
   value: item.id
 })))
 
+const templates = ref<ParticipationRubricTemplate[]>([])
+const selectedTemplateId = ref('')
+const templateStatus = ref('')
+const templateOptions = computed(() => templates.value.map(template => ({
+  label: template.name,
+  value: template.id
+})))
+const hasDefaultTemplate = computed(() => templates.value.some(template =>
+  template.rubric.id === DEFAULT_PARTICIPATION_RUBRIC.id
+))
 const newCategoryWeight = ref<number | null>(0)
 const schoolYear = ref('')
 const category = ref<Sport.GradeCategory | null>(null)
@@ -234,6 +265,12 @@ const students = ref<Student[]>([])
 const assessments = ref(new Map<string, ParticipationAssessment>())
 const notes = ref(new Map<string, string>())
 const entryIds = ref(new Map<string, string>())
+const entryHistory = ref(new Map<string, Sport.PerformanceEntry[]>())
+const assessmentDay = ref(localDateString(new Date()))
+const savedDays = computed(() => [...new Set(
+  [...entryHistory.value.values()].flatMap(entries => entries.map(participationEntryDay))
+)].sort().reverse())
+const savedDayOptions = computed(() => savedDays.value.map(day => ({ label: formatDay(day), value: day })))
 const unsaved = ref(new Set<string>())
 const loading = ref(true)
 const saving = ref(false)
@@ -254,7 +291,12 @@ onMounted(async () => {
   }
 
   try {
-    classes.value = (await sport.classGroupRepository.findAll()).filter(group => !group.archived)
+    const [groups, foundTemplates] = await Promise.all([
+      sport.classGroupRepository.findAll(),
+      sport.participationRubricTemplateRepository.findAll()
+    ])
+    classes.value = groups.filter(group => !group.archived)
+    templates.value = foundTemplates
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Klassen konnten nicht geladen werden.'
   } finally {
@@ -276,6 +318,10 @@ async function selectClass(): Promise<void> {
   category.value = null
   participationCategories.value = []
   students.value = []
+  entryHistory.value = new Map()
+  assessments.value = new Map()
+  notes.value = new Map()
+  entryIds.value = new Map()
   unsaved.value = new Set()
   if (!selectedClassId.value) return
 
@@ -299,8 +345,9 @@ async function importRubric(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  if (!file || !selectedClassId.value) return
+  if (!file) return
   error.value = null
+  templateStatus.value = ''
   if (file.size > 65536) {
     error.value = 'Rasterdatei darf höchstens 64 KiB groß sein.'
     return
@@ -308,21 +355,10 @@ async function importRubric(event: Event): Promise<void> {
   saving.value = true
   try {
     const parsed = parseParticipationRubric(JSON.parse(await file.text()) as unknown)
-    const existing = await sport.gradeCategoryRepository.findByClassGroup(selectedClassId.value)
-    if (existing.some(candidate => candidate.configuration.type === 'verbal' &&
-        candidate.configuration.participationRubric?.id === parsed.rubric.id)) {
-      throw new Error('Dieses Raster existiert bereits in der Klasse. Bestehende Bewertungen bleiben unverändert.')
-    }
-    const created = await sport.createGradeCategoryUseCase.execute({
-      classGroupId: selectedClassId.value,
-      name: parsed.name,
-      type: Sport.GradeCategoryType.Verbal,
-      weight: newCategoryWeight.value ?? 0,
-      configuration: createParticipationCategoryConfiguration(parsed.rubric)
-    })
-    participationCategories.value = [...participationCategories.value, created]
-    categoryId.value = created.id
-    await load()
+    const saved = await sport.participationRubricTemplateRepository.create(parsed)
+    templates.value = [saved, ...templates.value]
+    selectedTemplateId.value = saved.id
+    templateStatus.value = 'Vorlage lokal gespeichert. Wähle eine Klasse, um sie zu verwenden.'
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Import fehlgeschlagen.'
   } finally {
@@ -330,32 +366,78 @@ async function importRubric(event: Event): Promise<void> {
   }
 }
 
-async function createCategory(): Promise<void> {
-  if (!selectedClassId.value || newCategoryWeight.value === null ||
-      !Number.isFinite(newCategoryWeight.value) ||
-      newCategoryWeight.value < 0 || newCategoryWeight.value > 100) return
+async function saveDefaultTemplate(): Promise<void> {
+  saving.value = true
+  error.value = null
+  templateStatus.value = ''
+  try {
+    const saved = await sport.participationRubricTemplateRepository.create({
+      name: 'Mitarbeitsbewertung (Standard)',
+      rubric: DEFAULT_PARTICIPATION_RUBRIC
+    })
+    templates.value = [saved, ...templates.value]
+    selectedTemplateId.value = saved.id
+    templateStatus.value = 'Standardraster als unabhängige Vorlage gespeichert.'
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Vorlage konnte nicht gespeichert werden.'
+  } finally {
+    saving.value = false
+  }
+}
 
+async function deleteTemplate(): Promise<void> {
+  const selected = templates.value.find(item => item.id === selectedTemplateId.value)
+  if (!selected || !window.confirm(`Vorlage „${selected.name}“ aus der Bibliothek löschen? Bereits zugewiesene Klassen und Bewertungen bleiben erhalten.`)) return
   saving.value = true
   error.value = null
   try {
+    await sport.participationRubricTemplateRepository.delete(selected.id)
+    templates.value = templates.value.filter(item => item.id !== selected.id)
+    selectedTemplateId.value = ''
+    templateStatus.value = 'Vorlage gelöscht. Bereits verwendete Raster bleiben erhalten.'
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Vorlage konnte nicht gelöscht werden.'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function useTemplate(): Promise<void> {
+  const selected = templates.value.find(item => item.id === selectedTemplateId.value)
+  if (!selected || !selectedClassId.value || newCategoryWeight.value === null ||
+      !Number.isFinite(newCategoryWeight.value) ||
+      newCategoryWeight.value < 0 || newCategoryWeight.value > 100 ||
+      unsaved.value.size > 0) return
+
+  saving.value = true
+  error.value = null
+  templateStatus.value = ''
+  try {
     const existing = await sport.gradeCategoryRepository.findByClassGroup(selectedClassId.value)
-    if (existing.some(isParticipationCategory)) {
-      throw new Error('Für diese Klasse gibt es bereits ein Mitarbeitsraster. Bitte wähle es aus.')
+    const alreadyUsed = existing.find(candidate => isParticipationCategory(candidate) &&
+      (candidate.configuration.type === 'verbal'
+        ? candidate.configuration.participationRubric?.id ?? DEFAULT_PARTICIPATION_RUBRIC.id
+        : '') === selected.rubric.id)
+    if (alreadyUsed) {
+      categoryId.value = alreadyUsed.id
+      await load()
+      templateStatus.value = 'Diese Vorlage war der Klasse bereits zugeordnet.'
+      return
     }
 
     const created = await sport.createGradeCategoryUseCase.execute({
       classGroupId: selectedClassId.value,
-      name: 'Mitarbeitsbewertung',
+      name: selected.name,
       type: Sport.GradeCategoryType.Verbal,
       weight: newCategoryWeight.value,
-      configuration: createParticipationCategoryConfiguration()
+      configuration: createParticipationCategoryConfiguration(selected.rubric)
     })
-
-    participationCategories.value = [created]
+    participationCategories.value = [...participationCategories.value, created]
     categoryId.value = created.id
     await load()
+    templateStatus.value = 'Vorlage für die Klasse eingerichtet. Du kannst nun einen Bewertungstag auswählen.'
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'Mitarbeitsraster konnte nicht angelegt werden.'
+    error.value = cause instanceof Error ? cause.message : 'Vorlage konnte nicht verwendet werden.'
   } finally {
     saving.value = false
   }
@@ -421,12 +503,63 @@ function setNote(id: string, event: Event): void {
   unsaved.value = new Set(unsaved.value).add(id)
 }
 
+function localDateString(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+function formatDay(day: string): string {
+  const [year, month, date] = day.split('-')
+  return `${Number(date)}.${Number(month)}.${year}`
+}
+
+function validDay(day: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false
+  const date = new Date(`${day}T12:00:00`)
+  return Number.isFinite(date.getTime()) && localDateString(date) === day
+}
+
+function restoreDay(): void {
+  const restoredAssessments = new Map<string, ParticipationAssessment>()
+  const restoredNotes = new Map<string, string>()
+  const restoredIds = new Map<string, string>()
+  for (const [studentId, entries] of entryHistory.value) {
+    const matched = entries.find(entry => participationEntryDay(entry) === assessmentDay.value)
+    if (!matched) continue
+    const values = matched.measurements as Record<string, unknown>
+    restoredIds.set(studentId, matched.id)
+    if (isParticipationAssessment(values.participation)) {
+      restoredAssessments.set(studentId, values.participation)
+    }
+    if (typeof values.text === 'string') restoredNotes.set(studentId, values.text)
+  }
+  assessments.value = restoredAssessments
+  notes.value = restoredNotes
+  entryIds.value = restoredIds
+  unsaved.value = new Set()
+}
+
+function selectAssessmentDay(day: string): boolean {
+  if (!validDay(day)) return false
+  if (unsaved.value.size > 0 && !window.confirm('Ungespeicherte Änderungen dieses Bewertungstages verwerfen?')) {
+    return false
+  }
+  assessmentDay.value = day
+  restoreDay()
+  return true
+}
+
+function changeAssessmentDay(event: Event): void {
+  const input = event.target as HTMLInputElement
+  if (!selectAssessmentDay(input.value)) input.value = assessmentDay.value
+}
+
 async function load(): Promise<void> {
   if (!categoryId.value) return
   loading.value = true
   error.value = null
   category.value = null
   students.value = []
+  entryHistory.value = new Map()
   assessments.value = new Map()
   notes.value = new Map()
   entryIds.value = new Map()
@@ -434,7 +567,7 @@ async function load(): Promise<void> {
 
   try {
     const found = await sport.gradeCategoryRepository.findById(categoryId.value)
-    if (!found || found.type !== Sport.GradeCategoryType.Verbal) {
+    if (!found || !isParticipationCategory(found)) {
       throw new Error('Mitarbeitskategorie nicht gefunden.')
     }
     const group = await sport.classGroupRepository.findById(found.classGroupId)
@@ -447,25 +580,16 @@ async function load(): Promise<void> {
       sport.performanceEntryRepository.findByStudentAndCategory(student.id, found.id)
     ))
 
-    const restoredAssessments = new Map<string, ParticipationAssessment>()
-    const restoredNotes = new Map<string, string>()
-    const restoredIds = new Map<string, string>()
-    loadedStudents.forEach((student, index) => {
-      const latest = allEntries[index].find(entry => isPerformanceEntryInSchoolYear(entry, group.schoolYear))
-      if (!latest) return
-      restoredIds.set(student.id, latest.id)
-      const values = latest.measurements as Record<string, unknown>
-      if (isParticipationAssessment(values.participation)) {
-        restoredAssessments.set(student.id, values.participation)
-      }
-      if (typeof values.text === 'string') restoredNotes.set(student.id, values.text)
-    })
-
-    assessments.value = restoredAssessments
-    notes.value = restoredNotes
-    entryIds.value = restoredIds
+    entryHistory.value = new Map(loadedStudents.map((student, index) => [
+      student.id,
+      allEntries[index].filter(entry =>
+        isPerformanceEntryInSchoolYear(entry, group.schoolYear) &&
+        isParticipationAssessment((entry.measurements as Record<string, unknown>).participation)
+      )
+    ]))
     students.value = loadedStudents
     category.value = found
+    restoreDay()
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Fehler beim Laden der Mitarbeitsbewertung.'
   } finally {
@@ -474,7 +598,11 @@ async function load(): Promise<void> {
 }
 
 async function save(id: string): Promise<boolean> {
-  if (!unsaved.value.has(id) || !category.value || !schoolYear.value || saving.value) return false
+  if (!unsaved.value.has(id) || !category.value || !schoolYear.value || !validDay(assessmentDay.value) || saving.value) return false
+  if (schoolYearForDate(new Date(`${assessmentDay.value}T12:00:00`)) !== schoolYear.value) {
+    error.value = 'Der Bewertungstag liegt außerhalb des Schuljahres dieser Klasse.'
+    return false
+  }
   saving.value = true
   error.value = null
 
@@ -487,21 +615,24 @@ async function save(id: string): Promise<boolean> {
         rubric: value.rubric,
         totalPoints: total(id),
         selfAssessment: value.selfAssessment,
+        assessmentDate: assessmentDay.value,
         schoolYear: schoolYear.value
       }
     }
 
     const entryId = entryIds.value.get(id)
-    if (entryId) {
-      await sport.performanceEntryRepository.update(entryId, update)
-    } else {
-      const entry = await sport.recordGradeUseCase.execute({
-        studentId: id,
-        categoryId: category.value.id,
-        ...update
-      })
-      entryIds.value = new Map(entryIds.value).set(id, entry.id)
-    }
+    const entry = entryId
+      ? await sport.performanceEntryRepository.update(entryId, update)
+      : await sport.recordGradeUseCase.execute({
+          studentId: id,
+          categoryId: category.value.id,
+          ...update
+        })
+    entryIds.value = new Map(entryIds.value).set(id, entry.id)
+    entryHistory.value = new Map(entryHistory.value).set(id, [
+      entry,
+      ...(entryHistory.value.get(id) ?? []).filter(previous => previous.id !== entry.id)
+    ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()))
 
     const remaining = new Set(unsaved.value)
     remaining.delete(id)
