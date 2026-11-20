@@ -25,7 +25,7 @@
           @click="startRound"
         >{{ t('SCORES.startRound') }}</button>
         <button
-          v-else
+          v-if="timerRunning"
           class="ph-btn ph-btn--sm"
           type="button"
           @click="pauseTimer"
@@ -222,7 +222,7 @@
         <span class="timer-label">{{ t('SCORES.inlineTimer') }}:</span>
         <span class="timer-value" :class="{ 'timer-value--running': timerRunning }">{{ formatDuration(displayedTimerMs) }}</span>
         <Button severity="secondary" outlined v-if="!timerRunning && (!numberPickerEnabled || roundActive)" type="button" @click="startTimer">{{ t('SCORES.timerStart') }}</Button>
-        <Button severity="secondary" outlined v-else type="button" @click="pauseTimer">{{ t('SCORES.timerPause') }}</Button>
+        <Button severity="secondary" outlined v-if="timerRunning" type="button" @click="pauseTimer">{{ t('SCORES.timerPause') }}</Button>
         <Button severity="secondary" outlined type="button" @click="resetTimer">{{ t('SCORES.timerReset') }}</Button>
         <div class="timer-settings">
           <label for="scoreboard-timer-mode">{{ t('SCORES.timerMode') }}</label>
