@@ -79,6 +79,7 @@ describe('SaveScoreboardSessionUseCase', () => {
     expect(session.sessionMetadata.linkedTimerSessionId).toBe('timer-1');
     expect(session.sessionMetadata.history).toHaveLength(2);
     expect(session.sessionMetadata.history[0].timestamp).toEqual(expect.any(String));
+    expect(session.sessionMetadata.roundSettings).toBeUndefined();
   });
 
   it('persists optional numbered rounds without a class binding', async () => {
@@ -90,6 +91,8 @@ describe('SaveScoreboardSessionUseCase', () => {
       roundSettings: {
         sport: 'basketball',
         customPoints: 1,
+        soundEnabled: false,
+        foulCounts: { 'team-a': 4, 'team-b': 2 },
         timerMode: 'countdown',
         roundDurationMs: 180000,
         numberPickerEnabled: true,
@@ -106,11 +109,19 @@ describe('SaveScoreboardSessionUseCase', () => {
 
     expect(session.classGroupId).toBeUndefined();
     expect(session.sessionMetadata.roundSettings).toMatchObject({
+      soundEnabled: false,
+      foulCounts: { 'team-a': 4, 'team-b': 2 },
       teamSize: 12,
       playersPerRound: 5,
       activeNumbers: [1, 2, 3, 4, 5],
       pendingNumbers: [6, 7, 8, 9, 10]
     });
+    const reloaded = await repository.findById(session.id);
+    expect(reloaded?.sessionMetadata.roundSettings?.foulCounts).toEqual({
+      'team-a': 4,
+      'team-b': 2
+    });
+    expect(reloaded?.sessionMetadata.roundSettings?.soundEnabled).toBe(false);
   });
 
   it('preserves existing history timestamps on update', async () => {
