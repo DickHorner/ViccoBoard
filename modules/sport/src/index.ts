@@ -15,6 +15,8 @@ export { PerformanceEntryRepository } from './repositories/performance-entry.rep
 export { ToolSessionRepository } from './repositories/tool-session.repository.js';
 export { FeedbackSessionRepository } from './repositories/feedback-session.repository.js';
 export { TableDefinitionRepository } from './repositories/table-definition.repository.js';
+export { ParticipationRubricTemplateRepository } from './repositories/participation-rubric-template.repository.js';
+export type { ParticipationRubricTemplate } from './repositories/participation-rubric-template.repository.js';
 export { GameEntryRepository } from './repositories/game-entry.repository.js';
 export type { CreateGameEntryInput } from './repositories/game-entry.repository.js';
 export { TacticsSnapshotRepository } from './repositories/tactics-snapshot.repository.js';
