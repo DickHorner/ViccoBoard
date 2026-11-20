@@ -343,3 +343,51 @@
   .scoreboard-grid--4 { grid-template-columns: 1fr 1fr; }
   .presenter-board--4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 }
+
+/* Scoreboard rounds: compact setup, touch-friendly number selection. */
+.timer-settings {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.timer-settings .form-input { width: auto; }
+.timer-settings .timer-input { width: 5rem; }
+.scoreboard-toggle { display: flex; align-items: center; gap: 0.5rem; min-height: 44px; }
+.scoreboard-toggle input { width: 20px; height: 20px; }
+.round-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.number-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.number-chip {
+  min-width: 3rem;
+  text-align: center;
+  padding: 0.6rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+.number-grid { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+.number-choice {
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  cursor: pointer;
+}
+.number-choice.active { background: var(--color-primary); color: white; }
+.presenter-round-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  padding: 0.4rem 1rem;
+}
+.presenter-score-row { flex-wrap: wrap; justify-content: center; }
