@@ -146,10 +146,10 @@ export function useScoreboardView() {
     resetTimer();
   }
 
-  watch([teamSize, playersPerRound, exclusionMode, selectionMethod, numberPickerEnabled], resetRoundCycle);
+  watch([teamSize, playersPerRound, exclusionMode, selectionMethod, numberPickerEnabled], resetRoundCycle, { flush: 'sync' });
   watch([timerMode, roundMinutes, roundSeconds], () => {
     if (!timerRunning.value) resetTimer();
-  });
+  }, { flush: 'sync' });
 
   function prepareNextRound(): void {
     if (!numberPickerEnabled.value || !roundConfigurationValid.value) {
