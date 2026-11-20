@@ -410,7 +410,6 @@ const {
   sessionName,
   saving,
   message,
-  timerElapsedMs,
   displayedTimerMs,
   timerRunning,
   timerMode,
