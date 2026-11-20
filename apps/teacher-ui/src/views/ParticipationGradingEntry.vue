@@ -5,7 +5,7 @@
         @click="router.push(directEntry ? '/subjects/sport' : '/grading')" />
       <div>
         <h1>Mitarbeitsbewertung</h1>
-        <p>Sport Sek I · fünf Kriterien mit 0–3 Punkten und ein optionaler Zusatzpunkt.</p>
+        <p>Individuelle Bewertungsraster mit Selbst- und Lehrkrafteinschätzung.</p>
       </div>
     </header>
 
@@ -38,6 +38,12 @@
           fluid
           @update:modelValue="value => { categoryId = value; void load() }"
         />
+      </div>
+
+      <div v-if="selectedClassId" class="app-field">
+        <label for="participation-import">Eigenes Bewertungsraster (JSON) lokal importieren</label>
+        <input id="participation-import" type="file" accept=".json,application/json"
+          :disabled="loading || saving || unsaved.size > 0" @change="importRubric" />
       </div>
 
       <div v-if="selectedClassId && !loading && participationCategories.length === 0" class="create-category">
@@ -87,7 +93,7 @@
             @click="saveAll"
           />
         </div>
-        <p>Selbsteinschätzungen unterstützen das Gespräch; nur vollständig ausgefüllte Lehrkraftbewertungen ergeben eine Note.</p>
+        <p>Selbsteinschätzungen unterstützen das Gespräch; eine Note entsteht nur bei vollständiger Lehrkraftbewertung oder dokumentierter Leistungsverweigerung.</p>
         <details>
           <summary>Kriterien und Notenschwellen</summary>
           <ul>
@@ -95,7 +101,7 @@
               <strong>{{ criterion.label }}</strong>: {{ criterion.description }}
             </li>
           </ul>
-          <p>Note 1 ab 14,5 · Note 2 ab 12 · Note 3 ab 9 · Note 4 ab 7 · Note 5 ab 2,5 · Note 6 darunter.</p>
+          <p>Notenschwellen: {{ rubric.gradeThresholds.map(boundary => `Note ${boundary.grade} ab ${boundary.minPoints}`).join(' · ') }} · darunter Note {{ rubric.fallbackGrade }} · Leistungsverweigerung: {{ rubric.refusalGrade }}</p>
         </details>
       </section>
 
@@ -105,7 +111,7 @@
         <div class="student-heading">
           <h3>{{ student.firstName }} {{ student.lastName }}</h3>
           <span class="app-data-note">
-            {{ total(student.id).toFixed(1) }} Punkte ·
+            {{ assessment(student.id).refused ? 'Leistungsverweigerung' : `${total(student.id).toFixed(1)} Punkte` }} ·
             {{ complete(student.id) ? `Note ${grade(student.id)}` : 'Noch keine Note' }}
           </span>
         </div>
@@ -115,35 +121,49 @@
           <strong>Selbst</strong>
           <strong>Lehrkraft</strong>
           <template v-for="criterion in criteria" :key="criterion.id">
-            <label :for="`${student.id}-${criterion.id}-teacher`">
-              <strong>{{ criterion.label }}</strong>
-              <small>{{ criterion.description }}</small>
-            </label>
+            <div class="criterion-details">
+              <label :for="`${student.id}-${criterion.id}-teacher`">
+                <strong>{{ criterion.label }}</strong>
+                <small>{{ criterion.description }}</small>
+              </label>
+              <details class="criterion-levels">
+                <summary>Bewertungsstufen</summary>
+                <span v-for="level in criterion.levels" :key="level.value">
+                  <strong>{{ level.value }} Punkte:</strong> {{ level.description }}
+                </span>
+              </details>
+            </div>
             <select
               :aria-label="`Selbsteinschätzung: ${criterion.label}, ${student.firstName} ${student.lastName}`"
               :value="score(student.id, 'selfAssessment', criterion.id)"
-              :disabled="saving"
+              :disabled="saving || !!assessment(student.id).refused"
               @change="setScore(student.id, 'selfAssessment', criterion.id, $event)"
             >
               <option value="">–</option>
-              <option v-for="n in 4" :key="n" :value="n - 1">{{ n - 1 }}</option>
+              <option v-for="level in criterion.levels" :key="level.value" :value="level.value">{{ level.value }}</option>
             </select>
             <select
               :id="`${student.id}-${criterion.id}-teacher`"
               :value="score(student.id, 'teacherAssessment', criterion.id)"
-              :disabled="saving"
+              :disabled="saving || !!assessment(student.id).refused"
               @change="setScore(student.id, 'teacherAssessment', criterion.id, $event)"
             >
               <option value="">–</option>
-              <option v-for="n in 4" :key="n" :value="n - 1">{{ n - 1 }}</option>
+              <option v-for="level in criterion.levels" :key="level.value" :value="level.value">{{ level.value }}</option>
             </select>
           </template>
         </div>
 
         <label class="bonus">
-          <input type="checkbox" :checked="assessment(student.id).bonusPoint" :disabled="saving"
+          <input type="checkbox" :checked="assessment(student.id).bonusPoint" :disabled="saving || !!assessment(student.id).refused || rubric.bonusPoints === 0"
             @change="setBonus(student.id, $event)" />
-          Zusatzpunkt für besonderes Engagement
+          {{ rubric.bonusLabel }}
+        </label>
+
+        <label class="bonus">
+          <input type="checkbox" :checked="!!assessment(student.id).refused" :disabled="saving"
+            @change="setRefused(student.id, $event)" />
+          Leistungsverweigerung (Note {{ rubric.refusalGrade }})
         </label>
 
         <div class="app-field">
@@ -172,12 +192,14 @@ import { Sport, type ClassGroup, type Student } from '@viccoboard/core'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import {
+  DEFAULT_PARTICIPATION_RUBRIC,
   PARTICIPATION_CRITERIA,
   createParticipationCategoryConfiguration,
   emptyParticipationAssessment,
   hasCompleteTeacherAssessment,
   isParticipationAssessment,
   participationGrade,
+  parseParticipationRubric,
   participationTotal,
   type ParticipationAssessment,
   type ParticipationCriterionId
@@ -216,7 +238,10 @@ const unsaved = ref(new Set<string>())
 const loading = ref(true)
 const saving = ref(false)
 const error = ref<string | null>(null)
-const criteria = PARTICIPATION_CRITERIA
+const rubric = computed(() => category.value?.configuration.type === 'verbal'
+  ? category.value.configuration.participationRubric ?? DEFAULT_PARTICIPATION_RUBRIC
+  : DEFAULT_PARTICIPATION_RUBRIC)
+const criteria = computed(() => rubric.value.criteria)
 
 onBeforeRouteLeave(() =>
   unsaved.value.size === 0 || window.confirm('Ungespeicherte Mitarbeitsbewertungen verwerfen?')
@@ -242,7 +267,8 @@ function isParticipationCategory(candidate: Sport.GradeCategory): boolean {
   if (candidate.type !== Sport.GradeCategoryType.Verbal || config.type !== 'verbal') {
     return false
   }
-  return criteria.every(criterion => config.fields.some(field => field.id === criterion.id))
+  return !!config.participationRubric || PARTICIPATION_CRITERIA.every(criterion =>
+    config.fields.some(field => field.id === criterion.id))
 }
 
 async function selectClass(): Promise<void> {
@@ -266,6 +292,41 @@ async function selectClass(): Promise<void> {
     error.value = cause instanceof Error ? cause.message : 'Mitarbeitsraster konnten nicht geladen werden.'
   } finally {
     loading.value = false
+  }
+}
+
+async function importRubric(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file || !selectedClassId.value) return
+  error.value = null
+  if (file.size > 65536) {
+    error.value = 'Rasterdatei darf höchstens 64 KiB groß sein.'
+    return
+  }
+  saving.value = true
+  try {
+    const parsed = parseParticipationRubric(JSON.parse(await file.text()) as unknown)
+    const existing = await sport.gradeCategoryRepository.findByClassGroup(selectedClassId.value)
+    if (existing.some(candidate => candidate.configuration.type === 'verbal' &&
+        candidate.configuration.participationRubric?.id === parsed.rubric.id)) {
+      throw new Error('Dieses Raster existiert bereits in der Klasse. Bestehende Bewertungen bleiben unverändert.')
+    }
+    const created = await sport.createGradeCategoryUseCase.execute({
+      classGroupId: selectedClassId.value,
+      name: parsed.name,
+      type: Sport.GradeCategoryType.Verbal,
+      weight: newCategoryWeight.value ?? 0,
+      configuration: createParticipationCategoryConfiguration(parsed.rubric)
+    })
+    participationCategories.value = [...participationCategories.value, created]
+    categoryId.value = created.id
+    await load()
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Import fehlgeschlagen.'
+  } finally {
+    saving.value = false
   }
 }
 
@@ -301,7 +362,7 @@ async function createCategory(): Promise<void> {
 }
 
 function assessment(id: string): ParticipationAssessment {
-  return assessments.value.get(id) ?? emptyParticipationAssessment()
+  return assessments.value.get(id) ?? emptyParticipationAssessment(rubric.value.id)
 }
 
 function score(
@@ -313,15 +374,15 @@ function score(
 }
 
 function total(id: string): number {
-  return participationTotal(assessment(id))
+  return participationTotal(assessment(id), rubric.value)
 }
 
 function complete(id: string): boolean {
-  return hasCompleteTeacherAssessment(assessment(id))
+  return !!assessment(id).refused || hasCompleteTeacherAssessment(assessment(id), rubric.value)
 }
 
 function grade(id: string): number {
-  return participationGrade(total(id))
+  return participationGrade(total(id), rubric.value, assessment(id).refused)
 }
 
 function setScore(
@@ -339,6 +400,12 @@ function setScore(
   const value = (event.target as HTMLSelectElement).value
   if (value === '') delete next[type][criterion]
   else next[type][criterion] = Number(value)
+  assessments.value = new Map(assessments.value).set(id, next)
+  unsaved.value = new Set(unsaved.value).add(id)
+}
+
+function setRefused(id: string, event: Event): void {
+  const next = { ...assessment(id), refused: (event.target as HTMLInputElement).checked }
   assessments.value = new Map(assessments.value).set(id, next)
   unsaved.value = new Set(unsaved.value).add(id)
 }
@@ -473,7 +540,9 @@ async function saveAll(): Promise<void> {
 .student-card { padding: 1rem; display: grid; gap: 1rem; }
 .student-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
 .assessment-grid { display: grid; grid-template-columns: minmax(170px, 1fr) 95px 105px; gap: .5rem; align-items: center; }
-.assessment-grid label { display: grid; gap: .15rem; }
+.criterion-details, .criterion-details label { display: grid; gap: .15rem; }
+.criterion-levels summary { cursor: pointer; min-height: 36px; }
+.criterion-levels span { display: block; padding: .25rem 0; line-height: 1.4; }
 .assessment-grid small { color: var(--color-muted); }
 .assessment-grid select, textarea { min-height: 44px; width: 100%; border: 1px solid var(--surface-border); border-radius: 6px; padding: .35rem; background: var(--p-content-background, var(--surface-soft)); color: inherit; box-sizing: border-box; font: inherit; }
 .bonus { display: flex; align-items: center; gap: .5rem; min-height: 44px; }

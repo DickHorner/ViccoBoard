@@ -181,11 +181,27 @@ export interface BJSDiscipline {
   unit: string;
 }
 
+export interface ParticipationRubricDefinition {
+  id: string;
+  criteria: Array<{
+    id: string;
+    label: string;
+    description: string;
+    levels: Array<{ value: number; description: string }>;
+  }>;
+  bonusPoints: number;
+  bonusLabel: string;
+  gradeThresholds: Array<{ minPoints: number; grade: number }>;
+  fallbackGrade: number;
+  refusalGrade: number;
+}
+
 export interface VerbalAssessmentConfig {
   type: 'verbal';
   fields: VerbalAssessmentField[];
   scales: AssessmentScale[];
   exportFormat: 'text' | 'structured';
+  participationRubric?: ParticipationRubricDefinition;
 }
 
 export interface VerbalAssessmentField {
