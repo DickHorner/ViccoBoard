@@ -60,7 +60,8 @@ export function parseParticipationRubric(input: unknown): { name: string; rubric
     if (!rawCriterion || typeof rawCriterion !== 'object' || Array.isArray(rawCriterion)) throw new Error('Ungültiges Kriterium.')
     const criterion = rawCriterion as Record<string, unknown>
     if (typeof criterion.id !== 'string' || !/^[a-zA-Z0-9_-]{1,80}$/.test(criterion.id) ||
-        ids.has(criterion.id) || typeof criterion.label !== 'string' || !criterion.label.trim() ||
+        ids.has(criterion.id) || ['__proto__', 'constructor', 'prototype'].includes(criterion.id) ||
+        typeof criterion.label !== 'string' || !criterion.label.trim() ||
         criterion.label.length > 120 || typeof criterion.description !== 'string' || criterion.description.length > 500) {
       throw new Error('Kriterien-IDs müssen eindeutig sein; Bezeichnung/Beschreibung fehlen oder sind zu lang.')
     }
