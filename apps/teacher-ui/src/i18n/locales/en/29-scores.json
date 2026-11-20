@@ -129,6 +129,7 @@
     "technicalNoPenaltyDefined": "The rules sheet specifies no direct free-throw penalty for technical fouls.",
     "playerExcluded": "Player #{number}: 5 fouls – excluded",
     "legacyFouls": "Previous foul total without quarter assignment",
-    "invalidBasketballFoul": "Invalid foul entry."
+    "invalidBasketballFoul": "Invalid foul entry.",
+    "invalidSoundFile": "Select an audio file between 1 and 256 KiB."
   }
 }
