@@ -6,6 +6,7 @@ import type { ClassGroup, Sport } from '@viccoboard/core';
 import type { RoundExclusionMode, ScoreboardSessionMetadata, TeamSessionMetadata } from '@viccoboard/sport';
 
 import { getSportBridge, initializeSportBridge } from './useSportBridge';
+import type { ScoreboardSoundClips, ScoreboardSoundKind } from '../services/scoreboard-sound-library';
 
 interface TeamState {
   id: string;
@@ -62,6 +63,11 @@ export function useScoreboardView() {
   );
   const soundEnabled = ref(true);
   const soundMessage = ref('');
+  const customSounds = ref<ScoreboardSoundClips>(bridge.scoreboardSoundLibrary.load());
+  const importingSound = ref(false);
+  const flashEnabled = ref(false);
+  const flashActive = ref(false);
+  const audioBuffers: Partial<Record<ScoreboardSoundKind, AudioBuffer>> = {};
   const pointOptions = computed(() => sport.value === 'basketball' ? [1, 2, 3] :
     sport.value === 'custom' ? (Number.isInteger(customPoints.value) && customPoints.value > 0 && customPoints.value <= 20 ? [customPoints.value] : []) : [1]);
 
@@ -235,10 +241,34 @@ export function useScoreboardView() {
     }
   }
 
-  function playRoundSignal(kind: 'start' | 'warning' | 'end'): void {
+  async function playRoundSignal(kind: ScoreboardSoundKind): Promise<void> {
     if (!soundEnabled.value || !roundAudioContext) return;
+    const context = roundAudioContext;
+    const clip = customSounds.value[kind];
+
+    if (clip) {
+      try {
+        let buffer = audioBuffers[kind];
+        if (!buffer) {
+          const encoded = clip.dataUrl.slice(clip.dataUrl.indexOf(',') + 1);
+          const binary = window.atob(encoded);
+          const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+          buffer = await context.decodeAudioData(bytes.buffer);
+          audioBuffers[kind] = buffer;
+        }
+        if (!soundEnabled.value) return;
+        const source = context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(context.destination);
+        source.onended = () => source.disconnect();
+        source.start();
+        return;
+      } catch {
+        soundMessage.value = t('SCORES.customSoundUnavailable');
+      }
+    }
+
     try {
-      const context = roundAudioContext;
       const count = kind === 'end' ? 3 : kind === 'warning' ? 2 : 1;
       const duration = kind === 'end' ? 0.28 : 0.15;
       const interval = kind === 'end' ? 0.4 : 0.25;
@@ -264,23 +294,58 @@ export function useScoreboardView() {
     }
   }
 
-  function testSignal(): void {
+  async function importSound(kind: ScoreboardSoundKind, file: File): Promise<void> {
+    importingSound.value = true;
+    try {
+      unlockRoundAudio();
+      if (!roundAudioContext) throw new Error(t('SCORES.soundUnavailable'));
+      const buffer = await roundAudioContext.decodeAudioData(await file.arrayBuffer());
+      const clip = await bridge.scoreboardSoundLibrary.replace(kind, file);
+      audioBuffers[kind] = buffer;
+      customSounds.value = { ...customSounds.value, [kind]: clip };
+      soundMessage.value = t('SCORES.soundImported');
+    } catch (error) {
+      soundMessage.value = error instanceof Error ? error.message : t('SCORES.soundUnavailable');
+    } finally {
+      importingSound.value = false;
+    }
+  }
+
+  function removeSound(kind: ScoreboardSoundKind): void {
+    try {
+      bridge.scoreboardSoundLibrary.remove(kind);
+      const clips = { ...customSounds.value };
+      delete clips[kind];
+      delete audioBuffers[kind];
+      customSounds.value = clips;
+      soundMessage.value = '';
+    } catch (error) {
+      soundMessage.value = error instanceof Error ? error.message : t('SCORES.soundUnavailable');
+    }
+  }
+
+  function testSignal(kind: ScoreboardSoundKind = 'end'): void {
     if (!soundEnabled.value) return;
     unlockRoundAudio();
-    playRoundSignal('end');
+    void playRoundSignal(kind);
+  }
+
+  function dismissFlash(): void {
+    flashActive.value = false;
   }
 
   function startTimer(): void {
     if (timerRunning.value) return;
     if (numberPickerEnabled.value && !roundActive.value) return;
     if (timerMode.value === 'countdown' && !timerConfigurationValid.value) return;
+    dismissFlash();
     if (timerMode.value === 'countdown') unlockRoundAudio();
     if (timerMode.value === 'countdown' && timerRemainingMs.value === 0) {
       timerRemainingMs.value = roundDurationMs.value;
       timerElapsedMs.value = 0;
     }
     if (timerMode.value === 'countdown' && timerElapsedMs.value === 0) {
-      playRoundSignal('start');
+      void playRoundSignal('start');
     }
     timerRunning.value = true;
     timerLastTick = Date.now();
@@ -296,14 +361,15 @@ export function useScoreboardView() {
         timerRemainingMs.value = Math.max(0, previousRemaining - delta);
         if (timerRemainingMs.value === 0) {
           pauseTimer();
-          playRoundSignal('end');
+          void playRoundSignal('end');
+          flashActive.value = flashEnabled.value;
           if (numberPickerEnabled.value) {
             roundActive.value = false;
             prepareNextRound();
           }
         } else if (roundDurationMs.value > 10000 &&
           previousRemaining > 10000 && timerRemainingMs.value <= 10000) {
-          playRoundSignal('warning');
+          void playRoundSignal('warning');
         }
       }
     }, 200);
@@ -317,6 +383,7 @@ export function useScoreboardView() {
 
   function resetTimer(): void {
     pauseTimer();
+    dismissFlash();
     timerElapsedMs.value = 0;
     timerRemainingMs.value = timerConfigurationValid.value ? roundDurationMs.value : 0;
   }
@@ -438,6 +505,7 @@ export function useScoreboardView() {
           sport: sport.value,
           customPoints: customPoints.value,
           soundEnabled: soundEnabled.value,
+          flashEnabled: flashEnabled.value,
           foulCounts: foulCounts.value,
           timerMode: timerMode.value,
           roundDurationMs: roundDurationMs.value,
@@ -508,6 +576,8 @@ export function useScoreboardView() {
       ? settings.sport : 'basketball';
     customPoints.value = settings?.customPoints ?? 1;
     soundEnabled.value = settings?.soundEnabled !== false;
+    flashEnabled.value = settings?.flashEnabled === true;
+    dismissFlash();
     soundMessage.value = '';
     foulCounts.value = {};
     for (const team of rebuilt) {
@@ -665,6 +735,10 @@ export function useScoreboardView() {
     showFoulCounter,
     soundEnabled,
     soundMessage,
+    customSounds,
+    importingSound,
+    flashEnabled,
+    flashActive,
     numberPickerEnabled,
     teamSize,
     playersPerRound,
@@ -689,6 +763,9 @@ export function useScoreboardView() {
     resetFouls,
     undoLastScore,
     testSignal,
+    importSound,
+    removeSound,
+    dismissFlash,
     prepareNextRound,
     toggleManualNumber,
     startRound,
