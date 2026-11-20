@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import type { ClassGroup, Sport } from '@viccoboard/core';
-import type { RoundExclusionMode, ScoreboardSessionMetadata, TeamSessionMetadata } from '@viccoboard/sport';
+import type { BasketballFoulEvent, BasketballFoulKind, BasketballShotSituation, RoundExclusionMode, ScoreboardSessionMetadata, TeamSessionMetadata } from '@viccoboard/sport';
 
 import { getSportBridge, initializeSportBridge } from './useSportBridge';
 import type { ScoreboardSoundClips, ScoreboardSoundKind } from '../services/scoreboard-sound-library';
@@ -53,10 +53,19 @@ export function useScoreboardView() {
   const bridge = getSportBridge();
 
   const numberPicker = bridge.roundNumberPickerService;
+  const basketballRules = bridge.basketballFoulService;
   const sport = ref<'basketball' | 'football' | 'handball' | 'volleyball' | 'standard' | 'custom'>('basketball');
   const customPoints = ref(1);
   const foulCounts = ref<Record<string, number>>({});
-  const showFoulCounter = computed(() => sport.value !== 'volleyball');
+  const showFoulCounter = computed(() => sport.value !== 'volleyball' && sport.value !== 'basketball');
+  const basketballQuarter = ref<1 | 2 | 3 | 4>(1);
+  const basketballFouls = ref<BasketballFoulEvent[]>([]);
+  const basketballFoulKind = ref<BasketballFoulKind>('defense');
+  const basketballShotSituation = ref<BasketballShotSituation>('none');
+  const basketballPlayerNumbers = ref<Record<string, number | ''>>({});
+  const basketballFoulNotice = ref('');
+  const basketballQuarterOptions = [1, 2, 3, 4] as const;
+
   const foulLabel = computed(() =>
     sport.value === 'basketball' ? t('SCORES.teamFouls') :
     sport.value === 'handball' ? t('SCORES.twoMinutePenalties') : t('SCORES.fouls')
@@ -392,7 +401,8 @@ export function useScoreboardView() {
     const hasAnyTeamName = allTeams.value.slice(0, layout.value).some(team => team.name.trim());
     return Boolean(sessionName.value.trim() &&
       (hasAnyTeamName || history.value.length > 0 || roundHistory.value.length > 0 ||
-        Object.values(foulCounts.value).some(count => count > 0)));
+        Object.values(foulCounts.value).some(count => count > 0) ||
+        basketballFouls.value.length > 0));
   });
 
   const linkedTimerSummary = computed(() => {
@@ -440,6 +450,69 @@ export function useScoreboardView() {
     message.value = '';
   }
 
+  function basketballTeamFouls(teamId: string): number {
+    return basketballRules.teamQuarterTotal(basketballFouls.value, teamId, basketballQuarter.value);
+  }
+
+  function basketballTechnicalFouls(teamId: string): number {
+    return basketballRules.technicalTotal(basketballFouls.value, teamId);
+  }
+
+  function basketballPlayers(teamId: string): Array<{ number: number; fouls: number; excluded: boolean }> {
+    const numbers = new Set(basketballFouls.value.filter(event =>
+      event.teamId === teamId && event.kind !== 'technical' && event.playerNumber !== undefined
+    ).map(event => event.playerNumber as number));
+    return [...numbers].sort((a, b) => a - b).map(number => {
+      const fouls = basketballRules.playerTotal(basketballFouls.value, teamId, number);
+      return { number, fouls, excluded: fouls >= 5 };
+    });
+  }
+
+  function addBasketballFoul(teamId: string): void {
+    if (sport.value !== 'basketball' || !activeTeams.value.some(team => team.id === teamId)) return;
+    const value = basketballPlayerNumbers.value[teamId];
+    const playerNumber = value === '' || value === undefined ? undefined : Number(value);
+    const kind = basketballFoulKind.value;
+    const event: BasketballFoulEvent = {
+      teamId,
+      quarter: basketballQuarter.value,
+      kind,
+      shot: kind === 'technical' ? 'none' : basketballShotSituation.value,
+      ...(playerNumber !== undefined ? { playerNumber } : {}),
+    };
+    try {
+      basketballFouls.value = basketballRules.add(basketballFouls.value, event);
+      const freeThrows = basketballRules.freeThrowsForFoul(basketballFouls.value, event);
+      const notices = [];
+      if (freeThrows === null) notices.push(t('SCORES.technicalNoPenaltyDefined'));
+      else if (freeThrows > 0) notices.push(t('SCORES.freeThrowsNotice', { count: freeThrows }));
+      if (playerNumber !== undefined && kind !== 'technical' &&
+        basketballRules.playerTotal(basketballFouls.value, teamId, playerNumber) >= 5) {
+        notices.push(t('SCORES.playerExcluded', { number: playerNumber }));
+      }
+      basketballFoulNotice.value = notices.join(' · ');
+    } catch (error) {
+      basketballFoulNotice.value = error instanceof Error ? error.message : t('SCORES.invalidBasketballFoul');
+    }
+  }
+
+  function undoBasketballFoul(teamId: string): void {
+    for (let i = basketballFouls.value.length - 1; i >= 0; i--) {
+      if (basketballFouls.value[i].teamId !== teamId) continue;
+      basketballFouls.value = basketballFouls.value.filter((_, index) => index !== i);
+      basketballFoulNotice.value = '';
+      break;
+    }
+  }
+
+  function resetBasketballFouls(): void {
+    basketballFouls.value = [];
+    basketballQuarter.value = 1;
+    basketballFoulNotice.value = '';
+    basketballPlayerNumbers.value = {};
+    foulCounts.value = {};
+  }
+
   function adjustFouls(teamId: string, delta: number): void {
     if (!showFoulCounter.value || !activeTeams.value.some(team => team.id === teamId)) return;
     const current = foulCounts.value[teamId] ?? 0;
@@ -473,6 +546,7 @@ export function useScoreboardView() {
     scores.value = { 'team-1': 0, 'team-2': 0, 'team-3': 0, 'team-4': 0 };
     history.value = [];
     resetFouls();
+    resetBasketballFouls();
     currentSessionId.value = undefined;
     resetRoundCycle();
     message.value = '';
@@ -507,6 +581,8 @@ export function useScoreboardView() {
           soundEnabled: soundEnabled.value,
           flashEnabled: flashEnabled.value,
           foulCounts: foulCounts.value,
+          basketballQuarter: basketballQuarter.value,
+          basketballFouls: basketballFouls.value,
           timerMode: timerMode.value,
           roundDurationMs: roundDurationMs.value,
           numberPickerEnabled: numberPickerEnabled.value,
@@ -580,6 +656,20 @@ export function useScoreboardView() {
     dismissFlash();
     soundMessage.value = '';
     foulCounts.value = {};
+    basketballFouls.value = [];
+    basketballFoulNotice.value = '';
+    basketballPlayerNumbers.value = {};
+    basketballQuarter.value = [1, 2, 3, 4].includes(settings?.basketballQuarter ?? 1)
+      ? (settings?.basketballQuarter ?? 1) as 1 | 2 | 3 | 4 : 1;
+    if (Array.isArray(settings?.basketballFouls)) {
+      for (const event of settings.basketballFouls) {
+        try {
+          basketballFouls.value = basketballRules.add(basketballFouls.value, event);
+        } catch {
+          // Invalid imported foul events must not affect the scoreboard.
+        }
+      }
+    }
     for (const team of rebuilt) {
       const count = settings?.foulCounts?.[team.id];
       foulCounts.value[team.id] = Number.isInteger(count) && count !== undefined && count >= 0 ? count : 0;
@@ -635,6 +725,7 @@ export function useScoreboardView() {
     currentSessionId.value = undefined;
     history.value = [];
     resetFouls();
+    resetBasketballFouls();
     resetRoundCycle();
     sessionName.value = sessionName.value || metadata.sessionName || '';
     message.value = importedTeams.length > useCount ? t('SCORES.importedTeamsNotice') : '';
@@ -731,6 +822,16 @@ export function useScoreboardView() {
     customPoints,
     pointOptions,
     foulCounts,
+    basketballQuarter,
+    basketballQuarterOptions,
+    basketballFouls,
+    basketballFoulKind,
+    basketballShotSituation,
+    basketballPlayerNumbers,
+    basketballFoulNotice,
+    basketballTeamFouls,
+    basketballTechnicalFouls,
+    basketballPlayers,
     foulLabel,
     showFoulCounter,
     soundEnabled,
@@ -761,6 +862,9 @@ export function useScoreboardView() {
     adjustScore,
     adjustFouls,
     resetFouls,
+    addBasketballFoul,
+    undoBasketballFoul,
+    resetBasketballFouls,
     undoLastScore,
     testSignal,
     importSound,
