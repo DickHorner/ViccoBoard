@@ -95,7 +95,7 @@
               <strong>{{ criterion.label }}</strong>: {{ criterion.description }}
             </li>
           </ul>
-          <p>Note 1 ab 14,5 · Note 2 ab 12 · Note 3 ab 9 · Note 4 ab 7 · Note 5 ab 2,5 · Note 6 darunter.</p>
+          <p>Note 1 ab 14,5 · Note 2 ab 12 · Note 3 ab 9 · Note 4 ab 7 · Note 5 bei geringerer Punktzahl · Note 6 ausschließlich bei Leistungsverweigerung.</p>
         </details>
       </section>
 
@@ -105,7 +105,7 @@
         <div class="student-heading">
           <h3>{{ student.firstName }} {{ student.lastName }}</h3>
           <span class="app-data-note">
-            {{ total(student.id).toFixed(1) }} Punkte ·
+            {{ assessment(student.id).refused ? 'Leistungsverweigerung' : `${total(student.id).toFixed(1)} Punkte` }} ·
             {{ complete(student.id) ? `Note ${grade(student.id)}` : 'Noch keine Note' }}
           </span>
         </div>
@@ -118,11 +118,17 @@
             <label :for="`${student.id}-${criterion.id}-teacher`">
               <strong>{{ criterion.label }}</strong>
               <small>{{ criterion.description }}</small>
+              <details class="criterion-levels">
+                <summary>Bewertungsstufen 0–3</summary>
+                <span v-for="(description, points) in criterion.levels" :key="points">
+                  <strong>{{ points }} Punkte:</strong> {{ description }}
+                </span>
+              </details>
             </label>
             <select
               :aria-label="`Selbsteinschätzung: ${criterion.label}, ${student.firstName} ${student.lastName}`"
               :value="score(student.id, 'selfAssessment', criterion.id)"
-              :disabled="saving"
+              :disabled="saving || !!assessment(student.id).refused"
               @change="setScore(student.id, 'selfAssessment', criterion.id, $event)"
             >
               <option value="">–</option>
@@ -131,7 +137,7 @@
             <select
               :id="`${student.id}-${criterion.id}-teacher`"
               :value="score(student.id, 'teacherAssessment', criterion.id)"
-              :disabled="saving"
+              :disabled="saving || !!assessment(student.id).refused"
               @change="setScore(student.id, 'teacherAssessment', criterion.id, $event)"
             >
               <option value="">–</option>
@@ -141,9 +147,15 @@
         </div>
 
         <label class="bonus">
-          <input type="checkbox" :checked="assessment(student.id).bonusPoint" :disabled="saving"
+          <input type="checkbox" :checked="assessment(student.id).bonusPoint" :disabled="saving || !!assessment(student.id).refused"
             @change="setBonus(student.id, $event)" />
           Zusatzpunkt für besonderes Engagement
+        </label>
+
+        <label class="bonus">
+          <input type="checkbox" :checked="!!assessment(student.id).refused" :disabled="saving"
+            @change="setRefused(student.id, $event)" />
+          Leistungsverweigerung (Note 6, unabhängig von der Punktzahl)
         </label>
 
         <div class="app-field">
@@ -317,11 +329,11 @@ function total(id: string): number {
 }
 
 function complete(id: string): boolean {
-  return hasCompleteTeacherAssessment(assessment(id))
+  return !!assessment(id).refused || hasCompleteTeacherAssessment(assessment(id))
 }
 
 function grade(id: string): number {
-  return participationGrade(total(id))
+  return participationGrade(total(id), assessment(id).refused)
 }
 
 function setScore(
@@ -339,6 +351,12 @@ function setScore(
   const value = (event.target as HTMLSelectElement).value
   if (value === '') delete next[type][criterion]
   else next[type][criterion] = Number(value)
+  assessments.value = new Map(assessments.value).set(id, next)
+  unsaved.value = new Set(unsaved.value).add(id)
+}
+
+function setRefused(id: string, event: Event): void {
+  const next = { ...assessment(id), refused: (event.target as HTMLInputElement).checked }
   assessments.value = new Map(assessments.value).set(id, next)
   unsaved.value = new Set(unsaved.value).add(id)
 }
@@ -475,6 +493,9 @@ async function saveAll(): Promise<void> {
 .assessment-grid { display: grid; grid-template-columns: minmax(170px, 1fr) 95px 105px; gap: .5rem; align-items: center; }
 .assessment-grid label { display: grid; gap: .15rem; }
 .assessment-grid small { color: var(--color-muted); }
+.criterion-levels summary { cursor: pointer; min-height: 36px; }
+.criterion-levels span { display: block; margin: .4rem 0; line-height: 1.4; }
+.criterion-levels span strong { font-size: inherit; }
 .assessment-grid select, textarea { min-height: 44px; width: 100%; border: 1px solid var(--surface-border); border-radius: 6px; padding: .35rem; background: var(--p-content-background, var(--surface-soft)); color: inherit; box-sizing: border-box; font: inherit; }
 .bonus { display: flex; align-items: center; gap: .5rem; min-height: 44px; }
 .bonus input { width: 18px; height: 18px; }
