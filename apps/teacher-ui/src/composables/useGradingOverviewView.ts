@@ -127,7 +127,7 @@ export function useGradingOverviewView() {
     const entry = performanceEntries.value.find(
       (candidate) => candidate.studentId === studentId && candidate.categoryId === categoryId
     )
-    return entry?.calculatedGrade || null
+    return entry?.calculatedGrade ?? null
   }
 
   function formatGrade(grade: string | number | null): string {
