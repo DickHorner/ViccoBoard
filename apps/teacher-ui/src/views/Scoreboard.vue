@@ -313,7 +313,7 @@
           <Button type="button" :disabled="roundActive || !roundConfigurationValid || !timerConfigurationValid ||
             timerMode !== 'countdown' || pendingNumbers.length !== playersPerRound"
             @click="startRound">{{ t('SCORES.startRound') }}</Button>
-          <Button severity="secondary" outlined type="button" :disabled="roundActive" @click="resetRoundCycle">{{ t('SCORES.newCycle') }}</Button>
+          <Button severity="secondary" outlined type="button" @click="resetRoundCycle">{{ t('SCORES.newCycle') }}</Button>
         </div>
         <p v-if="roundMessage" class="info-text" role="status">{{ roundMessage }}</p>
       </template>
