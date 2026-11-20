@@ -40,6 +40,7 @@ export interface ScoreboardRoundSettings {
   exclusionMode: RoundExclusionMode;
   selectionMethod: 'random' | 'manual';
   activeNumbers: number[];
+  roundActive: boolean;
   pendingNumbers: number[];
   roundHistory: number[][];
 }
