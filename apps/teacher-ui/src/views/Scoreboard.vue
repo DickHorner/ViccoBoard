@@ -38,7 +38,7 @@
       <div class="presenter-audio-controls">
         <button class="ph-btn ph-btn--sm" type="button" :aria-pressed="soundEnabled"
           @click="soundEnabled = !soundEnabled">{{ soundEnabled ? t('SCORES.soundOn') : t('SCORES.soundOff') }}</button>
-        <button class="ph-btn ph-btn--sm" type="button" :disabled="!soundEnabled" @click="testSignal">
+        <button class="ph-btn ph-btn--sm" type="button" :disabled="!soundEnabled" @click="testSignal('end')">
           {{ t('SCORES.signalNow') }}
         </button>
       </div>
@@ -55,6 +55,30 @@
           @click="setLayout(4)"
         >{{ t('SCORES.layout4') }}</button>
       </div>
+    </div>
+
+    <div v-if="sport === 'basketball'" class="presenter-foul-toolbar">
+      <label>{{ t('SCORES.quarter') }}
+        <select v-model.number="basketballQuarter" class="form-input">
+          <option v-for="quarter in basketballQuarterOptions" :key="quarter" :value="quarter">{{ quarter }}</option>
+        </select>
+      </label>
+      <label>{{ t('SCORES.foulType') }}
+        <select v-model="basketballFoulKind" class="form-input">
+          <option value="defense">{{ t('SCORES.defenseFoul') }}</option>
+          <option value="offense">{{ t('SCORES.offenseFoul') }}</option>
+          <option value="technical">{{ t('SCORES.technicalFoul') }}</option>
+        </select>
+      </label>
+      <label v-if="basketballFoulKind !== 'technical'">{{ t('SCORES.shotSituation') }}
+        <select v-model="basketballShotSituation" class="form-input">
+          <option value="none">{{ t('SCORES.noShot') }}</option>
+          <option value="missed-two">{{ t('SCORES.missedTwo') }}</option>
+          <option value="missed-three">{{ t('SCORES.missedThree') }}</option>
+          <option value="made">{{ t('SCORES.madeBasket') }}</option>
+        </select>
+      </label>
+      <span v-if="basketballFoulNotice" role="status">{{ basketballFoulNotice }}</span>
     </div>
 
     <div v-if="numberPickerEnabled" class="presenter-round-strip">
@@ -79,6 +103,22 @@
           <div class="presenter-score-value">{{ scores[team.id] ?? 0 }}</div>
           <button v-for="points in pointOptions" :key="points" class="presenter-score-btn presenter-score-btn--plus"
             type="button" @click="adjustScore(team.id, points)">+{{ points }}</button>
+        </div>
+        <div v-if="sport === 'basketball'" class="presenter-basketball-fouls">
+          <strong>{{ t('SCORES.quarterFouls') }} {{ basketballQuarter }}: {{ basketballTeamFouls(team.id) }}</strong>
+          <span v-if="basketballTeamFouls(team.id) >= 5">{{ t('SCORES.bonusActive') }}</span>
+          <div class="presenter-foul-controls">
+            <label :for="'presenter-player-'+team.id">{{ t('SCORES.playerNumber') }}</label>
+            <input :id="'presenter-player-'+team.id" v-model.number="basketballPlayerNumbers[team.id]"
+              type="number" min="0" max="99" step="1" class="form-input player-number-input" />
+            <button class="ph-btn ph-btn--sm" type="button" @click="addBasketballFoul(team.id)">+ {{ t('SCORES.foul') }}</button>
+            <button class="ph-btn ph-btn--sm" type="button" @click="undoBasketballFoul(team.id)">{{ t('SCORES.undoFoul') }}</button>
+          </div>
+          <span>{{ t('SCORES.technicalTotal') }}: {{ basketballTechnicalFouls(team.id) }}</span>
+          <span v-for="player in basketballPlayers(team.id)" :key="player.number"
+            :class="{ 'foul-excluded': player.excluded }">
+            #{{ player.number }}: {{ player.fouls }}/5 <template v-if="player.excluded">– {{ t('SCORES.excluded') }}</template>
+          </span>
         </div>
         <div v-if="showFoulCounter" class="presenter-fouls">
           <span>{{ foulLabel }}</span>
@@ -148,6 +188,7 @@
         </div>
       </div>
       <p v-if="showFoulCounter" class="info-text">{{ t('SCORES.foulNote') }}</p>
+      <p v-else-if="sport === 'basketball'" class="info-text">{{ t('SCORES.basketballRulesNote') }}</p>
     </section>
 
     <!-- Layout + Teams card -->
@@ -168,6 +209,32 @@
         </div>
       </div>
 
+      <div v-if="sport === 'basketball'" class="basketball-rule-toolbar">
+        <div class="form-group">
+          <label for="basketball-quarter">{{ t('SCORES.quarter') }}</label>
+          <select id="basketball-quarter" v-model.number="basketballQuarter" class="form-input">
+            <option v-for="quarter in basketballQuarterOptions" :key="quarter" :value="quarter">{{ quarter }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="basketball-foul-kind">{{ t('SCORES.foulType') }}</label>
+          <select id="basketball-foul-kind" v-model="basketballFoulKind" class="form-input">
+            <option value="defense">{{ t('SCORES.defenseFoul') }}</option>
+            <option value="offense">{{ t('SCORES.offenseFoul') }}</option>
+            <option value="technical">{{ t('SCORES.technicalFoul') }}</option>
+          </select>
+        </div>
+        <div v-if="basketballFoulKind !== 'technical'" class="form-group">
+          <label for="basketball-shot">{{ t('SCORES.shotSituation') }}</label>
+          <select id="basketball-shot" v-model="basketballShotSituation" class="form-input">
+            <option value="none">{{ t('SCORES.noShot') }}</option>
+            <option value="missed-two">{{ t('SCORES.missedTwo') }}</option>
+            <option value="missed-three">{{ t('SCORES.missedThree') }}</option>
+            <option value="made">{{ t('SCORES.madeBasket') }}</option>
+          </select>
+        </div>
+      </div>
+      <p v-if="sport === 'basketball' && basketballFoulNotice" class="info-text" role="status">{{ basketballFoulNotice }}</p>
       <div :class="['scoreboard-grid', layout === 4 ? 'scoreboard-grid--4' : '']">
         <article
           v-for="team in activeTeams"
@@ -203,6 +270,33 @@
           <div v-if="pointOptions.length > 1" class="score-actions">
             <Button v-for="points in pointOptions" :key="points" severity="secondary" outlined
               type="button" @click="adjustScore(team.id, points)">+{{ points }}</Button>
+          </div>
+          <div v-if="sport === 'basketball'" class="team-basketball-fouls">
+            <strong>{{ t('SCORES.quarterFouls') }} {{ basketballQuarter }}: {{ basketballTeamFouls(team.id) }}</strong>
+            <span v-if="basketballTeamFouls(team.id) >= 5" class="bonus-hint">{{ t('SCORES.bonusActive') }}</span>
+            <span>{{ t('SCORES.technicalTotal') }}: {{ basketballTechnicalFouls(team.id) }}</span>
+            <div class="team-foul-controls">
+              <label :for="'player-number-'+team.id">{{ t('SCORES.playerNumber') }}</label>
+              <input :id="'player-number-'+team.id" v-model.number="basketballPlayerNumbers[team.id]"
+                type="number" min="0" max="99" step="1" class="form-input player-number-input"
+                :placeholder="t('SCORES.playerOptional')" />
+              <Button severity="secondary" outlined type="button" @click="addBasketballFoul(team.id)">
+                + {{ t('SCORES.foul') }}
+              </Button>
+              <Button severity="secondary" outlined type="button" @click="undoBasketballFoul(team.id)">
+                {{ t('SCORES.undoFoul') }}
+              </Button>
+            </div>
+            <div class="player-foul-list">
+              <span v-for="player in basketballPlayers(team.id)" :key="player.number"
+                :class="{ 'foul-excluded': player.excluded }">
+                #{{ player.number }}: {{ player.fouls }}/5
+                <template v-if="player.excluded">– {{ t('SCORES.excluded') }}</template>
+              </span>
+              <span v-if="(foulCounts[team.id] ?? 0) > 0" class="info-text">
+                {{ t('SCORES.legacyFouls') }}: {{ foulCounts[team.id] }}
+              </span>
+            </div>
           </div>
           <div v-if="showFoulCounter" class="team-fouls">
             <span class="timer-label">{{ foulLabel }}</span>
@@ -245,11 +339,34 @@
             <input v-model="soundEnabled" type="checkbox" />
             {{ t('SCORES.soundEnabled') }}
           </label>
-          <Button severity="secondary" outlined type="button" :disabled="!soundEnabled" @click="testSignal">
+          <label class="scoreboard-toggle">
+            <input v-model="flashEnabled" type="checkbox" />
+            {{ t('SCORES.flashAtEnd') }}
+          </label>
+          <Button severity="secondary" outlined type="button" :disabled="!soundEnabled" @click="testSignal('end')">
             {{ t('SCORES.testSound') }}
           </Button>
           <span v-if="soundMessage" class="info-text" role="status">{{ soundMessage }}</span>
           <span v-if="soundEnabled && timerMode === 'countdown'" class="info-text">{{ t('SCORES.soundNote') }}</span>
+        </div>
+      </div>
+
+      <div class="custom-sound-library">
+        <strong>{{ t('SCORES.ownSounds') }}</strong>
+        <span class="info-text">{{ t('SCORES.ownSoundsHint') }}</span>
+        <div class="sound-file-grid">
+          <div v-for="option in soundOptions" :key="option.kind" class="sound-file-row">
+            <label :for="'sound-file-'+option.kind">{{ t(option.label) }}</label>
+            <input :id="'sound-file-'+option.kind" type="file" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac"
+              :disabled="importingSound" @change="onSoundFile($event, option.kind)" />
+            <span v-if="customSounds[option.kind]" class="info-text">{{ customSounds[option.kind]?.name }}</span>
+            <div class="sound-file-actions">
+              <Button severity="secondary" outlined type="button" :disabled="!soundEnabled"
+                @click="testSignal(option.kind)">{{ t('SCORES.previewSound') }}</Button>
+              <Button v-if="customSounds[option.kind]" severity="secondary" text type="button"
+                @click="removeSound(option.kind)">{{ t('SCORES.removeSound') }}</Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -265,6 +382,9 @@
           :disabled="!activeTeams.some(team => (foulCounts[team.id] ?? 0) > 0)" @click="resetFouls">
           {{ t('SCORES.resetFouls') }}
         </Button>
+        <Button v-if="sport === 'basketball'" severity="secondary" outlined type="button"
+          :disabled="basketballFouls.length === 0 && !activeTeams.some(team => (foulCounts[team.id] ?? 0) > 0)"
+          @click="resetBasketballFouls">{{ t('SCORES.resetFouls') }}</Button>
       </div>
 
       <!-- Event log -->
@@ -430,6 +550,11 @@
       </ul>
     </section>
   </div>
+  <button v-if="flashActive" class="scoreboard-end-flash" type="button" role="alert"
+    @click="dismissFlash">
+    <strong>{{ t('SCORES.timeUp') }}</strong>
+    <span>{{ t('SCORES.tapToDismiss') }}</span>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -467,10 +592,24 @@ const {
   customPoints,
   pointOptions,
   foulCounts,
+  basketballQuarter,
+  basketballQuarterOptions,
+  basketballFouls,
+  basketballFoulKind,
+  basketballShotSituation,
+  basketballPlayerNumbers,
+  basketballFoulNotice,
+  basketballTeamFouls,
+  basketballTechnicalFouls,
+  basketballPlayers,
   foulLabel,
   showFoulCounter,
   soundEnabled,
   soundMessage,
+  customSounds,
+  importingSound,
+  flashEnabled,
+  flashActive,
   numberPickerEnabled,
   teamSize,
   playersPerRound,
@@ -493,8 +632,14 @@ const {
   adjustScore,
   adjustFouls,
   resetFouls,
+  addBasketballFoul,
+  undoBasketballFoul,
+  resetBasketballFouls,
   undoLastScore,
   testSignal,
+  importSound,
+  removeSound,
+  dismissFlash,
   prepareNextRound,
   toggleManualNumber,
   startRound,
@@ -511,6 +656,19 @@ const {
   formatDateTime,
   formatDuration,
 } = useScoreboardView();
+
+const soundOptions = [
+  { kind: 'start', label: 'SCORES.soundStart' },
+  { kind: 'warning', label: 'SCORES.soundWarning' },
+  { kind: 'end', label: 'SCORES.soundEnd' },
+] as const
+
+function onSoundFile(event: Event, kind: 'start' | 'warning' | 'end'): void {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (file) void importSound(kind, file)
+}
 
 const classOptions = computed(() => [
   { label: t('SCORES.noClassBinding'), value: '' },
