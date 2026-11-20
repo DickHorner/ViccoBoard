@@ -98,6 +98,7 @@ describe('SaveScoreboardSessionUseCase', () => {
         exclusionMode: 'unused',
         selectionMethod: 'random',
         activeNumbers: [1, 2, 3, 4, 5],
+        roundActive: false,
         pendingNumbers: [6, 7, 8, 9, 10],
         roundHistory: [[1, 2, 3, 4, 5]]
       }
