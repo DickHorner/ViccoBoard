@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import type { ClassGroup, Sport } from '@viccoboard/core';
-import type { ScoreboardSessionMetadata, TeamSessionMetadata } from '@viccoboard/sport';
+import { RoundNumberPickerService, type RoundExclusionMode, type ScoreboardSessionMetadata, type TeamSessionMetadata } from '@viccoboard/sport';
 
 import { getSportBridge, initializeSportBridge } from './useSportBridge';
 
@@ -51,6 +51,54 @@ export function useScoreboardView() {
   const router = useRouter();
   const bridge = getSportBridge();
 
+  const numberPicker = new RoundNumberPickerService();
+  const sport = ref<'basketball' | 'standard' | 'custom'>('basketball');
+  const customPoints = ref(1);
+  const pointOptions = computed(() => sport.value === 'basketball' ? [1, 2, 3] :
+    sport.value === 'custom' ? (Number.isInteger(customPoints.value) && customPoints.value > 0 && customPoints.value <= 20 ? [customPoints.value] : []) : [1]);
+
+  const timerMode = ref<'stopwatch' | 'countdown'>('stopwatch');
+  const roundMinutes = ref(3);
+  const roundSeconds = ref(0);
+  const roundDurationMs = computed(() => (Number(roundMinutes.value) * 60 + Number(roundSeconds.value)) * 1000);
+  const timerRemainingMs = ref(180000);
+  const displayedTimerMs = computed(() => timerMode.value === 'countdown' ? timerRemainingMs.value : timerElapsedMs.value);
+
+  const numberPickerEnabled = ref(false);
+  const teamSize = ref(12);
+  const playersPerRound = ref(5);
+  const exclusionMode = ref<RoundExclusionMode>('unused');
+  const selectionMethod = ref<'random' | 'manual'>('random');
+  const activeNumbers = ref<number[]>([]);
+  const pendingNumbers = ref<number[]>([]);
+  const roundHistory = ref<number[][]>([]);
+  const roundActive = ref(false);
+  const roundMessage = ref('');
+  const nextRoundNumber = computed(() => roundHistory.value.length + 1);
+  const usedNumbers = computed(() => roundHistory.value.flat());
+  const previousNumbers = computed(() => roundHistory.value.at(-1) ?? []);
+  const pickerInput = computed(() => ({
+    teamSize: teamSize.value,
+    playersPerRound: playersPerRound.value,
+    exclusionMode: exclusionMode.value,
+    usedNumbers: usedNumbers.value,
+    previousNumbers: previousNumbers.value,
+  }));
+  const selectableNumbers = computed(() => {
+    try {
+      return numberPicker.eligibleNumbers(pickerInput.value);
+    } catch {
+      return [];
+    }
+  });
+  const roundConfigurationValid = computed(() =>
+    layout.value === 2 && Number.isInteger(teamSize.value) && teamSize.value >= 1 && teamSize.value <= 99 &&
+    Number.isInteger(playersPerRound.value) && playersPerRound.value >= 1 && playersPerRound.value <= teamSize.value
+  );
+  const timerConfigurationValid = computed(() => Number.isInteger(roundMinutes.value) && Number.isInteger(roundSeconds.value) &&
+    roundMinutes.value >= 0 && roundMinutes.value <= 99 && roundSeconds.value >= 0 && roundSeconds.value <= 59 &&
+    roundDurationMs.value > 0);
+
   const viewMode = ref<'manage' | 'presenter'>('manage');
   const layout = ref<2 | 4>(2);
 
@@ -84,17 +132,127 @@ export function useScoreboardView() {
   let timerLastTick: number | undefined;
 
   function setLayout(n: 2 | 4): void {
+    if (n !== layout.value && numberPickerEnabled.value) resetRoundCycle();
     layout.value = n;
+  }
+
+  function resetRoundCycle(): void {
+    pauseTimer();
+    activeNumbers.value = [];
+    pendingNumbers.value = [];
+    roundHistory.value = [];
+    roundActive.value = false;
+    roundMessage.value = '';
+    resetTimer();
+  }
+
+  watch([teamSize, playersPerRound, exclusionMode, selectionMethod, numberPickerEnabled], resetRoundCycle);
+  watch([timerMode, roundMinutes, roundSeconds], () => {
+    if (!timerRunning.value) resetTimer();
+  });
+
+  function prepareNextRound(): void {
+    if (!numberPickerEnabled.value || !roundConfigurationValid.value) {
+      roundMessage.value = t('SCORES.invalidRoundSettings');
+      pendingNumbers.value = [];
+      return;
+    }
+    try {
+      if (selectableNumbers.value.length < playersPerRound.value) {
+        pendingNumbers.value = [];
+        roundMessage.value = t('SCORES.noEligibleNumbers');
+      } else if (selectionMethod.value === 'random') {
+        pendingNumbers.value = numberPicker.draw(pickerInput.value) ?? [];
+        roundMessage.value = '';
+      } else {
+        pendingNumbers.value = [];
+        roundMessage.value = '';
+      }
+    } catch {
+      pendingNumbers.value = [];
+      roundMessage.value = t('SCORES.invalidRoundSettings');
+    }
+  }
+
+  function toggleManualNumber(number: number): void {
+    if (selectionMethod.value !== 'manual' || roundActive.value || timerRunning.value ||
+        !selectableNumbers.value.includes(number)) return;
+    pendingNumbers.value = pendingNumbers.value.includes(number)
+      ? pendingNumbers.value.filter(value => value !== number)
+      : pendingNumbers.value.length < playersPerRound.value
+        ? [...pendingNumbers.value, number].sort((a, b) => a - b)
+        : pendingNumbers.value;
+    roundMessage.value = '';
+  }
+
+  function startRound(): void {
+    if (!numberPickerEnabled.value || roundActive.value || !roundConfigurationValid.value ||
+        timerMode.value !== 'countdown' || !timerConfigurationValid.value) {
+      roundMessage.value = t('SCORES.invalidRoundSettings');
+      return;
+    }
+    const valid = pendingNumbers.value.length === playersPerRound.value &&
+      new Set(pendingNumbers.value).size === playersPerRound.value &&
+      pendingNumbers.value.every(number => selectableNumbers.value.includes(number));
+    if (!valid) {
+      roundMessage.value = t('SCORES.chooseNumbers');
+      return;
+    }
+    activeNumbers.value = [...pendingNumbers.value];
+    roundHistory.value = [...roundHistory.value, activeNumbers.value];
+    pendingNumbers.value = [];
+    roundActive.value = true;
+    roundMessage.value = '';
+    resetTimer();
+    startTimer();
+  }
+
+  function playRoundSignal(): void {
+    try {
+      const AudioCtx = window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const context = new AudioCtx();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.frequency.value = 800;
+      gain.gain.value = 0.2;
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.2);
+      oscillator.onended = () => { void context.close(); };
+    } catch {
+      // Audio is optional; timer completion must not depend on playback.
+    }
   }
 
   function startTimer(): void {
     if (timerRunning.value) return;
+    if (numberPickerEnabled.value && !roundActive.value) return;
+    if (timerMode.value === 'countdown' && !timerConfigurationValid.value) return;
+    if (timerMode.value === 'countdown' && timerRemainingMs.value === 0) {
+      timerRemainingMs.value = roundDurationMs.value;
+      timerElapsedMs.value = 0;
+    }
     timerRunning.value = true;
     timerLastTick = Date.now();
     timerIntervalHandle = window.setInterval(() => {
       const now = Date.now();
-      timerElapsedMs.value += now - (timerLastTick ?? now);
+      const delta = now - (timerLastTick ?? now);
       timerLastTick = now;
+      timerElapsedMs.value += delta;
+      if (timerMode.value === 'countdown') {
+        timerRemainingMs.value = Math.max(0, timerRemainingMs.value - delta);
+        if (timerRemainingMs.value === 0) {
+          pauseTimer();
+          playRoundSignal();
+          if (numberPickerEnabled.value) {
+            roundActive.value = false;
+            prepareNextRound();
+          }
+        }
+      }
     }, 200);
   }
 
@@ -107,6 +265,7 @@ export function useScoreboardView() {
   function resetTimer(): void {
     pauseTimer();
     timerElapsedMs.value = 0;
+    timerRemainingMs.value = timerConfigurationValid.value ? roundDurationMs.value : 0;
   }
 
   const canSave = computed(() => {
@@ -149,6 +308,16 @@ export function useScoreboardView() {
     }
   }
 
+  function undoLastScore(): void {
+    const last = history.value.shift();
+    if (!last) return;
+    scores.value = {
+      ...scores.value,
+      [last.teamId]: Math.max(0, (scores.value[last.teamId] ?? 0) - last.points),
+    };
+    message.value = '';
+  }
+
   function adjustScore(teamId: string, delta: number): void {
     const current = scores.value[teamId] ?? 0;
     const next = Math.max(0, current + delta);
@@ -170,7 +339,7 @@ export function useScoreboardView() {
     scores.value = { 'team-1': 0, 'team-2': 0, 'team-3': 0, 'team-4': 0 };
     history.value = [];
     currentSessionId.value = undefined;
-    resetTimer();
+    resetRoundCycle();
     message.value = '';
   }
 
@@ -197,6 +366,20 @@ export function useScoreboardView() {
         linkedTimerSessionId: linkedTimerSessionId.value || undefined,
         layout: layout.value,
         inlineTimer: { elapsedMs: timerElapsedMs.value, running: false },
+        roundSettings: {
+          sport: sport.value,
+          customPoints: customPoints.value,
+          timerMode: timerMode.value,
+          roundDurationMs: roundDurationMs.value,
+          numberPickerEnabled: numberPickerEnabled.value,
+          teamSize: teamSize.value,
+          playersPerRound: playersPerRound.value,
+          exclusionMode: exclusionMode.value,
+          selectionMethod: selectionMethod.value,
+          activeNumbers: activeNumbers.value,
+          pendingNumbers: pendingNumbers.value,
+          roundHistory: roundHistory.value,
+        },
       });
 
       currentSessionId.value = result.id;
@@ -247,9 +430,26 @@ export function useScoreboardView() {
       timestamp: entry.timestamp,
     }));
 
+    resetRoundCycle();
+    const settings = metadata.roundSettings;
+    sport.value = settings?.sport === 'standard' || settings?.sport === 'custom' ? settings.sport : 'basketball';
+    customPoints.value = settings?.customPoints ?? 1;
+    timerMode.value = settings?.timerMode === 'countdown' ? 'countdown' : 'stopwatch';
+    const duration = settings?.roundDurationMs ?? 180000;
+    roundMinutes.value = Math.floor(duration / 60000);
+    roundSeconds.value = Math.floor((duration % 60000) / 1000);
+    numberPickerEnabled.value = settings?.numberPickerEnabled ?? false;
+    teamSize.value = settings?.teamSize ?? 12;
+    playersPerRound.value = settings?.playersPerRound ?? 5;
+    exclusionMode.value = settings?.exclusionMode ?? 'unused';
+    selectionMethod.value = settings?.selectionMethod ?? 'random';
+    roundHistory.value = settings?.roundHistory?.map(numbers => [...numbers]) ?? [];
+    activeNumbers.value = [...(settings?.activeNumbers ?? [])];
+    pendingNumbers.value = [...(settings?.pendingNumbers ?? [])];
     resetTimer();
-    if (metadata.inlineTimer) {
-      timerElapsedMs.value = metadata.inlineTimer.elapsedMs;
+    if (metadata.inlineTimer && Number.isFinite(metadata.inlineTimer.elapsedMs)) {
+      timerElapsedMs.value = Math.max(0, metadata.inlineTimer.elapsedMs);
+      timerRemainingMs.value = Math.max(0, roundDurationMs.value - timerElapsedMs.value);
     }
 
     message.value = '';
@@ -283,7 +483,7 @@ export function useScoreboardView() {
     scores.value = { 'team-1': 0, 'team-2': 0, 'team-3': 0, 'team-4': 0 };
     currentSessionId.value = undefined;
     history.value = [];
-    resetTimer();
+    resetRoundCycle();
     sessionName.value = sessionName.value || metadata.sessionName || '';
     message.value = importedTeams.length > useCount ? t('SCORES.importedTeamsNotice') : '';
   }
@@ -367,7 +567,29 @@ export function useScoreboardView() {
     saving,
     message,
     timerElapsedMs,
+    timerRemainingMs,
+    displayedTimerMs,
     timerRunning,
+    timerMode,
+    roundMinutes,
+    roundSeconds,
+    timerConfigurationValid,
+    sport,
+    customPoints,
+    pointOptions,
+    numberPickerEnabled,
+    teamSize,
+    playersPerRound,
+    exclusionMode,
+    selectionMethod,
+    selectableNumbers,
+    activeNumbers,
+    pendingNumbers,
+    roundHistory,
+    roundActive,
+    roundMessage,
+    nextRoundNumber,
+    roundConfigurationValid,
     canSave,
     linkedTimerSummary,
     setLayout,
@@ -375,6 +597,11 @@ export function useScoreboardView() {
     pauseTimer,
     resetTimer,
     adjustScore,
+    undoLastScore,
+    prepareNextRound,
+    toggleManualNumber,
+    startRound,
+    resetRoundCycle,
     resetBoard,
     saveSession,
     loadSession,
