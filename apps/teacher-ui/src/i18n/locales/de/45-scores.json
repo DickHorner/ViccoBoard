@@ -1,7 +1,7 @@
 {
   "SCORES": {
     "title": "Anzeigetafel",
-    "description": "Spielstände speichern, Teamsitzungen übernehmen und Timer verknüpfen.",
+    "description": "Punkte, akustische Rundensignale und sportartspezifische Fouls verwalten.",
     "classGroup": "Klasse",
     "noClassBinding": "Ohne Klassenbindung",
     "importTeams": "Teamsitzung übernehmen",
@@ -76,6 +76,23 @@
     "newCycle": "Neuen Auswahlzyklus beginnen",
     "invalidRoundSettings": "Bitte gültige Teamgröße, Anzahl, 2 Teams und Countdown einstellen.",
     "noEligibleNumbers": "Nicht genügend zulässige Nummern übrig. Auswahlzyklus neu beginnen oder Regel ändern.",
-    "chooseNumbers": "Bitte zuerst die benötigte Anzahl Nummern auswählen."
+    "chooseNumbers": "Bitte zuerst die benötigte Anzahl Nummern auswählen.",
+    "football": "Fußball (+1)",
+    "handball": "Handball (+1)",
+    "volleyball": "Volleyball (+1)",
+    "teamFouls": "Teamfouls",
+    "twoMinutePenalties": "2-Minuten-Strafen",
+    "fouls": "Fouls",
+    "foulMinus": "Foul oder Strafe abziehen",
+    "foulPlus": "Foul oder Strafe hinzufügen",
+    "resetFouls": "Foul- und Strafzähler zurücksetzen",
+    "soundEnabled": "Akustische Signale aktivieren",
+    "testSound": "Signal testen",
+    "signalNow": "Signal geben",
+    "soundOn": "Ton an",
+    "soundOff": "Ton aus",
+    "soundUnavailable": "Audio ist nicht verfügbar. Bitte Gerätelautstärke und Browser prüfen.",
+    "foulNote": "Fouls und Zeitstrafen werden manuell gezählt. Regelstrafen und Freiwürfe werden nicht automatisch vergeben.",
+    "soundNote": "Ein Signal beim Start, zwei kurze Signale bei 10 Sekunden Restzeit, drei bei Spielende. Am iPad nur bei aktiver Browser-Wiedergabe zuverlässig."
   }
 }

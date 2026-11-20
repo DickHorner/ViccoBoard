@@ -30,8 +30,10 @@ export interface InlineTimerState {
 }
 
 export interface ScoreboardRoundSettings {
-  sport: 'basketball' | 'standard' | 'custom';
+  sport: 'basketball' | 'football' | 'handball' | 'volleyball' | 'standard' | 'custom';
   customPoints: number;
+  soundEnabled?: boolean;
+  foulCounts?: Record<string, number>;
   timerMode: 'stopwatch' | 'countdown';
   roundDurationMs: number;
   numberPickerEnabled: boolean;

@@ -52,8 +52,16 @@ export function useScoreboardView() {
   const bridge = getSportBridge();
 
   const numberPicker = bridge.roundNumberPickerService;
-  const sport = ref<'basketball' | 'standard' | 'custom'>('basketball');
+  const sport = ref<'basketball' | 'football' | 'handball' | 'volleyball' | 'standard' | 'custom'>('basketball');
   const customPoints = ref(1);
+  const foulCounts = ref<Record<string, number>>({});
+  const showFoulCounter = computed(() => sport.value !== 'volleyball');
+  const foulLabel = computed(() =>
+    sport.value === 'basketball' ? t('SCORES.teamFouls') :
+    sport.value === 'handball' ? t('SCORES.twoMinutePenalties') : t('SCORES.fouls')
+  );
+  const soundEnabled = ref(true);
+  const soundMessage = ref('');
   const pointOptions = computed(() => sport.value === 'basketball' ? [1, 2, 3] :
     sport.value === 'custom' ? (Number.isInteger(customPoints.value) && customPoints.value > 0 && customPoints.value <= 20 ? [customPoints.value] : []) : [1]);
 
@@ -209,33 +217,57 @@ export function useScoreboardView() {
   }
 
   function unlockRoundAudio(): void {
+    if (!soundEnabled.value) return;
     try {
       const AudioCtx = window.AudioContext ??
         (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!AudioCtx) return;
+      if (!AudioCtx) {
+        soundMessage.value = t('SCORES.soundUnavailable');
+        return;
+      }
       roundAudioContext ??= new AudioCtx();
-      void roundAudioContext.resume().catch(() => {});
+      void roundAudioContext.resume().catch(() => {
+        soundMessage.value = t('SCORES.soundUnavailable');
+      });
+      soundMessage.value = '';
     } catch {
-      // Timer operation remains available when the device blocks audio.
+      soundMessage.value = t('SCORES.soundUnavailable');
     }
   }
 
-  function playRoundSignal(): void {
+  function playRoundSignal(kind: 'start' | 'warning' | 'end'): void {
+    if (!soundEnabled.value || !roundAudioContext) return;
     try {
       const context = roundAudioContext;
-      if (!context) return;
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.connect(gain);
-      gain.connect(context.destination);
-      oscillator.frequency.value = 800;
-      gain.gain.value = 0.2;
-      oscillator.start();
-      oscillator.stop(context.currentTime + 0.2);
-      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+      const count = kind === 'end' ? 3 : kind === 'warning' ? 2 : 1;
+      const duration = kind === 'end' ? 0.28 : 0.15;
+      const interval = kind === 'end' ? 0.4 : 0.25;
+      const frequency = kind === 'warning' ? 1100 : kind === 'end' ? 740 : 950;
+
+      for (let i = 0; i < count; i++) {
+        const at = context.currentTime + i * interval;
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = 'triangle';
+        oscillator.frequency.value = frequency;
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        gain.gain.setValueAtTime(0.0001, at);
+        gain.gain.exponentialRampToValueAtTime(0.25, at + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
+        oscillator.start(at);
+        oscillator.stop(at + duration);
+        oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+      }
     } catch {
-      // Audio is optional; timer completion must not depend on playback.
+      soundMessage.value = t('SCORES.soundUnavailable');
     }
+  }
+
+  function testSignal(): void {
+    if (!soundEnabled.value) return;
+    unlockRoundAudio();
+    playRoundSignal('end');
   }
 
   function startTimer(): void {
@@ -247,6 +279,9 @@ export function useScoreboardView() {
       timerRemainingMs.value = roundDurationMs.value;
       timerElapsedMs.value = 0;
     }
+    if (timerMode.value === 'countdown' && timerElapsedMs.value === 0) {
+      playRoundSignal('start');
+    }
     timerRunning.value = true;
     timerLastTick = Date.now();
     timerIntervalHandle = window.setInterval(() => {
@@ -257,14 +292,18 @@ export function useScoreboardView() {
         ? Math.min(delta, timerRemainingMs.value)
         : delta;
       if (timerMode.value === 'countdown') {
-        timerRemainingMs.value = Math.max(0, timerRemainingMs.value - delta);
+        const previousRemaining = timerRemainingMs.value;
+        timerRemainingMs.value = Math.max(0, previousRemaining - delta);
         if (timerRemainingMs.value === 0) {
           pauseTimer();
-          playRoundSignal();
+          playRoundSignal('end');
           if (numberPickerEnabled.value) {
             roundActive.value = false;
             prepareNextRound();
           }
+        } else if (roundDurationMs.value > 10000 &&
+          previousRemaining > 10000 && timerRemainingMs.value <= 10000) {
+          playRoundSignal('warning');
         }
       }
     }, 200);
@@ -284,7 +323,9 @@ export function useScoreboardView() {
 
   const canSave = computed(() => {
     const hasAnyTeamName = allTeams.value.slice(0, layout.value).some(team => team.name.trim());
-    return Boolean(sessionName.value.trim() && (hasAnyTeamName || history.value.length > 0 || roundHistory.value.length > 0));
+    return Boolean(sessionName.value.trim() &&
+      (hasAnyTeamName || history.value.length > 0 || roundHistory.value.length > 0 ||
+        Object.values(foulCounts.value).some(count => count > 0)));
   });
 
   const linkedTimerSummary = computed(() => {
@@ -332,6 +373,18 @@ export function useScoreboardView() {
     message.value = '';
   }
 
+  function adjustFouls(teamId: string, delta: number): void {
+    if (!showFoulCounter.value || !activeTeams.value.some(team => team.id === teamId)) return;
+    const current = foulCounts.value[teamId] ?? 0;
+    const next = Math.max(0, current + delta);
+    if (next === current) return;
+    foulCounts.value = { ...foulCounts.value, [teamId]: next };
+  }
+
+  function resetFouls(): void {
+    foulCounts.value = {};
+  }
+
   function adjustScore(teamId: string, delta: number): void {
     const current = scores.value[teamId] ?? 0;
     const next = Math.max(0, current + delta);
@@ -352,6 +405,7 @@ export function useScoreboardView() {
   function resetBoard(): void {
     scores.value = { 'team-1': 0, 'team-2': 0, 'team-3': 0, 'team-4': 0 };
     history.value = [];
+    resetFouls();
     currentSessionId.value = undefined;
     resetRoundCycle();
     message.value = '';
@@ -383,6 +437,8 @@ export function useScoreboardView() {
         roundSettings: {
           sport: sport.value,
           customPoints: customPoints.value,
+          soundEnabled: soundEnabled.value,
+          foulCounts: foulCounts.value,
           timerMode: timerMode.value,
           roundDurationMs: roundDurationMs.value,
           numberPickerEnabled: numberPickerEnabled.value,
@@ -447,8 +503,17 @@ export function useScoreboardView() {
 
     resetRoundCycle();
     const settings = metadata.roundSettings;
-    sport.value = settings?.sport === 'standard' || settings?.sport === 'custom' ? settings.sport : 'basketball';
+    sport.value = settings?.sport === 'standard' || settings?.sport === 'custom' ||
+      settings?.sport === 'football' || settings?.sport === 'handball' || settings?.sport === 'volleyball'
+      ? settings.sport : 'basketball';
     customPoints.value = settings?.customPoints ?? 1;
+    soundEnabled.value = settings?.soundEnabled !== false;
+    soundMessage.value = '';
+    foulCounts.value = {};
+    for (const team of rebuilt) {
+      const count = settings?.foulCounts?.[team.id];
+      foulCounts.value[team.id] = Number.isInteger(count) && count !== undefined && count >= 0 ? count : 0;
+    }
     timerMode.value = settings?.timerMode === 'countdown' ? 'countdown' : 'stopwatch';
     const duration = settings?.roundDurationMs ?? 180000;
     roundMinutes.value = Math.floor(duration / 60000);
@@ -499,6 +564,7 @@ export function useScoreboardView() {
     scores.value = { 'team-1': 0, 'team-2': 0, 'team-3': 0, 'team-4': 0 };
     currentSessionId.value = undefined;
     history.value = [];
+    resetFouls();
     resetRoundCycle();
     sessionName.value = sessionName.value || metadata.sessionName || '';
     message.value = importedTeams.length > useCount ? t('SCORES.importedTeamsNotice') : '';
@@ -594,6 +660,11 @@ export function useScoreboardView() {
     sport,
     customPoints,
     pointOptions,
+    foulCounts,
+    foulLabel,
+    showFoulCounter,
+    soundEnabled,
+    soundMessage,
     numberPickerEnabled,
     teamSize,
     playersPerRound,
@@ -614,7 +685,10 @@ export function useScoreboardView() {
     pauseTimer,
     resetTimer,
     adjustScore,
+    adjustFouls,
+    resetFouls,
     undoLastScore,
+    testSignal,
     prepareNextRound,
     toggleManualNumber,
     startRound,
