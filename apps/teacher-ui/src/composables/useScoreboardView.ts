@@ -306,6 +306,9 @@ export function useScoreboardView() {
   async function importSound(kind: ScoreboardSoundKind, file: File): Promise<void> {
     importingSound.value = true;
     try {
+      if (!file.type.startsWith('audio/') || file.size < 1 || file.size > 256 * 1024) {
+        throw new Error(t('SCORES.invalidSoundFile'));
+      }
       unlockRoundAudio();
       if (!roundAudioContext) throw new Error(t('SCORES.soundUnavailable'));
       const buffer = await roundAudioContext.decodeAudioData(await file.arrayBuffer());
@@ -460,7 +463,7 @@ export function useScoreboardView() {
 
   function basketballPlayers(teamId: string): Array<{ number: number; fouls: number; excluded: boolean }> {
     const numbers = new Set(basketballFouls.value.filter(event =>
-      event.teamId === teamId && event.kind !== 'technical' && event.playerNumber !== undefined
+      event.teamId === teamId && event.playerNumber !== undefined
     ).map(event => event.playerNumber as number));
     return [...numbers].sort((a, b) => a - b).map(number => {
       const fouls = basketballRules.playerTotal(basketballFouls.value, teamId, number);
@@ -486,7 +489,7 @@ export function useScoreboardView() {
       const notices = [];
       if (freeThrows === null) notices.push(t('SCORES.technicalNoPenaltyDefined'));
       else if (freeThrows > 0) notices.push(t('SCORES.freeThrowsNotice', { count: freeThrows }));
-      if (playerNumber !== undefined && kind !== 'technical' &&
+      if (playerNumber !== undefined &&
         basketballRules.playerTotal(basketballFouls.value, teamId, playerNumber) >= 5) {
         notices.push(t('SCORES.playerExcluded', { number: playerNumber }));
       }
