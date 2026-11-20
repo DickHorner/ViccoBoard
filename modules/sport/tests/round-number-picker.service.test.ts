@@ -47,7 +47,7 @@ describe('RoundNumberPickerService', () => {
       exclusionMode: 'any',
       usedNumbers: [1, 2, 3, 4, 5],
       previousNumbers: [1, 2, 3, 4, 5]
-    }, () => 0)).toEqual([1, 2, 3, 4, 5]);
+    }, () => 0.99999)).toEqual([1, 2, 3, 4, 5]);
   });
 
   it('never draws the same number twice in a round', () => {
