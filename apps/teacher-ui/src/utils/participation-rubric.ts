@@ -3,11 +3,61 @@ import type { Sport } from '@viccoboard/core'
 export const PARTICIPATION_RUBRIC_ID = 'sport-participation-sek1-v1'
 
 export const PARTICIPATION_CRITERIA = [
-  { id: 'preparation', label: 'Vorbereitung', description: 'Pünktlichkeit, Sportsachen, Schmuck' },
-  { id: 'discussion', label: 'Unterrichtsgespräche', description: 'Kognitive Phasen und Beteiligung' },
-  { id: 'effort', label: 'Anstrengung', description: 'Anstrengungs- und Übungsbereitschaft' },
-  { id: 'independence', label: 'Selbstständigkeit', description: 'Arbeit in Kleingruppen' },
-  { id: 'interaction', label: 'Interaktion', description: 'Regeln und Umgang mit Mitschülern' }
+  {
+    id: 'preparation',
+    label: 'Vorbereitung',
+    description: 'Pünktlichkeit, Sportsachen, Schmuck',
+    levels: [
+      'Verspätet zum Unterrichtsbeginn. Sportsachen vergessen oder Schmuck nicht abgelegt/ abgeklebt.',
+      'Ca. 1 min vor Unterrichtsbeginn in der Sporthalle. Sportsachen vergessen oder Schmuck nicht abgelegt/ abgeklebt.',
+      'Ca. 1 min vor Unterrichtsbeginn umgezogen in der Sporthalle.',
+      'Ca. 3 Minuten vor Unterrichtsbeginn umgezogen in der Halle. Vorbereiten der Sporthalle (U-Form, Materialien).'
+    ]
+  },
+  {
+    id: 'discussion',
+    label: 'Unterrichtsgespräche/kognitive Phasen',
+    description: 'Kognitive Phasen und Beteiligung',
+    levels: [
+      'Im Unterrichtsgespräch abgelenkt. Keine Beteiligung.',
+      'Aufmerksames Zuhören. Jederzeit in der Lage, nach Aufforderung eine Antwort zu geben.',
+      'Aufmerksames Zuhören. Phasenweise selbstständige Beteiligung.',
+      'Aufmerksames Zuhören. Regelmäßige selbstständige Beteiligung.'
+    ]
+  },
+  {
+    id: 'effort',
+    label: 'Anstrengungs- und Übungsbereitschaft',
+    description: 'Konzentriertes Üben und Arbeiten',
+    levels: [
+      'Arbeitsverweigerung oder ständige Beschäftigung mit ablenkender Tätigkeit.',
+      'Nur phasenweise konzentriertes Üben und Arbeiten.',
+      'Überwiegend konzentriertes Üben und Arbeiten.',
+      'Stets konzentriertes, ausdauerndes Üben und Arbeiten. Einfordern und Nutzen zusätzlicher Angebote.'
+    ]
+  },
+  {
+    id: 'independence',
+    label: 'Selbstständigkeit/Arbeit in Kleingruppen',
+    description: 'Stationskarten und Arbeitsaufträge',
+    levels: [
+      'Ignorieren von Stationskarten und Arbeitsaufträgen.',
+      'Oberflächliches Lesen von Stationskarten. Beim Absolvieren von Arbeitsaufträgen häufig Hilfestellung/ Erläuterung durch Lehrkraft nötig.',
+      'Sorgfältiges Lesen von Stationskarten. Beim Absolvieren von Arbeitsaufträgen selten Hilfestellung/ Erläuterung durch Lehrkraft nötig.',
+      'Sorgfältiges Lesen von Stationskarten und selbstständiges Absolvieren von Arbeitsaufträgen.'
+    ]
+  },
+  {
+    id: 'interaction',
+    label: 'Interaktion',
+    description: 'Regeln und Umgang mit Mitschülern',
+    levels: [
+      'Verstoßen gegen Regeln und Vorgaben. Ablehnende Mimik/ Gestik und Äußerungen gegenüber Lehrkraft/ Mitschülern.',
+      'Nur phasenweise Einhalten von Regeln und verantwortungsvoller Umgang mit Mitschülern.',
+      'Überwiegendes Einhalten von Regeln und verantwortungsvoller Umgang mit Mitschülern.',
+      'Permanentes Einhalten von Regeln. Verantwortungsvoller Umgang mit und Unterstützen von Mitschülern.'
+    ]
+  }
 ] as const
 
 export type ParticipationCriterionId = typeof PARTICIPATION_CRITERIA[number]['id']
@@ -17,6 +67,7 @@ export interface ParticipationAssessment {
   selfAssessment: ParticipationScores
   teacherAssessment: ParticipationScores
   bonusPoint: boolean
+  refused?: boolean
 }
 export function createParticipationCategoryConfiguration(): Sport.VerbalAssessmentConfig {
   return {
@@ -44,12 +95,13 @@ export function hasCompleteTeacherAssessment(assessment: ParticipationAssessment
 }
 
 export function emptyParticipationAssessment(): ParticipationAssessment {
-  return { rubric: PARTICIPATION_RUBRIC_ID, selfAssessment: {}, teacherAssessment: {}, bonusPoint: false }
+  return { rubric: PARTICIPATION_RUBRIC_ID, selfAssessment: {}, teacherAssessment: {}, bonusPoint: false, refused: false }
 }
 export function isParticipationAssessment(value: unknown): value is ParticipationAssessment {
   if (!value || typeof value !== 'object') return false
   const assessment = value as Partial<ParticipationAssessment>
-  return assessment.rubric === PARTICIPATION_RUBRIC_ID && !!assessment.selfAssessment && !!assessment.teacherAssessment && typeof assessment.bonusPoint === 'boolean'
+  return assessment.rubric === PARTICIPATION_RUBRIC_ID && !!assessment.selfAssessment && !!assessment.teacherAssessment && typeof assessment.bonusPoint === 'boolean' &&
+    (assessment.refused === undefined || typeof assessment.refused === 'boolean')
 }
 export function participationTotal(assessment: ParticipationAssessment): number {
   return PARTICIPATION_CRITERIA.reduce((total, criterion) => {
@@ -57,11 +109,11 @@ export function participationTotal(assessment: ParticipationAssessment): number 
     return total + (typeof score === 'number' && score >= 0 && score <= 3 ? score : 0)
   }, 0) + (assessment.bonusPoint ? 1 : 0)
 }
-export function participationGrade(total: number): number {
+export function participationGrade(total: number, refused = false): number {
+  if (refused) return 6
   if (total >= 14.5) return 1
   if (total >= 12) return 2
   if (total >= 9) return 3
   if (total >= 7) return 4
-  if (total >= 2.5) return 5
-  return 6
+  return 5
 }
