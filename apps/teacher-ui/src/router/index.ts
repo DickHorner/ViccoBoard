@@ -271,6 +271,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Bundesjugendspiele', parent: '/grading' }
   },
   {
+    path: '/grading/participation',
+    name: 'participation-grading',
+    component: () => import('../views/ParticipationGradingEntry.vue'),
+    meta: { title: 'Mitarbeitsbewertung', parent: '/subjects/sport' }
+  },
+  {
     path: '/grading/verbal/:id',
     name: 'verbal-grading',
     component: () => import('../views/ParticipationGradingEntry.vue'),

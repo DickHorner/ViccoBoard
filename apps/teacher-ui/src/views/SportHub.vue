@@ -52,16 +52,12 @@ const sportabzeichenStandardCount = ref(0)
 
 const entries = [
   {
-    to: '/subjects/sport/assessments',
-    title: 'Leistungsabnahmen'
-  },
-  {
-    to: '/subjects/sport/exam',
-    title: 'Sportprüfung'
-  },
-  {
     to: '/grading',
-    title: 'Bewertung & Tests'
+    title: 'Bewerten & Prüfen'
+  },
+  {
+    to: '/grading/participation',
+    title: 'Mitarbeitsbewertung'
   },
   {
     to: '/subjects/sport/tables',

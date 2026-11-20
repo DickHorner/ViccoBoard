@@ -1,3 +1,5 @@
+import type { Sport } from '@viccoboard/core'
+
 export const PARTICIPATION_RUBRIC_ID = 'sport-participation-sek1-v1'
 
 export const PARTICIPATION_CRITERIA = [
@@ -16,6 +18,31 @@ export interface ParticipationAssessment {
   teacherAssessment: ParticipationScores
   bonusPoint: boolean
 }
+export function createParticipationCategoryConfiguration(): Sport.VerbalAssessmentConfig {
+  return {
+    type: 'verbal',
+    fields: PARTICIPATION_CRITERIA.map(criterion => ({
+      id: criterion.id,
+      label: criterion.label,
+      type: 'scale',
+      required: true
+    })),
+    scales: [{
+      id: 'participation-0-3',
+      name: 'Mitarbeit 0–3 Punkte',
+      levels: [0, 1, 2, 3].map(value => ({ value, label: `${value} Punkte` }))
+    }],
+    exportFormat: 'structured'
+  }
+}
+
+export function hasCompleteTeacherAssessment(assessment: ParticipationAssessment): boolean {
+  return PARTICIPATION_CRITERIA.every(criterion => {
+    const value = assessment.teacherAssessment[criterion.id]
+    return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 3
+  })
+}
+
 export function emptyParticipationAssessment(): ParticipationAssessment {
   return { rubric: PARTICIPATION_RUBRIC_ID, selfAssessment: {}, teacherAssessment: {}, bonusPoint: false }
 }
