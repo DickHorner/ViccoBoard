@@ -1,7 +1,7 @@
 {
   "SCORES": {
     "title": "Scoreboard",
-    "description": "Save matches, pull in team sessions, and keep an optional timer link.",
+    "description": "Manage scores, audible round signals and sport-dependent foul counters.",
     "classGroup": "Class",
     "noClassBinding": "No class binding",
     "importTeams": "Import team session",
@@ -76,6 +76,23 @@
     "newCycle": "Start new selection cycle",
     "invalidRoundSettings": "Configure valid team size, player count, 2 teams and countdown.",
     "noEligibleNumbers": "Not enough eligible numbers. Start a new cycle or change the rule.",
-    "chooseNumbers": "Select the required number of players first."
+    "chooseNumbers": "Select the required number of players first.",
+    "football": "Football / soccer (+1)",
+    "handball": "Handball (+1)",
+    "volleyball": "Volleyball (+1)",
+    "teamFouls": "Team fouls",
+    "twoMinutePenalties": "Two-minute suspensions",
+    "fouls": "Fouls",
+    "foulMinus": "Remove a foul or penalty",
+    "foulPlus": "Add a foul or penalty",
+    "resetFouls": "Reset foul and penalty counters",
+    "soundEnabled": "Enable audible signals",
+    "testSound": "Test signal",
+    "signalNow": "Sound signal",
+    "soundOn": "Sound on",
+    "soundOff": "Sound off",
+    "soundUnavailable": "Audio unavailable. Check the device volume and browser.",
+    "foulNote": "Fouls and suspensions are counted manually. No automatic penalties or free throws are applied.",
+    "soundNote": "One tone on start, two short warning tones at 10 seconds remaining, three on time-up. On iPad, sound requires active browser playback."
   }
 }
