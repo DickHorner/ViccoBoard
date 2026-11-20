@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import type { ClassGroup, Sport } from '@viccoboard/core';
-import { RoundNumberPickerService, type RoundExclusionMode, type ScoreboardSessionMetadata, type TeamSessionMetadata } from '@viccoboard/sport';
+import type { RoundExclusionMode, ScoreboardSessionMetadata, TeamSessionMetadata } from '@viccoboard/sport';
 
 import { getSportBridge, initializeSportBridge } from './useSportBridge';
 
@@ -51,7 +51,7 @@ export function useScoreboardView() {
   const router = useRouter();
   const bridge = getSportBridge();
 
-  const numberPicker = new RoundNumberPickerService();
+  const numberPicker = bridge.roundNumberPickerService;
   const sport = ref<'basketball' | 'standard' | 'custom'>('basketball');
   const customPoints = ref(1);
   const pointOptions = computed(() => sport.value === 'basketball' ? [1, 2, 3] :
