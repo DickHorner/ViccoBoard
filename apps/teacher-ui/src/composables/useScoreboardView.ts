@@ -130,6 +130,7 @@ export function useScoreboardView() {
   const timerRunning = ref(false);
   let timerIntervalHandle: number | undefined;
   let timerLastTick: number | undefined;
+  let roundAudioContext: AudioContext | undefined;
 
   function setLayout(n: 2 | 4): void {
     if (n !== layout.value && numberPickerEnabled.value) resetRoundCycle();
@@ -207,12 +208,22 @@ export function useScoreboardView() {
     startTimer();
   }
 
-  function playRoundSignal(): void {
+  function unlockRoundAudio(): void {
     try {
       const AudioCtx = window.AudioContext ??
         (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
-      const context = new AudioCtx();
+      roundAudioContext ??= new AudioCtx();
+      void roundAudioContext.resume().catch(() => {});
+    } catch {
+      // Timer operation remains available when the device blocks audio.
+    }
+  }
+
+  function playRoundSignal(): void {
+    try {
+      const context = roundAudioContext;
+      if (!context) return;
       const oscillator = context.createOscillator();
       const gain = context.createGain();
       oscillator.connect(gain);
@@ -221,7 +232,7 @@ export function useScoreboardView() {
       gain.gain.value = 0.2;
       oscillator.start();
       oscillator.stop(context.currentTime + 0.2);
-      oscillator.onended = () => { void context.close(); };
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
     } catch {
       // Audio is optional; timer completion must not depend on playback.
     }
@@ -231,6 +242,7 @@ export function useScoreboardView() {
     if (timerRunning.value) return;
     if (numberPickerEnabled.value && !roundActive.value) return;
     if (timerMode.value === 'countdown' && !timerConfigurationValid.value) return;
+    if (timerMode.value === 'countdown') unlockRoundAudio();
     if (timerMode.value === 'countdown' && timerRemainingMs.value === 0) {
       timerRemainingMs.value = roundDurationMs.value;
       timerElapsedMs.value = 0;
@@ -545,6 +557,7 @@ export function useScoreboardView() {
 
   onUnmounted(() => {
     window.clearInterval(timerIntervalHandle);
+    if (roundAudioContext) void roundAudioContext.close();
   });
 
   return {
