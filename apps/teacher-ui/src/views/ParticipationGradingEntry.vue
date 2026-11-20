@@ -99,11 +99,15 @@
           <label for="participation-assessment-day">Bewertungstag</label>
           <input id="participation-assessment-day" type="date" :value="assessmentDay"
             :disabled="loading || saving || unsaved.size > 0" @change="changeAssessmentDay" />
-          <p class="app-data-note">Jeder Bewertungstag wird getrennt gespeichert. Bereits erfasste Tage:</p>
-          <div v-if="savedDays.length" class="app-actions-row">
-            <Button v-for="day in savedDays" :key="day" :label="formatDay(day)"
-              :severity="day === assessmentDay ? 'primary' : 'secondary'" outlined
-              :disabled="loading || saving || unsaved.size > 0" @click="selectAssessmentDay(day)" />
+          <p class="app-data-note">Jeder Bewertungstag wird getrennt gespeichert.</p>
+          <div v-if="savedDays.length" class="app-field">
+            <label for="participation-saved-day">Bereits erfassten Tag öffnen</label>
+            <Select inputId="participation-saved-day"
+              :modelValue="savedDays.includes(assessmentDay) ? assessmentDay : ''"
+              :options="savedDayOptions" optionLabel="label" optionValue="value"
+              placeholder="Bewertungstag auswählen"
+              :disabled="loading || saving || unsaved.size > 0"
+              fluid @update:modelValue="day => selectAssessmentDay(day)" />
           </div>
           <p v-else class="app-data-note">Noch keine Mitarbeitseinträge in dieser Klasse gespeichert.</p>
         </div>
@@ -265,6 +269,7 @@ const assessmentDay = ref(localDateString(new Date()))
 const savedDays = computed(() => [...new Set(
   [...entryHistory.value.values()].flatMap(entries => entries.map(participationEntryDay))
 )].sort().reverse())
+const savedDayOptions = computed(() => savedDays.value.map(day => ({ label: formatDay(day), value: day })))
 const unsaved = ref(new Set<string>())
 const loading = ref(true)
 const saving = ref(false)
