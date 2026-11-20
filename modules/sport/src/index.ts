@@ -89,6 +89,7 @@ export { SaveScoreboardSessionUseCase } from './use-cases/save-scoreboard-sessio
 export type {
   SaveScoreboardSessionInput,
   ScoreboardSessionMetadata,
+  ScoreboardRoundSettings,
   ScoreEventInput,
   ScoreboardTeamInput
 } from './use-cases/save-scoreboard-session.use-case.js';
