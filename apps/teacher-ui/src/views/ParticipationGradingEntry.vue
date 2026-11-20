@@ -335,8 +335,9 @@ async function importRubric(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  if (!file || !selectedClassId.value) return
+  if (!file) return
   error.value = null
+  templateStatus.value = ''
   if (file.size > 65536) {
     error.value = 'Rasterdatei darf höchstens 64 KiB groß sein.'
     return
@@ -344,21 +345,10 @@ async function importRubric(event: Event): Promise<void> {
   saving.value = true
   try {
     const parsed = parseParticipationRubric(JSON.parse(await file.text()) as unknown)
-    const existing = await sport.gradeCategoryRepository.findByClassGroup(selectedClassId.value)
-    if (existing.some(candidate => candidate.configuration.type === 'verbal' &&
-        candidate.configuration.participationRubric?.id === parsed.rubric.id)) {
-      throw new Error('Dieses Raster existiert bereits in der Klasse. Bestehende Bewertungen bleiben unverändert.')
-    }
-    const created = await sport.createGradeCategoryUseCase.execute({
-      classGroupId: selectedClassId.value,
-      name: parsed.name,
-      type: Sport.GradeCategoryType.Verbal,
-      weight: newCategoryWeight.value ?? 0,
-      configuration: createParticipationCategoryConfiguration(parsed.rubric)
-    })
-    participationCategories.value = [...participationCategories.value, created]
-    categoryId.value = created.id
-    await load()
+    const saved = await sport.participationRubricTemplateRepository.create(parsed)
+    templates.value = [saved, ...templates.value]
+    selectedTemplateId.value = saved.id
+    templateStatus.value = 'Vorlage lokal gespeichert. Wähle eine Klasse, um sie zu verwenden.'
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Import fehlgeschlagen.'
   } finally {
@@ -366,32 +356,78 @@ async function importRubric(event: Event): Promise<void> {
   }
 }
 
-async function createCategory(): Promise<void> {
-  if (!selectedClassId.value || newCategoryWeight.value === null ||
-      !Number.isFinite(newCategoryWeight.value) ||
-      newCategoryWeight.value < 0 || newCategoryWeight.value > 100) return
+async function saveDefaultTemplate(): Promise<void> {
+  saving.value = true
+  error.value = null
+  templateStatus.value = ''
+  try {
+    const saved = await sport.participationRubricTemplateRepository.create({
+      name: 'Mitarbeitsbewertung (Standard)',
+      rubric: DEFAULT_PARTICIPATION_RUBRIC
+    })
+    templates.value = [saved, ...templates.value]
+    selectedTemplateId.value = saved.id
+    templateStatus.value = 'Standardraster als unabhängige Vorlage gespeichert.'
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Vorlage konnte nicht gespeichert werden.'
+  } finally {
+    saving.value = false
+  }
+}
 
+async function deleteTemplate(): Promise<void> {
+  const selected = templates.value.find(item => item.id === selectedTemplateId.value)
+  if (!selected || !window.confirm(`Vorlage „${selected.name}“ aus der Bibliothek löschen? Bereits zugewiesene Klassen und Bewertungen bleiben erhalten.`)) return
   saving.value = true
   error.value = null
   try {
+    await sport.participationRubricTemplateRepository.delete(selected.id)
+    templates.value = templates.value.filter(item => item.id !== selected.id)
+    selectedTemplateId.value = ''
+    templateStatus.value = 'Vorlage gelöscht. Bereits verwendete Raster bleiben erhalten.'
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Vorlage konnte nicht gelöscht werden.'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function useTemplate(): Promise<void> {
+  const selected = templates.value.find(item => item.id === selectedTemplateId.value)
+  if (!selected || !selectedClassId.value || newCategoryWeight.value === null ||
+      !Number.isFinite(newCategoryWeight.value) ||
+      newCategoryWeight.value < 0 || newCategoryWeight.value > 100 ||
+      unsaved.value.size > 0) return
+
+  saving.value = true
+  error.value = null
+  templateStatus.value = ''
+  try {
     const existing = await sport.gradeCategoryRepository.findByClassGroup(selectedClassId.value)
-    if (existing.some(isParticipationCategory)) {
-      throw new Error('Für diese Klasse gibt es bereits ein Mitarbeitsraster. Bitte wähle es aus.')
+    const alreadyUsed = existing.find(candidate => isParticipationCategory(candidate) &&
+      (candidate.configuration.type === 'verbal'
+        ? candidate.configuration.participationRubric?.id ?? DEFAULT_PARTICIPATION_RUBRIC.id
+        : '') === selected.rubric.id)
+    if (alreadyUsed) {
+      categoryId.value = alreadyUsed.id
+      await load()
+      templateStatus.value = 'Diese Vorlage war der Klasse bereits zugeordnet.'
+      return
     }
 
     const created = await sport.createGradeCategoryUseCase.execute({
       classGroupId: selectedClassId.value,
-      name: 'Mitarbeitsbewertung',
+      name: selected.name,
       type: Sport.GradeCategoryType.Verbal,
       weight: newCategoryWeight.value,
-      configuration: createParticipationCategoryConfiguration()
+      configuration: createParticipationCategoryConfiguration(selected.rubric)
     })
-
-    participationCategories.value = [created]
+    participationCategories.value = [...participationCategories.value, created]
     categoryId.value = created.id
     await load()
+    templateStatus.value = 'Vorlage für die Klasse eingerichtet. Du kannst nun einen Bewertungstag auswählen.'
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'Mitarbeitsraster konnte nicht angelegt werden.'
+    error.value = cause instanceof Error ? cause.message : 'Vorlage konnte nicht verwendet werden.'
   } finally {
     saving.value = false
   }
