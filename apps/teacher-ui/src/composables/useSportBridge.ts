@@ -9,6 +9,7 @@ import { computed, ref } from 'vue';
 import {
   AttendanceRepository,
   BJSGradingService,
+  BasketballFoulService,
   ClassGroupRepository,
   SubjectRepository,
   CooperTestConfigRepository,
@@ -81,6 +82,7 @@ import {
   type UpdateLessonInput
 } from '@viccoboard/sport';
 import { getStorageAdapter } from '../services/storage.service';
+import { ScoreboardSoundLibrary } from '../services/scoreboard-sound-library';
 
 let sportBridgeInstance: SportBridge | null = null;
 
@@ -147,6 +149,8 @@ interface SportBridge {
   bjsGradingService: BJSGradingService;
   sportStatisticsService: SportStatisticsService;
   teamBuilderService: TeamBuilderService;
+  basketballFoulService: BasketballFoulService;
+  scoreboardSoundLibrary: ScoreboardSoundLibrary;
   roundNumberPickerService: RoundNumberPickerService;
   tournamentService: TournamentService;
 }
@@ -250,6 +254,8 @@ export function initializeSportBridge(): SportBridge {
   const bjsGradingService = new BJSGradingService();
   const sportStatisticsService = new SportStatisticsService();
   const teamBuilderService = new TeamBuilderService();
+  const basketballFoulService = new BasketballFoulService();
+  const scoreboardSoundLibrary = new ScoreboardSoundLibrary();
   const roundNumberPickerService = new RoundNumberPickerService();
 
   sportBridgeInstance = {
@@ -315,6 +321,8 @@ export function initializeSportBridge(): SportBridge {
     bjsGradingService,
     sportStatisticsService,
     teamBuilderService,
+    basketballFoulService,
+    scoreboardSoundLibrary,
     roundNumberPickerService,
     tournamentService
   };

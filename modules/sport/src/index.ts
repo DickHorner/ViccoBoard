@@ -160,6 +160,8 @@ export type {
 } from './grading/criteria-grading.engine.js';
 
 // Services
+export { BasketballFoulService } from './services/basketball-foul.service.js';
+export type { BasketballFoulEvent, BasketballFoulKind, BasketballShotSituation } from './services/basketball-foul.service.js';
 export { RoundNumberPickerService } from './services/round-number-picker.service.js';
 export type { RoundExclusionMode, RoundNumberPickerInput } from './services/round-number-picker.service.js';
 export { TeamBuilderService, TeamConstraintError } from './services/team-builder.service.js';

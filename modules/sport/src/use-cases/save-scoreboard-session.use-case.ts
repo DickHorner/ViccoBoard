@@ -4,6 +4,7 @@
  */
 
 import { Sport } from '@viccoboard/core';
+import type { BasketballFoulEvent } from '../services/basketball-foul.service.js';
 import type { RoundExclusionMode } from '../services/round-number-picker.service.js';
 import type { ToolSessionRepository } from '../repositories/tool-session.repository.js';
 
@@ -33,7 +34,10 @@ export interface ScoreboardRoundSettings {
   sport: 'basketball' | 'football' | 'handball' | 'volleyball' | 'standard' | 'custom';
   customPoints: number;
   soundEnabled?: boolean;
+  flashEnabled?: boolean;
   foulCounts?: Record<string, number>;
+  basketballQuarter?: 1 | 2 | 3 | 4;
+  basketballFouls?: BasketballFoulEvent[];
   timerMode: 'stopwatch' | 'countdown';
   roundDurationMs: number;
   numberPickerEnabled: boolean;

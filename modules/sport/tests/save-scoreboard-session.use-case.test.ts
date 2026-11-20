@@ -92,7 +92,13 @@ describe('SaveScoreboardSessionUseCase', () => {
         sport: 'basketball',
         customPoints: 1,
         soundEnabled: false,
+        flashEnabled: true,
         foulCounts: { 'team-a': 4, 'team-b': 2 },
+        basketballQuarter: 2,
+        basketballFouls: [
+          { teamId: 'team-a', quarter: 1, kind: 'defense', playerNumber: 7, shot: 'none' },
+          { teamId: 'team-a', quarter: 2, kind: 'technical', shot: 'none' }
+        ],
         timerMode: 'countdown',
         roundDurationMs: 180000,
         numberPickerEnabled: true,
@@ -110,6 +116,11 @@ describe('SaveScoreboardSessionUseCase', () => {
     expect(session.classGroupId).toBeUndefined();
     expect(session.sessionMetadata.roundSettings).toMatchObject({
       soundEnabled: false,
+      flashEnabled: true,
+      basketballQuarter: 2,
+      basketballFouls: expect.arrayContaining([
+        { teamId: 'team-a', quarter: 1, kind: 'defense', playerNumber: 7, shot: 'none' }
+      ]),
       foulCounts: { 'team-a': 4, 'team-b': 2 },
       teamSize: 12,
       playersPerRound: 5,
@@ -122,6 +133,9 @@ describe('SaveScoreboardSessionUseCase', () => {
       'team-b': 2
     });
     expect(reloaded?.sessionMetadata.roundSettings?.soundEnabled).toBe(false);
+    expect(reloaded?.sessionMetadata.roundSettings?.flashEnabled).toBe(true);
+    expect(reloaded?.sessionMetadata.roundSettings?.basketballQuarter).toBe(2);
+    expect(reloaded?.sessionMetadata.roundSettings?.basketballFouls).toHaveLength(2);
   });
 
   it('preserves existing history timestamps on update', async () => {
