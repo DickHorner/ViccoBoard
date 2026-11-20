@@ -98,7 +98,7 @@
         <div class="app-field">
           <label for="participation-assessment-day">Bewertungstag</label>
           <input id="participation-assessment-day" type="date" :value="assessmentDay"
-            :disabled="loading || saving || unsaved.size > 0" @change="changeAssessmentDay" />
+            :disabled="loading || saving" @change="changeAssessmentDay" />
           <p class="app-data-note">Jeder Bewertungstag wird getrennt gespeichert.</p>
           <div v-if="savedDays.length" class="app-field">
             <label for="participation-saved-day">Bereits erfassten Tag öffnen</label>
@@ -106,7 +106,7 @@
               :modelValue="savedDays.includes(assessmentDay) ? assessmentDay : ''"
               :options="savedDayOptions" optionLabel="label" optionValue="value"
               placeholder="Bewertungstag auswählen"
-              :disabled="loading || saving || unsaved.size > 0"
+              :disabled="loading || saving"
               fluid @update:modelValue="day => selectAssessmentDay(day)" />
           </div>
           <p v-else class="app-data-note">Noch keine Mitarbeitseinträge in dieser Klasse gespeichert.</p>
@@ -538,19 +538,19 @@ function restoreDay(): void {
   unsaved.value = new Set()
 }
 
-function selectAssessmentDay(day: string): void {
-  if (!validDay(day) || unsaved.value.size > 0) return
+function selectAssessmentDay(day: string): boolean {
+  if (!validDay(day)) return false
+  if (unsaved.value.size > 0 && !window.confirm('Ungespeicherte Änderungen dieses Bewertungstages verwerfen?')) {
+    return false
+  }
   assessmentDay.value = day
   restoreDay()
+  return true
 }
 
 function changeAssessmentDay(event: Event): void {
   const input = event.target as HTMLInputElement
-  if (!validDay(input.value) || unsaved.value.size > 0) {
-    input.value = assessmentDay.value
-    return
-  }
-  selectAssessmentDay(input.value)
+  if (!selectAssessmentDay(input.value)) input.value = assessmentDay.value
 }
 
 async function load(): Promise<void> {
