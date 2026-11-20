@@ -10,6 +10,24 @@
     </header>
 
     <section v-if="directEntry" class="app-card selection">
+      <h2>Meine Bewertungsraster-Vorlagen</h2>
+      <p class="app-data-note">Vorlagen werden unabhängig von Klassen gespeichert und können beliebig oft verwendet werden.</p>
+      <div class="app-field">
+        <label for="participation-import">Vorlage aus lokaler JSON-Datei importieren</label>
+        <input id="participation-import" type="file" accept=".json,application/json"
+          :disabled="loading || saving || unsaved.size > 0" @change="importRubric" />
+      </div>
+      <div class="app-field">
+        <label for="participation-template">Gespeicherte Vorlage</label>
+        <Select inputId="participation-template" v-model="selectedTemplateId"
+          :options="templateOptions" optionLabel="label" optionValue="value"
+          placeholder="Vorlage auswählen" :disabled="loading || saving" fluid />
+      </div>
+      <Button label="Standardraster als Vorlage speichern" severity="secondary" outlined
+        :disabled="loading || saving || hasDefaultTemplate" @click="saveDefaultTemplate" />
+      <Button label="Ausgewählte Vorlage löschen" severity="danger" text
+        :disabled="loading || saving || !selectedTemplateId || unsaved.size > 0" @click="deleteTemplate" />
+      <p v-if="templateStatus" class="app-data-note" role="status">{{ templateStatus }}</p>
       <div class="app-field">
         <label for="participation-class">Klasse</label>
         <Select
@@ -40,35 +58,19 @@
         />
       </div>
 
-      <div v-if="selectedClassId" class="app-field">
-        <label for="participation-import">Eigenes Bewertungsraster (JSON) lokal importieren</label>
-        <input id="participation-import" type="file" accept=".json,application/json"
-          :disabled="loading || saving || unsaved.size > 0" @change="importRubric" />
-      </div>
-
-      <div v-if="selectedClassId && !loading && participationCategories.length === 0" class="create-category">
-        <p>Für diese Klasse gibt es noch kein Mitarbeitsraster. Du kannst hier eines anlegen.</p>
+      <div v-if="selectedClassId && selectedTemplateId" class="create-category">
         <div class="app-field">
-          <label for="participation-weight">Gewichtung für die Gesamtnote (%)</label>
-          <InputNumber
-            inputId="participation-weight"
-            v-model="newCategoryWeight"
-            :min="0"
-            :max="100"
-            :useGrouping="false"
-            :disabled="saving"
-            fluid
-          />
+          <label for="participation-weight">Gewichtung in dieser Klasse (%)</label>
+          <InputNumber inputId="participation-weight" v-model="newCategoryWeight"
+            :min="0" :max="100" :useGrouping="false" :disabled="saving" fluid />
         </div>
-        <Button
-          label="Mitarbeitsraster anlegen"
-          icon="pi pi-plus"
-          :disabled="saving || newCategoryWeight === null || newCategoryWeight < 0 || newCategoryWeight > 100"
-          :loading="saving"
-          @click="createCategory"
-        />
-        <p class="app-data-note">Die Gewichtung lässt sich unter „Bewerten & Prüfen“ später ändern.</p>
+        <Button label="Vorlage für diese Klasse verwenden" icon="pi pi-check"
+          :disabled="loading || saving || unsaved.size > 0 || newCategoryWeight === null || newCategoryWeight < 0 || newCategoryWeight > 100"
+          :loading="saving" @click="useTemplate" />
       </div>
+      <p v-if="selectedClassId && !loading && participationCategories.length === 0" class="app-data-note">
+        Für diese Klasse ist noch kein Mitarbeitsraster eingerichtet. Wähle oben eine gespeicherte Vorlage.
+      </p>
 
       <p v-if="unsaved.size > 0" class="app-data-note" role="status">
         Bitte ungespeicherte Änderungen zuerst sichern, bevor Du die Klasse oder das Raster wechselst.
@@ -92,6 +94,18 @@
             :loading="saving"
             @click="saveAll"
           />
+        </div>
+        <div class="app-field">
+          <label for="participation-assessment-day">Bewertungstag</label>
+          <input id="participation-assessment-day" type="date" :value="assessmentDay"
+            :disabled="loading || saving || unsaved.size > 0" @change="changeAssessmentDay" />
+          <p class="app-data-note">Jeder Bewertungstag wird getrennt gespeichert. Bereits erfasste Tage:</p>
+          <div v-if="savedDays.length" class="app-actions-row">
+            <Button v-for="day in savedDays" :key="day" :label="formatDay(day)"
+              :severity="day === assessmentDay ? 'primary' : 'secondary'" outlined
+              :disabled="loading || saving || unsaved.size > 0" @click="selectAssessmentDay(day)" />
+          </div>
+          <p v-else class="app-data-note">Noch keine Mitarbeitseinträge in dieser Klasse gespeichert.</p>
         </div>
         <p>Selbsteinschätzungen unterstützen das Gespräch; eine Note entsteht nur bei vollständiger Lehrkraftbewertung oder dokumentierter Leistungsverweigerung.</p>
         <details>
@@ -189,6 +203,7 @@ import Button from 'openvue/button'
 import InputNumber from 'openvue/inputnumber'
 import Select from 'openvue/select'
 import { Sport, type ClassGroup, type Student } from '@viccoboard/core'
+import type { ParticipationRubricTemplate } from '@viccoboard/sport'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import {
@@ -205,6 +220,7 @@ import {
   type ParticipationCriterionId
 } from '../utils/participation-rubric'
 import { isPerformanceEntryInSchoolYear } from '../utils/performance-school-year'
+import { participationEntryDay } from '../utils/participation-entry-day'
 
 initializeSportBridge()
 initializeStudentsBridge()
@@ -227,6 +243,16 @@ const categoryOptions = computed(() => participationCategories.value.map(item =>
   value: item.id
 })))
 
+const templates = ref<ParticipationRubricTemplate[]>([])
+const selectedTemplateId = ref('')
+const templateStatus = ref('')
+const templateOptions = computed(() => templates.value.map(template => ({
+  label: template.name,
+  value: template.id
+})))
+const hasDefaultTemplate = computed(() => templates.value.some(template =>
+  template.rubric.id === DEFAULT_PARTICIPATION_RUBRIC.id
+))
 const newCategoryWeight = ref<number | null>(0)
 const schoolYear = ref('')
 const category = ref<Sport.GradeCategory | null>(null)
@@ -234,6 +260,11 @@ const students = ref<Student[]>([])
 const assessments = ref(new Map<string, ParticipationAssessment>())
 const notes = ref(new Map<string, string>())
 const entryIds = ref(new Map<string, string>())
+const entryHistory = ref(new Map<string, Sport.PerformanceEntry[]>())
+const assessmentDay = ref(localDateString(new Date()))
+const savedDays = computed(() => [...new Set(
+  [...entryHistory.value.values()].flatMap(entries => entries.map(participationEntryDay))
+)].sort().reverse())
 const unsaved = ref(new Set<string>())
 const loading = ref(true)
 const saving = ref(false)
@@ -254,7 +285,12 @@ onMounted(async () => {
   }
 
   try {
-    classes.value = (await sport.classGroupRepository.findAll()).filter(group => !group.archived)
+    const [groups, foundTemplates] = await Promise.all([
+      sport.classGroupRepository.findAll(),
+      sport.participationRubricTemplateRepository.findAll()
+    ])
+    classes.value = groups.filter(group => !group.archived)
+    templates.value = foundTemplates
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Klassen konnten nicht geladen werden.'
   } finally {
