@@ -43,14 +43,13 @@ export class BasketballFoulService {
 
   playerTotal(events: readonly BasketballFoulEvent[], teamId: string, playerNumber: number): number {
     return events.filter(event =>
-      event.teamId === teamId && event.playerNumber === playerNumber && event.kind !== 'technical'
+      event.teamId === teamId && event.playerNumber === playerNumber
     ).length;
   }
 
   excludedPlayers(events: readonly BasketballFoulEvent[], teamId: string): number[] {
     const numbers = new Set(events.filter(event =>
-      event.teamId === teamId && event.kind !== 'technical' &&
-      event.playerNumber !== undefined
+      event.teamId === teamId && event.playerNumber !== undefined
     ).map(event => event.playerNumber as number));
 
     return [...numbers].filter(number => this.playerTotal(events, teamId, number) >= 5)
