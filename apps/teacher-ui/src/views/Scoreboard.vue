@@ -147,6 +147,7 @@
             :disabled="availableTimerSessions.length === 0" />
         </div>
       </div>
+      <p v-if="showFoulCounter" class="info-text">{{ t('SCORES.foulNote') }}</p>
     </section>
 
     <!-- Layout + Teams card -->
@@ -248,6 +249,7 @@
             {{ t('SCORES.testSound') }}
           </Button>
           <span v-if="soundMessage" class="info-text" role="status">{{ soundMessage }}</span>
+          <span v-if="soundEnabled && timerMode === 'countdown'" class="info-text">{{ t('SCORES.soundNote') }}</span>
         </div>
       </div>
 
