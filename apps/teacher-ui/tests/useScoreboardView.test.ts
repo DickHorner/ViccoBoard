@@ -44,6 +44,11 @@ jest.mock('../src/composables/useSportBridge', () => ({
     },
     saveScoreboardSessionUseCase: {
       execute: mockSaveScoreboardSession
+    },
+    scoreboardSoundLibrary: {
+      load: () => ({}),
+      replace: jest.fn(),
+      remove: jest.fn()
     }
   })
 }));
@@ -90,6 +95,36 @@ describe('useScoreboardView', () => {
         expect.objectContaining({ name: 'Wolves' })
       ]
     }));
+  });
+
+  it('signals countdown expiry visually only when enabled, until dismissed', () => {
+    jest.useFakeTimers();
+    try {
+      const view = useScoreboardView();
+      view.soundEnabled.value = false;
+      view.timerMode.value = 'countdown';
+      view.roundMinutes.value = 0;
+      view.roundSeconds.value = 1;
+      view.flashEnabled.value = true;
+      view.resetTimer();
+      view.startTimer();
+
+      jest.advanceTimersByTime(1200);
+      expect(view.timerRemainingMs.value).toBe(0);
+      expect(view.flashActive.value).toBe(true);
+      expect(view.timerRunning.value).toBe(false);
+
+      view.dismissFlash();
+      expect(view.flashActive.value).toBe(false);
+
+      view.flashEnabled.value = false;
+      view.resetTimer();
+      view.startTimer();
+      jest.advanceTimersByTime(1200);
+      expect(view.flashActive.value).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('stores the active teams for tournament handoff and navigates to tournaments', () => {
