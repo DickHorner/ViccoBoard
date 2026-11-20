@@ -312,6 +312,10 @@ async function selectClass(): Promise<void> {
   category.value = null
   participationCategories.value = []
   students.value = []
+  entryHistory.value = new Map()
+  assessments.value = new Map()
+  notes.value = new Map()
+  entryIds.value = new Map()
   unsaved.value = new Set()
   if (!selectedClassId.value) return
 
@@ -493,12 +497,63 @@ function setNote(id: string, event: Event): void {
   unsaved.value = new Set(unsaved.value).add(id)
 }
 
+function localDateString(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+function formatDay(day: string): string {
+  const [year, month, date] = day.split('-')
+  return `${Number(date)}.${Number(month)}.${year}`
+}
+
+function validDay(day: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false
+  const date = new Date(`${day}T12:00:00`)
+  return Number.isFinite(date.getTime()) && localDateString(date) === day
+}
+
+function restoreDay(): void {
+  const restoredAssessments = new Map<string, ParticipationAssessment>()
+  const restoredNotes = new Map<string, string>()
+  const restoredIds = new Map<string, string>()
+  for (const [studentId, entries] of entryHistory.value) {
+    const matched = entries.find(entry => participationEntryDay(entry) === assessmentDay.value)
+    if (!matched) continue
+    const values = matched.measurements as Record<string, unknown>
+    restoredIds.set(studentId, matched.id)
+    if (isParticipationAssessment(values.participation)) {
+      restoredAssessments.set(studentId, values.participation)
+    }
+    if (typeof values.text === 'string') restoredNotes.set(studentId, values.text)
+  }
+  assessments.value = restoredAssessments
+  notes.value = restoredNotes
+  entryIds.value = restoredIds
+  unsaved.value = new Set()
+}
+
+function selectAssessmentDay(day: string): void {
+  if (!validDay(day) || unsaved.value.size > 0) return
+  assessmentDay.value = day
+  restoreDay()
+}
+
+function changeAssessmentDay(event: Event): void {
+  const input = event.target as HTMLInputElement
+  if (!validDay(input.value) || unsaved.value.size > 0) {
+    input.value = assessmentDay.value
+    return
+  }
+  selectAssessmentDay(input.value)
+}
+
 async function load(): Promise<void> {
   if (!categoryId.value) return
   loading.value = true
   error.value = null
   category.value = null
   students.value = []
+  entryHistory.value = new Map()
   assessments.value = new Map()
   notes.value = new Map()
   entryIds.value = new Map()
@@ -506,7 +561,7 @@ async function load(): Promise<void> {
 
   try {
     const found = await sport.gradeCategoryRepository.findById(categoryId.value)
-    if (!found || found.type !== Sport.GradeCategoryType.Verbal) {
+    if (!found || !isParticipationCategory(found)) {
       throw new Error('Mitarbeitskategorie nicht gefunden.')
     }
     const group = await sport.classGroupRepository.findById(found.classGroupId)
@@ -519,25 +574,16 @@ async function load(): Promise<void> {
       sport.performanceEntryRepository.findByStudentAndCategory(student.id, found.id)
     ))
 
-    const restoredAssessments = new Map<string, ParticipationAssessment>()
-    const restoredNotes = new Map<string, string>()
-    const restoredIds = new Map<string, string>()
-    loadedStudents.forEach((student, index) => {
-      const latest = allEntries[index].find(entry => isPerformanceEntryInSchoolYear(entry, group.schoolYear))
-      if (!latest) return
-      restoredIds.set(student.id, latest.id)
-      const values = latest.measurements as Record<string, unknown>
-      if (isParticipationAssessment(values.participation)) {
-        restoredAssessments.set(student.id, values.participation)
-      }
-      if (typeof values.text === 'string') restoredNotes.set(student.id, values.text)
-    })
-
-    assessments.value = restoredAssessments
-    notes.value = restoredNotes
-    entryIds.value = restoredIds
+    entryHistory.value = new Map(loadedStudents.map((student, index) => [
+      student.id,
+      allEntries[index].filter(entry =>
+        isPerformanceEntryInSchoolYear(entry, group.schoolYear) &&
+        isParticipationAssessment((entry.measurements as Record<string, unknown>).participation)
+      )
+    ]))
     students.value = loadedStudents
     category.value = found
+    restoreDay()
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Fehler beim Laden der Mitarbeitsbewertung.'
   } finally {
@@ -546,7 +592,7 @@ async function load(): Promise<void> {
 }
 
 async function save(id: string): Promise<boolean> {
-  if (!unsaved.value.has(id) || !category.value || !schoolYear.value || saving.value) return false
+  if (!unsaved.value.has(id) || !category.value || !schoolYear.value || !validDay(assessmentDay.value) || saving.value) return false
   saving.value = true
   error.value = null
 
@@ -559,21 +605,24 @@ async function save(id: string): Promise<boolean> {
         rubric: value.rubric,
         totalPoints: total(id),
         selfAssessment: value.selfAssessment,
+        assessmentDate: assessmentDay.value,
         schoolYear: schoolYear.value
       }
     }
 
     const entryId = entryIds.value.get(id)
-    if (entryId) {
-      await sport.performanceEntryRepository.update(entryId, update)
-    } else {
-      const entry = await sport.recordGradeUseCase.execute({
-        studentId: id,
-        categoryId: category.value.id,
-        ...update
-      })
-      entryIds.value = new Map(entryIds.value).set(id, entry.id)
-    }
+    const entry = entryId
+      ? await sport.performanceEntryRepository.update(entryId, update)
+      : await sport.recordGradeUseCase.execute({
+          studentId: id,
+          categoryId: category.value.id,
+          ...update
+        })
+    entryIds.value = new Map(entryIds.value).set(id, entry.id)
+    entryHistory.value = new Map(entryHistory.value).set(id, [
+      entry,
+      ...(entryHistory.value.get(id) ?? []).filter(previous => previous.id !== entry.id)
+    ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()))
 
     const remaining = new Set(unsaved.value)
     remaining.delete(id)
