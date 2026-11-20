@@ -1,4 +1,4 @@
-import { SQLiteStorage, InitialSchemaMigration, GradingSchemaMigration, ExamSchemaMigration } from '@viccoboard/storage/node';
+import { SQLiteStorage, InitialSchemaMigration } from '@viccoboard/storage/node';
 import type { Sport } from '@viccoboard/core';
 import { ParticipationRubricTemplateRepository } from '../src/repositories/participation-rubric-template.repository';
 
@@ -28,8 +28,6 @@ describe('ParticipationRubricTemplateRepository', () => {
     storage = new SQLiteStorage({ databasePath: ':memory:', memory: true });
     await storage.initialize('test-password');
     storage.registerMigration(new InitialSchemaMigration(storage));
-    storage.registerMigration(new GradingSchemaMigration(storage));
-    storage.registerMigration(new ExamSchemaMigration(storage));
     await storage.migrate();
     templates = new ParticipationRubricTemplateRepository(storage.getAdapter());
   });
