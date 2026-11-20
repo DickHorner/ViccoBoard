@@ -225,6 +225,7 @@ import {
 } from '../utils/participation-rubric'
 import { isPerformanceEntryInSchoolYear } from '../utils/performance-school-year'
 import { participationEntryDay } from '../utils/participation-entry-day'
+import { schoolYearForDate } from '../utils/exam-school-year'
 
 initializeSportBridge()
 initializeStudentsBridge()
@@ -598,6 +599,10 @@ async function load(): Promise<void> {
 
 async function save(id: string): Promise<boolean> {
   if (!unsaved.value.has(id) || !category.value || !schoolYear.value || !validDay(assessmentDay.value) || saving.value) return false
+  if (schoolYearForDate(new Date(`${assessmentDay.value}T12:00:00`)) !== schoolYear.value) {
+    error.value = 'Der Bewertungstag liegt außerhalb des Schuljahres dieser Klasse.'
+    return false
+  }
   saving.value = true
   error.value = null
 
