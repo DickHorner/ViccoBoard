@@ -42,6 +42,8 @@
 
         <template v-else-if="phase === 'comparison'">
           <p>Die Werte sind Gesprächsanlässe. Die Note ergibt sich aus der Lehrkraftbewertung.</p>
+          <ParticipationAssessmentChart :criteria="criteria"
+            :self-scores="selfScores" :teacher-scores="teacherScores" />
           <div class="comparison-wrap">
             <table>
               <thead><tr><th>Kriterium</th><th>Selbst</th><th>Lehrkraft</th></tr></thead>
@@ -66,6 +68,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Button from 'openvue/button'
+import ParticipationAssessmentChart from './ParticipationAssessmentChart.vue'
 import type { Sport } from '@viccoboard/core'
 
 type Criterion = Sport.ParticipationRubricDefinition['criteria'][number]
