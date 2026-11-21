@@ -18,18 +18,11 @@ npm run preview
 
 [Glide](https://github.com/SrivarsanK/Glide) kann Vue-Ansichten im laufenden Vite-Entwicklungsserver visuell bearbeiten und Änderungen direkt in `.vue`-Quelldateien speichern. Das ist **kein** Bestandteil der produktiven App, des Standard-Entwicklungsstarts oder der lokalen iPad-Datei.
 
-Glide **1.1.2** benötigt zwei lokale Prozesse: den Vite-Server mit Quellcode-Markierung auf Port 5173 und die separate Glide-Editor-CLI auf Port 7777. Die Adresse `/__glide/` auf Port 5173 gehört **nicht** zu Version 1.1.2; Vite zeigt dort nur die normale Anwendung (gegebenenfalls mit leerer Router-Ansicht).
-
-Glide ist derzeit nicht als Dependency versioniert. Für eine lokale Installation **vom ViccoBoard-Repository-Root aus** (mit Node.js 22):
-
-```bash
-npm install --save-dev --legacy-peer-deps --ignore-scripts @srivarsank/glide@1.1.2
-```
-
-Der Installationsbefehl ergänzt lokal die Root-`package.json` und `package-lock.json`; beide Dateien sind vor einem Commit zusammen zu prüfen. `--legacy-peer-deps` umgeht den bestehenden Jest-Peer-Konflikt; `--ignore-scripts` verhindert den nativen SQLite-Build, weshalb Node-SQLite-Tests danach nicht als geprüft gelten. Für eine vollständige Installation sind native Build-Werkzeuge nötig.
+Einrichtung und Start unter **Windows 11 und Linux** – jeweils vom Repository-Root
+(Node.js 22 und npm 10 wie in CI):
 
 ```bash
-# Terminal 1: ViccoBoard mit Glide-Markierung starten
+npm ci
 npm run dev:glide
 
 # Terminal 2: Editor starten, während Terminal 1 weiterläuft
