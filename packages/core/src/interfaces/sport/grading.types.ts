@@ -96,6 +96,7 @@ export interface PerformanceGradingConfig {
   sport?: string;
   discipline?: string;
   gradeLevel?: number;
+  tableMeasurementType?: string;
   normalization?: PerformanceNormalization;
 }
 
