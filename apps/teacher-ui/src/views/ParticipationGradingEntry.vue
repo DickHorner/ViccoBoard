@@ -235,7 +235,7 @@
         <label for="participation-handoff-pin">Lehrkraft-PIN (4–6 Ziffern)</label>
         <input id="participation-handoff-pin" v-model="pinDraft" type="password"
           inputmode="numeric" autocomplete="off" pattern="[0-9]{4,6}" maxlength="6" required />
-        <Button type="submit" label="iPad übergeben" :disabled="!/^\\d{4,6}$/.test(pinDraft)" />
+        <Button type="submit" label="iPad übergeben" :disabled="!/^[0-9]{4,6}$/.test(pinDraft)" />
         <Button label="Abbrechen" severity="secondary" outlined @click="handoffStudent = null" />
       </form>
     </div>
@@ -662,7 +662,7 @@ function prepareHandoff(student: Student): void {
 }
 
 function startHandoff(): void {
-  if (!/^\\d{4,6}$/.test(pinDraft.value)) return
+  if (!/^[0-9]{4,6}$/.test(pinDraft.value)) return
   handoffPin.value = pinDraft.value
   pinDraft.value = ''
 }
