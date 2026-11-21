@@ -9,13 +9,13 @@
       <div v-for="series in seriesLabels" :key="series.key" class="chart-row">
         <span>{{ series.label }}</span>
         <div class="track">
-          <div v-if="validScore(criterion, scores[series.key][criterion.id])"
+          <div v-if="validScore(criterion, scoreFor(series.key, criterion.id))"
             class="bar" :class="series.key"
-            :style="{ width: `${scoreWidth(criterion, scores[series.key][criterion.id])}%` }">
+            :style="{ width: `${scoreWidth(criterion, scoreFor(series.key, criterion.id))}%` }">
           </div>
         </div>
-        <strong>{{ validScore(criterion, scores[series.key][criterion.id])
-          ? `${scores[series.key][criterion.id]} / ${criterion.levels.length - 1}`
+        <strong>{{ validScore(criterion, scoreFor(series.key, criterion.id))
+          ? `${scoreFor(series.key, criterion.id)} / ${criterion.levels.length - 1}`
           : '–' }}</strong>
       </div>
     </div>
@@ -39,7 +39,9 @@ const seriesLabels = [
   { key: 'teacher' as const, label: 'Lehrkraft' }
 ]
 
-const scores = { self: props.selfScores, teacher: props.teacherScores }
+function scoreFor(key: 'self' | 'teacher', criterionId: string): number | undefined {
+  return key === 'self' ? props.selfScores[criterionId] : props.teacherScores[criterionId]
+}
 
 function validScore(criterion: Criterion, value: number | undefined): boolean {
   return criterion.levels.some(level => level.value === value)
