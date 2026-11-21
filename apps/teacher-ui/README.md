@@ -1,6 +1,6 @@
-# ViccoBoard Teacher UI (Vue 3)
+# ViccoBoard – gemeinsame Vue-Oberfläche
 
-This app is the Vue 3 + Vite front-end for ViccoBoard's teacher experience.
+Dieser Workspace enthält den historisch benannten Pfad `apps/teacher-ui`, ist aber der einzige Vue-Einstiegspunkt für die gesamte ViccoBoard-Anwendung mit Schülerverwaltung, Sport und KBR.
 
 ## Scripts
 
@@ -18,17 +18,27 @@ npm run preview
 
 [Glide](https://github.com/SrivarsanK/Glide) kann Vue-Ansichten im laufenden Vite-Entwicklungsserver visuell bearbeiten und Änderungen direkt in `.vue`-Quelldateien speichern. Das ist **kein** Bestandteil der produktiven App, des Standard-Entwicklungsstarts oder der lokalen iPad-Datei.
 
-Einrichtung auf Deinem Entwicklungsrechner, **vom ViccoBoard-Repository-Root aus** (Node.js 22 und npm 10 wie in CI):
+Glide **1.1.2** benötigt zwei lokale Prozesse: den Vite-Server mit Quellcode-Markierung auf Port 5173 und die separate Glide-Editor-CLI auf Port 7777. Die Adresse `/__glide/` auf Port 5173 gehört **nicht** zu Version 1.1.2; Vite zeigt dort nur die normale Anwendung (gegebenenfalls mit leerer Router-Ansicht).
+
+Glide ist derzeit nicht als Dependency versioniert. Für eine lokale Installation **vom ViccoBoard-Repository-Root aus** (mit Node.js 22):
 
 ```bash
-npm ci
-npm install --no-save --no-package-lock --workspace=teacher-ui @srivarsank/glide@1.1.2
-npm run dev:glide
+npm install --save-dev --legacy-peer-deps --ignore-scripts @srivarsank/glide@1.1.2
 ```
 
-Öffne die **vom Dev-Server ausgegebene** Glide-Adresse, typischerweise `http://127.0.0.1:5173/__glide/`. Der Glide-Modus verwendet den festen Port 5173 und beendet sich bei Portbelegung, statt unbemerkt eine andere App zu bearbeiten. Für den normalen Entwicklungsstart weiterhin `npm run dev:ui` verwenden.
+Der Installationsbefehl ergänzt lokal die Root-`package.json` und `package-lock.json`; beide Dateien sind vor einem Commit zusammen zu prüfen. `--legacy-peer-deps` umgeht den bestehenden Jest-Peer-Konflikt; `--ignore-scripts` verhindert den nativen SQLite-Build, weshalb Node-SQLite-Tests danach nicht als geprüft gelten. Für eine vollständige Installation sind native Build-Werkzeuge nötig.
 
-Der `--no-save --no-package-lock`-Installationsschritt hält die experimentelle Editor-Abhängigkeit aus den gemeinsam versionierten Paketdateien heraus; nach einem erneuten `npm ci` muss Glide lokal erneut installiert werden. Glide ist auf dem **öffentlichen npm-Registry** verfügbar; eine GitHub-Packages-Anmeldung oder ein Personal Access Token ist dafür nicht erforderlich. Ohne lokale Installation schlägt `dev:glide` erwartungsgemäß fehl. Das separate `vite.glide.config.ts` ergänzt nur beim opt-in-Start den bestehenden Vue-/Tailwind-Vite-Stack um `glideSourceStamping()`.
+```bash
+# Terminal 1: ViccoBoard mit Glide-Markierung starten
+npm run dev:glide
+
+# Terminal 2: Editor starten, während Terminal 1 weiterläuft
+npx @srivarsank/glide 5173
+```
+
+Öffne **`http://localhost:7777/`** als Editor. Die normale ViccoBoard-Vorschau ist unter `http://localhost:5173/` erreichbar. Der Glide-Vite-Modus verwendet Port 5173 mit `--strictPort`, damit nicht versehentlich eine andere Anwendung bearbeitet wird. Der normale Startbefehl für ViccoBoard bleibt **`npm run dev`**.
+
+Das separate `vite.glide.config.ts` ergänzt nur beim optionalen Start die bestehende Vue-/Tailwind-Vite-Konfiguration um `glideSourceStamping()`; das Plugin stellt in Version 1.1.2 **keinen eigenen Editor auf Port 5173** bereit. Glide ist auf der öffentlichen npm-Registry verfügbar, ohne GitHub-Packages-Anmeldung.
 
 **Sicher arbeiten:** Nutze einen eigenen Git-Branch und ein frisches Browserprofil **ohne echte Schülerdaten**. Glide hat Schreibzugriff auf lokale Quelldateien; überprüfe nach jeder Bearbeitung `git diff`, erhalte OpenVue-Standardkomponenten und verhindere ungewollte Inline-Stile. Die generierte Komponentenliste und Positionsdatei werden von `.gitignore` ausgeschlossen. Der Editor ist ausschließlich für den lokalen Entwicklungsbetrieb vorgesehen; keine LAN-Freigabe aktivieren.
 
