@@ -67,7 +67,7 @@
           „Tabellenverwaltung“ importieren. Für die Sportprüfung müssen sie Messwert- oder Zeitspalten enthalten.
         </p>
         <Button label="Tabellenverwaltung öffnen" severity="secondary" text
-          @click="router.push('/subjects/sport/tables')" />
+          @click="router.push('/grading/tables')" />
       </div>
 
       <div v-if="selectedCategory" class="exam-meta">
