@@ -39,6 +39,37 @@
         </label>
       </div>
 
+      <div v-if="selectedClassId" class="app-field">
+        <p v-if="categories.length === 0" class="app-data-note" role="status">
+          Für diese Klasse ist noch keine Disziplin eingerichtet. Importierte Tabellen müssen zunächst
+          einer Disziplin zugeordnet werden.
+        </p>
+        <p class="app-data-note">Importierte Bewertungstabelle als Disziplin für diese Klasse verwenden:</p>
+        <div v-if="compatibleTables.length > 0" class="setup-grid">
+          <div class="app-field">
+            <label for="sport-exam-new-table">Bewertungstabelle</label>
+            <Select inputId="sport-exam-new-table" :modelValue="newTableId"
+              :options="tableOptions" optionLabel="label" optionValue="value"
+              placeholder="Tabelle auswählen" fluid :disabled="addingCategory"
+              @update:modelValue="selectTableForCategory" />
+          </div>
+          <div class="app-field">
+            <label for="sport-exam-measurement-type">Eingabeart</label>
+            <Select inputId="sport-exam-measurement-type" v-model="newMeasurementType"
+              :options="measurementTypeOptions" optionLabel="label" optionValue="value"
+              :disabled="addingCategory" fluid />
+          </div>
+          <Button label="Als Disziplin hinzufügen" :disabled="addingCategory || !newTableId"
+            :loading="addingCategory" @click="addTableDiscipline" />
+        </div>
+        <p v-else class="app-data-note" role="status">
+          Keine kompatible aktive Bewertungstabelle vorhanden. Tabellen lassen sich unter
+          „Tabellenverwaltung“ importieren. Für die Sportprüfung müssen sie Messwert- oder Zeitspalten enthalten.
+        </p>
+        <Button label="Tabellenverwaltung öffnen" severity="secondary" text
+          @click="router.push('/grading/tables')" />
+      </div>
+
       <div v-if="selectedCategory" class="exam-meta">
         <strong>{{ categoryLabel(selectedCategory) }}</strong>
         <template v-if="isCriteriaAssessment">
@@ -192,7 +223,7 @@ import {
   AttendanceStatus,
   calculateAgeFromDateOfBirth,
   type ClassGroup,
-  type Sport,
+  Sport,
   type SportStudentProfile,
   type Student
 } from '@viccoboard/core'
@@ -220,6 +251,27 @@ const classOptions = computed(() => [
   }))
 ])
 const categories = ref<Sport.GradeCategory[]>([])
+const tables = ref<Sport.TableDefinition[]>([])
+const newTableId = ref('')
+const newMeasurementType = ref<'number' | 'time'>('number')
+const addingCategory = ref(false)
+const measurementTypeOptions = [
+  { label: 'Messwert (Zahl)', value: 'number' },
+  { label: 'Zeit (Sekunden)', value: 'time' }
+]
+const measurementKeys = new Set([
+  'measurement', 'exactValue', 'exact_value', 'minValue', 'min_value',
+  'maxValue', 'max_value', 'time', 'minTime', 'min_time', 'maxTime', 'max_time'
+])
+const compatibleTables = computed(() => tables.value.filter(table =>
+  table.active !== false && table.entries.some(entry =>
+    Object.keys(entry.key).some(key => measurementKeys.has(key))
+  )
+))
+const tableOptions = computed(() => compatibleTables.value.map(table => ({
+  label: table.name,
+  value: table.id
+})))
 const categoryOptions = computed(() => [
   { label: 'Disziplin auswählen', value: '' },
   ...categories.value.map(category => ({ label: categoryLabel(category), value: category.id }))
@@ -272,9 +324,65 @@ const canSave = computed(() => {
 })
 
 onMounted(async () => {
-  classes.value = (await sportBridge.classGroupRepository.findAll())
-    .filter((classGroup) => !classGroup.archived)
+  try {
+    const [classGroups, tableDefinitions] = await Promise.all([
+      sportBridge.classGroupRepository.findAll(),
+      sportBridge.tableDefinitionRepository.findAll()
+    ])
+    classes.value = classGroups.filter(classGroup => !classGroup.archived)
+    tables.value = tableDefinitions
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'Klassen und Tabellen konnten nicht geladen werden.')
+  }
 })
+
+function selectTableForCategory(tableId: string): void {
+  newTableId.value = tableId
+  const table = compatibleTables.value.find(candidate => candidate.id === tableId)
+  newMeasurementType.value = table?.dimensions.some(dimension =>
+    ['time', 'minTime', 'min_time', 'maxTime', 'max_time'].includes(dimension.name)
+  ) ? 'time' : 'number'
+}
+
+async function addTableDiscipline(): Promise<void> {
+  const table = compatibleTables.value.find(candidate => candidate.id === newTableId.value)
+  if (!selectedClassId.value || !table || addingCategory.value) return
+
+  const existing = categories.value.find(candidate =>
+    candidate.configuration.type === 'performance' &&
+    candidate.configuration.gradingTable === table.id
+  )
+  if (existing) {
+    selectedCategoryId.value = existing.id
+    await loadCategory()
+    toast.info('Diese Tabelle ist bereits als Disziplin für die Klasse eingerichtet.')
+    return
+  }
+
+  addingCategory.value = true
+  try {
+    const created = await sportBridge.createGradeCategoryUseCase.execute({
+      classGroupId: selectedClassId.value,
+      name: table.name,
+      type: Sport.GradeCategoryType.Performance,
+      weight: 0,
+      configuration: {
+        type: 'performance',
+        gradingTable: table.id,
+        measurementType: newMeasurementType.value,
+        measurementLabel: table.name
+      }
+    })
+    categories.value.push(created)
+    selectedCategoryId.value = created.id
+    await loadCategory()
+    toast.success('Disziplin für diese Klasse angelegt. Die Bewertungstabelle ist verknüpft.')
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : 'Die Disziplin konnte nicht angelegt werden.')
+  } finally {
+    addingCategory.value = false
+  }
+}
 
 async function loadClassContext(): Promise<void> {
   selectedCategoryId.value = ''
