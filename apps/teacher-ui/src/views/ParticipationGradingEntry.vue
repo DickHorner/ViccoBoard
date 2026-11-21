@@ -143,7 +143,15 @@
         <h3>Schüler auswählen</h3>
         <div v-for="student in students" :key="student.id" class="student-list-row">
           <span>{{ student.firstName }} {{ student.lastName }}</span>
-          <span class="app-data-note">{{ complete(student.id) ? 'Bewertet' : 'Offen' }}</span>
+          <span class="app-data-note">
+            <template v-if="complete(student.id)">
+              <template v-if="assessment(student.id).refused">
+                Leistungsverweigerung · Note {{ grade(student.id) }}
+              </template>
+              <template v-else>Note {{ grade(student.id) }} · {{ total(student.id).toFixed(1) }} Punkte</template>
+            </template>
+            <template v-else>Offen</template>
+          </span>
           <Button label="Bewertungsbogen öffnen" severity="secondary" outlined
             :disabled="saving || unsaved.size > 0" @click="selectedStudentId = student.id" />
         </div>
