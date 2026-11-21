@@ -236,7 +236,7 @@
         <input id="participation-handoff-pin" v-model="pinDraft" type="password"
           inputmode="numeric" autocomplete="off" pattern="[0-9]{4,6}" maxlength="6" required />
         <Button type="submit" label="iPad übergeben" :disabled="!/^[0-9]{4,6}$/.test(pinDraft)" />
-        <Button label="Abbrechen" severity="secondary" outlined @click="handoffStudent = null" />
+        <Button type="button" label="Abbrechen" severity="secondary" outlined @click="handoffStudent = null" />
       </form>
     </div>
     <ParticipationSelfAssessmentHandoff v-if="handoffStudent && handoffPin"
@@ -337,7 +337,7 @@ const rubric = computed(() => category.value?.configuration.type === 'verbal'
 const criteria = computed(() => rubric.value.criteria)
 
 onBeforeRouteLeave(() =>
-  unsaved.value.size === 0 || window.confirm('Ungespeicherte Mitarbeitsbewertungen verwerfen?')
+  !handoffPin.value && (unsaved.value.size === 0 || window.confirm('Ungespeicherte Mitarbeitsbewertungen verwerfen?'))
 )
 
 onMounted(async () => {
