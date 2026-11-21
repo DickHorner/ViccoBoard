@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Button from 'openvue/button'
 import type { Sport } from '@viccoboard/core'
 
@@ -91,6 +91,23 @@ const complete = computed(() =>
 const saving = ref(false)
 const error = ref('')
 const unlockPin = ref('')
+
+let app: HTMLElement | null = null
+let wasInert = false
+let previousOverflow = ''
+
+onMounted(() => {
+  app = document.getElementById('app')
+  wasInert = app?.hasAttribute('inert') ?? false
+  app?.setAttribute('inert', '')
+  previousOverflow = document.body.style.overflow
+  document.body.style.overflow = 'hidden'
+})
+
+onBeforeUnmount(() => {
+  if (app && !wasInert) app.removeAttribute('inert')
+  document.body.style.overflow = previousOverflow
+})
 
 function setScore(id: string, value: number): void {
   selfScores.value = { ...selfScores.value, [id]: value }
