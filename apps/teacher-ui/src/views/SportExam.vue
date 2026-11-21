@@ -54,15 +54,26 @@
               @update:modelValue="selectTableForCategory" />
           </div>
           <div class="app-field">
-            <label for="sport-exam-measurement-type">Eingabeart</label>
-            <Select inputId="sport-exam-measurement-type" v-model="newMeasurementType"
-              :options="measurementTypeOptions" optionLabel="label" optionValue="value"
-              :disabled="addingCategory" fluid />
+            <label for="sport-exam-new-discipline">Disziplin aus der Tabelle</label>
+            <Select inputId="sport-exam-new-discipline" v-model="newDisciplineIndex"
+              :options="disciplineOptions" optionLabel="label" optionValue="value"
+              placeholder="Disziplin auswählen" :disabled="addingCategory || disciplineOptions.length === 0" fluid />
           </div>
-          <Button label="Als Disziplin hinzufügen" :disabled="addingCategory || !newTableId"
+          <Button label="Als Disziplin hinzufügen" :disabled="addingCategory || !selectedDiscipline"
             :loading="addingCategory" @click="addTableDiscipline" />
         </div>
-        <p v-else class="app-data-note" role="status">
+        <p v-if="missingGradeLevel" class="warning" role="status">
+          Diese Tabelle enthält jahrgangsabhängige Noten. Bitte zuerst eine Klassenstufe
+          in den Klasseneinstellungen hinterlegen.
+        </p>
+        <p v-else-if="newTableId && disciplineOptions.length === 0" class="app-data-note" role="status">
+          Keine passenden Disziplinen für die Klassenstufe {{ classGradeLevel ?? 'ohne Angabe' }} in dieser Tabelle.
+        </p>
+        <p v-else-if="selectedDiscipline" class="app-data-note">
+          Eingabeart: {{ selectedDiscipline.measurementType === 'time' ? 'Zeit (Sekunden)' : 'Messwert (Zahl)' }}
+        </p>
+        <p v-else-if="newTableId" class="app-data-note">Wähle eine Disziplin aus der Sammeltabelle.</p>
+        <p v-else-if="compatibleTables.length === 0" class="app-data-note" role="status">
           Keine kompatible aktive Bewertungstabelle vorhanden. Tabellen lassen sich unter
           „Tabellenverwaltung“ importieren. Für die Sportprüfung müssen sie Messwert- oder Zeitspalten enthalten.
         </p>
@@ -253,25 +264,37 @@ const classOptions = computed(() => [
 const categories = ref<Sport.GradeCategory[]>([])
 const tables = ref<Sport.TableDefinition[]>([])
 const newTableId = ref('')
-const newMeasurementType = ref<'number' | 'time'>('number')
+const newDisciplineIndex = ref<number | null>(null)
 const addingCategory = ref(false)
-const measurementTypeOptions = [
-  { label: 'Messwert (Zahl)', value: 'number' },
-  { label: 'Zeit (Sekunden)', value: 'time' }
-]
-const measurementKeys = new Set([
-  'measurement', 'exactValue', 'exact_value', 'minValue', 'min_value',
-  'maxValue', 'max_value', 'time', 'minTime', 'min_time', 'maxTime', 'max_time'
-])
 const compatibleTables = computed(() => tables.value.filter(table =>
-  table.active !== false && table.entries.some(entry =>
-    Object.keys(entry.key).some(key => measurementKeys.has(key))
-  )
+  table.active !== false && sportBridge.performanceTableGradingService.listDisciplines(table).length > 0
 ))
 const tableOptions = computed(() => compatibleTables.value.map(table => ({
   label: table.name,
   value: table.id
 })))
+const classGradeLevel = computed(() =>
+  classes.value.find(group => group.id === selectedClassId.value)?.gradeLevel
+)
+const newTable = computed(() => compatibleTables.value.find(table => table.id === newTableId.value))
+const missingGradeLevel = computed(() =>
+  !!newTable.value?.entries.some(entry => entry.key.gradeLevel !== undefined) &&
+  classGradeLevel.value === undefined
+)
+const availableDisciplines = computed(() => newTable.value && !missingGradeLevel.value
+  ? sportBridge.performanceTableGradingService.listDisciplines(newTable.value, classGradeLevel.value)
+  : []
+)
+const disciplineOptions = computed(() => availableDisciplines.value.map((item, index) => ({
+  label: (item.discipline ?? newTable.value?.name ?? 'Leistung') + ' · ' +
+    (item.tableMeasurementType && item.tableMeasurementType !== item.measurementType
+      ? item.tableMeasurementType
+      : item.measurementType === 'time' ? 'Zeit' : 'Messwert'),
+  value: index
+})))
+const selectedDiscipline = computed(() =>
+  newDisciplineIndex.value === null ? null : availableDisciplines.value[newDisciplineIndex.value] ?? null
+)
 const categoryOptions = computed(() => [
   { label: 'Disziplin auswählen', value: '' },
   ...categories.value.map(category => ({ label: categoryLabel(category), value: category.id }))
@@ -338,24 +361,26 @@ onMounted(async () => {
 
 function selectTableForCategory(tableId: string): void {
   newTableId.value = tableId
-  const table = compatibleTables.value.find(candidate => candidate.id === tableId)
-  newMeasurementType.value = table?.dimensions.some(dimension =>
-    ['time', 'minTime', 'min_time', 'maxTime', 'max_time'].includes(dimension.name)
-  ) ? 'time' : 'number'
+  newDisciplineIndex.value = null
+  if (availableDisciplines.value.length === 1) newDisciplineIndex.value = 0
 }
 
 async function addTableDiscipline(): Promise<void> {
-  const table = compatibleTables.value.find(candidate => candidate.id === newTableId.value)
-  if (!selectedClassId.value || !table || addingCategory.value) return
+  const table = newTable.value
+  const discipline = selectedDiscipline.value
+  if (!selectedClassId.value || !table || !discipline || addingCategory.value) return
 
   const existing = categories.value.find(candidate =>
     candidate.configuration.type === 'performance' &&
-    candidate.configuration.gradingTable === table.id
+    candidate.configuration.gradingTable === table.id &&
+    candidate.configuration.discipline === discipline.discipline &&
+    candidate.configuration.measurementType === discipline.measurementType &&
+    candidate.configuration.tableMeasurementType === discipline.tableMeasurementType
   )
   if (existing) {
     selectedCategoryId.value = existing.id
     await loadCategory()
-    toast.info('Diese Tabelle ist bereits als Disziplin für die Klasse eingerichtet.')
+    toast.info('Diese Disziplin ist für die Klasse bereits eingerichtet.')
     return
   }
 
@@ -363,14 +388,18 @@ async function addTableDiscipline(): Promise<void> {
   try {
     const created = await sportBridge.createGradeCategoryUseCase.execute({
       classGroupId: selectedClassId.value,
-      name: table.name,
+      name: discipline.discipline
+        ? discipline.discipline + ' · ' + (discipline.measurementType === 'time' ? 'Zeit' : 'Messwert')
+        : table.name,
       type: Sport.GradeCategoryType.Performance,
       weight: 0,
       configuration: {
         type: 'performance',
         gradingTable: table.id,
-        measurementType: newMeasurementType.value,
-        measurementLabel: table.name
+        discipline: discipline.discipline,
+        tableMeasurementType: discipline.tableMeasurementType,
+        measurementType: discipline.measurementType,
+        measurementLabel: discipline.measurementType === 'time' ? 'Zeit' : 'Messwert'
       }
     })
     categories.value.push(created)
@@ -385,6 +414,7 @@ async function addTableDiscipline(): Promise<void> {
 }
 
 async function loadClassContext(): Promise<void> {
+  newDisciplineIndex.value = null
   selectedCategoryId.value = ''
   selectedCategory.value = null
   selectedTable.value = null
@@ -530,6 +560,8 @@ async function loadRoster(): Promise<void> {
 
 function categoryLabel(category: Sport.GradeCategory): string {
   if (category.configuration.type !== 'performance') return category.name
+  if (!category.configuration.sport && category.configuration.discipline &&
+      category.name.startsWith(category.configuration.discipline + ' · ')) return category.name
   const parts = [category.configuration.sport, category.configuration.discipline]
     .filter((value): value is string => Boolean(value))
   return parts.length > 0 ? `${parts.join(' · ')} — ${category.name}` : category.name
@@ -645,7 +677,7 @@ function buildContext(student: Student): Record<string, unknown> {
     gradeLevel: config?.gradeLevel ?? classGroup?.gradeLevel,
     sport: config?.sport,
     discipline: config?.discipline,
-    measurementType: config?.measurementType,
+    measurementType: config?.tableMeasurementType ?? config?.measurementType,
     normalization: config?.normalization ?? 'raw'
   }
 }

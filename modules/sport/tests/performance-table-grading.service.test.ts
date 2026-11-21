@@ -79,4 +79,58 @@ describe('PerformanceTableGradingService', () => {
       })
     ).toThrow('No matching grading table entry');
   });
+  test('discovers distinct class-specific disciplines within one composite table', () => {
+    const table = createTable([
+      { key: { discipline: '100 m Sprint', gradeLevel: 7, gender: 'f', measurementType: 'time', maxTime: 16 }, value: 1 },
+      { key: { discipline: '100 m Sprint', gradeLevel: 9, gender: 'f', measurementType: 'time', maxTime: 17 }, value: 1 },
+      { key: { discipline: '100 m Sprint', gradeLevel: 9, gender: 'm', measurementType: 'time', maxTime: 16 }, value: 1 },
+      { key: { discipline: 'Weitsprung', gradeLevel: 9, gender: 'm', measurementType: 'distance', minValue: 4 }, value: 1 },
+      { key: { discipline: 'Weitsprung', gradeLevel: 10, gender: 'm', measurementType: 'distance', minValue: 5 }, value: 1 },
+      { key: { discipline: 'Nur Kontext', gradeLevel: 9 }, value: 1 }
+    ]);
+
+    expect(service.listDisciplines(table, 9)).toEqual([
+      { discipline: '100 m Sprint', measurementType: 'time', tableMeasurementType: 'time' },
+      { discipline: 'Weitsprung', measurementType: 'number', tableMeasurementType: 'distance' }
+    ]);
+    expect(service.listDisciplines(table, 7)).toEqual([
+      { discipline: '100 m Sprint', measurementType: 'time', tableMeasurementType: 'time' }
+    ]);
+
+    expect(service.calculateGrade({
+      value: 16.5,
+      table,
+      measurementType: 'time',
+      context: { discipline: '100 m Sprint', gradeLevel: 9, gender: 'f', measurementType: 'time' }
+    }).grade).toBe(1);
+    expect(service.calculateGrade({
+      value: 4.2,
+      table,
+      measurementType: 'number',
+      context: { discipline: 'Weitsprung', gradeLevel: 9, gender: 'm', measurementType: 'distance' }
+    }).grade).toBe(1);
+    expect(() => service.calculateGrade({
+      value: 4.2,
+      table,
+      measurementType: 'number',
+      context: { discipline: 'Weitsprung', gradeLevel: 9, gender: 'm', measurementType: 'number' }
+    })).toThrow('No matching grading table entry');
+  });
+
+  test('retains ungrouped tables and keeps different measurement types distinct', () => {
+    const ungrouped = createTable([{ key: { maxTime: 12 }, value: 1 }]);
+    expect(service.listDisciplines(ungrouped, 9)).toEqual([
+      { discipline: undefined, measurementType: 'time', tableMeasurementType: undefined }
+    ]);
+
+    const mixed = createTable([
+      { key: { discipline: 'Station', measurementType: 'time', maxTime: 20 }, value: 1 },
+      { key: { discipline: 'Station', measurementType: 'distance', minValue: 3 }, value: 1 }
+    ]);
+    expect(service.listDisciplines(mixed)).toEqual([
+      { discipline: 'Station', measurementType: 'time', tableMeasurementType: 'time' },
+      { discipline: 'Station', measurementType: 'number', tableMeasurementType: 'distance' }
+    ]);
+  });
+
 });
