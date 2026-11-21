@@ -23,6 +23,20 @@
           :options="templateOptions" optionLabel="label" optionValue="value"
           placeholder="Vorlage auswählen" :disabled="loading || saving" fluid />
       </div>
+      <Button v-if="selectedTemplateId" label="Vorlage ansehen" severity="secondary" outlined
+        @click="previewTemplateId = previewTemplateId === selectedTemplateId ? '' : selectedTemplateId" />
+      <section v-if="previewTemplate" class="app-card rubric" aria-label="Rastervorschau">
+        <h3>{{ previewTemplate.name }} – Vorschau</h3>
+        <p v-for="criterion in previewTemplate.rubric.criteria" :key="criterion.id">
+          <strong>{{ criterion.label }}</strong>: {{ criterion.description }}
+          <span v-for="level in criterion.levels" :key="level.value" class="preview-level">
+            {{ level.value }} Punkte: {{ level.description }}
+          </span>
+        </p>
+        <p>Notenschwellen: {{ previewTemplate.rubric.gradeThresholds.map(boundary =>
+          `Note ${boundary.grade} ab ${boundary.minPoints}`).join(' · ') }}
+        </p>
+      </section>
       <Button label="Standardraster als Vorlage speichern" severity="secondary" outlined
         :disabled="loading || saving || hasDefaultTemplate" @click="saveDefaultTemplate" />
       <Button label="Ausgewählte Vorlage löschen" severity="danger" text
@@ -125,7 +139,23 @@
 
       <p v-if="students.length === 0" class="app-data-note">Dieser Klasse sind keine Schüler zugeordnet.</p>
 
-      <section v-for="student in students" :key="student.id" class="app-card student-card">
+      <section v-if="!selectedStudent" class="app-card student-card">
+        <h3>Schüler auswählen</h3>
+        <div v-for="student in students" :key="student.id" class="student-list-row">
+          <span>{{ student.firstName }} {{ student.lastName }}</span>
+          <span class="app-data-note">{{ complete(student.id) ? 'Bewertet' : 'Offen' }}</span>
+          <Button label="Bewertungsbogen öffnen" severity="secondary" outlined
+            :disabled="saving || unsaved.size > 0" @click="selectedStudentId = student.id" />
+        </div>
+      </section>
+
+      <section v-for="student in selectedStudent ? [selectedStudent] : []" :key="student.id" class="app-card student-card">
+        <div class="app-actions-row">
+          <Button label="Zur Schülerliste" severity="secondary" outlined
+            :disabled="saving || unsaved.size > 0" @click="selectedStudentId = ''" />
+          <Button label="Selbsteinschätzung starten / iPad übergeben" :disabled="saving || !!assessment(student.id).refused"
+            @click="prepareHandoff(student)" />
+        </div>
         <div class="student-heading">
           <h3>{{ student.firstName }} {{ student.lastName }}</h3>
           <span class="app-data-note">
@@ -197,6 +227,24 @@
         </div>
       </section>
     </template>
+    <div v-if="handoffStudent && !handoffPin" class="app-card pin-setup" role="dialog"
+      aria-modal="true" aria-label="Lehrkraft-PIN festlegen">
+      <h2>Selbsteinschätzung vorbereiten</h2>
+      <p>Lege eine temporäre PIN fest. Die Schüleransicht wird erst anschließend geöffnet.</p>
+      <form @submit.prevent="startHandoff">
+        <label for="participation-handoff-pin">Lehrkraft-PIN (4–6 Ziffern)</label>
+        <input id="participation-handoff-pin" v-model="pinDraft" type="password"
+          inputmode="numeric" autocomplete="off" pattern="[0-9]{4,6}" maxlength="6" required />
+        <Button type="submit" label="iPad übergeben" :disabled="!/^[0-9]{4,6}$/.test(pinDraft)" />
+        <Button type="button" label="Abbrechen" severity="secondary" outlined @click="handoffStudent = null" />
+      </form>
+    </div>
+    <ParticipationSelfAssessmentHandoff v-if="handoffStudent && handoffPin"
+      :student-name="`${handoffStudent.firstName} ${handoffStudent.lastName}`"
+      :criteria="criteria" :teacher-scores="assessment(handoffStudent.id).teacherAssessment"
+      :initial-scores="assessment(handoffStudent.id).selfAssessment" :pin="handoffPin"
+      :save-assessment="scores => saveHandoff(handoffStudent!.id, scores)"
+      @close="closeHandoff" />
   </section>
 </template>
 
@@ -208,6 +256,7 @@ import InputNumber from 'openvue/inputnumber'
 import Select from 'openvue/select'
 import { Sport, type ClassGroup, type Student } from '@viccoboard/core'
 import type { ParticipationRubricTemplate } from '@viccoboard/sport'
+import ParticipationSelfAssessmentHandoff from '../components/ParticipationSelfAssessmentHandoff.vue'
 import { getSportBridge, initializeSportBridge } from '../composables/useSportBridge'
 import { getStudentsBridge, initializeStudentsBridge } from '../composables/useStudentsBridge'
 import {
@@ -251,6 +300,13 @@ const categoryOptions = computed(() => participationCategories.value.map(item =>
 const templates = ref<ParticipationRubricTemplate[]>([])
 const selectedTemplateId = ref('')
 const templateStatus = ref('')
+const previewTemplateId = ref('')
+const previewTemplate = computed(() => templates.value.find(item => item.id === previewTemplateId.value))
+const selectedStudentId = ref('')
+const selectedStudent = computed(() => students.value.find(item => item.id === selectedStudentId.value))
+const handoffStudent = ref<Student | null>(null)
+const handoffPin = ref('')
+const pinDraft = ref('')
 const templateOptions = computed(() => templates.value.map(template => ({
   label: template.name,
   value: template.id
@@ -281,7 +337,7 @@ const rubric = computed(() => category.value?.configuration.type === 'verbal'
 const criteria = computed(() => rubric.value.criteria)
 
 onBeforeRouteLeave(() =>
-  unsaved.value.size === 0 || window.confirm('Ungespeicherte Mitarbeitsbewertungen verwerfen?')
+  !handoffPin.value && (unsaved.value.size === 0 || window.confirm('Ungespeicherte Mitarbeitsbewertungen verwerfen?'))
 )
 
 onMounted(async () => {
@@ -314,6 +370,7 @@ function isParticipationCategory(candidate: Sport.GradeCategory): boolean {
 }
 
 async function selectClass(): Promise<void> {
+  selectedStudentId.value = ''
   categoryId.value = ''
   category.value = null
   participationCategories.value = []
@@ -555,6 +612,7 @@ function changeAssessmentDay(event: Event): void {
 
 async function load(): Promise<void> {
   if (!categoryId.value) return
+  selectedStudentId.value = ''
   loading.value = true
   error.value = null
   category.value = null
@@ -595,6 +653,34 @@ async function load(): Promise<void> {
   } finally {
     loading.value = false
   }
+}
+
+function prepareHandoff(student: Student): void {
+  handoffStudent.value = student
+  handoffPin.value = ''
+  pinDraft.value = ''
+}
+
+function startHandoff(): void {
+  if (!/^[0-9]{4,6}$/.test(pinDraft.value)) return
+  handoffPin.value = pinDraft.value
+  pinDraft.value = ''
+}
+
+function closeHandoff(): void {
+  handoffPin.value = ''
+  handoffStudent.value = null
+}
+
+async function saveHandoff(id: string, scores: Record<string, number>): Promise<boolean> {
+  const previous = assessment(id)
+  const next = {
+    ...previous,
+    selfAssessment: { ...scores }
+  }
+  assessments.value = new Map(assessments.value).set(id, next)
+  unsaved.value = new Set(unsaved.value).add(id)
+  return save(id)
 }
 
 async function save(id: string): Promise<boolean> {
@@ -669,6 +755,12 @@ async function saveAll(): Promise<void> {
 .rubric details { color: var(--color-muted); }
 .rubric summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
 .student-card { padding: 1rem; display: grid; gap: 1rem; }
+.student-list-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding: .5rem 0; border-bottom: 1px solid var(--surface-border); }
+.student-list-row > span:first-child { flex: 1; min-width: 150px; }
+.preview-level { display: block; padding: .25rem 0 .25rem 1rem; }
+.pin-setup { position: fixed; inset: 0; z-index: 1900; background: var(--p-content-background, #fff); padding: 2rem; overflow: auto; }
+.pin-setup form { display: grid; gap: .75rem; max-width: 350px; }
+.pin-setup input { min-height: 44px; padding: .5rem; }
 .student-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
 .assessment-grid { display: grid; grid-template-columns: minmax(170px, 1fr) 95px 105px; gap: .5rem; align-items: center; }
 .criterion-details, .criterion-details label { display: grid; gap: .15rem; }
