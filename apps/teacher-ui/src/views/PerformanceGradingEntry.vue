@@ -42,7 +42,7 @@
 
           <div class="form-group">
             <label for="measurement-type">Eingabeart</label>
-            <select id="measurement-type" v-model="measurementType" class="form-select" @change="recalculateAll">
+            <select id="measurement-type" v-model="measurementType" class="form-select" @change="onMeasurementTypeChange">
               <option value="number">Zahl</option>
               <option value="time">Zeit</option>
             </select>
@@ -85,7 +85,7 @@
 
           <div class="form-group">
             <label for="grading-table">Bewertungstabelle</label>
-            <select id="grading-table" v-model="selectedTableId" class="form-select" @change="recalculateAll">
+            <select id="grading-table" v-model="selectedTableId" class="form-select" @change="onGradingTableChange">
               <option value="">Tabelle auswählen...</option>
               <option v-for="table in tables" :key="table.id" :value="table.id">
                 {{ table.name }}{{ table.active === false ? ' (inaktiv)' : '' }}
@@ -224,6 +224,7 @@ const students = ref<Student[]>([])
 const tables = ref<Sport.TableDefinition[]>([])
 const selectedTableId = ref('')
 const measurementType = ref<'number' | 'time'>('number')
+const tableMeasurementType = ref<string | undefined>(undefined)
 const measurementLabel = ref('Leistung')
 const measurementUnit = ref('')
 const sportName = ref('')
@@ -257,6 +258,7 @@ async function loadData(): Promise<void> {
     const config = loadedCategory.configuration as Sport.PerformanceGradingConfig
     selectedTableId.value = config.gradingTable ?? ''
     measurementType.value = config.measurementType
+    tableMeasurementType.value = config.tableMeasurementType
     measurementLabel.value = config.measurementLabel
     measurementUnit.value = config.unit ?? ''
     sportName.value = config.sport ?? ''
@@ -370,7 +372,7 @@ function buildContext(student: Student): Record<string, unknown> {
     gradeLevel: gradeLevel.value,
     sport: sportName.value.trim() || undefined,
     discipline: disciplineName.value.trim() || undefined,
-    measurementType: measurementType.value,
+    measurementType: tableMeasurementType.value ?? measurementType.value,
     normalization: normalization.value
   }
 }
@@ -401,6 +403,16 @@ function calculateGrade(student: Student, rawValue: string): string | number | u
   } catch {
     return undefined
   }
+}
+
+function onMeasurementTypeChange(): void {
+  tableMeasurementType.value = undefined
+  recalculateAll()
+}
+
+function onGradingTableChange(): void {
+  tableMeasurementType.value = undefined
+  recalculateAll()
 }
 
 function onValueChange(student: Student, rawValue: string): void {
@@ -447,6 +459,7 @@ async function saveConfiguration(): Promise<void> {
         type: 'performance',
         gradingTable: selectedTableId.value || undefined,
         measurementType: measurementType.value,
+        tableMeasurementType: tableMeasurementType.value,
         measurementLabel: measurementLabel.value.trim(),
         unit: measurementUnit.value.trim() || undefined,
         sport: sportName.value.trim() || undefined,
