@@ -18,17 +18,30 @@ npm run preview
 
 [Glide](https://github.com/SrivarsanK/Glide) kann Vue-Ansichten im laufenden Vite-Entwicklungsserver visuell bearbeiten und Änderungen direkt in `.vue`-Quelldateien speichern. Das ist **kein** Bestandteil der produktiven App, des Standard-Entwicklungsstarts oder der lokalen iPad-Datei.
 
-Einrichtung auf Deinem Entwicklungsrechner, **vom ViccoBoard-Repository-Root aus** (Node.js 22 und npm 10 wie in CI):
+Einrichtung und Start unter **Windows 11 und Linux** – jeweils vom Repository-Root
+(Node.js 22 und npm 10 wie in CI):
 
 ```bash
 npm ci
-npm install --no-save --no-package-lock --workspace=teacher-ui @srivarsank/glide@1.1.2
 npm run dev:glide
 ```
 
-Öffne die **vom Dev-Server ausgegebene** Glide-Adresse, typischerweise `http://127.0.0.1:5173/__glide/`. Der Glide-Modus verwendet den festen Port 5173 und beendet sich bei Portbelegung, statt unbemerkt eine andere App zu bearbeiten. Für den normalen Entwicklungsstart weiterhin `npm run dev:ui` verwenden.
+Öffne anschließend **http://127.0.0.1:7777/**. Der Befehl startet zwei lokale
+Entwicklungsprozesse: den Vite-Server mit Glide-Quellpositionsmarkierung auf
+`127.0.0.1:5173` und den separaten Glide-Editor auf Port 7777. Beende beide mit
+`Ctrl+C`. Sind die benötigten Ports belegt, muss der fremde Prozess zuerst beendet werden;
+Glide darf nicht unbeabsichtigt eine andere App bearbeiten.
 
-Der `--no-save --no-package-lock`-Installationsschritt hält die experimentelle Editor-Abhängigkeit aus den gemeinsam versionierten Paketdateien heraus; nach einem erneuten `npm ci` muss Glide lokal erneut installiert werden. Glide ist auf dem **öffentlichen npm-Registry** verfügbar; eine GitHub-Packages-Anmeldung oder ein Personal Access Token ist dafür nicht erforderlich. Ohne lokale Installation schlägt `dev:glide` erwartungsgemäß fehl. Das separate `vite.glide.config.ts` ergänzt nur beim opt-in-Start den bestehenden Vue-/Tailwind-Vite-Stack um `glideSourceStamping()`.
+Die Version `@srivarsank/glide@1.1.2` ist als **exakte Entwicklungsabhängigkeit**
+des `teacher-ui`-Workspaces fixiert und wird mit dem gemeinsamen
+`package-lock.json` installiert. Eine zweite `npm install --no-save`-Aktion
+ist nicht mehr nötig. Das Paket stammt aus dem öffentlichen npm-Registry;
+ein GitHub-PAT oder eine GitHub-Packages-Konfiguration ist dafür nicht erforderlich.
+
+Für die reguläre Entwicklung weiterhin `npm run dev:ui` verwenden. Dieser
+Standardstart verwendet `vite.config.ts` ohne Glide-Plugin. Ebenso bleibt
+die lokale iPad-/Produktionsausgabe ohne Glide-Editor oder Laufzeitserver. Das
+separate `vite.glide.config.ts` wird ausschließlich für `dev:glide` geladen.
 
 **Sicher arbeiten:** Nutze einen eigenen Git-Branch und ein frisches Browserprofil **ohne echte Schülerdaten**. Glide hat Schreibzugriff auf lokale Quelldateien; überprüfe nach jeder Bearbeitung `git diff`, erhalte OpenVue-Standardkomponenten und verhindere ungewollte Inline-Stile. Die generierte Komponentenliste und Positionsdatei werden von `.gitignore` ausgeschlossen. Der Editor ist ausschließlich für den lokalen Entwicklungsbetrieb vorgesehen; keine LAN-Freigabe aktivieren.
 

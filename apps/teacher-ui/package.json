@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:glide": "vite --config vite.glide.config.ts --port 5173 --strictPort",
+    "dev:glide": "node scripts/dev-glide.mjs",
     "build": "vue-tsc --noEmit -p tsconfig.app.json && vite build",
     "preview": "vite preview",
     "test": "jest",
@@ -28,6 +28,7 @@
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
+    "@srivarsank/glide": "1.1.2",
     "@tailwindcss/vite": "4.3.5",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.6",
