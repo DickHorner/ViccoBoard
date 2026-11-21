@@ -266,14 +266,8 @@ const tables = ref<Sport.TableDefinition[]>([])
 const newTableId = ref('')
 const newDisciplineIndex = ref<number | null>(null)
 const addingCategory = ref(false)
-const measurementKeys = new Set([
-  'measurement', 'exactValue', 'exact_value', 'minValue', 'min_value',
-  'maxValue', 'max_value', 'time', 'minTime', 'min_time', 'maxTime', 'max_time'
-])
 const compatibleTables = computed(() => tables.value.filter(table =>
-  table.active !== false && table.entries.some(entry =>
-    Object.keys(entry.key).some(key => measurementKeys.has(key))
-  )
+  table.active !== false && sportBridge.performanceTableGradingService.listDisciplines(table).length > 0
 ))
 const tableOptions = computed(() => compatibleTables.value.map(table => ({
   label: table.name,
