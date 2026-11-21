@@ -1,0 +1,48 @@
+# One-time lockfile regeneration in a network-enabled runner. Delete after use.
+name: Glide lockfile bootstrap
+on:
+  push:
+    branches:
+      - chore/glide-reproducible-windows-linux-20261121
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - name: Resolve dependencies without running package scripts
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Commit regenerated lockfile
+        run: |
+          git diff --quiet -- package-lock.json && { echo "Lockfile unchanged"; exit 1; }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore(glide): regenerate npm lockfile with pinned editor"
+          git push origin HEAD:refs/heads/chore/glide-reproducible-windows-linux-20261121
+      - name: Verify clean install
+        run: npm ci
+      - name: Verify portable launcher syntax
+        run: node --check apps/teacher-ui/scripts/dev-glide.mjs
+      - name: Smoke-test local editor startup
+        run: |
+          npm run dev:glide > /tmp/viccoboard-glide.log 2>&1 &
+          editor_pid=$!
+          trap 'kill "$editor_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for attempt in $(seq 1 80); do
+            if curl --fail --silent http://127.0.0.1:5173/ --output /dev/null &&
+               curl --fail --silent http://127.0.0.1:7777/ --output /dev/null; then
+              ready=1
+              break
+            fi
+            sleep 1
+          done
+          cat /tmp/viccoboard-glide.log
+          test "$ready" -eq 1
