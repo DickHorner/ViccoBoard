@@ -12,6 +12,12 @@ export interface PerformanceTableGradingResult {
   value: number;
 }
 
+export interface PerformanceTableDiscipline {
+  discipline?: string;
+  measurementType: 'number' | 'time';
+  tableMeasurementType?: string;
+}
+
 const toNumber = (value: unknown): number | null => {
   if (value === undefined || value === null || value === '') return null;
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -42,6 +48,40 @@ const PERFORMANCE_KEYS = new Set([
 ]);
 
 export class PerformanceTableGradingService {
+  listDisciplines(table: Sport.TableDefinition, gradeLevel?: number): PerformanceTableDiscipline[] {
+    const disciplines: PerformanceTableDiscipline[] = [];
+
+    for (const entry of table.entries) {
+      const key = entry.key as Record<string, unknown>;
+      if (!Object.keys(key).some(name => PERFORMANCE_KEYS.has(name))) continue;
+      if (gradeLevel !== undefined && key.gradeLevel !== undefined &&
+          !matchesValue(key.gradeLevel, gradeLevel)) continue;
+
+      const discipline = typeof key.discipline === 'string' && key.discipline.trim()
+        ? key.discipline
+        : undefined;
+      if (key.discipline !== undefined && !discipline) continue;
+      const tableMeasurementType = typeof key.measurementType === 'string' && key.measurementType.trim()
+        ? key.measurementType
+        : undefined;
+      const measurementType = tableMeasurementType === 'time' ||
+        (tableMeasurementType === undefined && ['time', 'minTime', 'min_time', 'maxTime', 'max_time']
+          .some(name => key[name] !== undefined))
+        ? 'time'
+        : 'number';
+
+      if (disciplines.some(candidate =>
+        candidate.discipline === discipline &&
+        candidate.measurementType === measurementType &&
+        candidate.tableMeasurementType === tableMeasurementType
+      )) continue;
+
+      disciplines.push({ discipline, measurementType, tableMeasurementType });
+    }
+
+    return disciplines;
+  }
+
   calculateGrade(input: PerformanceTableGradingInput): PerformanceTableGradingResult {
     const { value, table, measurementType, context = {} } = input;
 
