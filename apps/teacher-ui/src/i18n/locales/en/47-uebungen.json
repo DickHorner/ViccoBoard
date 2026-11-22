@@ -64,6 +64,7 @@
     "schlagworte": "Tags",
     "alle-schlagworte": "All tags",
     "schlagworte-hinweis": "e.g. reaction, ball game, basketball",
-    "alle": "All"
+    "alle": "All",
+    "video-extern-hinweis": "External provider: opening the link may transfer data and display advertisements."
   }
 }
