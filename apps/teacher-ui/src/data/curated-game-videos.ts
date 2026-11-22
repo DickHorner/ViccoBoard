@@ -7,7 +7,7 @@ import type { Sport } from '@viccoboard/core'
  */
 export const CURATED_GAME_VIDEO_URLS: Readonly<Record<string, string>> = {
   'core:Kettenfangen': 'https://www.youtube.com/watch?v=kCeSqe4SE6c',
-  'core:Völkerball (klassisch)': 'https://www.uni-muenster.de/ProVision/video/SPO_K5_LK3_1DS_KLE.shtml',
+  'core:Völkerball (klassisch)': 'https://www.uni-muenster.de/ProVision/video/SPO_K5_LK3_1DS_KLE_Clip1.shtml',
   'core:Blind führen': 'https://albathek.de/spiele/blindenhund-ein-spiel-fur-kooperation-und-vertrauen',
   'core:Jonglieren lernen (mit Tüchern)': 'https://www.youtube.com/watch?v=E6k6tQu3m5s',
   'core:Progressive Muskelentspannung': 'https://www.youtube.com/watch?v=KOgjIWzCgJk',
