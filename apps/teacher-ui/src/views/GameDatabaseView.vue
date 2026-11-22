@@ -142,6 +142,7 @@
               >
                 ▶ {{ t('UEBUNGEN.video-oeffnen') }}
               </a>
+              <p class="app-data-note">{{ t('UEBUNGEN.video-extern-hinweis') }}</p>
             </div>
           </div>
         </transition>
