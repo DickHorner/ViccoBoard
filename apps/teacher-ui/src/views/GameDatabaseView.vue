@@ -269,7 +269,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import Button from 'openvue/button'
 import Dialog from 'openvue/dialog'
 import InputText from 'openvue/inputtext'
@@ -301,6 +301,10 @@ const selectedTag = ref<string | null>(null)
 const selectedPhase = ref<Sport.GamePhase | ''>('')
 const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
+
+watch([searchQuery, selectedTag, selectedPhase, selectedDifficulty, sortBy], () => {
+  playingVideoId.value = null
+})
 const phaseOptions = computed(() => [
   { label: t('UEBUNGEN.phase-erwaermung'), value: 'erwaermung' },
   { label: t('UEBUNGEN.phase-hauptteil'), value: 'hauptteil' },
