@@ -131,16 +131,32 @@
               <span class="detail-label">{{ t('UEBUNGEN.detail-hinweise') }}</span>
               <p class="detail-text">{{ entry.notes }}</p>
             </div>
-            <div v-if="safeVideoUrl(entry.videoUrl)" class="detail-section">
+            <div v-if="youtubeEmbedUrl(entry.videoUrl)" class="detail-section"
+              @click.stop @keydown.stop>
               <span class="detail-label">{{ t('UEBUNGEN.video') }}</span>
-              <a
-                class="video-link"
-                :href="safeVideoUrl(entry.videoUrl) ?? undefined"
-                target="_blank"
-                rel="noopener noreferrer"
-                @click.stop
-              >
-                ▶ {{ t('UEBUNGEN.video-oeffnen') }}
+              <div v-if="playingVideoId === entry.id" class="video-frame">
+                <iframe
+                  :src="youtubeEmbedUrl(entry.videoUrl) ?? undefined"
+                  :title="`${t('UEBUNGEN.video')}: ${entry.name}`"
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowfullscreen
+                ></iframe>
+              </div>
+              <button v-else type="button" class="video-play-button"
+                @click.stop="playingVideoId = entry.id">
+                ▶ {{ t('UEBUNGEN.video-hier-abspielen') }}
+              </button>
+              <p class="app-data-note">{{ t('UEBUNGEN.video-extern-hinweis') }}</p>
+            </div>
+            <div v-else-if="safeVideoUrl(entry.videoUrl)" class="detail-section"
+              @click.stop @keydown.stop>
+              <span class="detail-label">{{ t('UEBUNGEN.video') }}</span>
+              <p class="app-data-note">{{ t('UEBUNGEN.video-kein-embed') }}</p>
+              <a class="video-link" :href="safeVideoUrl(entry.videoUrl) ?? undefined"
+                target="_blank" rel="noopener noreferrer" @click.stop>
+                {{ t('UEBUNGEN.video-oeffnen') }}
               </a>
             </div>
           </div>
@@ -253,7 +269,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import Button from 'openvue/button'
 import Dialog from 'openvue/dialog'
 import InputText from 'openvue/inputtext'
@@ -263,6 +279,8 @@ import { useI18n } from 'vue-i18n'
 import type { Sport } from '@viccoboard/core'
 import { getSportBridge } from '../composables/useSportBridge'
 import { GAME_SEED_DATA } from '../data/game-seed-data'
+import { canBackfillBuiltInVideo, CURATED_GAME_VIDEO_URLS } from '../data/curated-game-videos'
+import { youtubeEmbedUrl } from '../utils/video-embed'
 import { METHODENFUNDGRUBE_SEED_DATA } from '../data/methodenfundgrube-seed-data'
 
 const { t } = useI18n()
@@ -272,6 +290,7 @@ const allEntries = ref<Sport.GameEntry[]>([])
 const loadError = ref<string | null>(null)
 const initializing = ref(false)
 const expandedId = ref<string | null>(null)
+const playingVideoId = ref<string | null>(null)
 const showModal = ref(false)
 const editingEntry = ref<Sport.GameEntry | null>(null)
 const modalError = ref('')
@@ -282,6 +301,10 @@ const selectedTag = ref<string | null>(null)
 const selectedPhase = ref<Sport.GamePhase | ''>('')
 const selectedDifficulty = ref<Sport.GameDifficulty | ''>('')
 const sortBy = ref<'name' | 'duration' | 'difficulty'>('name')
+
+watch([searchQuery, selectedTag, selectedPhase, selectedDifficulty, sortBy], () => {
+  playingVideoId.value = null
+})
 const phaseOptions = computed(() => [
   { label: t('UEBUNGEN.phase-erwaermung'), value: 'erwaermung' },
   { label: t('UEBUNGEN.phase-hauptteil'), value: 'hauptteil' },
@@ -401,6 +424,7 @@ function safeVideoUrl(value?: string): string | null {
 }
 
 function toggleExpand(id: string) {
+  playingVideoId.value = null
   expandedId.value = expandedId.value === id ? null : id
 }
 
@@ -449,19 +473,35 @@ async function seedBuiltIns(): Promise<void> {
   }
 
   const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingKeys.has(seed.builtinKey))
-  if (missingSeeds.length === 0) return
+  const videoBackfills = existingEntries.filter((entry) =>
+    entry.builtinKey &&
+    CURATED_GAME_VIDEO_URLS[entry.builtinKey] &&
+    canBackfillBuiltInVideo(entry)
+  )
+  if (missingSeeds.length === 0 && videoBackfills.length === 0) return
 
   initializing.value = true
   try {
+    for (const entry of videoBackfills) {
+      await bridge.gameEntryRepository.update(entry.id, {
+        videoUrl: CURATED_GAME_VIDEO_URLS[entry.builtinKey!]
+      })
+    }
+
     for (const seed of missingSeeds) {
       const legacyMatches = legacyByName.get(seed.name)
       const legacyEntry = legacyMatches?.shift()
+      const videoUrl = seed.videoUrl ?? CURATED_GAME_VIDEO_URLS[seed.builtinKey]
 
       if (legacyEntry) {
-        await bridge.gameEntryRepository.update(legacyEntry.id, { builtinKey: seed.builtinKey })
+        await bridge.gameEntryRepository.update(legacyEntry.id, {
+          builtinKey: seed.builtinKey,
+          ...(videoUrl && canBackfillBuiltInVideo(legacyEntry) ? { videoUrl } : {})
+        })
       } else {
         await bridge.gameEntryRepository.create({
           ...seed,
+          videoUrl,
           isCustom: false
         })
       }

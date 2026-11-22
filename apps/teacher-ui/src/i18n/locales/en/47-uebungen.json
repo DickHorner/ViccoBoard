@@ -64,6 +64,9 @@
     "schlagworte": "Tags",
     "alle-schlagworte": "All tags",
     "schlagworte-hinweis": "e.g. reaction, ball game, basketball",
-    "alle": "All"
+    "alle": "All",
+    "video-extern-hinweis": "Loading external videos may transfer data to the provider and show advertisements.",
+    "video-hier-abspielen": "Play video here",
+    "video-kein-embed": "This video source cannot be played directly inside ViccoBoard."
   }
 }
