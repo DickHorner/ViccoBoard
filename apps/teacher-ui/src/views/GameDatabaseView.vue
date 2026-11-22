@@ -263,6 +263,7 @@ import { useI18n } from 'vue-i18n'
 import type { Sport } from '@viccoboard/core'
 import { getSportBridge } from '../composables/useSportBridge'
 import { GAME_SEED_DATA } from '../data/game-seed-data'
+import { canBackfillBuiltInVideo, CURATED_GAME_VIDEO_URLS } from '../data/curated-game-videos'
 import { METHODENFUNDGRUBE_SEED_DATA } from '../data/methodenfundgrube-seed-data'
 
 const { t } = useI18n()
@@ -449,19 +450,35 @@ async function seedBuiltIns(): Promise<void> {
   }
 
   const missingSeeds = BUILT_IN_GAME_SEED_DATA.filter((seed) => !existingKeys.has(seed.builtinKey))
-  if (missingSeeds.length === 0) return
+  const videoBackfills = existingEntries.filter((entry) =>
+    entry.builtinKey &&
+    CURATED_GAME_VIDEO_URLS[entry.builtinKey] &&
+    canBackfillBuiltInVideo(entry)
+  )
+  if (missingSeeds.length === 0 && videoBackfills.length === 0) return
 
   initializing.value = true
   try {
+    for (const entry of videoBackfills) {
+      await bridge.gameEntryRepository.update(entry.id, {
+        videoUrl: CURATED_GAME_VIDEO_URLS[entry.builtinKey!]
+      })
+    }
+
     for (const seed of missingSeeds) {
       const legacyMatches = legacyByName.get(seed.name)
       const legacyEntry = legacyMatches?.shift()
+      const videoUrl = seed.videoUrl ?? CURATED_GAME_VIDEO_URLS[seed.builtinKey]
 
       if (legacyEntry) {
-        await bridge.gameEntryRepository.update(legacyEntry.id, { builtinKey: seed.builtinKey })
+        await bridge.gameEntryRepository.update(legacyEntry.id, {
+          builtinKey: seed.builtinKey,
+          ...(videoUrl && canBackfillBuiltInVideo(legacyEntry) ? { videoUrl } : {})
+        })
       } else {
         await bridge.gameEntryRepository.create({
           ...seed,
+          videoUrl,
           isCustom: false
         })
       }
