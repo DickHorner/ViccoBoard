@@ -12,7 +12,7 @@ describe('curated sport exercise videos', () => {
       })
     ])
 
-    expect(Object.keys(CURATED_GAME_VIDEO_URLS)).toHaveLength(7)
+    expect(Object.keys(CURATED_GAME_VIDEO_URLS)).toHaveLength(5)
     for (const [key, value] of Object.entries(CURATED_GAME_VIDEO_URLS)) {
       expect(knownKeys.has(key)).toBe(true)
       const parsed = new URL(value)
