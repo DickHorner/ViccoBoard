@@ -2,7 +2,7 @@
 
 Stand der Quellenrecherche: 22.11.2026.
 
-Die Übungsdatenbank enthält aktuell 30 Kernübungen und 120 Einträge aus der Methodenfundgrube. Die folgenden fünf direkt einbettbaren YouTube-Videos sind eine **erste kuratierte Auswahl**, kein Nachweis über die vollständige Datenbank. Die Quellseiten bzw. Videometadaten wurden auf eine fachliche Entsprechung zur gespeicherten Übungsbeschreibung geprüft. Der **vollständige audiovisuelle Inhalt** wurde nicht mit einem echten Browser abgespielt und ist vor einer endgültigen didaktischen Freigabe noch szenisch zu prüfen.
+Die Übungsdatenbank enthält aktuell 30 Kernübungen und 120 Einträge aus der Methodenfundgrube. Die folgenden fünf YouTube-Adressen mit technisch unterstütztem Einbettungsformat sind eine **erste kuratierte Auswahl**, kein Nachweis über die vollständige Datenbank. Die Quellseiten bzw. Videometadaten wurden auf eine fachliche Entsprechung zur gespeicherten Übungsbeschreibung geprüft. Der **vollständige audiovisuelle Inhalt** wurde nicht mit einem echten Browser abgespielt und ist vor einer endgültigen didaktischen Freigabe noch szenisch zu prüfen.
 
 | Interner Schlüssel | Anbieter und Videotitel / Videoseite | Fachlicher Abgleich und Grenzen |
 | --- | --- | --- |
