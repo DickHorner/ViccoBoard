@@ -131,18 +131,33 @@
               <span class="detail-label">{{ t('UEBUNGEN.detail-hinweise') }}</span>
               <p class="detail-text">{{ entry.notes }}</p>
             </div>
-            <div v-if="safeVideoUrl(entry.videoUrl)" class="detail-section">
+            <div v-if="youtubeEmbedUrl(entry.videoUrl)" class="detail-section"
+              @click.stop @keydown.stop>
               <span class="detail-label">{{ t('UEBUNGEN.video') }}</span>
-              <a
-                class="video-link"
-                :href="safeVideoUrl(entry.videoUrl) ?? undefined"
-                target="_blank"
-                rel="noopener noreferrer"
-                @click.stop
-              >
-                ▶ {{ t('UEBUNGEN.video-oeffnen') }}
-              </a>
+              <div v-if="playingVideoId === entry.id" class="video-frame">
+                <iframe
+                  :src="youtubeEmbedUrl(entry.videoUrl) ?? undefined"
+                  :title="`${t('UEBUNGEN.video')}: ${entry.name}`"
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowfullscreen
+                ></iframe>
+              </div>
+              <button v-else type="button" class="video-play-button"
+                @click.stop="playingVideoId = entry.id">
+                ▶ {{ t('UEBUNGEN.video-hier-abspielen') }}
+              </button>
               <p class="app-data-note">{{ t('UEBUNGEN.video-extern-hinweis') }}</p>
+            </div>
+            <div v-else-if="safeVideoUrl(entry.videoUrl)" class="detail-section"
+              @click.stop @keydown.stop>
+              <span class="detail-label">{{ t('UEBUNGEN.video') }}</span>
+              <p class="app-data-note">{{ t('UEBUNGEN.video-kein-embed') }}</p>
+              <a class="video-link" :href="safeVideoUrl(entry.videoUrl) ?? undefined"
+                target="_blank" rel="noopener noreferrer" @click.stop>
+                {{ t('UEBUNGEN.video-oeffnen') }}
+              </a>
             </div>
           </div>
         </transition>
@@ -265,6 +280,7 @@ import type { Sport } from '@viccoboard/core'
 import { getSportBridge } from '../composables/useSportBridge'
 import { GAME_SEED_DATA } from '../data/game-seed-data'
 import { canBackfillBuiltInVideo, CURATED_GAME_VIDEO_URLS } from '../data/curated-game-videos'
+import { youtubeEmbedUrl } from '../utils/video-embed'
 import { METHODENFUNDGRUBE_SEED_DATA } from '../data/methodenfundgrube-seed-data'
 
 const { t } = useI18n()
@@ -274,6 +290,7 @@ const allEntries = ref<Sport.GameEntry[]>([])
 const loadError = ref<string | null>(null)
 const initializing = ref(false)
 const expandedId = ref<string | null>(null)
+const playingVideoId = ref<string | null>(null)
 const showModal = ref(false)
 const editingEntry = ref<Sport.GameEntry | null>(null)
 const modalError = ref('')
@@ -403,6 +420,7 @@ function safeVideoUrl(value?: string): string | null {
 }
 
 function toggleExpand(id: string) {
+  playingVideoId.value = null
   expandedId.value = expandedId.value === id ? null : id
 }
 
