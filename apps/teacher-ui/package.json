@@ -30,17 +30,17 @@
     "@tailwindcss/vite": "4.3.5",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.6",
-    "@vitejs/plugin-vue": "^6.0.10",
+    "@vitejs/plugin-vue": "^6.0.11",
     "@vue/tsconfig": "^0.9.1",
     "@vue/vue3-jest": "^29.2.6",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
-    "jsdom": "^31.0.0",
+    "jsdom": "^31.0.1",
     "tailwindcss": "4.3.5",
     "ts-jest": "^29.4.15",
     "typescript": "^7.0.2",
-    "vite": "^8.3.6",
+    "vite": "^8.3.8",
     "vue-tsc": "^3.3.14"
   }
 }
